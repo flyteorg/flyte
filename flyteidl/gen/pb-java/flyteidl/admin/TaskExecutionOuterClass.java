@@ -49,6 +49,7 @@ public final class TaskExecutionOuterClass {
   /**
    * <pre>
    * A message used to fetch a single task execution entity.
+   * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskExecutionGetRequest}
@@ -333,6 +334,7 @@ public final class TaskExecutionOuterClass {
     /**
      * <pre>
      * A message used to fetch a single task execution entity.
+     * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskExecutionGetRequest}
@@ -820,6 +822,7 @@ public final class TaskExecutionOuterClass {
   /**
    * <pre>
    * Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+   * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskExecutionListRequest}
@@ -1325,6 +1328,7 @@ public final class TaskExecutionOuterClass {
     /**
      * <pre>
      * Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+     * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskExecutionListRequest}
@@ -3369,6 +3373,7 @@ public final class TaskExecutionOuterClass {
   /**
    * <pre>
    * Response structure for a query to list of task execution entities.
+   * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskExecutionList}
@@ -3711,6 +3716,7 @@ public final class TaskExecutionOuterClass {
     /**
      * <pre>
      * Response structure for a query to list of task execution entities.
+     * See :ref:`ref_flyteidl.admin.TaskExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskExecutionList}
@@ -7776,6 +7782,7 @@ public final class TaskExecutionOuterClass {
   /**
    * <pre>
    * Request structure to fetch inputs and output for a task execution.
+   * By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskExecutionGetDataRequest}
@@ -8060,6 +8067,7 @@ public final class TaskExecutionOuterClass {
     /**
      * <pre>
      * Request structure to fetch inputs and output for a task execution.
+     * By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskExecutionGetDataRequest}

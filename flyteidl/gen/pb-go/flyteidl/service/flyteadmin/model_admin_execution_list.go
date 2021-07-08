@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Used as a response for request to list executions.
 type AdminExecutionList struct {
 	Executions []AdminExecution `json:"executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty.

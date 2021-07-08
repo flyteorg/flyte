@@ -2710,6 +2710,7 @@ public final class LaunchPlanOuterClass {
   /**
    * <pre>
    * Response object for list launch plan requests.
+   * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.LaunchPlanList}
@@ -3052,6 +3053,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Response object for list launch plan requests.
+     * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.LaunchPlanList}
@@ -10636,6 +10638,7 @@ public final class LaunchPlanOuterClass {
   /**
    * <pre>
    * Request to set the referenced launch plan state to the configured value.
+   * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.LaunchPlanUpdateRequest}
@@ -10964,6 +10967,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Request to set the referenced launch plan state to the configured value.
+     * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.LaunchPlanUpdateRequest}
@@ -11861,6 +11865,7 @@ public final class LaunchPlanOuterClass {
   /**
    * <pre>
    * Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+   * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanRequest}
@@ -12142,6 +12147,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+     * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanRequest}
@@ -12610,6 +12616,7 @@ public final class LaunchPlanOuterClass {
   /**
    * <pre>
    * Represents a request structure to list active launch plans within a project/domain.
+   * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanListRequest}
@@ -13109,6 +13116,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Represents a request structure to list active launch plans within a project/domain.
+     * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanListRequest}

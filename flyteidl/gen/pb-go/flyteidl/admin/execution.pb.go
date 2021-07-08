@@ -243,6 +243,7 @@ func (m *ExecutionCreateResponse) GetId() *core.WorkflowExecutionIdentifier {
 }
 
 // A message used to fetch a single workflow execution entity.
+// See :ref:`ref_flyteidl.admin.Execution` for more details
 type WorkflowExecutionGetRequest struct {
 	// Uniquely identifies an individual workflow execution.
 	Id                   *core.WorkflowExecutionIdentifier `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -345,6 +346,7 @@ func (m *Execution) GetClosure() *ExecutionClosure {
 }
 
 // Used as a response for request to list executions.
+// See :ref:`ref_flyteidl.admin.Execution` for more details
 type ExecutionList struct {
 	Executions []*Execution `protobuf:"bytes,1,rep,name=executions,proto3" json:"executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -1153,6 +1155,7 @@ func (m *ExecutionTerminateResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ExecutionTerminateResponse proto.InternalMessageInfo
 
 // Request structure to fetch inputs, output and other data produced by an execution.
+// By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
 type WorkflowExecutionGetDataRequest struct {
 	// The identifier of the execution for which to fetch inputs and outputs.
 	Id                   *core.WorkflowExecutionIdentifier `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`

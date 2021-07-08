@@ -23,6 +23,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Represents a request structure to create a revision of a task.
+// See :ref:`ref_flyteidl.admin.Task` for more details
 type TaskCreateRequest struct {
 	// id represents the unique identifier of the task.
 	// +required
@@ -159,6 +160,7 @@ func (m *Task) GetClosure() *TaskClosure {
 }
 
 // Represents a list of tasks returned from the admin.
+// See :ref:`ref_flyteidl.admin.Task` for more details
 type TaskList struct {
 	// A list of tasks returned based on the request.
 	Tasks []*Task `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`

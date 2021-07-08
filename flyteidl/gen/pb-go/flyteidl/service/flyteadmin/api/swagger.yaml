@@ -15,6 +15,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`."
       description: "Retrieve the active launch plan version specified by input request\
         \ filters."
       operationId: "GetActiveLaunchPlan"
@@ -49,6 +50,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`."
       description: "Fetch the active launch plan versions specified by input request\
         \ filters."
       operationId: "ListActiveLaunchPlans"
@@ -111,6 +113,8 @@ paths:
   : get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by\
+        \ the reference :ref:`ref_flyteidl.admin.TaskExecution`."
       description: "Fetch child node executions launched by the specified task execution."
       operationId: "ListNodeExecutionsForTask"
       parameters:
@@ -242,6 +246,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`."
       description: "Retrieve input and output data from an existing workflow execution."
       operationId: "GetExecutionData"
       parameters:
@@ -273,6 +278,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`."
       description: "Retrieve input and output data from an existing node execution."
       operationId: "GetNodeExecutionData"
       parameters:
@@ -309,6 +315,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      summary: "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`."
       description: "Retrieve input and output data from an existing task execution."
       operationId: "GetTaskExecutionData"
       parameters:
@@ -396,6 +403,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred."
       description: "Create a node execution event recording a phase transition."
       operationId: "CreateNodeEvent"
       parameters:
@@ -414,6 +422,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred."
       description: "Create a task execution event recording a phase transition."
       operationId: "CreateTaskEvent"
       parameters:
@@ -432,6 +441,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred."
       description: "Create a workflow execution event recording a phase transition."
       operationId: "CreateWorkflowEvent"
       parameters:
@@ -450,6 +460,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`"
       description: "Create a workflow execution."
       operationId: "CreateExecution"
       parameters:
@@ -468,6 +479,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`"
       description: "Relaunch a workflow execution."
       operationId: "RelaunchExecution"
       parameters:
@@ -486,6 +498,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.Execution`."
       description: "Fetch existing workflow executions matching input filters."
       operationId: "ListExecutions"
       parameters:
@@ -564,6 +577,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches a :ref:`ref_flyteidl.admin.Execution`."
       description: "Retrieve an existing workflow execution."
       operationId: "GetExecution"
       parameters:
@@ -594,6 +608,7 @@ paths:
     delete:
       tags:
       - "AdminService"
+      summary: "Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`."
       description: "Terminate the active workflow execution specified in the request."
       operationId: "TerminateExecution"
       parameters:
@@ -631,6 +646,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of\
+        \ launch plan objects."
       description: "Fetch existing launch plan definition identifiers matching input\
         \ filters."
       operationId: "ListLaunchPlanIds"
@@ -700,6 +717,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition"
       description: "Create and register a launch plan definition."
       operationId: "CreateLaunchPlan"
       parameters:
@@ -725,6 +743,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions."
       description: "Fetch existing launch plan definitions matching input filters."
       operationId: "ListLaunchPlans2"
       parameters:
@@ -803,6 +822,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions."
       description: "Fetch existing launch plan definitions matching input filters."
       operationId: "ListLaunchPlans"
       parameters:
@@ -880,6 +900,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition."
       description: "Retrieve an existing launch plan definition."
       operationId: "GetLaunchPlan"
       parameters:
@@ -936,6 +957,7 @@ paths:
     put:
       tags:
       - "AdminService"
+      summary: "Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`."
       description: "Update the status of an existing launch plan definition. At most\
         \ one launch plan version for a given {project, domain, name} can be active\
         \ at a time. If this call sets a launch plan to active and existing version\
@@ -987,6 +1009,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a specific resource type."
       description: "Retrieve a list of MatchableAttributesConfiguration objects."
       operationId: "ListMatchableAttributes"
       parameters:
@@ -1023,6 +1047,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object."
       description: "Retrieve a NamedEntity object."
       operationId: "GetNamedEntity"
       parameters:
@@ -1068,6 +1093,7 @@ paths:
     put:
       tags:
       - "AdminService"
+      summary: "Updates a :ref:`ref_flyteidl.admin.NamedEntity` object."
       description: "Update the fields associated with a NamedEntity"
       operationId: "UpdateNamedEntity"
       parameters:
@@ -1119,6 +1145,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects."
       description: "Retrieve a list of NamedEntity objects sharing a common resource\
         \ type, project, and domain."
       operationId: "ListNamedEntities"
@@ -1200,6 +1227,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches a :ref:`ref_flyteidl.admin.NodeExecution`."
       description: "Retrieve an existing node execution."
       operationId: "GetNodeExecution"
       parameters:
@@ -1236,6 +1264,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`."
       description: "Fetch existing node executions matching input filters."
       operationId: "ListNodeExecutions"
       parameters:
@@ -1316,6 +1345,8 @@ paths:
     put:
       tags:
       - "AdminService"
+      summary: "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project and domain."
       description: "Update the customized resource attributes associated with a project-domain\
         \ combination"
       operationId: "UpdateProjectDomainAttributes"
@@ -1347,6 +1378,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project and domain."
       description: "Retrieve the customized resource attributes associated with a\
         \ project-domain combination"
       operationId: "GetProjectDomainAttributes"
@@ -1398,6 +1431,8 @@ paths:
     delete:
       tags:
       - "AdminService"
+      summary: "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project and domain."
       description: "Delete the customized resource attributes associated with a project-domain\
         \ combination"
       operationId: "DeleteProjectDomainAttributes"
@@ -1431,6 +1466,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches a list of :ref:`ref_flyteidl.admin.Project`"
       description: "Fetch registered projects."
       operationId: "ListProjects"
       parameters:
@@ -1486,6 +1522,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment."
       description: "Register a project."
       operationId: "RegisterProject"
       parameters:
@@ -1504,9 +1541,9 @@ paths:
     put:
       tags:
       - "AdminService"
-      summary: "flyteidl.admin.Project should be passed but the domains property should\
-        \ be empty;\nit will be ignored in the handler as domains cannot be updated\
-        \ via this API."
+      summary: "Updates an existing :ref:`ref_flyteidl.admin.Project` \nflyteidl.admin.Project\
+        \ should be passed but the domains property should be empty;\nit will be ignored\
+        \ in the handler as domains cannot be updated via this API."
       description: "Update a project."
       operationId: "UpdateProject"
       parameters:
@@ -1531,6 +1568,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      summary: "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`."
       description: "Retrieve an existing task execution."
       operationId: "GetTaskExecution"
       parameters:
@@ -1618,6 +1656,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      summary: "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`."
       description: "Fetch existing task executions matching input filters."
       operationId: "ListTaskExecutions"
       parameters:
@@ -1698,6 +1737,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of\
+        \ task objects."
       description: "Fetch existing task definition identifiers matching input filters."
       operationId: "ListTaskIds"
       parameters:
@@ -1766,6 +1807,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Create and upload a :ref:`ref_flyteidl.admin.Task` definition"
       description: "Create and register a task definition."
       operationId: "CreateTask"
       parameters:
@@ -1791,6 +1833,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions."
       description: "Fetch existing task definitions matching input filters."
       operationId: "ListTasks2"
       parameters:
@@ -1869,6 +1912,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions."
       description: "Fetch existing task definitions matching input filters."
       operationId: "ListTasks"
       parameters:
@@ -1946,6 +1990,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a :ref:`ref_flyteidl.admin.Task` definition."
       description: "Retrieve an existing task definition."
       operationId: "GetTask"
       parameters:
@@ -2016,6 +2061,8 @@ paths:
     put:
       tags:
       - "AdminService"
+      summary: "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project, domain and workflow."
       description: "Update the customized resource attributes associated with a project,\
         \ domain and workflow combination"
       operationId: "UpdateWorkflowAttributes"
@@ -2053,6 +2100,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project, domain and workflow."
       description: "Retrieve the customized resource attributes associated with a\
         \ project, domain and workflow combination"
       operationId: "GetWorkflowAttributes"
@@ -2110,6 +2159,8 @@ paths:
     delete:
       tags:
       - "AdminService"
+      summary: "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project, domain and workflow."
       description: "Delete the customized resource attributes associated with a project,\
         \ domain and workflow combination"
       operationId: "DeleteWorkflowAttributes"
@@ -2149,6 +2200,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of\
+        \ workflow objects."
       description: "Fetch an existing workflow definition identifiers matching input\
         \ filters."
       operationId: "ListWorkflowIds"
@@ -2218,6 +2271,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      summary: "Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition"
       description: "Create and register a workflow definition."
       operationId: "CreateWorkflow"
       parameters:
@@ -2243,6 +2297,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions."
       description: "Fetch existing workflow definitions matching input filters."
       operationId: "ListWorkflows2"
       parameters:
@@ -2321,6 +2376,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions."
       description: "Fetch existing workflow definitions matching input filters."
       operationId: "ListWorkflows"
       parameters:
@@ -2398,6 +2454,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      summary: "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition."
       description: "Retrieve an existing workflow definition."
       operationId: "GetWorkflow"
       parameters:
@@ -3167,7 +3224,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Used as a response for request to list executions."
+    title: "Used as a response for request to list executions.\nSee :ref:`ref_flyteidl.admin.Execution`\
+      \ for more details"
     example:
       executions:
       - id:
@@ -4331,7 +4389,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Response object for list launch plan requests."
+    title: "Response object for list launch plan requests.\nSee :ref:`ref_flyteidl.admin.LaunchPlan`\
+      \ for more details"
     example:
       launch_plans:
       - id:
@@ -5275,8 +5334,8 @@ definitions:
       state:
         description: "Desired state to apply to the launch plan.\n+required."
         $ref: "#/definitions/adminLaunchPlanState"
-    description: "Request to set the referenced launch plan state to the configured\
-      \ value."
+    title: "Request to set the referenced launch plan state to the configured value.\n\
+      See :ref:`ref_flyteidl.admin.LaunchPlan` for more details"
   adminLaunchPlanUpdateResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -5287,8 +5346,9 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/adminMatchableAttributesConfiguration"
-    description: "Response for a request for all matching resource attributes for\
-      \ a resource type."
+    title: "Response for a request for all matching resource attributes for a resource\
+      \ type.\nSee :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for\
+      \ more details"
     example:
       configurations:
       - launch_plan: "launch_plan"
@@ -8826,7 +8886,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Request structure to retrieve a list of node execution entities."
+    title: "Request structure to retrieve a list of node execution entities.\nSee\
+      \ :ref:`ref_flyteidl.admin.NodeExecution` for more details"
     example:
       node_executions:
       - metadata:
@@ -9140,9 +9201,8 @@ definitions:
         description: "Unique domain id for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
-    description: "Defines a set of custom matching attributes which defines resource\
-      \ defaults for a project and domain.\nFor more info on matchable attributes,\
-      \ see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
+    title: "Defines a set of custom matching attributes which defines resource defaults\
+      \ for a project and domain.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     example:
       domain: "domain"
       project: "project"
@@ -9197,7 +9257,8 @@ definitions:
       resource_type:
         title: "Which type of matchable attributes to delete.\n+required"
         $ref: "#/definitions/adminMatchableResource"
-    description: "Request to delete a set matchable project domain attribute override."
+    title: "Request to delete a set matchable project domain attribute override.\n\
+      For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
   adminProjectDomainAttributesDeleteResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -9206,7 +9267,8 @@ definitions:
     properties:
       attributes:
         $ref: "#/definitions/adminProjectDomainAttributes"
-    description: "Response to get an individual project domain attribute override."
+    title: "Response to get an individual project domain attribute override.\nFor\
+      \ more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     example:
       attributes:
         domain: "domain"
@@ -9256,7 +9318,8 @@ definitions:
       attributes:
         title: "+required"
         $ref: "#/definitions/adminProjectDomainAttributes"
-    description: "Sets custom attributes for a project-domain combination."
+    title: "Sets custom attributes for a project-domain combination.\nFor more info\
+      \ on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
   adminProjectDomainAttributesUpdateResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -9266,10 +9329,14 @@ definitions:
       project:
         title: "+required"
         $ref: "#/definitions/adminProject"
+    title: "Adds a new user-project within the Flyte deployment.\nSee :ref:`ref_flyteidl.admin.Project`\
+      \ for more details"
   adminProjectRegisterResponse:
     type: "object"
+    description: "Purposefully empty, may be updated in the future."
   adminProjectUpdateResponse:
     type: "object"
+    description: "Purposefully empty, may be updated in the future."
   adminProjects:
     type: "object"
     properties:
@@ -9282,6 +9349,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
+    title: "Represents a list of projects.\nSee :ref:`ref_flyteidl.admin.Project`\
+      \ for more details"
     example:
       projects:
       - name: "name"
@@ -9819,7 +9888,8 @@ definitions:
       spec:
         title: "Represents the specification for task.\n+required"
         $ref: "#/definitions/adminTaskSpec"
-    description: "Represents a request structure to create a revision of a task."
+    title: "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task`\
+      \ for more details"
   adminTaskCreateResponse:
     type: "object"
     description: "Represents a response structure if task creation succeeds."
@@ -9973,7 +10043,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Response structure for a query to list of task execution entities."
+    title: "Response structure for a query to list of task execution entities.\nSee\
+      \ :ref:`ref_flyteidl.admin.TaskExecution` for more details"
     example:
       task_executions:
       - input_uri: "input_uri"
@@ -10114,7 +10185,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Represents a list of tasks returned from the admin."
+    title: "Represents a list of tasks returned from the admin.\nSee :ref:`ref_flyteidl.admin.Task`\
+      \ for more details"
     example:
       tasks:
       - id:
@@ -13645,9 +13717,9 @@ definitions:
         description: "Workflow name for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
-    description: "Defines a set of custom matching attributes which defines resource\
-      \ defaults for a project, domain and workflow.\nFor more info on matchable attributes,\
-      \ see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
+    title: "Defines a set of custom matching attributes which defines resource defaults\
+      \ for a project, domain and workflow.\nFor more info on matchable attributes,\
+      \ see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     example:
       workflow: "workflow"
       domain: "domain"
@@ -13706,7 +13778,8 @@ definitions:
       resource_type:
         title: "Which type of matchable attributes to delete.\n+required"
         $ref: "#/definitions/adminMatchableResource"
-    description: "Request to delete a set matchable workflow attribute override."
+    title: "Request to delete a set matchable workflow attribute override.\nFor more\
+      \ info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
   adminWorkflowAttributesDeleteResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -13765,7 +13838,8 @@ definitions:
     properties:
       attributes:
         $ref: "#/definitions/adminWorkflowAttributes"
-    description: "Sets custom attributes for a project, domain and workflow combination."
+    title: "Sets custom attributes for a project, domain and workflow combination.\n\
+      For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
   adminWorkflowAttributesUpdateResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -16797,7 +16871,8 @@ definitions:
       spec:
         title: "Represents the specification for workflow.\n+required"
         $ref: "#/definitions/adminWorkflowSpec"
-    description: "Represents a request structure to create a revision of a workflow."
+    title: "Represents a request structure to create a revision of a workflow.\nSee\
+      \ :ref:`ref_flyteidl.admin.Workflow` for more details"
   adminWorkflowCreateResponse:
     type: "object"
   adminWorkflowExecutionConfig:
@@ -16870,7 +16945,8 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Represents a list of workflows returned from the admin."
+    title: "Represents a list of workflows returned from the admin.\nSee :ref:`ref_flyteidl.admin.Workflow`\
+      \ for more details"
     example:
       workflows:
       - id:

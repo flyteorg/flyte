@@ -9,5 +9,6 @@
 
 package flyteadmin
 
+// Purposefully empty, may be updated in the future.
 type AdminProjectUpdateResponse struct {
 }

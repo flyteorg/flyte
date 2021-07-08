@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
-// For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type WorkflowAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -89,6 +89,7 @@ func (m *WorkflowAttributes) GetMatchingAttributes() *MatchingAttributes {
 }
 
 // Sets custom attributes for a project, domain and workflow combination.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type WorkflowAttributesUpdateRequest struct {
 	Attributes           *WorkflowAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
@@ -161,6 +162,7 @@ func (m *WorkflowAttributesUpdateResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_WorkflowAttributesUpdateResponse proto.InternalMessageInfo
 
 // Request to get an individual workflow attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type WorkflowAttributesGetRequest struct {
 	// Unique project id which this set of attributes references.
 	// +required
@@ -273,6 +275,7 @@ func (m *WorkflowAttributesGetResponse) GetAttributes() *WorkflowAttributes {
 }
 
 // Request to delete a set matchable workflow attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type WorkflowAttributesDeleteRequest struct {
 	// Unique project id which this set of attributes references.
 	// +required

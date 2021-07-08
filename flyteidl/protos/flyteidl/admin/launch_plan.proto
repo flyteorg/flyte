@@ -53,6 +53,7 @@ message LaunchPlan {
 }
 
 // Response object for list launch plan requests.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message LaunchPlanList {
     repeated LaunchPlan launch_plans = 1;
 
@@ -150,6 +151,7 @@ message LaunchPlanMetadata {
 }
 
 // Request to set the referenced launch plan state to the configured value.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message LaunchPlanUpdateRequest {
     // Identifier of launch plan for which to change state.
     // +required.
@@ -165,12 +167,14 @@ message LaunchPlanUpdateResponse {
 }
 
 // Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message ActiveLaunchPlanRequest {
     // +required.
     NamedEntityIdentifier id = 1;
 }
 
 // Represents a request structure to list active launch plans within a project/domain.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message ActiveLaunchPlanListRequest {
     // Name of the project that contains the identifiers.
     // +required.

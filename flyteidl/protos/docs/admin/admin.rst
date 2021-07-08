@@ -913,6 +913,7 @@ ExecutionList
 ------------------------------------------------------------------
 
 Used as a response for request to list executions.
+See :ref:`ref_flyteidl.admin.Execution` for more details
 
 
 
@@ -1121,6 +1122,7 @@ WorkflowExecutionGetDataRequest
 ------------------------------------------------------------------
 
 Request structure to fetch inputs, output and other data produced by an execution.
+By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
 
 
 
@@ -1166,6 +1168,7 @@ WorkflowExecutionGetRequest
 ------------------------------------------------------------------
 
 A message used to fetch a single workflow execution entity.
+See :ref:`ref_flyteidl.admin.Execution` for more details
 
 
 
@@ -1224,6 +1227,7 @@ ActiveLaunchPlanListRequest
 ------------------------------------------------------------------
 
 Represents a request structure to list active launch plans within a project/domain.
+See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 
 
 
@@ -1249,6 +1253,7 @@ ActiveLaunchPlanRequest
 ------------------------------------------------------------------
 
 Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 
 
 
@@ -1385,6 +1390,7 @@ LaunchPlanList
 ------------------------------------------------------------------
 
 Response object for list launch plan requests.
+See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 
 
 
@@ -1463,6 +1469,7 @@ LaunchPlanUpdateRequest
 ------------------------------------------------------------------
 
 Request to set the referenced launch plan state to the configured value.
+See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 
 
 
@@ -1622,6 +1629,7 @@ ListMatchableAttributesRequest
 ------------------------------------------------------------------
 
 Request all matching resource attributes for a resource type.
+See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 
 
 
@@ -1643,6 +1651,7 @@ ListMatchableAttributesResponse
 ------------------------------------------------------------------
 
 Response for a request for all matching resource attributes for a resource type.
+See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 
 
 
@@ -1992,6 +2001,7 @@ NodeExecutionGetDataRequest
 ------------------------------------------------------------------
 
 Request structure to fetch inputs and output for a node execution.
+By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
 
 
 
@@ -2038,6 +2048,7 @@ NodeExecutionGetRequest
 ------------------------------------------------------------------
 
 A message used to fetch a single node execution entity.
+See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 
 
 
@@ -2059,6 +2070,7 @@ NodeExecutionList
 ------------------------------------------------------------------
 
 Request structure to retrieve a list of node execution entities.
+See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 
 
 
@@ -2081,6 +2093,7 @@ NodeExecutionListRequest
 ------------------------------------------------------------------
 
 Represents a request structure to retrieve a list of node execution entities.
+See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 
 
 
@@ -2283,7 +2296,8 @@ Top-level namespace used to classify different entities like workflows and execu
 ProjectListRequest
 ------------------------------------------------------------------
 
-
+Request to retrieve a list of projects matching specified filters. 
+See :ref:`ref_flyteidl.admin.Project` for more details
 
 
 
@@ -2307,7 +2321,8 @@ ProjectListRequest
 ProjectRegisterRequest
 ------------------------------------------------------------------
 
-
+Adds a new user-project within the Flyte deployment.
+See :ref:`ref_flyteidl.admin.Project` for more details
 
 
 
@@ -2328,7 +2343,7 @@ ProjectRegisterRequest
 ProjectRegisterResponse
 ------------------------------------------------------------------
 
-
+Purposefully empty, may be updated in the future.
 
 
 
@@ -2342,7 +2357,7 @@ ProjectRegisterResponse
 ProjectUpdateResponse
 ------------------------------------------------------------------
 
-
+Purposefully empty, may be updated in the future.
 
 
 
@@ -2356,7 +2371,8 @@ ProjectUpdateResponse
 Projects
 ------------------------------------------------------------------
 
-
+Represents a list of projects.
+See :ref:`ref_flyteidl.admin.Project` for more details
 
 
 
@@ -2414,7 +2430,7 @@ ProjectDomainAttributes
 ------------------------------------------------------------------
 
 Defines a set of custom matching attributes which defines resource defaults for a project and domain.
-For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -2438,6 +2454,7 @@ ProjectDomainAttributesDeleteRequest
 ------------------------------------------------------------------
 
 Request to delete a set matchable project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -2475,6 +2492,7 @@ ProjectDomainAttributesGetRequest
 ------------------------------------------------------------------
 
 Request to get an individual project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -2498,6 +2516,7 @@ ProjectDomainAttributesGetResponse
 ------------------------------------------------------------------
 
 Response to get an individual project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -2519,6 +2538,7 @@ ProjectDomainAttributesUpdateRequest
 ------------------------------------------------------------------
 
 Sets custom attributes for a project-domain combination.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -2722,6 +2742,7 @@ TaskCreateRequest
 ------------------------------------------------------------------
 
 Represents a request structure to create a revision of a task.
+See :ref:`ref_flyteidl.admin.Task` for more details
 
 
 
@@ -2760,6 +2781,7 @@ TaskList
 ------------------------------------------------------------------
 
 Represents a list of tasks returned from the admin.
+See :ref:`ref_flyteidl.admin.Task` for more details
 
 
 
@@ -2879,6 +2901,7 @@ TaskExecutionGetDataRequest
 ------------------------------------------------------------------
 
 Request structure to fetch inputs and output for a task execution.
+By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
 
 
 
@@ -2924,6 +2947,7 @@ TaskExecutionGetRequest
 ------------------------------------------------------------------
 
 A message used to fetch a single task execution entity.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 
 
 
@@ -2945,6 +2969,7 @@ TaskExecutionList
 ------------------------------------------------------------------
 
 Response structure for a query to list of task execution entities.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 
 
 
@@ -2967,6 +2992,7 @@ TaskExecutionListRequest
 ------------------------------------------------------------------
 
 Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 
 
 
@@ -3132,6 +3158,7 @@ WorkflowCreateRequest
 ------------------------------------------------------------------
 
 Represents a request structure to create a revision of a workflow.
+See :ref:`ref_flyteidl.admin.Workflow` for more details
 
 
 
@@ -3168,6 +3195,7 @@ WorkflowList
 ------------------------------------------------------------------
 
 Represents a list of workflows returned from the admin.
+See :ref:`ref_flyteidl.admin.Workflow` for more details
 
 
 
@@ -3230,7 +3258,7 @@ WorkflowAttributes
 ------------------------------------------------------------------
 
 Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
-For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -3255,6 +3283,7 @@ WorkflowAttributesDeleteRequest
 ------------------------------------------------------------------
 
 Request to delete a set matchable workflow attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -3293,6 +3322,7 @@ WorkflowAttributesGetRequest
 ------------------------------------------------------------------
 
 Request to get an individual workflow attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 
@@ -3338,6 +3368,7 @@ WorkflowAttributesUpdateRequest
 ------------------------------------------------------------------
 
 Sets custom attributes for a project, domain and workflow combination.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 
 
 

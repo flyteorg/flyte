@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Represents a request structure to create a revision of a workflow.
 type AdminWorkflowCreateRequest struct {
 	Id *CoreIdentifier `json:"id,omitempty"`
 	Spec *AdminWorkflowSpec `json:"spec,omitempty"`

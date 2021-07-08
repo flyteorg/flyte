@@ -50,6 +50,7 @@ class AdminService final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
+    // Create and upload a :ref:`ref_flyteidl.admin.Task` definition
     virtual ::grpc::Status CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>> AsyncCreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>>(AsyncCreateTaskRaw(context, request, cq));
@@ -57,6 +58,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>> PrepareAsyncCreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>>(PrepareAsyncCreateTaskRaw(context, request, cq));
     }
+    // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
     virtual ::grpc::Status GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::flyteidl::admin::Task* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>> AsyncGetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>>(AsyncGetTaskRaw(context, request, cq));
@@ -64,6 +66,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>> PrepareAsyncGetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>>(PrepareAsyncGetTaskRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
     virtual ::grpc::Status ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(AsyncListTaskIdsRaw(context, request, cq));
@@ -71,6 +74,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> PrepareAsyncListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(PrepareAsyncListTaskIdsRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
     virtual ::grpc::Status ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::flyteidl::admin::TaskList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskList>> AsyncListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskList>>(AsyncListTasksRaw(context, request, cq));
@@ -78,6 +82,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskList>> PrepareAsyncListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskList>>(PrepareAsyncListTasksRaw(context, request, cq));
     }
+    // Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
     virtual ::grpc::Status CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest& request, ::flyteidl::admin::WorkflowCreateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowCreateResponse>> AsyncCreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowCreateResponse>>(AsyncCreateWorkflowRaw(context, request, cq));
@@ -85,6 +90,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowCreateResponse>> PrepareAsyncCreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowCreateResponse>>(PrepareAsyncCreateWorkflowRaw(context, request, cq));
     }
+    // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
     virtual ::grpc::Status GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::flyteidl::admin::Workflow* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>> AsyncGetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>>(AsyncGetWorkflowRaw(context, request, cq));
@@ -92,6 +98,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>> PrepareAsyncGetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>>(PrepareAsyncGetWorkflowRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
     virtual ::grpc::Status ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(AsyncListWorkflowIdsRaw(context, request, cq));
@@ -99,6 +106,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> PrepareAsyncListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(PrepareAsyncListWorkflowIdsRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
     virtual ::grpc::Status ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::flyteidl::admin::WorkflowList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowList>> AsyncListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowList>>(AsyncListWorkflowsRaw(context, request, cq));
@@ -106,6 +114,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowList>> PrepareAsyncListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowList>>(PrepareAsyncListWorkflowsRaw(context, request, cq));
     }
+    // Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
     virtual ::grpc::Status CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest& request, ::flyteidl::admin::LaunchPlanCreateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanCreateResponse>> AsyncCreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanCreateResponse>>(AsyncCreateLaunchPlanRaw(context, request, cq));
@@ -113,6 +122,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanCreateResponse>> PrepareAsyncCreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanCreateResponse>>(PrepareAsyncCreateLaunchPlanRaw(context, request, cq));
     }
+    // Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
     virtual ::grpc::Status GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::flyteidl::admin::LaunchPlan* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>> AsyncGetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>>(AsyncGetLaunchPlanRaw(context, request, cq));
@@ -120,6 +130,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>> PrepareAsyncGetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>>(PrepareAsyncGetLaunchPlanRaw(context, request, cq));
     }
+    // Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::flyteidl::admin::LaunchPlan* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>> AsyncGetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>>(AsyncGetActiveLaunchPlanRaw(context, request, cq));
@@ -127,6 +138,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>> PrepareAsyncGetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>>(PrepareAsyncGetActiveLaunchPlanRaw(context, request, cq));
     }
+    // List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::flyteidl::admin::LaunchPlanList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> AsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(AsyncListActiveLaunchPlansRaw(context, request, cq));
@@ -134,6 +146,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(PrepareAsyncListActiveLaunchPlansRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
     virtual ::grpc::Status ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(AsyncListLaunchPlanIdsRaw(context, request, cq));
@@ -141,6 +154,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> PrepareAsyncListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(PrepareAsyncListLaunchPlanIdsRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
     virtual ::grpc::Status ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::flyteidl::admin::LaunchPlanList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> AsyncListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(AsyncListLaunchPlansRaw(context, request, cq));
@@ -148,6 +162,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(PrepareAsyncListLaunchPlansRaw(context, request, cq));
     }
+    // Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest& request, ::flyteidl::admin::LaunchPlanUpdateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanUpdateResponse>> AsyncUpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanUpdateResponse>>(AsyncUpdateLaunchPlanRaw(context, request, cq));
@@ -155,6 +170,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanUpdateResponse>> PrepareAsyncUpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanUpdateResponse>>(PrepareAsyncUpdateLaunchPlanRaw(context, request, cq));
     }
+    // Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
     virtual ::grpc::Status CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest& request, ::flyteidl::admin::ExecutionCreateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>> AsyncCreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>>(AsyncCreateExecutionRaw(context, request, cq));
@@ -162,6 +178,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>> PrepareAsyncCreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>>(PrepareAsyncCreateExecutionRaw(context, request, cq));
     }
+    // Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
     virtual ::grpc::Status RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest& request, ::flyteidl::admin::ExecutionCreateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>> AsyncRelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>>(AsyncRelaunchExecutionRaw(context, request, cq));
@@ -169,6 +186,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>> PrepareAsyncRelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionCreateResponse>>(PrepareAsyncRelaunchExecutionRaw(context, request, cq));
     }
+    // Fetches a :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest& request, ::flyteidl::admin::Execution* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Execution>> AsyncGetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Execution>>(AsyncGetExecutionRaw(context, request, cq));
@@ -176,6 +194,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Execution>> PrepareAsyncGetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Execution>>(PrepareAsyncGetExecutionRaw(context, request, cq));
     }
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest& request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionGetDataResponse>> AsyncGetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionGetDataResponse>>(AsyncGetExecutionDataRaw(context, request, cq));
@@ -183,6 +202,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionGetDataResponse>> PrepareAsyncGetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionGetDataResponse>>(PrepareAsyncGetExecutionDataRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::flyteidl::admin::ExecutionList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionList>> AsyncListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionList>>(AsyncListExecutionsRaw(context, request, cq));
@@ -190,6 +210,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionList>> PrepareAsyncListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionList>>(PrepareAsyncListExecutionsRaw(context, request, cq));
     }
+    // Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest& request, ::flyteidl::admin::ExecutionTerminateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionTerminateResponse>> AsyncTerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionTerminateResponse>>(AsyncTerminateExecutionRaw(context, request, cq));
@@ -197,6 +218,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionTerminateResponse>> PrepareAsyncTerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionTerminateResponse>>(PrepareAsyncTerminateExecutionRaw(context, request, cq));
     }
+    // Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::flyteidl::admin::NodeExecution* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>> AsyncGetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>>(AsyncGetNodeExecutionRaw(context, request, cq));
@@ -204,6 +226,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>> PrepareAsyncGetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>>(PrepareAsyncGetNodeExecutionRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::flyteidl::admin::NodeExecutionList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>> AsyncListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>>(AsyncListNodeExecutionsRaw(context, request, cq));
@@ -211,6 +234,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>> PrepareAsyncListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>>(PrepareAsyncListNodeExecutionsRaw(context, request, cq));
     }
+    // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest& request, ::flyteidl::admin::NodeExecutionList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>> AsyncListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>>(AsyncListNodeExecutionsForTaskRaw(context, request, cq));
@@ -218,6 +242,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>> PrepareAsyncListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>>(PrepareAsyncListNodeExecutionsForTaskRaw(context, request, cq));
     }
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest& request, ::flyteidl::admin::NodeExecutionGetDataResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionGetDataResponse>> AsyncGetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionGetDataResponse>>(AsyncGetNodeExecutionDataRaw(context, request, cq));
@@ -225,6 +250,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionGetDataResponse>> PrepareAsyncGetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionGetDataResponse>>(PrepareAsyncGetNodeExecutionDataRaw(context, request, cq));
     }
+    // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
     virtual ::grpc::Status RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest& request, ::flyteidl::admin::ProjectRegisterResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>> AsyncRegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>>(AsyncRegisterProjectRaw(context, request, cq));
@@ -232,6 +258,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>> PrepareAsyncRegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>>(PrepareAsyncRegisterProjectRaw(context, request, cq));
     }
+    // Updates an existing :ref:`ref_flyteidl.admin.Project` 
     // flyteidl.admin.Project should be passed but the domains property should be empty;
     // it will be ignored in the handler as domains cannot be updated via this API.
     virtual ::grpc::Status UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::flyteidl::admin::ProjectUpdateResponse* response) = 0;
@@ -241,6 +268,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectUpdateResponse>> PrepareAsyncUpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectUpdateResponse>>(PrepareAsyncUpdateProjectRaw(context, request, cq));
     }
+    // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
     virtual ::grpc::Status ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::flyteidl::admin::Projects* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>> AsyncListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>>(AsyncListProjectsRaw(context, request, cq));
@@ -248,6 +276,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>> PrepareAsyncListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>>(PrepareAsyncListProjectsRaw(context, request, cq));
     }
+    // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
     virtual ::grpc::Status CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest& request, ::flyteidl::admin::WorkflowExecutionEventResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionEventResponse>> AsyncCreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionEventResponse>>(AsyncCreateWorkflowEventRaw(context, request, cq));
@@ -255,6 +284,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionEventResponse>> PrepareAsyncCreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowExecutionEventResponse>>(PrepareAsyncCreateWorkflowEventRaw(context, request, cq));
     }
+    // Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
     virtual ::grpc::Status CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest& request, ::flyteidl::admin::NodeExecutionEventResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionEventResponse>> AsyncCreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionEventResponse>>(AsyncCreateNodeEventRaw(context, request, cq));
@@ -262,6 +292,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionEventResponse>> PrepareAsyncCreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionEventResponse>>(PrepareAsyncCreateNodeEventRaw(context, request, cq));
     }
+    // Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
     virtual ::grpc::Status CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest& request, ::flyteidl::admin::TaskExecutionEventResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionEventResponse>> AsyncCreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionEventResponse>>(AsyncCreateTaskEventRaw(context, request, cq));
@@ -269,6 +300,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionEventResponse>> PrepareAsyncCreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionEventResponse>>(PrepareAsyncCreateTaskEventRaw(context, request, cq));
     }
+    // Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest& request, ::flyteidl::admin::TaskExecution* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecution>> AsyncGetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecution>>(AsyncGetTaskExecutionRaw(context, request, cq));
@@ -276,6 +308,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecution>> PrepareAsyncGetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecution>>(PrepareAsyncGetTaskExecutionRaw(context, request, cq));
     }
+    // Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest& request, ::flyteidl::admin::TaskExecutionList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionList>> AsyncListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionList>>(AsyncListTaskExecutionsRaw(context, request, cq));
@@ -283,6 +316,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionList>> PrepareAsyncListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionList>>(PrepareAsyncListTaskExecutionsRaw(context, request, cq));
     }
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest& request, ::flyteidl::admin::TaskExecutionGetDataResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>> AsyncGetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>>(AsyncGetTaskExecutionDataRaw(context, request, cq));
@@ -290,6 +324,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>> PrepareAsyncGetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>>(PrepareAsyncGetTaskExecutionDataRaw(context, request, cq));
     }
+    // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>> AsyncUpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>>(AsyncUpdateProjectDomainAttributesRaw(context, request, cq));
@@ -297,6 +332,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>> PrepareAsyncUpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>>(PrepareAsyncUpdateProjectDomainAttributesRaw(context, request, cq));
     }
+    // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesGetResponse>> AsyncGetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesGetResponse>>(AsyncGetProjectDomainAttributesRaw(context, request, cq));
@@ -304,6 +340,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesGetResponse>> PrepareAsyncGetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesGetResponse>>(PrepareAsyncGetProjectDomainAttributesRaw(context, request, cq));
     }
+    // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>> AsyncDeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>>(AsyncDeleteProjectDomainAttributesRaw(context, request, cq));
@@ -311,6 +348,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>> PrepareAsyncDeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>>(PrepareAsyncDeleteProjectDomainAttributesRaw(context, request, cq));
     }
+    // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest& request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesUpdateResponse>> AsyncUpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesUpdateResponse>>(AsyncUpdateWorkflowAttributesRaw(context, request, cq));
@@ -318,6 +356,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesUpdateResponse>> PrepareAsyncUpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesUpdateResponse>>(PrepareAsyncUpdateWorkflowAttributesRaw(context, request, cq));
     }
+    // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::flyteidl::admin::WorkflowAttributesGetResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesGetResponse>> AsyncGetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesGetResponse>>(AsyncGetWorkflowAttributesRaw(context, request, cq));
@@ -325,6 +364,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesGetResponse>> PrepareAsyncGetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesGetResponse>>(PrepareAsyncGetWorkflowAttributesRaw(context, request, cq));
     }
+    // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesDeleteResponse>> AsyncDeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesDeleteResponse>>(AsyncDeleteWorkflowAttributesRaw(context, request, cq));
@@ -332,6 +372,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesDeleteResponse>> PrepareAsyncDeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowAttributesDeleteResponse>>(PrepareAsyncDeleteWorkflowAttributesRaw(context, request, cq));
     }
+    // Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
     virtual ::grpc::Status ListMatchableAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest& request, ::flyteidl::admin::ListMatchableAttributesResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListMatchableAttributesResponse>> AsyncListMatchableAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListMatchableAttributesResponse>>(AsyncListMatchableAttributesRaw(context, request, cq));
@@ -339,6 +380,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListMatchableAttributesResponse>> PrepareAsyncListMatchableAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListMatchableAttributesResponse>>(PrepareAsyncListMatchableAttributesRaw(context, request, cq));
     }
+    // Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
     virtual ::grpc::Status ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::flyteidl::admin::NamedEntityList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityList>> AsyncListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityList>>(AsyncListNamedEntitiesRaw(context, request, cq));
@@ -346,6 +388,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityList>> PrepareAsyncListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityList>>(PrepareAsyncListNamedEntitiesRaw(context, request, cq));
     }
+    // Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
     virtual ::grpc::Status GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::flyteidl::admin::NamedEntity* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntity>> AsyncGetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntity>>(AsyncGetNamedEntityRaw(context, request, cq));
@@ -353,6 +396,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntity>> PrepareAsyncGetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntity>>(PrepareAsyncGetNamedEntityRaw(context, request, cq));
     }
+    // Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
     virtual ::grpc::Status UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::flyteidl::admin::NamedEntityUpdateResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>> AsyncUpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>>(AsyncUpdateNamedEntityRaw(context, request, cq));
@@ -370,180 +414,224 @@ class AdminService final {
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
+      // Create and upload a :ref:`ref_flyteidl.admin.Task` definition
       virtual void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
       virtual void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
       virtual void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
       virtual void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
       virtual void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
       virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
       virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
       virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
       virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
       virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
       virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
       virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
       virtual void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
       virtual void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a :ref:`ref_flyteidl.admin.Execution`.
       virtual void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
       virtual void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
       virtual void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
       virtual void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
       virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
       virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
       virtual void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Updates an existing :ref:`ref_flyteidl.admin.Project` 
       // flyteidl.admin.Project should be passed but the domains property should be empty;
       // it will be ignored in the handler as domains cannot be updated via this API.
       virtual void UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
       virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
       virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
       virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
       virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
       virtual void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
       virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
       virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
       virtual void UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
       virtual void GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
       virtual void DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
       virtual void UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
       virtual void GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
       virtual void DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
       virtual void ListMatchableAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest* request, ::flyteidl::admin::ListMatchableAttributesResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListMatchableAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListMatchableAttributesResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListMatchableAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest* request, ::flyteidl::admin::ListMatchableAttributesResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListMatchableAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListMatchableAttributesResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
       virtual void ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNamedEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListNamedEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
       virtual void GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntity* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -1300,51 +1388,95 @@ class AdminService final {
    public:
     Service();
     virtual ~Service();
+    // Create and upload a :ref:`ref_flyteidl.admin.Task` definition
     virtual ::grpc::Status CreateTask(::grpc::ServerContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response);
+    // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
     virtual ::grpc::Status GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
     virtual ::grpc::Status ListTaskIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
     virtual ::grpc::Status ListTasks(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response);
+    // Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
     virtual ::grpc::Status CreateWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response);
+    // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
     virtual ::grpc::Status GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
     virtual ::grpc::Status ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
     virtual ::grpc::Status ListWorkflows(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response);
+    // Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
     virtual ::grpc::Status CreateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response);
+    // Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
     virtual ::grpc::Status GetLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response);
+    // Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status GetActiveLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response);
+    // List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
     virtual ::grpc::Status ListLaunchPlanIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
     virtual ::grpc::Status ListLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response);
+    // Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
     virtual ::grpc::Status UpdateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response);
+    // Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
     virtual ::grpc::Status CreateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response);
+    // Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
     virtual ::grpc::Status RelaunchExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response);
+    // Fetches a :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status GetExecution(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response);
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status GetExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status ListExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response);
+    // Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
     virtual ::grpc::Status TerminateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response);
+    // Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status ListNodeExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status ListNodeExecutionsForTask(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response);
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status GetNodeExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response);
+    // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
     virtual ::grpc::Status RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response);
+    // Updates an existing :ref:`ref_flyteidl.admin.Project` 
     // flyteidl.admin.Project should be passed but the domains property should be empty;
     // it will be ignored in the handler as domains cannot be updated via this API.
     virtual ::grpc::Status UpdateProject(::grpc::ServerContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response);
+    // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
     virtual ::grpc::Status ListProjects(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response);
+    // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
     virtual ::grpc::Status CreateWorkflowEvent(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response);
+    // Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
     virtual ::grpc::Status CreateNodeEvent(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response);
+    // Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
     virtual ::grpc::Status CreateTaskEvent(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response);
+    // Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status GetTaskExecution(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response);
+    // Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status ListTaskExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response);
+    // Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
     virtual ::grpc::Status GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response);
+    // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status UpdateProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response);
+    // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status GetProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response);
+    // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
     virtual ::grpc::Status DeleteProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response);
+    // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status UpdateWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response);
+    // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status GetWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response);
+    // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
     virtual ::grpc::Status DeleteWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response);
+    // Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
     virtual ::grpc::Status ListMatchableAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ListMatchableAttributesRequest* request, ::flyteidl::admin::ListMatchableAttributesResponse* response);
+    // Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
     virtual ::grpc::Status ListNamedEntities(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response);
+    // Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
     virtual ::grpc::Status GetNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response);
+    // Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
     virtual ::grpc::Status UpdateNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response);
     virtual ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response);
   };

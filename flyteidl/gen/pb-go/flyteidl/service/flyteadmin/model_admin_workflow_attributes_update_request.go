@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Sets custom attributes for a project, domain and workflow combination.
 type AdminWorkflowAttributesUpdateRequest struct {
 	Attributes *AdminWorkflowAttributes `json:"attributes,omitempty"`
 }

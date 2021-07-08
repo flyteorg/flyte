@@ -88,7 +88,7 @@ public final class WorkflowAttributesOuterClass {
   /**
    * <pre>
    * Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
-   * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowAttributes}
@@ -535,7 +535,7 @@ public final class WorkflowAttributesOuterClass {
     /**
      * <pre>
      * Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
-     * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowAttributes}
@@ -1169,6 +1169,7 @@ public final class WorkflowAttributesOuterClass {
   /**
    * <pre>
    * Sets custom attributes for a project, domain and workflow combination.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowAttributesUpdateRequest}
@@ -1438,6 +1439,7 @@ public final class WorkflowAttributesOuterClass {
     /**
      * <pre>
      * Sets custom attributes for a project, domain and workflow combination.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowAttributesUpdateRequest}
@@ -2268,6 +2270,7 @@ public final class WorkflowAttributesOuterClass {
   /**
    * <pre>
    * Request to get an individual workflow attribute override.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowAttributesGetRequest}
@@ -2714,6 +2717,7 @@ public final class WorkflowAttributesOuterClass {
     /**
      * <pre>
      * Request to get an individual workflow attribute override.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowAttributesGetRequest}
@@ -3987,6 +3991,7 @@ public final class WorkflowAttributesOuterClass {
   /**
    * <pre>
    * Request to delete a set matchable workflow attribute override.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowAttributesDeleteRequest}
@@ -4433,6 +4438,7 @@ public final class WorkflowAttributesOuterClass {
     /**
      * <pre>
      * Request to delete a set matchable workflow attribute override.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowAttributesDeleteRequest}
