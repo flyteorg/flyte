@@ -32,6 +32,11 @@ K3S_PID=$!
 timeout 600 sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
 echo "Done."
 
+# Build flyte
+echo "Build Flyte..."
+cp /flyteorg/share/flyte_generated.yaml /opt/flyteorg/share/deployment
+kustomize build /opt/flyteorg/share/deployment | tee /flyteorg/share/flyte_generated.yaml
+
 # Deploy flyte
 echo "Deploying Flyte..."
 k3s kubectl apply -f /flyteorg/share/flyte_generated.yaml
