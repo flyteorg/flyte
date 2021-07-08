@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Sets custom attributes for a project-domain combination.
 type AdminProjectDomainAttributesUpdateRequest struct {
 	Attributes *AdminProjectDomainAttributes `json:"attributes,omitempty"`
 }

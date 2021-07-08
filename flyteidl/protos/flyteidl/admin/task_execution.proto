@@ -13,6 +13,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 
 // A message used to fetch a single task execution entity.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 message TaskExecutionGetRequest {
     // Unique identifier for the task execution.
     // +required
@@ -20,6 +21,7 @@ message TaskExecutionGetRequest {
 }
 
 // Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 message TaskExecutionListRequest {
     // Indicates the node execution to filter by.
     // +required
@@ -62,6 +64,7 @@ message TaskExecution {
 }
 
 // Response structure for a query to list of task execution entities.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 message TaskExecutionList {
     repeated TaskExecution task_executions = 1;
 
@@ -112,6 +115,7 @@ message TaskExecutionClosure {
 }
 
 // Request structure to fetch inputs and output for a task execution.
+// By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
 message TaskExecutionGetDataRequest {
     // The identifier of the task execution for which to fetch inputs and outputs.
     // +required

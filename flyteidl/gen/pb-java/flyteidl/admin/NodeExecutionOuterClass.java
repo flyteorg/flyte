@@ -49,6 +49,7 @@ public final class NodeExecutionOuterClass {
   /**
    * <pre>
    * A message used to fetch a single node execution entity.
+   * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NodeExecutionGetRequest}
@@ -333,6 +334,7 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * A message used to fetch a single node execution entity.
+     * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NodeExecutionGetRequest}
@@ -828,6 +830,7 @@ public final class NodeExecutionOuterClass {
   /**
    * <pre>
    * Represents a request structure to retrieve a list of node execution entities.
+   * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NodeExecutionListRequest}
@@ -1382,6 +1385,7 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Represents a request structure to retrieve a list of node execution entities.
+     * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NodeExecutionListRequest}
@@ -5976,6 +5980,7 @@ public final class NodeExecutionOuterClass {
   /**
    * <pre>
    * Request structure to retrieve a list of node execution entities.
+   * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NodeExecutionList}
@@ -6318,6 +6323,7 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Request structure to retrieve a list of node execution entities.
+     * See :ref:`ref_flyteidl.admin.NodeExecution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NodeExecutionList}
@@ -11950,6 +11956,7 @@ public final class NodeExecutionOuterClass {
   /**
    * <pre>
    * Request structure to fetch inputs and output for a node execution.
+   * By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NodeExecutionGetDataRequest}
@@ -12231,6 +12238,7 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Request structure to fetch inputs and output for a node execution.
+     * By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NodeExecutionGetDataRequest}

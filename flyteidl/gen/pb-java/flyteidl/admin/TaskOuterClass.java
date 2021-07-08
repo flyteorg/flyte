@@ -77,6 +77,7 @@ public final class TaskOuterClass {
   /**
    * <pre>
    * Represents a request structure to create a revision of a task.
+   * See :ref:`ref_flyteidl.admin.Task` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskCreateRequest}
@@ -426,6 +427,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents a request structure to create a revision of a task.
+     * See :ref:`ref_flyteidl.admin.Task` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskCreateRequest}
@@ -2394,6 +2396,7 @@ public final class TaskOuterClass {
   /**
    * <pre>
    * Represents a list of tasks returned from the admin.
+   * See :ref:`ref_flyteidl.admin.Task` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskList}
@@ -2756,6 +2759,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents a list of tasks returned from the admin.
+     * See :ref:`ref_flyteidl.admin.Task` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskList}

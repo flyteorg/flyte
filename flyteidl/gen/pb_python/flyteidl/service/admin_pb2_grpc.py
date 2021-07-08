@@ -260,189 +260,190 @@ class AdminServiceServicer(object):
   """
 
   def CreateTask(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Create and upload a :ref:`ref_flyteidl.admin.Task` definition
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetTask(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a :ref:`ref_flyteidl.admin.Task` definition.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListTaskIds(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListTasks(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateWorkflow(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetWorkflow(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListWorkflowIds(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListWorkflows(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateLaunchPlan(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetLaunchPlan(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetActiveLaunchPlan(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListActiveLaunchPlans(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListLaunchPlanIds(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListLaunchPlans(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def UpdateLaunchPlan(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def RelaunchExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches a :ref:`ref_flyteidl.admin.Execution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetExecutionData(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListExecutions(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def TerminateExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetNodeExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListNodeExecutions(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListNodeExecutionsForTask(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetNodeExecutionData(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def RegisterProject(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def UpdateProject(self, request, context):
-    """flyteidl.admin.Project should be passed but the domains property should be empty;
+    """Updates an existing :ref:`ref_flyteidl.admin.Project` 
+    flyteidl.admin.Project should be passed but the domains property should be empty;
     it will be ignored in the handler as domains cannot be updated via this API.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -450,120 +451,120 @@ class AdminServiceServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def ListProjects(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateWorkflowEvent(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateNodeEvent(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateTaskEvent(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetTaskExecution(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListTaskExecutions(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetTaskExecutionData(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def UpdateProjectDomainAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetProjectDomainAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def DeleteProjectDomainAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def UpdateWorkflowAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetWorkflowAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def DeleteWorkflowAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListMatchableAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListNamedEntities(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetNamedEntity(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def UpdateNamedEntity(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')

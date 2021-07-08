@@ -229,51 +229,95 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AdminServiceClient interface {
+	// Create and upload a :ref:`ref_flyteidl.admin.Task` definition
 	CreateTask(ctx context.Context, in *admin.TaskCreateRequest, opts ...grpc.CallOption) (*admin.TaskCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.Task` definition.
 	GetTask(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.Task, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
 	ListTaskIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
 	ListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.TaskList, error)
+	// Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
 	CreateWorkflow(ctx context.Context, in *admin.WorkflowCreateRequest, opts ...grpc.CallOption) (*admin.WorkflowCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
 	GetWorkflow(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.Workflow, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
 	ListWorkflowIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
 	ListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.WorkflowList, error)
+	// Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
 	CreateLaunchPlan(ctx context.Context, in *admin.LaunchPlanCreateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
 	GetLaunchPlan(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error)
+	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
 	GetActiveLaunchPlan(ctx context.Context, in *admin.ActiveLaunchPlanRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error)
+	// List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
 	ListActiveLaunchPlans(ctx context.Context, in *admin.ActiveLaunchPlanListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
 	ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
+	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(ctx context.Context, in *admin.LaunchPlanUpdateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanUpdateResponse, error)
+	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
 	CreateExecution(ctx context.Context, in *admin.ExecutionCreateRequest, opts ...grpc.CallOption) (*admin.ExecutionCreateResponse, error)
+	// Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
 	RelaunchExecution(ctx context.Context, in *admin.ExecutionRelaunchRequest, opts ...grpc.CallOption) (*admin.ExecutionCreateResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecution(ctx context.Context, in *admin.WorkflowExecutionGetRequest, opts ...grpc.CallOption) (*admin.Execution, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionData(ctx context.Context, in *admin.WorkflowExecutionGetDataRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionGetDataResponse, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
 	ListExecutions(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.ExecutionList, error)
+	// Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
 	TerminateExecution(ctx context.Context, in *admin.ExecutionTerminateRequest, opts ...grpc.CallOption) (*admin.ExecutionTerminateResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecution(ctx context.Context, in *admin.NodeExecutionGetRequest, opts ...grpc.CallOption) (*admin.NodeExecution, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
 	ListNodeExecutions(ctx context.Context, in *admin.NodeExecutionListRequest, opts ...grpc.CallOption) (*admin.NodeExecutionList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
 	ListNodeExecutionsForTask(ctx context.Context, in *admin.NodeExecutionForTaskListRequest, opts ...grpc.CallOption) (*admin.NodeExecutionList, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecutionData(ctx context.Context, in *admin.NodeExecutionGetDataRequest, opts ...grpc.CallOption) (*admin.NodeExecutionGetDataResponse, error)
+	// Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 	RegisterProject(ctx context.Context, in *admin.ProjectRegisterRequest, opts ...grpc.CallOption) (*admin.ProjectRegisterResponse, error)
+	// Updates an existing :ref:`ref_flyteidl.admin.Project`
 	// flyteidl.admin.Project should be passed but the domains property should be empty;
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) (*admin.ProjectUpdateResponse, error)
+	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(ctx context.Context, in *admin.ProjectListRequest, opts ...grpc.CallOption) (*admin.Projects, error)
+	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
 	CreateWorkflowEvent(ctx context.Context, in *admin.WorkflowExecutionEventRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionEventResponse, error)
+	// Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
 	CreateNodeEvent(ctx context.Context, in *admin.NodeExecutionEventRequest, opts ...grpc.CallOption) (*admin.NodeExecutionEventResponse, error)
+	// Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
 	CreateTaskEvent(ctx context.Context, in *admin.TaskExecutionEventRequest, opts ...grpc.CallOption) (*admin.TaskExecutionEventResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
 	GetTaskExecution(ctx context.Context, in *admin.TaskExecutionGetRequest, opts ...grpc.CallOption) (*admin.TaskExecution, error)
+	// Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
 	ListTaskExecutions(ctx context.Context, in *admin.TaskExecutionListRequest, opts ...grpc.CallOption) (*admin.TaskExecutionList, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
 	GetTaskExecutionData(ctx context.Context, in *admin.TaskExecutionGetDataRequest, opts ...grpc.CallOption) (*admin.TaskExecutionGetDataResponse, error)
+	// Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	UpdateProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesUpdateRequest, opts ...grpc.CallOption) (*admin.ProjectDomainAttributesUpdateResponse, error)
+	// Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	GetProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesGetRequest, opts ...grpc.CallOption) (*admin.ProjectDomainAttributesGetResponse, error)
+	// Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	DeleteProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesDeleteRequest, opts ...grpc.CallOption) (*admin.ProjectDomainAttributesDeleteResponse, error)
+	// Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	UpdateWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesUpdateRequest, opts ...grpc.CallOption) (*admin.WorkflowAttributesUpdateResponse, error)
+	// Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	GetWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesGetRequest, opts ...grpc.CallOption) (*admin.WorkflowAttributesGetResponse, error)
+	// Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	DeleteWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesDeleteRequest, opts ...grpc.CallOption) (*admin.WorkflowAttributesDeleteResponse, error)
+	// Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
 	ListMatchableAttributes(ctx context.Context, in *admin.ListMatchableAttributesRequest, opts ...grpc.CallOption) (*admin.ListMatchableAttributesResponse, error)
+	// Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
 	ListNamedEntities(ctx context.Context, in *admin.NamedEntityListRequest, opts ...grpc.CallOption) (*admin.NamedEntityList, error)
+	// Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
 	GetNamedEntity(ctx context.Context, in *admin.NamedEntityGetRequest, opts ...grpc.CallOption) (*admin.NamedEntity, error)
+	// Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
 	UpdateNamedEntity(ctx context.Context, in *admin.NamedEntityUpdateRequest, opts ...grpc.CallOption) (*admin.NamedEntityUpdateResponse, error)
 	GetVersion(ctx context.Context, in *admin.GetVersionRequest, opts ...grpc.CallOption) (*admin.GetVersionResponse, error)
 }
@@ -693,51 +737,95 @@ func (c *adminServiceClient) GetVersion(ctx context.Context, in *admin.GetVersio
 
 // AdminServiceServer is the server API for AdminService service.
 type AdminServiceServer interface {
+	// Create and upload a :ref:`ref_flyteidl.admin.Task` definition
 	CreateTask(context.Context, *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.Task` definition.
 	GetTask(context.Context, *admin.ObjectGetRequest) (*admin.Task, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
 	ListTaskIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
 	ListTasks(context.Context, *admin.ResourceListRequest) (*admin.TaskList, error)
+	// Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
 	CreateWorkflow(context.Context, *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
 	GetWorkflow(context.Context, *admin.ObjectGetRequest) (*admin.Workflow, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
 	ListWorkflowIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
 	ListWorkflows(context.Context, *admin.ResourceListRequest) (*admin.WorkflowList, error)
+	// Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
 	CreateLaunchPlan(context.Context, *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error)
+	// Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
 	GetLaunchPlan(context.Context, *admin.ObjectGetRequest) (*admin.LaunchPlan, error)
+	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
 	GetActiveLaunchPlan(context.Context, *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error)
+	// List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
 	ListActiveLaunchPlans(context.Context, *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
 	ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error)
+	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(context.Context, *admin.LaunchPlanUpdateRequest) (*admin.LaunchPlanUpdateResponse, error)
+	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
 	CreateExecution(context.Context, *admin.ExecutionCreateRequest) (*admin.ExecutionCreateResponse, error)
+	// Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
 	RelaunchExecution(context.Context, *admin.ExecutionRelaunchRequest) (*admin.ExecutionCreateResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecution(context.Context, *admin.WorkflowExecutionGetRequest) (*admin.Execution, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionData(context.Context, *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
 	ListExecutions(context.Context, *admin.ResourceListRequest) (*admin.ExecutionList, error)
+	// Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
 	TerminateExecution(context.Context, *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecution(context.Context, *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
 	ListNodeExecutions(context.Context, *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
 	ListNodeExecutionsForTask(context.Context, *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecutionData(context.Context, *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
+	// Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 	RegisterProject(context.Context, *admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error)
+	// Updates an existing :ref:`ref_flyteidl.admin.Project`
 	// flyteidl.admin.Project should be passed but the domains property should be empty;
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(context.Context, *admin.Project) (*admin.ProjectUpdateResponse, error)
+	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(context.Context, *admin.ProjectListRequest) (*admin.Projects, error)
+	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
 	CreateWorkflowEvent(context.Context, *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error)
+	// Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
 	CreateNodeEvent(context.Context, *admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error)
+	// Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
 	CreateTaskEvent(context.Context, *admin.TaskExecutionEventRequest) (*admin.TaskExecutionEventResponse, error)
+	// Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
 	GetTaskExecution(context.Context, *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error)
+	// Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
 	ListTaskExecutions(context.Context, *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error)
+	// Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
 	GetTaskExecutionData(context.Context, *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error)
+	// Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	UpdateProjectDomainAttributes(context.Context, *admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error)
+	// Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	GetProjectDomainAttributes(context.Context, *admin.ProjectDomainAttributesGetRequest) (*admin.ProjectDomainAttributesGetResponse, error)
+	// Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
 	DeleteProjectDomainAttributes(context.Context, *admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error)
+	// Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	UpdateWorkflowAttributes(context.Context, *admin.WorkflowAttributesUpdateRequest) (*admin.WorkflowAttributesUpdateResponse, error)
+	// Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	GetWorkflowAttributes(context.Context, *admin.WorkflowAttributesGetRequest) (*admin.WorkflowAttributesGetResponse, error)
+	// Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 	DeleteWorkflowAttributes(context.Context, *admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error)
+	// Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
 	ListMatchableAttributes(context.Context, *admin.ListMatchableAttributesRequest) (*admin.ListMatchableAttributesResponse, error)
+	// Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
 	ListNamedEntities(context.Context, *admin.NamedEntityListRequest) (*admin.NamedEntityList, error)
+	// Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
 	GetNamedEntity(context.Context, *admin.NamedEntityGetRequest) (*admin.NamedEntity, error)
+	// Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
 	UpdateNamedEntity(context.Context, *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error)
 	GetVersion(context.Context, *admin.GetVersionRequest) (*admin.GetVersionResponse, error)
 }

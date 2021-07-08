@@ -26,6 +26,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // A message used to fetch a single task execution entity.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 type TaskExecutionGetRequest struct {
 	// Unique identifier for the task execution.
 	// +required
@@ -68,6 +69,7 @@ func (m *TaskExecutionGetRequest) GetId() *core.TaskExecutionIdentifier {
 }
 
 // Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 type TaskExecutionListRequest struct {
 	// Indicates the node execution to filter by.
 	// +required
@@ -222,6 +224,7 @@ func (m *TaskExecution) GetIsParent() bool {
 }
 
 // Response structure for a query to list of task execution entities.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 type TaskExecutionList struct {
 	TaskExecutions []*TaskExecution `protobuf:"bytes,1,rep,name=task_executions,json=taskExecutions,proto3" json:"task_executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -443,6 +446,7 @@ func (*TaskExecutionClosure) XXX_OneofWrappers() []interface{} {
 }
 
 // Request structure to fetch inputs and output for a task execution.
+// By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
 type TaskExecutionGetDataRequest struct {
 	// The identifier of the task execution for which to fetch inputs and outputs.
 	// +required

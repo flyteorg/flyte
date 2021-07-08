@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Request to set the referenced launch plan state to the configured value.
 type AdminLaunchPlanUpdateRequest struct {
 	// Identifier of launch plan for which to change state. +required.
 	Id *CoreIdentifier `json:"id,omitempty"`
