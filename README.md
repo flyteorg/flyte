@@ -33,6 +33,9 @@
   </a>
   <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a> 
   <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" />
+  <a href="https://artifacthub.io/packages/search?repo=flyte">
+    <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
+  </a> 
   <a href="https://forms.gle/UVuek9WfBoweiqcJA">
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
@@ -187,27 +190,27 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </h2>
 </html>
 
-| Repo                                                          | Language      | Purpose                                        | Status           |
-| ------------------------------------------------------------- | ------------- | ---------------------------------------------- | ---------------- |
-| [flyte](https://github.com/flyteorg/flyte)                    | Kustomize,RST | deployment, documentation, issues              | Production-grade |
-| [flyteidl](https://github.com/flyteorg/flyteidl)              | Protobuf      | interface definitions                          | Production-grade |
-| [flytepropeller](https://github.com/flyteorg/flytepropeller)  | Go            | execution engine                               | Production-grade |
-| [flyteadmin](https://github.com/flyteorg/flyteadmin)          | Go            | control plane                                  | Production-grade |
-| [flytekit](https://github.com/flyteorg/flytekit)              | Python        | python SDK and tools                           | Production-grade |
-| [flyteconsole](https://github.com/flyteorg/flyteconsole)      | Typescript    | admin console                                  | Production-grade |
-| [datacatalog](https://github.com/flyteorg/datacatalog)        | Go            | manage input & output artifacts                | Production-grade |
-| [flyteplugins](https://github.com/flyteorg/flyteplugins)      | Go            | flyte plugins                                  | Production-grade |
-| [flytestdlib](https://github.com/flyteorg/flytestdlib)        | Go            | standard library                               | Production-grade |
-| [flytesnacks](https://github.com/flyteorg/flytesnacks)        | Python        | examples, tips, and tricks                     | Incubating       |
-| [flytekit-java](https://github.com/flyteorg/flytekit-java)    | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
-| [flytectl](https://github.com/flyteorg/flytectl)              | Go            | A standalone Flyte CLI                         | Incomplete       |
+| Repo                                                         | Language      | Purpose                                        | Status           |
+| ------------------------------------------------------------ | ------------- | ---------------------------------------------- | ---------------- |
+| [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
+| [flyteidl](https://github.com/flyteorg/flyteidl)             | Protobuf      | interface definitions                          | Production-grade |
+| [flytepropeller](https://github.com/flyteorg/flytepropeller) | Go            | execution engine                               | Production-grade |
+| [flyteadmin](https://github.com/flyteorg/flyteadmin)         | Go            | control plane                                  | Production-grade |
+| [flytekit](https://github.com/flyteorg/flytekit)             | Python        | python SDK and tools                           | Production-grade |
+| [flyteconsole](https://github.com/flyteorg/flyteconsole)     | Typescript    | admin console                                  | Production-grade |
+| [datacatalog](https://github.com/flyteorg/datacatalog)       | Go            | manage input & output artifacts                | Production-grade |
+| [flyteplugins](https://github.com/flyteorg/flyteplugins)     | Go            | flyte plugins                                  | Production-grade |
+| [flytestdlib](https://github.com/flyteorg/flytestdlib)       | Go            | standard library                               | Production-grade |
+| [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Incubating       |
+| [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
+| [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
 
 ## 🔩 Production K8s Operators
 
 | Repo                                                                  | Language | Purpose                |
 | --------------------------------------------------------------------- | -------- | ---------------------- |
 | [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
-| [Flink](https://github.com/flyteorg/flinkk8soperator)                     | Go       | Apache Flink streaming |
+| [Flink](https://github.com/flyteorg/flinkk8soperator)                 | Go       | Apache Flink streaming |
 
 <html>
 <h2 id="community--resources"> 
