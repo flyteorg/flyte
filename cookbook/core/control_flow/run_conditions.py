@@ -121,12 +121,14 @@ if __name__ == "__main__":
 #
 #    Wondering how output values get these methods. In a workflow no output value is available to access directly. The inputs and outputs are auto-wrapped in a special object called :py:class:`flytekit.extend.Promise`.
 #
+# In this contrived example for ease of testing, we are creating a biased coin whose seed we can control.
 @task
-def coin_toss() -> bool:
+def coin_toss(seed: int) -> bool:
     """
     Mimic some condition checking to see if something ran correctly
     """
-    if random.random() < 0.5:
+    r = random.Random(seed)
+    if r.random() < 0.5:
         return True
     return False
 
@@ -148,8 +150,8 @@ def success() -> int:
 
 
 @workflow
-def basic_boolean_wf() -> int:
-    result = coin_toss()
+def basic_boolean_wf(seed: int = 5) -> int:
+    result = coin_toss(seed=seed)
     return (
         conditional("test").if_(result.is_true()).then(success()).else_().then(failed())
     )
@@ -222,11 +224,11 @@ if __name__ == "__main__":
 # to be the subset of outputs that all then-nodes produce. In the following example, we call square() in one condition
 # and call double in another.
 @task
-def sum_diff(a: float, b: float) -> (float, float):
+def sum_diff(a: float, b: float) -> float:
     """
     sum_diff returns the sum and difference between a and b.
     """
-    return a + b, a - b
+    return a + b
 
 
 # %%
@@ -241,11 +243,11 @@ def sum_diff(a: float, b: float) -> (float, float):
 #
 #           x = 0 if m < 0 else 1
 @workflow
-def consume_outputs(my_input: float) -> float:
-    is_heads = coin_toss()
+def consume_outputs(my_input: float, seed: int = 5) -> float:
+    is_heads = coin_toss(seed=seed)
     res = (
         conditional("double_or_square")
-            .if_(is_heads == True)
+            .if_(is_heads.is_true())
             .then(square(n=my_input))
             .else_()
             .then(sum_diff(a=my_input, b=my_input))
@@ -259,4 +261,5 @@ def consume_outputs(my_input: float) -> float:
 # %%
 # As usual local execution does not change
 if __name__ == "__main__":
-    print(f"consume_outputs(0.4) => {consume_outputs(my_input=0.4)}")
+    print(f"consume_outputs(0.4) with default seed=5. This should return output of sum_diff => {consume_outputs(my_input=0.4)}")
+    print(f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}")
