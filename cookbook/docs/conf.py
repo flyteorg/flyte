@@ -186,7 +186,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 master_doc = "index"
 
 pygments_style = "tango"
-pygments_dark_style = "native"
+pygments_dark_style = "monokai"
 
 html_context = {
     "home_page": "https://docs.flyte.org",
