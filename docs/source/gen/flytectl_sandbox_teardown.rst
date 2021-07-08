@@ -10,7 +10,7 @@ Synopsis
 
 
 
-Teardown will remove docker container and all the flyte config 
+Teardown will remove sandbox cluster and all the flyte config created by sandbox start
 ::
 
  bin/flytectl sandbox teardown 
@@ -43,5 +43,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for testing flyte sandbox.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 

@@ -44,5 +44,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for testing flyte sandbox.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 
