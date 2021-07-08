@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Defines a set of custom matching attributes which defines resource defaults for a project and domain.
-// For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type ProjectDomainAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -80,6 +80,7 @@ func (m *ProjectDomainAttributes) GetMatchingAttributes() *MatchingAttributes {
 }
 
 // Sets custom attributes for a project-domain combination.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type ProjectDomainAttributesUpdateRequest struct {
 	// +required
 	Attributes           *ProjectDomainAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
@@ -153,6 +154,7 @@ func (m *ProjectDomainAttributesUpdateResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ProjectDomainAttributesUpdateResponse proto.InternalMessageInfo
 
 // Request to get an individual project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type ProjectDomainAttributesGetRequest struct {
 	// Unique project id which this set of attributes references.
 	// +required
@@ -215,6 +217,7 @@ func (m *ProjectDomainAttributesGetRequest) GetResourceType() MatchableResource 
 }
 
 // Response to get an individual project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type ProjectDomainAttributesGetResponse struct {
 	Attributes           *ProjectDomainAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
@@ -255,6 +258,7 @@ func (m *ProjectDomainAttributesGetResponse) GetAttributes() *ProjectDomainAttri
 }
 
 // Request to delete a set matchable project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 type ProjectDomainAttributesDeleteRequest struct {
 	// Unique project id which this set of attributes references.
 	// +required

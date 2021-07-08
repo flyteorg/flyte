@@ -3079,6 +3079,7 @@ public final class ExecutionOuterClass {
   /**
    * <pre>
    * A message used to fetch a single workflow execution entity.
+   * See :ref:`ref_flyteidl.admin.Execution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetRequest}
@@ -3360,6 +3361,7 @@ public final class ExecutionOuterClass {
     /**
      * <pre>
      * A message used to fetch a single workflow execution entity.
+     * See :ref:`ref_flyteidl.admin.Execution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetRequest}
@@ -4958,6 +4960,7 @@ public final class ExecutionOuterClass {
   /**
    * <pre>
    * Used as a response for request to list executions.
+   * See :ref:`ref_flyteidl.admin.Execution` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ExecutionList}
@@ -5300,6 +5303,7 @@ public final class ExecutionOuterClass {
     /**
      * <pre>
      * Used as a response for request to list executions.
+     * See :ref:`ref_flyteidl.admin.Execution` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ExecutionList}
@@ -19063,6 +19067,7 @@ public final class ExecutionOuterClass {
   /**
    * <pre>
    * Request structure to fetch inputs, output and other data produced by an execution.
+   * By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetDataRequest}
@@ -19344,6 +19349,7 @@ public final class ExecutionOuterClass {
     /**
      * <pre>
      * Request structure to fetch inputs, output and other data produced by an execution.
+     * By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetDataRequest}

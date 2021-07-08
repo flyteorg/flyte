@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Represents a list of workflows returned from the admin.
 type AdminWorkflowList struct {
 	// A list of workflows returned based on the request.
 	Workflows []AdminWorkflow `json:"workflows,omitempty"`

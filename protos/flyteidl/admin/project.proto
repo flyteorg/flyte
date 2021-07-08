@@ -47,6 +47,8 @@ message Project {
     ProjectState state = 6;
 }
 
+// Represents a list of projects.
+// See :ref:`ref_flyteidl.admin.Project` for more details
 message Projects {
     repeated Project projects = 1;
 
@@ -55,6 +57,8 @@ message Projects {
     string token        = 2;
 }
 
+// Request to retrieve a list of projects matching specified filters. 
+// See :ref:`ref_flyteidl.admin.Project` for more details
 message ProjectListRequest {
     // Indicates the number of projects to be returned.
     // +required
@@ -75,13 +79,17 @@ message ProjectListRequest {
     Sort sort_by    = 4;
 }
 
+// Adds a new user-project within the Flyte deployment.
+// See :ref:`ref_flyteidl.admin.Project` for more details
 message ProjectRegisterRequest {
     // +required
     Project project                       = 1;
 }
 
+// Purposefully empty, may be updated in the future.
 message ProjectRegisterResponse {
 }
 
+// Purposefully empty, may be updated in the future.
 message ProjectUpdateResponse {
 }

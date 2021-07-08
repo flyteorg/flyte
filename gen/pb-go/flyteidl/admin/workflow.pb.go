@@ -23,6 +23,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Represents a request structure to create a revision of a workflow.
+// See :ref:`ref_flyteidl.admin.Workflow` for more details
 type WorkflowCreateRequest struct {
 	// id represents the unique identifier of the workflow.
 	// +required
@@ -158,6 +159,7 @@ func (m *Workflow) GetClosure() *WorkflowClosure {
 }
 
 // Represents a list of workflows returned from the admin.
+// See :ref:`ref_flyteidl.admin.Workflow` for more details
 type WorkflowList struct {
 	// A list of workflows returned based on the request.
 	Workflows []*Workflow `protobuf:"bytes,1,rep,name=workflows,proto3" json:"workflows,omitempty"`

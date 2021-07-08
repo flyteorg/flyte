@@ -704,6 +704,7 @@ func (m *MatchableAttributesConfiguration) GetLaunchPlan() string {
 }
 
 // Request all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 type ListMatchableAttributesRequest struct {
 	// +required
 	ResourceType         MatchableResource `protobuf:"varint,1,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
@@ -745,6 +746,7 @@ func (m *ListMatchableAttributesRequest) GetResourceType() MatchableResource {
 }
 
 // Response for a request for all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 type ListMatchableAttributesResponse struct {
 	Configurations       []*MatchableAttributesConfiguration `protobuf:"bytes,1,rep,name=configurations,proto3" json:"configurations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`

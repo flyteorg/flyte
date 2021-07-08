@@ -198,6 +198,7 @@ func (m *LaunchPlan) GetClosure() *LaunchPlanClosure {
 }
 
 // Response object for list launch plan requests.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 type LaunchPlanList struct {
 	LaunchPlans []*LaunchPlan `protobuf:"bytes,1,rep,name=launch_plans,json=launchPlans,proto3" json:"launch_plans,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -587,6 +588,7 @@ func (m *LaunchPlanMetadata) GetNotifications() []*Notification {
 }
 
 // Request to set the referenced launch plan state to the configured value.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 type LaunchPlanUpdateRequest struct {
 	// Identifier of launch plan for which to change state.
 	// +required.
@@ -671,6 +673,7 @@ func (m *LaunchPlanUpdateResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_LaunchPlanUpdateResponse proto.InternalMessageInfo
 
 // Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 type ActiveLaunchPlanRequest struct {
 	// +required.
 	Id                   *NamedEntityIdentifier `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -712,6 +715,7 @@ func (m *ActiveLaunchPlanRequest) GetId() *NamedEntityIdentifier {
 }
 
 // Represents a request structure to list active launch plans within a project/domain.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 type ActiveLaunchPlanListRequest struct {
 	// Name of the project that contains the identifiers.
 	// +required.

@@ -70,7 +70,7 @@ public final class ProjectDomainAttributesOuterClass {
   /**
    * <pre>
    * Defines a set of custom matching attributes which defines resource defaults for a project and domain.
-   * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributes}
@@ -458,7 +458,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Defines a set of custom matching attributes which defines resource defaults for a project and domain.
-     * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributes}
@@ -1008,6 +1008,7 @@ public final class ProjectDomainAttributesOuterClass {
   /**
    * <pre>
    * Sets custom attributes for a project-domain combination.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesUpdateRequest}
@@ -1289,6 +1290,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Sets custom attributes for a project-domain combination.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesUpdateRequest}
@@ -2135,6 +2137,7 @@ public final class ProjectDomainAttributesOuterClass {
   /**
    * <pre>
    * Request to get an individual project domain attribute override.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetRequest}
@@ -2520,6 +2523,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Request to get an individual project domain attribute override.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetRequest}
@@ -3012,6 +3016,7 @@ public final class ProjectDomainAttributesOuterClass {
   /**
    * <pre>
    * Response to get an individual project domain attribute override.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetResponse}
@@ -3281,6 +3286,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Response to get an individual project domain attribute override.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetResponse}
@@ -3672,6 +3678,7 @@ public final class ProjectDomainAttributesOuterClass {
   /**
    * <pre>
    * Request to delete a set matchable project domain attribute override.
+   * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesDeleteRequest}
@@ -4057,6 +4064,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Request to delete a set matchable project domain attribute override.
+     * For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesDeleteRequest}

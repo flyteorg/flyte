@@ -9652,6 +9652,7 @@ public final class MatchableResourceOuterClass {
   /**
    * <pre>
    * Request all matching resource attributes for a resource type.
+   * See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ListMatchableAttributesRequest}
@@ -9913,6 +9914,7 @@ public final class MatchableResourceOuterClass {
     /**
      * <pre>
      * Request all matching resource attributes for a resource type.
+     * See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ListMatchableAttributesRequest}
@@ -10209,6 +10211,7 @@ public final class MatchableResourceOuterClass {
   /**
    * <pre>
    * Response for a request for all matching resource attributes for a resource type.
+   * See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ListMatchableAttributesResponse}
@@ -10489,6 +10492,7 @@ public final class MatchableResourceOuterClass {
     /**
      * <pre>
      * Response for a request for all matching resource attributes for a resource type.
+     * See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ListMatchableAttributesResponse}

@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Represents a list of tasks returned from the admin.
 type AdminTaskList struct {
 	// A list of tasks returned based on the request.
 	Tasks []AdminTask `json:"tasks,omitempty"`

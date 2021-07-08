@@ -13,6 +13,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
 // A message used to fetch a single node execution entity.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 message NodeExecutionGetRequest {
 
    // Uniquely identifies an individual node execution.
@@ -21,6 +22,7 @@ message NodeExecutionGetRequest {
 }
 
 // Represents a request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 message NodeExecutionListRequest {
     // Indicates the workflow execution to filter by.
    // +required
@@ -111,6 +113,7 @@ message NodeExecutionMetaData {
 }
 
 // Request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 message NodeExecutionList {
     repeated NodeExecution node_executions = 1;
 
@@ -177,6 +180,7 @@ message DynamicWorkflowNodeMetadata {
 }
 
 // Request structure to fetch inputs and output for a node execution.
+// By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
 message NodeExecutionGetDataRequest {
     // The identifier of the node execution for which to fetch inputs and outputs.
     core.NodeExecutionIdentifier id        = 1;

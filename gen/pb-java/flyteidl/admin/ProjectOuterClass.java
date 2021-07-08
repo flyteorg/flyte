@@ -2604,6 +2604,11 @@ public final class ProjectOuterClass {
         getTokenBytes();
   }
   /**
+   * <pre>
+   * Represents a list of projects.
+   * See :ref:`ref_flyteidl.admin.Project` for more details
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.Projects}
    */
   public  static final class Projects extends
@@ -2942,6 +2947,11 @@ public final class ProjectOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Represents a list of projects.
+     * See :ref:`ref_flyteidl.admin.Project` for more details
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.Projects}
      */
     public static final class Builder extends
@@ -3608,6 +3618,11 @@ public final class ProjectOuterClass {
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
   }
   /**
+   * <pre>
+   * Request to retrieve a list of projects matching specified filters. 
+   * See :ref:`ref_flyteidl.admin.Project` for more details
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectListRequest}
    */
   public  static final class ProjectListRequest extends
@@ -4044,6 +4059,11 @@ public final class ProjectOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Request to retrieve a list of projects matching specified filters. 
+     * See :ref:`ref_flyteidl.admin.Project` for more details
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectListRequest}
      */
     public static final class Builder extends
@@ -4701,6 +4721,11 @@ public final class ProjectOuterClass {
     flyteidl.admin.ProjectOuterClass.ProjectOrBuilder getProjectOrBuilder();
   }
   /**
+   * <pre>
+   * Adds a new user-project within the Flyte deployment.
+   * See :ref:`ref_flyteidl.admin.Project` for more details
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectRegisterRequest}
    */
   public  static final class ProjectRegisterRequest extends
@@ -4978,6 +5003,11 @@ public final class ProjectOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Adds a new user-project within the Flyte deployment.
+     * See :ref:`ref_flyteidl.admin.Project` for more details
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectRegisterRequest}
      */
     public static final class Builder extends
@@ -5342,6 +5372,10 @@ public final class ProjectOuterClass {
       com.google.protobuf.MessageOrBuilder {
   }
   /**
+   * <pre>
+   * Purposefully empty, may be updated in the future.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectRegisterResponse}
    */
   public  static final class ProjectRegisterResponse extends
@@ -5556,6 +5590,10 @@ public final class ProjectOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Purposefully empty, may be updated in the future.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectRegisterResponse}
      */
     public static final class Builder extends
@@ -5753,6 +5791,10 @@ public final class ProjectOuterClass {
       com.google.protobuf.MessageOrBuilder {
   }
   /**
+   * <pre>
+   * Purposefully empty, may be updated in the future.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectUpdateResponse}
    */
   public  static final class ProjectUpdateResponse extends
@@ -5967,6 +6009,10 @@ public final class ProjectOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Purposefully empty, may be updated in the future.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectUpdateResponse}
      */
     public static final class Builder extends

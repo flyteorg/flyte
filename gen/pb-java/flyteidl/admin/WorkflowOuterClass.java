@@ -77,6 +77,7 @@ public final class WorkflowOuterClass {
   /**
    * <pre>
    * Represents a request structure to create a revision of a workflow.
+   * See :ref:`ref_flyteidl.admin.Workflow` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowCreateRequest}
@@ -426,6 +427,7 @@ public final class WorkflowOuterClass {
     /**
      * <pre>
      * Represents a request structure to create a revision of a workflow.
+     * See :ref:`ref_flyteidl.admin.Workflow` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowCreateRequest}
@@ -2394,6 +2396,7 @@ public final class WorkflowOuterClass {
   /**
    * <pre>
    * Represents a list of workflows returned from the admin.
+   * See :ref:`ref_flyteidl.admin.Workflow` for more details
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowList}
@@ -2756,6 +2759,7 @@ public final class WorkflowOuterClass {
     /**
      * <pre>
      * Represents a list of workflows returned from the admin.
+     * See :ref:`ref_flyteidl.admin.Workflow` for more details
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowList}

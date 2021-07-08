@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Request structure to retrieve a list of node execution entities.
 type AdminNodeExecutionList struct {
 	NodeExecutions []FlyteidladminNodeExecution `json:"node_executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty.

@@ -24,6 +24,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // A message used to fetch a single node execution entity.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 type NodeExecutionGetRequest struct {
 	// Uniquely identifies an individual node execution.
 	// +required
@@ -66,6 +67,7 @@ func (m *NodeExecutionGetRequest) GetId() *core.NodeExecutionIdentifier {
 }
 
 // Represents a request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 type NodeExecutionListRequest struct {
 	// Indicates the workflow execution to filter by.
 	// +required
@@ -376,6 +378,7 @@ func (m *NodeExecutionMetaData) GetSpecNodeId() string {
 }
 
 // Request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 type NodeExecutionList struct {
 	NodeExecutions []*NodeExecution `protobuf:"bytes,1,rep,name=node_executions,json=nodeExecutions,proto3" json:"node_executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -741,6 +744,7 @@ func (m *DynamicWorkflowNodeMetadata) GetCompiledWorkflow() *core.CompiledWorkfl
 }
 
 // Request structure to fetch inputs and output for a node execution.
+// By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
 type NodeExecutionGetDataRequest struct {
 	// The identifier of the node execution for which to fetch inputs and outputs.
 	Id                   *core.NodeExecutionIdentifier `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`

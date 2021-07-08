@@ -17,6 +17,7 @@
   "paths": {
     "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
         "description": "Retrieve the active launch plan version specified by input request filters.",
         "operationId": "GetActiveLaunchPlan",
         "responses": {
@@ -57,6 +58,7 @@
     },
     "/api/v1/active_launch_plans/{project}/{domain}": {
       "get": {
+        "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
         "description": "Fetch the active launch plan versions specified by input request filters.",
         "operationId": "ListActiveLaunchPlans",
         "responses": {
@@ -124,6 +126,7 @@
     },
     "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.",
         "description": "Fetch child node executions launched by the specified task execution.",
         "operationId": "ListNodeExecutionsForTask",
         "responses": {
@@ -261,6 +264,7 @@
     },
     "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.",
         "description": "Retrieve input and output data from an existing workflow execution.",
         "operationId": "GetExecutionData",
         "responses": {
@@ -301,6 +305,7 @@
     },
     "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
         "description": "Retrieve input and output data from an existing node execution.",
         "operationId": "GetNodeExecutionData",
         "responses": {
@@ -347,6 +352,7 @@
     },
     "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
         "description": "Retrieve input and output data from an existing task execution.",
         "operationId": "GetTaskExecutionData",
         "responses": {
@@ -443,6 +449,7 @@
     },
     "/api/v1/events/nodes": {
       "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
         "description": "Create a node execution event recording a phase transition.",
         "operationId": "CreateNodeEvent",
         "responses": {
@@ -470,6 +477,7 @@
     },
     "/api/v1/events/tasks": {
       "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
         "description": "Create a task execution event recording a phase transition.",
         "operationId": "CreateTaskEvent",
         "responses": {
@@ -497,6 +505,7 @@
     },
     "/api/v1/events/workflows": {
       "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
         "description": "Create a workflow execution event recording a phase transition.",
         "operationId": "CreateWorkflowEvent",
         "responses": {
@@ -524,6 +533,7 @@
     },
     "/api/v1/executions": {
       "post": {
+        "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`",
         "description": "Create a workflow execution.",
         "operationId": "CreateExecution",
         "responses": {
@@ -551,6 +561,7 @@
     },
     "/api/v1/executions/relaunch": {
       "post": {
+        "summary": "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`",
         "description": "Relaunch a workflow execution.",
         "operationId": "RelaunchExecution",
         "responses": {
@@ -578,6 +589,7 @@
     },
     "/api/v1/executions/{id.project}/{id.domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Execution`.",
         "description": "Fetch existing workflow executions matching input filters.",
         "operationId": "ListExecutions",
         "responses": {
@@ -659,6 +671,7 @@
     },
     "/api/v1/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Execution`.",
         "description": "Retrieve an existing workflow execution.",
         "operationId": "GetExecution",
         "responses": {
@@ -697,6 +710,7 @@
         ]
       },
       "delete": {
+        "summary": "Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.",
         "description": "Terminate the active workflow execution specified in the request.",
         "operationId": "TerminateExecution",
         "responses": {
@@ -745,6 +759,7 @@
     },
     "/api/v1/launch_plan_ids/{project}/{domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.",
         "description": "Fetch existing launch plan definition identifiers matching input filters.",
         "operationId": "ListLaunchPlanIds",
         "responses": {
@@ -819,6 +834,7 @@
     },
     "/api/v1/launch_plans": {
       "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition",
         "description": "Create and register a launch plan definition.",
         "operationId": "CreateLaunchPlan",
         "responses": {
@@ -854,6 +870,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "ListLaunchPlans2",
         "responses": {
@@ -935,6 +952,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "ListLaunchPlans",
         "responses": {
@@ -1016,6 +1034,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.",
         "description": "Retrieve an existing launch plan definition.",
         "operationId": "GetLaunchPlan",
         "responses": {
@@ -1076,6 +1095,7 @@
         ]
       },
       "put": {
+        "summary": "Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.",
         "description": "Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.",
         "operationId": "UpdateLaunchPlan",
         "responses": {
@@ -1131,6 +1151,7 @@
     },
     "/api/v1/matchable_attributes": {
       "get": {
+        "summary": "Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.",
         "description": "Retrieve a list of MatchableAttributesConfiguration objects.",
         "operationId": "ListMatchableAttributes",
         "responses": {
@@ -1167,6 +1188,7 @@
     },
     "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
         "description": "Retrieve a NamedEntity object.",
         "operationId": "GetNamedEntity",
         "responses": {
@@ -1219,6 +1241,7 @@
         ]
       },
       "put": {
+        "summary": "Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.",
         "description": "Update the fields associated with a NamedEntity",
         "operationId": "UpdateNamedEntity",
         "responses": {
@@ -1281,6 +1304,7 @@
     },
     "/api/v1/named_entities/{resource_type}/{project}/{domain}": {
       "get": {
+        "summary": "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.",
         "description": "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.",
         "operationId": "ListNamedEntities",
         "responses": {
@@ -1369,6 +1393,7 @@
     },
     "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.",
         "description": "Retrieve an existing node execution.",
         "operationId": "GetNodeExecution",
         "responses": {
@@ -1415,6 +1440,7 @@
     },
     "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.",
         "description": "Fetch existing node executions matching input filters.",
         "operationId": "ListNodeExecutions",
         "responses": {
@@ -1502,6 +1528,7 @@
     },
     "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
       "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
         "description": "Update the customized resource attributes associated with a project-domain combination",
         "operationId": "UpdateProjectDomainAttributes",
         "responses": {
@@ -1543,6 +1570,7 @@
     },
     "/api/v1/project_domain_attributes/{project}/{domain}": {
       "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
         "description": "Retrieve the customized resource attributes associated with a project-domain combination",
         "operationId": "GetProjectDomainAttributes",
         "responses": {
@@ -1591,6 +1619,7 @@
         ]
       },
       "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
         "description": "Delete the customized resource attributes associated with a project-domain combination",
         "operationId": "DeleteProjectDomainAttributes",
         "responses": {
@@ -1632,6 +1661,7 @@
     },
     "/api/v1/projects": {
       "get": {
+        "summary": "Fetches a list of :ref:`ref_flyteidl.admin.Project`",
         "description": "Fetch registered projects.",
         "operationId": "ListProjects",
         "responses": {
@@ -1690,6 +1720,7 @@
         ]
       },
       "post": {
+        "summary": "Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.",
         "description": "Register a project.",
         "operationId": "RegisterProject",
         "responses": {
@@ -1717,7 +1748,7 @@
     },
     "/api/v1/projects/{id}": {
       "put": {
-        "summary": "flyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project` \nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "description": "Update a project.",
         "operationId": "UpdateProject",
         "responses": {
@@ -1752,6 +1783,7 @@
     },
     "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
         "description": "Retrieve an existing task execution.",
         "operationId": "GetTaskExecution",
         "responses": {
@@ -1848,6 +1880,7 @@
     },
     "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}": {
       "get": {
+        "summary": "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.",
         "description": "Fetch existing task executions matching input filters.",
         "operationId": "ListTaskExecutions",
         "responses": {
@@ -1935,6 +1968,7 @@
     },
     "/api/v1/task_ids/{project}/{domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.",
         "description": "Fetch existing task definition identifiers matching input filters.",
         "operationId": "ListTaskIds",
         "responses": {
@@ -2009,6 +2043,7 @@
     },
     "/api/v1/tasks": {
       "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.Task` definition",
         "description": "Create and register a task definition.",
         "operationId": "CreateTask",
         "responses": {
@@ -2044,6 +2079,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "ListTasks2",
         "responses": {
@@ -2125,6 +2161,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "ListTasks",
         "responses": {
@@ -2206,6 +2243,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.Task` definition.",
         "description": "Retrieve an existing task definition.",
         "operationId": "GetTask",
         "responses": {
@@ -2285,6 +2323,7 @@
     },
     "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
       "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
         "description": "Update the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "UpdateWorkflowAttributes",
         "responses": {
@@ -2333,6 +2372,7 @@
     },
     "/api/v1/workflow_attributes/{project}/{domain}/{workflow}": {
       "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
         "description": "Retrieve the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "GetWorkflowAttributes",
         "responses": {
@@ -2388,6 +2428,7 @@
         ]
       },
       "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
         "description": "Delete the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "DeleteWorkflowAttributes",
         "responses": {
@@ -2436,6 +2477,7 @@
     },
     "/api/v1/workflow_ids/{project}/{domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.",
         "description": "Fetch an existing workflow definition identifiers matching input filters.",
         "operationId": "ListWorkflowIds",
         "responses": {
@@ -2510,6 +2552,7 @@
     },
     "/api/v1/workflows": {
       "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition",
         "description": "Create and register a workflow definition.",
         "operationId": "CreateWorkflow",
         "responses": {
@@ -2545,6 +2588,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "ListWorkflows2",
         "responses": {
@@ -2626,6 +2670,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "ListWorkflows",
         "responses": {
@@ -2707,6 +2752,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.",
         "description": "Retrieve an existing workflow definition.",
         "operationId": "GetWorkflow",
         "responses": {
@@ -3247,7 +3293,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Used as a response for request to list executions."
+      "title": "Used as a response for request to list executions.\nSee :ref:`ref_flyteidl.admin.Execution` for more details"
     },
     "adminExecutionMetadata": {
       "type": "object",
@@ -3502,7 +3548,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Response object for list launch plan requests."
+      "title": "Response object for list launch plan requests.\nSee :ref:`ref_flyteidl.admin.LaunchPlan` for more details"
     },
     "adminLaunchPlanMetadata": {
       "type": "object",
@@ -3600,7 +3646,7 @@
           "description": "Desired state to apply to the launch plan.\n+required."
         }
       },
-      "description": "Request to set the referenced launch plan state to the configured value."
+      "title": "Request to set the referenced launch plan state to the configured value.\nSee :ref:`ref_flyteidl.admin.LaunchPlan` for more details"
     },
     "adminLaunchPlanUpdateResponse": {
       "type": "object",
@@ -3616,7 +3662,7 @@
           }
         }
       },
-      "description": "Response for a request for all matching resource attributes for a resource type."
+      "title": "Response for a request for all matching resource attributes for a resource type.\nSee :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details"
     },
     "adminLiteralMapBlob": {
       "type": "object",
@@ -3909,7 +3955,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Request structure to retrieve a list of node execution entities."
+      "title": "Request structure to retrieve a list of node execution entities.\nSee :ref:`ref_flyteidl.admin.NodeExecution` for more details"
     },
     "adminNodeExecutionMetaData": {
       "type": "object",
@@ -4053,7 +4099,7 @@
           "$ref": "#/definitions/adminMatchingAttributes"
         }
       },
-      "description": "Defines a set of custom matching attributes which defines resource defaults for a project and domain.\nFor more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
+      "title": "Defines a set of custom matching attributes which defines resource defaults for a project and domain.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminProjectDomainAttributesDeleteRequest": {
       "type": "object",
@@ -4071,7 +4117,7 @@
           "title": "Which type of matchable attributes to delete.\n+required"
         }
       },
-      "description": "Request to delete a set matchable project domain attribute override."
+      "title": "Request to delete a set matchable project domain attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminProjectDomainAttributesDeleteResponse": {
       "type": "object",
@@ -4084,7 +4130,7 @@
           "$ref": "#/definitions/adminProjectDomainAttributes"
         }
       },
-      "description": "Response to get an individual project domain attribute override."
+      "title": "Response to get an individual project domain attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminProjectDomainAttributesUpdateRequest": {
       "type": "object",
@@ -4094,7 +4140,7 @@
           "title": "+required"
         }
       },
-      "description": "Sets custom attributes for a project-domain combination."
+      "title": "Sets custom attributes for a project-domain combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminProjectDomainAttributesUpdateResponse": {
       "type": "object",
@@ -4107,13 +4153,16 @@
           "$ref": "#/definitions/adminProject",
           "title": "+required"
         }
-      }
+      },
+      "title": "Adds a new user-project within the Flyte deployment.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
     },
     "adminProjectRegisterResponse": {
-      "type": "object"
+      "type": "object",
+      "description": "Purposefully empty, may be updated in the future."
     },
     "adminProjectUpdateResponse": {
-      "type": "object"
+      "type": "object",
+      "description": "Purposefully empty, may be updated in the future."
     },
     "adminProjects": {
       "type": "object",
@@ -4128,7 +4177,8 @@
           "type": "string",
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
-      }
+      },
+      "title": "Represents a list of projects.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
     },
     "adminRawOutputDataConfig": {
       "type": "object",
@@ -4238,7 +4288,7 @@
           "title": "Represents the specification for task.\n+required"
         }
       },
-      "description": "Represents a request structure to create a revision of a task."
+      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
     },
     "adminTaskCreateResponse": {
       "type": "object",
@@ -4357,7 +4407,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Response structure for a query to list of task execution entities."
+      "title": "Response structure for a query to list of task execution entities.\nSee :ref:`ref_flyteidl.admin.TaskExecution` for more details"
     },
     "adminTaskList": {
       "type": "object",
@@ -4374,7 +4424,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Represents a list of tasks returned from the admin."
+      "title": "Represents a list of tasks returned from the admin.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
     },
     "adminTaskResourceAttributes": {
       "type": "object",
@@ -4482,7 +4532,7 @@
           "$ref": "#/definitions/adminMatchingAttributes"
         }
       },
-      "description": "Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.\nFor more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
+      "title": "Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminWorkflowAttributesDeleteRequest": {
       "type": "object",
@@ -4504,7 +4554,7 @@
           "title": "Which type of matchable attributes to delete.\n+required"
         }
       },
-      "description": "Request to delete a set matchable workflow attribute override."
+      "title": "Request to delete a set matchable workflow attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminWorkflowAttributesDeleteResponse": {
       "type": "object",
@@ -4526,7 +4576,7 @@
           "$ref": "#/definitions/adminWorkflowAttributes"
         }
       },
-      "description": "Sets custom attributes for a project, domain and workflow combination."
+      "title": "Sets custom attributes for a project, domain and workflow combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "adminWorkflowAttributesUpdateResponse": {
       "type": "object",
@@ -4559,7 +4609,7 @@
           "title": "Represents the specification for workflow.\n+required"
         }
       },
-      "description": "Represents a request structure to create a revision of a workflow."
+      "title": "Represents a request structure to create a revision of a workflow.\nSee :ref:`ref_flyteidl.admin.Workflow` for more details"
     },
     "adminWorkflowCreateResponse": {
       "type": "object"
@@ -4629,7 +4679,7 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Represents a list of workflows returned from the admin."
+      "title": "Represents a list of workflows returned from the admin.\nSee :ref:`ref_flyteidl.admin.Workflow` for more details"
     },
     "adminWorkflowSpec": {
       "type": "object",

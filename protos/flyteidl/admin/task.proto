@@ -9,6 +9,7 @@ import "flyteidl/core/compiler.proto";
 import "google/protobuf/timestamp.proto";
 
 // Represents a request structure to create a revision of a task.
+// See :ref:`ref_flyteidl.admin.Task` for more details
 message TaskCreateRequest {
     // id represents the unique identifier of the task.
     // +required
@@ -36,6 +37,7 @@ message Task {
 }
 
 // Represents a list of tasks returned from the admin.
+// See :ref:`ref_flyteidl.admin.Task` for more details
 message TaskList {
     // A list of tasks returned based on the request.
     repeated Task tasks = 1;

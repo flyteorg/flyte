@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Response structure for a query to list of task execution entities.
 type AdminTaskExecutionList struct {
 	TaskExecutions []FlyteidladminTaskExecution `json:"task_executions,omitempty"`
 	// In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty.

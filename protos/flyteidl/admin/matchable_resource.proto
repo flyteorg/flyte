@@ -134,12 +134,14 @@ message MatchableAttributesConfiguration {
 }
 
 // Request all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 message ListMatchableAttributesRequest {
     // +required
     MatchableResource resource_type = 1;
 }
 
 // Response for a request for all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
 message ListMatchableAttributesResponse {
     repeated MatchableAttributesConfiguration configurations = 1;
 }
