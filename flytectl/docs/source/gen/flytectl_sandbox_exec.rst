@@ -3,14 +3,14 @@
 flytectl sandbox exec
 ---------------------
 
-Execute any command in sandbox
+Execute non-interactive command inside the sandbox container
 
 Synopsis
 ~~~~~~~~
 
 
 
-Execute command will Will run non-interactive commands and return immediately with the output.
+Execute command will run non-interactive command inside the sandbox container and return immediately with the output.By default flytectl exec in /root directory inside the sandbox container
 
 ::
  bin/flytectl sandbox exec -- ls -al 
@@ -42,5 +42,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for testing flyte sandbox.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 

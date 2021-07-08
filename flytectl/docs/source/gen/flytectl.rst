@@ -31,7 +31,7 @@ SEE ALSO
 * :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
 * :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
 * :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Used for testing flyte sandbox.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 * :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
 * :doc:`flytectl_version` 	 - Used for fetching flyte version
 
