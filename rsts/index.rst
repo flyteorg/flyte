@@ -63,27 +63,187 @@ Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freen
 
 The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit Python SDK:
 
-.. code:: python
-   
-   @task
-   def greet(name: str) -> str:
-       return f"Welcome, {name}!"
+.. tabs::
 
-You can compose one or more tasks to create a ``workflow``:
+    .. tab:: python
 
-.. code:: python
+        .. code:: python
 
-   @task
-   def add_question(greeting: str) -> str:
-       return f"{greeting} How are you?"
-   
-   @workflow
-   def welcome(name: str) -> str:
-       greeting = greet(name=name)
-       return add_question(greeting=greeting)
+           @task
+           def greet(name: str) -> str:
+               return f"Welcome, {name}!"
 
-   welcome("Traveler")
-   # Output: "Welcome, Traveler! How are you?"
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: python
+
+           @task
+           def add_question(greeting: str) -> str:
+               return f"{greeting} How are you?"
+
+           @workflow
+           def welcome(name: str) -> str:
+               greeting = greet(name=name)
+               return add_question(greeting=greeting)
+
+           welcome("Traveler")
+           # Output: "Welcome, Traveler! How are you?"
+
+    .. tab:: java
+
+        .. code:: java
+
+            @AutoService(SdkRunnableTask.class)
+            public class GreetTask extends SdkRunnableTask<GreetTask.Input, GreetTask.Output> {
+              public GreetTask() {
+                super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
+              }
+
+              public static SdkTransform of(SdkBindingData name) {
+                return new GreetTask().withInput("name", name);
+              }
+
+              @AutoValue
+              public abstract static class Input {
+                public abstract String name();
+              }
+
+              @AutoValue
+              public abstract static class Output {
+                public abstract String greeting();
+
+                public static Output create(String greeting) {
+                  return new AutoValue_GreetTask_Output(greeting);
+                }
+              }
+
+              @Override
+              public Output run(Input input) {
+                return Output.create(String.format("Welcome, %s!", input.name()));
+              }
+            }
+
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: java
+
+            @AutoService(SdkRunnableTask.class)
+            public class AddQuestionTask extends SdkRunnableTask<AddQuestionTask.Input, AddQuestionTask.Output> {
+              public AddQuestionTask() {
+                super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
+              }
+
+              public static SdkTransform of(SdkBindingData greeting) {
+                return new AddQuestionTask().withInput("greeting", greeting);
+              }
+
+              @AutoValue
+              public abstract static class Input {
+                public abstract String greeting();
+              }
+
+              @AutoValue
+              public abstract static class Output {
+                public abstract String greeting();
+
+                public static Output create(String greeting) {
+                  return new AutoValue_AddQuestionTask_Output(greeting);
+                }
+              }
+
+              @Override
+              public Output run(Input input) {
+                return Output.create(String.format("%s How are you?", input.greeting()));
+              }
+            }
+
+        .. code:: java
+
+            @AutoService(SdkWorkflow.class)
+            public class WelcomeWorkflow extends SdkWorkflow {
+
+              @Override
+              public void expand(SdkWorkflowBuilder builder) {
+                // defines the input of the workflow
+                SdkBindingData name = builder.inputOfString("name", "The name for the welcome message");
+
+                // uses the workflow input as the task input of the GreetTask
+                SdkBindingData greeting = builder.apply("greet", GreetTask.of(name)).getOutput("greeting");
+
+                // uses the output of the GreetTask as the task input of the AddQuestionTask
+                SdkBindingData greetingWithQuestion =
+                    builder.apply("add-question", AddQuestionTask.of(greeting)).getOutput("greeting");
+
+                // uses the task output of the AddQuestionTask as the output of the workflow
+                builder.output("greeting", greetingWithQuestion, "Welcome message");
+              }
+            }
+
+        Link to the example code: `WelcomeWorkflow.java <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples/src/main/java/org/flyte/examples/WelcomeWorkflow.java>`_
+
+    .. tab:: scala
+
+        .. code:: scala
+
+            case class GreetTaskInput(name: String)
+            case class GreetTaskOutput(greeting: String)
+
+            class GreetTask
+                extends SdkRunnableTask(
+                  SdkScalaType[GreetTaskInput],
+                  SdkScalaType[GreetTaskOutput]
+                ) {
+
+              override def run(input: GreetTaskInput): GreetTaskOutput = GreetTaskOutput(s"Welcome, ${input.name}!")
+            }
+
+            object GreetTask {
+              def apply(name: SdkBindingData): SdkTransform =
+                new GreetTask().withInput("name", name)
+            }
+
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: scala
+
+            case class AddQuestionTaskInput(greeting: String)
+            case class AddQuestionTaskOutput(greeting: String)
+
+            class AddQuestionTask
+                extends SdkRunnableTask(
+                  SdkScalaType[AddQuestionTaskInput],
+                  SdkScalaType[AddQuestionTaskOutput]
+                ) {
+
+              override def run(input: AddQuestionTaskInput): AddQuestionTaskOutput = AddQuestionTaskOutput(s"${input.greeting} How are you?")
+            }
+
+            object AddQuestionTask {
+              def apply(greeting: SdkBindingData): SdkTransform =
+                new AddQuestionTask().withInput("greeting", greeting)
+            }
+
+        .. code:: scala
+
+            class WelcomeWorkflow extends SdkWorkflow {
+
+              def expand(builder: SdkWorkflowBuilder): Unit = {
+                // defines the input of the workflow
+                val name = builder.inputOfString("name", "The name for the welcome message")
+
+                // uses the workflow input as the task input of the GreetTask
+                val greeting = builder.apply("greet", GreetTask(name)).getOutput("greeting")
+
+                // uses the output of the GreetTask as the task input of the AddQuestionTask
+                val greetingWithQuestion = builder.apply("add-question", AddQuestionTask(greeting)).getOutput("greeting")
+
+                // uses the task output of the AddQuestionTask as the output of the workflow
+                builder.output("greeting", greetingWithQuestion, "Welcome message")
+              }
+            }
+
+        Link to the example code: `WelcomeWorkflow.scala <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples-scala/src/main/scala/org/flyte/examples/flytekitscala/WelcomeWorkflow.scala>`_
+
 
 
 Why Flyte?
