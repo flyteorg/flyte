@@ -72,6 +72,23 @@ spec:
               memory: "200Mi"
               cpu: "0.1"
               ephemeral-storage: "100Mi"
+        - name: sync-cluster-resources-goroutine
+          image: flyteadmin:v0.4.13
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "flyteadmin",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "clusterresource",
+              "run",
+            ]
+          volumeMounts:
+            - name: resource-templates
+              mountPath: /etc/flyte/clusterresource/templates
+            - name: config-volume
+              mountPath: /etc/flyte/config
+
 ---
 apiVersion: v1
 kind: Service

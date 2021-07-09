@@ -2133,7 +2133,7 @@ data:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-      refresh: 5m
+      refreshInterval: 5m
   db.yaml: |
     database:
       port: 5432
@@ -2222,7 +2222,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-7gmg5ffhdd
+  name: flyte-admin-config-hg87cttf8m
   namespace: flyte
 ---
 apiVersion: v1
@@ -2904,6 +2904,20 @@ spec:
         - mountPath: /etc/secrets/
           name: auth
       - command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - clusterresource
+        - run
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        imagePullPolicy: IfNotPresent
+        name: sync-cluster-resources-goroutine
+        volumeMounts:
+        - mountPath: /etc/flyte/clusterresource/templates
+          name: resource-templates
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
         - sh
         - -c
         - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
@@ -3000,7 +3014,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-7gmg5ffhdd
+          name: flyte-admin-config-hg87cttf8m
         name: config-volume
       - name: db-pass
         secret:
@@ -3412,7 +3426,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7gmg5ffhdd
+              name: flyte-admin-config-hg87cttf8m
             name: config-volume
           - name: db-pass
             secret:

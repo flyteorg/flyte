@@ -8119,7 +8119,7 @@ data:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-      refresh: 5m
+      refreshInterval: 5m
   db.yaml: |
     database:
       port: 5432
@@ -8217,7 +8217,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-864hmfdc2m
+  name: flyte-admin-config-hgfd27g4bd
   namespace: flyte
 ---
 apiVersion: v1
@@ -8891,7 +8891,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-864hmfdc2m
+          name: flyte-admin-config-hgfd27g4bd
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -9179,7 +9179,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-864hmfdc2m
+              name: flyte-admin-config-hgfd27g4bd
             name: config-volume
           - name: db-pass
             secret:
