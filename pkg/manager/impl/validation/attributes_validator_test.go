@@ -85,6 +85,18 @@ func TestValidateMatchingAttributes(t *testing.T) {
 			admin.MatchableResource_PLUGIN_OVERRIDE,
 			nil,
 		},
+		{
+			&admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+					WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+						MaxParallelism: 100,
+					},
+				},
+			},
+			"foo",
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			nil,
+		},
 	}
 	for _, tc := range testCases {
 		matchableResource, err := validateMatchingAttributes(tc.attributes, tc.identifier)
