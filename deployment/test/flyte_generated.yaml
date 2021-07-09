@@ -281,7 +281,7 @@ data:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-      refreshInterval: 5m
+      refreshInterval: 1m
   db.yaml: |
     database:
       port: 5432
@@ -370,7 +370,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-fk254ggftb
+  name: flyte-admin-config-kh795dtf68
   namespace: flyte
 ---
 apiVersion: v1
@@ -854,7 +854,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-fk254ggftb
+          name: flyte-admin-config-kh795dtf68
         name: config-volume
       - name: db-pass
         secret:

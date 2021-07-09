@@ -16,4 +16,4 @@ cluster_resources:
             value: "4"
         - projectQuotaMemory:
             value: "3000Mi"
-  refreshInterval: 5m
+  refreshInterval: 1m

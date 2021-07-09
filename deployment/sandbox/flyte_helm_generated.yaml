@@ -432,6 +432,7 @@ data:
         - defaultIamRole:
             value: ""
       refresh: 5m
+      refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
 # Source: flyte/templates/console/configmap.yaml
@@ -617,8 +618,7 @@ data:
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName
-          }}/pod?namespace={{ .namespace }}
+        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
 ---
 # Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
@@ -3289,7 +3289,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "01022a541ec245fb382df6cb533da25e5a5c058ee59a7c4f804aeb3aaa5fd90"
+        configChecksum: "0330846fbb9f22cddfd65abeed5ec540bc78a6ac7dbb456338fff2f7be7ccfe"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3675,7 +3675,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "cfbaa304d7e24679665db495c56b7f99a7bca805a98efce58066d51c1e0dbc0"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3740,7 +3740,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "cfbaa304d7e24679665db495c56b7f99a7bca805a98efce58066d51c1e0dbc0"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
