@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -26,6 +28,12 @@ var podSpec = v1.PodSpec{
 	Containers: []v1.Container{
 		{
 			Name: testPrimaryContainerName,
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:     resource.MustParse("1"),
+					v1.ResourceStorage: resource.MustParse("2"),
+				},
+			},
 		},
 		{
 			Name: "secondary container",
@@ -160,6 +168,18 @@ func TestFlyteArrayJobToK8sPodTemplate(t *testing.T) {
 	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
 	tMeta.OnGetSecurityContext().Return(core.SecurityContext{})
 	tMeta.OnGetK8sServiceAccount().Return("sa")
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+		RetryAttempt: 1,
+	})
+	tMeta.OnGetTaskExecutionID().Return(tID)
 
 	outputReader := &mocks2.OutputWriter{}
 	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))
@@ -191,4 +211,33 @@ func TestFlyteArrayJobToK8sPodTemplate(t *testing.T) {
 		},
 	}, pod.ObjectMeta)
 	assert.EqualValues(t, &arrayJob, job)
+	defaultMemoryFromConfig := resource.MustParse("1024Mi")
+	assert.EqualValues(t, v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: defaultMemoryFromConfig,
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: defaultMemoryFromConfig,
+		},
+	}, pod.Spec.Containers[0].Resources)
+	assert.EqualValues(t, []v1.EnvVar{
+		{
+			Name:  "FLYTE_INTERNAL_EXECUTION_ID",
+			Value: "my_name",
+		},
+		{
+			Name:  "FLYTE_INTERNAL_EXECUTION_PROJECT",
+			Value: "my_project",
+		},
+		{
+			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
+			Value: "my_domain",
+		},
+		{
+			Name:  "FLYTE_ATTEMPT_NUMBER",
+			Value: "1",
+		},
+	}, pod.Spec.Containers[0].Env)
 }
