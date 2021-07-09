@@ -127,7 +127,7 @@ Usage
 `
 )
 
-//go:generate pflags ExecutionConfig --default-var executionConfig
+//go:generate pflags ExecutionConfig --default-var executionConfig --bind-default-var
 
 // ExecutionConfig hold configuration for create execution flags and configuration of the actual task or workflow  to be launched.
 type ExecutionConfig struct {

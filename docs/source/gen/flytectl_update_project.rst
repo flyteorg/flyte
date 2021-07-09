@@ -22,34 +22,23 @@ Archives project named flytesnacks.
 
  bin/flytectl update project -p flytesnacks --archiveProject
 
-Activates project named flytesnacks using short option -t.
-::
-
- bin/flytectl update project -p flytesnacks -t
-
-Archives project named flytesnacks using short option -a.
-
-::
-
- bin/flytectl update project flytesnacks -a
-
 Incorrect usage when passing both archive and activate.
 
 ::
 
- bin/flytectl update project flytesnacks -a -t
+ bin/flytectl update project flytesnacks --archiveProject --activateProject
 
 Incorrect usage when passing unknown-project.
 
 ::
 
- bin/flytectl update project unknown-project -a
+ bin/flytectl update project unknown-project --archiveProject
 
 Incorrect usage when passing valid project using -p option.
 
 ::
 
- bin/flytectl update project unknown-project -a -p known-project
+ bin/flytectl update project unknown-project --archiveProject -p known-project
 
 Usage
 
@@ -63,8 +52,8 @@ Options
 
 ::
 
-  -t, --activateProject   Activates the project specified as argument.
-  -a, --archiveProject    Archives the project specified as argument.
+      --activateProject   Activates the project specified as argument.
+      --archiveProject    Archives the project specified as argument.
   -h, --help              help for project
 
 Options inherited from parent commands

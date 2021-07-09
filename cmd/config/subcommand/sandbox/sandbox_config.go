@@ -1,6 +1,6 @@
 package sandbox
 
-//go:generate pflags Config --default-var DefaultConfig
+//go:generate pflags Config --default-var DefaultConfig --bind-default-var
 var (
 	DefaultConfig = &Config{}
 )

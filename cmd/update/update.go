@@ -35,7 +35,7 @@ func CreateUpdateCommand() *cobra.Command {
 	updateResourcesFuncs := map[string]cmdCore.CommandEntry{
 		"launchplan": {CmdFunc: updateLPFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
 			Short: updateLPShort, Long: updateLPLong},
-		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: projectConfig,
+		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: DefaultProjectConfig,
 			Short: projectShort, Long: projectLong},
 		"task": {CmdFunc: updateTaskFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
 			Short: updateTaskShort, Long: updateTaskLong},

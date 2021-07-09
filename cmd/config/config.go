@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/printer"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --bind-default-var
 
 var (
 	defaultConfig = &Config{}

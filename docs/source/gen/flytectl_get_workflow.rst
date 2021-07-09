@@ -36,17 +36,17 @@ Retrieves particular version of workflow by name within project and domain.
 Retrieves all the workflows with filters.
 ::
  
-  bin/flytectl get workflow -p flytesnacks -d development  --filter.field-selector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
+  bin/flytectl get workflow -p flytesnacks -d development  --filter.fieldSelector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
  
 Retrieve specific workflow with filters.
 ::
  
-  bin/flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.field-selector="workflow.version=v1"
+  bin/flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="workflow.version=v1"
   
 Retrieves all the workflows with limit and sorting.
 ::
   
-  bin/flytectl get -p flytesnacks -d development workflow  --filter.sort-by=created_at --filter.limit=1 --filter.asc
+  bin/flytectl get -p flytesnacks -d development workflow  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the workflow within project and domain in yaml format.
 
@@ -84,13 +84,13 @@ Options
 
 ::
 
-      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
-      --filter.field-selector string   Specifies the Field selector
-      --filter.limit int32             Specifies the limit (default 100)
-      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
-  -h, --help                           help for workflow
-      --latest                          flag to indicate to fetch the latest version,  version flag will be ignored in this case
-      --version string                 version of the workflow to be fetched.
+      --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.fieldSelector string   Specifies the Field selector
+      --filter.limit int32            Specifies the limit (default 100)
+      --filter.sortBy string          Specifies which field to sort results  (default "created_at")
+  -h, --help                          help for workflow
+      --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case
+      --version string                version of the workflow to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

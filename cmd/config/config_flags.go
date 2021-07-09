@@ -50,8 +50,8 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "project"), defaultConfig.Project, "Specifies the project to work on.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "domain"), defaultConfig.Domain, "Specified the domain to work on.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "output"), defaultConfig.Output, "Specified the output type.")
+	cmdFlags.StringVar(&defaultConfig.Project, fmt.Sprintf("%v%v", prefix, "project"), defaultConfig.Project, "Specifies the project to work on.")
+	cmdFlags.StringVar(&defaultConfig.Domain, fmt.Sprintf("%v%v", prefix, "domain"), defaultConfig.Domain, "Specified the domain to work on.")
+	cmdFlags.StringVar(&defaultConfig.Output, fmt.Sprintf("%v%v", prefix, "output"), defaultConfig.Output, "Specified the output type.")
 	return cmdFlags
 }

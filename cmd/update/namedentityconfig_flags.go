@@ -28,6 +28,15 @@ func (NamedEntityConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (NamedEntityConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (NamedEntityConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -39,10 +48,10 @@ func (NamedEntityConfig) mustMarshalJSON(v json.Marshaler) string {
 
 // GetPFlagSet will return strongly types pflags for all fields in NamedEntityConfig and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
-func (n NamedEntityConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
+func (cfg NamedEntityConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("NamedEntityConfig", pflag.ExitOnError)
-	cmdFlags.BoolVar(&(namedEntityConfig.Activate), fmt.Sprintf("%v%v", prefix, "activate"), *new(bool), "Activates the named entity specified as argument.")
-	cmdFlags.BoolVar(&(namedEntityConfig.Archive), fmt.Sprintf("%v%v", prefix, "archive"), *new(bool), "Archives the named entity specified as argument.")
-	cmdFlags.StringVar(&(namedEntityConfig.Description), fmt.Sprintf("%v%v", prefix, "description"), namedEntityConfig.Description, "description of the namedentity.")
+	cmdFlags.BoolVar(&namedEntityConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), namedEntityConfig.Archive, "archive named entity.")
+	cmdFlags.BoolVar(&namedEntityConfig.Activate, fmt.Sprintf("%v%v", prefix, "activate"), namedEntityConfig.Activate, "activate the named entity.")
+	cmdFlags.StringVar(&namedEntityConfig.Description, fmt.Sprintf("%v%v", prefix, "description"), namedEntityConfig.Description, "description of the named entity.")
 	return cmdFlags
 }

@@ -31,12 +31,12 @@ Retrieves project by name
 Retrieves all the projects with filters.
 ::
  
-  bin/flytectl get project --filter.field-selector="project.name=flytesnacks"
+  bin/flytectl get project --filter.fieldSelector="project.name=flytesnacks"
  
 Retrieves all the projects with limit and sorting.
 ::
  
-  bin/flytectl get project --filter.sort-by=created_at --filter.limit=1 --filter.asc
+  bin/flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the projects in yaml format
 

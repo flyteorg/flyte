@@ -84,7 +84,7 @@ func testDecodeJson_AttrUpdateConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_AttrUpdateConfig(val, result))
 }
 
-func testDecodeSlice_AttrUpdateConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_AttrUpdateConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_AttrUpdateConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestAttrUpdateConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_attrFile", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("attrFile"); err == nil {
-				assert.Equal(t, string(DefaultUpdateConfig.AttrFile), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

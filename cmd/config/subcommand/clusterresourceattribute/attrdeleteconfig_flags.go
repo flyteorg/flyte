@@ -28,6 +28,15 @@ func (AttrDeleteConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (AttrDeleteConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (AttrDeleteConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,6 +50,6 @@ func (AttrDeleteConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg AttrDeleteConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("AttrDeleteConfig", pflag.ExitOnError)
-	cmdFlags.StringVar(&(DefaultDelConfig.AttrFile), fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultDelConfig.AttrFile, "attribute file name to be used for delete attribute for the resource type.")
+	cmdFlags.StringVar(&DefaultDelConfig.AttrFile, fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultDelConfig.AttrFile, "attribute file name to be used for delete attribute for the resource type.")
 	return cmdFlags
 }

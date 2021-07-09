@@ -2,14 +2,14 @@ package adminutils
 
 import "github.com/flyteorg/flytestdlib/config"
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var DefaultConfig --bind-default-var
 
 var (
-	defaultConfig = &Config{
+	DefaultConfig = &Config{
 		MaxRecords: 500,
 		BatchSize:  100,
 	}
-	section = config.MustRegisterSection("adminutils", defaultConfig)
+	section = config.MustRegisterSection("adminutils", DefaultConfig)
 )
 
 type Config struct {

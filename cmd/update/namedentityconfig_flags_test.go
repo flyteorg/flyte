@@ -84,7 +84,7 @@ func testDecodeJson_NamedEntityConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_NamedEntityConfig(val, result))
 }
 
-func testDecodeSlice_NamedEntityConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_NamedEntityConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_NamedEntityConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestNamedEntityConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_archive", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("archive"); err == nil {
-				assert.Equal(t, bool(namedEntityConfig.Archive), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestNamedEntityConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_activate", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("activate"); err == nil {
-				assert.Equal(t, bool(namedEntityConfig.Activate), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestNamedEntityConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_description", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("description"); err == nil {
-				assert.Equal(t, string(namedEntityConfig.Description), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

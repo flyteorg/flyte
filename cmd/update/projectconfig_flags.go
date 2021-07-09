@@ -28,6 +28,15 @@ func (ProjectConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (ProjectConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (ProjectConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,7 +50,7 @@ func (ProjectConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg ProjectConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("ProjectConfig", pflag.ExitOnError)
-	cmdFlags.BoolVarP(&(projectConfig.ActivateProject), fmt.Sprintf("%v%v", prefix, "activateProject"), "t", *new(bool), "Activates the project specified as argument.")
-	cmdFlags.BoolVarP(&(projectConfig.ArchiveProject), fmt.Sprintf("%v%v", prefix, "archiveProject"), "a", *new(bool), "Archives the project specified as argument.")
+	cmdFlags.BoolVar(&DefaultProjectConfig.ActivateProject, fmt.Sprintf("%v%v", prefix, "activateProject"), DefaultProjectConfig.ActivateProject, "Activates the project specified as argument.")
+	cmdFlags.BoolVar(&DefaultProjectConfig.ArchiveProject, fmt.Sprintf("%v%v", prefix, "archiveProject"), DefaultProjectConfig.ArchiveProject, "Archives the project specified as argument.")
 	return cmdFlags
 }

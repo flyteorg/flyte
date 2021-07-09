@@ -43,17 +43,17 @@ Retrieves particular version of task by name within project and domain.
 Retrieves all the tasks with filters.
 ::
   
-  bin/flytectl get task -p flytesnacks -d development --filter.field-selector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
+  bin/flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
  
 Retrieve a specific task with filters.
 ::
  
-  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.field-selector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
+  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
   
 Retrieves all the task with limit and sorting.
 ::
    
-  bin/flytectl get -p flytesnacks -d development task  --filter.sort-by=created_at --filter.limit=1 --filter.asc
+  bin/flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the tasks within project and domain in yaml format.
 ::
