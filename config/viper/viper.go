@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/pkg/errors"
 
 	stdLibErrs "github.com/flyteorg/flytestdlib/errors"
@@ -44,6 +46,7 @@ type viperAccessor struct {
 	rootConfig config.Section
 	// Ensures we initialize the file Watcher once.
 	watcherInitializer *sync.Once
+	existingFlagKeys   sets.String
 }
 
 func (viperAccessor) ID() string {
@@ -54,7 +57,17 @@ func (viperAccessor) InitializeFlags(cmdFlags *flag.FlagSet) {
 	// TODO: Implement?
 }
 
-func (v viperAccessor) InitializePflags(cmdFlags *pflag.FlagSet) {
+func (v *viperAccessor) InitializePflags(cmdFlags *pflag.FlagSet) {
+	existingFlagKeys := sets.NewString()
+	cmdFlags.VisitAll(func(f *pflag.Flag) {
+		existingFlagKeys.Insert(f.Name)
+		if len(f.Shorthand) > 0 {
+			existingFlagKeys.Insert(f.Shorthand)
+		}
+	})
+
+	v.existingFlagKeys = existingFlagKeys
+
 	err := v.addSectionsPFlags(cmdFlags)
 	if err != nil {
 		panic(errors.Wrap(err, "error adding config PFlags to flag set"))
@@ -260,12 +273,14 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 	errs := stdLibErrs.ErrorCollection{}
 	var mine interface{}
 	myKeysCount := 0
+	discoveredKeys := sets.NewString()
 	if asMap, casted := settings.(map[string]interface{}); casted {
 		myMap := map[string]interface{}{}
 		for childKey, childValue := range asMap {
 			if childSection, found := root.GetSections()[childKey]; found {
 				errs.Append(v.parseViperConfigRecursive(childSection, childValue))
 			} else {
+				discoveredKeys.Insert(childKey)
 				myMap[childKey] = childValue
 			}
 		}
@@ -276,6 +291,7 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 		mine = settings
 		myKeysCount = len(asSlice)
 	} else {
+		discoveredKeys.Insert(fmt.Sprintf("%v", mine))
 		mine = settings
 		if settings != nil {
 			myKeysCount = 1
@@ -296,10 +312,12 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 	} else if myKeysCount > 0 {
 		// There are keys set that are meant to be decoded but no config to receive them. Fail if strict mode is on.
 		if v.strictMode {
-			errs.Append(errors.Wrap(
-				config.ErrStrictModeValidation,
-				fmt.Sprintf("strict mode is on but received keys [%+v] to decode with no config assigned to"+
-					" receive them", mine)))
+			if newKeys := discoveredKeys.Difference(v.existingFlagKeys); newKeys.Len() > 0 {
+				errs.Append(errors.Wrap(
+					config.ErrStrictModeValidation,
+					fmt.Sprintf("strict mode is on but received keys [%+v] to decode with no config assigned to"+
+						" receive them", newKeys)))
+			}
 		}
 	}
 
@@ -396,7 +414,7 @@ func NewAccessor(opts config.Options) config.Accessor {
 	return newAccessor(opts)
 }
 
-func newAccessor(opts config.Options) viperAccessor {
+func newAccessor(opts config.Options) *viperAccessor {
 	vipers := make([]Viper, 0, 1)
 	configFiles := files.FindConfigFiles(opts.SearchPaths)
 	for _, configFile := range configFiles {
@@ -417,7 +435,7 @@ func newAccessor(opts config.Options) viperAccessor {
 		r = config.GetRootSection()
 	}
 
-	return viperAccessor{
+	return &viperAccessor{
 		strictMode:         opts.StrictMode,
 		rootConfig:         r,
 		viper:              &CollectionProxy{underlying: vipers},
