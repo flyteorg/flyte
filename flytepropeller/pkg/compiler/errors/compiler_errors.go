@@ -22,6 +22,9 @@ const (
 	// An expected field isn't populated.
 	ValueRequired ErrorCode = "ValueRequired"
 
+	// An expected field is malformed or contains invalid inputs
+	InvalidValue ErrorCode = "InvalidValue"
+
 	// A nodeBuilder referenced by an edge doesn't belong to the Workflow.
 	NodeReferenceNotFound ErrorCode = "NodeReferenceNotFound"
 
@@ -111,6 +114,14 @@ func NewValueRequiredErr(nodeID, paramName string) *CompileError {
 	return newError(
 		ValueRequired,
 		fmt.Sprintf("Value required [%v].", paramName),
+		nodeID,
+	)
+}
+
+func NewInvalidValueErr(nodeID, paramName string) *CompileError {
+	return newError(
+		InvalidValue,
+		fmt.Sprintf("Invalid value [%v].", paramName),
 		nodeID,
 	)
 }

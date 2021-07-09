@@ -3,6 +3,9 @@ package compiler
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -39,6 +42,56 @@ func TestValidateContainerCommand(t *testing.T) {
 	errs = errors.NewCompileErrors()
 	assert.True(t, validateContainerCommand(&task, errs))
 	assert.False(t, errs.HasErrors())
+}
+
+func TestValidateK8sPod(t *testing.T) {
+	var podSpec = v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+			},
+			{
+				Name: "secondary",
+			},
+		},
+	}
+	structObj, _ := utils.MarshalObjToStruct(&podSpec)
+	task := core.TaskTemplate{
+		Id: &core.Identifier{Name: "task_123"},
+		Interface: &core.TypedInterface{
+			Inputs: createVariableMap(map[string]*core.Variable{
+				"foo": {},
+			}),
+			Outputs: createEmptyVariableMap(),
+		},
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: structObj,
+			},
+		},
+	}
+	errs := errors.NewCompileErrors()
+	assert.True(t, validateK8sPod(&task, errs))
+
+	podSpec = v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+			},
+			{
+				Name: "$Up3R+Invalid",
+			},
+		},
+	}
+	structObj, _ = utils.MarshalObjToStruct(&podSpec)
+	task.Target = &core.TaskTemplate_K8SPod{
+		K8SPod: &core.K8SPod{
+			PodSpec: structObj,
+		},
+	}
+	errs = errors.NewCompileErrors()
+	assert.False(t, validateK8sPod(&task, errs))
+	assert.Contains(t, errs.Error(), "InvalidValue, Node Id: root, Description: Invalid value [k8s pod spec container name]")
 }
 
 func TestCompileTask(t *testing.T) {
