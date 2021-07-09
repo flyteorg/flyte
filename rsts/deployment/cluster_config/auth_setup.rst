@@ -265,14 +265,14 @@ If your organization does any automated registration, then you'll need to authen
         .. code-block:: yaml
 
             admin:
-                # Update with the admin's endpoint. You must keep the 3 forward-slashe after dns:
-                endpoint:: dns:///<admin's url>
+                # Update with the flyteAdmin's endpoint. You must keep the 3 forward-slashes after dns:
+                endpoint: dns:///<flyteAdmin's url>
 
                 # Update auth type to `Pkce` or `ClientSecret`
                 authType: Pkce
 
                 # Set to the clientId (will be used for both Pkce and ClientSecret flows)
-                # Leave empty to use the value discovered through flyteadmins Auth discovery endpoint.
+                # Leave empty to use the value discovered through flyteAdmin's Auth discovery endpoint.
                 clientId: <Id>
 
                 # Set to the location where the client secret is mounted.
@@ -280,7 +280,7 @@ If your organization does any automated registration, then you'll need to authen
                 clientSecretLocation: </some/path/to/key>
 
                 # If required, set the scopes needed here. Otherwise, flytectl will discover scopes required for OpenID
-                # Connect through Admin's Auth discovery endpoint.
+                # Connect through flyteAdmin's Auth discovery endpoint.
                 # scopes: [ "scope1", "scope2" ]
 
         To read further about the available config options, please
