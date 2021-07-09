@@ -5,9 +5,9 @@ other-component:
   int-val: 4
   string-value: Hey there!
   strings:
-  - hello
-  - world
-  - '!'
+    - hello
+    - world
+    - '!'
   url-value: http://something.com
-  unknown-key: "something"
+unknown-key: "something"
 

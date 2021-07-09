@@ -207,6 +207,25 @@ func TestStrictAccessor(t *testing.T) {
 			assert.Error(t, v.UpdateConfig(context.TODO()))
 		})
 
+		t.Run(fmt.Sprintf("[%v] flags defined outside", provider(config.Options{}).ID()), func(t *testing.T) {
+			reg := config.NewRootSection()
+			_, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
+			assert.NoError(t, err)
+
+			_, err = reg.RegisterSection(OtherComponentSectionKey, &OtherComponentConfig{})
+			assert.NoError(t, err)
+			v := provider(config.Options{
+				StrictMode:  true,
+				SearchPaths: []string{filepath.Join("testdata", "bad_config.yaml")},
+				RootSection: reg,
+			})
+
+			set := pflag.NewFlagSet("test", pflag.ExitOnError)
+			set.StringP("unknown-key", "u", "", "")
+			v.InitializePflags(set)
+			assert.NoError(t, v.UpdateConfig(context.TODO()))
+		})
+
 		t.Run(fmt.Sprintf("[%v] Set through env", provider(config.Options{}).ID()), func(t *testing.T) {
 			reg := config.NewRootSection()
 			_, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
