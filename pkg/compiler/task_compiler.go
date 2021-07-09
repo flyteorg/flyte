@@ -3,6 +3,10 @@ package compiler
 import (
 	"fmt"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/validation"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
@@ -70,6 +74,24 @@ func validateContainer(task *core.TaskTemplate, errs errors.CompileErrors) (ok b
 	return !errs.HasErrors()
 }
 
+func validateK8sPod(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool) {
+	if task.GetK8SPod() == nil {
+		errs.Collect(errors.NewValueRequiredErr("root", "k8s pod"))
+		return
+	}
+	var podSpec v1.PodSpec
+	if err := utils.UnmarshalStructToObj(task.GetK8SPod().PodSpec, &podSpec); err != nil {
+		errs.Collect(errors.NewInvalidValueErr("root", "k8s pod spec"))
+		return
+	}
+	for _, container := range podSpec.Containers {
+		if containerErrs := validation.IsDNS1123Label(container.Name); len(containerErrs) > 0 {
+			errs.Collect(errors.NewInvalidValueErr("root", "k8s pod spec container name"))
+		}
+	}
+	return !errs.HasErrors()
+}
+
 func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) common.Task {
 	if task.Id == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "Id"))
@@ -78,6 +100,8 @@ func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) com
 	switch task.GetTarget().(type) {
 	case *core.TaskTemplate_Container:
 		validateContainer(task, errs.NewScope())
+	case *core.TaskTemplate_K8SPod:
+		validateK8sPod(task, errs.NewScope())
 	}
 
 	return taskBuilder{flyteTask: task}
