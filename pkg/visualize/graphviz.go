@@ -229,8 +229,9 @@ func (gb *graphBuilder) constructNode(parentGraphName string, prefix string, gra
 			}
 			gb.nodeClusters[name] = parentGraphName
 		case *core.Node_BranchNode:
-			branchSubGraphName := SubgraphPrefix + n.Metadata.Name
-			err := graph.AddSubGraph(parentGraphName, branchSubGraphName, nil)
+			sanitizedName := strings.ReplaceAll(n.Metadata.Name, "-", "_")
+			branchSubGraphName := SubgraphPrefix + sanitizedName
+			err := graph.AddSubGraph(parentGraphName, branchSubGraphName, map[string]string{LabelAttr: sanitizedName})
 			if err != nil {
 				return nil, err
 			}
@@ -247,8 +248,9 @@ func (gb *graphBuilder) constructNode(parentGraphName string, prefix string, gra
 					return nil, err
 				}
 			} else {
-				subGraphName := SubgraphPrefix + name
-				err := graph.AddSubGraph(parentGraphName, subGraphName, nil)
+				sanitizedName := strings.ReplaceAll(name, "-", "_")
+				subGraphName := SubgraphPrefix + sanitizedName
+				err := graph.AddSubGraph(parentGraphName, subGraphName, map[string]string{LabelAttr: sanitizedName})
 				if err != nil {
 					return nil, err
 				}
