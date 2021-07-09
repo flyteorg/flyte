@@ -84,7 +84,7 @@ func testDecodeJson_ProjectConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_ProjectConfig(val, result))
 }
 
-func testDecodeSlice_ProjectConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_ProjectConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_ProjectConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestProjectConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_activateProject", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("activateProject"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestProjectConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_archiveProject", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("archiveProject"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

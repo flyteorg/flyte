@@ -1,6 +1,6 @@
 package taskresourceattribute
 
-//go:generate pflags AttrUpdateConfig --default-var DefaultUpdateConfig
+//go:generate pflags AttrUpdateConfig --default-var DefaultUpdateConfig --bind-default-var
 
 // AttrUpdateConfig Matchable resource attributes configuration passed from command line
 type AttrUpdateConfig struct {

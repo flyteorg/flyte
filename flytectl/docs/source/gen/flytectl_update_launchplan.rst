@@ -37,9 +37,9 @@ Options
 
 ::
 
-      --activate             Activates the named entity specified as argument.
-      --archive              Archives the named entity specified as argument.
-      --description string   description of the namedentity.
+      --activate             activate the named entity.
+      --archive              archive named entity.
+      --description string   description of the named entity.
   -h, --help                 help for launchplan
 
 Options inherited from parent commands

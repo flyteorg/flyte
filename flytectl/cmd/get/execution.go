@@ -30,13 +30,13 @@ Retrieves execution by name within project and domain.
 Retrieves all the executions with filters.
 ::
  
-  bin/flytectl get execution -p flytesnacks -d development --filter.field-selector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
+  bin/flytectl get execution -p flytesnacks -d development --filter.fieldSelector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
 
  
 Retrieves all the execution with limit and sorting.
 ::
   
-   bin/flytectl get execution -p flytesnacks -d development --filter.sort-by=created_at --filter.limit=1 --filter.asc
+   bin/flytectl get execution -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
    
 
 Retrieves all the execution within project and domain in yaml format

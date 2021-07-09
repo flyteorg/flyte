@@ -28,14 +28,14 @@ Options
 
 ::
 
-  -a, --archive                       pass in archive file either an http link or local path.
-  -i, --assumableIamRole string        Custom assumable iam auth role to register launch plans with.
+      --archive                       pass in archive file either an http link or local path.
+      --assumableIamRole string        custom assumable iam auth role to register launch plans with.
       --continueOnError               continue on error when registering files.
   -h, --help                          help for examples
-  -k, --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
-  -l, --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
+      --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
+      --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
       --sourceUploadPath string        Location for source code in storage.
-  -v, --version string                version of the entity to be registered with flyte. (default "v1")
+      --version string                version of the entity to be registered with flyte. (default "v1")
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

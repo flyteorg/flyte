@@ -24,12 +24,12 @@ Retrieves project by name
 Retrieves all the projects with filters.
 ::
  
-  bin/flytectl get project --filter.field-selector="project.name=flytesnacks"
+  bin/flytectl get project --filter.fieldSelector="project.name=flytesnacks"
  
 Retrieves all the projects with limit and sorting.
 ::
  
-  bin/flytectl get project --filter.sort-by=created_at --filter.limit=1 --filter.asc
+  bin/flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the projects in yaml format
 
@@ -55,11 +55,11 @@ Options
 
 ::
 
-      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
-      --filter.field-selector string   Specifies the Field selector
-      --filter.limit int32             Specifies the limit (default 100)
-      --filter.sort-by string          Specifies which field to sort result by 
-  -h, --help                           help for project
+      --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.fieldSelector string   Specifies the Field selector
+      --filter.limit int32            Specifies the limit (default 100)
+      --filter.sortBy string          Specifies which field to sort results  (default "created_at")
+  -h, --help                          help for project
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

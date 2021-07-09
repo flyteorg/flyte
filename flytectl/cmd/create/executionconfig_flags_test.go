@@ -84,7 +84,7 @@ func testDecodeJson_ExecutionConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_ExecutionConfig(val, result))
 }
 
-func testDecodeSlice_ExecutionConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_ExecutionConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_ExecutionConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_execFile", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("execFile"); err == nil {
-				assert.Equal(t, string(executionConfig.ExecFile), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_targetDomain", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("targetDomain"); err == nil {
-				assert.Equal(t, string(executionConfig.TargetDomain), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_targetProject", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("targetProject"); err == nil {
-				assert.Equal(t, string(executionConfig.TargetProject), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_kubeServiceAcct", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("kubeServiceAcct"); err == nil {
-				assert.Equal(t, string(executionConfig.KubeServiceAcct), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_iamRoleARN", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("iamRoleARN"); err == nil {
-				assert.Equal(t, string(executionConfig.IamRoleARN), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -203,6 +163,20 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("iamRoleARN", testValue)
 			if vString, err := cmdFlags.GetString("iamRoleARN"); err == nil {
 				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.IamRoleARN)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_relaunch", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("relaunch", testValue)
+			if vString, err := cmdFlags.GetString("relaunch"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.Relaunch)
 
 			} else {
 				assert.FailNow(t, err.Error())

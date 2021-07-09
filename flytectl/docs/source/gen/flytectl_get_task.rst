@@ -36,17 +36,17 @@ Retrieves particular version of task by name within project and domain.
 Retrieves all the tasks with filters.
 ::
   
-  bin/flytectl get task -p flytesnacks -d development --filter.field-selector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
+  bin/flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
  
 Retrieve a specific task with filters.
 ::
  
-  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.field-selector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
+  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
   
 Retrieves all the task with limit and sorting.
 ::
    
-  bin/flytectl get -p flytesnacks -d development task  --filter.sort-by=created_at --filter.limit=1 --filter.asc
+  bin/flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the tasks within project and domain in yaml format.
 ::
@@ -95,14 +95,14 @@ Options
 
 ::
 
-      --execFile string                execution file name to be used for generating execution spec of a single task.
-      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
-      --filter.field-selector string   Specifies the Field selector
-      --filter.limit int32             Specifies the limit (default 100)
-      --filter.sort-by string          Specifies which field to sort result by 
-  -h, --help                           help for task
-      --latest                         flag to indicate to fetch the latest version, version flag will be ignored in this case
-      --version string                 version of the task to be fetched.
+      --execFile string               execution file name to be used for generating execution spec of a single task.
+      --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.fieldSelector string   Specifies the Field selector
+      --filter.limit int32            Specifies the limit (default 100)
+      --filter.sortBy string          Specifies which field to sort results  (default "created_at")
+  -h, --help                          help for task
+      --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case
+      --version string                version of the task to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

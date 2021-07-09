@@ -1,6 +1,6 @@
 package taskresourceattribute
 
-//go:generate pflags AttrDeleteConfig --default-var DefaultDelConfig
+//go:generate pflags AttrDeleteConfig --default-var DefaultDelConfig --bind-default-var
 
 // AttrDeleteConfig Matchable resource attributes configuration passed from command line
 type AttrDeleteConfig struct {

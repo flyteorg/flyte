@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-//go:generate pflags NamedEntityConfig --default-var namedEntityConfig
+//go:generate pflags NamedEntityConfig --default-var namedEntityConfig --bind-default-var
 
 var (
 	namedEntityConfig = &NamedEntityConfig{}

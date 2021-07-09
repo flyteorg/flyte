@@ -28,6 +28,15 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (Config) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (Config) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,7 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxRecords"), defaultConfig.MaxRecords, "Maximum number of records to retrieve.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "batchSize"), defaultConfig.BatchSize, "Maximum number of records to retrieve per call.")
+	cmdFlags.IntVar(&DefaultConfig.MaxRecords, fmt.Sprintf("%v%v", prefix, "maxRecords"), DefaultConfig.MaxRecords, "Maximum number of records to retrieve.")
+	cmdFlags.IntVar(&DefaultConfig.BatchSize, fmt.Sprintf("%v%v", prefix, "batchSize"), DefaultConfig.BatchSize, "Maximum number of records to retrieve per call.")
 	return cmdFlags
 }

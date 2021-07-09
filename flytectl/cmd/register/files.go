@@ -26,12 +26,12 @@ There is no difference between registration and fast registration, In fast regis
 SourceUploadPath is an optional flag. By default, flytectl will create SourceUploadPath from your storage config. In case of s3 flytectl will upload code base in s3://{{DEFINE_BUCKET_IN_STORAGE_CONFIG}}/fast/{{VERSION}}-fast{{MD5_CREATED_BY_PYFLYTE}.tar.gz}. 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks  -v v2 
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks  --version v2 
 	
 In case of fast registration, If the SourceUploadPath flag is defined then In this case flytectl will not use the default directory for uploading the source code, it will override the destination path on the registration  
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks  -v v2 --SourceUploadPath="s3://dummy/fast" 
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks  --version v2 --SourceUploadPath="s3://dummy/fast" 
 	
 Using archive file.Currently supported are .tgz and .tar extension files and can be local or remote file served through http/https.
 Use --archive flag.
@@ -60,7 +60,7 @@ Using short format of continueOnError flag
 Overriding the default version v1 using version string.
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -v v2
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --version v2
 
 Change the o/p format has not effect on registration. The O/p is currently available only in table format.
 
@@ -72,19 +72,19 @@ Override IamRole during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -i "arn:aws:iam::123456789:role/dummy"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -i "arn:aws:iam::123456789:role/dummy"
 
 Override Kubernetes service account during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -k "kubernetes-service-account"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -k "kubernetes-service-account"
 
 Override Output location prefix during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -l "s3://dummy/prefix"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -l "s3://dummy/prefix"
 	
 Usage
 `

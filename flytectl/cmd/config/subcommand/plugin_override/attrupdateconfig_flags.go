@@ -28,6 +28,15 @@ func (AttrUpdateConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (AttrUpdateConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (AttrUpdateConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,6 +50,6 @@ func (AttrUpdateConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg AttrUpdateConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("AttrUpdateConfig", pflag.ExitOnError)
-	cmdFlags.StringVar(&(DefaultUpdateConfig.AttrFile), fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultUpdateConfig.AttrFile, "attribute file name to be used for updating attribute for the resource type.")
+	cmdFlags.StringVar(&DefaultUpdateConfig.AttrFile, fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultUpdateConfig.AttrFile, "attribute file name to be used for updating attribute for the resource type.")
 	return cmdFlags
 }

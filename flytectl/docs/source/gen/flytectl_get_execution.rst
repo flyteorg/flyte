@@ -24,13 +24,13 @@ Retrieves execution by name within project and domain.
 Retrieves all the executions with filters.
 ::
  
-  bin/flytectl get execution -p flytesnacks -d development --filter.field-selector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
+  bin/flytectl get execution -p flytesnacks -d development --filter.fieldSelector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
 
  
 Retrieves all the execution with limit and sorting.
 ::
   
-   bin/flytectl get execution -p flytesnacks -d development --filter.sort-by=created_at --filter.limit=1 --filter.asc
+   bin/flytectl get execution -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
    
 
 Retrieves all the execution within project and domain in yaml format
@@ -82,13 +82,13 @@ Options
 
 ::
 
-      --details                        gets node execution details. Only applicable for single execution name i.e get execution name --details
-      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
-      --filter.field-selector string   Specifies the Field selector
-      --filter.limit int32             Specifies the limit (default 100)
-      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
-  -h, --help                           help for execution
-      --nodeId string                  get task executions for given node name.
+      --details                       gets node execution details. Only applicable for single execution name i.e get execution name --details
+      --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.fieldSelector string   Specifies the Field selector
+      --filter.limit int32            Specifies the limit (default 100)
+      --filter.sortBy string          Specifies which field to sort results  (default "created_at")
+  -h, --help                          help for execution
+      --nodeId string                 get task executions for given node name.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
