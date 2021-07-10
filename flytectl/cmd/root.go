@@ -47,6 +47,8 @@ func newRootCmd() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.flyte/config.yaml)")
 
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
+
 	// Due to https://github.com/flyteorg/flyte/issues/341, project flag will have to be specified as
 	// --root.project, this adds a convenience on top to allow --project to be used
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Project), "project", "p", "", "Specifies the Flyte project.")
@@ -69,18 +71,29 @@ func newRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-func initConfig(_ *cobra.Command, _ []string) error {
+func initConfig(cmd *cobra.Command, _ []string) error {
 	configFile := f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName)
 	if len(os.Getenv("FLYTECTL_CONFIG")) > 0 {
 		configFile = os.Getenv("FLYTECTL_CONFIG")
 	}
+
 	if len(cfgFile) > 0 {
 		configFile = cfgFile
 	}
+
 	configAccessor = viper.NewAccessor(stdConfig.Options{
 		StrictMode:  true,
 		SearchPaths: []string{configFile},
 	})
+
+	// persistent flags were initially bound to the root command so we must bind to the same command to avoid
+	// overriding those initial ones. We need to traverse up to the root command and initialize pflags for that.
+	rootCmd := cmd
+	for rootCmd.Parent() != nil {
+		rootCmd = rootCmd.Parent()
+	}
+
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
 	err := configAccessor.UpdateConfig(context.TODO())
 	if err != nil {
