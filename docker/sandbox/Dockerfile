@@ -78,7 +78,7 @@ COPY --from=base_ /flyteorg/ /flyteorg/
 COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
 # Copy kustomization template 
-COPY docker/sandbox/kustomization.yaml.tmpl /opt/flyteorg/share/deployment/kustomization.yaml
+COPY docker/sandbox/kustomization.yaml  /flyteorg/share/kustomization.yaml
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"

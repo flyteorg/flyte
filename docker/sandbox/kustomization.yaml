@@ -4,6 +4,3 @@ kind: Kustomization
 
 bases:
   - flyte_generated.yaml
-
-# Image overrides
-images: []
