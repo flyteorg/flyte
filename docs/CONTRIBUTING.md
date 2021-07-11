@@ -20,6 +20,6 @@ Flyte ships commit hooks that allow you to auto-generate the DCO signoff line if
 it doesn't exist when you run `git commit`. Simply navigate to the flytectl project root and run
 
 ```bash
-make dco
+make setup-precommit
 ```
 
