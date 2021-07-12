@@ -84,7 +84,7 @@ func testDecodeJson_LogConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_LogConfig(val, result))
 }
 
-func testDecodeSlice_LogConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_LogConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_LogConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_cloudwatch-enabled", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("cloudwatch-enabled"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_cloudwatch-region", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("cloudwatch-region"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_cloudwatch-log-group", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("cloudwatch-log-group"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_cloudwatch-template-uri", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("cloudwatch-template-uri"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_kubernetes-enabled", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("kubernetes-enabled"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -210,14 +170,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_kubernetes-url", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("kubernetes-url"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -232,14 +184,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_kubernetes-template-uri", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("kubernetes-template-uri"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -254,14 +198,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_stackdriver-enabled", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("stackdriver-enabled"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -276,14 +212,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_gcp-project", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("gcp-project"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -298,14 +226,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_stackdriver-logresourcename", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("stackdriver-logresourcename"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -320,14 +240,6 @@ func TestLogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_stackdriver-template-uri", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("stackdriver-template-uri"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
