@@ -31,7 +31,7 @@ jobs:
           GO111MODULE: "on"
           CI_ENV: "true"
         with:
-          args: make install && make test_unit_codecov
+          args: make install && make test_unit_without_flag
       - name: Push CodeCov
         uses: codecov/codecov-action@v1.0.5
         with:
