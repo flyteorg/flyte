@@ -37,7 +37,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, map[string]string{
 			"annotationKey1": "annotationValue1",
 			"annotationKey2": "annotationValue2",
-			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
 		}, k8sConfig.DefaultAnnotations)
 		assert.Equal(t, map[string]string{
 			"label1": "labelValue1",

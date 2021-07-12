@@ -84,7 +84,7 @@ func testDecodeJson_PluginConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_PluginConfig(val, result))
 }
 
-func testDecodeSlice_PluginConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_PluginConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_PluginConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_readRateLimiter.qps", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("readRateLimiter.qps"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.ReadRateLimiter.QPS), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_readRateLimiter.burst", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("readRateLimiter.burst"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.ReadRateLimiter.Burst), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_writeRateLimiter.qps", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("writeRateLimiter.qps"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.WriteRateLimiter.QPS), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_writeRateLimiter.burst", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("writeRateLimiter.burst"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.WriteRateLimiter.Burst), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_caching.size", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("caching.size"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.Caching.Size), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -210,14 +170,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_caching.resyncInterval", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("caching.resyncInterval"); err == nil {
-				assert.Equal(t, string(DefaultPluginConfig.Caching.ResyncInterval.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultPluginConfig.Caching.ResyncInterval.String()
@@ -232,14 +184,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_caching.workers", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("caching.workers"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.Caching.Workers), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -254,14 +198,6 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_caching.maxSystemFailures", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("caching.maxSystemFailures"); err == nil {
-				assert.Equal(t, int(DefaultPluginConfig.Caching.MaxSystemFailures), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

@@ -84,7 +84,7 @@ func testDecodeJson_K8sPluginConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_K8sPluginConfig(val, result))
 }
 
-func testDecodeSlice_K8sPluginConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_K8sPluginConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_K8sPluginConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_inject-finalizer", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("inject-finalizer"); err == nil {
-				assert.Equal(t, bool(defaultK8sConfig.InjectFinalizer), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_default-cpus", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("default-cpus"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.DefaultCPURequest), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_default-memory", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("default-memory"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.DefaultMemoryRequest), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_scheduler-name", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("scheduler-name"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.SchedulerName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.name", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.name"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.NamePrefix), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -210,14 +170,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.image", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.image"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.Image), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -232,14 +184,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.default-input-path", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.default-input-path"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.DefaultInputDataPath), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -254,14 +198,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.default-output-path", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.default-output-path"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.DefaultOutputPath), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -276,14 +212,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.input-vol-name", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.input-vol-name"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.InputVolumeName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -298,14 +226,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.output-vol-name", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.output-vol-name"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.OutputVolumeName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -320,14 +240,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.cpu", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.cpu"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.CPU), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -342,14 +254,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.memory", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.memory"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.Memory), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -364,14 +268,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_co-pilot.storage", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("co-pilot.storage"); err == nil {
-				assert.Equal(t, string(defaultK8sConfig.CoPilot.Storage), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -386,14 +282,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_delete-resource-on-finalize", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("delete-resource-on-finalize"); err == nil {
-				assert.Equal(t, bool(defaultK8sConfig.DeleteResourceOnFinalize), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
