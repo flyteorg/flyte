@@ -8,6 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
+	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	"github.com/flyteorg/flytectl/pkg/util"
+
 	"github.com/flyteorg/flytectl/pkg/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -30,9 +33,22 @@ Mount your source code repository inside sandbox
 ::
 
  bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
+	
+Run specific version of flyte, Only available after v0.14.0+
+::
+
+ bin/flytectl sandbox start  --version=v0.14.0
 
 Usage
 	`
+	GeneratedManifest            = "/flyteorg/share/flyte_generated.yaml"
+	FlyteReleaseURL              = "/flyteorg/flyte/releases/download/%v/flyte_sandbox_manifest.yaml"
+	FlyteMinimumVersionSupported = "v0.14.0"
+	GithubURL                    = "https://github.com"
+)
+
+var (
+	FlyteManifest = f.FilePathJoin(f.UserHomeDir(), ".flyte", "flyte_generated.yaml")
 )
 
 type ExecResult struct {
@@ -57,6 +73,10 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 
 func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
 	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
+	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
+		return nil, err
+	}
+
 	if err := docker.SetupFlyteDir(); err != nil {
 		return nil, err
 	}
@@ -65,25 +85,15 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		return nil, err
 	}
 
-	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
+	if err := mountSourceCode(); err != nil {
 		return nil, err
 	}
 
-	if len(sandboxConfig.DefaultConfig.Source) > 0 {
-		source, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
-		if err != nil {
-			return nil, err
-		}
-		docker.Volumes = append(docker.Volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: source,
-			Target: docker.Source,
-		})
+	if err := mountFlyteManifest(sandboxConfig.DefaultConfig.Version); err != nil {
+		return nil, err
 	}
 
 	fmt.Printf("%v pulling docker image %s\n", emoji.Whale, docker.ImageName)
-	os.Setenv("KUBECONFIG", docker.Kubeconfig)
-	os.Setenv("FLYTECTL_CONFIG", docker.FlytectlConfig)
 	if err := docker.PullDockerImage(ctx, cli, docker.ImageName); err != nil {
 		return nil, err
 	}
@@ -110,4 +120,44 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	}()
 
 	return logReader, nil
+}
+
+func mountSourceCode() error {
+	if len(sandboxConfig.DefaultConfig.Source) > 0 {
+		source, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
+		if err != nil {
+			return err
+		}
+		docker.Volumes = append(docker.Volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: source,
+			Target: docker.Source,
+		})
+	}
+	return nil
+}
+
+func mountFlyteManifest(version string) error {
+	if len(version) > 0 {
+		isGreater, err := util.IsVersionGreaterThan(version, FlyteMinimumVersionSupported)
+		if err != nil {
+			return err
+		}
+		if !isGreater {
+			return fmt.Errorf("version flag only support %s+ flyte version", FlyteMinimumVersionSupported)
+		}
+		response, err := util.GetRequest(GithubURL, fmt.Sprintf(FlyteReleaseURL, version))
+		if err != nil {
+			return err
+		}
+		if err := util.WriteIntoFile(response, FlyteManifest); err != nil {
+			return err
+		}
+		docker.Volumes = append(docker.Volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: FlyteManifest,
+			Target: GeneratedManifest,
+		})
+	}
+	return nil
 }

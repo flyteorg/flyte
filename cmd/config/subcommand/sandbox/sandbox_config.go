@@ -7,5 +7,6 @@ var (
 
 //Config
 type Config struct {
-	Source string `json:"source" pflag:", Path of your source code"`
+	Source  string `json:"source" pflag:",Path of your source code"`
+	Version string `json:"version" pflag:",Version of flyte"`
 }
