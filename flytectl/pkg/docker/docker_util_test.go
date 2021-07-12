@@ -4,23 +4,18 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-
-	"github.com/docker/docker/api/types/container"
-
-	//"github.com/docker/go-connections/nat"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/docker/docker/api/types/container"
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
+	"github.com/flyteorg/flytectl/pkg/util"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/docker/docker/api/types"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
-
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +28,7 @@ var (
 func setupSandbox() {
 	mockAdminClient := u.MockClient
 	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
-	_ = SetupFlyteDir()
+	_ = util.SetupFlyteDir()
 	container1 := types.Container{
 		ID: "FlyteSandboxClusterName",
 		Names: []string{
@@ -41,43 +36,6 @@ func setupSandbox() {
 		},
 	}
 	containers = append(containers, container1)
-}
-
-func TestConfigCleanup(t *testing.T) {
-	_, err := os.Stat(f.FilePathJoin(f.UserHomeDir(), ".flyte"))
-	if os.IsNotExist(err) {
-		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
-	}
-	_ = ioutil.WriteFile(FlytectlConfig, []byte("string"), 0600)
-	_ = ioutil.WriteFile(Kubeconfig, []byte("string"), 0600)
-
-	err = ConfigCleanup()
-	assert.Nil(t, err)
-
-	_, err = os.Stat(FlytectlConfig)
-	check := os.IsNotExist(err)
-	assert.Equal(t, check, true)
-
-	_, err = os.Stat(Kubeconfig)
-	check = os.IsNotExist(err)
-	assert.Equal(t, check, true)
-	_ = ConfigCleanup()
-}
-
-func TestSetupFlytectlConfig(t *testing.T) {
-	_, err := os.Stat(f.FilePathJoin(f.UserHomeDir(), ".flyte"))
-	if os.IsNotExist(err) {
-		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
-	}
-	err = SetupFlyteDir()
-	assert.Nil(t, err)
-	err = GetFlyteSandboxConfig()
-	assert.Nil(t, err)
-	_, err = os.Stat(FlytectlConfig)
-	assert.Nil(t, err)
-	check := os.IsNotExist(err)
-	assert.Equal(t, check, false)
-	_ = ConfigCleanup()
 }
 
 func TestGetSandbox(t *testing.T) {

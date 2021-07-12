@@ -324,7 +324,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("Failed manifest", func(t *testing.T) {
-		err := mountFlyteManifest("v100.9.9")
+		err := downloadFlyteManifest("v100.9.9")
 		assert.NotNil(t, err)
 	})
 	t.Run("Error in reading logs", func(t *testing.T) {

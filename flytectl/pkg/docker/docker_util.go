@@ -8,24 +8,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flytectl/pkg/util"
-
-	"github.com/docker/docker/client"
-
-	"github.com/enescakir/emoji"
-
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
+	"github.com/flyteorg/flytectl/pkg/configutil"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"github.com/enescakir/emoji"
+	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
 
 var (
 	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
-	FlytectlConfig          = f.FilePathJoin(f.UserHomeDir(), ".flyte", "config-sandbox.yaml")
 	SuccessMessage          = "Flyte is ready! Flyte UI is available at http://localhost:30081/console"
 	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox:dind"
 	FlyteSandboxClusterName = "flyte-sandbox"
@@ -50,37 +46,6 @@ var (
 	StdWriterPrefixLen = 8
 	StartingBufLen     = 32*1024 + StdWriterPrefixLen + 1
 )
-
-// SetupFlyteDir will create .flyte dir if not exist
-func SetupFlyteDir() error {
-	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755); err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetFlyteSandboxConfig download the flyte sandbox config
-func GetFlyteSandboxConfig() error {
-	response, err := util.GetRequest("https://raw.githubusercontent.com", "/flyteorg/flytectl/master/config.yaml")
-	if err != nil {
-		return err
-	}
-
-	return util.WriteIntoFile(response, FlytectlConfig)
-}
-
-// ConfigCleanup will remove the sandbox config from flyte dir
-func ConfigCleanup() error {
-	err := os.Remove(FlytectlConfig)
-	if err != nil {
-		return err
-	}
-	err = os.RemoveAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"))
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 // GetSandbox will return sandbox container if it exist
 func GetSandbox(ctx context.Context, cli Docker) *types.Container {
@@ -125,6 +90,7 @@ func PullDockerImage(ctx context.Context, cli Docker, image string) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = io.Copy(os.Stdout, r)
 	return err
 }
@@ -155,12 +121,12 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 
 // WatchError will return channel for watching errors of a container
 func WatchError(ctx context.Context, cli Docker, id string) (<-chan container.ContainerWaitOKBody, <-chan error) {
-	return cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
+	return cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
 }
 
 // ReadLogs will return io scanner for reading the logs of a container
 func ReadLogs(ctx context.Context, cli Docker, id string) (*bufio.Scanner, error) {
-	reader, err := cli.ContainerLogs(context.Background(), id, types.ContainerLogsOptions{
+	reader, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{
 		ShowStderr: true,
 		ShowStdout: true,
 		Timestamps: true,
@@ -176,12 +142,19 @@ func ReadLogs(ctx context.Context, cli Docker, id string) (*bufio.Scanner, error
 func WaitForSandbox(reader *bufio.Scanner, message string) bool {
 	for reader.Scan() {
 		if strings.Contains(reader.Text(), message) {
+			kubeconfig := strings.Join([]string{
+				"$KUBECONFIG",
+				f.FilePathJoin(f.UserHomeDir(), ".kube", "config"),
+				Kubeconfig,
+			}, ":")
+
 			fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, message, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
 			fmt.Printf("Please visit https://github.com/flyteorg/flytesnacks for more example %v \n", emoji.Rocket)
 			fmt.Printf("Register all flytesnacks example by running 'flytectl register examples  -d development  -p flytesnacks' \n")
+
 			fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
-			fmt.Printf("export KUBECONFIG=%v \n", Kubeconfig)
-			fmt.Printf("export FLYTECTL_CONFIG=%v \n", FlytectlConfig)
+			fmt.Printf("export KUBECONFIG=%v \n", kubeconfig)
+			fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
 			return true
 		}
 		fmt.Println(reader.Text())
