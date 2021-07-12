@@ -22,13 +22,6 @@ ARG K3S_VERSION="v1.21.1%2Bk3s1"
 RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s \
     && chmod +x /flyteorg/bin/k3s
 
-# Install kustomize
-ARG KUSTOMIZE_VERSION="v4.0.5"
-RUN wget -q -O /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz \
-    && tar -xf /tmp/kustomize.tar.gz -C /flyteorg/bin \
-    && chmod +x /flyteorg/bin/kustomize \
-    && rm /tmp/kustomize.tar.gz
-
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
