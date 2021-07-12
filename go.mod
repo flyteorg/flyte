@@ -23,6 +23,7 @@ require (
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/kr/text v0.2.0 // indirect
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
+	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
@@ -42,5 +43,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
+	k8s.io/kubernetes v1.13.0
 	sigs.k8s.io/yaml v1.2.0
 )
