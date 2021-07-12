@@ -63,7 +63,8 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
@@ -101,7 +102,8 @@ func TestStartSandboxFunc(t *testing.T) {
 		sandboxConfig.DefaultConfig.Source = "../"
 		absPath, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
 		assert.Nil(t, err)
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: absPath,
 			Target: docker.Source,
@@ -131,13 +133,90 @@ func TestStartSandboxFunc(t *testing.T) {
 		_, err = startSandbox(ctx, mockDocker, os.Stdin)
 		assert.Nil(t, err)
 	})
+	t.Run("Successfully run sandbox cluster with specific version", func(t *testing.T) {
+		ctx := context.Background()
+		errCh := make(chan error)
+		bodyStatus := make(chan container.ContainerWaitOKBody)
+		mockDocker := &mocks.Docker{}
+		sandboxConfig.DefaultConfig.Version = "v0.15.0"
+		sandboxConfig.DefaultConfig.Source = ""
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: FlyteManifest,
+			Target: GeneratedManifest,
+		})
+		mockDocker.OnContainerCreate(ctx, &container.Config{
+			Env:          docker.Environment,
+			Image:        docker.ImageName,
+			Tty:          false,
+			ExposedPorts: p1,
+		}, &container.HostConfig{
+			Mounts:       volumes,
+			PortBindings: p2,
+			Privileged:   true,
+		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+			ID: "Hello",
+		}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+			ShowStderr: true,
+			ShowStdout: true,
+			Timestamps: true,
+			Follow:     true,
+		}).Return(nil, nil)
+		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+		_, err := startSandbox(ctx, mockDocker, os.Stdin)
+		assert.Nil(t, err)
+	})
+	t.Run("Failed run sandbox cluster with wrong version", func(t *testing.T) {
+		ctx := context.Background()
+		errCh := make(chan error)
+		bodyStatus := make(chan container.ContainerWaitOKBody)
+		mockDocker := &mocks.Docker{}
+		sandboxConfig.DefaultConfig.Version = "v0.13.0"
+		sandboxConfig.DefaultConfig.Source = ""
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: FlyteManifest,
+			Target: GeneratedManifest,
+		})
+		mockDocker.OnContainerCreate(ctx, &container.Config{
+			Env:          docker.Environment,
+			Image:        docker.ImageName,
+			Tty:          false,
+			ExposedPorts: p1,
+		}, &container.HostConfig{
+			Mounts:       volumes,
+			PortBindings: p2,
+			Privileged:   true,
+		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+			ID: "Hello",
+		}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+			ShowStderr: true,
+			ShowStdout: true,
+			Timestamps: true,
+			Follow:     true,
+		}).Return(nil, nil)
+		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+		_, err := startSandbox(ctx, mockDocker, os.Stdin)
+		assert.NotNil(t, err)
+	})
 	t.Run("Error in pulling image", func(t *testing.T) {
 		ctx := context.Background()
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
@@ -173,7 +252,8 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
@@ -216,19 +296,15 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
+		sandboxConfig.DefaultConfig.Source = ""
+		sandboxConfig.DefaultConfig.Version = ""
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
 			Image:        docker.ImageName,
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
-			Mounts:       volumes,
+			Mounts:       docker.Volumes,
 			PortBindings: p2,
 			Privileged:   true,
 		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
@@ -247,13 +323,18 @@ func TestStartSandboxFunc(t *testing.T) {
 		_, err := startSandbox(ctx, mockDocker, os.Stdin)
 		assert.NotNil(t, err)
 	})
+	t.Run("Failed manifest", func(t *testing.T) {
+		err := mountFlyteManifest("v100.9.9")
+		assert.NotNil(t, err)
+	})
 	t.Run("Error in reading logs", func(t *testing.T) {
 		ctx := context.Background()
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
@@ -289,7 +370,8 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := append(docker.Volumes, mount.Mount{
+		volumes := docker.Volumes
+		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,

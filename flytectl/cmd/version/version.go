@@ -10,7 +10,6 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
-	hversion "github.com/hashicorp/go-version"
 	"github.com/spf13/cobra"
 )
 
@@ -23,12 +22,14 @@ Example version.
 
  bin/flytectl version
 `
-	latestVersionMessage  = "Installed flytectl version is the latest"
-	upgradeVersionMessage = "A newer version of flytectl is available [%v] Please upgrade using - https://docs.flyte.org/projects/flytectl/en/latest/index.html"
 	flytectlAppName       = "flytectl"
 	controlPlanAppName    = "controlPlane"
-	flytectlReleasePath   = "/repos/flyteorg/flytectl/releases/latest"
+	GithubAPIURL          = "https://api.github.com"
+	latestVersionMessage  = "Installed flytectl version is the latest"
+	upgradeVersionMessage = "A newer version of flytectl is available [%v] Please upgrade using - https://docs.flyte.org/projects/flytectl/en/latest/index.html"
 )
+
+var flytectlReleasePath = "/repos/flyteorg/flytectl/releases/latest"
 
 type versionOutput struct {
 	// Specifies the Name of app
@@ -54,13 +55,19 @@ func GetVersionCommand(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	latest, err := getLatestVersion(flytectlReleasePath)
 	if err != nil {
-		return err
+		logger.Errorf(ctx, "Get latest version of flyte got failed", err)
 	}
 
-	message, err := compareVersion(latest, stdlibversion.Version)
+	isGreater, err := util.IsVersionGreaterThan(latest, stdlibversion.Version)
 	if err != nil {
-		return err
+		logger.Errorf(ctx, "Error while comparing the flytectl version", err)
 	}
+
+	message := latestVersionMessage
+	if isGreater {
+		message = fmt.Sprintf(upgradeVersionMessage, latest)
+	}
+
 	fmt.Println(message)
 	// Print Flytectl
 	if err := printVersion(versionOutput{
@@ -87,22 +94,6 @@ func printVersion(response versionOutput) error {
 	return nil
 }
 
-func compareVersion(latest, current string) (string, error) {
-	semanticVersion, err := hversion.NewVersion(latest)
-	if err != nil {
-		return "", err
-	}
-	currentVersion, err := hversion.NewVersion(current)
-	if err != nil {
-		return "", err
-	}
-	if currentVersion.LessThan(semanticVersion) {
-		return fmt.Sprintf(upgradeVersionMessage, latest), nil
-	}
-
-	return latestVersionMessage, nil
-}
-
 func getControlPlaneVersion(ctx context.Context, cmdCtx cmdCore.CommandContext) error {
 	v, err := cmdCtx.AdminClient().GetVersion(ctx, &admin.GetVersionRequest{})
 	if err != nil || v == nil {
@@ -122,7 +113,7 @@ func getControlPlaneVersion(ctx context.Context, cmdCtx cmdCore.CommandContext) 
 }
 
 func getLatestVersion(path string) (string, error) {
-	response, err := util.GetRequest("https://api.github.com", path)
+	response, err := util.GetRequest(GithubAPIURL, path)
 	if err != nil {
 		return "", err
 	}
