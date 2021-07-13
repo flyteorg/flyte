@@ -14,4 +14,6 @@ var (
 
 	ErrTaskNotPassed    = "Task name not passed\n" // #nosec
 	ErrFailedTaskUpdate = "Task %v failed to get updated to due to %v\n"
+
+	ErrSandboxExists = "Sandbox Exist\n"
 )

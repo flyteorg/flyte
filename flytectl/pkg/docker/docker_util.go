@@ -3,10 +3,13 @@ package docker
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/flyteorg/flytectl/clierrors"
 
 	"github.com/flyteorg/flytectl/pkg/configutil"
 
@@ -69,7 +72,7 @@ func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
 			})
 			return err
 		}
-		return nil
+		return errors.New(clierrors.ErrSandboxExists)
 	}
 	return nil
 }

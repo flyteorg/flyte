@@ -80,7 +80,7 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 		mockDocker.OnContainerList(context, types.ContainerListOptions{All: true}).Return(containers, nil)
 		mockDocker.OnContainerRemove(context, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
 		err := RemoveSandbox(context, mockDocker, strings.NewReader("n"))
-		assert.Nil(t, err)
+		assert.NotNil(t, err)
 	})
 
 	t.Run("Successfully remove sandbox container with zero sandbox containers are running", func(t *testing.T) {
