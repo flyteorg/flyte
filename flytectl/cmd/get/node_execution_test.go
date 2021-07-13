@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -14,6 +12,7 @@ import (
 
 	"github.com/disiqueira/gotree"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -27,73 +26,40 @@ const (
 func TestCreateNodeDetailsTreeView(t *testing.T) {
 
 	t.Run("empty node execution", func(t *testing.T) {
-		var nodeExecutions []*admin.NodeExecution
-		var nodeExecToTaskExec map[string]*admin.TaskExecutionList
 		expectedRoot := gotree.New("")
-		treeRoot := createNodeDetailsTreeView(nodeExecutions, nodeExecToTaskExec)
+		treeRoot := createNodeDetailsTreeView(nil, nil)
 		assert.Equal(t, expectedRoot, treeRoot)
 	})
 
 	t.Run("successful simple node execution full view", func(t *testing.T) {
-		nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
 
-		nodeExec1 := createDummyNodeWithID("start-node", true)
+		nodeExec1 := createDummyNodeWithID("start-node", false)
+		nodeExec1Closure := NodeExecutionClosure{NodeExec: &NodeExecution{nodeExec1}}
 		taskExec11 := createDummyTaskExecutionForNode("start-node", "task11")
+		taskExec11Closure := TaskExecutionClosure{&TaskExecution{taskExec11}}
 		taskExec12 := createDummyTaskExecutionForNode("start-node", "task12")
+		taskExec12Closure := TaskExecutionClosure{&TaskExecution{taskExec12}}
 
-		nodeExecToTaskExec["start-node"] = &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec11, taskExec12},
-		}
+		nodeExec1Closure.TaskExecutions = []*TaskExecutionClosure{&taskExec11Closure, &taskExec12Closure}
 
 		nodeExec2 := createDummyNodeWithID("n0", false)
+		nodeExec2Closure := NodeExecutionClosure{NodeExec: &NodeExecution{nodeExec2}}
 		taskExec21 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec21Closure := TaskExecutionClosure{&TaskExecution{taskExec21}}
 		taskExec22 := createDummyTaskExecutionForNode("n0", "task22")
+		taskExec22Closure := TaskExecutionClosure{&TaskExecution{taskExec22}}
 
-		nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec21, taskExec22},
-		}
+		nodeExec2Closure.TaskExecutions = []*TaskExecutionClosure{&taskExec21Closure, &taskExec22Closure}
 
-		nodeExec3 := createDummyNodeWithID("n1", false)
-		taskExec31 := createDummyTaskExecutionForNode("n1", "task31")
-		taskExec32 := createDummyTaskExecutionForNode("n1", "task32")
+		wrapperNodeExecutions := []*NodeExecutionClosure{&nodeExec1Closure, &nodeExec2Closure}
 
-		nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec31, taskExec32},
-		}
+		treeRoot := createNodeDetailsTreeView(nil, wrapperNodeExecutions)
 
-		nodeExecutions := []*admin.NodeExecution{nodeExec1, nodeExec2, nodeExec3}
-
-		treeRoot := createNodeDetailsTreeView(nodeExecutions, nodeExecToTaskExec)
-
-		assert.Equal(t, 3, len(treeRoot.Items()))
-	})
-
-	t.Run("empty task execution only view", func(t *testing.T) {
-		taskExecutionList := &admin.TaskExecutionList{}
-		treeRoot := createNodeTaskExecTreeView(nil, taskExecutionList)
-		assert.Equal(t, 0, len(treeRoot.Items()))
-	})
-
-	t.Run("successful task execution only view", func(t *testing.T) {
-		taskExec31 := createDummyTaskExecutionForNode("n1", "task31")
-		taskExec32 := createDummyTaskExecutionForNode("n1", "task32")
-
-		taskExecutionList := &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec31, taskExec32},
-		}
-
-		treeRoot := createNodeTaskExecTreeView(nil, taskExecutionList)
 		assert.Equal(t, 2, len(treeRoot.Items()))
 	})
 }
 
-func createDummyNodeWithID(nodeID string, startedAtEmpty bool) *admin.NodeExecution {
-	// Remove this param  startedAtEmpty and code once admin code is fixed
-	startedAt := timestamppb.Now()
-	if startedAtEmpty {
-		startedAt = nil
-	}
-
+func createDummyNodeWithID(nodeID string, isParentNode bool) *admin.NodeExecution {
 	nodeExecution := &admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: nodeID,
@@ -104,12 +70,15 @@ func createDummyNodeWithID(nodeID string, startedAtEmpty bool) *admin.NodeExecut
 			},
 		},
 		InputUri: nodeID + "inputUri",
+		Metadata: &admin.NodeExecutionMetaData{
+			IsParentNode: isParentNode,
+		},
 		Closure: &admin.NodeExecutionClosure{
 			OutputResult: &admin.NodeExecutionClosure_OutputUri{
 				OutputUri: nodeID + "outputUri",
 			},
 			Phase:     core.NodeExecution_SUCCEEDED,
-			StartedAt: startedAt,
+			StartedAt: timestamppb.Now(),
 			Duration:  &durationpb.Duration{Seconds: 100},
 			CreatedAt: timestamppb.Now(),
 			UpdatedAt: timestamppb.Now(),
@@ -194,35 +163,128 @@ func TestGetExecutionDetails(t *testing.T) {
 		ctx := u.Ctx
 		mockCmdCtx := u.CmdCtx
 		mockFetcherExt := u.FetcherExt
-		nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
+
+		nodeExecStart := createDummyNodeWithID("start-node", false)
+		nodeExecN2 := createDummyNodeWithID("n2", true)
+		nodeExec1 := createDummyNodeWithID("n0", false)
+		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+		nodeExecutions := []*admin.NodeExecution{nodeExecStart, nodeExecN2, nodeExec1}
+		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+
+		inputs := map[string]*core.Literal{
+			"val1": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 100,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		outputs := map[string]*core.Literal{
+			"o2": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 120,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		dataResp := &admin.NodeExecutionGetDataResponse{
+			FullOutputs: &core.LiteralMap{
+				Literals: inputs,
+			},
+			FullInputs: &core.LiteralMap{
+				Literals: outputs,
+			},
+		}
+
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "n2").Return(&admin.NodeExecutionList{}, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+
+		nodeExecWrappers, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
+		assert.Nil(t, err)
+		assert.NotNil(t, nodeExecWrappers)
+	})
+
+	t.Run("successful get details default view for node-id", func(t *testing.T) {
+		setup()
+		ctx := u.Ctx
+		mockCmdCtx := u.CmdCtx
+		mockFetcherExt := u.FetcherExt
 
 		nodeExec1 := createDummyNodeWithID("n0", false)
 		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
 		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
 
-		nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
-		}
-
 		nodeExecutions := []*admin.NodeExecution{nodeExec1}
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nodeExecToTaskExec["n0"], nil)
+		inputs := map[string]*core.Literal{
+			"val1": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 100,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		outputs := map[string]*core.Literal{
+			"o2": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 120,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		dataResp := &admin.NodeExecutionGetDataResponse{
+			FullOutputs: &core.LiteralMap{
+				Literals: inputs,
+			},
+			FullInputs: &core.LiteralMap{
+				Literals: outputs,
+			},
+		}
 
-		err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, mockCmdCtx)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+
+		nodeExecWrappers, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "n0", mockCmdCtx)
 		assert.Nil(t, err)
-	})
-
-	t.Run("failure node details fetch", func(t *testing.T) {
-		setup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockFetcherExt := u.FetcherExt
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch details"))
-		err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, mockCmdCtx)
-		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("unable to fetch details"), err)
+		assert.NotNil(t, nodeExecWrappers)
 	})
 
 	t.Run("failure task exec fetch", func(t *testing.T) {
@@ -243,80 +305,10 @@ func TestGetExecutionDetails(t *testing.T) {
 		nodeExecutions := []*admin.NodeExecution{nodeExec1}
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
 		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch task exec details"))
-		err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, mockCmdCtx)
+		_, err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to fetch task exec details"), err)
-	})
-
-	t.Run("successful get details non default view", func(t *testing.T) {
-		setup()
-		config.GetConfig().Output = "table"
-		execution.DefaultConfig.NodeID = "n0"
-
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockFetcherExt := u.FetcherExt
-		nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
-
-		nodeExec1 := createDummyNodeWithID("n0", false)
-		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
-		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
-
-		nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
-			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
-		}
-
-		nodeExecutions := []*admin.NodeExecution{nodeExec1}
-		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
-
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nodeExecToTaskExec["n0"], nil)
-
-		err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, mockCmdCtx)
-		assert.Nil(t, err)
-	})
-
-	t.Run("Table test successful cases", func(t *testing.T) {
-		tests := []struct {
-			outputFormat string
-			nodeID       string
-			want         error
-		}{
-			{outputFormat: "table", nodeID: "", want: nil},
-			{outputFormat: "table", nodeID: "n0", want: nil},
-			{outputFormat: "yaml", nodeID: "", want: nil},
-			{outputFormat: "yaml", nodeID: "n0", want: nil},
-			{outputFormat: "yaml", nodeID: "n1", want: nil},
-		}
-
-		for _, tt := range tests {
-			setup()
-			config.GetConfig().Output = tt.outputFormat
-			execution.DefaultConfig.NodeID = tt.nodeID
-
-			ctx := u.Ctx
-			mockCmdCtx := u.CmdCtx
-			mockFetcherExt := u.FetcherExt
-			nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
-
-			nodeExec1 := createDummyNodeWithID("n0", false)
-			taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
-			taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
-
-			nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
-				TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
-			}
-
-			nodeExecutions := []*admin.NodeExecution{nodeExec1}
-			nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
-
-			mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nodeExecList, nil)
-			mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nodeExecToTaskExec["n0"], nil)
-
-			got := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, mockCmdCtx)
-			assert.Equal(t, tt.want, got)
-		}
 	})
 }

@@ -15,5 +15,5 @@ var (
 type Config struct {
 	Filter  filters.Filters `json:"filter" pflag:","`
 	Details bool            `json:"details" pflag:",gets node execution details. Only applicable for single execution name i.e get execution name --details"`
-	NodeID  string          `json:"nodeId" pflag:",get task executions for given node name."`
+	NodeID  string          `json:"nodeID" pflag:",get task executions for given node name."`
 }

@@ -71,14 +71,14 @@ func TestFetchExecutionError(t *testing.T) {
 func TestFetchNodeExecutionDetails(t *testing.T) {
 	getExecutionFetcherSetup()
 	adminClient.OnListNodeExecutionsMatch(mock.Anything, mock.Anything).Return(&admin.NodeExecutionList{}, nil)
-	_, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue")
+	_, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue", "")
 	assert.Nil(t, err)
 }
 
 func TestFetchNodeExecutionDetailsError(t *testing.T) {
 	getExecutionFetcherSetup()
 	adminClient.OnListNodeExecutionsMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-	_, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue")
+	_, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue", "")
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
 
@@ -93,5 +93,19 @@ func TestFetchTaskExecOnNodeError(t *testing.T) {
 	getExecutionFetcherSetup()
 	adminClient.OnListTaskExecutionsMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	_, err := adminFetcherExt.FetchTaskExecutionsOnNode(ctx, "nodeId", "execName", "dummyProject", "domainValue")
+	assert.Equal(t, fmt.Errorf("failed"), err)
+}
+
+func TestFetchNodeData(t *testing.T) {
+	getExecutionFetcherSetup()
+	adminClient.OnGetNodeExecutionDataMatch(mock.Anything, mock.Anything).Return(&admin.NodeExecutionGetDataResponse{}, nil)
+	_, err := adminFetcherExt.FetchNodeExecutionData(ctx, "nodeId", "execName", "dummyProject", "domainValue")
+	assert.Nil(t, err)
+}
+
+func TestFetchNodeDataError(t *testing.T) {
+	getExecutionFetcherSetup()
+	adminClient.OnGetNodeExecutionDataMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	_, err := adminFetcherExt.FetchNodeExecutionData(ctx, "nodeId", "execName", "dummyProject", "domainValue")
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }

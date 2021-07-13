@@ -124,6 +124,46 @@ func (p Printer) JSONToTable(jsonRows []byte, columns []Column) error {
 	return nil
 }
 
+func (p Printer) PrintInterface(format OutputFormat, columns []Column, v interface{}) error {
+	jsonRows, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	// Factory Method for all printer
+	switch format {
+	case OutputFormatJSON, OutputFormatYAML:
+		return printJSONYaml(format, v)
+	default: // Print table
+		return p.JSONToTable(jsonRows, columns)
+	}
+}
+
+// printJSONYaml internal function for printing
+func printJSONYaml(format OutputFormat, v interface{}) error {
+	if format != OutputFormatJSON && format != OutputFormatYAML {
+		return fmt.Errorf("this function should be called only for json/yaml printing")
+	}
+	buf := new(bytes.Buffer)
+	encoder := json.NewEncoder(buf)
+	encoder.SetIndent(empty, tab)
+
+	err := encoder.Encode(v)
+	if err != nil {
+		return err
+	}
+
+	if format == OutputFormatJSON {
+		fmt.Println(buf.String())
+	} else {
+		v, err := yaml.JSONToYAML(buf.Bytes())
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(v))
+	}
+	return nil
+}
+
 func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.Message) error {
 
 	printableMessages := make([]*PrintableProto, 0, len(messages))
@@ -134,27 +174,13 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 	// Factory Method for all printer
 	switch format {
 	case OutputFormatJSON, OutputFormatYAML: // Print protobuf to json
-		buf := new(bytes.Buffer)
-		encoder := json.NewEncoder(buf)
-		encoder.SetIndent(empty, tab)
-		var err error
+		var v interface{}
 		if len(printableMessages) == 1 {
-			err = encoder.Encode(printableMessages[0])
+			v = printableMessages[0]
 		} else {
-			err = encoder.Encode(printableMessages)
+			v = printableMessages
 		}
-		if err != nil {
-			return err
-		}
-		if format == OutputFormatJSON {
-			fmt.Println(buf.String())
-		} else {
-			v, err := yaml.JSONToYAML(buf.Bytes())
-			if err != nil {
-				return err
-			}
-			fmt.Println(string(v))
-		}
+		return printJSONYaml(format, v)
 	case OutputFormatDOT, OutputFormatDOTURL:
 		var workflows []*admin.Workflow
 		for _, m := range messages {
