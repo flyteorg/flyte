@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
 	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
@@ -47,6 +48,9 @@ func RemoteDeleteCommand() *cobra.Command {
 		"plugin-override": {CmdFunc: deletePluginOverride, Aliases: []string{"plugin-overrides"},
 			Short: pluginOverrideShort,
 			Long:  pluginOverrideLong, PFlagProvider: pluginoverride.DefaultDelConfig, ProjectDomainNotRequired: true},
+		"workflow-execution-config": {CmdFunc: deleteWorkflowExecutionConfig, Aliases: []string{"workflow-execution-config"},
+			Short: workflowExecutionConfigShort,
+			Long:  workflowExecutionConfigLong, PFlagProvider: workflowexecutionconfig.DefaultDelConfig, ProjectDomainNotRequired: true},
 	}
 	cmdcore.AddCommands(deleteCmd, terminateResourcesFuncs)
 	return deleteCmd
