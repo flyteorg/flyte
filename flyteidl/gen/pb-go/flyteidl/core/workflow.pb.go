@@ -205,7 +205,7 @@ func (*IfElseBlock) XXX_OneofWrappers() []interface{} {
 }
 
 // BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
-// runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+// runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
 type BranchNode struct {
 	//+required
 	IfElse               *IfElseBlock `protobuf:"bytes,1,opt,name=if_else,json=ifElse,proto3" json:"if_else,omitempty"`
@@ -556,10 +556,10 @@ type Node struct {
 	// Extra metadata about the node.
 	Metadata *NodeMetadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-	// must be fullfilled.
+	// must be fulfilled.
 	Inputs []*Binding `protobuf:"bytes,3,rep,name=inputs,proto3" json:"inputs,omitempty"`
-	//+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-	// upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+	//+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+	// upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
 	// field.
 	UpstreamNodeIds []string `protobuf:"bytes,4,rep,name=upstream_node_ids,json=upstreamNodeIds,proto3" json:"upstream_node_ids,omitempty"`
 	//+optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes

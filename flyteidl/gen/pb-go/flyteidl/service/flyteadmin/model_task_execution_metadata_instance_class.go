@@ -8,11 +8,12 @@
  */
 
 package flyteadmin
-// TaskExecutionMetadataInstanceClass : Includes the broad cateogry of machine used for this specific task execution.   - DEFAULT: The default instance class configured for the flyte application platform.  - INTERRUPTIBLE: The instance class configured for interruptible tasks.
+
+// TaskExecutionMetadataInstanceClass : Includes the broad category of machine used for this specific task execution.   - DEFAULT: The default instance class configured for the flyte application platform.  - INTERRUPTIBLE: The instance class configured for interruptible tasks.
 type TaskExecutionMetadataInstanceClass string
 
 // List of TaskExecutionMetadataInstanceClass
 const (
-	TaskExecutionMetadataInstanceClassDEFAULT_ TaskExecutionMetadataInstanceClass = "DEFAULT"
+	TaskExecutionMetadataInstanceClassDEFAULT_      TaskExecutionMetadataInstanceClass = "DEFAULT"
 	TaskExecutionMetadataInstanceClassINTERRUPTIBLE TaskExecutionMetadataInstanceClass = "INTERRUPTIBLE"
 )

@@ -11,7 +11,7 @@ package flyteadmin
 
 // Encapsulation of fields that uniquely identifies a Flyte resource.
 type CoreIdentifier struct {
-	// Identifies the specific type of resource that this identifer corresponds to.
+	// Identifies the specific type of resource that this identifier corresponds to.
 	ResourceType *CoreResourceType `json:"resource_type,omitempty"`
 	// Name of the project the resource belongs to.
 	Project string `json:"project,omitempty"`

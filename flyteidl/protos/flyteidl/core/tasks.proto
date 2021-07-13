@@ -11,7 +11,7 @@ package flyteidl.core;
 
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
-// A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+// A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 // container engines.
 message Resources {
     // Known resource names.
@@ -41,7 +41,7 @@ message Resources {
     repeated ResourceEntry limits = 2;
 }
 
-// Runtime information. This is losely defined to allow for extensibility.
+// Runtime information. This is loosely defined to allow for extensibility.
 message RuntimeMetadata {
     enum RuntimeType {
         OTHER = 0;
@@ -106,7 +106,7 @@ message TaskTemplate {
     // Extra metadata about the task.
     TaskMetadata metadata = 3;
 
-    // A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+    // A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
     // compile-time validation of the workflow to avoid costly runtime failures.
     TypedInterface interface = 4;
 

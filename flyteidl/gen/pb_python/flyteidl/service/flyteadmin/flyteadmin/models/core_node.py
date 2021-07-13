@@ -139,7 +139,7 @@ class CoreNode(object):
     def inputs(self):
         """Gets the inputs of this CoreNode.  # noqa: E501
 
-        Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fullfilled.  # noqa: E501
+        Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fulfilled.  # noqa: E501
 
         :return: The inputs of this CoreNode.  # noqa: E501
         :rtype: list[CoreBinding]
@@ -150,7 +150,7 @@ class CoreNode(object):
     def inputs(self, inputs):
         """Sets the inputs of this CoreNode.
 
-        Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fullfilled.  # noqa: E501
+        Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fulfilled.  # noqa: E501
 
         :param inputs: The inputs of this CoreNode.  # noqa: E501
         :type: list[CoreBinding]
@@ -162,7 +162,7 @@ class CoreNode(object):
     def upstream_node_ids(self):
         """Gets the upstream_node_ids of this CoreNode.  # noqa: E501
 
-        +optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs field.  # noqa: E501
+        +optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field.  # noqa: E501
 
         :return: The upstream_node_ids of this CoreNode.  # noqa: E501
         :rtype: list[str]
@@ -173,7 +173,7 @@ class CoreNode(object):
     def upstream_node_ids(self, upstream_node_ids):
         """Sets the upstream_node_ids of this CoreNode.
 
-        +optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs field.  # noqa: E501
+        +optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field.  # noqa: E501
 
         :param upstream_node_ids: The upstream_node_ids of this CoreNode.  # noqa: E501
         :type: list[str]

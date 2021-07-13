@@ -22,7 +22,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Indicates that a sent event was not used to update execution state due to
-// the referenced execution already being terminated (and therefore inelegible
+// the referenced execution already being terminated (and therefore ineligible
 // for further state transitions).
 type EventErrorAlreadyInTerminalState struct {
 	// +required

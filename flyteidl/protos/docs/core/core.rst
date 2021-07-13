@@ -66,7 +66,7 @@ Catalog artifact information with specific metadata
 CatalogCacheStatus
 ------------------------------------------------------------------
 
-Indicates the status of CatalogCaching. The reason why this is not embeded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
+Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
 
 .. csv-table:: Enum CatalogCacheStatus values
    :header: "Name", "Number", "Description"
@@ -158,7 +158,7 @@ compiled subworkflows.
 
    "primary", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "", "&#43;required"
    "sub_workflows", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "repeated", "Guaranteed that there will only exist one and only one workflow with a given id, i.e., every sub workflow has a unique identifier. Also every enclosed subworkflow is used either by a primary workflow or by a subworkflow as an inlined workflow &#43;optional"
-   "tasks", ":ref:`ref_flyteidl.core.CompiledTask`", "repeated", "Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id &#43;required (atleast 1)"
+   "tasks", ":ref:`ref_flyteidl.core.CompiledTask`", "repeated", "Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id &#43;required (at least 1)"
 
 
 
@@ -830,7 +830,7 @@ Encapsulation of fields that uniquely identifies a Flyte resource.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Identifies the specific type of resource that this identifer corresponds to."
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Identifies the specific type of resource that this identifier corresponds to."
    "project", ":ref:`ref_string`", "", "Name of the project the resource belongs to."
    "domain", ":ref:`ref_string`", "", "Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project."
    "name", ":ref:`ref_string`", "", "User provided value for the resource."
@@ -1901,7 +1901,7 @@ Defines a pod spec and additional pod metadata that is created when a task is ex
 Resources
 ------------------------------------------------------------------
 
-A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 container engines.
 
 
@@ -1946,7 +1946,7 @@ Encapsulates a resource name and value.
 RuntimeMetadata
 ------------------------------------------------------------------
 
-Runtime information. This is losely defined to allow for extensibility.
+Runtime information. This is loosely defined to allow for extensibility.
 
 
 
@@ -2008,7 +2008,7 @@ Tasks are registered as a first step in the system.
    "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
    "type", ":ref:`ref_string`", "", "A predefined yet extensible Task type identifier. This can be used to customize any of the components. If no extensions are provided in the system, Flyte will resolve the this task to its TaskCategory and default the implementation registered for the TaskCategory."
    "metadata", ":ref:`ref_flyteidl.core.TaskMetadata`", "", "Extra metadata about the task."
-   "interface", ":ref:`ref_flyteidl.core.TypedInterface`", "", "A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees compile-time validation of the workflow to avoid costly runtime failures."
+   "interface", ":ref:`ref_flyteidl.core.TypedInterface`", "", "A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees compile-time validation of the workflow to avoid costly runtime failures."
    "custom", ":ref:`ref_google.protobuf.Struct`", "", "Custom data about the task. This is extensible to allow various plugins in the system."
    "container", ":ref:`ref_flyteidl.core.Container`", "", ""
    "k8s_pod", ":ref:`ref_flyteidl.core.K8sPod`", "", ""
@@ -2417,7 +2417,7 @@ BranchNode
 ------------------------------------------------------------------
 
 BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
-runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
 
 
 
@@ -2496,8 +2496,8 @@ node.
 
    "id", ":ref:`ref_string`", "", "A workflow-level unique identifier that identifies this node in the workflow. &#34;inputs&#34; and &#34;outputs&#34; are reserved node ids that cannot be used by other nodes."
    "metadata", ":ref:`ref_flyteidl.core.NodeMetadata`", "", "Extra metadata about the node."
-   "inputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "Specifies how to bind the underlying interface&#39;s inputs. All required inputs specified in the underlying interface must be fullfilled."
-   "upstream_node_ids", ":ref:`ref_string`", "repeated", "&#43;optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs field."
+   "inputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "Specifies how to bind the underlying interface&#39;s inputs. All required inputs specified in the underlying interface must be fulfilled."
+   "upstream_node_ids", ":ref:`ref_string`", "repeated", "&#43;optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field."
    "output_aliases", ":ref:`ref_flyteidl.core.Alias`", "repeated", "&#43;optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes need to conform to the same interface (e.g. all branches in a branch node). Downstream nodes must refer to this nodes outputs using the alias if one&#39;s specified."
    "task_node", ":ref:`ref_flyteidl.core.TaskNode`", "", "Information about the Task to execute in this node."
    "workflow_node", ":ref:`ref_flyteidl.core.WorkflowNode`", "", "Information about the Workflow to execute in this mode."

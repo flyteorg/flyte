@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Runtime information. This is losely defined to allow for extensibility.
+// Runtime information. This is loosely defined to allow for extensibility.
 type CoreRuntimeMetadata struct {
 	// Type of runtime.
 	Type_ *RuntimeMetadataRuntimeType `json:"type,omitempty"`
