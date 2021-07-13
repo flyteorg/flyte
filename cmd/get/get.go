@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
@@ -62,6 +63,9 @@ func CreateGetCommand() *cobra.Command {
 		"plugin-override": {CmdFunc: getPluginOverridesFunc, Aliases: []string{"plugin-overrides"},
 			Short: pluginOverrideShort,
 			Long:  pluginOverrideLong, PFlagProvider: pluginoverride.DefaultFetchConfig},
+		"workflow-execution-config": {CmdFunc: getWorkflowExecutionConfigFunc, Aliases: []string{"workflow-execution-config"},
+			Short: workflowExecutionConfigShort,
+			Long:  workflowExecutionConfigLong, PFlagProvider: workflowexecutionconfig.DefaultFetchConfig},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)

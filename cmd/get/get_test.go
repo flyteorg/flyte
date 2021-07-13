@@ -42,20 +42,20 @@ func TestCreateGetCommand(t *testing.T) {
 	assert.Equal(t, getCommand.Use, "get")
 	assert.Equal(t, getCommand.Short, "Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.")
 	fmt.Println(getCommand.Commands())
-	assert.Equal(t, len(getCommand.Commands()), 10)
+	assert.Equal(t, len(getCommand.Commands()), 11)
 	cmdNouns := getCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
 		return cmdNouns[i].Use < cmdNouns[j].Use
 	})
 	useArray := []string{"cluster-resource-attribute", "execution", "execution-cluster-label",
-		"execution-queue-attribute", "launchplan", "plugin-override", "project", "task", "task-resource-attribute", "workflow"}
+		"execution-queue-attribute", "launchplan", "plugin-override", "project", "task", "task-resource-attribute", "workflow", "workflow-execution-config"}
 	aliases := [][]string{{"cluster-resource-attributes"}, {"executions"}, {"execution-cluster-labels"},
-		{"execution-queue-attributes"}, {"launchplans"}, {"plugin-overrides"}, {"projects"}, {"tasks"}, {"task-resource-attributes"}, {"workflows"}}
+		{"execution-queue-attributes"}, {"launchplans"}, {"plugin-overrides"}, {"projects"}, {"tasks"}, {"task-resource-attributes"}, {"workflows"}, {"workflow-execution-config"}}
 	shortArray := []string{clusterResourceAttributesShort, executionShort, executionClusterLabelShort, executionQueueAttributesShort, launchPlanShort,
-		pluginOverrideShort, projectShort, taskShort, taskResourceAttributesShort, workflowShort}
+		pluginOverrideShort, projectShort, taskShort, taskResourceAttributesShort, workflowShort, workflowExecutionConfigShort}
 	longArray := []string{clusterResourceAttributesLong, executionLong, executionClusterLabelLong, executionQueueAttributesLong, launchPlanLong,
-		pluginOverrideLong, projectLong, taskLong, taskResourceAttributesLong, workflowLong}
+		pluginOverrideLong, projectLong, taskLong, taskResourceAttributesLong, workflowLong, workflowExecutionConfigLong}
 	for i := range cmdNouns {
 		assert.Equal(t, cmdNouns[i].Use, useArray[i])
 		assert.Equal(t, cmdNouns[i].Aliases, aliases[i])
