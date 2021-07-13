@@ -57,6 +57,44 @@ func TestStartSandboxFunc(t *testing.T) {
 		_, err := startSandbox(ctx, mockDocker, os.Stdin)
 		assert.Nil(t, err)
 	})
+	t.Run("Successfully exit when sandbox cluster exist", func(t *testing.T) {
+		ctx := context.Background()
+		mockDocker := &mocks.Docker{}
+		errCh := make(chan error)
+		bodyStatus := make(chan container.ContainerWaitOKBody)
+		mockDocker.OnContainerCreate(ctx, &container.Config{
+			Env:          docker.Environment,
+			Image:        docker.ImageName,
+			Tty:          false,
+			ExposedPorts: p1,
+		}, &container.HostConfig{
+			Mounts:       docker.Volumes,
+			PortBindings: p2,
+			Privileged:   true,
+		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+			ID: "Hello",
+		}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+			{
+				ID: docker.FlyteSandboxClusterName,
+				Names: []string{
+					docker.FlyteSandboxClusterName,
+				},
+			},
+		}, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+			ShowStderr: true,
+			ShowStdout: true,
+			Timestamps: true,
+			Follow:     true,
+		}).Return(nil, nil)
+		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+		reader, err := startSandbox(ctx, mockDocker, strings.NewReader("n"))
+		assert.Nil(t, err)
+		assert.Nil(t, reader)
+	})
 	t.Run("Successfully run sandbox cluster with source code", func(t *testing.T) {
 		ctx := context.Background()
 		errCh := make(chan error)

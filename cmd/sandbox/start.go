@@ -7,6 +7,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/flyteorg/flytectl/clierrors"
 
 	"github.com/docker/docker/api/types/mount"
 
@@ -70,7 +73,9 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 	if err != nil {
 		return err
 	}
-	docker.WaitForSandbox(reader, docker.SuccessMessage)
+	if reader != nil {
+		docker.WaitForSandbox(reader, docker.SuccessMessage)
+	}
 	return nil
 }
 
@@ -78,7 +83,11 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 
 	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
-		return nil, err
+		if err.Error() != clierrors.ErrSandboxExists {
+			return nil, err
+		}
+		printExistingSandboxMessage()
+		return nil, nil
 	}
 
 	if err := util.SetupFlyteDir(); err != nil {
@@ -171,4 +180,18 @@ func downloadFlyteManifest(version string) error {
 		return err
 	}
 	return nil
+}
+
+func printExistingSandboxMessage() {
+	kubeconfig := strings.Join([]string{
+		"$KUBECONFIG",
+		f.FilePathJoin(f.UserHomeDir(), ".kube", "config"),
+		docker.Kubeconfig,
+	}, ":")
+
+	fmt.Printf("Existing details of your sandbox:")
+	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, docker.SuccessMessage, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
+	fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
+	fmt.Printf("export KUBECONFIG=%v \n", kubeconfig)
+	fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
 }
