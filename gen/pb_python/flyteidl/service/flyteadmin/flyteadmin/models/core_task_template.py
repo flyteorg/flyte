@@ -173,7 +173,7 @@ class CoreTaskTemplate(object):
     def interface(self):
         """Gets the interface of this CoreTaskTemplate.  # noqa: E501
 
-        A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees compile-time validation of the workflow to avoid costly runtime failures.  # noqa: E501
+        A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees compile-time validation of the workflow to avoid costly runtime failures.  # noqa: E501
 
         :return: The interface of this CoreTaskTemplate.  # noqa: E501
         :rtype: CoreTypedInterface
@@ -184,7 +184,7 @@ class CoreTaskTemplate(object):
     def interface(self, interface):
         """Sets the interface of this CoreTaskTemplate.
 
-        A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees compile-time validation of the workflow to avoid costly runtime failures.  # noqa: E501
+        A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees compile-time validation of the workflow to avoid costly runtime failures.  # noqa: E501
 
         :param interface: The interface of this CoreTaskTemplate.  # noqa: E501
         :type: CoreTypedInterface

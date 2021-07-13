@@ -113,7 +113,7 @@ public final class Tasks {
   }
   /**
    * <pre>
-   * A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+   * A customizable interface to convey resources requested for a container. This can be interpreted differently for different
    * container engines.
    * </pre>
    *
@@ -1361,7 +1361,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     * A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+     * A customizable interface to convey resources requested for a container. This can be interpreted differently for different
      * container engines.
      * </pre>
      *
@@ -2346,7 +2346,7 @@ public final class Tasks {
   }
   /**
    * <pre>
-   * Runtime information. This is losely defined to allow for extensibility.
+   * Runtime information. This is loosely defined to allow for extensibility.
    * </pre>
    *
    * Protobuf type {@code flyteidl.core.RuntimeMetadata}
@@ -2825,7 +2825,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     * Runtime information. This is losely defined to allow for extensibility.
+     * Runtime information. This is loosely defined to allow for extensibility.
      * </pre>
      *
      * Protobuf type {@code flyteidl.core.RuntimeMetadata}
@@ -5132,7 +5132,7 @@ public final class Tasks {
 
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -5141,7 +5141,7 @@ public final class Tasks {
     boolean hasInterface();
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -5150,7 +5150,7 @@ public final class Tasks {
     flyteidl.core.Interface.TypedInterface getInterface();
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -5670,7 +5670,7 @@ public final class Tasks {
     private flyteidl.core.Interface.TypedInterface interface_;
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -5681,7 +5681,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -5692,7 +5692,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+     * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
      * compile-time validation of the workflow to avoid costly runtime failures.
      * </pre>
      *
@@ -6954,7 +6954,7 @@ public final class Tasks {
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> interfaceBuilder_;
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -6965,7 +6965,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -6980,7 +6980,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7001,7 +7001,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7020,7 +7020,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7043,7 +7043,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7062,7 +7062,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7075,7 +7075,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *
@@ -7091,7 +7091,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       * A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+       * A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
        * compile-time validation of the workflow to avoid costly runtime failures.
        * </pre>
        *

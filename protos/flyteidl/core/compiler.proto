@@ -48,6 +48,6 @@ message CompiledWorkflowClosure {
     //+optional
     repeated CompiledWorkflow sub_workflows = 2;
     // Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id
-    //+required (atleast 1)
+    //+required (at least 1)
     repeated CompiledTask tasks = 3;
 }

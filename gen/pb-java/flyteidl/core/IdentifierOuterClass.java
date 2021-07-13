@@ -161,7 +161,7 @@ public final class IdentifierOuterClass {
 
     /**
      * <pre>
-     * Identifies the specific type of resource that this identifer corresponds to.
+     * Identifies the specific type of resource that this identifier corresponds to.
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -169,7 +169,7 @@ public final class IdentifierOuterClass {
     int getResourceTypeValue();
     /**
      * <pre>
-     * Identifies the specific type of resource that this identifer corresponds to.
+     * Identifies the specific type of resource that this identifier corresponds to.
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -364,7 +364,7 @@ public final class IdentifierOuterClass {
     private int resourceType_;
     /**
      * <pre>
-     * Identifies the specific type of resource that this identifer corresponds to.
+     * Identifies the specific type of resource that this identifier corresponds to.
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -374,7 +374,7 @@ public final class IdentifierOuterClass {
     }
     /**
      * <pre>
-     * Identifies the specific type of resource that this identifer corresponds to.
+     * Identifies the specific type of resource that this identifier corresponds to.
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -931,7 +931,7 @@ public final class IdentifierOuterClass {
       private int resourceType_ = 0;
       /**
        * <pre>
-       * Identifies the specific type of resource that this identifer corresponds to.
+       * Identifies the specific type of resource that this identifier corresponds to.
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -941,7 +941,7 @@ public final class IdentifierOuterClass {
       }
       /**
        * <pre>
-       * Identifies the specific type of resource that this identifer corresponds to.
+       * Identifies the specific type of resource that this identifier corresponds to.
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -953,7 +953,7 @@ public final class IdentifierOuterClass {
       }
       /**
        * <pre>
-       * Identifies the specific type of resource that this identifer corresponds to.
+       * Identifies the specific type of resource that this identifier corresponds to.
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -965,7 +965,7 @@ public final class IdentifierOuterClass {
       }
       /**
        * <pre>
-       * Identifies the specific type of resource that this identifer corresponds to.
+       * Identifies the specific type of resource that this identifier corresponds to.
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -981,7 +981,7 @@ public final class IdentifierOuterClass {
       }
       /**
        * <pre>
-       * Identifies the specific type of resource that this identifer corresponds to.
+       * Identifies the specific type of resource that this identifier corresponds to.
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>

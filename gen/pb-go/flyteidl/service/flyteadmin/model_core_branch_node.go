@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+// BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
 type CoreBranchNode struct {
 	IfElse *CoreIfElseBlock `json:"if_else,omitempty"`
 }

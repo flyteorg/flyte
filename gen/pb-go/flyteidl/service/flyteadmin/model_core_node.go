@@ -15,9 +15,9 @@ type CoreNode struct {
 	Id string `json:"id,omitempty"`
 	// Extra metadata about the node.
 	Metadata *CoreNodeMetadata `json:"metadata,omitempty"`
-	// Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fullfilled.
+	// Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fulfilled.
 	Inputs []CoreBinding `json:"inputs,omitempty"`
-	// +optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs field.
+	// +optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field.
 	UpstreamNodeIds []string `json:"upstream_node_ids,omitempty"`
 	// +optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes need to conform to the same interface (e.g. all branches in a branch node). Downstream nodes must refer to this nodes outputs using the alias if one's specified.
 	OutputAliases []CoreAlias `json:"output_aliases,omitempty"`

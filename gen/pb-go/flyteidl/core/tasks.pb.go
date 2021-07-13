@@ -180,7 +180,7 @@ func (DataLoadingConfig_LiteralMapFormat) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_bd8423ba58d6ed80, []int{7, 0}
 }
 
-// A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+// A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 // container engines.
 type Resources struct {
 	// The desired set of resources requested. ResourceNames must be unique within the list.
@@ -283,7 +283,7 @@ func (m *Resources_ResourceEntry) GetValue() string {
 	return ""
 }
 
-// Runtime information. This is losely defined to allow for extensibility.
+// Runtime information. This is loosely defined to allow for extensibility.
 type RuntimeMetadata struct {
 	// Type of runtime.
 	Type RuntimeMetadata_RuntimeType `protobuf:"varint,1,opt,name=type,proto3,enum=flyteidl.core.RuntimeMetadata_RuntimeType" json:"type,omitempty"`
@@ -477,7 +477,7 @@ type TaskTemplate struct {
 	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	// Extra metadata about the task.
 	Metadata *TaskMetadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+	// A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
 	// compile-time validation of the workflow to avoid costly runtime failures.
 	Interface *TypedInterface `protobuf:"bytes,4,opt,name=interface,proto3" json:"interface,omitempty"`
 	// Custom data about the task. This is extensible to allow various plugins in the system.

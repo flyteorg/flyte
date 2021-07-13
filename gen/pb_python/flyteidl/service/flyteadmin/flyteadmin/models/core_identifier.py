@@ -73,7 +73,7 @@ class CoreIdentifier(object):
     def resource_type(self):
         """Gets the resource_type of this CoreIdentifier.  # noqa: E501
 
-        Identifies the specific type of resource that this identifer corresponds to.  # noqa: E501
+        Identifies the specific type of resource that this identifier corresponds to.  # noqa: E501
 
         :return: The resource_type of this CoreIdentifier.  # noqa: E501
         :rtype: CoreResourceType
@@ -84,7 +84,7 @@ class CoreIdentifier(object):
     def resource_type(self, resource_type):
         """Sets the resource_type of this CoreIdentifier.
 
-        Identifies the specific type of resource that this identifer corresponds to.  # noqa: E501
+        Identifies the specific type of resource that this identifier corresponds to.  # noqa: E501
 
         :param resource_type: The resource_type of this CoreIdentifier.  # noqa: E501
         :type: CoreResourceType

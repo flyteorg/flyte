@@ -214,7 +214,7 @@ type CompiledWorkflowClosure struct {
 	//+optional
 	SubWorkflows []*CompiledWorkflow `protobuf:"bytes,2,rep,name=sub_workflows,json=subWorkflows,proto3" json:"sub_workflows,omitempty"`
 	// Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id
-	//+required (atleast 1)
+	//+required (at least 1)
 	Tasks                []*CompiledTask `protobuf:"bytes,3,rep,name=tasks,proto3" json:"tasks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`

@@ -14419,7 +14419,7 @@ public final class Event {
 
     /**
      * <pre>
-     * Includes the broad cateogry of machine used for this specific task execution. 
+     * Includes the broad category of machine used for this specific task execution.
      * </pre>
      *
      * Protobuf enum {@code flyteidl.event.TaskExecutionMetadata.InstanceClass}

@@ -60,7 +60,7 @@ func (ResourceType) EnumDescriptor() ([]byte, []int) {
 
 // Encapsulation of fields that uniquely identifies a Flyte resource.
 type Identifier struct {
-	// Identifies the specific type of resource that this identifer corresponds to.
+	// Identifies the specific type of resource that this identifier corresponds to.
 	ResourceType ResourceType `protobuf:"varint,1,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.core.ResourceType" json:"resource_type,omitempty"`
 	// Name of the project the resource belongs to.
 	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`

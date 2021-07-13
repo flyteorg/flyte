@@ -40,7 +40,7 @@ message IfElseBlock {
 }
 
 // BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
-// runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+// runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
 message BranchNode {
     //+required
     IfElseBlock if_else = 1;
@@ -106,11 +106,11 @@ message Node {
     NodeMetadata metadata = 2;
 
     // Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-    // must be fullfilled.
+    // must be fulfilled.
     repeated Binding inputs = 3;
 
-    //+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-    // upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+    //+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+    // upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
     // field.
     repeated string upstream_node_ids = 4;
 

@@ -175,7 +175,7 @@ paths:
         x-exportParamName: "TaskExecutionIdRetryAttempt"
       - name: "task_execution_id.task_id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -376,7 +376,7 @@ paths:
         x-exportParamName: "IdRetryAttempt"
       - name: "id.task_id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -931,7 +931,7 @@ paths:
         x-exportParamName: "IdVersion"
       - name: "id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -1629,7 +1629,7 @@ paths:
         x-exportParamName: "IdRetryAttempt"
       - name: "id.task_id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -2021,7 +2021,7 @@ paths:
         x-exportParamName: "IdVersion"
       - name: "id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -2485,7 +2485,7 @@ paths:
         x-exportParamName: "IdVersion"
       - name: "id.resource_type"
         in: "query"
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
           \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
           \ a compilation of multiple individual objects.\nEventually all Catalog\
@@ -2714,7 +2714,7 @@ definitions:
     default: "DESCENDING"
   TaskExecutionMetadataInstanceClass:
     type: "string"
-    description: "Includes the broad cateogry of machine used for this specific task\
+    description: "Includes the broad category of machine used for this specific task\
       \ execution.\n\n - DEFAULT: The default instance class configured for the flyte\
       \ application platform.\n - INTERRUPTIBLE: The instance class configured for\
       \ interruptible tasks."
@@ -23254,7 +23254,7 @@ definitions:
         $ref: "#/definitions/coreIfElseBlock"
     description: "BranchNode is a special node that alter the flow of the workflow\
       \ graph. It allows the control flow to branch at\nruntime based on a series\
-      \ of conditions that get evaluated on various parameters (e.g. inputs, primtives)."
+      \ of conditions that get evaluated on various parameters (e.g. inputs, primitives)."
     example:
       if_else:
         other:
@@ -23345,7 +23345,7 @@ definitions:
       artifact_id: "artifact_id"
   coreCatalogCacheStatus:
     type: "string"
-    title: "Indicates the status of CatalogCaching. The reason why this is not embeded\
+    title: "Indicates the status of CatalogCaching. The reason why this is not embedded\
       \ in TaskNodeMetadata is, that we may use for other types of nodes as well in\
       \ the future"
     description: "- CACHE_DISABLED: Used to indicate that caching was disabled\n -\
@@ -24537,7 +24537,7 @@ definitions:
       tasks:
         type: "array"
         title: "Guaranteed that there will only exist one and only one task with a\
-          \ given id, i.e., every task has a unique id\n+required (atleast 1)"
+          \ given id, i.e., every task has a unique id\n+required (at least 1)"
         items:
           $ref: "#/definitions/coreCompiledTask"
     description: "A Compiled Workflow Closure contains all the information required\
@@ -27805,7 +27805,7 @@ definitions:
     type: "object"
     properties:
       resource_type:
-        description: "Identifies the specific type of resource that this identifer\
+        description: "Identifies the specific type of resource that this identifier\
           \ corresponds to."
         $ref: "#/definitions/coreResourceType"
       project:
@@ -28203,14 +28203,14 @@ definitions:
       inputs:
         type: "array"
         description: "Specifies how to bind the underlying interface's inputs. All\
-          \ required inputs specified in the underlying interface\nmust be fullfilled."
+          \ required inputs specified in the underlying interface\nmust be fulfilled."
         items:
           $ref: "#/definitions/coreBinding"
       upstream_node_ids:
         type: "array"
-        description: "+optional Specifies execution depdendency for this node ensuring\
+        description: "+optional Specifies execution dependency for this node ensuring\
           \ it will only get scheduled to run after all its\nupstream nodes have completed.\
-          \ This node will have an implicit depdendency on any node that appears in\
+          \ This node will have an implicit dependency on any node that appears in\
           \ inputs\nfield."
         items:
           type: "string"
@@ -28874,7 +28874,7 @@ definitions:
         items:
           $ref: "#/definitions/ResourcesResourceEntry"
     description: "A customizable interface to convey resources requested for a container.\
-      \ This can be interpretted differently for different\ncontainer engines."
+      \ This can be interpreted differently for different\ncontainer engines."
     example:
       requests:
       - name: {}
@@ -28913,7 +28913,7 @@ definitions:
         type: "string"
         description: "+optional It can be used to provide extra information about\
           \ the runtime (e.g. python, golang... etc.)."
-    description: "Runtime information. This is losely defined to allow for extensibility."
+    description: "Runtime information. This is loosely defined to allow for extensibility."
     example:
       flavor: "flavor"
       type: {}
@@ -29286,7 +29286,7 @@ definitions:
         $ref: "#/definitions/coreTaskMetadata"
       interface:
         description: "A strongly typed interface for the task. This enables others\
-          \ to use this task within a workflow and gauarantees\ncompile-time validation\
+          \ to use this task within a workflow and guarantees\ncompile-time validation\
           \ of the workflow to avoid costly runtime failures."
         $ref: "#/definitions/coreTypedInterface"
       custom:
