@@ -16,7 +16,7 @@ public final class Catalog {
   }
   /**
    * <pre>
-   * Indicates the status of CatalogCaching. The reason why this is not embeded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
+   * Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
    * </pre>
    *
    * Protobuf enum {@code flyteidl.core.CatalogCacheStatus}

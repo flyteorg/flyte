@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// A customizable interface to convey resources requested for a container. This can be interpretted differently for different container engines.
+// A customizable interface to convey resources requested for a container. This can be interpreted differently for different container engines.
 type CoreResources struct {
 	// The desired set of resources requested. ResourceNames must be unique within the list.
 	Requests []ResourcesResourceEntry `json:"requests,omitempty"`

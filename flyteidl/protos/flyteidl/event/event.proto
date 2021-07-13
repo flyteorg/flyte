@@ -213,7 +213,7 @@ message TaskExecutionMetadata {
     // The identifier of the plugin used to execute this task.
     string plugin_identifier = 4;
 
-    // Includes the broad cateogry of machine used for this specific task execution. 
+    // Includes the broad category of machine used for this specific task execution.
     enum InstanceClass {
         // The default instance class configured for the flyte application platform.
         DEFAULT = 0; 

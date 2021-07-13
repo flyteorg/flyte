@@ -39,7 +39,7 @@ public final class Event {
   /**
    * <pre>
    * Indicates that a sent event was not used to update execution state due to
-   * the referenced execution already being terminated (and therefore inelegible
+   * the referenced execution already being terminated (and therefore ineligible
    * for further state transitions).
    * </pre>
    *
@@ -319,7 +319,7 @@ public final class Event {
     /**
      * <pre>
      * Indicates that a sent event was not used to update execution state due to
-     * the referenced execution already being terminated (and therefore inelegible
+     * the referenced execution already being terminated (and therefore ineligible
      * for further state transitions).
      * </pre>
      *

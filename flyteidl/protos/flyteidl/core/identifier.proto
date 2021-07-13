@@ -18,7 +18,7 @@ enum ResourceType {
 
 // Encapsulation of fields that uniquely identifies a Flyte resource.
 message Identifier {
-    // Identifies the specific type of resource that this identifer corresponds to.
+    // Identifies the specific type of resource that this identifier corresponds to.
     ResourceType resource_type  = 1;
 
     // Name of the project the resource belongs to.

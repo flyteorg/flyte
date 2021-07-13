@@ -296,7 +296,7 @@ For Workflow Nodes we need to send information about the workflow that's launche
 TaskExecutionMetadata.InstanceClass
 ------------------------------------------------------------------
 
-Includes the broad cateogry of machine used for this specific task execution.
+Includes the broad category of machine used for this specific task execution.
 
 .. csv-table:: Enum TaskExecutionMetadata.InstanceClass values
    :header: "Name", "Number", "Description"

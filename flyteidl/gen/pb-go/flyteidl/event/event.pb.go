@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-// Includes the broad cateogry of machine used for this specific task execution.
+// Includes the broad category of machine used for this specific task execution.
 type TaskExecutionMetadata_InstanceClass int32
 
 const (

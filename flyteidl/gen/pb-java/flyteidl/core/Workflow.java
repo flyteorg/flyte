@@ -2636,7 +2636,7 @@ public final class Workflow {
   /**
    * <pre>
    * BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
-   * runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+   * runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
    * </pre>
    *
    * Protobuf type {@code flyteidl.core.BranchNode}
@@ -2918,7 +2918,7 @@ public final class Workflow {
     /**
      * <pre>
      * BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
-     * runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives).
+     * runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
      * </pre>
      *
      * Protobuf type {@code flyteidl.core.BranchNode}
@@ -7406,7 +7406,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7416,7 +7416,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7425,7 +7425,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7434,7 +7434,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7444,7 +7444,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7454,8 +7454,8 @@ public final class Workflow {
 
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -7465,8 +7465,8 @@ public final class Workflow {
         getUpstreamNodeIdsList();
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -7475,8 +7475,8 @@ public final class Workflow {
     int getUpstreamNodeIdsCount();
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -7485,8 +7485,8 @@ public final class Workflow {
     java.lang.String getUpstreamNodeIds(int index);
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -7926,7 +7926,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7937,7 +7937,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7949,7 +7949,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7960,7 +7960,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7971,7 +7971,7 @@ public final class Workflow {
     /**
      * <pre>
      * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-     * must be fullfilled.
+     * must be fulfilled.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -7985,8 +7985,8 @@ public final class Workflow {
     private com.google.protobuf.LazyStringList upstreamNodeIds_;
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -7998,8 +7998,8 @@ public final class Workflow {
     }
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -8010,8 +8010,8 @@ public final class Workflow {
     }
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -8022,8 +8022,8 @@ public final class Workflow {
     }
     /**
      * <pre>
-     *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-     * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+     *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+     * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
      * field.
      * </pre>
      *
@@ -9070,7 +9070,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9085,7 +9085,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9100,7 +9100,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9115,7 +9115,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9137,7 +9137,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9156,7 +9156,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9177,7 +9177,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9199,7 +9199,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9218,7 +9218,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9237,7 +9237,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9257,7 +9257,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9275,7 +9275,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9293,7 +9293,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9305,7 +9305,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9320,7 +9320,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9336,7 +9336,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9348,7 +9348,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9361,7 +9361,7 @@ public final class Workflow {
       /**
        * <pre>
        * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
-       * must be fullfilled.
+       * must be fulfilled.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Binding inputs = 3;</code>
@@ -9394,8 +9394,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9407,8 +9407,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9419,8 +9419,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9431,8 +9431,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9444,8 +9444,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9463,8 +9463,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9482,8 +9482,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9499,8 +9499,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *
@@ -9514,8 +9514,8 @@ public final class Workflow {
       }
       /**
        * <pre>
-       *+optional Specifies execution depdendency for this node ensuring it will only get scheduled to run after all its
-       * upstream nodes have completed. This node will have an implicit depdendency on any node that appears in inputs
+       *+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+       * upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
        * field.
        * </pre>
        *

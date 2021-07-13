@@ -6,7 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/identifier.proto";
 
-// Indicates the status of CatalogCaching. The reason why this is not embeded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
+// Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
 enum CatalogCacheStatus {
   // Used to indicate that caching was disabled
   CACHE_DISABLED = 0;
