@@ -210,7 +210,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 | Repo                                                                  | Language | Purpose                |
 | --------------------------------------------------------------------- | -------- | ---------------------- |
 | [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
-| [Flink](https://github.com/flyteorg/flinkk8soperator)                 | Go       | Apache Flink streaming |
+| [Flink](https://github.com/lyft/flinkk8soperator)                 | Go       | Apache Flink streaming |
 
 <html>
 <h2 id="community--resources"> 
