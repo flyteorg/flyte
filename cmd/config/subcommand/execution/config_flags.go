@@ -55,6 +55,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int32Var(&DefaultConfig.Filter.Limit, fmt.Sprintf("%v%v", prefix, "filter.limit"), DefaultConfig.Filter.Limit, "Specifies the limit")
 	cmdFlags.BoolVar(&DefaultConfig.Filter.Asc, fmt.Sprintf("%v%v", prefix, "filter.asc"), DefaultConfig.Filter.Asc, "Specifies the sorting order. By default flytectl sort result in descending order")
 	cmdFlags.BoolVar(&DefaultConfig.Details, fmt.Sprintf("%v%v", prefix, "details"), DefaultConfig.Details, "gets node execution details. Only applicable for single execution name i.e get execution name --details")
-	cmdFlags.StringVar(&DefaultConfig.NodeID, fmt.Sprintf("%v%v", prefix, "nodeId"), DefaultConfig.NodeID, "get task executions for given node name.")
+	cmdFlags.StringVar(&DefaultConfig.NodeID, fmt.Sprintf("%v%v", prefix, "nodeID"), DefaultConfig.NodeID, "get task executions for given node name.")
 	return cmdFlags
 }

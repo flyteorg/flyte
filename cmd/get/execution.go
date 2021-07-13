@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
@@ -58,23 +59,23 @@ Get more details for the execution using --details flag which shows node executi
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
 
-Using yaml view for the details. In this view only node details are available. For task details pass --nodeId flag
+Using yaml view for the details. In this view only node details are available. For task details pass --nodeID flag
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
 
-Using --nodeId flag to get task executions on a specific node. Use the nodeId attribute from node details view
+Using --nodeID flag to get task executions on a specific node. Use the nodeID attribute from node details view
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0
 
-Task execution view is also available in yaml/json format. Below example shows yaml
+Task execution view is also available in yaml/json format. Below example shows yaml. This also contains inputs/outputs data for each node
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0 -o yaml
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0 -o yaml
 
 Usage
 `
@@ -115,7 +116,18 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 
 		if execution.DefaultConfig.Details || len(execution.DefaultConfig.NodeID) > 0 {
 			// Fetching Node execution details
-			return getExecutionDetails(ctx, config.GetConfig().Project, config.GetConfig().Domain, name, cmdCtx)
+			nExecDetailsForView, err := getExecutionDetails(ctx, config.GetConfig().Project, config.GetConfig().Domain, name, execution.DefaultConfig.NodeID, cmdCtx)
+			if err != nil {
+				return err
+			}
+			// o/p format of table is not supported on the details. TODO: Add tree format in printer
+			if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
+				fmt.Println("TABLE format is not supported on detailed view and defaults to tree view. Choose either json/yaml")
+				nodeExecTree := createNodeDetailsTreeView(nil, nExecDetailsForView)
+				fmt.Println(nodeExecTree.Print())
+				return nil
+			}
+			return adminPrinter.PrintInterface(config.GetConfig().MustOutputFormat(), nodeExecutionColumns, nExecDetailsForView)
 		}
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 			ExecutionToProtoMessages(executions)...)

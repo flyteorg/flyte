@@ -52,23 +52,23 @@ Get more details for the execution using --details flag which shows node executi
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
 
-Using yaml view for the details. In this view only node details are available. For task details pass --nodeId flag
+Using yaml view for the details. In this view only node details are available. For task details pass --nodeID flag
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
 
-Using --nodeId flag to get task executions on a specific node. Use the nodeId attribute from node details view
+Using --nodeID flag to get task executions on a specific node. Use the nodeID attribute from node details view
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0
 
-Task execution view is also available in yaml/json format. Below example shows yaml
+Task execution view is also available in yaml/json format. Below example shows yaml. This also contains inputs/outputs data for each node
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0 -o yaml
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0 -o yaml
 
 Usage
 
@@ -88,7 +88,7 @@ Options
       --filter.limit int32            Specifies the limit (default 100)
       --filter.sortBy string          Specifies which field to sort results  (default "created_at")
   -h, --help                          help for execution
-      --nodeId string                 get task executions for given node name.
+      --nodeID string                 get task executions for given node name.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

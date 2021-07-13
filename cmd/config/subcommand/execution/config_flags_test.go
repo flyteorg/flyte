@@ -169,13 +169,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_nodeId", func(t *testing.T) {
+	t.Run("Test_nodeID", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("nodeId", testValue)
-			if vString, err := cmdFlags.GetString("nodeId"); err == nil {
+			cmdFlags.Set("nodeID", testValue)
+			if vString, err := cmdFlags.GetString("nodeID"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeID)
 
 			} else {

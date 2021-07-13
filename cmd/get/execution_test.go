@@ -19,11 +19,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestListExecutionFunc(t *testing.T) {
-	ctx := context.Background()
+const (
+	nodeID = "node-id"
+)
+
+func getExecutionSetup() {
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
 	config.GetConfig().Output = output
+	execution.DefaultConfig.Details = false
+	execution.DefaultConfig.NodeID = ""
+}
+
+func TestListExecutionFunc(t *testing.T) {
+	ctx := context.Background()
+	getExecutionSetup()
 	var args []string
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
@@ -77,9 +87,7 @@ func TestListExecutionFunc(t *testing.T) {
 
 func TestListExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
-	config.GetConfig().Project = projectValue
-	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = output
+	getExecutionSetup()
 	var args []string
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
@@ -129,9 +137,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 
 func TestGetExecutionFunc(t *testing.T) {
 	ctx := context.Background()
-	config.GetConfig().Project = projectValue
-	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = output
+	getExecutionSetup()
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
@@ -176,6 +182,7 @@ func TestGetExecutionFunc(t *testing.T) {
 
 func TestGetExecutionFuncForDetails(t *testing.T) {
 	setup()
+	getExecutionSetup()
 	ctx := u.Ctx
 	mockCmdCtx := u.CmdCtx
 	mockClient = u.MockClient
@@ -183,17 +190,313 @@ func TestGetExecutionFuncForDetails(t *testing.T) {
 	execution.DefaultConfig.Details = true
 	args := []string{dummyExec}
 	mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
-	mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch details"))
+	mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nil, fmt.Errorf("unable to fetch details"))
 	err = getExecutionFunc(ctx, args, mockCmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf("unable to fetch details"), err)
 }
 
+func TestGetExecutionFuncWithIOData(t *testing.T) {
+	t.Run("successful inputs outputs", func(t *testing.T) {
+		setup()
+		getExecutionSetup()
+		ctx := u.Ctx
+		mockCmdCtx := u.CmdCtx
+		mockClient = u.MockClient
+		mockFetcherExt := u.FetcherExt
+		execution.DefaultConfig.NodeID = nodeID
+		args := []string{dummyExec}
+
+		nodeExec1 := createDummyNodeWithID("n0", false)
+		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+		nodeExecutions := []*admin.NodeExecution{nodeExec1}
+		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+
+		inputs := map[string]*core.Literal{
+			"val1": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 110,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		outputs := map[string]*core.Literal{
+			"o2": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 120,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		dataResp := &admin.NodeExecutionGetDataResponse{
+			FullOutputs: &core.LiteralMap{
+				Literals: inputs,
+			},
+			FullInputs: &core.LiteralMap{
+				Literals: outputs,
+			},
+		}
+		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+
+		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		assert.Nil(t, err)
+	})
+	t.Run("invalid inputs", func(t *testing.T) {
+		setup()
+		getExecutionSetup()
+		ctx := u.Ctx
+		mockCmdCtx := u.CmdCtx
+		mockClient = u.MockClient
+		mockFetcherExt := u.FetcherExt
+		execution.DefaultConfig.NodeID = nodeID
+		args := []string{dummyExec}
+
+		nodeExec1 := createDummyNodeWithID("n0", false)
+		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+		nodeExecutions := []*admin.NodeExecution{nodeExec1}
+		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+
+		inputs := map[string]*core.Literal{
+			"val1": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Schema{},
+					},
+				},
+			},
+		}
+		outputs := map[string]*core.Literal{
+			"o2": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 120,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		dataResp := &admin.NodeExecutionGetDataResponse{
+			FullOutputs: &core.LiteralMap{
+				Literals: inputs,
+			},
+			FullInputs: &core.LiteralMap{
+				Literals: outputs,
+			},
+		}
+		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+
+		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("unsupported literal scalar type *core.Scalar_Schema"), err)
+	})
+	t.Run("invalid outputs", func(t *testing.T) {
+		setup()
+		getExecutionSetup()
+		ctx := u.Ctx
+		mockCmdCtx := u.CmdCtx
+		mockClient = u.MockClient
+		mockFetcherExt := u.FetcherExt
+		execution.DefaultConfig.NodeID = nodeID
+		args := []string{dummyExec}
+
+		nodeExec1 := createDummyNodeWithID("n0", false)
+		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+		nodeExecutions := []*admin.NodeExecution{nodeExec1}
+		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+
+		inputs := map[string]*core.Literal{
+			"val1": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 120,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		outputs := map[string]*core.Literal{
+			"o2": &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Schema{},
+					},
+				},
+			},
+		}
+		dataResp := &admin.NodeExecutionGetDataResponse{
+			FullOutputs: &core.LiteralMap{
+				Literals: inputs,
+			},
+			FullInputs: &core.LiteralMap{
+				Literals: outputs,
+			},
+		}
+		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+
+		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("unsupported literal scalar type *core.Scalar_Schema"), err)
+	})
+	t.Run("fetch data error from admin", func(t *testing.T) {
+		setup()
+		getExecutionSetup()
+		ctx := u.Ctx
+		mockCmdCtx := u.CmdCtx
+		mockClient = u.MockClient
+		mockFetcherExt := u.FetcherExt
+		execution.DefaultConfig.NodeID = nodeID
+		args := []string{dummyExec}
+
+		nodeExec1 := createDummyNodeWithID("n0", false)
+		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+		taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+		nodeExecutions := []*admin.NodeExecution{nodeExec1}
+		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+		}, nil)
+		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("error in fetching data"))
+
+		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("error in fetching data"), err)
+	})
+	t.Run("Table test successful cases", func(t *testing.T) {
+		tests := []struct {
+			outputFormat string
+			nodeID       string
+			want         error
+		}{
+			{outputFormat: "table", nodeID: "", want: nil},
+			{outputFormat: "table", nodeID: "n0", want: nil},
+			{outputFormat: "yaml", nodeID: "", want: nil},
+			{outputFormat: "yaml", nodeID: "n0", want: nil},
+			{outputFormat: "yaml", nodeID: "n1", want: nil},
+		}
+
+		args := []string{dummyExec}
+		for _, tt := range tests {
+			setup()
+			config.GetConfig().Output = tt.outputFormat
+			execution.DefaultConfig.NodeID = tt.nodeID
+
+			ctx := u.Ctx
+			mockCmdCtx := u.CmdCtx
+			mockFetcherExt := u.FetcherExt
+			nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
+
+			nodeExec1 := createDummyNodeWithID("n0", false)
+			taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
+			taskExec2 := createDummyTaskExecutionForNode("n0", "task22")
+
+			nodeExecToTaskExec["n0"] = &admin.TaskExecutionList{
+				TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+			}
+
+			nodeExecutions := []*admin.NodeExecution{nodeExec1}
+			nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
+			inputs := map[string]*core.Literal{
+				"val1": &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 100,
+									},
+								},
+							},
+						},
+					},
+				},
+			}
+			outputs := map[string]*core.Literal{
+				"o2": &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 120,
+									},
+								},
+							},
+						},
+					},
+				},
+			}
+			dataResp := &admin.NodeExecutionGetDataResponse{
+				FullOutputs: &core.LiteralMap{
+					Literals: inputs,
+				},
+				FullInputs: &core.LiteralMap{
+					Literals: outputs,
+				},
+			}
+
+			mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+			mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+			mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+				TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
+			}, nil)
+			mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+			got := getExecutionFunc(ctx, args, mockCmdCtx)
+			assert.Equal(t, tt.want, got)
+		}
+	})
+}
+
 func TestGetExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
-	config.GetConfig().Project = projectValue
-	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = output
+	getExecutionSetup()
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)

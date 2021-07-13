@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -23,14 +22,32 @@ func (a *AdminFetcherExtClient) FetchExecution(ctx context.Context, name, projec
 	return e, nil
 }
 
-func (a *AdminFetcherExtClient) FetchNodeExecutionDetails(ctx context.Context, name, project, domain string) (*admin.NodeExecutionList, error) {
+func (a *AdminFetcherExtClient) FetchNodeExecutionData(ctx context.Context, nodeID, execName, project, domain string) (*admin.NodeExecutionGetDataResponse, error) {
+	ne, err := a.AdminServiceClient().GetNodeExecutionData(ctx, &admin.NodeExecutionGetDataRequest{
+		Id: &core.NodeExecutionIdentifier{
+			NodeId: nodeID,
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: project,
+				Domain:  domain,
+				Name:    execName,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ne, nil
+}
+
+func (a *AdminFetcherExtClient) FetchNodeExecutionDetails(ctx context.Context, name, project, domain, uniqueParentID string) (*admin.NodeExecutionList, error) {
 	ne, err := a.AdminServiceClient().ListNodeExecutions(ctx, &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
 			Name:    name,
 		},
-		Limit: 100,
+		UniqueParentId: uniqueParentID,
+		Limit:          100,
 	})
 	if err != nil {
 		return nil, err
