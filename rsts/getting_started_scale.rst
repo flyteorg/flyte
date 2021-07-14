@@ -120,27 +120,28 @@ Build & Deploy Your Application to the Cluster
 
      .. prompt:: bash $
 
-         docker build . --tag registry/repo:version
-         docker push registry/repo:version
+         docker build . --tag <registry/repo:version>
+         docker push <registry/repo:version>
 
      **OR** ``flytekit-python-template`` ships with a helper `docker build script <https://github.com/flyteorg/flytekit-python-template/blob/main/docker_build_and_tag.sh>`__ which make it possible to build and image, tag it correctly and optionally use the git-SHA as the version.
      We recommend using such a script to track versions more effectively and use a CI/CD pipeline to deploy your code.
 
      .. prompt:: bash $
 
-         ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version]
+         ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version>]
 
 #. Next, package the workflow using the ``pyflyte`` cli bundled with Flytekit and upload it to the Flyte backend. Note that the image is the same as the one built in the previous step.
 
    .. prompt:: bash (venv)$
 
-      pyflyte --pkgs myapp.workflows package --image myapp:v1
+      pyflyte --pkgs myapp.workflows package --image <registry/repo:version>
 
-#. Upload this package to the Flyte backend. We refer to this as ``registration``.
+#. Upload this package to the Flyte backend. We refer to this as ``registration``. The version here ``v1`` does not have to match the version
+   used in the commands above. It's generally recommended to match the versions to make it easier to track.
 
    .. prompt:: bash $
 
-      flytectl register files -p flytesnacks -d development --archive flyte-package.tgz  --version v1
+      flytectl register files -p flytesnacks -d development --archive flyte-package.tgz --version v1
 
 #. Finally, visualize the registered workflow.
 
