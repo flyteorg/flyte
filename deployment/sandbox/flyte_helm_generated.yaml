@@ -85,7 +85,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
@@ -97,7 +97,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: flyte/templates/propeller/rbac.yaml
@@ -109,7 +109,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: flyte/templates/propeller/webhook.yaml
@@ -261,7 +261,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   aa_namespace.yaml: | 
@@ -313,7 +313,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -443,7 +443,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data: 
   BASE_URL: /console
@@ -459,7 +459,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -504,7 +504,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   admin.yaml: | 
@@ -617,8 +617,7 @@ data:
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName
-          }}/pod?namespace={{ .namespace }}
+        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
 ---
 # Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
@@ -2161,7 +2160,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -2191,7 +2190,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 # Allow RO access to PODS
@@ -2357,7 +2356,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -2376,7 +2375,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -2640,7 +2639,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
@@ -2675,7 +2674,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -2696,7 +2695,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
@@ -2728,7 +2727,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -2750,7 +2749,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -3278,7 +3277,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3289,11 +3288,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "01022a541ec245fb382df6cb533da25e5a5c058ee59a7c4f804aeb3aaa5fd90"
+        configChecksum: "95a59a1199d90bbcdd51417e3bd062640c702aa9514524d295630f855174f79"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
@@ -3436,7 +3435,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3447,11 +3446,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ad82d0fe9f2ee373bcf932eb30b2565b5003d6fa2859e1ee553353fc462fbd5"
+        configChecksum: "8ef03d2ed4468082a4585c0454139c5df15794f3340e17c7ea338cd6e781b91"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3486,7 +3485,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3497,11 +3496,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "7de99a431c56b3e464f075e04b730e3a2a82fd236259385eff72885929e58d1"
+        configChecksum: "dc650fe97fa1e27ccfadf0c5a298d1dfbaad5e0e3732e8df8984fc4cd769faa"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
@@ -3561,7 +3560,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3574,7 +3573,7 @@ spec:
       labels: 
         app.kubernetes.io/name: minio
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3615,7 +3614,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3628,7 +3627,7 @@ spec:
       labels: 
         app.kubernetes.io/name: postgres
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3664,7 +3663,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3675,11 +3674,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "23649f70ef6d41dc508d570df33d78103effffb3d876ea7fc84bcef4693bfd3"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3740,7 +3739,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "23649f70ef6d41dc508d570df33d78103effffb3d876ea7fc84bcef4693bfd3"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -3809,7 +3808,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   schedule: '*/1 * * * *'
