@@ -1,8 +1,11 @@
 package v1alpha1
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
+
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
@@ -189,4 +192,63 @@ func TestDynamicNodeStatus_SetExecutionError(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNodeStatus_GetNodeExecutionStatus(t *testing.T) {
+	ctx := context.Background()
+	t.Run("First Level", func(t *testing.T) {
+		t.Run("Not cached", func(t *testing.T) {
+			n := NodeStatus{
+				SubNodeStatus:            map[NodeID]*NodeStatus{},
+				DataReferenceConstructor: storage.URLPathConstructor{},
+			}
+
+			newNode := n.GetNodeExecutionStatus(ctx, "abc")
+			assert.Equal(t, storage.DataReference("/abc/0"), newNode.GetOutputDir())
+			assert.Equal(t, storage.DataReference("/abc"), newNode.GetDataDir())
+		})
+
+		t.Run("cached", func(t *testing.T) {
+			n := NodeStatus{
+				SubNodeStatus:            map[NodeID]*NodeStatus{},
+				DataReferenceConstructor: storage.URLPathConstructor{},
+			}
+
+			newNode := n.GetNodeExecutionStatus(ctx, "abc")
+			assert.Equal(t, storage.DataReference("/abc/0"), newNode.GetOutputDir())
+			assert.Equal(t, storage.DataReference("/abc"), newNode.GetDataDir())
+
+			newNode = n.GetNodeExecutionStatus(ctx, "abc")
+			assert.Equal(t, storage.DataReference("/abc/0"), newNode.GetOutputDir())
+			assert.Equal(t, storage.DataReference("/abc"), newNode.GetDataDir())
+		})
+
+		t.Run("cached but datadir not populated", func(t *testing.T) {
+			n := NodeStatus{
+				SubNodeStatus: map[NodeID]*NodeStatus{
+					"abc": {},
+				},
+				DataReferenceConstructor: storage.URLPathConstructor{},
+			}
+
+			newNode := n.GetNodeExecutionStatus(ctx, "abc")
+			assert.Equal(t, storage.DataReference("/abc/0"), newNode.GetOutputDir())
+			assert.Equal(t, storage.DataReference("/abc"), newNode.GetDataDir())
+		})
+	})
+
+	t.Run("Nested", func(t *testing.T) {
+		n := NodeStatus{
+			SubNodeStatus:            map[NodeID]*NodeStatus{},
+			DataReferenceConstructor: storage.URLPathConstructor{},
+		}
+
+		newNode := n.GetNodeExecutionStatus(ctx, "abc")
+		assert.Equal(t, storage.DataReference("/abc/0"), newNode.GetOutputDir())
+		assert.Equal(t, storage.DataReference("/abc"), newNode.GetDataDir())
+
+		subsubNode := newNode.GetNodeExecutionStatus(ctx, "xyz")
+		assert.Equal(t, storage.DataReference("/abc/0/xyz/0"), subsubNode.GetOutputDir())
+		assert.Equal(t, storage.DataReference("/abc/0/xyz"), subsubNode.GetDataDir())
+	})
 }
