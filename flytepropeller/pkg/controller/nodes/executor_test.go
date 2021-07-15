@@ -273,6 +273,10 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	// Node not yet started
 	{
 		createSingleNodeWf := func(parentPhase v1alpha1.NodePhase, _ int) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
+			sn := &v1alpha1.NodeSpec{
+				ID:   v1alpha1.StartNodeID,
+				Kind: v1alpha1.NodeKindStart,
+			}
 			n := &v1alpha1.NodeSpec{
 				ID:   v1alpha1.EndNodeID,
 				Kind: v1alpha1.NodeKindEnd,
@@ -292,7 +296,8 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 				WorkflowSpec: &v1alpha1.WorkflowSpec{
 					ID: "wf",
 					Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
-						v1alpha1.EndNodeID: n,
+						v1alpha1.StartNodeID: sn,
+						v1alpha1.EndNodeID:   n,
 					},
 					Connections: v1alpha1.Connections{
 						Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
@@ -608,6 +613,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockWf := &mocks.ExecutableWorkflow{}
 			mockWf.OnStartNode().Return(mockNodeN0)
 			mockWf.OnGetNode(nodeN2).Return(mockNode, true)
+			mockWf.OnGetNode(nodeN0).Return(mockNodeN0, true)
 			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN0).Return(mockN0Status)
 			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN2).Return(mockN2Status)
 			mockWf.OnGetConnections().Return(connections)
@@ -653,8 +659,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o handler.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
-				h.On("FinalizeRequired").Return(false)
-				hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
+				h.OnFinalizeRequired().Return(false)
+				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase)
 				startNode := mockWf.StartNode()
@@ -1095,6 +1101,11 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	taskID := taskID
 
 	createSingleNodeWf := func(parentPhase v1alpha1.NodePhase, maxAttempts int) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
+		startNode := &v1alpha1.NodeSpec{
+			Kind: v1alpha1.NodeKindStart,
+			ID:   v1alpha1.StartNodeID,
+		}
+
 		n := &v1alpha1.NodeSpec{
 			ID:      defaultNodeID,
 			TaskRef: &taskID,
@@ -1103,6 +1114,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 				MinAttempts: &maxAttempts,
 			},
 		}
+
 		ns := &v1alpha1.NodeStatus{}
 
 		return &v1alpha1.FlyteWorkflow{
@@ -1123,7 +1135,8 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "wf",
 				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
-					defaultNodeID: n,
+					v1alpha1.StartNodeID: startNode,
+					defaultNodeID:        n,
 				},
 				Connections: v1alpha1.Connections{
 					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
@@ -1210,8 +1223,8 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 			expectedError       bool
 		}{
 			{"branchSuccess", v1alpha1.BranchNodeSuccess, v1alpha1.NodePhaseNotYetStarted, true, executors.NodePhaseQueued, false},
-			{"branchNotYetDone", v1alpha1.BranchNodeNotYetEvaluated, v1alpha1.NodePhaseNotYetStarted, false, executors.NodePhaseUndefined, true},
-			{"branchError", v1alpha1.BranchNodeError, v1alpha1.NodePhaseNotYetStarted, false, executors.NodePhaseUndefined, true},
+			{"branchNotYetDone", v1alpha1.BranchNodeNotYetEvaluated, v1alpha1.NodePhaseNotYetStarted, false, executors.NodePhasePending, false},
+			{"branchError", v1alpha1.BranchNodeError, v1alpha1.NodePhaseNotYetStarted, false, executors.NodePhasePending, false},
 		}
 
 		for _, test := range tests {
@@ -1228,6 +1241,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 
 				hf.OnGetHandlerMatch(v1alpha1.NodeKindTask).Return(h, nil)
 
+				now := v1.Time{Time: time.Now()}
 				parentBranchNodeID := "branchNode"
 				parentBranchNode := &mocks.ExecutableNode{}
 				parentBranchNode.OnGetID().Return(parentBranchNodeID)
@@ -1235,6 +1249,8 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				parentBranchNodeStatus := &mocks.ExecutableNodeStatus{}
 				parentBranchNodeStatus.OnGetPhase().Return(v1alpha1.NodePhaseRunning)
 				parentBranchNodeStatus.OnIsDirty().Return(false)
+				parentBranchNodeStatus.OnGetStartedAt().Return(&now)
+				parentBranchNodeStatus.OnGetLastUpdatedAt().Return(nil)
 				bns := &mocks.MutableBranchNodeStatus{}
 				parentBranchNodeStatus.OnGetBranchStatus().Return(bns)
 				bns.OnGetPhase().Return(test.parentNodePhase)
@@ -1271,6 +1287,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				branchTakeNodeStatus.OnGetDataDir().Return("data")
 				branchTakeNodeStatus.OnGetParentNodeID().Return(&parentBranchNodeID)
 				branchTakeNodeStatus.OnGetParentTaskID().Return(nil)
+				branchTakeNodeStatus.OnGetStartedAt().Return(&now)
 
 				if test.phaseUpdateExpected {
 					var ee *core.ExecutionError
