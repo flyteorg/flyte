@@ -106,7 +106,7 @@ Modify Code and Test Locally
 
    .. prompt:: bash $
 
-      flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1
+      flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz  --version v1-fast1
 
 
    .. dropdown:: Flytectl configuration with ``storage`` block for Fast registration
@@ -178,7 +178,7 @@ Modify Code and Test Locally
 
       .. prompt:: bash $
 
-       flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
+       flytectl get launchplan --project flytesnacks --domain development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
 
    #. Modify the execution spec file and update the input params and save the file. Notice that the version would be changed to your latest one.
 
@@ -194,13 +194,13 @@ Modify Code and Test Locally
 
       .. prompt:: bash $
 
-        flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+        flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
 
    #. Monitor the execution by providing the execution name from the ``create execution`` command.
 
       .. prompt:: bash $
 
-         flytectl get execution -p flytesnacks -d development <execname>
+         flytectl get execution --project flytesnacks --domain development <execname>
 
 
 .. admonition:: Recap
