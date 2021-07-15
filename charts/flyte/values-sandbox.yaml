@@ -29,38 +29,6 @@ flytepropeller: {}
 
 flyteconsole: {}
 
-# ----------------------------------------------
-# Sandbox Configuration
-# Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop.
-# This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal
-# for a high performance setup, but are great to try out flyte
-# -----------------------------------------------
-#
-# REDIS SETTINGS
-#
-
-redis:
-  enabled: false
-
-#
-# POSTGRES
-#
-
-postgres:
-  image:
-    # Override postgres image to use alpine based (rather smaller) docker image
-    tag: "10.16-alpine"
-
-#
-# MINIO
-#
-
-minio: {}
-
-#
-# CONTOUR
-#
-
 contour:
   contour: {}
   envoy:
@@ -220,20 +188,21 @@ cluster_resource_manager:
 sparkoperator:
   enabled: false
 
+# --------------------------------------------------------
+# Sandbox component
+# --------------------------------------------------------
+
+
 #
-# PYTORCHOPERATOR
+# MINIO
 #
 
-pytorchoperator:
-  enabled: false
-# ----------------------
-# Distributed tensorflow training using the TF-Operator
+minio:
+  enabled: true
+
+#
+# POSTGRESQL
 #
 
-# ----------------------
-# Training on AWS Sagemaker using AWS Sagemaker operator
-#
-
-# ---------------------------
-# Flink jobs using the Flink Operator
-#
+postgresql:
+  enabled: true

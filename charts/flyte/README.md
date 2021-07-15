@@ -9,6 +9,9 @@ A Helm chart for Flyte
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | contour | 4.1.2 |
+| https://charts.bitnami.com/bitnami | minio | 7.0.0 |
+| https://charts.bitnami.com/bitnami | postgresql | 4.0.2 |
+| https://charts.bitnami.com/bitnami | postgresql | 8.0.0 |
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.0.6 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 

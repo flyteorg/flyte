@@ -92,6 +92,20 @@ metadata:
     helm.sh/chart: flyte-0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.0.0
+    release: "flyte"
+    heritage: "Helm"
+type: Opaque
+data:
+  postgresql-password: "YWQ5RXdhaU4zaA=="
+---
 # Source: flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
@@ -1079,6 +1093,48 @@ roleRef:
   name: spark-role
   apiGroup: rbac.authorization.k8s.io
 ---
+# Source: flyte/charts/postgresql/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-postgresql-headless
+  labels:
+    app: postgresql
+    chart: postgresql-8.0.0
+    release: "flyte"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "flyte"
+---
+# Source: flyte/charts/postgresql/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.0.0
+    release: "flyte"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "flyte"
+    role: master
+---
 # Source: flyte/templates/admin/service.yaml
 apiVersion: v1
 kind: Service
@@ -1817,6 +1873,140 @@ spec:
             cpu: 50m
             memory: 250Mi
       serviceAccountName: pytorch-operator
+---
+# Source: flyte/charts/postgresql/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: flyte-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.0.0
+    release: "flyte"
+    heritage: "Helm"
+spec:
+  serviceName: flyte-postgresql-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: postgresql
+      release: "flyte"
+      role: master
+  template:
+    metadata:
+      name: flyte-postgresql
+      labels:
+        app: postgresql
+        chart: postgresql-8.0.0
+        release: "flyte"
+        heritage: "Helm"
+        role: master
+    spec:      
+      securityContext:
+        fsGroup: 1001
+      initContainers:
+        - name: init-chmod-data
+          image: docker.io/bitnami/minideb:latest
+          imagePullPolicy: "Always"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /bitnami/postgresql/data
+              chmod 700 /bitnami/postgresql/data
+              find /bitnami/postgresql -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | \
+                xargs chown -R 1001:1001
+              chmod -R 777 /dev/shm
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/postgresql
+              subPath: 
+            - name: dshm
+              mountPath: /dev/shm
+      containers:
+        - name: flyte-postgresql
+          image: docker.io/bitnami/postgresql:10.7.0
+          imagePullPolicy: "Always"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flyte-postgresql
+                  key: postgresql-password
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /bitnami/postgresql
+              subPath: 
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
 ---
 # Source: flyte/templates/redis/statefulset.yaml
 apiVersion: apps/v1

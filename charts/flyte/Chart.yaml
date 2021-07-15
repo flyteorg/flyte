@@ -17,3 +17,15 @@ dependencies:
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/
     condition: kubernetes-dashboard.enabled
+  - name: postgresql
+    version: 4.0.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: postgresql
+    version: 8.0.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: minio
+    version: 7.0.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: minio.enabled
