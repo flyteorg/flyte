@@ -2062,6 +2062,16 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---

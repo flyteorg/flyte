@@ -3958,6 +3958,16 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific

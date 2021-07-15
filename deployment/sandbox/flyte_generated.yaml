@@ -3797,6 +3797,20 @@ spec:
               number: 80
         path: /config/*
         pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2/*
+        pathType: ImplementationSpecific
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
