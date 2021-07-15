@@ -38,6 +38,8 @@ func (p PredicatePhase) String() string {
 	return "undefined"
 }
 
+// CanExecute method informs the callee if the given node can begin execution. This is dependent on
+// primarily that all nodes upstream to the given node are successful and the results are available.
 func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.BaseNode) (
 	PredicatePhase, error) {
 
@@ -47,8 +49,6 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 		return PredicatePhaseReady, nil
 	}
 
-	nodeStatus := nl.GetNodeExecutionStatus(ctx, nodeID)
-	parentNodeID := nodeStatus.GetParentNodeID()
 	upstreamNodes, err := dag.ToNode(nodeID)
 	if err != nil {
 		return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
@@ -56,27 +56,40 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 
 	skipped := false
 	for _, upstreamNodeID := range upstreamNodes {
+		upstreamNode, ok := nl.GetNode(upstreamNodeID)
+		if !ok {
+			return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
+		}
+
 		upstreamNodeStatus := nl.GetNodeExecutionStatus(ctx, upstreamNodeID)
 
 		if upstreamNodeStatus.IsDirty() {
 			return PredicatePhaseNotReady, nil
 		}
 
-		if parentNodeID != nil && *parentNodeID == upstreamNodeID {
-			upstreamNode, ok := nl.GetNode(upstreamNodeID)
-			if !ok {
-				return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
+		// BranchNodes are special. When the upstreamNode is a branch node it could represent one of two cases
+		// Case 1: the upstreamNode is the parent branch node (the one that houses the condition) and the child node
+		//         is one of the branches for the condition.
+		//         i.e For an example Branch (if condition then take-branch1 else take-branch2)
+		//         condition is the branch node, take-branch1/2 are the 2 child nodes and this condition can be triggered
+		//         for either one of them
+		// Case 2: the upstreamNode is some branch node and the current node is simply a node that consumes the output
+		//         of the branch
+		// Thus,
+		//   In case1, we can proceed to execute one of the branches as soon as the branch evaluation completes, but
+		//   branch node itself will not be successful (as it contains the branches)
+		//   In case2, we will continue the evaluation of the CanExecute code block and can only proceed if the entire
+		//   branch node is complete
+		if upstreamNode.GetBranchNode() != nil && upstreamNodeStatus.GetBranchStatus() != nil {
+			if upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
+				return PredicatePhaseNotReady, nil
 			}
-
-			// Deprecated: This if block will be removed in a future version. It's harmless (will be no-op) for newly
-			// compiled Workflows as sub-branch-nodes won't have an execution or code dependency on branch nodes.
-			// This only happens if current node is the child node of a branch node
-			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
-				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
-				return PredicatePhaseUndefined, errors.Errorf(errors.IllegalStateError, nodeID, "Upstream node [%v] is set as parent, but is not a branch node of [%v] or in illegal state.", upstreamNodeID, nodeID)
+			// Branch node is success, so we are free to go ahead and execute the child nodes of the branch node, but
+			// not any of the dependent nodes
+			nodeStatus := nl.GetNodeExecutionStatus(ctx, nodeID)
+			if nodeStatus.GetParentNodeID() != nil && *nodeStatus.GetParentNodeID() == upstreamNodeID {
+				continue
 			}
-
-			continue
 		}
 
 		if upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseSkipped ||
@@ -103,8 +116,6 @@ func GetParentNodeMaxEndTime(ctx context.Context, dag executors.DAGStructure, nl
 		return zeroTime, nil
 	}
 
-	nodeStatus := nl.GetNodeExecutionStatus(ctx, node.GetID())
-	parentNodeID := nodeStatus.GetParentNodeID()
 	upstreamNodes, err := dag.ToNode(nodeID)
 	if err != nil {
 		return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
@@ -113,24 +124,24 @@ func GetParentNodeMaxEndTime(ctx context.Context, dag executors.DAGStructure, nl
 	var latest v1.Time
 	for _, upstreamNodeID := range upstreamNodes {
 		upstreamNodeStatus := nl.GetNodeExecutionStatus(ctx, upstreamNodeID)
-		if parentNodeID != nil && *parentNodeID == upstreamNodeID {
-			upstreamNode, ok := nl.GetNode(upstreamNodeID)
-			if !ok {
-				return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
-			}
-
-			// Deprecated: This if block will be removed in a future version. It's harmless (will be no-op) for newly
-			// compiled Workflows as sub-branch-nodes won't have an execution or code dependency on branch nodes.
-			// This only happens if current node is the child node of a branch node
-			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
-				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
-				return zeroTime, errors.Errorf(errors.IllegalStateError, nodeID, "Upstream node [%v] is set as parent, but is not a branch node of [%v] or in illegal state.", upstreamNodeID, nodeID)
-			}
-
-			continue
+		upstreamNode, ok := nl.GetNode(upstreamNodeID)
+		if !ok {
+			return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 		}
 
-		if stoppedAt := upstreamNodeStatus.GetStoppedAt(); stoppedAt != nil && stoppedAt.Unix() > latest.Unix() {
+		// Special handling for branch node. The status for branch does not get updated to success, as it is the parent node
+		if upstreamNode.GetBranchNode() != nil && upstreamNodeStatus.GetBranchStatus() != nil {
+			if upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
+				return zeroTime, nil
+			}
+			branchUpdatedAt := upstreamNodeStatus.GetStartedAt()
+			if upstreamNodeStatus.GetLastUpdatedAt() != nil {
+				branchUpdatedAt = upstreamNodeStatus.GetLastUpdatedAt()
+			}
+			if branchUpdatedAt != nil && branchUpdatedAt.Unix() > latest.Unix() {
+				latest = *branchUpdatedAt
+			}
+		} else if stoppedAt := upstreamNodeStatus.GetStoppedAt(); stoppedAt != nil && stoppedAt.Unix() > latest.Unix() {
 			latest = *upstreamNodeStatus.GetStoppedAt()
 		}
 	}
