@@ -432,6 +432,7 @@ data:
         - defaultIamRole:
             value: ""
       refresh: 5m
+      refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
 # Source: flyte/templates/console/configmap.yaml
@@ -3289,7 +3290,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "01022a541ec245fb382df6cb533da25e5a5c058ee59a7c4f804aeb3aaa5fd90"
+        configChecksum: "0330846fbb9f22cddfd65abeed5ec540bc78a6ac7dbb456338fff2f7be7ccfe"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
