@@ -490,7 +490,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://{{ .Values.userSettings.bucketName }}/
+      rawoutput-prefix: s3://<BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -552,10 +552,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "{{ .Values.userSettings.bucketName }}"
+      container: "<BUCKET_NAME>"
       connection:
         auth-type: iam
-        region: {{ .Values.userSettings.accountRegion }}
+        region: <AWS_REGION>
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -566,7 +566,7 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: true
-        cloudwatch-log-group: '<LOG_GROUP>'
+        cloudwatch-log-group: '<LOG_GROUP_NAME>'
         cloudwatch-region: '<AWS_REGION>'
         kubernetes-enabled: false
 ---
@@ -1634,7 +1634,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ceaa2735d430f1ea75d0655e6e893677523f75d814314880793cb6a5b0bce18"
+        configChecksum: "d86b0523fd228f4dbb3e371e964b3d84db1063c887e5f7b483da680cb2066f7"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1706,7 +1706,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "ceaa2735d430f1ea75d0655e6e893677523f75d814314880793cb6a5b0bce18"
+        configChecksum: "d86b0523fd228f4dbb3e371e964b3d84db1063c887e5f7b483da680cb2066f7"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -2085,8 +2085,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: '{{ .Values.userSettings.certificateArn
-      }}'
+    alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing

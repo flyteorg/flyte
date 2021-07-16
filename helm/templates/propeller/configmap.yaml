@@ -18,7 +18,7 @@ data:
   copilot.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.core }}
-  core.yaml: | {{ toYaml . | nindent 4 }}
+  core.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.enabled_plugins }}
   enabled_plugins.yaml: | {{ toYaml . | nindent 4 }}
@@ -40,7 +40,7 @@ data:
   spark.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- end }}
-  storage.yaml: | {{ include "storage" . | nindent 4 }}
+  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
   cache.yaml: |
     cache:
       max_size_mbs: {{ .Values.flytepropeller.cacheSizeMbs }}

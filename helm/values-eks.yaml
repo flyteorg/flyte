@@ -5,7 +5,7 @@ userSettings:
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
   bucketName: <BUCKET_NAME>
-  logGroup: <LOG_GROUP>
+  logGroup: <LOG_GROUP_NAME>
 
 #
 # FLYTEADMIN
