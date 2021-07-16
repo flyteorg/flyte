@@ -475,6 +475,38 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecutionCreateResponse"
+  /api/v1/executions/recover:
+    post:
+      tags:
+      - "AdminService"
+      summary: "Recreates a previously-run workflow execution that will only start\
+        \ executing from the last known failure point.\nIn Recover mode, users cannot\
+        \ change any input parameters or update the version of the execution.\nThis\
+        \ is extremely useful to recover from system errors and byzantine faults like\
+        \ - Loss of K8s cluster, bugs in platform or instability, machine failures,\n\
+        downstream system failures (downstream services), or simply to recover executions\
+        \ that failed because of retry exhaustion and should complete if tried again.\n\
+        See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details."
+      description: "Recreates a previously-run workflow execution that will only start\
+        \ executing from the last known failure point. In Recover mode, users cannot\
+        \ change any input parameters or update the version of the execution. This\
+        \ is extremely useful to recover from system errors and byzantine faults like\
+        \ - Loss of K8s cluster, bugs in platform or instability, machine failures,\
+        \ downstream system failures (downstream services), or simply to recover executions\
+        \ that failed because of retry exhaustion and should complete if tried again."
+      operationId: "RecoverExecution"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminExecutionRecoverRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminExecutionCreateResponse"
   /api/v1/executions/relaunch:
     post:
       tags:
@@ -2580,13 +2612,15 @@ definitions:
       \ SYSTEM: A system process was responsible for launching this execution rather\
       \ an individual.\n - RELAUNCH: This execution was launched with identical inputs\
       \ as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered\
-      \ by another execution."
+      \ by another execution.\n - RECOVERED: This execution was recovered from another\
+      \ execution."
     enum:
     - "MANUAL"
     - "SCHEDULED"
     - "SYSTEM"
     - "RELAUNCH"
     - "CHILD_WORKFLOW"
+    - "RECOVERED"
     default: "MANUAL"
   IOStrategyDownloadMode:
     type: "string"
@@ -3652,6 +3686,21 @@ definitions:
       tags:
       - "tags"
       - "tags"
+  adminExecutionRecoverRequest:
+    type: "object"
+    properties:
+      id:
+        description: "Identifier of the workflow execution to recover."
+        $ref: "#/definitions/coreWorkflowExecutionIdentifier"
+      name:
+        type: "string"
+        title: "User provided value for the recovered execution.\nIf none is provided\
+          \ the system will generate a unique string.\n+optional"
+      metadata:
+        description: "Additional metadata which will be used to overwrite any metadata\
+          \ in the reference execution when triggering a recovery execution."
+        $ref: "#/definitions/adminExecutionMetadata"
+    description: "Request to recover the referenced execution."
   adminExecutionRelaunchRequest:
     type: "object"
     properties:
@@ -28487,6 +28536,7 @@ definitions:
     - "SKIPPED"
     - "TIMED_OUT"
     - "DYNAMIC_RUNNING"
+    - "RECOVERED"
     default: "UNDEFINED"
   coreNodeMetadata:
     type: "object"

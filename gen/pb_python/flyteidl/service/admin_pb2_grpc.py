@@ -112,6 +112,11 @@ class AdminServiceStub(object):
         request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionRelaunchRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCreateResponse.FromString,
         )
+    self.RecoverExecution = channel.unary_unary(
+        '/flyteidl.service.AdminService/RecoverExecution',
+        request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionRecoverRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCreateResponse.FromString,
+        )
     self.GetExecution = channel.unary_unary(
         '/flyteidl.service.AdminService/GetExecution',
         request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetRequest.SerializeToString,
@@ -373,6 +378,17 @@ class AdminServiceServicer(object):
 
   def RelaunchExecution(self, request, context):
     """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def RecoverExecution(self, request, context):
+    """Recreates a previously-run workflow execution that will only start executing from the last known failure point.
+    In Recover mode, users cannot change any input parameters or update the version of the execution.
+    This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,
+    downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.
+    See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -662,6 +678,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
       'RelaunchExecution': grpc.unary_unary_rpc_method_handler(
           servicer.RelaunchExecution,
           request_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionRelaunchRequest.FromString,
+          response_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCreateResponse.SerializeToString,
+      ),
+      'RecoverExecution': grpc.unary_unary_rpc_method_handler(
+          servicer.RecoverExecution,
+          request_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionRecoverRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCreateResponse.SerializeToString,
       ),
       'GetExecution': grpc.unary_unary_rpc_method_handler(

@@ -248,6 +248,25 @@ service AdminService {
     };
   }
 
+  // Recreates a previously-run workflow execution that will only start executing from the last known failure point.
+  // In Recover mode, users cannot change any input parameters or update the version of the execution.
+  // This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,
+  // downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.
+  // See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
+  rpc RecoverExecution (flyteidl.admin.ExecutionRecoverRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions/recover"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Recreates a previously-run workflow execution that will only start executing from the last known failure point. "
+      "In Recover mode, users cannot change any input parameters or update the version of the execution. "
+      "This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, "
+      "downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again."
+
+    };
+  }
+
   // Fetches a :ref:`ref_flyteidl.admin.Execution`.
   rpc GetExecution (flyteidl.admin.WorkflowExecutionGetRequest) returns (flyteidl.admin.Execution) {
     option (google.api.http) = {
