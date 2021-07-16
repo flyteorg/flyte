@@ -41,7 +41,7 @@ storage:
 storage:
   type: stow	
   stow:
-    kind: s3
+    kind: google
     config:
       json: ""
       project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
