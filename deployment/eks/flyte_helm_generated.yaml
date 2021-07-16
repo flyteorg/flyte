@@ -107,7 +107,7 @@ kind: Secret
 metadata:
   name: db-pass
 stringData:
-  pass.txt: '{{ .Values.userSettings.dbPassword }}'
+  pass.txt: '<DB_PASSWORD>'
 type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
@@ -230,10 +230,10 @@ data:
       config.yaml: | 
         storage:
           type: s3
-          container: "{{ .Values.userSettings.bucketName }}"
+          container: "<BUCKET_NAME>"
           connection:
             auth-type: iam
-            region: {{ .Values.userSettings.accountRegion }}
+            region: us-east-1
           enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
@@ -251,7 +251,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: '{{ .Values.userSettings.rdsHost }}'
+      host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -1326,7 +1326,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a11c995ed742294045e735e10c1333577fb14617d7d470e2159a4d4798ce95e"
+        configChecksum: "c19d9f49ce20d553c3e303364cd161c5c0bbd1c6a037294043bf60a24299438"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte

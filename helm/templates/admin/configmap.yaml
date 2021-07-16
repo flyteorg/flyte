@@ -6,7 +6,7 @@ metadata:
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
 {{- with .Values.db }}
-  db.yaml: | {{ toYaml . | nindent 4 }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.domain }}
   domain.yaml: | {{ toYaml . | nindent 4 }}
