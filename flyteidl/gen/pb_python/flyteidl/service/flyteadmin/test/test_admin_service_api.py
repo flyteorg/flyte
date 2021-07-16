@@ -308,6 +308,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_recover_execution(self):
+        """Test case for recover_execution
+
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
+        """
+        pass
+
     def test_register_project(self):
         """Test case for register_project
 

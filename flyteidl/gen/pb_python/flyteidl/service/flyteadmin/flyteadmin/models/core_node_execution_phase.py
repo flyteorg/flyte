@@ -36,6 +36,7 @@ class CoreNodeExecutionPhase(object):
     SKIPPED = "SKIPPED"
     TIMED_OUT = "TIMED_OUT"
     DYNAMIC_RUNNING = "DYNAMIC_RUNNING"
+    RECOVERED = "RECOVERED"
 
     """
     Attributes:

@@ -31,6 +31,7 @@ class ExecutionMetadataExecutionMode(object):
     SYSTEM = "SYSTEM"
     RELAUNCH = "RELAUNCH"
     CHILD_WORKFLOW = "CHILD_WORKFLOW"
+    RECOVERED = "RECOVERED"
 
     """
     Attributes:

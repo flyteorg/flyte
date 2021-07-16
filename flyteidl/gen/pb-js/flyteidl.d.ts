@@ -3313,7 +3313,8 @@ export namespace flyteidl {
                 ABORTED = 6,
                 SKIPPED = 7,
                 TIMED_OUT = 8,
-                DYNAMIC_RUNNING = 9
+                DYNAMIC_RUNNING = 9,
+                RECOVERED = 10
             }
         }
 
@@ -8125,6 +8126,70 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionRecoverRequest. */
+        interface IExecutionRecoverRequest {
+
+            /** ExecutionRecoverRequest id */
+            id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionRecoverRequest name */
+            name?: (string|null);
+
+            /** ExecutionRecoverRequest metadata */
+            metadata?: (flyteidl.admin.IExecutionMetadata|null);
+        }
+
+        /** Represents an ExecutionRecoverRequest. */
+        class ExecutionRecoverRequest implements IExecutionRecoverRequest {
+
+            /**
+             * Constructs a new ExecutionRecoverRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionRecoverRequest);
+
+            /** ExecutionRecoverRequest id. */
+            public id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionRecoverRequest name. */
+            public name: string;
+
+            /** ExecutionRecoverRequest metadata. */
+            public metadata?: (flyteidl.admin.IExecutionMetadata|null);
+
+            /**
+             * Creates a new ExecutionRecoverRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionRecoverRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionRecoverRequest): flyteidl.admin.ExecutionRecoverRequest;
+
+            /**
+             * Encodes the specified ExecutionRecoverRequest message. Does not implicitly {@link flyteidl.admin.ExecutionRecoverRequest.verify|verify} messages.
+             * @param message ExecutionRecoverRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionRecoverRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionRecoverRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionRecoverRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionRecoverRequest;
+
+            /**
+             * Verifies an ExecutionRecoverRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ExecutionCreateResponse. */
         interface IExecutionCreateResponse {
 
@@ -8739,7 +8804,8 @@ export namespace flyteidl {
                 SCHEDULED = 1,
                 SYSTEM = 2,
                 RELAUNCH = 3,
-                CHILD_WORKFLOW = 4
+                CHILD_WORKFLOW = 4,
+                RECOVERED = 5
             }
         }
 
@@ -14535,6 +14601,20 @@ export namespace flyteidl {
             public relaunchExecution(request: flyteidl.admin.IExecutionRelaunchRequest): Promise<flyteidl.admin.ExecutionCreateResponse>;
 
             /**
+             * Calls RecoverExecution.
+             * @param request ExecutionRecoverRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ExecutionCreateResponse
+             */
+            public recoverExecution(request: flyteidl.admin.IExecutionRecoverRequest, callback: flyteidl.service.AdminService.RecoverExecutionCallback): void;
+
+            /**
+             * Calls RecoverExecution.
+             * @param request ExecutionRecoverRequest message or plain object
+             * @returns Promise
+             */
+            public recoverExecution(request: flyteidl.admin.IExecutionRecoverRequest): Promise<flyteidl.admin.ExecutionCreateResponse>;
+
+            /**
              * Calls GetExecution.
              * @param request WorkflowExecutionGetRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Execution
@@ -15047,6 +15127,13 @@ export namespace flyteidl {
              * @param [response] ExecutionCreateResponse
              */
             type RelaunchExecutionCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionCreateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#recoverExecution}.
+             * @param error Error, if any
+             * @param [response] ExecutionCreateResponse
+             */
+            type RecoverExecutionCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionCreateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#getExecution}.

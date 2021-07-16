@@ -7936,6 +7936,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number} SKIPPED=7 SKIPPED value
              * @property {number} TIMED_OUT=8 TIMED_OUT value
              * @property {number} DYNAMIC_RUNNING=9 DYNAMIC_RUNNING value
+             * @property {number} RECOVERED=10 RECOVERED value
              */
             NodeExecution.Phase = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
@@ -7949,6 +7950,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 values[valuesById[7] = "SKIPPED"] = 7;
                 values[valuesById[8] = "TIMED_OUT"] = 8;
                 values[valuesById[9] = "DYNAMIC_RUNNING"] = 9;
+                values[valuesById[10] = "RECOVERED"] = 10;
                 return values;
             })();
 
@@ -13521,6 +13523,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 7:
                     case 8:
                     case 9:
+                    case 10:
                         break;
                     }
                 if (message.occurredAt != null && message.hasOwnProperty("occurredAt")) {
@@ -19450,6 +19453,154 @@ export const flyteidl = $root.flyteidl = (() => {
             return ExecutionRelaunchRequest;
         })();
 
+        admin.ExecutionRecoverRequest = (function() {
+
+            /**
+             * Properties of an ExecutionRecoverRequest.
+             * @memberof flyteidl.admin
+             * @interface IExecutionRecoverRequest
+             * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] ExecutionRecoverRequest id
+             * @property {string|null} [name] ExecutionRecoverRequest name
+             * @property {flyteidl.admin.IExecutionMetadata|null} [metadata] ExecutionRecoverRequest metadata
+             */
+
+            /**
+             * Constructs a new ExecutionRecoverRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents an ExecutionRecoverRequest.
+             * @implements IExecutionRecoverRequest
+             * @constructor
+             * @param {flyteidl.admin.IExecutionRecoverRequest=} [properties] Properties to set
+             */
+            function ExecutionRecoverRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ExecutionRecoverRequest id.
+             * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @instance
+             */
+            ExecutionRecoverRequest.prototype.id = null;
+
+            /**
+             * ExecutionRecoverRequest name.
+             * @member {string} name
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @instance
+             */
+            ExecutionRecoverRequest.prototype.name = "";
+
+            /**
+             * ExecutionRecoverRequest metadata.
+             * @member {flyteidl.admin.IExecutionMetadata|null|undefined} metadata
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @instance
+             */
+            ExecutionRecoverRequest.prototype.metadata = null;
+
+            /**
+             * Creates a new ExecutionRecoverRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @static
+             * @param {flyteidl.admin.IExecutionRecoverRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.ExecutionRecoverRequest} ExecutionRecoverRequest instance
+             */
+            ExecutionRecoverRequest.create = function create(properties) {
+                return new ExecutionRecoverRequest(properties);
+            };
+
+            /**
+             * Encodes the specified ExecutionRecoverRequest message. Does not implicitly {@link flyteidl.admin.ExecutionRecoverRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @static
+             * @param {flyteidl.admin.IExecutionRecoverRequest} message ExecutionRecoverRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ExecutionRecoverRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.name != null && message.hasOwnProperty("name"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.admin.ExecutionMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes an ExecutionRecoverRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.ExecutionRecoverRequest} ExecutionRecoverRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ExecutionRecoverRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionRecoverRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.name = reader.string();
+                        break;
+                    case 3:
+                        message.metadata = $root.flyteidl.admin.ExecutionMetadata.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an ExecutionRecoverRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.ExecutionRecoverRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ExecutionRecoverRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.name != null && message.hasOwnProperty("name"))
+                    if (!$util.isString(message.name))
+                        return "name: string expected";
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.admin.ExecutionMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
+                return null;
+            };
+
+            return ExecutionRecoverRequest;
+        })();
+
         admin.ExecutionCreateResponse = (function() {
 
             /**
@@ -20912,6 +21063,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 2:
                     case 3:
                     case 4:
+                    case 5:
                         break;
                     }
                 if (message.principal != null && message.hasOwnProperty("principal"))
@@ -20952,6 +21104,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number} SYSTEM=2 SYSTEM value
              * @property {number} RELAUNCH=3 RELAUNCH value
              * @property {number} CHILD_WORKFLOW=4 CHILD_WORKFLOW value
+             * @property {number} RECOVERED=5 RECOVERED value
              */
             ExecutionMetadata.ExecutionMode = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
@@ -20960,6 +21113,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 values[valuesById[2] = "SYSTEM"] = 2;
                 values[valuesById[3] = "RELAUNCH"] = 3;
                 values[valuesById[4] = "CHILD_WORKFLOW"] = 4;
+                values[valuesById[5] = "RECOVERED"] = 5;
                 return values;
             })();
 
@@ -27184,6 +27338,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 7:
                     case 8:
                     case 9:
+                    case 10:
                         break;
                     }
                 if (message.startedAt != null && message.hasOwnProperty("startedAt")) {
@@ -34491,6 +34646,39 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.service.AdminService
              * @instance
              * @param {flyteidl.admin.IExecutionRelaunchRequest} request ExecutionRelaunchRequest message or plain object
+             * @returns {Promise<flyteidl.admin.ExecutionCreateResponse>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#recoverExecution}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef RecoverExecutionCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.ExecutionCreateResponse} [response] ExecutionCreateResponse
+             */
+
+            /**
+             * Calls RecoverExecution.
+             * @function recoverExecution
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IExecutionRecoverRequest} request ExecutionRecoverRequest message or plain object
+             * @param {flyteidl.service.AdminService.RecoverExecutionCallback} callback Node-style callback called with the error, if any, and ExecutionCreateResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.recoverExecution = function recoverExecution(request, callback) {
+                return this.rpcCall(recoverExecution, $root.flyteidl.admin.ExecutionRecoverRequest, $root.flyteidl.admin.ExecutionCreateResponse, request, callback);
+            }, "name", { value: "RecoverExecution" });
+
+            /**
+             * Calls RecoverExecution.
+             * @function recoverExecution
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IExecutionRecoverRequest} request ExecutionRecoverRequest message or plain object
              * @returns {Promise<flyteidl.admin.ExecutionCreateResponse>} Promise
              * @variation 2
              */

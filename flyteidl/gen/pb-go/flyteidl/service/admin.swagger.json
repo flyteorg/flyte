@@ -559,6 +559,34 @@
         ]
       }
     },
+    "/api/v1/executions/recover": {
+      "post": {
+        "summary": "Recreates a previously-run workflow execution that will only start executing from the last known failure point.\nIn Recover mode, users cannot change any input parameters or update the version of the execution.\nThis is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,\ndownstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.\nSee :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.",
+        "description": "Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.",
+        "operationId": "RecoverExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionRecoverRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/executions/relaunch": {
       "post": {
         "summary": "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`",
@@ -2886,10 +2914,11 @@
         "SCHEDULED",
         "SYSTEM",
         "RELAUNCH",
-        "CHILD_WORKFLOW"
+        "CHILD_WORKFLOW",
+        "RECOVERED"
       ],
       "default": "MANUAL",
-      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution."
+      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution."
     },
     "IOStrategyDownloadMode": {
       "type": "string",
@@ -3341,6 +3370,24 @@
           "description": "Tags used for assigning execution queues for tasks defined within this project."
         }
       }
+    },
+    "adminExecutionRecoverRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "description": "Identifier of the workflow execution to recover."
+        },
+        "name": {
+          "type": "string",
+          "title": "User provided value for the recovered execution.\nIf none is provided the system will generate a unique string.\n+optional"
+        },
+        "metadata": {
+          "$ref": "#/definitions/adminExecutionMetadata",
+          "description": "Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution."
+        }
+      },
+      "description": "Request to recover the referenced execution."
     },
     "adminExecutionRelaunchRequest": {
       "type": "object",
@@ -5410,7 +5457,8 @@
         "ABORTED",
         "SKIPPED",
         "TIMED_OUT",
-        "DYNAMIC_RUNNING"
+        "DYNAMIC_RUNNING",
+        "RECOVERED"
       ],
       "default": "UNDEFINED"
     },

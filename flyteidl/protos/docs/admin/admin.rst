@@ -958,6 +958,29 @@ These attributes are assigned at launch time and do not change.
 
 
 
+.. _ref_flyteidl.admin.ExecutionRecoverRequest:
+
+ExecutionRecoverRequest
+------------------------------------------------------------------
+
+Request to recover the referenced execution.
+
+
+
+.. csv-table:: ExecutionRecoverRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of the workflow execution to recover."
+   "name", ":ref:`ref_string`", "", "User provided value for the recovered execution. If none is provided the system will generate a unique string. +optional"
+   "metadata", ":ref:`ref_flyteidl.admin.ExecutionMetadata`", "", "Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution."
+
+
+
+
+
+
+
 .. _ref_flyteidl.admin.ExecutionRelaunchRequest:
 
 ExecutionRelaunchRequest
@@ -1202,6 +1225,7 @@ The method by which this execution was launched.
    "SYSTEM", "2", "A system process was responsible for launching this execution rather an individual."
    "RELAUNCH", "3", "This execution was launched with identical inputs as a previous execution."
    "CHILD_WORKFLOW", "4", "This execution was triggered by another execution."
+   "RECOVERED", "5", "This execution was recovered from another execution."
 
  <!-- end enums -->
 

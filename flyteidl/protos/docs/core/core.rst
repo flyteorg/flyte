@@ -718,6 +718,7 @@ NodeExecution.Phase
    "SKIPPED", "7", ""
    "TIMED_OUT", "8", ""
    "DYNAMIC_RUNNING", "9", ""
+   "RECOVERED", "10", ""
 
 
 

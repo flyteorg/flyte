@@ -49,7 +49,7 @@ struct TableStruct_flyteidl_2fadmin_2fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[17]
+  static const ::google::protobuf::internal::ParseTable schema[18]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -79,6 +79,9 @@ extern ExecutionListDefaultTypeInternal _ExecutionList_default_instance_;
 class ExecutionMetadata;
 class ExecutionMetadataDefaultTypeInternal;
 extern ExecutionMetadataDefaultTypeInternal _ExecutionMetadata_default_instance_;
+class ExecutionRecoverRequest;
+class ExecutionRecoverRequestDefaultTypeInternal;
+extern ExecutionRecoverRequestDefaultTypeInternal _ExecutionRecoverRequest_default_instance_;
 class ExecutionRelaunchRequest;
 class ExecutionRelaunchRequestDefaultTypeInternal;
 extern ExecutionRelaunchRequestDefaultTypeInternal _ExecutionRelaunchRequest_default_instance_;
@@ -120,6 +123,7 @@ template<> ::flyteidl::admin::ExecutionCreateRequest* Arena::CreateMaybeMessage<
 template<> ::flyteidl::admin::ExecutionCreateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionCreateResponse>(Arena*);
 template<> ::flyteidl::admin::ExecutionList* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionList>(Arena*);
 template<> ::flyteidl::admin::ExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionMetadata>(Arena*);
+template<> ::flyteidl::admin::ExecutionRecoverRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionRecoverRequest>(Arena*);
 template<> ::flyteidl::admin::ExecutionRelaunchRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionRelaunchRequest>(Arena*);
 template<> ::flyteidl::admin::ExecutionSpec* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionSpec>(Arena*);
 template<> ::flyteidl::admin::ExecutionTerminateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionTerminateRequest>(Arena*);
@@ -141,12 +145,13 @@ enum ExecutionMetadata_ExecutionMode {
   ExecutionMetadata_ExecutionMode_SYSTEM = 2,
   ExecutionMetadata_ExecutionMode_RELAUNCH = 3,
   ExecutionMetadata_ExecutionMode_CHILD_WORKFLOW = 4,
+  ExecutionMetadata_ExecutionMode_RECOVERED = 5,
   ExecutionMetadata_ExecutionMode_ExecutionMetadata_ExecutionMode_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   ExecutionMetadata_ExecutionMode_ExecutionMetadata_ExecutionMode_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool ExecutionMetadata_ExecutionMode_IsValid(int value);
 const ExecutionMetadata_ExecutionMode ExecutionMetadata_ExecutionMode_ExecutionMode_MIN = ExecutionMetadata_ExecutionMode_MANUAL;
-const ExecutionMetadata_ExecutionMode ExecutionMetadata_ExecutionMode_ExecutionMode_MAX = ExecutionMetadata_ExecutionMode_CHILD_WORKFLOW;
+const ExecutionMetadata_ExecutionMode ExecutionMetadata_ExecutionMode_ExecutionMode_MAX = ExecutionMetadata_ExecutionMode_RECOVERED;
 const int ExecutionMetadata_ExecutionMode_ExecutionMode_ARRAYSIZE = ExecutionMetadata_ExecutionMode_ExecutionMode_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* ExecutionMetadata_ExecutionMode_descriptor();
@@ -461,6 +466,146 @@ class ExecutionRelaunchRequest final :
 };
 // -------------------------------------------------------------------
 
+class ExecutionRecoverRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ExecutionRecoverRequest) */ {
+ public:
+  ExecutionRecoverRequest();
+  virtual ~ExecutionRecoverRequest();
+
+  ExecutionRecoverRequest(const ExecutionRecoverRequest& from);
+
+  inline ExecutionRecoverRequest& operator=(const ExecutionRecoverRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ExecutionRecoverRequest(ExecutionRecoverRequest&& from) noexcept
+    : ExecutionRecoverRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ExecutionRecoverRequest& operator=(ExecutionRecoverRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ExecutionRecoverRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ExecutionRecoverRequest* internal_default_instance() {
+    return reinterpret_cast<const ExecutionRecoverRequest*>(
+               &_ExecutionRecoverRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(ExecutionRecoverRequest* other);
+  friend void swap(ExecutionRecoverRequest& a, ExecutionRecoverRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ExecutionRecoverRequest* New() const final {
+    return CreateMaybeMessage<ExecutionRecoverRequest>(nullptr);
+  }
+
+  ExecutionRecoverRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ExecutionRecoverRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ExecutionRecoverRequest& from);
+  void MergeFrom(const ExecutionRecoverRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ExecutionRecoverRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string name = 2;
+  void clear_name();
+  static const int kNameFieldNumber = 2;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_name(::std::string&& value);
+  #endif
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
+
+  // .flyteidl.core.WorkflowExecutionIdentifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& id() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_id();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::core::WorkflowExecutionIdentifier* id);
+
+  // .flyteidl.admin.ExecutionMetadata metadata = 3;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 3;
+  const ::flyteidl::admin::ExecutionMetadata& metadata() const;
+  ::flyteidl::admin::ExecutionMetadata* release_metadata();
+  ::flyteidl::admin::ExecutionMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::admin::ExecutionMetadata* metadata);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionRecoverRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* id_;
+  ::flyteidl::admin::ExecutionMetadata* metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ExecutionCreateResponse final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ExecutionCreateResponse) */ {
  public:
@@ -499,7 +644,7 @@ class ExecutionCreateResponse final :
                &_ExecutionCreateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(ExecutionCreateResponse* other);
   friend void swap(ExecutionCreateResponse& a, ExecutionCreateResponse& b) {
@@ -614,7 +759,7 @@ class WorkflowExecutionGetRequest final :
                &_WorkflowExecutionGetRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(WorkflowExecutionGetRequest* other);
   friend void swap(WorkflowExecutionGetRequest& a, WorkflowExecutionGetRequest& b) {
@@ -729,7 +874,7 @@ class Execution final :
                &_Execution_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(Execution* other);
   friend void swap(Execution& a, Execution& b) {
@@ -864,7 +1009,7 @@ class ExecutionList final :
                &_ExecutionList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(ExecutionList* other);
   friend void swap(ExecutionList& a, ExecutionList& b) {
@@ -1003,7 +1148,7 @@ class LiteralMapBlob final :
                &_LiteralMapBlob_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(LiteralMapBlob* other);
   friend void swap(LiteralMapBlob& a, LiteralMapBlob& b) {
@@ -1148,7 +1293,7 @@ class AbortMetadata final :
                &_AbortMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(AbortMetadata* other);
   friend void swap(AbortMetadata& a, AbortMetadata& b) {
@@ -1291,7 +1436,7 @@ class ExecutionClosure final :
                &_ExecutionClosure_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(ExecutionClosure* other);
   friend void swap(ExecutionClosure& a, ExecutionClosure& b) {
@@ -1538,7 +1683,7 @@ class SystemMetadata final :
                &_SystemMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(SystemMetadata* other);
   friend void swap(SystemMetadata& a, SystemMetadata& b) {
@@ -1658,7 +1803,7 @@ class ExecutionMetadata final :
                &_ExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(ExecutionMetadata* other);
   friend void swap(ExecutionMetadata& a, ExecutionMetadata& b) {
@@ -1724,6 +1869,8 @@ class ExecutionMetadata final :
     ExecutionMetadata_ExecutionMode_RELAUNCH;
   static const ExecutionMode CHILD_WORKFLOW =
     ExecutionMetadata_ExecutionMode_CHILD_WORKFLOW;
+  static const ExecutionMode RECOVERED =
+    ExecutionMetadata_ExecutionMode_RECOVERED;
   static inline bool ExecutionMode_IsValid(int value) {
     return ExecutionMetadata_ExecutionMode_IsValid(value);
   }
@@ -1864,7 +2011,7 @@ class NotificationList final :
                &_NotificationList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(NotificationList* other);
   friend void swap(NotificationList& a, NotificationList& b) {
@@ -1988,7 +2135,7 @@ class ExecutionSpec final :
                &_ExecutionSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(ExecutionSpec* other);
   friend void swap(ExecutionSpec& a, ExecutionSpec& b) {
@@ -2212,7 +2359,7 @@ class ExecutionTerminateRequest final :
                &_ExecutionTerminateRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(ExecutionTerminateRequest* other);
   friend void swap(ExecutionTerminateRequest& a, ExecutionTerminateRequest& b) {
@@ -2342,7 +2489,7 @@ class ExecutionTerminateResponse final :
                &_ExecutionTerminateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(ExecutionTerminateResponse* other);
   friend void swap(ExecutionTerminateResponse& a, ExecutionTerminateResponse& b) {
@@ -2447,7 +2594,7 @@ class WorkflowExecutionGetDataRequest final :
                &_WorkflowExecutionGetDataRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(WorkflowExecutionGetDataRequest* other);
   friend void swap(WorkflowExecutionGetDataRequest& a, WorkflowExecutionGetDataRequest& b) {
@@ -2562,7 +2709,7 @@ class WorkflowExecutionGetDataResponse final :
                &_WorkflowExecutionGetDataResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   void Swap(WorkflowExecutionGetDataResponse* other);
   friend void swap(WorkflowExecutionGetDataResponse& a, WorkflowExecutionGetDataResponse& b) {
@@ -3033,6 +3180,159 @@ inline void ExecutionRelaunchRequest::set_allocated_name(::std::string* name) {
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionRelaunchRequest.name)
+}
+
+// -------------------------------------------------------------------
+
+// ExecutionRecoverRequest
+
+// .flyteidl.core.WorkflowExecutionIdentifier id = 1;
+inline bool ExecutionRecoverRequest::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& ExecutionRecoverRequest::id() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionRecoverRequest.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ExecutionRecoverRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionRecoverRequest.id)
+  
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ExecutionRecoverRequest::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionRecoverRequest.id)
+  return id_;
+}
+inline void ExecutionRecoverRequest::set_allocated_id(::flyteidl::core::WorkflowExecutionIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionRecoverRequest.id)
+}
+
+// string name = 2;
+inline void ExecutionRecoverRequest::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ExecutionRecoverRequest::name() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionRecoverRequest.name)
+  return name_.GetNoArena();
+}
+inline void ExecutionRecoverRequest::set_name(const ::std::string& value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionRecoverRequest.name)
+}
+#if LANG_CXX11
+inline void ExecutionRecoverRequest::set_name(::std::string&& value) {
+  
+  name_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ExecutionRecoverRequest.name)
+}
+#endif
+inline void ExecutionRecoverRequest::set_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ExecutionRecoverRequest.name)
+}
+inline void ExecutionRecoverRequest::set_name(const char* value, size_t size) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ExecutionRecoverRequest.name)
+}
+inline ::std::string* ExecutionRecoverRequest::mutable_name() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionRecoverRequest.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ExecutionRecoverRequest::release_name() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionRecoverRequest.name)
+  
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ExecutionRecoverRequest::set_allocated_name(::std::string* name) {
+  if (name != nullptr) {
+    
+  } else {
+    
+  }
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionRecoverRequest.name)
+}
+
+// .flyteidl.admin.ExecutionMetadata metadata = 3;
+inline bool ExecutionRecoverRequest::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void ExecutionRecoverRequest::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::admin::ExecutionMetadata& ExecutionRecoverRequest::metadata() const {
+  const ::flyteidl::admin::ExecutionMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionRecoverRequest.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::ExecutionMetadata*>(
+      &::flyteidl::admin::_ExecutionMetadata_default_instance_);
+}
+inline ::flyteidl::admin::ExecutionMetadata* ExecutionRecoverRequest::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionRecoverRequest.metadata)
+  
+  ::flyteidl::admin::ExecutionMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::ExecutionMetadata* ExecutionRecoverRequest::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::ExecutionMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionRecoverRequest.metadata)
+  return metadata_;
+}
+inline void ExecutionRecoverRequest::set_allocated_metadata(::flyteidl::admin::ExecutionMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionRecoverRequest.metadata)
 }
 
 // -------------------------------------------------------------------
@@ -5323,6 +5623,8 @@ inline void WorkflowExecutionGetDataResponse::set_allocated_full_outputs(::flyte
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

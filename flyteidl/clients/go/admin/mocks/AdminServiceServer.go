@@ -1532,6 +1532,47 @@ func (_m *AdminServiceServer) ListWorkflows(_a0 context.Context, _a1 *admin.Reso
 	return r0, r1
 }
 
+type AdminServiceServer_RecoverExecution struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_RecoverExecution) Return(_a0 *admin.ExecutionCreateResponse, _a1 error) *AdminServiceServer_RecoverExecution {
+	return &AdminServiceServer_RecoverExecution{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnRecoverExecution(_a0 context.Context, _a1 *admin.ExecutionRecoverRequest) *AdminServiceServer_RecoverExecution {
+	c := _m.On("RecoverExecution", _a0, _a1)
+	return &AdminServiceServer_RecoverExecution{Call: c}
+}
+
+func (_m *AdminServiceServer) OnRecoverExecutionMatch(matchers ...interface{}) *AdminServiceServer_RecoverExecution {
+	c := _m.On("RecoverExecution", matchers...)
+	return &AdminServiceServer_RecoverExecution{Call: c}
+}
+
+// RecoverExecution provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) RecoverExecution(_a0 context.Context, _a1 *admin.ExecutionRecoverRequest) (*admin.ExecutionCreateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ExecutionCreateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionRecoverRequest) *admin.ExecutionCreateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionCreateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionRecoverRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_RegisterProject struct {
 	*mock.Call
 }

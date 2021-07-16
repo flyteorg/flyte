@@ -128,12 +128,13 @@ enum NodeExecution_Phase {
   NodeExecution_Phase_SKIPPED = 7,
   NodeExecution_Phase_TIMED_OUT = 8,
   NodeExecution_Phase_DYNAMIC_RUNNING = 9,
+  NodeExecution_Phase_RECOVERED = 10,
   NodeExecution_Phase_NodeExecution_Phase_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   NodeExecution_Phase_NodeExecution_Phase_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool NodeExecution_Phase_IsValid(int value);
 const NodeExecution_Phase NodeExecution_Phase_Phase_MIN = NodeExecution_Phase_UNDEFINED;
-const NodeExecution_Phase NodeExecution_Phase_Phase_MAX = NodeExecution_Phase_DYNAMIC_RUNNING;
+const NodeExecution_Phase NodeExecution_Phase_Phase_MAX = NodeExecution_Phase_RECOVERED;
 const int NodeExecution_Phase_Phase_ARRAYSIZE = NodeExecution_Phase_Phase_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* NodeExecution_Phase_descriptor();
@@ -501,6 +502,8 @@ class NodeExecution final :
     NodeExecution_Phase_TIMED_OUT;
   static const Phase DYNAMIC_RUNNING =
     NodeExecution_Phase_DYNAMIC_RUNNING;
+  static const Phase RECOVERED =
+    NodeExecution_Phase_RECOVERED;
   static inline bool Phase_IsValid(int value) {
     return NodeExecution_Phase_IsValid(value);
   }
