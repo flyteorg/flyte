@@ -46,5 +46,5 @@ data:
       max_size_mbs: {{ .Values.flytepropeller.cacheSizeMbs }}
       target_gc_percent: 70
 {{- with .Values.configmap.task_logs }}
-  task_logs.yaml: | {{ toYaml . | nindent 4 }}
+  task_logs.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
