@@ -38,7 +38,7 @@ metadata:
   name: {{ template "flyte.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   {{- with .Values.common.ingress.annotations }}
-  annotations: {{ toYaml . | nindent 4}}
+  annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
   rules:
