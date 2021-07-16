@@ -9,11 +9,15 @@ DEPLOYMENT=${1:-sandbox eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-helm dep update ${DIR}/../helm/
+helm dep update ${DIR}/../charts/flyte/
+helm dep update ${DIR}/../charts/flyte-core/
 
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte -n flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
+
+helm template flyte-core -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml --debug > ${DIR}/../deployment/flyte_core_generated.yaml
+
 
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
@@ -21,7 +25,8 @@ then
     GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
 fi
 
-${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
+${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../charts/flyte/README.md.gotmpl ${DIR}/../charts/flyte/
+${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../charts/flyte-core/README.md.gotmpl ${DIR}/../charts/flyte-core/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then

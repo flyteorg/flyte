@@ -61,7 +61,7 @@ jobs:
           FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
           VERSION: ${{ github.event.inputs.version }}
         run: |
-          grep -rlZ "version:[^P]*# VERSION" ./helm/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
           # Commit Chart registry to github gh-pages
           bin/cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${FLYTE_BOT_PAT} --release-name-template="{{ .Version }}"
 
