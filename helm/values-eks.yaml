@@ -1,3 +1,7 @@
+userSettings:
+  accountNumber: 12345
+  accountRegion: us-east-1
+
 #
 # FLYTEADMIN
 #
@@ -10,7 +14,7 @@ flyteadmin:
     # you can change the name of this role
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte"
 
   resources:
     limits:

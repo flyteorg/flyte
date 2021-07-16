@@ -42,7 +42,7 @@ metadata:
     helm.sh/chart: flyte-0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::12345:role/iam-role-flyte
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
