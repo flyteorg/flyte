@@ -49,6 +49,20 @@ message ExecutionRelaunchRequest {
     string name = 3;
 }
 
+// Request to recover the referenced execution.
+message ExecutionRecoverRequest {
+    // Identifier of the workflow execution to recover.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // User provided value for the recovered execution.
+    // If none is provided the system will generate a unique string.
+    // +optional
+    string name = 2;
+
+   // Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution.
+   ExecutionMetadata metadata = 3; 
+}
+
 // The unique identifier for a successfully created execution.
 // If the name was *not* specified in the create request, this identifier will include a generated name.
 message ExecutionCreateResponse {
@@ -178,6 +192,9 @@ message ExecutionMetadata {
 
         // This execution was triggered by another execution.
         CHILD_WORKFLOW = 4;
+
+        // This execution was recovered from another execution.
+        RECOVERED = 5;
     }
     ExecutionMode mode = 1;
 

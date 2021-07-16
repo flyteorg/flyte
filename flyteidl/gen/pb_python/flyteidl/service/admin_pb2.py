@@ -35,7 +35,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.service',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service'),
-  serialized_pb=_b('\n\x1c\x66lyteidl/service/admin.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a\x1c\x66lyteidl/admin/project.proto\x1a.flyteidl/admin/project_domain_attributes.proto\x1a\x19\x66lyteidl/admin/task.proto\x1a\x1d\x66lyteidl/admin/workflow.proto\x1a(flyteidl/admin/workflow_attributes.proto\x1a flyteidl/admin/launch_plan.proto\x1a\x1a\x66lyteidl/admin/event.proto\x1a\x1e\x66lyteidl/admin/execution.proto\x1a\'flyteidl/admin/matchable_resource.proto\x1a#flyteidl/admin/node_execution.proto\x1a#flyteidl/admin/task_execution.proto\x1a\x1c\x66lyteidl/admin/version.proto\x1a\x1b\x66lyteidl/admin/common.proto\x1a,protoc-gen-swagger/options/annotations.proto2\xa5\x61\n\x0c\x41\x64minService\x12\xc5\x02\n\nCreateTask\x12!.flyteidl.admin.TaskCreateRequest\x1a\".flyteidl.admin.TaskCreateResponse\"\xef\x01\x82\xd3\xe4\x93\x02\x12\"\r/api/v1/tasks:\x01*\x92\x41\xd3\x01\x1a&Create and register a task definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xb2\x01\n\x07GetTask\x12 .flyteidl.admin.ObjectGetRequest\x1a\x14.flyteidl.admin.Task\"o\x82\xd3\xe4\x93\x02?\x12=/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41\'\x1a%Retrieve an existing task definition.\x12\xde\x01\n\x0bListTaskIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"r\x82\xd3\xe4\x93\x02%\x12#/api/v1/task_ids/{project}/{domain}\x92\x41\x44\x1a\x42\x46\x65tch existing task definition identifiers matching input filters.\x12\xeb\x01\n\tListTasks\x12#.flyteidl.admin.ResourceListRequest\x1a\x18.flyteidl.admin.TaskList\"\x9e\x01\x82\xd3\xe4\x93\x02\\\x12\x30/api/v1/tasks/{id.project}/{id.domain}/{id.name}Z(\x12&/api/v1/tasks/{id.project}/{id.domain}\x92\x41\x39\x1a\x37\x46\x65tch existing task definitions matching input filters.\x12\xd9\x02\n\x0e\x43reateWorkflow\x12%.flyteidl.admin.WorkflowCreateRequest\x1a&.flyteidl.admin.WorkflowCreateResponse\"\xf7\x01\x82\xd3\xe4\x93\x02\x16\"\x11/api/v1/workflows:\x01*\x92\x41\xd7\x01\x1a*Create and register a workflow definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xc2\x01\n\x0bGetWorkflow\x12 .flyteidl.admin.ObjectGetRequest\x1a\x18.flyteidl.admin.Workflow\"w\x82\xd3\xe4\x93\x02\x43\x12\x41/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41+\x1a)Retrieve an existing workflow definition.\x12\xed\x01\n\x0fListWorkflowIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"}\x82\xd3\xe4\x93\x02)\x12\'/api/v1/workflow_ids/{project}/{domain}\x92\x41K\x1aIFetch an existing workflow definition identifiers matching input filters.\x12\xff\x01\n\rListWorkflows\x12#.flyteidl.admin.ResourceListRequest\x1a\x1c.flyteidl.admin.WorkflowList\"\xaa\x01\x82\xd3\xe4\x93\x02\x64\x12\x34/api/v1/workflows/{id.project}/{id.domain}/{id.name}Z,\x12*/api/v1/workflows/{id.project}/{id.domain}\x92\x41=\x1a;Fetch existing workflow definitions matching input filters.\x12\xe5\x02\n\x10\x43reateLaunchPlan\x12\'.flyteidl.admin.LaunchPlanCreateRequest\x1a(.flyteidl.admin.LaunchPlanCreateResponse\"\xfd\x01\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/launch_plans:\x01*\x92\x41\xda\x01\x1a-Create and register a launch plan definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xcc\x01\n\rGetLaunchPlan\x12 .flyteidl.admin.ObjectGetRequest\x1a\x1a.flyteidl.admin.LaunchPlan\"}\x82\xd3\xe4\x93\x02\x46\x12\x44/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41.\x1a,Retrieve an existing launch plan definition.\x12\xf3\x01\n\x13GetActiveLaunchPlan\x12\'.flyteidl.admin.ActiveLaunchPlanRequest\x1a\x1a.flyteidl.admin.LaunchPlan\"\x96\x01\x82\xd3\xe4\x93\x02@\x12>/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}\x92\x41M\x1aKRetrieve the active launch plan version specified by input request filters.\x12\xeb\x01\n\x15ListActiveLaunchPlans\x12+.flyteidl.admin.ActiveLaunchPlanListRequest\x1a\x1e.flyteidl.admin.LaunchPlanList\"\x84\x01\x82\xd3\xe4\x93\x02\x30\x12./api/v1/active_launch_plans/{project}/{domain}\x92\x41K\x1aIFetch the active launch plan versions specified by input request filters.\x12\xf3\x01\n\x11ListLaunchPlanIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"\x80\x01\x82\xd3\xe4\x93\x02,\x12*/api/v1/launch_plan_ids/{project}/{domain}\x92\x41K\x1aIFetch existing launch plan definition identifiers matching input filters.\x12\x8c\x02\n\x0fListLaunchPlans\x12#.flyteidl.admin.ResourceListRequest\x1a\x1e.flyteidl.admin.LaunchPlanList\"\xb3\x01\x82\xd3\xe4\x93\x02j\x12\x37/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}Z/\x12-/api/v1/launch_plans/{id.project}/{id.domain}\x92\x41@\x1a>Fetch existing launch plan definitions matching input filters.\x12\xc0\x06\n\x10UpdateLaunchPlan\x12\'.flyteidl.admin.LaunchPlanUpdateRequest\x1a(.flyteidl.admin.LaunchPlanUpdateResponse\"\xd8\x05\x82\xd3\xe4\x93\x02I\x1a\x44/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}:\x01*\x92\x41\x85\x05\x1a\x82\x05Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.\x12\xa2\x01\n\x0f\x43reateExecution\x12&.flyteidl.admin.ExecutionCreateRequest\x1a\'.flyteidl.admin.ExecutionCreateResponse\">\x82\xd3\xe4\x93\x02\x17\"\x12/api/v1/executions:\x01*\x92\x41\x1e\x1a\x1c\x43reate a workflow execution.\x12\xb1\x01\n\x11RelaunchExecution\x12(.flyteidl.admin.ExecutionRelaunchRequest\x1a\'.flyteidl.admin.ExecutionCreateResponse\"I\x82\xd3\xe4\x93\x02 \"\x1b/api/v1/executions/relaunch:\x01*\x92\x41 \x1a\x1eRelaunch a workflow execution.\x12\xc2\x01\n\x0cGetExecution\x12+.flyteidl.admin.WorkflowExecutionGetRequest\x1a\x19.flyteidl.admin.Execution\"j\x82\xd3\xe4\x93\x02\x37\x12\x35/api/v1/executions/{id.project}/{id.domain}/{id.name}\x92\x41*\x1a(Retrieve an existing workflow execution.\x12\x82\x02\n\x10GetExecutionData\x12/.flyteidl.admin.WorkflowExecutionGetDataRequest\x1a\x30.flyteidl.admin.WorkflowExecutionGetDataResponse\"\x8a\x01\x82\xd3\xe4\x93\x02<\x12:/api/v1/data/executions/{id.project}/{id.domain}/{id.name}\x92\x41\x45\x1a\x43Retrieve input and output data from an existing workflow execution.\x12\xc8\x01\n\x0eListExecutions\x12#.flyteidl.admin.ResourceListRequest\x1a\x1d.flyteidl.admin.ExecutionList\"r\x82\xd3\xe4\x93\x02-\x12+/api/v1/executions/{id.project}/{id.domain}\x92\x41<\x1a:Fetch existing workflow executions matching input filters.\x12\xf4\x01\n\x12TerminateExecution\x12).flyteidl.admin.ExecutionTerminateRequest\x1a*.flyteidl.admin.ExecutionTerminateResponse\"\x86\x01\x82\xd3\xe4\x93\x02:*5/api/v1/executions/{id.project}/{id.domain}/{id.name}:\x01*\x92\x41\x43\x1a\x41Terminate the active workflow execution specified in the request.\x12\xfc\x01\n\x10GetNodeExecution\x12\'.flyteidl.admin.NodeExecutionGetRequest\x1a\x1d.flyteidl.admin.NodeExecution\"\x9f\x01\x82\xd3\xe4\x93\x02p\x12n/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}\x92\x41&\x1a$Retrieve an existing node execution.\x12\x9a\x02\n\x12ListNodeExecutions\x12(.flyteidl.admin.NodeExecutionListRequest\x1a!.flyteidl.admin.NodeExecutionList\"\xb6\x01\x82\xd3\xe4\x93\x02u\x12s/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}\x92\x41\x38\x1a\x36\x46\x65tch existing node executions matching input filters.\x12\xef\x04\n\x19ListNodeExecutionsForTask\x12/.flyteidl.admin.NodeExecutionForTaskListRequest\x1a!.flyteidl.admin.NodeExecutionList\"\xfd\x03\x82\xd3\xe4\x93\x02\xac\x03\x12\xa9\x03/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}\x92\x41G\x1a\x45\x46\x65tch child node executions launched by the specified task execution.\x12\xb3\x02\n\x14GetNodeExecutionData\x12+.flyteidl.admin.NodeExecutionGetDataRequest\x1a,.flyteidl.admin.NodeExecutionGetDataResponse\"\xbf\x01\x82\xd3\xe4\x93\x02u\x12s/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}\x92\x41\x41\x1a?Retrieve input and output data from an existing node execution.\x12\x97\x01\n\x0fRegisterProject\x12&.flyteidl.admin.ProjectRegisterRequest\x1a\'.flyteidl.admin.ProjectRegisterResponse\"3\x82\xd3\xe4\x93\x02\x15\"\x10/api/v1/projects:\x01*\x92\x41\x15\x1a\x13Register a project.\x12\x87\x01\n\rUpdateProject\x12\x17.flyteidl.admin.Project\x1a%.flyteidl.admin.ProjectUpdateResponse\"6\x82\xd3\xe4\x93\x02\x1a\x1a\x15/api/v1/projects/{id}:\x01*\x92\x41\x13\x1a\x11Update a project.\x12\x85\x01\n\x0cListProjects\x12\".flyteidl.admin.ProjectListRequest\x1a\x18.flyteidl.admin.Projects\"7\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/projects\x92\x41\x1c\x1a\x1a\x46\x65tch registered projects.\x12\xdd\x01\n\x13\x43reateWorkflowEvent\x12-.flyteidl.admin.WorkflowExecutionEventRequest\x1a..flyteidl.admin.WorkflowExecutionEventResponse\"g\x82\xd3\xe4\x93\x02\x1d\"\x18/api/v1/events/workflows:\x01*\x92\x41\x41\x1a?Create a workflow execution event recording a phase transition.\x12\xc9\x01\n\x0f\x43reateNodeEvent\x12).flyteidl.admin.NodeExecutionEventRequest\x1a*.flyteidl.admin.NodeExecutionEventResponse\"_\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/events/nodes:\x01*\x92\x41=\x1a;Create a node execution event recording a phase transition.\x12\xc9\x01\n\x0f\x43reateTaskEvent\x12).flyteidl.admin.TaskExecutionEventRequest\x1a*.flyteidl.admin.TaskExecutionEventResponse\"_\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/events/tasks:\x01*\x92\x41=\x1a;Create a task execution event recording a phase transition.\x12\xa9\x03\n\x10GetTaskExecution\x12\'.flyteidl.admin.TaskExecutionGetRequest\x1a\x1d.flyteidl.admin.TaskExecution\"\xcc\x02\x82\xd3\xe4\x93\x02\x9c\x02\x12\x99\x02/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}\x92\x41&\x1a$Retrieve an existing task execution.\x12\xd3\x02\n\x12ListTaskExecutions\x12(.flyteidl.admin.TaskExecutionListRequest\x1a!.flyteidl.admin.TaskExecutionList\"\xef\x01\x82\xd3\xe4\x93\x02\xad\x01\x12\xaa\x01/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}\x92\x41\x38\x1a\x36\x46\x65tch existing task executions matching input filters.\x12\xe0\x03\n\x14GetTaskExecutionData\x12+.flyteidl.admin.TaskExecutionGetDataRequest\x1a,.flyteidl.admin.TaskExecutionGetDataResponse\"\xec\x02\x82\xd3\xe4\x93\x02\xa1\x02\x12\x9e\x02/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}\x92\x41\x41\x1a?Retrieve input and output data from an existing task execution.\x12\xbf\x02\n\x1dUpdateProjectDomainAttributes\x12\x34.flyteidl.admin.ProjectDomainAttributesUpdateRequest\x1a\x35.flyteidl.admin.ProjectDomainAttributesUpdateResponse\"\xb0\x01\x82\xd3\xe4\x93\x02O\x1aJ/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:\x01*\x92\x41X\x1aVUpdate the customized resource attributes associated with a project-domain combination\x12\x9f\x02\n\x1aGetProjectDomainAttributes\x12\x31.flyteidl.admin.ProjectDomainAttributesGetRequest\x1a\x32.flyteidl.admin.ProjectDomainAttributesGetResponse\"\x99\x01\x82\xd3\xe4\x93\x02\x36\x12\x34/api/v1/project_domain_attributes/{project}/{domain}\x92\x41Z\x1aXRetrieve the customized resource attributes associated with a project-domain combination\x12\xa9\x02\n\x1d\x44\x65leteProjectDomainAttributes\x12\x34.flyteidl.admin.ProjectDomainAttributesDeleteRequest\x1a\x35.flyteidl.admin.ProjectDomainAttributesDeleteResponse\"\x9a\x01\x82\xd3\xe4\x93\x02\x39*4/api/v1/project_domain_attributes/{project}/{domain}:\x01*\x92\x41X\x1aVDelete the customized resource attributes associated with a project-domain combination\x12\xce\x02\n\x18UpdateWorkflowAttributes\x12/.flyteidl.admin.WorkflowAttributesUpdateRequest\x1a\x30.flyteidl.admin.WorkflowAttributesUpdateResponse\"\xce\x01\x82\xd3\xe4\x93\x02_\x1aZ/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}:\x01*\x92\x41\x66\x1a\x64Update the customized resource attributes associated with a project, domain and workflow combination\x12\xa3\x02\n\x15GetWorkflowAttributes\x12,.flyteidl.admin.WorkflowAttributesGetRequest\x1a-.flyteidl.admin.WorkflowAttributesGetResponse\"\xac\x01\x82\xd3\xe4\x93\x02;\x12\x39/api/v1/workflow_attributes/{project}/{domain}/{workflow}\x92\x41h\x1a\x66Retrieve the customized resource attributes associated with a project, domain and workflow combination\x12\xad\x02\n\x18\x44\x65leteWorkflowAttributes\x12/.flyteidl.admin.WorkflowAttributesDeleteRequest\x1a\x30.flyteidl.admin.WorkflowAttributesDeleteResponse\"\xad\x01\x82\xd3\xe4\x93\x02>*9/api/v1/workflow_attributes/{project}/{domain}/{workflow}:\x01*\x92\x41\x66\x1a\x64\x44\x65lete the customized resource attributes associated with a project, domain and workflow combination\x12\xe1\x01\n\x17ListMatchableAttributes\x12..flyteidl.admin.ListMatchableAttributesRequest\x1a/.flyteidl.admin.ListMatchableAttributesResponse\"e\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/matchable_attributes\x92\x41>\x1a<Retrieve a list of MatchableAttributesConfiguration objects.\x12\x80\x02\n\x11ListNamedEntities\x12&.flyteidl.admin.NamedEntityListRequest\x1a\x1f.flyteidl.admin.NamedEntityList\"\xa1\x01\x82\xd3\xe4\x93\x02;\x12\x39/api/v1/named_entities/{resource_type}/{project}/{domain}\x92\x41]\x1a[Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.\x12\xca\x01\n\x0eGetNamedEntity\x12%.flyteidl.admin.NamedEntityGetRequest\x1a\x1b.flyteidl.admin.NamedEntity\"t\x82\xd3\xe4\x93\x02K\x12I/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}\x92\x41 \x1a\x1eRetrieve a NamedEntity object.\x12\xf3\x01\n\x11UpdateNamedEntity\x12(.flyteidl.admin.NamedEntityUpdateRequest\x1a).flyteidl.admin.NamedEntityUpdateResponse\"\x88\x01\x82\xd3\xe4\x93\x02N\x1aI/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}:\x01*\x92\x41\x31\x1a/Update the fields associated with a NamedEntity\x12\xbf\x01\n\nGetVersion\x12!.flyteidl.admin.GetVersionRequest\x1a\".flyteidl.admin.GetVersionResponse\"j\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/version\x92\x41P\x1aNRetrieve the Version (including the Build  information) for FlyteAdmin serviceB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
+  serialized_pb=_b('\n\x1c\x66lyteidl/service/admin.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a\x1c\x66lyteidl/admin/project.proto\x1a.flyteidl/admin/project_domain_attributes.proto\x1a\x19\x66lyteidl/admin/task.proto\x1a\x1d\x66lyteidl/admin/workflow.proto\x1a(flyteidl/admin/workflow_attributes.proto\x1a flyteidl/admin/launch_plan.proto\x1a\x1a\x66lyteidl/admin/event.proto\x1a\x1e\x66lyteidl/admin/execution.proto\x1a\'flyteidl/admin/matchable_resource.proto\x1a#flyteidl/admin/node_execution.proto\x1a#flyteidl/admin/task_execution.proto\x1a\x1c\x66lyteidl/admin/version.proto\x1a\x1b\x66lyteidl/admin/common.proto\x1a,protoc-gen-swagger/options/annotations.proto2\xc5\x66\n\x0c\x41\x64minService\x12\xc5\x02\n\nCreateTask\x12!.flyteidl.admin.TaskCreateRequest\x1a\".flyteidl.admin.TaskCreateResponse\"\xef\x01\x82\xd3\xe4\x93\x02\x12\"\r/api/v1/tasks:\x01*\x92\x41\xd3\x01\x1a&Create and register a task definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xb2\x01\n\x07GetTask\x12 .flyteidl.admin.ObjectGetRequest\x1a\x14.flyteidl.admin.Task\"o\x82\xd3\xe4\x93\x02?\x12=/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41\'\x1a%Retrieve an existing task definition.\x12\xde\x01\n\x0bListTaskIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"r\x82\xd3\xe4\x93\x02%\x12#/api/v1/task_ids/{project}/{domain}\x92\x41\x44\x1a\x42\x46\x65tch existing task definition identifiers matching input filters.\x12\xeb\x01\n\tListTasks\x12#.flyteidl.admin.ResourceListRequest\x1a\x18.flyteidl.admin.TaskList\"\x9e\x01\x82\xd3\xe4\x93\x02\\\x12\x30/api/v1/tasks/{id.project}/{id.domain}/{id.name}Z(\x12&/api/v1/tasks/{id.project}/{id.domain}\x92\x41\x39\x1a\x37\x46\x65tch existing task definitions matching input filters.\x12\xd9\x02\n\x0e\x43reateWorkflow\x12%.flyteidl.admin.WorkflowCreateRequest\x1a&.flyteidl.admin.WorkflowCreateResponse\"\xf7\x01\x82\xd3\xe4\x93\x02\x16\"\x11/api/v1/workflows:\x01*\x92\x41\xd7\x01\x1a*Create and register a workflow definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xc2\x01\n\x0bGetWorkflow\x12 .flyteidl.admin.ObjectGetRequest\x1a\x18.flyteidl.admin.Workflow\"w\x82\xd3\xe4\x93\x02\x43\x12\x41/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41+\x1a)Retrieve an existing workflow definition.\x12\xed\x01\n\x0fListWorkflowIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"}\x82\xd3\xe4\x93\x02)\x12\'/api/v1/workflow_ids/{project}/{domain}\x92\x41K\x1aIFetch an existing workflow definition identifiers matching input filters.\x12\xff\x01\n\rListWorkflows\x12#.flyteidl.admin.ResourceListRequest\x1a\x1c.flyteidl.admin.WorkflowList\"\xaa\x01\x82\xd3\xe4\x93\x02\x64\x12\x34/api/v1/workflows/{id.project}/{id.domain}/{id.name}Z,\x12*/api/v1/workflows/{id.project}/{id.domain}\x92\x41=\x1a;Fetch existing workflow definitions matching input filters.\x12\xe5\x02\n\x10\x43reateLaunchPlan\x12\'.flyteidl.admin.LaunchPlanCreateRequest\x1a(.flyteidl.admin.LaunchPlanCreateResponse\"\xfd\x01\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/launch_plans:\x01*\x92\x41\xda\x01\x1a-Create and register a launch plan definition.JB\n\x03\x34\x30\x30\x12;\n9Returned for bad request that may have failed validation.Je\n\x03\x34\x30\x39\x12^\n\\Returned for a request that references an identical entity that has already been registered.\x12\xcc\x01\n\rGetLaunchPlan\x12 .flyteidl.admin.ObjectGetRequest\x1a\x1a.flyteidl.admin.LaunchPlan\"}\x82\xd3\xe4\x93\x02\x46\x12\x44/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}\x92\x41.\x1a,Retrieve an existing launch plan definition.\x12\xf3\x01\n\x13GetActiveLaunchPlan\x12\'.flyteidl.admin.ActiveLaunchPlanRequest\x1a\x1a.flyteidl.admin.LaunchPlan\"\x96\x01\x82\xd3\xe4\x93\x02@\x12>/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}\x92\x41M\x1aKRetrieve the active launch plan version specified by input request filters.\x12\xeb\x01\n\x15ListActiveLaunchPlans\x12+.flyteidl.admin.ActiveLaunchPlanListRequest\x1a\x1e.flyteidl.admin.LaunchPlanList\"\x84\x01\x82\xd3\xe4\x93\x02\x30\x12./api/v1/active_launch_plans/{project}/{domain}\x92\x41K\x1aIFetch the active launch plan versions specified by input request filters.\x12\xf3\x01\n\x11ListLaunchPlanIds\x12\x30.flyteidl.admin.NamedEntityIdentifierListRequest\x1a).flyteidl.admin.NamedEntityIdentifierList\"\x80\x01\x82\xd3\xe4\x93\x02,\x12*/api/v1/launch_plan_ids/{project}/{domain}\x92\x41K\x1aIFetch existing launch plan definition identifiers matching input filters.\x12\x8c\x02\n\x0fListLaunchPlans\x12#.flyteidl.admin.ResourceListRequest\x1a\x1e.flyteidl.admin.LaunchPlanList\"\xb3\x01\x82\xd3\xe4\x93\x02j\x12\x37/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}Z/\x12-/api/v1/launch_plans/{id.project}/{id.domain}\x92\x41@\x1a>Fetch existing launch plan definitions matching input filters.\x12\xc0\x06\n\x10UpdateLaunchPlan\x12\'.flyteidl.admin.LaunchPlanUpdateRequest\x1a(.flyteidl.admin.LaunchPlanUpdateResponse\"\xd8\x05\x82\xd3\xe4\x93\x02I\x1a\x44/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}:\x01*\x92\x41\x85\x05\x1a\x82\x05Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.\x12\xa2\x01\n\x0f\x43reateExecution\x12&.flyteidl.admin.ExecutionCreateRequest\x1a\'.flyteidl.admin.ExecutionCreateResponse\">\x82\xd3\xe4\x93\x02\x17\"\x12/api/v1/executions:\x01*\x92\x41\x1e\x1a\x1c\x43reate a workflow execution.\x12\xb1\x01\n\x11RelaunchExecution\x12(.flyteidl.admin.ExecutionRelaunchRequest\x1a\'.flyteidl.admin.ExecutionCreateResponse\"I\x82\xd3\xe4\x93\x02 \"\x1b/api/v1/executions/relaunch:\x01*\x92\x41 \x1a\x1eRelaunch a workflow execution.\x12\x9d\x05\n\x10RecoverExecution\x12\'.flyteidl.admin.ExecutionRecoverRequest\x1a\'.flyteidl.admin.ExecutionCreateResponse\"\xb6\x04\x82\xd3\xe4\x93\x02\x1f\"\x1a/api/v1/executions/recover:\x01*\x92\x41\x8d\x04\x1a\x8a\x04Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.\x12\xc2\x01\n\x0cGetExecution\x12+.flyteidl.admin.WorkflowExecutionGetRequest\x1a\x19.flyteidl.admin.Execution\"j\x82\xd3\xe4\x93\x02\x37\x12\x35/api/v1/executions/{id.project}/{id.domain}/{id.name}\x92\x41*\x1a(Retrieve an existing workflow execution.\x12\x82\x02\n\x10GetExecutionData\x12/.flyteidl.admin.WorkflowExecutionGetDataRequest\x1a\x30.flyteidl.admin.WorkflowExecutionGetDataResponse\"\x8a\x01\x82\xd3\xe4\x93\x02<\x12:/api/v1/data/executions/{id.project}/{id.domain}/{id.name}\x92\x41\x45\x1a\x43Retrieve input and output data from an existing workflow execution.\x12\xc8\x01\n\x0eListExecutions\x12#.flyteidl.admin.ResourceListRequest\x1a\x1d.flyteidl.admin.ExecutionList\"r\x82\xd3\xe4\x93\x02-\x12+/api/v1/executions/{id.project}/{id.domain}\x92\x41<\x1a:Fetch existing workflow executions matching input filters.\x12\xf4\x01\n\x12TerminateExecution\x12).flyteidl.admin.ExecutionTerminateRequest\x1a*.flyteidl.admin.ExecutionTerminateResponse\"\x86\x01\x82\xd3\xe4\x93\x02:*5/api/v1/executions/{id.project}/{id.domain}/{id.name}:\x01*\x92\x41\x43\x1a\x41Terminate the active workflow execution specified in the request.\x12\xfc\x01\n\x10GetNodeExecution\x12\'.flyteidl.admin.NodeExecutionGetRequest\x1a\x1d.flyteidl.admin.NodeExecution\"\x9f\x01\x82\xd3\xe4\x93\x02p\x12n/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}\x92\x41&\x1a$Retrieve an existing node execution.\x12\x9a\x02\n\x12ListNodeExecutions\x12(.flyteidl.admin.NodeExecutionListRequest\x1a!.flyteidl.admin.NodeExecutionList\"\xb6\x01\x82\xd3\xe4\x93\x02u\x12s/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}\x92\x41\x38\x1a\x36\x46\x65tch existing node executions matching input filters.\x12\xef\x04\n\x19ListNodeExecutionsForTask\x12/.flyteidl.admin.NodeExecutionForTaskListRequest\x1a!.flyteidl.admin.NodeExecutionList\"\xfd\x03\x82\xd3\xe4\x93\x02\xac\x03\x12\xa9\x03/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}\x92\x41G\x1a\x45\x46\x65tch child node executions launched by the specified task execution.\x12\xb3\x02\n\x14GetNodeExecutionData\x12+.flyteidl.admin.NodeExecutionGetDataRequest\x1a,.flyteidl.admin.NodeExecutionGetDataResponse\"\xbf\x01\x82\xd3\xe4\x93\x02u\x12s/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}\x92\x41\x41\x1a?Retrieve input and output data from an existing node execution.\x12\x97\x01\n\x0fRegisterProject\x12&.flyteidl.admin.ProjectRegisterRequest\x1a\'.flyteidl.admin.ProjectRegisterResponse\"3\x82\xd3\xe4\x93\x02\x15\"\x10/api/v1/projects:\x01*\x92\x41\x15\x1a\x13Register a project.\x12\x87\x01\n\rUpdateProject\x12\x17.flyteidl.admin.Project\x1a%.flyteidl.admin.ProjectUpdateResponse\"6\x82\xd3\xe4\x93\x02\x1a\x1a\x15/api/v1/projects/{id}:\x01*\x92\x41\x13\x1a\x11Update a project.\x12\x85\x01\n\x0cListProjects\x12\".flyteidl.admin.ProjectListRequest\x1a\x18.flyteidl.admin.Projects\"7\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/projects\x92\x41\x1c\x1a\x1a\x46\x65tch registered projects.\x12\xdd\x01\n\x13\x43reateWorkflowEvent\x12-.flyteidl.admin.WorkflowExecutionEventRequest\x1a..flyteidl.admin.WorkflowExecutionEventResponse\"g\x82\xd3\xe4\x93\x02\x1d\"\x18/api/v1/events/workflows:\x01*\x92\x41\x41\x1a?Create a workflow execution event recording a phase transition.\x12\xc9\x01\n\x0f\x43reateNodeEvent\x12).flyteidl.admin.NodeExecutionEventRequest\x1a*.flyteidl.admin.NodeExecutionEventResponse\"_\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/events/nodes:\x01*\x92\x41=\x1a;Create a node execution event recording a phase transition.\x12\xc9\x01\n\x0f\x43reateTaskEvent\x12).flyteidl.admin.TaskExecutionEventRequest\x1a*.flyteidl.admin.TaskExecutionEventResponse\"_\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/events/tasks:\x01*\x92\x41=\x1a;Create a task execution event recording a phase transition.\x12\xa9\x03\n\x10GetTaskExecution\x12\'.flyteidl.admin.TaskExecutionGetRequest\x1a\x1d.flyteidl.admin.TaskExecution\"\xcc\x02\x82\xd3\xe4\x93\x02\x9c\x02\x12\x99\x02/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}\x92\x41&\x1a$Retrieve an existing task execution.\x12\xd3\x02\n\x12ListTaskExecutions\x12(.flyteidl.admin.TaskExecutionListRequest\x1a!.flyteidl.admin.TaskExecutionList\"\xef\x01\x82\xd3\xe4\x93\x02\xad\x01\x12\xaa\x01/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}\x92\x41\x38\x1a\x36\x46\x65tch existing task executions matching input filters.\x12\xe0\x03\n\x14GetTaskExecutionData\x12+.flyteidl.admin.TaskExecutionGetDataRequest\x1a,.flyteidl.admin.TaskExecutionGetDataResponse\"\xec\x02\x82\xd3\xe4\x93\x02\xa1\x02\x12\x9e\x02/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}\x92\x41\x41\x1a?Retrieve input and output data from an existing task execution.\x12\xbf\x02\n\x1dUpdateProjectDomainAttributes\x12\x34.flyteidl.admin.ProjectDomainAttributesUpdateRequest\x1a\x35.flyteidl.admin.ProjectDomainAttributesUpdateResponse\"\xb0\x01\x82\xd3\xe4\x93\x02O\x1aJ/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:\x01*\x92\x41X\x1aVUpdate the customized resource attributes associated with a project-domain combination\x12\x9f\x02\n\x1aGetProjectDomainAttributes\x12\x31.flyteidl.admin.ProjectDomainAttributesGetRequest\x1a\x32.flyteidl.admin.ProjectDomainAttributesGetResponse\"\x99\x01\x82\xd3\xe4\x93\x02\x36\x12\x34/api/v1/project_domain_attributes/{project}/{domain}\x92\x41Z\x1aXRetrieve the customized resource attributes associated with a project-domain combination\x12\xa9\x02\n\x1d\x44\x65leteProjectDomainAttributes\x12\x34.flyteidl.admin.ProjectDomainAttributesDeleteRequest\x1a\x35.flyteidl.admin.ProjectDomainAttributesDeleteResponse\"\x9a\x01\x82\xd3\xe4\x93\x02\x39*4/api/v1/project_domain_attributes/{project}/{domain}:\x01*\x92\x41X\x1aVDelete the customized resource attributes associated with a project-domain combination\x12\xce\x02\n\x18UpdateWorkflowAttributes\x12/.flyteidl.admin.WorkflowAttributesUpdateRequest\x1a\x30.flyteidl.admin.WorkflowAttributesUpdateResponse\"\xce\x01\x82\xd3\xe4\x93\x02_\x1aZ/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}:\x01*\x92\x41\x66\x1a\x64Update the customized resource attributes associated with a project, domain and workflow combination\x12\xa3\x02\n\x15GetWorkflowAttributes\x12,.flyteidl.admin.WorkflowAttributesGetRequest\x1a-.flyteidl.admin.WorkflowAttributesGetResponse\"\xac\x01\x82\xd3\xe4\x93\x02;\x12\x39/api/v1/workflow_attributes/{project}/{domain}/{workflow}\x92\x41h\x1a\x66Retrieve the customized resource attributes associated with a project, domain and workflow combination\x12\xad\x02\n\x18\x44\x65leteWorkflowAttributes\x12/.flyteidl.admin.WorkflowAttributesDeleteRequest\x1a\x30.flyteidl.admin.WorkflowAttributesDeleteResponse\"\xad\x01\x82\xd3\xe4\x93\x02>*9/api/v1/workflow_attributes/{project}/{domain}/{workflow}:\x01*\x92\x41\x66\x1a\x64\x44\x65lete the customized resource attributes associated with a project, domain and workflow combination\x12\xe1\x01\n\x17ListMatchableAttributes\x12..flyteidl.admin.ListMatchableAttributesRequest\x1a/.flyteidl.admin.ListMatchableAttributesResponse\"e\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/matchable_attributes\x92\x41>\x1a<Retrieve a list of MatchableAttributesConfiguration objects.\x12\x80\x02\n\x11ListNamedEntities\x12&.flyteidl.admin.NamedEntityListRequest\x1a\x1f.flyteidl.admin.NamedEntityList\"\xa1\x01\x82\xd3\xe4\x93\x02;\x12\x39/api/v1/named_entities/{resource_type}/{project}/{domain}\x92\x41]\x1a[Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.\x12\xca\x01\n\x0eGetNamedEntity\x12%.flyteidl.admin.NamedEntityGetRequest\x1a\x1b.flyteidl.admin.NamedEntity\"t\x82\xd3\xe4\x93\x02K\x12I/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}\x92\x41 \x1a\x1eRetrieve a NamedEntity object.\x12\xf3\x01\n\x11UpdateNamedEntity\x12(.flyteidl.admin.NamedEntityUpdateRequest\x1a).flyteidl.admin.NamedEntityUpdateResponse\"\x88\x01\x82\xd3\xe4\x93\x02N\x1aI/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}:\x01*\x92\x41\x31\x1a/Update the fields associated with a NamedEntity\x12\xbf\x01\n\nGetVersion\x12!.flyteidl.admin.GetVersionRequest\x1a\".flyteidl.admin.GetVersionResponse\"j\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/version\x92\x41P\x1aNRetrieve the Version (including the Build  information) for FlyteAdmin serviceB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
   ,
   dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_project__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_project__domain__attributes__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_task__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_workflow__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_workflow__attributes__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_launch__plan__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_event__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_matchable__resource__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_node__execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_task__execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_version__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_common__pb2.DESCRIPTOR,protoc__gen__swagger_dot_options_dot_annotations__pb2.DESCRIPTOR,])
 
@@ -53,7 +53,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   serialized_start=573,
-  serialized_end=13026,
+  serialized_end=13698,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateTask',
@@ -209,9 +209,18 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
     serialized_options=_b('\202\323\344\223\002 \"\033/api/v1/executions/relaunch:\001*\222A \032\036Relaunch a workflow execution.'),
   ),
   _descriptor.MethodDescriptor(
+    name='RecoverExecution',
+    full_name='flyteidl.service.AdminService.RecoverExecution',
+    index=17,
+    containing_service=None,
+    input_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTIONRECOVERREQUEST,
+    output_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTIONCREATERESPONSE,
+    serialized_options=_b('\202\323\344\223\002\037\"\032/api/v1/executions/recover:\001*\222A\215\004\032\212\004Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.'),
+  ),
+  _descriptor.MethodDescriptor(
     name='GetExecution',
     full_name='flyteidl.service.AdminService.GetExecution',
-    index=17,
+    index=18,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_execution__pb2._WORKFLOWEXECUTIONGETREQUEST,
     output_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTION,
@@ -220,7 +229,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetExecutionData',
     full_name='flyteidl.service.AdminService.GetExecutionData',
-    index=18,
+    index=19,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_execution__pb2._WORKFLOWEXECUTIONGETDATAREQUEST,
     output_type=flyteidl_dot_admin_dot_execution__pb2._WORKFLOWEXECUTIONGETDATARESPONSE,
@@ -229,7 +238,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListExecutions',
     full_name='flyteidl.service.AdminService.ListExecutions',
-    index=19,
+    index=20,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_common__pb2._RESOURCELISTREQUEST,
     output_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTIONLIST,
@@ -238,7 +247,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='TerminateExecution',
     full_name='flyteidl.service.AdminService.TerminateExecution',
-    index=20,
+    index=21,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTIONTERMINATEREQUEST,
     output_type=flyteidl_dot_admin_dot_execution__pb2._EXECUTIONTERMINATERESPONSE,
@@ -247,7 +256,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetNodeExecution',
     full_name='flyteidl.service.AdminService.GetNodeExecution',
-    index=21,
+    index=22,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONGETREQUEST,
     output_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTION,
@@ -256,7 +265,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListNodeExecutions',
     full_name='flyteidl.service.AdminService.ListNodeExecutions',
-    index=22,
+    index=23,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONLISTREQUEST,
     output_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONLIST,
@@ -265,7 +274,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListNodeExecutionsForTask',
     full_name='flyteidl.service.AdminService.ListNodeExecutionsForTask',
-    index=23,
+    index=24,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONFORTASKLISTREQUEST,
     output_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONLIST,
@@ -274,7 +283,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetNodeExecutionData',
     full_name='flyteidl.service.AdminService.GetNodeExecutionData',
-    index=24,
+    index=25,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONGETDATAREQUEST,
     output_type=flyteidl_dot_admin_dot_node__execution__pb2._NODEEXECUTIONGETDATARESPONSE,
@@ -283,7 +292,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='RegisterProject',
     full_name='flyteidl.service.AdminService.RegisterProject',
-    index=25,
+    index=26,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__pb2._PROJECTREGISTERREQUEST,
     output_type=flyteidl_dot_admin_dot_project__pb2._PROJECTREGISTERRESPONSE,
@@ -292,7 +301,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='UpdateProject',
     full_name='flyteidl.service.AdminService.UpdateProject',
-    index=26,
+    index=27,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__pb2._PROJECT,
     output_type=flyteidl_dot_admin_dot_project__pb2._PROJECTUPDATERESPONSE,
@@ -301,7 +310,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListProjects',
     full_name='flyteidl.service.AdminService.ListProjects',
-    index=27,
+    index=28,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__pb2._PROJECTLISTREQUEST,
     output_type=flyteidl_dot_admin_dot_project__pb2._PROJECTS,
@@ -310,7 +319,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='CreateWorkflowEvent',
     full_name='flyteidl.service.AdminService.CreateWorkflowEvent',
-    index=28,
+    index=29,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_event__pb2._WORKFLOWEXECUTIONEVENTREQUEST,
     output_type=flyteidl_dot_admin_dot_event__pb2._WORKFLOWEXECUTIONEVENTRESPONSE,
@@ -319,7 +328,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='CreateNodeEvent',
     full_name='flyteidl.service.AdminService.CreateNodeEvent',
-    index=29,
+    index=30,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_event__pb2._NODEEXECUTIONEVENTREQUEST,
     output_type=flyteidl_dot_admin_dot_event__pb2._NODEEXECUTIONEVENTRESPONSE,
@@ -328,7 +337,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='CreateTaskEvent',
     full_name='flyteidl.service.AdminService.CreateTaskEvent',
-    index=30,
+    index=31,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_event__pb2._TASKEXECUTIONEVENTREQUEST,
     output_type=flyteidl_dot_admin_dot_event__pb2._TASKEXECUTIONEVENTRESPONSE,
@@ -337,7 +346,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetTaskExecution',
     full_name='flyteidl.service.AdminService.GetTaskExecution',
-    index=31,
+    index=32,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTIONGETREQUEST,
     output_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTION,
@@ -346,7 +355,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListTaskExecutions',
     full_name='flyteidl.service.AdminService.ListTaskExecutions',
-    index=32,
+    index=33,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTIONLISTREQUEST,
     output_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTIONLIST,
@@ -355,7 +364,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetTaskExecutionData',
     full_name='flyteidl.service.AdminService.GetTaskExecutionData',
-    index=33,
+    index=34,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTIONGETDATAREQUEST,
     output_type=flyteidl_dot_admin_dot_task__execution__pb2._TASKEXECUTIONGETDATARESPONSE,
@@ -364,7 +373,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='UpdateProjectDomainAttributes',
     full_name='flyteidl.service.AdminService.UpdateProjectDomainAttributes',
-    index=34,
+    index=35,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESUPDATEREQUEST,
     output_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESUPDATERESPONSE,
@@ -373,7 +382,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetProjectDomainAttributes',
     full_name='flyteidl.service.AdminService.GetProjectDomainAttributes',
-    index=35,
+    index=36,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESGETREQUEST,
     output_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESGETRESPONSE,
@@ -382,7 +391,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='DeleteProjectDomainAttributes',
     full_name='flyteidl.service.AdminService.DeleteProjectDomainAttributes',
-    index=36,
+    index=37,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESDELETEREQUEST,
     output_type=flyteidl_dot_admin_dot_project__domain__attributes__pb2._PROJECTDOMAINATTRIBUTESDELETERESPONSE,
@@ -391,7 +400,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='UpdateWorkflowAttributes',
     full_name='flyteidl.service.AdminService.UpdateWorkflowAttributes',
-    index=37,
+    index=38,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESUPDATEREQUEST,
     output_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESUPDATERESPONSE,
@@ -400,7 +409,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetWorkflowAttributes',
     full_name='flyteidl.service.AdminService.GetWorkflowAttributes',
-    index=38,
+    index=39,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESGETREQUEST,
     output_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESGETRESPONSE,
@@ -409,7 +418,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='DeleteWorkflowAttributes',
     full_name='flyteidl.service.AdminService.DeleteWorkflowAttributes',
-    index=39,
+    index=40,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESDELETEREQUEST,
     output_type=flyteidl_dot_admin_dot_workflow__attributes__pb2._WORKFLOWATTRIBUTESDELETERESPONSE,
@@ -418,7 +427,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListMatchableAttributes',
     full_name='flyteidl.service.AdminService.ListMatchableAttributes',
-    index=40,
+    index=41,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_matchable__resource__pb2._LISTMATCHABLEATTRIBUTESREQUEST,
     output_type=flyteidl_dot_admin_dot_matchable__resource__pb2._LISTMATCHABLEATTRIBUTESRESPONSE,
@@ -427,7 +436,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ListNamedEntities',
     full_name='flyteidl.service.AdminService.ListNamedEntities',
-    index=41,
+    index=42,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITYLISTREQUEST,
     output_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITYLIST,
@@ -436,7 +445,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetNamedEntity',
     full_name='flyteidl.service.AdminService.GetNamedEntity',
-    index=42,
+    index=43,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITYGETREQUEST,
     output_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITY,
@@ -445,7 +454,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='UpdateNamedEntity',
     full_name='flyteidl.service.AdminService.UpdateNamedEntity',
-    index=43,
+    index=44,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITYUPDATEREQUEST,
     output_type=flyteidl_dot_admin_dot_common__pb2._NAMEDENTITYUPDATERESPONSE,
@@ -454,7 +463,7 @@ _ADMINSERVICE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetVersion',
     full_name='flyteidl.service.AdminService.GetVersion',
-    index=44,
+    index=45,
     containing_service=None,
     input_type=flyteidl_dot_admin_dot_version__pb2._GETVERSIONREQUEST,
     output_type=flyteidl_dot_admin_dot_version__pb2._GETVERSIONRESPONSE,

@@ -212,6 +212,95 @@ var _ interface {
 	ErrorName() string
 } = ExecutionRelaunchRequestValidationError{}
 
+// Validate checks the field values on ExecutionRecoverRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExecutionRecoverRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionRecoverRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Name
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionRecoverRequestValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ExecutionRecoverRequestValidationError is the validation error returned by
+// ExecutionRecoverRequest.Validate if the designated constraints aren't met.
+type ExecutionRecoverRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExecutionRecoverRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExecutionRecoverRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExecutionRecoverRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExecutionRecoverRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExecutionRecoverRequestValidationError) ErrorName() string {
+	return "ExecutionRecoverRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExecutionRecoverRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExecutionRecoverRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExecutionRecoverRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExecutionRecoverRequestValidationError{}
+
 // Validate checks the field values on ExecutionCreateResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

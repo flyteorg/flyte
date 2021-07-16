@@ -717,6 +717,10 @@ public final class Execution {
        * <code>DYNAMIC_RUNNING = 9;</code>
        */
       DYNAMIC_RUNNING(9),
+      /**
+       * <code>RECOVERED = 10;</code>
+       */
+      RECOVERED(10),
       UNRECOGNIZED(-1),
       ;
 
@@ -760,6 +764,10 @@ public final class Execution {
        * <code>DYNAMIC_RUNNING = 9;</code>
        */
       public static final int DYNAMIC_RUNNING_VALUE = 9;
+      /**
+       * <code>RECOVERED = 10;</code>
+       */
+      public static final int RECOVERED_VALUE = 10;
 
 
       public final int getNumber() {
@@ -790,6 +798,7 @@ public final class Execution {
           case 7: return SKIPPED;
           case 8: return TIMED_OUT;
           case 9: return DYNAMIC_RUNNING;
+          case 10: return RECOVERED;
           default: return null;
         }
       }
@@ -5684,33 +5693,33 @@ public final class Execution {
       "\001\n\021WorkflowExecution\"\203\001\n\005Phase\022\r\n\tUNDEFI" +
       "NED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007RUNNING\020\002\022\016\n\nSUCCEE" +
       "DING\020\003\022\r\n\tSUCCEEDED\020\004\022\013\n\007FAILING\020\005\022\n\n\006FA" +
-      "ILED\020\006\022\013\n\007ABORTED\020\007\022\r\n\tTIMED_OUT\020\010\"\247\001\n\rN" +
-      "odeExecution\"\225\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n" +
+      "ILED\020\006\022\013\n\007ABORTED\020\007\022\r\n\tTIMED_OUT\020\010\"\266\001\n\rN" +
+      "odeExecution\"\244\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n" +
       "\006QUEUED\020\001\022\013\n\007RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n" +
       "\007FAILING\020\004\022\n\n\006FAILED\020\005\022\013\n\007ABORTED\020\006\022\013\n\007S" +
       "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\022\023\n\017DYNAMIC_RUNNI" +
-      "NG\020\t\"\226\001\n\rTaskExecution\"\204\001\n\005Phase\022\r\n\tUNDE" +
-      "FINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007RUNNING\020\002\022\r\n\tSUCC" +
-      "EEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n\006FAILED\020\005\022\020\n\014INIT" +
-      "IALIZING\020\006\022\031\n\025WAITING_FOR_RESOURCES\020\007\"\251\001" +
-      "\n\016ExecutionError\022\014\n\004code\030\001 \001(\t\022\017\n\007messag" +
-      "e\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\0225\n\004kind\030\004 \001(\016" +
-      "2\'.flyteidl.core.ExecutionError.ErrorKin" +
-      "d\".\n\tErrorKind\022\013\n\007UNKNOWN\020\000\022\010\n\004USER\020\001\022\n\n" +
-      "\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003uri\030\001 \001(\t\022\014\n\004na" +
-      "me\030\002 \001(\t\022<\n\016message_format\030\003 \001(\0162$.flyte" +
-      "idl.core.TaskLog.MessageFormat\022&\n\003ttl\030\004 " +
-      "\001(\0132\031.google.protobuf.Duration\"/\n\rMessag" +
-      "eFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003CSV\020\001\022\010\n\004JSON\020\002\"" +
-      "J\n\024QualityOfServiceSpec\0222\n\017queueing_budg" +
-      "et\030\001 \001(\0132\031.google.protobuf.Duration\"\302\001\n\020" +
-      "QualityOfService\0224\n\004tier\030\001 \001(\0162$.flyteid" +
-      "l.core.QualityOfService.TierH\000\0223\n\004spec\030\002" +
-      " \001(\0132#.flyteidl.core.QualityOfServiceSpe" +
-      "cH\000\"4\n\004Tier\022\r\n\tUNDEFINED\020\000\022\010\n\004HIGH\020\001\022\n\n\006" +
-      "MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013designationB6Z4gith" +
-      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
-      "idl/coreb\006proto3"
+      "NG\020\t\022\r\n\tRECOVERED\020\n\"\226\001\n\rTaskExecution\"\204\001" +
+      "\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007RU" +
+      "NNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n\006F" +
+      "AILED\020\005\022\020\n\014INITIALIZING\020\006\022\031\n\025WAITING_FOR" +
+      "_RESOURCES\020\007\"\251\001\n\016ExecutionError\022\014\n\004code\030" +
+      "\001 \001(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(" +
+      "\t\0225\n\004kind\030\004 \001(\0162\'.flyteidl.core.Executio" +
+      "nError.ErrorKind\".\n\tErrorKind\022\013\n\007UNKNOWN" +
+      "\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003" +
+      "uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_forma" +
+      "t\030\003 \001(\0162$.flyteidl.core.TaskLog.MessageF" +
+      "ormat\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf.Dur" +
+      "ation\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003C" +
+      "SV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityOfServiceSpec\0222" +
+      "\n\017queueing_budget\030\001 \001(\0132\031.google.protobu" +
+      "f.Duration\"\302\001\n\020QualityOfService\0224\n\004tier\030" +
+      "\001 \001(\0162$.flyteidl.core.QualityOfService.T" +
+      "ierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core.Qual" +
+      "ityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFINED\020" +
+      "\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013desi" +
+      "gnationB6Z4github.com/flyteorg/flyteidl/" +
+      "gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
