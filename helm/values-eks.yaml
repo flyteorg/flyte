@@ -1,7 +1,7 @@
 userSettings:
-  accountNumber: 12345
-  accountRegion: us-east-1
-  certificateArn: arn:cert
+  accountNumber: <ACCOUNT_NUMBER>
+  accountRegion: <AWS_REGION>
+  certificateArn: <CERTIFICATE_ARN>
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
   bucketName: <BUCKET_NAME>
