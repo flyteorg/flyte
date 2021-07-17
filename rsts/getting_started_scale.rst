@@ -120,33 +120,39 @@ Build & Deploy Your Application to the Cluster
 
      .. prompt:: bash $
 
-         docker build . --tag registry/repo:version
-         docker push registry/repo:version
+         docker build . --tag <registry/repo:version>
+         docker push <registry/repo:version>
 
      **OR** ``flytekit-python-template`` ships with a helper `docker build script <https://github.com/flyteorg/flytekit-python-template/blob/main/docker_build_and_tag.sh>`__ which make it possible to build and image, tag it correctly and optionally use the git-SHA as the version.
      We recommend using such a script to track versions more effectively and use a CI/CD pipeline to deploy your code.
 
      .. prompt:: bash $
 
-         ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version]
+         ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version>]
 
 #. Next, package the workflow using the ``pyflyte`` cli bundled with Flytekit and upload it to the Flyte backend. Note that the image is the same as the one built in the previous step.
 
    .. prompt:: bash (venv)$
 
-      pyflyte --pkgs myapp.workflows package --image myapp:v1
+      pyflyte --pkgs myapp.workflows package --image <registry/repo:version>
 
-#. Upload this package to the Flyte backend. We refer to this as ``registration``.
+#. Upload this package to the Flyte backend. We refer to this as ``registration``. The version here ``v1`` does not have to match the version
+   used in the commands above. It's generally recommended to match the versions to make it easier to track.
+
+   .. note::
+
+      Note that we are simply using an existing project ``flytesnacks`` and an existing domain ``development`` to register the workflows and tasks. It is possible to create your own project
+      and configure domains. Refer to :ref:`control-plane` to understand projects and domains.
 
    .. prompt:: bash $
 
-      flytectl register files -p flytesnacks -d development --archive flyte-package.tgz  --version v1
+      flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
 
 #. Finally, visualize the registered workflow.
 
    .. prompt:: bash $
 
-      flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf --version v1 -o doturl
+      flytectl get workflows --project flytesnacks --domain development myapp.workflows.example.my_wf --version v1 -o doturl
 
 
 .. _getting-started-execute:
@@ -167,19 +173,19 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
    .. prompt:: bash $
 
-      flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
 
 #. Create an execution using the exec spec file.
 
    .. prompt:: bash $
 
-      flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+      flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
 
 #. Monitor the execution by providing the execution name from the ``create execution`` command.
 
    .. prompt:: bash $
 
-      flytectl get execution -p flytesnacks -d development <execname>
+      flytectl get execution --project flytesnacks --domain development <execname>
 
 
 .. admonition:: Recap

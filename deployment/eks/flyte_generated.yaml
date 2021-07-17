@@ -8121,7 +8121,7 @@ data:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-      refresh: 5m
+      refreshInterval: 1m
   db.yaml: |
     database:
       port: 5432
@@ -8218,7 +8218,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-dck98m94b6
+  name: flyte-admin-config-29g4dtt8tc
   namespace: flyte
 ---
 apiVersion: v1
@@ -8849,7 +8849,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-dck98m94b6
+          name: flyte-admin-config-29g4dtt8tc
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -9137,7 +9137,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-dck98m94b6
+              name: flyte-admin-config-29g4dtt8tc
             name: config-volume
           - name: db-pass
             secret:
@@ -9349,6 +9349,20 @@ spec:
             port:
               number: 80
         path: /config/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2/*
         pathType: ImplementationSpecific
 ---
 apiVersion: networking.k8s.io/v1

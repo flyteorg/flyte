@@ -169,3 +169,17 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
