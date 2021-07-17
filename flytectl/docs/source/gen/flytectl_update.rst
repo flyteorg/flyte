@@ -80,4 +80,5 @@ SEE ALSO
 * :doc:`flytectl_update_task` 	 - Updates task metadata
 * :doc:`flytectl_update_task-resource-attribute` 	 - Updates matchable resources of task attributes
 * :doc:`flytectl_update_workflow` 	 - Updates workflow metadata
+* :doc:`flytectl_update_workflow-execution-config` 	 - Updates matchable resources of workflow execution config
 
