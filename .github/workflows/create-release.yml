@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'version name. example v0.1.1'
+        description: "version name. example v0.1.1"
         required: true
 
 jobs:
@@ -25,3 +25,42 @@ jobs:
           WITH_V: true
           CUSTOM_TAG: ${{ github.event.inputs.version }}
           RELEASE_BRANCHES: master
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+
+      - name: Preprare Flyte Release
+        env:
+          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          grep -rlZ "version:[^P]*# VERSION" ./helm/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+          sed -i "s/v0.1.10/${VERSION}/g" ./helm/README.md
+          VERSION=$VERSION make prepare_artifacts
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+
+      - name: Release helm registry
+        env:
+          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          grep -rlZ "version:[^P]*# VERSION" ./helm/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+          # Commit Chart registry to github gh-pages
+          bin/cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${FLYTE_BOT_PAT} --release-name-template="{{ .Version }}"
