@@ -75,4 +75,5 @@ SEE ALSO
 * :doc:`flytectl_delete_execution-queue-attribute` 	 - Deletes matchable resources of execution queue attributes
 * :doc:`flytectl_delete_plugin-override` 	 - Deletes matchable resources of plugin overrides
 * :doc:`flytectl_delete_task-resource-attribute` 	 - Deletes matchable resources of task attributes
+* :doc:`flytectl_delete_workflow-execution-config` 	 - Deletes matchable resources of workflow execution config
 

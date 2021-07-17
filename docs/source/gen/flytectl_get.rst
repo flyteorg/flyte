@@ -79,4 +79,5 @@ SEE ALSO
 * :doc:`flytectl_get_task` 	 - Gets task resources
 * :doc:`flytectl_get_task-resource-attribute` 	 - Gets matchable resources of task attributes
 * :doc:`flytectl_get_workflow` 	 - Gets workflow resources
+* :doc:`flytectl_get_workflow-execution-config` 	 - Gets matchable resources of workflow execution config
 
