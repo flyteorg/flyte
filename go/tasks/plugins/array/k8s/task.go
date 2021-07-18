@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -44,6 +45,29 @@ const (
 	LaunchWaiting
 	LaunchReturnState
 )
+
+const finalizer = "flyte/array"
+
+func addPodFinalizer(pod *corev1.Pod) *corev1.Pod {
+	pod.Finalizers = append(pod.Finalizers, finalizer)
+	return pod
+}
+
+func removeString(list []string, target string) []string {
+	ret := make([]string, 0)
+	for _, s := range list {
+		if s != target {
+			ret = append(ret, s)
+		}
+	}
+
+	return ret
+}
+
+func clearFinalizer(pod *corev1.Pod) *corev1.Pod {
+	pod.Finalizers = removeString(pod.Finalizers, finalizer)
+	return pod
+}
 
 const (
 	MonitorSuccess MonitorResult = iota
@@ -107,7 +131,7 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	pod = ApplyPodPolicies(ctx, t.Config, pod)
 	pod = applyNodeSelectorLabels(ctx, t.Config, pod)
 	pod = applyPodTolerations(ctx, t.Config, pod)
-
+	pod = addPodFinalizer(pod)
 	allocationStatus, err := allocateResource(ctx, tCtx, t.Config, podName)
 	if err != nil {
 		return LaunchError, err
@@ -227,8 +251,34 @@ func (t Task) Finalize(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 
+	pod := &v1.Pod{
+		TypeMeta: metaV1.TypeMeta{
+			Kind:       PodKind,
+			APIVersion: v1.SchemeGroupVersion.String(),
+		},
+	}
+
+	err := kubeClient.GetClient().Get(ctx, k8sTypes.NamespacedName{
+		Name:      podName,
+		Namespace: GetNamespaceForExecution(tCtx, t.Config.NamespaceTemplate),
+	}, pod)
+
+	if err != nil {
+		if !k8serrors.IsNotFound(err) {
+			logger.Errorf(ctx, "Error fetching pod [%s] in Finalize [%s]", podName, err)
+			return err
+		}
+	} else {
+		pod = clearFinalizer(pod)
+		err := kubeClient.GetClient().Update(ctx, pod)
+		if err != nil {
+			logger.Errorf(ctx, "Error updating pod finalizer [%s] in Finalize [%s]", podName, err)
+			return err
+		}
+	}
+
 	// Deallocate Resource
-	err := deallocateResource(ctx, tCtx, t.Config, t.ChildIdx)
+	err = deallocateResource(ctx, tCtx, t.Config, t.ChildIdx)
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", podName, err)
 		return err
