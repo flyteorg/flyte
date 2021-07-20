@@ -119,7 +119,7 @@ A backend plugin essentially makes it possible for users to write extensions for
 
 #. Need to be implemented in golang
 #. Needs a FlytePropeller build - *currently*
-#. Need to implement contract in some spec language like protobf, openAPI etc
+#. Need to implement contract in some spec language like protobuf, openAPI etc
 #. Development cycle can be much slower than flytekit only plugins
 
 
