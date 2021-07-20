@@ -417,10 +417,10 @@ storage:
 
 # Database configuration
 db:
-  database: {}
+  database:
     # port: 5432
     # username: postgres
-    # host: postgres
+    host: postgres
     # dbname: flyte
     # passwordPath: /etc/db/pass.txt
     # options:

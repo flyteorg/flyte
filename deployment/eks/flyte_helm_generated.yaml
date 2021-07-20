@@ -107,7 +107,7 @@ kind: Secret
 metadata:
   name: db-pass
 stringData:
-  pass.txt: <DB_PASSWORD>
+  pass.txt: '<DB_PASSWORD>'
 type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
@@ -251,7 +251,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -394,7 +394,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -567,8 +567,8 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: true
-        cloudwatch-log-group: <LOG_GROUP_NAME>
-        cloudwatch-region: <AWS_REGION>
+        cloudwatch-log-group: '<LOG_GROUP_NAME>'
+        cloudwatch-region: '<AWS_REGION>'
         kubernetes-enabled: false
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
@@ -1327,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "7c5a7103d7e5b0462f3b3403813fd5abe1ed437bd5010c4b89df42f30b6d5b6"
+        configChecksum: "5557cb260e3c55e1c0612d232201a66fe5133821ead3f8b1616483fb4221a57"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1549,7 +1549,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8ed5710602cdb84df59a4c4cb642b695f643af6908953661ff22d854c7f7919"
+        configChecksum: "0cf9d3a246a3eb65c44535f3ae9c441761bb4599ec44c50d433774959354336"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1635,7 +1635,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "be1167826c5b79e2f8be53be18f9247a46193fa8987e249982030b0f7b3cad7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1707,7 +1707,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "be1167826c5b79e2f8be53be18f9247a46193fa8987e249982030b0f7b3cad7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -1949,7 +1949,7 @@ metadata:
   annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
+    alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -2085,7 +2085,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
+    alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing

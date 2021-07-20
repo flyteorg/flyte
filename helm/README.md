@@ -118,7 +118,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
 | datacatalog.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
-| db.database | object | `{}` |  |
+| db.database.host | string | `"postgres"` |  username: postgres |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |

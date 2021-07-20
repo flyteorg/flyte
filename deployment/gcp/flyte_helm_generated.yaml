@@ -225,7 +225,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
-    database: {}
+    database:
+      host: postgres
   domain.yaml: | 
     domains:
     - id: development
@@ -367,7 +368,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
-    database: {}
+    database:
+      host: postgres
   logger.yaml: | 
     logger:
       level: 4
@@ -3125,7 +3127,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c8c5bf1ba901c1a0d7051e60b599bf5a7b69b89f8043b526694f8d347546b13"
+        configChecksum: "5830c0e1769b08bfa13cd6082137aab286d23e624bca7bb4247ff7a23409551"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3138,7 +3140,7 @@ spec:
           command:
           - sh
           - -c
-          - until pg_isready -h  -p ; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h postgres -p ; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config
@@ -3333,7 +3335,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "953b7f2e5924dec7701c651d62ce18607854cc3b47be6feb3f1c8fa5dbffd51"
+        configChecksum: "e21401ed835a1eea1496ec03ca4ce674d2fc041d19e4b69ac05389f41911830"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
