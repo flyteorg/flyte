@@ -1,5 +1,3 @@
-:nosearch:
-
 ######
 Athena
 ######

@@ -23,7 +23,16 @@ Flyte integrates with various AWS services. The subsections below provide exampl
        :text: Pytorch with Sagemaker
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Train Pytorch models using Sagamaker, with support for distributed training.
+    Train Pytorch models using Sagemaker, with support for distributed training.
+
+    ---
+
+    .. link-button:: auto/integrations/aws/athena/index
+       :type: ref
+       :text: Athena
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Execute queries using AWS Athena
 
 
 .. toctree::
@@ -33,3 +42,4 @@ Flyte integrates with various AWS services. The subsections below provide exampl
 
     auto/integrations/aws/sagemaker_training/index
     auto/integrations/aws/sagemaker_pytorch/index
+    auto/integrations/aws/athena/index
