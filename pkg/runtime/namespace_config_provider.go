@@ -3,42 +3,36 @@ package runtime
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (
-	namespaceMappingKey   = "namespace_mapping"
-	domainVariable        = "domain"
-	projectVariable       = "project"
-	projectDomainVariable = "project-domain"
+	namespaceMappingKey = "namespace_mapping"
+	defaultTemplate     = "{{ project }}-{{ domain }}"
 )
 
 var namespaceMappingConfig = config.MustRegisterSection(namespaceMappingKey, &interfaces.NamespaceMappingConfig{
-	Mapping: projectDomainVariable,
+	Template: defaultTemplate,
 })
 
 type NamespaceMappingConfigurationProvider struct{}
 
-func (p *NamespaceMappingConfigurationProvider) GetNamespaceMappingConfig() common.NamespaceMapping {
-	var mapping string
+func (p *NamespaceMappingConfigurationProvider) GetNamespaceTemplate() string {
+	var template string
 	if namespaceMappingConfig != nil && namespaceMappingConfig.GetConfig() != nil {
-		mapping = namespaceMappingConfig.GetConfig().(*interfaces.NamespaceMappingConfig).Mapping
+		template = namespaceMappingConfig.GetConfig().(*interfaces.NamespaceMappingConfig).Template
+		if len(namespaceMappingConfig.GetConfig().(*interfaces.NamespaceMappingConfig).Mapping) > 0 {
+			logger.Errorf(context.TODO(), "Using `mapping` in namespace configs is deprecated. "+
+				"Please use a custom string template like `{{ project }}-{{ domain }}` instead")
+		}
 	}
-
-	switch mapping {
-	case domainVariable:
-		return common.NamespaceMappingDomain
-	case projectVariable:
-		return common.NamespaceMappingProject
-	case projectDomainVariable:
-		return common.NamespaceMappingProjectDomain
-	default:
-		logger.Warningf(context.Background(), "Unsupported value for namespace_mapping in config, defaulting to <project>-<domain>")
-		return common.NamespaceMappingProjectDomain
+	if len(template) == 0 {
+		logger.Infof(context.TODO(), "No namespace template specified in config. Using [%+s] by default", defaultTemplate)
+		template = defaultTemplate
 	}
+	return template
 }
 
 func NewNamespaceMappingConfigurationProvider() interfaces.NamespaceMappingConfiguration {
