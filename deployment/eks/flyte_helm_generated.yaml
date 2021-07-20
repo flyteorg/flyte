@@ -39,7 +39,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
@@ -53,7 +53,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
@@ -67,7 +67,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
@@ -89,7 +89,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: flyte/templates/admin/secret-auth.yaml
@@ -138,7 +138,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   aa_namespace.yaml: | 
@@ -245,7 +245,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -360,6 +360,7 @@ data:
         - defaultIamRole:
             value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       refresh: 5m
+      refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
 # Source: flyte/templates/console/configmap.yaml
@@ -371,7 +372,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data: 
   BASE_URL: /console
@@ -387,7 +388,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -429,7 +430,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   admin.yaml: | 
@@ -727,7 +728,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -757,7 +758,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 # Allow RO access to PODS
@@ -850,7 +851,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules: []
 aggregationRule:
@@ -866,7 +867,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -892,7 +893,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -913,7 +914,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -967,7 +968,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -986,7 +987,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1021,7 +1022,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1088,7 +1089,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     external-dns.alpha.kubernetes.io/hostname: flyte.example.com
@@ -1127,7 +1128,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     external-dns.alpha.kubernetes.io/hostname: flyte.example.com
@@ -1151,7 +1152,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
@@ -1202,7 +1203,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -1223,7 +1224,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: redis
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -1315,7 +1316,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 2
@@ -1326,11 +1327,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "367614bdcf6373e43bd78601c0a3e327add55dbc3ad71799f16454b139dbc6e"
+        configChecksum: "5557cb260e3c55e1c0612d232201a66fe5133821ead3f8b1616483fb4221a57"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
@@ -1480,7 +1481,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 2
@@ -1491,11 +1492,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ad82d0fe9f2ee373bcf932eb30b2565b5003d6fa2859e1ee553353fc462fbd5"
+        configChecksum: "8ef03d2ed4468082a4585c0454139c5df15794f3340e17c7ea338cd6e781b91"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -1537,7 +1538,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 2
@@ -1548,11 +1549,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6c1edda2b42af10bffe9f48e17c35207bde04a26083180febb229b3fe9c74cc"
+        configChecksum: "0cf9d3a246a3eb65c44535f3ae9c441761bb4599ec44c50d433774959354336"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
@@ -1623,7 +1624,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 2
@@ -1634,11 +1635,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d86b0523fd228f4dbb3e371e964b3d84db1063c887e5f7b483da680cb2066f7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -1706,7 +1707,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "d86b0523fd228f4dbb3e371e964b3d84db1063c887e5f7b483da680cb2066f7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -1775,7 +1776,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: pytorch-operator
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1788,7 +1789,7 @@ spec:
       labels: 
         app.kubernetes.io/name: pytorch-operator
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -1827,7 +1828,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: redis
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1841,7 +1842,7 @@ spec:
       labels: 
         app.kubernetes.io/name: redis
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -1901,7 +1902,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   schedule: '*/1 * * * *'
