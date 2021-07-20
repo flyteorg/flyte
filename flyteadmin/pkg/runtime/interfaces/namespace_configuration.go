@@ -1,11 +1,11 @@
 package interfaces
 
-import "github.com/flyteorg/flyteadmin/pkg/common"
-
 type NamespaceMappingConfig struct {
-	Mapping string `json:"mapping"`
+	Mapping      string       `json:"mapping"` // Deprecated
+	Template     string       `json:"template"`
+	TemplateData TemplateData `json:"templateData"`
 }
 
 type NamespaceMappingConfiguration interface {
-	GetNamespaceMappingConfig() common.NamespaceMapping
+	GetNamespaceTemplate() string
 }

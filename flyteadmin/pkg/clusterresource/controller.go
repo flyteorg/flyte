@@ -489,7 +489,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	for _, project := range projects {
 		for _, domain := range *domains {
-			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceMappingConfig(), project.Identifier, domain.Name)
+			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Identifier, domain.Name)
 			customTemplateValues, err := c.getCustomTemplateValues(
 				ctx, project.Identifier, domain.ID, domainTemplateValues[domain.ID])
 			if err != nil {

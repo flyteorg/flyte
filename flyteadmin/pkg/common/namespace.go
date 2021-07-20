@@ -1,27 +1,19 @@
 package common
 
-import "fmt"
-
-type NamespaceMapping int
-
-const namespaceFormat = "%s-%s"
-
-const (
-	NamespaceMappingProjectDomain NamespaceMapping = iota
-	NamespaceMappingDomain        NamespaceMapping = iota
-	NamespaceMappingProject       NamespaceMapping = iota
+import (
+	"strings"
 )
 
-// GetNamespaceName returns kubernetes namespace name
-func GetNamespaceName(mapping NamespaceMapping, project, domain string) string {
-	switch mapping {
-	case NamespaceMappingDomain:
-		return domain
-	case NamespaceMappingProject:
-		return project
-	case NamespaceMappingProjectDomain:
-		fallthrough
-	default:
-		return fmt.Sprintf(namespaceFormat, project, domain)
-	}
+const projectTemplate = "{{ project }}"
+const domainTemplate = "{{ domain }}"
+
+const replaceAllInstancesOfString = -1
+
+// GetNamespaceName returns kubernetes namespace name according to user defined template from config
+func GetNamespaceName(template string, project, domain string) string {
+	var namespace = template
+	namespace = strings.Replace(namespace, projectTemplate, project, replaceAllInstancesOfString)
+	namespace = strings.Replace(namespace, domainTemplate, domain, replaceAllInstancesOfString)
+
+	return namespace
 }

@@ -108,7 +108,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 		c.metrics.InvalidExecutionID.Inc()
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "invalid execution id")
 	}
-	namespace := common.GetNamespaceName(c.config.GetNamespaceMappingConfig(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
+	namespace := common.GetNamespaceName(c.config.GetNamespaceTemplate(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
 	flyteWf, err := c.builder.BuildFlyteWorkflow(&input.WfClosure, input.Inputs, input.ExecutionID, namespace)
 	if err != nil {
 		c.metrics.WorkflowBuildFailure.Inc()
@@ -185,7 +185,7 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 		c.metrics.InvalidExecutionID.Inc()
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "invalid execution id")
 	}
-	namespace := common.GetNamespaceName(c.config.GetNamespaceMappingConfig(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
+	namespace := common.GetNamespaceName(c.config.GetNamespaceTemplate(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
 	flyteWf, err := c.builder.BuildFlyteWorkflow(&input.WfClosure, input.Inputs, input.ExecutionID, namespace)
 	if err != nil {
 		c.metrics.WorkflowBuildFailure.Inc()
@@ -263,7 +263,7 @@ func (c *FlytePropeller) TerminateWorkflowExecution(
 		c.metrics.InvalidExecutionID.Inc()
 		return errors.NewFlyteAdminErrorf(codes.Internal, "invalid execution id")
 	}
-	namespace := common.GetNamespaceName(c.config.GetNamespaceMappingConfig(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
+	namespace := common.GetNamespaceName(c.config.GetNamespaceTemplate(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
 	target, err := c.executionCluster.GetTarget(ctx, &executioncluster.ExecutionTargetSpec{
 		TargetID: input.Cluster,
 	})
