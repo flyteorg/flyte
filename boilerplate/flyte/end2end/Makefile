@@ -7,3 +7,6 @@
 end2end_execute:
 	./boilerplate/flyte/end2end/end2end.sh
 	
+.PHONY: k8s_integration_execute
+k8s_integration_execute:
+	echo "pass"
