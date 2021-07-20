@@ -28,6 +28,15 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (Config) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (Config) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {

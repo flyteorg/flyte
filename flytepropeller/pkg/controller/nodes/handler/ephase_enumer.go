@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-const _EPhaseName = "UndefinedNotReadyQueuedRunningSkipFailedRetryableFailureSuccessTimedoutFailingDynamicRunning"
+const _EPhaseName = "UndefinedNotReadyQueuedRunningSkipFailedRetryableFailureSuccessTimedoutFailingDynamicRunningRecovered"
 
-var _EPhaseIndex = [...]uint8{0, 9, 17, 23, 30, 34, 40, 56, 63, 71, 78, 92}
+var _EPhaseIndex = [...]uint8{0, 9, 17, 23, 30, 34, 40, 56, 63, 71, 78, 92, 101}
 
 func (i EPhase) String() string {
 	if i >= EPhase(len(_EPhaseIndex)-1) {
@@ -18,20 +18,21 @@ func (i EPhase) String() string {
 	return _EPhaseName[_EPhaseIndex[i]:_EPhaseIndex[i+1]]
 }
 
-var _EPhaseValues = []EPhase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+var _EPhaseValues = []EPhase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 var _EPhaseNameToValueMap = map[string]EPhase{
-	_EPhaseName[0:9]:   0,
-	_EPhaseName[9:17]:  1,
-	_EPhaseName[17:23]: 2,
-	_EPhaseName[23:30]: 3,
-	_EPhaseName[30:34]: 4,
-	_EPhaseName[34:40]: 5,
-	_EPhaseName[40:56]: 6,
-	_EPhaseName[56:63]: 7,
-	_EPhaseName[63:71]: 8,
-	_EPhaseName[71:78]: 9,
-	_EPhaseName[78:92]: 10,
+	_EPhaseName[0:9]:    0,
+	_EPhaseName[9:17]:   1,
+	_EPhaseName[17:23]:  2,
+	_EPhaseName[23:30]:  3,
+	_EPhaseName[30:34]:  4,
+	_EPhaseName[34:40]:  5,
+	_EPhaseName[40:56]:  6,
+	_EPhaseName[56:63]:  7,
+	_EPhaseName[63:71]:  8,
+	_EPhaseName[71:78]:  9,
+	_EPhaseName[78:92]:  10,
+	_EPhaseName[92:101]: 11,
 }
 
 // EPhaseString retrieves an enum value from the enum constants string name.

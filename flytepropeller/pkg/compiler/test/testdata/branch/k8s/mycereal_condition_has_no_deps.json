@@ -650,6 +650,7 @@
   "rawOutputDataConfig": {},
   "executionConfig": {
     "TaskPluginImpls": null,
-    "MaxParallelism": 0
+    "MaxParallelism": 0,
+    "RecoveryExecution": {}
   }
 }

@@ -363,6 +363,40 @@ func (_m *WorkflowBuilder) GetNodes() common.NodeIndex {
 	return r0
 }
 
+type WorkflowBuilder_GetOrCreateNodeBuilder struct {
+	*mock.Call
+}
+
+func (_m WorkflowBuilder_GetOrCreateNodeBuilder) Return(_a0 common.NodeBuilder) *WorkflowBuilder_GetOrCreateNodeBuilder {
+	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilder(n *core.Node) *WorkflowBuilder_GetOrCreateNodeBuilder {
+	c := _m.On("GetOrCreateNodeBuilder", n)
+	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
+}
+
+func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilderMatch(matchers ...interface{}) *WorkflowBuilder_GetOrCreateNodeBuilder {
+	c := _m.On("GetOrCreateNodeBuilder", matchers...)
+	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
+}
+
+// GetOrCreateNodeBuilder provides a mock function with given fields: n
+func (_m *WorkflowBuilder) GetOrCreateNodeBuilder(n *core.Node) common.NodeBuilder {
+	ret := _m.Called(n)
+
+	var r0 common.NodeBuilder
+	if rf, ok := ret.Get(0).(func(*core.Node) common.NodeBuilder); ok {
+		r0 = rf(n)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(common.NodeBuilder)
+		}
+	}
+
+	return r0
+}
+
 type WorkflowBuilder_GetSubWorkflow struct {
 	*mock.Call
 }
@@ -507,40 +541,6 @@ func (_m *WorkflowBuilder) GetUpstreamNodes() common.StringAdjacencyList {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(common.StringAdjacencyList)
-		}
-	}
-
-	return r0
-}
-
-type WorkflowBuilder_GetOrCreateNodeBuilder struct {
-	*mock.Call
-}
-
-func (_m WorkflowBuilder_GetOrCreateNodeBuilder) Return(_a0 common.NodeBuilder) *WorkflowBuilder_GetOrCreateNodeBuilder {
-	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilder(n *core.Node) *WorkflowBuilder_GetOrCreateNodeBuilder {
-	c := _m.On("GetOrCreateNodeBuilder", n)
-	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
-}
-
-func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilderMatch(matchers ...interface{}) *WorkflowBuilder_GetOrCreateNodeBuilder {
-	c := _m.On("GetOrCreateNodeBuilder", matchers...)
-	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
-}
-
-// GetOrCreateNodeBuilder provides a mock function with given fields: n
-func (_m *WorkflowBuilder) GetOrCreateNodeBuilder(n *core.Node) common.NodeBuilder {
-	ret := _m.Called(n)
-
-	var r0 common.NodeBuilder
-	if rf, ok := ret.Get(0).(func(*core.Node) common.NodeBuilder); ok {
-		r0 = rf(n)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(common.NodeBuilder)
 		}
 	}
 

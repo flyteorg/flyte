@@ -1,6 +1,8 @@
 package v1alpha1
 
-import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+import (
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+)
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
 // s3://my-bucket, or s3://my-bucket/  A sharding string will automatically be appended to this prefix before
@@ -20,6 +22,8 @@ type ExecutionConfig struct {
 	TaskPluginImpls map[string]TaskPluginOverride
 	// Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
 	MaxParallelism uint32
+	// Defines execution behavior for processing nodes.
+	RecoveryExecution WorkflowExecutionIdentifier
 }
 
 type TaskPluginOverride struct {

@@ -22,6 +22,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var isRecovery = true
+
 // IsWorkflowTerminated returns a true if the Workflow Phase is in a Terminal Phase, else returns a false
 func IsWorkflowTerminated(p core.WorkflowExecution_Phase) bool {
 	return p == core.WorkflowExecution_ABORTED || p == core.WorkflowExecution_FAILED ||
@@ -44,9 +46,49 @@ func (e executionCacheItem) ID() string {
 	return e.String()
 }
 
+func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecovery bool,
+	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, err error) error {
+
+	statusCode := status.Code(err)
+	if isRecovery && statusCode == codes.NotFound {
+		logger.Warnf(ctx, "failed to recover workflow [%s] with err %+v. will attempt to launch instead", launchPlanRef.Name, err)
+		return nil
+	}
+	switch statusCode {
+	case codes.AlreadyExists:
+		_, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+		if err != nil {
+			logger.Errorf(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
+		}
+
+		return errors.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
+	case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
+		return errors.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
+	default:
+		return errors.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
+	}
+}
+
 func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
 	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
-
+	var err error
+	if launchCtx.RecoveryExecution != nil {
+		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
+			Id:   launchCtx.RecoveryExecution,
+			Name: executionID.Name,
+			Metadata: &admin.ExecutionMetadata{
+				ParentNodeExecution: launchCtx.ParentNodeExecution,
+			},
+		})
+		if err != nil {
+			launchErr := a.handleLaunchError(ctx, isRecovery, executionID, launchPlanRef, err)
+			if launchErr != nil {
+				return launchErr
+			}
+		} else {
+			return nil
+		}
+	}
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
@@ -62,21 +104,11 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			Inputs: inputs,
 		},
 	}
-	_, err := a.adminClient.CreateExecution(ctx, req)
+	_, err = a.adminClient.CreateExecution(ctx, req)
 	if err != nil {
-		statusCode := status.Code(err)
-		switch statusCode {
-		case codes.AlreadyExists:
-			_, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
-			if err != nil {
-				logger.Errorf(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
-			}
-
-			return errors.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
-		case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
-			return errors.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
-		default:
-			return errors.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
+		launchErr := a.handleLaunchError(ctx, !isRecovery, executionID, launchPlanRef, err)
+		if launchErr != nil {
+			return launchErr
 		}
 	}
 

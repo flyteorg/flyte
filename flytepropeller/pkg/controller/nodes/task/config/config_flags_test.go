@@ -84,7 +84,7 @@ func testDecodeJson_Config(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_Config(val, result))
 }
 
-func testDecodeSlice_Config(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_Config(vStringSlice, result))
 }
 
@@ -100,21 +100,13 @@ func TestConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_task-plugins.enabled-plugins", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("task-plugins.enabled-plugins"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_Config("1,1", ",")
 
 			cmdFlags.Set("task-plugins.enabled-plugins", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("task-plugins.enabled-plugins"); err == nil {
-				testDecodeSlice_Config(t, join_Config(vStringSlice, ","), &actual.TaskPlugins.EnabledPlugins)
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.TaskPlugins.EnabledPlugins)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -122,14 +114,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_max-plugin-phase-versions", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt32, err := cmdFlags.GetInt32("max-plugin-phase-versions"); err == nil {
-				assert.Equal(t, int32(defaultConfig.MaxPluginPhaseVersions), vInt32)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_barrier.enabled", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("barrier.enabled"); err == nil {
-				assert.Equal(t, bool(defaultConfig.BarrierConfig.Enabled), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_barrier.cache-size", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("barrier.cache-size"); err == nil {
-				assert.Equal(t, int(defaultConfig.BarrierConfig.CacheSize), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_barrier.cache-ttl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("barrier.cache-ttl"); err == nil {
-				assert.Equal(t, string(defaultConfig.BarrierConfig.CacheTTL.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.BarrierConfig.CacheTTL.String()
@@ -210,14 +170,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_backoff.base-second", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("backoff.base-second"); err == nil {
-				assert.Equal(t, int(defaultConfig.BackOffConfig.BaseSecond), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -232,14 +184,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_backoff.max-duration", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("backoff.max-duration"); err == nil {
-				assert.Equal(t, string(defaultConfig.BackOffConfig.MaxDuration.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.BackOffConfig.MaxDuration.String()
@@ -254,14 +198,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_maxLogMessageLength", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("maxLogMessageLength"); err == nil {
-				assert.Equal(t, int(defaultConfig.MaxErrorMessageLength), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

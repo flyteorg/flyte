@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	mocks5 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery/mocks"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mocks4 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -99,6 +101,7 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	ex.OnGetEventVersion().Return(version)
 	ex.OnGetParentInfo().Return(nil)
 	ex.OnGetName().Return("name")
+	ex.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 
 	nCtx.OnExecutionContext().Return(ex)
 
@@ -139,11 +142,12 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	wfStatus := &mocks2.MutableWorkflowNodeStatus{}
 	mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
+	recoveryClient := &mocks5.RecoveryClient{}
 
 	t.Run("happy v0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnLaunchMatch(
 			ctx,
 			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
@@ -166,7 +170,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	t.Run("happy v1", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnLaunchMatch(
 			ctx,
 			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
@@ -213,12 +217,13 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
+	recoveryClient := &mocks5.RecoveryClient{}
 
 	t.Run("stillRunning V0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -237,7 +242,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -280,13 +285,14 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
+	recoveryClient := &mocks5.RecoveryClient{}
 
 	t.Run("abort v0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnKillMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -307,7 +313,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnKillMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -326,7 +332,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 		expectedErr := fmt.Errorf("fail")
-		h := New(nil, mockLPExec, promutils.NewTestScope())
+		h := New(nil, mockLPExec, recoveryClient, promutils.NewTestScope())
 		mockLPExec.OnKillMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
