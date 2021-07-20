@@ -18,6 +18,8 @@ type LaunchContext struct {
 	Principal string
 	// If a node launched the execution, this specifies which node execution
 	ParentNodeExecution *core.NodeExecutionIdentifier
+	// If a node in recovery mode launched this execution, propagate recovery mode to the child execution.
+	RecoveryExecution *core.WorkflowExecutionIdentifier
 }
 
 // Interface to be implemented by the remote system that can allow workflow launching capabilities

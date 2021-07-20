@@ -46,6 +46,7 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	recoveryMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 )
 
@@ -230,10 +231,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	eventSink := events.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, promutils.NewTestScope())
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -308,10 +310,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	eventSink := events.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, promutils.NewTestScope())
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
@@ -371,9 +374,10 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	eventSink := events.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(b, err)
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, scope)
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, scope)
 	assert.NoError(b, err)
 
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
@@ -458,9 +462,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	}
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, promutils.NewTestScope())
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -551,8 +556,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, promutils.NewTestScope())
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -605,10 +611,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	nodeEventSink := events.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
+	recoveryClient := &recoveryMocks.RecoveryClient{}
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient,
-		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, promutils.NewTestScope())
+		adminClient, maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	t.Run("EventAlreadyInTerminalStateError", func(t *testing.T) {

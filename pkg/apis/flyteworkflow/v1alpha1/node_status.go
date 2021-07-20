@@ -397,7 +397,7 @@ func (in *NodeStatus) GetMessage() string {
 }
 
 func IsPhaseTerminal(phase NodePhase) bool {
-	return phase == NodePhaseSucceeded || phase == NodePhaseFailed || phase == NodePhaseSkipped || phase == NodePhaseTimedOut
+	return phase == NodePhaseSucceeded || phase == NodePhaseFailed || phase == NodePhaseSkipped || phase == NodePhaseTimedOut || phase == NodePhaseRecovered
 }
 
 func (in *NodeStatus) GetOrCreateTaskStatus() MutableTaskNodeStatus {
@@ -576,7 +576,7 @@ func (in *NodeStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID) Exe
 }
 
 func (in *NodeStatus) IsTerminated() bool {
-	return in.GetPhase() == NodePhaseFailed || in.GetPhase() == NodePhaseSkipped || in.GetPhase() == NodePhaseSucceeded
+	return in.GetPhase() == NodePhaseFailed || in.GetPhase() == NodePhaseSkipped || in.GetPhase() == NodePhaseSucceeded || in.GetPhase() == NodePhaseRecovered
 }
 
 func (in *NodeStatus) GetDataDir() DataReference {

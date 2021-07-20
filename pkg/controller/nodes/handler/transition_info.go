@@ -24,10 +24,11 @@ const (
 	EPhaseTimedout
 	EPhaseFailing
 	EPhaseDynamicRunning
+	EPhaseRecovered
 )
 
 func (p EPhase) IsTerminal() bool {
-	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout {
+	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout || p == EPhaseRecovered {
 		return true
 	}
 	return false
@@ -136,6 +137,10 @@ func PhaseInfoSkip(info *ExecutionInfo, reason string) PhaseInfo {
 
 func PhaseInfoTimedOut(info *ExecutionInfo, reason string) PhaseInfo {
 	return phaseInfo(EPhaseTimedout, nil, info, reason)
+}
+
+func PhaseInfoRecovered(info *ExecutionInfo) PhaseInfo {
+	return phaseInfo(EPhaseRecovered, nil, info, "successfully recovered")
 }
 
 func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {

@@ -46,6 +46,7 @@ import (
 	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
 	lister "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
 )
@@ -317,14 +318,13 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, err
 func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
+	adminClient, err := getAdminClient(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
+		return nil, err
+	}
 	var launchPlanActor launchplan.FlyteAdmin
 	if cfg.EnableAdminLauncher {
-		adminClient, err := getAdminClient(ctx)
-		if err != nil {
-			logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
-			return nil, err
-		}
-
 		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
 			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"))
 		if err != nil {
@@ -421,7 +421,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes,
-		storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient, catalogClient, scope)
+		storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient, catalogClient, recovery.NewClient(adminClient), scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}

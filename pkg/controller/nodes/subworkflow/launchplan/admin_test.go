@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flytestdlib/cache"
 	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
 
@@ -191,6 +193,92 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			nil,
 		)
 		assert.NoError(t, err)
+	})
+
+	t.Run("happy recover", func(t *testing.T) {
+
+		mockClient := &mocks.AdminServiceClient{}
+		parentNodeExecution := &core.NodeExecutionIdentifier{
+			NodeId: "node-id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "p",
+				Domain:  "d",
+				Name:    "orig",
+			},
+		}
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope())
+		mockClient.On("RecoverExecution",
+			ctx,
+			mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
+				return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
+					proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
+			}),
+		).Return(nil, nil)
+		assert.NoError(t, err)
+		err = exec.Launch(ctx,
+			LaunchContext{
+				RecoveryExecution: &core.WorkflowExecutionIdentifier{
+					Project: "p",
+					Domain:  "d",
+					Name:    "w",
+				},
+				ParentNodeExecution: parentNodeExecution,
+			},
+			id,
+			&core.Identifier{},
+			nil,
+		)
+		assert.NoError(t, err)
+	})
+
+	t.Run("recovery fails", func(t *testing.T) {
+
+		mockClient := &mocks.AdminServiceClient{}
+		parentNodeExecution := &core.NodeExecutionIdentifier{
+			NodeId: "node-id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "p",
+				Domain:  "d",
+				Name:    "orig",
+			},
+		}
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		recoveryErr := status.Error(codes.NotFound, "foo")
+		mockClient.On("RecoverExecution",
+			ctx,
+			mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
+				return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
+					proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
+			}),
+		).Return(nil, recoveryErr)
+
+		var createCalled = false
+		mockClient.On("CreateExecution",
+			ctx,
+			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
+				createCalled = true
+				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
+					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW
+			}),
+		).Return(nil, nil)
+
+		err = exec.Launch(ctx,
+			LaunchContext{
+				RecoveryExecution: &core.WorkflowExecutionIdentifier{
+					Project: "p",
+					Domain:  "d",
+					Name:    "w",
+				},
+				ParentNodeExecution: parentNodeExecution,
+			},
+			id,
+			&core.Identifier{},
+			nil,
+		)
+		assert.NoError(t, err)
+		assert.True(t, createCalled)
 	})
 
 	t.Run("notFound", func(t *testing.T) {

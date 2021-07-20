@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,7 +21,8 @@ import (
 )
 
 type launchPlanHandler struct {
-	launchPlan launchplan.Executor
+	launchPlan     launchplan.Executor
+	recoveryClient recovery.Client
 }
 
 func getParentNodeExecutionID(nCtx handler.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {
@@ -58,6 +63,22 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 
 	launchCtx := launchplan.LaunchContext{
 		ParentNodeExecution: parentNodeExecutionID,
+	}
+	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
+		recovered, err := l.recoveryClient.RecoverNodeExecution(ctx, nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier, nCtx.NodeExecutionMetadata().GetNodeExecutionID())
+		if err != nil {
+			st, ok := status.FromError(err)
+			if !ok || st.Code() != codes.NotFound {
+				logger.Warnf(ctx, "Failed to recover workflow node [%+v] with err [%+v]", nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
+			}
+		}
+		if recovered != nil && recovered.Closure != nil && recovered.Closure.Phase == core.NodeExecution_SUCCEEDED {
+			if recovered.Closure.GetWorkflowNodeMetadata() != nil {
+				launchCtx.RecoveryExecution = recovered.Closure.GetWorkflowNodeMetadata().ExecutionId
+			} else {
+				logger.Debugf(ctx, "Attempted to recovered workflow node execution [%+v] but was missing workflow node metadata", recovered.Id)
+			}
+		}
 	}
 	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier, nodeInputs)
 	if err != nil {

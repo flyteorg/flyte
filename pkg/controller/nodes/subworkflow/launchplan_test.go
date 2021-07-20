@@ -6,6 +6,11 @@ import (
 	"reflect"
 	"testing"
 
+	mocks4 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	mocks3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flytestdlib/errors"
 
@@ -20,6 +25,7 @@ import (
 	mocks2 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	execMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	recoveryMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
@@ -165,6 +171,98 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 		s, err := h.StartLaunchPlan(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseFailed, s.Info().GetPhase())
+	})
+	t.Run("recover successfully", func(t *testing.T) {
+		recoveredExecID := &core.WorkflowExecutionIdentifier{
+			Project: "p",
+			Domain:  "d",
+			Name:    "n",
+		}
+
+		mockLPExec := &mocks.Executor{}
+		mockLPExec.On("Launch", mock.Anything, launchplan.LaunchContext{
+			ParentNodeExecution: &core.NodeExecutionIdentifier{
+				NodeId: "n",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+			},
+			RecoveryExecution: recoveredExecID,
+		}, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		recoveryClient := recoveryMocks.RecoveryClient{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveredExecID, mock.Anything).Return(&admin.NodeExecution{
+			Closure: &admin.NodeExecutionClosure{
+				Phase: core.NodeExecution_SUCCEEDED,
+				TargetMetadata: &admin.NodeExecutionClosure_WorkflowNodeMetadata{
+					WorkflowNodeMetadata: &admin.WorkflowNodeMetadata{
+						ExecutionId: recoveredExecID,
+					},
+				},
+			},
+		}, nil)
+
+		h := launchPlanHandler{
+			launchPlan:     mockLPExec,
+			recoveryClient: &recoveryClient,
+		}
+		mockLPExec.On("Launch",
+			ctx,
+			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
+				return o.ParentNodeExecution.NodeId == mockNode.GetID() &&
+					o.ParentNodeExecution.ExecutionId == wfExecID
+			}),
+			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+			}),
+			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+		).Return(nil)
+
+		wfStatus := &mocks2.MutableWorkflowNodeStatus{}
+		mockNodeStatus.On("GetOrCreateWorkflowStatus").Return(wfStatus)
+
+		nCtx := &mocks3.NodeExecutionContext{}
+
+		ir := &mocks4.InputReader{}
+		inputs := &core.LiteralMap{}
+		ir.OnGetMatch(mock.Anything).Return(inputs, nil)
+		nCtx.OnInputReader().Return(ir)
+
+		nm := &mocks3.NodeExecutionMetadata{}
+		nm.OnGetAnnotations().Return(map[string]string{})
+		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+			ExecutionId: wfExecID,
+			NodeId:      "n",
+		})
+		nm.OnGetK8sServiceAccount().Return("service-account")
+		nm.OnGetLabels().Return(map[string]string{})
+		nm.OnGetNamespace().Return("namespace")
+		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+
+		nCtx.OnNodeExecutionMetadata().Return(nm)
+		ectx := &execMocks.ExecutionContext{}
+		ectx.OnGetEventVersion().Return(1)
+		ectx.OnGetParentInfo().Return(nil)
+		ectx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+			RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
+				WorkflowExecutionIdentifier: recoveredExecID,
+			},
+		})
+		nCtx.OnExecutionContext().Return(ectx)
+		nCtx.OnCurrentAttempt().Return(uint32(1))
+		nCtx.OnNode().Return(mockNode)
+
+		s, err := h.StartLaunchPlan(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseRunning)
+		assert.Equal(t, len(recoveryClient.Calls), 1)
 	})
 }
 

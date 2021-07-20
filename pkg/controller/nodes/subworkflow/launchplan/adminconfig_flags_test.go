@@ -84,7 +84,7 @@ func testDecodeJson_AdminConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_AdminConfig(val, result))
 }
 
-func testDecodeSlice_AdminConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_AdminConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_AdminConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_tps", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt64, err := cmdFlags.GetInt64("tps"); err == nil {
-				assert.Equal(t, int64(defaultAdminConfig.TPS), vInt64)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_burst", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("burst"); err == nil {
-				assert.Equal(t, int(defaultAdminConfig.Burst), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_cacheSize", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("cacheSize"); err == nil {
-				assert.Equal(t, int(defaultAdminConfig.MaxCacheSize), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_workers", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("workers"); err == nil {
-				assert.Equal(t, int(defaultAdminConfig.Workers), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
