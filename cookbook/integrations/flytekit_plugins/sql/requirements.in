@@ -1,0 +1,2 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-sqlalchemy>=0.20.1

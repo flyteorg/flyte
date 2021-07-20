@@ -1,15 +1,8 @@
 """
-.. _extend_sql_sqlite3:
+.. _integrations_sql_sqlite3:
 
-SQL Query Tasks
-===============
-
-SQLite3 Example 
----------------
-
-Flyte tasks are not always restricted to running user-supplied containers, nor even containers at all. Indeed, this is
-one of the most important design decisions in Flyte. Non-container tasks can have arbitrary targets for execution -
-example an API that executes SQL queries like SnowFlake, BigQuery etc, a synchronous WebAPI etc
+Sqlite3
+#######
 
 The following example shows how you can write SQLite3 queries using the SQLite3Task, which is bundled as part of the
 core flytekit. Since SQL Queries are portable across workflows and Flyte installations (as long as the data exists),

@@ -18,6 +18,15 @@ You can find the plugins maintained by the core flyte team `here <https://github
 .. panels::
    :header: text-center
 
+   .. link-button:: auto/integrations/flytekit_plugins/sql/index
+      :type: ref
+      :text: SQL
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   Execute SQL queries as tasks.
+
+   ---
+
    .. link-button:: auto/integrations/flytekit_plugins/papermilltasks/index
       :type: ref
       :text: Papermill
@@ -34,16 +43,22 @@ You can find the plugins maintained by the core flyte team `here <https://github
    ^^^^^^^^^^^^
    Validate pandas dataframes with ``pandera``.
 
+   ---
 
-.. TODO: add the following items to the TOC when the content is written.
-.. - auto/integrations/flytekit_plugins/sqllite3/index
-.. - auto/integrations/flytekit_plugins/sqlalchemy/index
+   .. link-button:: auto/integrations/flytekit_plugins/dolt/index
+      :type: ref
+      :text: Dolt
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   Version your SQL database with ``dolt``.
+
 
 .. toctree::
    :maxdepth: -1
    :caption: Contents
    :hidden:
 
+   auto/integrations/flytekit_plugins/sql/index
    auto/integrations/flytekit_plugins/papermilltasks/index
    auto/integrations/flytekit_plugins/pandera/index
    auto/integrations/flytekit_plugins/dolt/index
