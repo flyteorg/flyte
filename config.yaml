@@ -3,7 +3,7 @@
 propeller:
   rawoutput-prefix: s3://my-container/test/
   metadata-prefix: metadata/propeller/sandbox
-  workers: 4
+  workers: 1
   workflow-reeval-duration: 10s
   downstream-eval-duration: 5s
   limit-namespace: "all"
@@ -23,7 +23,7 @@ propeller:
       rate: 100
       capacity: 1000
   # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
-  kube-config: "$HOME/kubeconfig/k3s/k3s.yaml"
+  kube-config: "$HOME/.flyte/k3s/k3s.yaml"
   publish-k8s-events: true
   workflowStore:
     policy: "ResourceVersionCache"
@@ -102,5 +102,5 @@ catalog-cache:
   endpoint: datacatalog:8089
   insecure: true
 logger:
-  level: 4
+  level: 5
   show-source: true
