@@ -64,6 +64,13 @@ class CustomSorter(FileNameSortKey):
         "use_secrets.py",
         "spot_instances.py",
         "workflow_labels_annotations.py",
+        # Remote Access
+        "register_project.py",
+        "run_task.py",
+        "run_workflow.py",
+        "run_launchplan.py",
+        "inspecting_executions.py",
+        "debugging_workflows_tasks.py",
         # Deployment
         ## Workflow
         "deploying_workflows.py",
@@ -235,7 +242,7 @@ examples_dirs = [
     "../testing",
     "../core/containerization",
     "../deployment",
-    # "../control_plane",  # TODO: add content to this section
+    "../remote_access",
     "../integrations/flytekit_plugins/sql",
     "../integrations/flytekit_plugins/papermilltasks",
     "../integrations/flytekit_plugins/pandera",
@@ -261,8 +268,7 @@ gallery_dirs = [
     "auto/testing",
     "auto/core/containerization",
     "auto/deployment",
-    # "auto/deployment/guides",  # TODO: add content to this section
-    # "auto/control_plane",  # TODO: add content to this section
+    "auto/remote_access",
     "auto/integrations/flytekit_plugins/sql",
     "auto/integrations/flytekit_plugins/papermilltasks",
     "auto/integrations/flytekit_plugins/pandera",

@@ -2,13 +2,15 @@
 Distributed Pytorch on Sagemaker
 ################################
 
-This example is adapted from the following sagemake example:
-https://github.com/aws/amazon-sagemaker-examples/blob/89831fcf99ea3110f52794db0f6433a4013a5bca/sagemaker-python-sdk/pytorch_mnist/mnist.py
+This example is adapted from
+`this sagemaker example <https://github.com/aws/amazon-sagemaker-examples/blob/89831fcf99ea3110f52794db0f6433a4013a5bca/sagemaker-python-sdk/pytorch_mnist/mnist.py>`__:
 
 It shows how distributed training can be completely performed on the user side with minimal changes using Flyte.
 
-TODO: Flytekit will be adding further simplifications to make writing a distributed training algorithm even simpler, but
-      this example basically provides the full details.
+.. NOTE::
+
+    Flytekit will be adding further simplifications to make writing a distributed training algorithm even simpler, but
+    this example basically provides the full details.
 """
 import logging
 import os

@@ -77,6 +77,15 @@ Table of Contents
 
    ---
 
+   .. link-button:: auto/remote_access/index
+      :type: ref
+      :text: 🎮 Remote Access
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^
+   Register, inspect, and monitor tasks and workflows on a Flyte backend.
+
+   ---
+
    .. link-button:: integrations
       :type: ref
       :text: 🔌  Integrations
@@ -248,6 +257,7 @@ Steps
    Type System <auto/core/type_system/index>
    Testing <auto/testing/index>
    Containerization <auto/core/containerization/index>
+   Remote Access <auto/remote_access/index>
    Configuring Production Features <auto/deployment/index>
    integrations
    Extending flyte <auto/core/extend_flyte/index>

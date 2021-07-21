@@ -1,4 +1,0 @@
-.. _controlplane:
-
-Control Plane
--------------
