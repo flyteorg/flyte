@@ -183,4 +183,18 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_recover", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("recover", testValue)
+			if vString, err := cmdFlags.GetString("recover"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.Recover)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	relaunchExecResponse *admin.ExecutionCreateResponse
-	relaunchRequest      *admin.ExecutionRelaunchRequest
+	executionCreateResponse *admin.ExecutionCreateResponse
+	relaunchRequest         *admin.ExecutionRelaunchRequest
+	recoverRequest          *admin.ExecutionRecoverRequest
 )
 
 // This function needs to be called after testutils.Steup()
@@ -22,7 +23,7 @@ func createExecutionUtilSetup() {
 	ctx = testutils.Ctx
 	cmdCtx = testutils.CmdCtx
 	mockClient = testutils.MockClient
-	relaunchExecResponse = &admin.ExecutionCreateResponse{
+	executionCreateResponse = &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
 			Domain:  "development",
@@ -36,12 +37,19 @@ func createExecutionUtilSetup() {
 			Domain:  config.GetConfig().Domain,
 		},
 	}
+	recoverRequest = &admin.ExecutionRecoverRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Name:    "execName",
+			Project: config.GetConfig().Project,
+			Domain:  config.GetConfig().Domain,
+		},
+	}
 }
 
 func TestCreateExecutionForRelaunch(t *testing.T) {
 	setup()
 	createExecutionUtilSetup()
-	mockClient.OnRelaunchExecutionMatch(ctx, relaunchRequest).Return(relaunchExecResponse, nil)
+	mockClient.OnRelaunchExecutionMatch(ctx, relaunchRequest).Return(executionCreateResponse, nil)
 	err = relaunchExecution(ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
 	assert.Nil(t, err)
 }
@@ -51,6 +59,23 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 	createExecutionUtilSetup()
 	mockClient.OnRelaunchExecutionMatch(ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
 	err = relaunchExecution(ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, errors.New("unknown execution"))
+}
+
+func TestCreateExecutionForRecovery(t *testing.T) {
+	setup()
+	createExecutionUtilSetup()
+	mockClient.OnRecoverExecutionMatch(ctx, recoverRequest).Return(executionCreateResponse, nil)
+	err = recoverExecution(ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
+	assert.Nil(t, err)
+}
+
+func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
+	setup()
+	createExecutionUtilSetup()
+	mockClient.OnRecoverExecutionMatch(ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
+	err = recoverExecution(ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("unknown execution"))
 }
