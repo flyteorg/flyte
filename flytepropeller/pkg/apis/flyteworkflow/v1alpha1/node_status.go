@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -517,62 +518,53 @@ func (in NodeStatus) GetTaskNodeStatus() ExecutableTaskNodeStatus {
 	return in.TaskNodeStatus
 }
 
+func (in *NodeStatus) setEphemeralNodeExecutionStatusAttributes(ctx context.Context, id NodeID, n *NodeStatus) error {
+	n.SetParentTaskID(in.GetParentTaskID())
+	if len(n.GetDataDir()) == 0 {
+		dataDir, err := in.DataReferenceConstructor.ConstructReference(ctx, in.GetOutputDir(), id)
+		if err != nil {
+			return fmt.Errorf("failed to construct data dir for node [%v]. Error: %w", id, err)
+		}
+
+		n.SetDataDir(dataDir)
+	}
+
+	if len(n.GetOutputDir()) == 0 {
+		outputDir, err := in.DataReferenceConstructor.ConstructReference(ctx, n.GetDataDir(), strconv.FormatUint(uint64(n.Attempts), 10))
+		if err != nil {
+			return fmt.Errorf("failed to construct output dir for node [%v]. Error: %w", id, err)
+		}
+
+		n.SetOutputDir(outputDir)
+	}
+
+	n.DataReferenceConstructor = in.DataReferenceConstructor
+
+	return nil
+}
+
 func (in *NodeStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID) ExecutableNodeStatus {
 	n, ok := in.SubNodeStatus[id]
-	if ok {
-		n.SetParentTaskID(in.GetParentTaskID())
-		n.DataReferenceConstructor = in.DataReferenceConstructor
-		if len(n.GetDataDir()) == 0 {
-			dataDir, err := in.DataReferenceConstructor.ConstructReference(ctx, in.GetDataDir(), id)
-			if err != nil {
-				logger.Errorf(ctx, "Failed to construct data dir for node [%v]", id)
-				return n
-			}
-
-			n.SetDataDir(dataDir)
+	if !ok {
+		if in.SubNodeStatus == nil {
+			in.SubNodeStatus = make(map[NodeID]*NodeStatus)
 		}
 
-		if len(n.GetOutputDir()) == 0 {
-			outputDir, err := in.DataReferenceConstructor.ConstructReference(ctx, n.GetDataDir(), strconv.FormatUint(uint64(in.Attempts), 10))
-			if err != nil {
-				logger.Errorf(ctx, "Failed to construct output dir for node [%v]", id)
-				return n
-			}
-
-			n.SetOutputDir(outputDir)
+		n = &NodeStatus{
+			MutableStruct: MutableStruct{},
 		}
 
-		return n
+		in.SubNodeStatus[id] = n
+		in.SetDirty()
 	}
 
-	if in.SubNodeStatus == nil {
-		in.SubNodeStatus = make(map[NodeID]*NodeStatus)
-	}
-
-	newNodeStatus := &NodeStatus{
-		MutableStruct: MutableStruct{},
-	}
-	newNodeStatus.SetParentTaskID(in.GetParentTaskID())
-	newNodeStatus.SetParentNodeID(in.GetParentNodeID())
-	dataDir, err := in.DataReferenceConstructor.ConstructReference(ctx, in.GetDataDir(), id)
+	err := in.setEphemeralNodeExecutionStatusAttributes(ctx, id, n)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to construct data dir for node [%v]", id)
+		logger.Errorf(ctx, "Failed to set node attributes for node [%v]. Error: %v", id, err)
 		return n
 	}
 
-	outputDir, err := in.DataReferenceConstructor.ConstructReference(ctx, dataDir, "0")
-	if err != nil {
-		logger.Errorf(ctx, "Failed to construct output dir for node [%v]", id)
-		return n
-	}
-
-	newNodeStatus.SetDataDir(dataDir)
-	newNodeStatus.SetOutputDir(outputDir)
-	newNodeStatus.DataReferenceConstructor = in.DataReferenceConstructor
-
-	in.SubNodeStatus[id] = newNodeStatus
-	in.SetDirty()
-	return newNodeStatus
+	return n
 }
 
 func (in *NodeStatus) IsTerminated() bool {

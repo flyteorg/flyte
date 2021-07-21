@@ -467,6 +467,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		subNs := &flyteMocks.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
 		subNs.On("SetOutputDir", mock.Anything).Return()
+		subNs.On("SetParentNodeID", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
 		subNs.OnGetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
@@ -476,6 +477,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_2").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_3").Return(subNs)
@@ -658,12 +660,14 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		subNs.On("ResetDirty").Return()
 		subNs.OnGetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
+		subNs.On("SetParentNodeID", mock.Anything).Return()
 		subNs.OnGetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
@@ -907,12 +911,14 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		subNs.On("ResetDirty").Return()
 		subNs.OnGetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
+		subNs.On("SetParentNodeID", mock.Anything).Return()
 		subNs.OnGetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)

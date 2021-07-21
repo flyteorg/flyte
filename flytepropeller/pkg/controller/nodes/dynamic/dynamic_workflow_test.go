@@ -111,12 +111,14 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		subNs.On("ResetDirty").Return()
 		subNs.OnGetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
+		subNs.On("SetParentNodeID", mock.Anything).Return()
 		subNs.OnGetAttempts().Return(0)
 
 		dynamicNS := &mocks2.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
@@ -153,7 +155,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		finalOutput := storage.DataReference("/subnode")
 		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
-		nCtx.On("NodeStateWriter").Return(s)
+		nCtx.OnNodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
