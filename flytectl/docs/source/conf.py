@@ -35,6 +35,7 @@ version = release
 extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx.ext.doctest",
@@ -181,3 +182,9 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# -- Options for intersphinx -------------------------------------------------
+# intersphinx configuration
+intersphinx_mapping = {
+    "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
+}

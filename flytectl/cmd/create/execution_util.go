@@ -107,6 +107,22 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 	return nil
 }
 
+func recoverExecution(ctx context.Context, executionName string, project string, domain string,
+	cmdCtx cmdCore.CommandContext) error {
+	recoveredExec, err := cmdCtx.AdminClient().RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Name:    executionName,
+			Project: project,
+			Domain:  domain,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("execution identifier %v\n", recoveredExec.Id)
+	return nil
+}
+
 func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securityContext *core.SecurityContext,
 	authRole *admin.AuthRole) *admin.ExecutionCreateRequest {
 
@@ -164,13 +180,17 @@ func resolveOverrides(toBeOverridden *ExecutionConfig, project string, domain st
 
 func readConfigAndValidate(project string, domain string) (ExecutionParams, error) {
 	executionParams := ExecutionParams{}
-	if executionConfig.ExecFile == "" && executionConfig.Relaunch == "" {
-		return executionParams, fmt.Errorf("executionConfig or relaunch can't be empty." +
+	if executionConfig.ExecFile == "" && executionConfig.Relaunch == "" && executionConfig.Recover == "" {
+		return executionParams, fmt.Errorf("executionConfig, relaunch and recover can't be empty." +
 			" Run the flytectl get task/launchplan to generate the config")
 	}
 	if executionConfig.Relaunch != "" {
 		resolveOverrides(executionConfig, project, domain)
 		return ExecutionParams{name: executionConfig.Relaunch, execType: Relaunch}, nil
+	}
+	if len(executionConfig.Recover) > 0 {
+		resolveOverrides(executionConfig, project, domain)
+		return ExecutionParams{name: executionConfig.Recover, execType: Recover}, nil
 	}
 	var readExecutionConfig *ExecutionConfig
 	var err error

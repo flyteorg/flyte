@@ -183,6 +183,7 @@ func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
 func TestCreateRelaunchExecutionFunc(t *testing.T) {
 	setup()
 	createExecutionSetup()
+	defer func() { executionConfig.Relaunch = "" }()
 	relaunchExecResponse := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
@@ -206,6 +207,36 @@ func TestCreateRelaunchExecutionFunc(t *testing.T) {
 	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
 }
 
+func TestCreateRecoverExecutionFunc(t *testing.T) {
+	setup()
+	createExecutionSetup()
+	defer func() { executionConfig.Recover = "" }()
+
+	originalExecutionName := "abc123"
+	recoverExecResponse := &admin.ExecutionCreateResponse{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "flytesnacks",
+			Domain:  "development",
+			Name:    "f652ea3596e7f4d80a0e",
+		},
+	}
+
+	executionConfig.Recover = originalExecutionName
+	recoverRequest := &admin.ExecutionRecoverRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Name:    originalExecutionName,
+			Project: config.GetConfig().Project,
+			Domain:  config.GetConfig().Domain,
+		},
+	}
+	mockClient.OnRecoverExecutionMatch(ctx, recoverRequest).Return(recoverExecResponse, nil)
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.Nil(t, err)
+	mockClient.AssertCalled(t, "RecoverExecution", ctx, recoverRequest)
+	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+	executionConfig.Relaunch = ""
+}
+
 func TestCreateExecutionFuncInvalid(t *testing.T) {
 	setup()
 	createExecutionSetup()
@@ -213,7 +244,7 @@ func TestCreateExecutionFuncInvalid(t *testing.T) {
 	executionConfig.ExecFile = ""
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("executionConfig or relaunch can't be empty. Run the flytectl get task/launchplan to generate the config"), err)
+	assert.Equal(t, fmt.Errorf("executionConfig, relaunch and recover can't be empty. Run the flytectl get task/launchplan to generate the config"), err)
 	executionConfig.ExecFile = "Invalid-file"
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.NotNil(t, err)

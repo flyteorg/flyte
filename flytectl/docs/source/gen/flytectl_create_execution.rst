@@ -76,6 +76,13 @@ Also an execution can be relaunched by passing in current execution id.
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytectldemo -d development
 
+An execution can be recovered, that is recreated from the last known failure point for a previously-run workflow execution.
+See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
+
+::
+
+ flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytectldemo -d development
+
 Generic data types are also supported for execution in similar way.Following is sample of how the inputs need to be specified while creating the execution.
 As usual the spec file should be generated first and then run the execution using the spec file.
 
@@ -137,6 +144,7 @@ Options
   -h, --help                     help for execution
       --iamRoleARN string        iam role ARN AuthRole for launching execution.
       --kubeServiceAcct string   kubernetes service account AuthRole for launching execution.
+      --recover string           execution id to be recreated from the last known failure point.
       --relaunch string          execution id to be relaunched.
       --targetDomain string      project where execution needs to be created.If not specified configured domain would be used.
       --targetProject string     project where execution needs to be created.If not specified configured project would be used.
