@@ -181,7 +181,7 @@ Steps
 
    .. prompt:: bash
 
-      flytectl sandbox start --sourcesPath ${PWD}
+      flytectl sandbox start --source ${PWD}
 
    .. tip::
       In case make start throws any error please refer to the troubleshooting guide here `Troubleshoot <https://docs.flyte.org/en/latest/community/troubleshoot.html>`_
