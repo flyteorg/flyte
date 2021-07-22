@@ -1985,9 +1985,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
-#  - ""
   - flyte.lyft.com
-#   - rbac.authorization.k8s.io
   resources:
   - flyteworkflows
 #  - configmaps
@@ -2003,7 +2001,6 @@ rules:
   - '*'
 - apiGroups:
   - ""
-  - rbac.authorization.k8s.io
   resources:
   - secrets
   verbs:
