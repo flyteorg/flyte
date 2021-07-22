@@ -39,6 +39,13 @@ rules:
 #  - serviceaccounts
   verbs:
   - '*'
+- apiGroups:
+  - ""
+  - rbac.authorization.k8s.io
+  resources:
+  - secrets
+  verbs:
+  - '*'
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
