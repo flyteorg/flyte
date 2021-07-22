@@ -1,4 +1,34 @@
 ---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-dev-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-stg-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-prd-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: projectcontour
+---
 # Source: flyte/charts/contour/templates/contour/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -2961,7 +2991,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -2977,7 +3007,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -2985,7 +3015,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3006,7 +3036,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:

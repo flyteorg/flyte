@@ -1,4 +1,34 @@
 ---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-dev-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-stg-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-prd-jpdev
+---
+# Source: flyte/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: projectcontour
+---
 # Source: flyte/charts/contour/templates/contour/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount

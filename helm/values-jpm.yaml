@@ -11,7 +11,7 @@
 
 flyteadmin:
   image:
-    tag: flyte-v0.16.3
+    tag: v0.16.3
 
 #
 # DATACATALOG

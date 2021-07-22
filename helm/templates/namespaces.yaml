@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-dev-jpdev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-stg-jpdev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 10302-flytepoc-flytesnacks-prd-jpdev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: projectcontour
