@@ -2991,7 +2991,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.13"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3007,7 +3007,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.13"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3015,7 +3015,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.13"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3036,7 +3036,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.16.3"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.13"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
