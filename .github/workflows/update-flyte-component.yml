@@ -1,10 +1,10 @@
-name: Update flyteidl version
+name: Update Flyte component
 on:
   workflow_dispatch:
 
 jobs:
   update-flyte-releases:
-    name: Update Flyteidl version
+    name: Update Flyte component
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +23,10 @@ jobs:
       - name: Update Flyte component
         run: |
           FLYTEIDL_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flyteidl/releases/latest" | jq -r .tag_name)
+          FLYTESTDLIB_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytestdlib/releases/latest" | jq -r .tag_name)
           go get -u github.com/flyteorg/flyteidl@$FLYTEIDL_VERSION
+          go get -u github.com/flyteorg/flytestdlib@$FLYTESTDLIB_VERSION
+          go mod tidy
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
