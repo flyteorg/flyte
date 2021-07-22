@@ -9,6 +9,8 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
+	"github.com/flyteorg/flytectl/pkg/util"
+
 	"github.com/flyteorg/flytectl/pkg/configutil"
 
 	initConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/config"
@@ -69,6 +71,10 @@ func configInitFunc(ctx context.Context, args []string, cmdCtx cmdcore.CommandCo
 
 func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 
+	if err := util.SetupFlyteDir(); err != nil {
+		return err
+	}
+
 	templateValues := configutil.ConfigTemplateSpec{
 		Host:     "dns:///localhost:30081",
 		Insecure: initConfig.DefaultConfig.Insecure,
@@ -87,6 +93,8 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 			if strings.ToUpper(result) == "GCS" {
 				templateStr = configutil.GetGoogleCloudTemplate()
 			}
+		} else {
+			logger.Infof(ctx, "Init flytectl config for remote cluster, Please update your storage config in %s. Learn more about the config here https://docs.flyte.org/projects/flytectl/en/latest/index.html#configure", configutil.ConfigFile)
 		}
 	}
 	var _err error
@@ -100,9 +108,9 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 			_err = configutil.SetupConfig(configutil.ConfigFile, templateStr, templateValues)
 		}
 	}
-
-	if len(initConfig.DefaultConfig.Host) > 0 {
-		logger.Infof(ctx, "Init flytectl config for remote cluster, Please update your storage config in %s. Learn more about the config here https://docs.flyte.org/projects/flytectl/en/latest/index.html#configure", configutil.ConfigFile)
+	if _err != nil {
+		return _err
 	}
-	return _err
+	fmt.Printf("Init flytectl config file at [%s]", configutil.ConfigFile)
+	return nil
 }
