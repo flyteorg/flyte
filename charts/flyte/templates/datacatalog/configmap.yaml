@@ -6,7 +6,7 @@ metadata:
   labels: {{ include "datacatalog.labels" . | nindent 4 }}
 data:
 {{- with .Values.db }}
-  db.yaml: | {{ toYaml . | nindent 4 }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
@@ -14,5 +14,5 @@ data:
 {{- with .Values.configmap.datacatalogServer }}
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-  storage.yaml: | {{ include "storage" . | nindent 4 }}
+  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
 

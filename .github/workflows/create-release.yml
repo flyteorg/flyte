@@ -7,8 +7,8 @@ on:
         required: true
 
 jobs:
-  goreleaser:
-    name: Goreleaser
+  bump-version:
+    name: bump-version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
@@ -35,11 +35,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-          
+                  
       - name: Install Helm
         uses: azure/setup-helm@v1
         with:
-          version: v3.4.0
+          version: v3.4.1
 
       - name: Configure Git
         run: |
@@ -47,19 +47,16 @@ jobs:
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
 
       - name: Preprare Flyte Helm Release
+        env:
+          VERSION: ${{ needs.bump-version.outputs.version }}
         run: |
-          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${{ needs.bump-version.outputs.version }} # VERSION/g"
-          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-core/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${{ needs.bump-version.outputs.version }} # VERSION/g"
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add googlecloudplatform https://googlecloudplatform.github.io/spark-on-k8s-operator
-          helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+          make prepare_artifacts
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
+        uses: stefanprodan/helm-gh-pages@v1.4.1
         with:
-          charts_dir: charts
-        env:
-          CR_TOKEN: "${{ secrets.FLYTE_BOT_PAT }}"
+          token: "${{ secrets.FLYTE_BOT_PAT }}"
+          linting: off
 
 
   manifest-release:
@@ -73,14 +70,17 @@ jobs:
           fetch-depth: "0"
 
       - name: Preprare Flyte Release
+        env:
+          VERSION: ${{ needs.bump-version.outputs.version }}
         run: |
           make prepare_artifacts
+          git stash
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
+          args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           

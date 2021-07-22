@@ -42,7 +42,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -56,7 +56,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
@@ -70,7 +70,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
@@ -107,7 +107,7 @@ kind: Secret
 metadata:
   name: db-pass
 stringData:
-  pass.txt: '{{ .Values.userSettings.dbPassword }}'
+  pass.txt: '<DB_PASSWORD>'
 type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
@@ -251,7 +251,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: '{{ .Values.userSettings.rdsHost }}'
+      host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -318,10 +318,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "{{ .Values.userSettings.bucketName }}"
+      container: "<BUCKET_NAME>"
       connection:
         auth-type: iam
-        region: {{ .Values.userSettings.accountRegion }}
+        region: <AWS_REGION>
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -344,21 +344,21 @@ data:
         - projectQuotaMemory:
             value: 4000Mi
         - defaultIamRole:
-            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -394,7 +394,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: '{{ .Values.userSettings.rdsHost }}'
+      host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -414,10 +414,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "{{ .Values.userSettings.bucketName }}"
+      container: "<BUCKET_NAME>"
       connection:
         auth-type: iam
-        region: {{ .Values.userSettings.accountRegion }}
+        region: <AWS_REGION>
       limits:
         maxDownloadMBs: 10
 ---
@@ -1327,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "beaa4259c628986312c359bf8ebc8f6a7a743d11bb525f5d5456d12f41e748d"
+        configChecksum: "5557cb260e3c55e1c0612d232201a66fe5133821ead3f8b1616483fb4221a57"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1549,7 +1549,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "33c7c6584b9a3a309e005c581b35f8eadacff2fa00266ae1d3a63e6044da236"
+        configChecksum: "0cf9d3a246a3eb65c44535f3ae9c441761bb4599ec44c50d433774959354336"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte

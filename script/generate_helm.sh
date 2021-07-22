@@ -10,14 +10,10 @@ DEPLOYMENT=${1:-sandbox eks gcp}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 helm dep update ${DIR}/../charts/flyte/
-helm dep update ${DIR}/../charts/flyte-core/
 
 for deployment in ${DEPLOYMENT}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
-
-helm template flyte-core -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml --debug > ${DIR}/../deployment/flyte_core_generated.yaml
-
 
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
