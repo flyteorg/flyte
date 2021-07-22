@@ -1,26 +1,512 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: flyte
 ---
+# Source: flyte/charts/contour/templates/contour/serviceaccount.yaml
 apiVersion: v1
-kind: Namespace
+kind: ServiceAccount
 metadata:
-  name: kubernetes-dashboard
+  name: flyte-contour-contour
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
 ---
+# Source: flyte/charts/contour/templates/envoy/serviceaccount.yaml
 apiVersion: v1
-kind: Namespace
+kind: ServiceAccount
 metadata:
-  name: projectcontour
+  name: flyte-contour-envoy
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: envoy
 ---
+# Source: flyte/charts/kubernetes-dashboard/templates/serviceaccount.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  name: flyte-kubernetes-dashboard
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/templates/datacatalog/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/templates/propeller/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/templates/propeller/webhook.yaml
+# Create a Service Account for webhook
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# kubernetes-dashboard-certs
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  name: flyte-kubernetes-dashboard-certs
+type: Opaque
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
+# kubernetes-dashboard-csrf
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  name: kubernetes-dashboard-csrf
+type: Opaque
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
+# kubernetes-dashboard-key-holder
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  name: kubernetes-dashboard-key-holder
+type: Opaque
+---
+# Source: flyte/templates/admin/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-admin-secrets
+  namespace: flyte
+type: Opaque
+stringData:
+---
+# Source: flyte/templates/propeller/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-propeller-auth
+  namespace: flyte
+type: Opaque
+stringData:
+  client_secret: foobar
+---
+# Source: flyte/templates/propeller/webhook.yaml
+# Create an empty secret that the first propeller pod will populate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+type: Opaque
+---
+# Source: flyte/charts/contour/templates/contour/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-contour
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
+data:
+  contour.yaml: |
+    accesslog-format: envoy
+    disablePermitInsecure: false
+    envoy-service-name: 'flyte-contour-envoy'
+    leaderelection:
+      configmap-namespace: 'flyte'
+    tls: {}
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/configmap.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  name: kubernetes-dashboard-settings
+data:
+---
+# Source: flyte/templates/admin/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  db.yaml: | 
+    database:
+      dbname: flyte_development
+      host: postgres
+      port: 5432
+      username: postgres
+  domain.yaml: | 
+    domains:
+    - id: dev
+      name: Development
+    - id: test
+      name: Test
+    - id: prod
+      name: Production
+  logger.yaml: | 
+    logger:
+      level: 4
+      show-source: true
+  server.yaml: | 
+    flyteadmin:
+      eventVersion: 1
+      metadataStoragePrefix:
+      - metadata
+      - admin
+      metricsScope: 'flyte:'
+      profilerPort: 10254
+      roleNameKey: iam.amazonaws.com/role
+      testing:
+        host: http://flyteadmin
+    server:
+      grpcPort: 8089
+      httpPort: 8088
+      security:
+        allowCors: true
+        allowedHeaders:
+        - Content-Type
+        - flyte-authorization
+        allowedOrigins:
+        - '*'
+        secure: false
+        useAuth: false
+  remoteData.yaml: | 
+    remoteData:
+      region: us-east-1
+      scheme: local
+      signedUrls:
+        durationMinutes: 3
+  storage.yaml: | 
+    storage:
+      type: minio
+      container: "my-s3-bucket"
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        secret-key: miniostorage
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+      limits:
+        maxDownloadMBs: 10
+  task_resource_defaults.yaml: | 
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 200Mi
+        storage: 5Mi
+      limits:
+        cpu: 2
+        gpu: 1
+        memory: 8Gi
+        storage: 20Mi
+---
+# Source: flyte/templates/console/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-console-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteconsole
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+data: 
+  BASE_URL: /console
+  CONFIG_DIR: /etc/flyte/config
+  DISABLE_AUTH: "1"
+---
+# Source: flyte/templates/datacatalog/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datacatalog-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  db.yaml: | 
+    database:
+      dbname: flyte_development
+      host: postgres
+      port: 5432
+      username: postgres
+  logger.yaml: | 
+    logger:
+      level: 4
+      show-source: true
+  server.yaml: | 
+    application:
+      grpcPort: 8089
+      grpcServerReflection: true
+      httpPort: 8080
+    datacatalog:
+      metrics-scope: datacatalog
+      profiler-port: 10254
+      storage-prefix: metadata/datacatalog
+  storage.yaml: | 
+    storage:
+      type: minio
+      container: "my-s3-bucket"
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        secret-key: miniostorage
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+      limits:
+        maxDownloadMBs: 10
+---
+# Source: flyte/templates/propeller/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-propeller-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  admin.yaml: | 
+    admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  catalog.yaml: | 
+    catalog-cache:
+      endpoint: datacatalog:89
+      insecure: true
+      type: datacatalog
+  copilot.yaml: | 
+    plugins:
+      k8s:
+        co-pilot:
+          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          name: flyte-copilot-
+          start-timeout: 30s
+  core.yaml: | 
+    propeller:
+      downstream-eval-duration: 30s
+      enable-admin-launcher: true
+      leader-election:
+        enabled: true
+        lease-duration: 15s
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        renew-deadline: 10s
+        retry-period: 2s
+      limit-namespace: all
+      max-workflow-retries: 30
+      metadata-prefix: metadata/propeller
+      metrics-prefix: flyte
+      prof-port: 10254
+      queue:
+        batch-size: -1
+        batching-interval: 2s
+        queue:
+          base-delay: 5s
+          capacity: 1000
+          max-delay: 120s
+          rate: 100
+          type: maxof
+        sub-queue:
+          capacity: 100
+          rate: 10
+          type: bucket
+        type: batch
+      rawoutput-prefix: s3://my-s3-bucket/
+      workers: 20
+      workflow-reeval-duration: 30s
+    webhook:
+      certDir: /etc/webhook/certs
+      serviceName: flyte-pod-webhook
+  enabled_plugins.yaml: | 
+    tasks:
+      task-plugins:
+        default-for-task-types:
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+  k8s.yaml: | 
+    plugins:
+      k8s:
+        default-cpus: 100m
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
+        - FLYTE_AWS_ACCESS_KEY_ID: minio
+        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        default-memory: 200Mi
+  logger.yaml: | 
+    logger:
+      level: 4
+      show-source: true
+  resource_manager.yaml: | 
+    propeller:
+      resourcemanager:
+        resourceMaxQuota: 10000
+        type: noop
+  storage.yaml: | 
+    storage:
+      type: minio
+      container: "my-s3-bucket"
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        secret-key: miniostorage
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+      limits:
+        maxDownloadMBs: 10
+  cache.yaml: |
+    cache:
+      max_size_mbs: 0
+      target_gc_percent: 70
+  task_logs.yaml: | 
+    plugins:
+      logs:
+        cloudwatch-enabled: false
+        kubernetes-enabled: true
+        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName
+          }}/pod?namespace={{ .namespace }}
+---
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.2.9
   creationTimestamp: null
   name: extensionservices.projectcontour.io
 spec:
+  preserveUnknownFields: false
   group: projectcontour.io
   names:
     kind: ExtensionService
@@ -30,7 +516,6 @@ spec:
     - extensionservice
     - extensionservices
     singular: extensionservice
-  preserveUnknownFields: false
   scope: Namespaced
   versions:
   - name: v1alpha1
@@ -50,28 +535,10 @@ spec:
             description: ExtensionServiceSpec defines the desired state of an ExtensionService resource.
             properties:
               loadBalancerPolicy:
-                description: The policy for load balancing GRPC service requests. Note that the `Cookie` and `RequestHash` load balancing strategies cannot be used here.
+                description: The policy for load balancing GRPC service requests. Note that the `Cookie` load balancing strategy cannot be used here.
                 properties:
-                  requestHashPolicies:
-                    description: RequestHashPolicies contains a list of hash policies to apply when the `RequestHash` load balancing strategy is chosen. If an element of the supplied list of hash policies is invalid, it will be ignored. If the list of hash policies is empty after validation, the load balancing strategy will fall back the the default `RoundRobin`.
-                    items:
-                      description: RequestHashPolicy contains configuration for an individual hash policy on a request attribute.
-                      properties:
-                        headerHashOptions:
-                          description: HeaderHashOptions should be set when request header hash based load balancing is desired. It must be the only hash option field set, otherwise this request hash policy object will be ignored.
-                          properties:
-                            headerName:
-                              description: HeaderName is the name of the HTTP request header that will be used to calculate the hash key. If the header specified is not present on a request, no hash will be produced.
-                              minLength: 1
-                              type: string
-                          type: object
-                        terminal:
-                          description: Terminal is a flag that allows for short-circuiting computing of a hash for a given request. If set to true, and the request attribute specified in the attribute hash options is present, no further hash policies will be used to calculate a hash for the request.
-                          type: boolean
-                      type: object
-                    type: array
                   strategy:
-                    description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Cookie`, and `RequestHash`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
+                    description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Random` and `Cookie`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
                     type: string
                 type: object
               protocol:
@@ -268,14 +735,16 @@ status:
   conditions: []
   storedVersions: []
 ---
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.2.9
   creationTimestamp: null
   name: httpproxies.projectcontour.io
 spec:
+  preserveUnknownFields: false
   group: projectcontour.io
   names:
     kind: HTTPProxy
@@ -285,7 +754,6 @@ spec:
     - proxy
     - proxies
     singular: httpproxy
-  preserveUnknownFields: false
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -321,6 +789,9 @@ spec:
           spec:
             description: HTTPProxySpec defines the spec of the CRD.
             properties:
+              ggvar:
+                description: Testing new param for CRD
+                type: string
               includes:
                 description: Includes allow for specific routing configuration to be included from another HTTPProxy, possibly in another namespace.
                 items:
@@ -457,26 +928,8 @@ spec:
                     loadBalancerPolicy:
                       description: The load balancing policy for this route.
                       properties:
-                        requestHashPolicies:
-                          description: RequestHashPolicies contains a list of hash policies to apply when the `RequestHash` load balancing strategy is chosen. If an element of the supplied list of hash policies is invalid, it will be ignored. If the list of hash policies is empty after validation, the load balancing strategy will fall back the the default `RoundRobin`.
-                          items:
-                            description: RequestHashPolicy contains configuration for an individual hash policy on a request attribute.
-                            properties:
-                              headerHashOptions:
-                                description: HeaderHashOptions should be set when request header hash based load balancing is desired. It must be the only hash option field set, otherwise this request hash policy object will be ignored.
-                                properties:
-                                  headerName:
-                                    description: HeaderName is the name of the HTTP request header that will be used to calculate the hash key. If the header specified is not present on a request, no hash will be produced.
-                                    minLength: 1
-                                    type: string
-                                type: object
-                              terminal:
-                                description: Terminal is a flag that allows for short-circuiting computing of a hash for a given request. If set to true, and the request attribute specified in the attribute hash options is present, no further hash policies will be used to calculate a hash for the request.
-                                type: boolean
-                            type: object
-                          type: array
                         strategy:
-                          description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Cookie`, and `RequestHash`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
+                          description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Random` and `Cookie`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
                           type: string
                       type: object
                     pathRewritePolicy:
@@ -503,103 +956,6 @@ spec:
                     permitInsecure:
                       description: Allow this path to respond to insecure requests over HTTP which are normally not permitted when a `virtualhost.tls` block is present.
                       type: boolean
-                    rateLimitPolicy:
-                      description: The policy for rate limiting on the route.
-                      properties:
-                        global:
-                          description: Global defines global rate limiting parameters, i.e. parameters defining descriptors that are sent to an external rate limit service (RLS) for a rate limit decision on each request.
-                          properties:
-                            descriptors:
-                              description: Descriptors defines the list of descriptors that will be generated and sent to the rate limit service. Each descriptor contains 1+ key-value pair entries.
-                              items:
-                                description: RateLimitDescriptor defines a list of key-value pair generators.
-                                properties:
-                                  entries:
-                                    description: Entries is the list of key-value pair generators.
-                                    items:
-                                      description: RateLimitDescriptorEntry is a key-value pair generator. Exactly one field on this struct must be non-nil.
-                                      properties:
-                                        genericKey:
-                                          description: GenericKey defines a descriptor entry with a static key and value.
-                                          properties:
-                                            key:
-                                              description: Key defines the key of the descriptor entry. If not set, the key is set to "generic_key".
-                                              type: string
-                                            value:
-                                              description: Value defines the value of the descriptor entry.
-                                              minLength: 1
-                                              type: string
-                                          type: object
-                                        remoteAddress:
-                                          description: RemoteAddress defines a descriptor entry with a key of "remote_address" and a value equal to the client's IP address (from x-forwarded-for).
-                                          type: object
-                                        requestHeader:
-                                          description: RequestHeader defines a descriptor entry that's populated only if a given header is present on the request. The descriptor key is static, and the descriptor value is equal to the value of the header.
-                                          properties:
-                                            descriptorKey:
-                                              description: DescriptorKey defines the key to use on the descriptor entry.
-                                              minLength: 1
-                                              type: string
-                                            headerName:
-                                              description: HeaderName defines the name of the header to look for on the request.
-                                              minLength: 1
-                                              type: string
-                                          type: object
-                                      type: object
-                                    minItems: 1
-                                    type: array
-                                type: object
-                              minItems: 1
-                              type: array
-                          type: object
-                        local:
-                          description: Local defines local rate limiting parameters, i.e. parameters for rate limiting that occurs within each Envoy pod as requests are handled.
-                          properties:
-                            burst:
-                              description: Burst defines the number of requests above the requests per unit that should be allowed within a short period of time.
-                              format: int32
-                              type: integer
-                            requests:
-                              description: Requests defines how many requests per unit of time should be allowed before rate limiting occurs.
-                              format: int32
-                              minimum: 1
-                              type: integer
-                            responseHeadersToAdd:
-                              description: ResponseHeadersToAdd is an optional list of response headers to set when a request is rate-limited.
-                              items:
-                                description: HeaderValue represents a header name/value pair
-                                properties:
-                                  name:
-                                    description: Name represents a key of a header
-                                    minLength: 1
-                                    type: string
-                                  value:
-                                    description: Value represents the value of a header specified by a key
-                                    minLength: 1
-                                    type: string
-                                required:
-                                - name
-                                - value
-                                type: object
-                              type: array
-                            responseStatusCode:
-                              description: ResponseStatusCode is the HTTP status code to use for responses to rate-limited requests. Codes must be in the 400-599 range (inclusive). If not specified, the Envoy default of 429 (Too Many Requests) is used.
-                              format: int32
-                              maximum: 599
-                              minimum: 400
-                              type: integer
-                            unit:
-                              description: Unit defines the period of time within which requests over the limit will be rate limited. Valid values are "second", "minute" and "hour".
-                              enum:
-                              - second
-                              - minute
-                              - hour
-                              type: string
-                          required:
-                          - requests
-                          - unit
-                          type: object
-                      type: object
                     requestHeadersPolicy:
                       description: The policy for managing request headers during proxying.
                       properties:
@@ -859,28 +1215,10 @@ spec:
                     - name
                     type: object
                   loadBalancerPolicy:
-                    description: The load balancing policy for the backend services. Note that the `Cookie` and `RequestHash` load balancing strategies cannot be used here.
+                    description: The load balancing policy for the backend services.
                     properties:
-                      requestHashPolicies:
-                        description: RequestHashPolicies contains a list of hash policies to apply when the `RequestHash` load balancing strategy is chosen. If an element of the supplied list of hash policies is invalid, it will be ignored. If the list of hash policies is empty after validation, the load balancing strategy will fall back the the default `RoundRobin`.
-                        items:
-                          description: RequestHashPolicy contains configuration for an individual hash policy on a request attribute.
-                          properties:
-                            headerHashOptions:
-                              description: HeaderHashOptions should be set when request header hash based load balancing is desired. It must be the only hash option field set, otherwise this request hash policy object will be ignored.
-                              properties:
-                                headerName:
-                                  description: HeaderName is the name of the HTTP request header that will be used to calculate the hash key. If the header specified is not present on a request, no hash will be produced.
-                                  minLength: 1
-                                  type: string
-                              type: object
-                            terminal:
-                              description: Terminal is a flag that allows for short-circuiting computing of a hash for a given request. If set to true, and the request attribute specified in the attribute hash options is present, no further hash policies will be used to calculate a hash for the request.
-                              type: boolean
-                          type: object
-                        type: array
                       strategy:
-                        description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Cookie`, and `RequestHash`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
+                        description: Strategy specifies the policy used to balance requests across the pool of backend pods. Valid policy names are `Random`, `RoundRobin`, `WeightedLeastRequest`, `Random` and `Cookie`. If an unknown strategy name is specified or no policy is supplied, the default `RoundRobin` policy is used.
                         type: string
                     type: object
                   services:
@@ -1071,103 +1409,6 @@ spec:
                   fqdn:
                     description: The fully qualified domain name of the root of the ingress tree all leaves of the DAG rooted at this object relate to the fqdn.
                     type: string
-                  rateLimitPolicy:
-                    description: The policy for rate limiting on the virtual host.
-                    properties:
-                      global:
-                        description: Global defines global rate limiting parameters, i.e. parameters defining descriptors that are sent to an external rate limit service (RLS) for a rate limit decision on each request.
-                        properties:
-                          descriptors:
-                            description: Descriptors defines the list of descriptors that will be generated and sent to the rate limit service. Each descriptor contains 1+ key-value pair entries.
-                            items:
-                              description: RateLimitDescriptor defines a list of key-value pair generators.
-                              properties:
-                                entries:
-                                  description: Entries is the list of key-value pair generators.
-                                  items:
-                                    description: RateLimitDescriptorEntry is a key-value pair generator. Exactly one field on this struct must be non-nil.
-                                    properties:
-                                      genericKey:
-                                        description: GenericKey defines a descriptor entry with a static key and value.
-                                        properties:
-                                          key:
-                                            description: Key defines the key of the descriptor entry. If not set, the key is set to "generic_key".
-                                            type: string
-                                          value:
-                                            description: Value defines the value of the descriptor entry.
-                                            minLength: 1
-                                            type: string
-                                        type: object
-                                      remoteAddress:
-                                        description: RemoteAddress defines a descriptor entry with a key of "remote_address" and a value equal to the client's IP address (from x-forwarded-for).
-                                        type: object
-                                      requestHeader:
-                                        description: RequestHeader defines a descriptor entry that's populated only if a given header is present on the request. The descriptor key is static, and the descriptor value is equal to the value of the header.
-                                        properties:
-                                          descriptorKey:
-                                            description: DescriptorKey defines the key to use on the descriptor entry.
-                                            minLength: 1
-                                            type: string
-                                          headerName:
-                                            description: HeaderName defines the name of the header to look for on the request.
-                                            minLength: 1
-                                            type: string
-                                        type: object
-                                    type: object
-                                  minItems: 1
-                                  type: array
-                              type: object
-                            minItems: 1
-                            type: array
-                        type: object
-                      local:
-                        description: Local defines local rate limiting parameters, i.e. parameters for rate limiting that occurs within each Envoy pod as requests are handled.
-                        properties:
-                          burst:
-                            description: Burst defines the number of requests above the requests per unit that should be allowed within a short period of time.
-                            format: int32
-                            type: integer
-                          requests:
-                            description: Requests defines how many requests per unit of time should be allowed before rate limiting occurs.
-                            format: int32
-                            minimum: 1
-                            type: integer
-                          responseHeadersToAdd:
-                            description: ResponseHeadersToAdd is an optional list of response headers to set when a request is rate-limited.
-                            items:
-                              description: HeaderValue represents a header name/value pair
-                              properties:
-                                name:
-                                  description: Name represents a key of a header
-                                  minLength: 1
-                                  type: string
-                                value:
-                                  description: Value represents the value of a header specified by a key
-                                  minLength: 1
-                                  type: string
-                              required:
-                              - name
-                              - value
-                              type: object
-                            type: array
-                          responseStatusCode:
-                            description: ResponseStatusCode is the HTTP status code to use for responses to rate-limited requests. Codes must be in the 400-599 range (inclusive). If not specified, the Envoy default of 429 (Too Many Requests) is used.
-                            format: int32
-                            maximum: 599
-                            minimum: 400
-                            type: integer
-                          unit:
-                            description: Unit defines the period of time within which requests over the limit will be rate limited. Valid values are "second", "minute" and "hour".
-                            enum:
-                            - second
-                            - minute
-                            - hour
-                            type: string
-                        required:
-                        - requests
-                        - unit
-                        type: object
-                    type: object
                   tls:
                     description: If present the fields describes TLS properties of the virtual host. The SNI names that will be matched on are described in fqdn, the tls.secretName secret must contain a certificate that itself contains a name that matches the FQDN.
                     properties:
@@ -1185,7 +1426,7 @@ spec:
                         description: EnableFallbackCertificate defines if the vhost should allow a default certificate to be applied which handles all requests which don't match the SNI defined in this vhost.
                         type: boolean
                       minimumProtocolVersion:
-                        description: MinimumProtocolVersion is the minimum TLS version this vhost should negotiate. Valid options are `1.2` (default) and `1.3`. Any other value defaults to TLS 1.2.
+                        description: Minimum TLS version this vhost should negotiate
                         type: string
                       passthrough:
                         description: Passthrough defines whether the encrypted TLS handshake will be passed through to the backing cluster. Either Passthrough or SecretName must be specified, but not both.
@@ -1334,29 +1575,6 @@ spec:
                         ip:
                           description: IP is set for load-balancer ingress points that are IP based (typically GCE or OpenStack load-balancers)
                           type: string
-                        ports:
-                          description: Ports is a list of records of service ports If used, every port defined in the service should have an entry in it
-                          items:
-                            properties:
-                              error:
-                                description: 'Error is to record the problem with the service port The format of the error shall comply with the following rules: - built-in error values shall be specified in this file and those shall use   CamelCase names - cloud provider specific error values must have names that comply with the   format foo.example.com/CamelCase. --- The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)'
-                                maxLength: 316
-                                pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
-                                type: string
-                              port:
-                                description: Port is the port number of the service port of which status is recorded here
-                                format: int32
-                                type: integer
-                              protocol:
-                                default: TCP
-                                description: 'Protocol is the protocol of the service port of which status is recorded here The supported values are: "TCP", "UDP", "SCTP"'
-                                type: string
-                            required:
-                            - port
-                            - protocol
-                            type: object
-                          type: array
-                          x-kubernetes-list-type: atomic
                       type: object
                     type: array
                 type: object
@@ -1376,14 +1594,16 @@ status:
   conditions: []
   storedVersions: []
 ---
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.2.9
   creationTimestamp: null
   name: tlscertificatedelegations.projectcontour.io
 spec:
+  preserveUnknownFields: false
   group: projectcontour.io
   names:
     kind: TLSCertificateDelegation
@@ -1392,7 +1612,6 @@ spec:
     shortNames:
     - tlscerts
     singular: tlscertificatedelegation
-  preserveUnknownFields: false
   scope: Namespaced
   versions:
   - name: v1
@@ -1565,6 +1784,7 @@ status:
   conditions: []
   storedVersions: []
 ---
+# Source: flyte/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -1580,282 +1800,188 @@ spec:
   scope: Namespaced
   version: v1alpha1
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: datacatalog
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyteadmin
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flytepropeller
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: contour
-  namespace: projectcontour
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: contour-certgen
-  namespace: projectcontour
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: envoy
-  namespace: projectcontour
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
-rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-key-holder
-  - kubernetes-dashboard-certs
-  - kubernetes-dashboard-csrf
-  resources:
-  - secrets
-  verbs:
-  - get
-  - update
-  - delete
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-settings
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - update
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - dashboard-metrics-scraper
-  resources:
-  - services
-  verbs:
-  - proxy
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - 'http:heapster:'
-  - 'https:heapster:'
-  - dashboard-metrics-scraper
-  - http:dashboard-metrics-scraper
-  resources:
-  - services/proxy
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: contour-certgen
-  namespace: projectcontour
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - update
----
+# Source: flyte/charts/contour/templates/contour/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
+  name: flyte-contour-contour
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
 rules:
-- apiGroups:
-  - '*'
-  resources:
-  - mutatingwebhookconfigurations
-  - secrets
-  - pods
-  verbs:
-  - get
-  - create
-  - update
-  - patch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - list
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - gatewayclasses
+      - gateways
+      - httproutes
+      - tcproutes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses/status
+    verbs:
+      - create
+      - get
+      - update
+  - apiGroups:
+      - projectcontour.io
+    resources:
+      - extensionservices
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - projectcontour.io
+    resources:
+      - extensionservices/status
+    verbs:
+      - create
+      - get
+      - update
+  - apiGroups:
+      - projectcontour.io
+    resources:
+      - httpproxies
+      - tlscertificatedelegations
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - projectcontour.io
+    resources:
+      - httpproxies/status
+    verbs:
+      - create
+      - get
+      - update
 ---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "flyte-kubernetes-dashboard-metrics"
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  # Allow Metrics Scraper to get metrics from the Metrics server
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+---
+# Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: flyteadmin
-  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
-  - ""
+#  - ""
   - flyte.lyft.com
-  - rbac.authorization.k8s.io
+#   - rbac.authorization.k8s.io
   resources:
-  - configmaps
   - flyteworkflows
-  - namespaces
-  - pods
-  - resourcequotas
-  - roles
-  - rolebindings
-  - secrets
-  - services
-  - serviceaccounts
-  - spark-role
+#  - configmaps
+#  - namespaces
+#  - pods
+#  - resourcequotas
+#  - roles
+#  - rolebindings
+#  - secrets
+#  - services
+#  - serviceaccounts
   verbs:
   - '*'
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  creationTimestamp: null
-  name: contour
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - create
-  - get
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - list
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingressclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses/status
-  verbs:
-  - create
-  - get
-  - update
-- apiGroups:
-  - networking.x-k8s.io
-  resources:
-  - backendpolicies
-  - gateways
-  - httproutes
-  - tlsroutes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - projectcontour.io
-  resources:
-  - extensionservices
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - projectcontour.io
-  resources:
-  - extensionservices/status
-  verbs:
-  - create
-  - get
-  - update
-- apiGroups:
-  - projectcontour.io
-  resources:
-  - httpproxies
-  - tlscertificatedelegations
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - projectcontour.io
-  resources:
-  - httpproxies/status
-  verbs:
-  - create
-  - get
-  - update
----
+# Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: flytepropeller
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 rules:
+# Allow RO access to PODS
 - apiGroups:
   - ""
   resources:
@@ -1864,6 +1990,7 @@ rules:
   - get
   - list
   - watch
+# Allow Event recording access
 - apiGroups:
   - ""
   resources:
@@ -1873,6 +2000,7 @@ rules:
   - update
   - delete
   - patch
+# Allow Access All plugin objects
 - apiGroups:
   - '*'
   resources:
@@ -1885,6 +2013,7 @@ rules:
   - update
   - delete
   - patch
+# Allow Access to CRD
 - apiGroups:
   - apiextensions.k8s.io
   resources:
@@ -1896,6 +2025,7 @@ rules:
   - create
   - delete
   - update
+# Allow Access to all resources under flyte.lyft.com
 - apiGroups:
   - flyte.lyft.com
   resources:
@@ -1912,111 +2042,90 @@ rules:
   - post
   - deletecollection
 ---
-apiVersion: rbac.authorization.k8s.io/v1
+# Source: flyte/templates/propeller/webhook.yaml
+# Create a ClusterRole for the webhook
+# https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
+  name: flyte-pod-webhook
+  namespace: flyte
 rules:
-- apiGroups:
-  - metrics.k8s.io
-  resources:
-  - pods
-  - nodes
-  verbs:
-  - get
-  - list
-  - watch
+  - apiGroups:
+      - "*"
+    resources:
+      - mutatingwebhookconfigurations
+      - secrets
+      - pods
+    verbs:
+      - get
+      - create
+      - update
+      - patch
 ---
+# Source: flyte/charts/contour/templates/contour/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
+  name: flyte-contour-contour
   labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubernetes-dashboard
-subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: contour
-  namespace: projectcontour
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: contour-certgen
-subjects:
-- kind: ServiceAccount
-  name: contour-certgen
-  namespace: projectcontour
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-pod-webhook
+  name: flyte-contour-contour
 subjects:
-- kind: ServiceAccount
-  name: flyte-pod-webhook
-  namespace: flyte
+  - kind: ServiceAccount
+    name: flyte-contour-contour
+    namespace: flyte
 ---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-metrics.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: contour
+  name: "flyte-kubernetes-dashboard-metrics"
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: contour
+  name: flyte-kubernetes-dashboard-metrics
 subjects:
-- kind: ServiceAccount
-  name: contour
-  namespace: projectcontour
+  - kind: ServiceAccount
+    name: flyte-kubernetes-dashboard
+    namespace: flyte
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubernetes-dashboard
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: kubernetes-dashboard
-subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubernetes-dashboard-admin
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
----
+# Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: flyteadmin-binding
-  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -2026,11 +2135,16 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
+# Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: flytepropeller
-  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -2040,504 +2154,279 @@ subjects:
   name: flytepropeller
   namespace: flyte
 ---
-apiVersion: v1
-data:
-  aa_namespace.yaml: |
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
-  ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
-  ac_project-copilot-dataconfig.yaml: |
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: |
-        storage:
-          connection:
-            access-key: minio
-            auth-type: accesskey
-            disable-ssl: true
-            endpoint: http://minio.flyte.svc.cluster.local:9000
-            region: us-east-1
-            secret-key: miniostorage
-          type: minio
-          container: my-s3-bucket
-          enable-multicontainer: true
-kind: ConfigMap
+# Source: flyte/templates/propeller/webhook.yaml
+# Create a binding from Role -> ServiceAccount
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: clusterresource-template-dtg8ff28mt
+  name: flyte-pod-webhook
   namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+  - kind: ServiceAccount
+    name: flyte-pod-webhook
+    namespace: flyte
 ---
-apiVersion: v1
-data:
-  db.yaml: |
-    database:
-      port: 5432
-      username: postgres
-      host: postgres
-      dbname: datacatalog
-      options: sslmode=disable
-  logger.yaml: |
-    logger:
-      show-source: true
-      level: 2
-  server.yaml: |
-    datacatalog:
-      storage-prefix: metadata/datacatalog
-      metrics-scope: "datacatalog"
-      profiler-port: 10254
-    application:
-      grpcPort: 8089
-  storage.yaml: |+
-    storage:
-      type: minio
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-      container: "my-s3-bucket"
+# Source: flyte/charts/kubernetes-dashboard/templates/role.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-kind: ConfigMap
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
-  name: datacatalog-config-64k8dg9gck
-  namespace: flyte
----
-apiVersion: v1
-data:
-  cluster_resources.yaml: |
-    cluster_resources:
-      templatePath: "/etc/flyte/clusterresource/templates"
-      customData:
-        - production:
-            - projectQuotaCpu:
-                value: "5"
-            - projectQuotaMemory:
-                value: "4000Mi"
-        - staging:
-            - projectQuotaCpu:
-                value: "2"
-            - projectQuotaMemory:
-                value: "3000Mi"
-        - development:
-            - projectQuotaCpu:
-                value: "4"
-            - projectQuotaMemory:
-                value: "3000Mi"
-      refresh: 5m
-  db.yaml: |
-    database:
-      port: 5432
-      username: postgres
-      host: postgres
-      dbname: postgres
-      options: sslmode=disable
-  domain.yaml: |
-    domains:
-      - id: development
-        name: development
-      - id: staging
-        name: staging
-      - id: production
-        name: production
-  logger.yaml: |
-    logger:
-      show-source: true
-      level: 2
-  server.yaml: |
-    server:
-      httpPort: 8088
-      grpcPort: 8089
-      security:
-        # Controls whether to serve requests over SSL/TLS.
-        secure: false
-        # Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
-        useAuth: false
-        allowCors: true
-        allowedOrigins:
-          # Accepting all domains for Sandbox installation
-          - "*"
-        allowedHeaders:
-          - "Content-Type"
-          - "flyte-authorization"
-    auth:
-      authorizedUris:
-        # This should point at your public http Uri.
-        - https://localhost:30081
-        # This will be used by internal services in the same namespace as flyteadmin
-        - http://flyteadmin:80
-        # This will be used by internal services in the same cluster but different namespaces
-        - http://flyteadmin.flyte.svc.cluster.local:80
-
-      # Controls app authentication config
-      appAuth:
-        thirdPartyConfig:
-          flyteClient:
-            clientId: flytectl
-            redirectUri: https://localhost:53593/callback
-            scopes:
-              - offline
-              - all
-      # Controls user authentication
-      userAuth:
-        openId:
-          baseUrl: https://accounts.google.com
-          scopes:
-            - profile
-            - openid
-          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-    flyteadmin:
-      roleNameKey: "iam.amazonaws.com/role"
-  storage.yaml: |+
-    storage:
-      type: minio
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-      container: "my-s3-bucket"
-
-  task_resource_defaults.yaml: |
-    task_resources:
-      defaults:
-        cpu: 100m
-        memory: 200Mi
-        storage: 5Mi
-      limits:
-        cpu: 2
-        memory: 8Gi
-        storage: 20Mi
-        gpu: 1
-kind: ConfigMap
-metadata:
-  name: flyte-admin-config-7gmg5ffhdd
-  namespace: flyte
----
-apiVersion: v1
-data:
-  BASE_URL: /console
-  CONFIG_DIR: /etc/flyte/config
-kind: ConfigMap
-metadata:
-  name: flyte-console-config
-  namespace: flyte
----
-apiVersion: v1
-data:
-  admin.yaml: |
-    event:
-      type: admin
-      rate: 500
-      capacity: 1000
-    admin:
-      endpoint: flyteadmin:81
-      insecure: true
-  catalog.yaml: |
-    catalog-cache:
-      endpoint: datacatalog:89
-      type: datacatalog
-      insecure: true
-  copilot.yaml: |
-    plugins:
-      k8s:
-        co-pilot:
-          name: "flyte-copilot-"
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.5.28"
-          start-timeout: "30s"
-  core.yaml: |
-    propeller:
-      rawoutput-prefix: s3://my-s3-bucket/
-      metadata-prefix: metadata/propeller
-      workers: 4
-      max-workflow-retries: 30
-      workflow-reeval-duration: 30s
-      downstream-eval-duration: 30s
-      limit-namespace: "all"
-      prof-port: 10254
-      metrics-prefix: flyte
-      enable-admin-launcher: true
-      leader-election:
-        lock-config-map:
-          name: propeller-leader
-          namespace: flyte
-        enabled: true
-        lease-duration: 15s
-        renew-deadline: 10s
-        retry-period: 2s
-      queue:
-        type: batch
-        batching-interval: 2s
-        batch-size: -1
-        queue:
-          type: maxof
-          rate: 100
-          capacity: 1000
-          base-delay: 5s
-          max-delay: 120s
-        sub-queue:
-          type: bucket
-          rate: 10
-          capacity: 100
-    webhook:
-      certDir: /etc/webhook/certs
-      serviceName: flyte-pod-webhook
-  enabled_plugins.yaml: |
-    tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - k8s-array
-        default-for-task-types:
-          container: container
-          sidecar: sidecar
-          container_array: k8s-array
-  k8s.yaml: |
-    plugins:
-      k8s:
-        default-env-vars:
-          - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
-          - FLYTE_AWS_ACCESS_KEY_ID: minio
-          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-        default-cpus: 100m
-        default-memory: 200Mi
-  logger.yaml: |
-    logger:
-      show-source: true
-      level: 2
-  resource_manager.yaml: |
-    propeller:
-      resourcemanager:
-        type: noop
-  storage.yaml: |+
-    storage:
-      type: minio
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-      container: "my-s3-bucket"
-
-  task_logs.yaml: |
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
-kind: ConfigMap
-metadata:
-  name: flyte-propeller-config-d9bhkt4m5d
-  namespace: flyte
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
+  name: flyte-kubernetes-dashboard
   labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard-settings
-  namespace: kubernetes-dashboard
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+    # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
+    verbs: ["get", "update", "delete"]
+    # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["kubernetes-dashboard-settings"]
+    verbs: ["get", "update"]
+    # Allow Dashboard to get metrics.
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["heapster", "dashboard-metrics-scraper"]
+    verbs: ["proxy"]
+  - apiGroups: [""]
+    resources: ["services/proxy"]
+    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
+    verbs: ["get"]
 ---
-apiVersion: v1
-data:
-  contour.yaml: |
-    #
-    # server:
-    #   determine which XDS Server implementation to utilize in Contour.
-    #   xds-server-type: contour
-    #
-    # Specify the gateway-api Gateway Contour should watch.
-    # gateway:
-    #   name: contour
-    #   namespace: projectcontour
-    #
-    # should contour expect to be running inside a k8s cluster
-    # incluster: true
-    #
-    # path to kubeconfig (if not running inside a k8s cluster)
-    # kubeconfig: /path/to/.kube/config
-    #
-    # Disable RFC-compliant behavior to strip "Content-Length" header if
-    # "Tranfer-Encoding: chunked" is also set.
-    # disableAllowChunkedLength: false
-    # Disable HTTPProxy permitInsecure field
-    disablePermitInsecure: false
-    tls:
-    # minimum TLS version that Contour will negotiate
-    # minimum-protocol-version: "1.2"
-    # TLS ciphers to be supported by Envoy TLS listeners when negotiating
-    # TLS 1.2.
-    # cipher-suites:
-    # - '[ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]'
-    # - '[ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]'
-    # - 'ECDHE-ECDSA-AES256-GCM-SHA384'
-    # - 'ECDHE-RSA-AES256-GCM-SHA384'
-    # Defines the Kubernetes name/namespace matching a secret to use
-    # as the fallback certificate when requests which don't match the
-    # SNI defined for a vhost.
-      fallback-certificate:
-    #   name: fallback-secret-name
-    #   namespace: projectcontour
-      envoy-client-certificate:
-    #   name: envoy-client-cert-secret-name
-    #   namespace: projectcontour
-    # The following config shows the defaults for the leader election.
-    # leaderelection:
-    #   configmap-name: leader-elect
-    #   configmap-namespace: projectcontour
-    ### Logging options
-    # Default setting
-    accesslog-format: envoy
-    # To enable JSON logging in Envoy
-    # accesslog-format: json
-    # The default fields that will be logged are specified below.
-    # To customise this list, just add or remove entries.
-    # The canonical list is available at
-    # https://godoc.org/github.com/projectcontour/contour/internal/envoy#JSONFields
-    # json-fields:
-    #   - "@timestamp"
-    #   - "authority"
-    #   - "bytes_received"
-    #   - "bytes_sent"
-    #   - "downstream_local_address"
-    #   - "downstream_remote_address"
-    #   - "duration"
-    #   - "method"
-    #   - "path"
-    #   - "protocol"
-    #   - "request_id"
-    #   - "requested_server_name"
-    #   - "response_code"
-    #   - "response_flags"
-    #   - "uber_trace_id"
-    #   - "upstream_cluster"
-    #   - "upstream_host"
-    #   - "upstream_local_address"
-    #   - "upstream_service_time"
-    #   - "user_agent"
-    #   - "x_forwarded_for"
-    #
-    # default-http-versions:
-    # - "HTTP/2"
-    # - "HTTP/1.1"
-    #
-    # The following shows the default proxy timeout settings.
-    # timeouts:
-    #   request-timeout: infinity
-    #   connection-idle-timeout: 60s
-    #   stream-idle-timeout: 5m
-    #   max-connection-duration: infinity
-    #   delayed-close-timeout: 1s
-    #   connection-shutdown-grace-period: 5s
-    #
-    # Envoy cluster settings.
-    # cluster:
-    #   configure the cluster dns lookup family
-    #   valid options are: auto (default), v4, v6
-    #   dns-lookup-family: auto
-    #
-    # Envoy network settings.
-    # network:
-    #   Configure the number of additional ingress proxy hops from the
-    #   right side of the x-forwarded-for HTTP header to trust.
-    #   num-trusted-hops: 0
-    #
-    # Configure an optional global rate limit service.
-    # rateLimitService:
-    #   Identifies the extension service defining the rate limit service,
-    #   formatted as <namespace>/<name>.
-    #   extensionService: projectcontour/ratelimit
-    #   Defines the rate limit domain to pass to the rate limit service.
-    #   Acts as a container for a set of rate limit definitions within
-    #   the RLS.
-    #   domain: contour
-    #   Defines whether to allow requests to proceed when the rate limit
-    #   service fails to respond with a valid rate limit decision within
-    #   the timeout defined on the extension service.
-    #   failOpen: false
-kind: ConfigMap
+# Source: flyte/charts/kubernetes-dashboard/templates/rolebinding.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
-  name: contour
-  namespace: projectcontour
----
-apiVersion: v1
-data:
-  pass.txt: YXdlc29tZXNhdWNl
-kind: Secret
-metadata:
-  name: db-pass-9dgchhk2bm
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-admin-auth
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-propeller-auth
-  namespace: flyte
-stringData:
-  client_secret: foobar
-type: Opaque
----
-apiVersion: v1
-data:
-  password: bXl1c2Vy
-  user_secret: bXlzZWNyZXQ=
-  username: bXl1c2Vy
-kind: Secret
-metadata:
-  name: user-info
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-data:
-  csrf: ""
-kind: Secret
-metadata:
+  name: flyte-kubernetes-dashboard
   labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard-csrf
-  namespace: kubernetes-dashboard
-type: Opaque
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyte-kubernetes-dashboard
+subjects:
+  - kind: ServiceAccount
+    name: flyte-kubernetes-dashboard
+    namespace: flyte
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard-key-holder
-  namespace: kubernetes-dashboard
-type: Opaque
----
+# Source: flyte/charts/contour/templates/contour/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    contour.heptio.com/upstream-protocol.h2c: grpc
-  name: datacatalog
+  name: flyte-contour
   namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
 spec:
   ports:
+    - port: 8001
+      name: xds
+      protocol: TCP
+      targetPort: 8001
+  selector:
+    app.kubernetes.io/name: contour
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/component: contour
+  type: ClusterIP
+---
+# Source: flyte/charts/contour/templates/envoy/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-contour-envoy
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: envoy
+  annotations:
+    # This annotation puts the AWS ELB into "TCP" mode so that it does not
+    # do HTTP negotiation for HTTPS connections at the ELB edge.
+    # The downside of this is the remote IP address of all connections will
+    # appear to be the internal address of the ELB. See docs/proxy-proto.md
+    # for information about enabling the PROXY protocol on the ELB to recover
+    # the original remote IP address.
+    # We don't set this for nlb, per the contour docs.
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+spec:
+  externalTrafficPolicy: "Local"
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+      nodePort: 30081
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    app.kubernetes.io/name: contour
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/component: envoy
+  type: NodePort
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/service.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-kubernetes-dashboard
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: kubernetes-dashboard
+    kubernetes.io/cluster-service: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 30082
+    targetPort: http
+    name: http
+  selector:
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/component: kubernetes-dashboard
+---
+# Source: flyte/templates/admin/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8088
+    - name: grpc
+      port: 81
+      protocol: TCP
+      targetPort: 8089
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+    - name: http-metrics
+      protocol: TCP
+      port: 10254
+  selector: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+---
+# Source: flyte/templates/console/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteconsole
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteconsole
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector: 
+    app.kubernetes.io/name: flyteconsole
+    app.kubernetes.io/instance: flyte
+---
+# Source: flyte/templates/datacatalog/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: NodePort
+  ports:
+  - name: grpc-2
+    port: 8089
+    protocol: TCP
+    targetPort: 8089
   - name: http
     port: 88
     protocol: TCP
@@ -2546,363 +2435,598 @@ spec:
     port: 89
     protocol: TCP
     targetPort: 8089
-  selector:
-    app: datacatalog
+  selector: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    projectcontour.io/upstream-protocol.h2c: grpc
-  name: flyte-pod-webhook
-  namespace: flyte
-spec:
-  ports:
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: 9443
-  selector:
-    app: flyte-pod-webhook
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    projectcontour.io/upstream-protocol.h2c: grpc
-  name: flyteadmin
-  namespace: flyte
-spec:
-  ports:
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: 8088
-  - name: grpc
-    port: 81
-    protocol: TCP
-    targetPort: 8089
-  selector:
-    app: flyteadmin
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyteconsole
-  namespace: flyte
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app: flyteconsole
----
+# Source: flyte/templates/minio/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: minio
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
-  externalName: minio
+  type: ClusterIP
   ports:
-  - port: 9000
-  selector:
-    app: minio
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: minio
-  name: minio-direct
-  namespace: flyte
-spec:
-  ports:
-  - nodePort: 30084
+  - name: minio
     port: 9000
     protocol: TCP
-  selector:
-    app: minio
-  type: NodePort
+    targetPort: minio
+  selector: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/postgres/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
+  type: ClusterIP
   ports:
-  - port: 5432
-  selector:
-    app: postgres
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: postgres
-  name: postgres-direct
-  namespace: flyte
-spec:
-  ports:
-  - nodePort: 30083
+  - name: postgres
     port: 5432
     protocol: TCP
-  selector:
-    app: postgres
-  type: NodePort
+    targetPort: postgres
+  selector: 
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/propeller/webhook.yaml
+# Service
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    k8s-app: dashboard-metrics-scraper
-  name: dashboard-metrics-scraper
-  namespace: kubernetes-dashboard
-spec:
-  ports:
-  - port: 8000
-    targetPort: 8000
-  selector:
-    k8s-app: dashboard-metrics-scraper
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
-spec:
-  ports:
-  - name: http
-    nodePort: 30082
-    port: 80
-    protocol: TCP
-    targetPort: 9090
-  selector:
-    k8s-app: kubernetes-dashboard
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: contour
-  namespace: projectcontour
-spec:
-  ports:
-  - name: xds
-    port: 8001
-    protocol: TCP
-    targetPort: 8001
-  selector:
-    app: contour
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-  name: envoy
-  namespace: projectcontour
-spec:
-  externalTrafficPolicy: Local
-  ports:
-  - name: http
-    nodePort: 30081
-    port: 80
-    protocol: TCP
-  - name: https
-    port: 443
-    protocol: TCP
-  selector:
-    app: envoy
-  type: NodePort
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: datacatalog
-  name: datacatalog
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: datacatalog
-  template:
-    metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-      labels:
-        app: datacatalog
-        app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.3.0
-    spec:
-      containers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - serve
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.5
-        imagePullPolicy: IfNotPresent
-        name: datacatalog
-        ports:
-        - containerPort: 8088
-        - containerPort: 8089
-        volumeMounts:
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-      initContainers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - migrate
-        - run
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.5
-        imagePullPolicy: IfNotPresent
-        name: run-migrations
-        volumeMounts:
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-      serviceAccountName: datacatalog
-      volumes:
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: datacatalog-config-64k8dg9gck
-        name: config-volume
-      - name: db-pass
-        secret:
-          secretName: db-pass-9dgchhk2bm
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: flyte-pod-webhook
   name: flyte-pod-webhook
   namespace: flyte
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   selector:
+    app: flyte-pod-webhook
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9443
+---
+# Source: flyte/charts/contour/templates/envoy/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: flyte-contour-envoy
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: envoy
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  selector:
     matchLabels:
-      app: flyte-pod-webhook
+      app.kubernetes.io/name: contour
+      app.kubernetes.io/instance: flyte
+      app.kubernetes.io/component: envoy
   template:
     metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
       labels:
-        app: flyte-pod-webhook
-        app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: 0.5.13
+        app.kubernetes.io/name: contour
+        helm.sh/chart: contour-4.1.2
+        app.kubernetes.io/instance: flyte
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: envoy
     spec:
+      
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          
+        nodeAffinity:
+          
+      terminationGracePeriodSeconds: 300
+      hostNetwork: false
+      dnsPolicy: ClusterFirst
       containers:
-      - args:
-        - webhook
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/secrets/user-info
-          name: sample-secrets
-          readOnly: true
-        - mountPath: /etc/flyte/config
-          name: config-volume
-          readOnly: true
-        - mountPath: /etc/webhook/certs
-          name: webhook-certs
-          readOnly: true
-      serviceAccountName: flyte-pod-webhook
+        - command:
+            - contour
+          args:
+            - envoy
+            - shutdown-manager
+          image: docker.io/bitnami/contour:1.12.0-debian-10-r0
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - contour
+                  - envoy
+                  - shutdown
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8090
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          name: shutdown-manager
+        - command:
+            - envoy
+          args:
+            - -c
+            - /config/envoy.json
+            - --service-cluster $(CONTOUR_NAMESPACE)
+            - --service-node $(ENVOY_POD_NAME)
+            - --log-level info
+          image: docker.io/bitnami/envoy:1.16.2-debian-10-r54
+          imagePullPolicy: IfNotPresent
+          name: envoy
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: CONTOUR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: ENVOY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 80
+              hostPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              hostPort: 443
+              name: https
+              protocol: TCP
+            - containerPort: 8002
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8002
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          resources: 
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /config
+            - name: envoycert
+              mountPath: /certs
+          lifecycle:
+            preStop:
+              httpGet:
+                path: /shutdown
+                port: 8090
+                scheme: HTTP
+      initContainers:
+        - command:
+            - contour
+          args:
+            - bootstrap
+            - /config/envoy.json
+            - --xds-address=flyte-contour
+            - --xds-port=8001
+            - --resources-dir=/config/resources
+            - --envoy-cafile=/certs/ca.crt
+            - --envoy-cert-file=/certs/tls.crt
+            - --envoy-key-file=/certs/tls.key
+          image: docker.io/bitnami/contour:1.12.0-debian-10-r0
+          imagePullPolicy: IfNotPresent
+          name: envoy-initconfig
+          resources: 
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /config
+            - name: envoycert
+              mountPath: /certs
+              readOnly: true
+          env:
+            - name: CONTOUR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      automountServiceAccountToken: false
+      serviceAccountName: flyte-contour-envoy
       volumes:
-      - name: sample-secrets
-        secret:
-          secretName: user-info
-      - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
-        name: config-volume
-      - name: webhook-certs
-        secret:
-          secretName: flyte-pod-webhook
+        - name: envoy-config
+          emptyDir: {}
+        - name: envoycert
+          secret:
+            secretName: envoycert
+      restartPolicy: Always
 ---
+# Source: flyte/charts/contour/templates/contour/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: flyteadmin
-  name: flyteadmin
+  name: flyte-contour-contour
   namespace: flyte
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # This value of maxSurge means that during a rolling update
+      # the new ReplicaSet will be created first.
+      maxSurge: 50%
   selector:
     matchLabels:
-      app: flyteadmin
+      app.kubernetes.io/name: contour
+      app.kubernetes.io/instance: flyte
+      app.kubernetes.io/component: contour
   template:
     metadata:
       annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
+        checksum/config: 5653797be256c34530f8f4002c2b997af941d56f68b110582887fafe0784864e
       labels:
-        app: flyteadmin
-        app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.4.13
+        app.kubernetes.io/name: contour
+        helm.sh/chart: contour-4.1.2
+        app.kubernetes.io/instance: flyte
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: contour
     spec:
+      
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: contour
+                    app.kubernetes.io/instance: flyte
+                    app.kubernetes.io/component: contour
+                namespaces:
+                  - "flyte"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      containers:
+        - command:
+            - contour
+          args:
+            - serve
+            - --incluster
+            - --xds-address=0.0.0.0
+            - --xds-port=8001
+            - --envoy-service-http-port=80
+            - --envoy-service-https-port=443
+            - --contour-cafile=/certs/ca.crt
+            - --contour-cert-file=/certs/tls.crt
+            - --contour-key-file=/certs/tls.key
+            - --config-path=/config/contour.yaml
+          image: docker.io/bitnami/contour:1.12.0-debian-10-r0
+          imagePullPolicy: IfNotPresent
+          name: contour
+          ports:
+            - containerPort: 8001
+              name: xds
+              protocol: TCP
+            - containerPort: 8000
+              name: metrics
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources: 
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - name: contourcert
+              mountPath: /certs
+              readOnly: true
+            - name: contour-config
+              mountPath: /config
+              readOnly: true
+          env:
+            - name: CONTOUR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+      dnsPolicy: ClusterFirst
+      serviceAccountName: flyte-contour-contour
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 
+        runAsNonRoot: true
+      volumes:
+        - name: contourcert
+          secret:
+            secretName: contourcert
+        - name: contour-config
+          configMap:
+            name: flyte-contour
+            defaultMode: 0644
+            items:
+              - key: contour.yaml
+                path: contour.yaml
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/deployment.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-kubernetes-dashboard
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: kubernetes-dashboard
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubernetes-dashboard
+      app.kubernetes.io/instance: flyte
+      app.kubernetes.io/component: kubernetes-dashboard
+  template:
+    metadata:
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
+      labels:
+        app.kubernetes.io/name: kubernetes-dashboard
+        helm.sh/chart: kubernetes-dashboard-4.0.2
+        app.kubernetes.io/instance: flyte
+        app.kubernetes.io/version: "2.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: kubernetes-dashboard
+    spec:
+      serviceAccountName: flyte-kubernetes-dashboard
+      containers:
+      - name: kubernetes-dashboard
+        image: "kubernetesui/dashboard:v2.2.0"
+        imagePullPolicy: IfNotPresent
+        args:
+          - --namespace=flyte
+          - --metrics-provider=none
+          - --enable-skip-login
+          - --enable-insecure-login
+          - --disable-settings-authorizer
+        ports:
+        - name: http
+          containerPort: 9090
+          protocol: TCP
+        volumeMounts:
+        - name: kubernetes-dashboard-certs
+          mountPath: /certs
+          # Create on-disk volume to store exec logs
+        - mountPath: /tmp
+          name: tmp-volume
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        resources:
+          limits:
+            cpu: 2
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2001
+          runAsUser: 1001
+      volumes:
+      - name: kubernetes-dashboard-certs
+        secret:
+          secretName: flyte-kubernetes-dashboard-certs
+      - name: tmp-volume
+        emptyDir: {}
+---
+# Source: flyte/templates/admin/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyteadmin
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "9b7508db7dfe3e047c148901e91161fb5417d57331ac566f38ac1f106abd92f"
+      labels: 
+        app.kubernetes.io/name: flyteadmin
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      initContainers:
+        - name: check-db-ready
+          image: postgres:10.16-alpine
+          command:
+          - sh
+          - -c
+          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        - command:
+          - flyteadmin
+          - --config
+          - /etc/flyte/config/*.yaml
+          - migrate
+          - run
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          imagePullPolicy: "IfNotPresent"
+          name: run-migrations
+          volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+        - command:
+          - flyteadmin
+          - --config
+          - /etc/flyte/config/*.yaml
+          - migrate
+          - seed-projects
+          - flytesnacks
+          - flytetester
+          - flyteexamples
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          imagePullPolicy: "IfNotPresent"
+          name: seed-projects
+          volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+        - name: generate-secrets
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          imagePullPolicy: "IfNotPresent"
+          command: ["/bin/sh", "-c"]
+          args:
+            [
+                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
+            ]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
       containers:
       - command:
         - flyteadmin
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-        imagePullPolicy: IfNotPresent
+        image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
         - containerPort: 8088
         - containerPort: 8089
-        resources:
+        resources: 
           limits:
-            cpu: "0.1"
+            cpu: 250m
             ephemeral-storage: 100Mi
-            memory: 200Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
         volumeMounts:
+        
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
           name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-        - mountPath: /etc/secrets/
-          name: auth
+        - name: auth
+          mountPath: /etc/secrets/
       - command:
         - sh
         - -c
@@ -2923,119 +3047,61 @@ spec:
           limits:
             cpu: "0.1"
             memory: 200Mi
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.16-alpine
-        name: check-db-ready
-      - command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - migrate
-        - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-        imagePullPolicy: IfNotPresent
-        name: run-migrations
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-      - command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - migrate
-        - seed-projects
-        - flytesnacks
-        - flyteexamples
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-        imagePullPolicy: IfNotPresent
-        name: seed-projects
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-      - command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - clusterresource
-        - sync
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-        imagePullPolicy: IfNotPresent
-        name: sync-cluster-resources
-        volumeMounts:
-        - mountPath: /etc/flyte/clusterresource/templates
-          name: resource-templates
-        - mountPath: /etc/flyte/config
-          name: config-volume
-        - mountPath: /etc/db
-          name: db-pass
-      - args:
-        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
-        command:
-        - /bin/sh
-        - -c
-        env:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-        imagePullPolicy: IfNotPresent
-        name: generate-secrets
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
       serviceAccountName: flyteadmin
       volumes:
-      - configMap:
-          name: clusterresource-template-dtg8ff28mt
-        name: resource-templates
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: flyte-admin-config-7gmg5ffhdd
-        name: config-volume
-      - name: db-pass
-        secret:
-          secretName: db-pass-9dgchhk2bm
-      - name: auth
-        secret:
-          secretName: flyte-admin-auth
+        
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: flyte-admin-config
+          name: config-volume
+        - name: auth
+          secret:
+            secretName: flyte-admin-secrets
 ---
+# Source: flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: flyteconsole
   name: flyteconsole
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteconsole
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: flyteconsole
+    matchLabels: 
+      app.kubernetes.io/name: flyteconsole
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
-      labels:
-        app: flyteconsole
+      annotations:
+        configChecksum: "ad82d0fe9f2ee373bcf932eb30b2565b5003d6fa2859e1ee553353fc462fbd5"
+      labels: 
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/version: 0.19.0
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - envFrom:
+      - image: "cr.flyte.org/flyteorg/flyteconsole:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: flyteconsole
+        envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: cr.flyte.org/flyteorg/flyteconsole:v0.20.1
-        name: flyteconsole
         ports:
         - containerPort: 8080
+        resources: 
+          limits:
+            cpu: 500m
+            memory: 250Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
@@ -3043,74 +3109,111 @@ spec:
       - emptyDir: {}
         name: shared-data
 ---
+# Source: flyte/templates/datacatalog/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: flytepropeller
-  name: flytepropeller
+  name: datacatalog
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
+  replicas: 1
   selector:
-    matchLabels:
-      app: flytepropeller
+    matchLabels: 
+      app.kubernetes.io/name: datacatalog
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-      labels:
-        app: flytepropeller
-        app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.7.1
+        configChecksum: "7de99a431c56b3e464f075e04b730e3a2a82fd236259385eff72885929e58d1"
+      labels: 
+        app.kubernetes.io/name: datacatalog
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
-      containers:
-      - args:
+      initContainers:
+      - command:
+        - datacatalog
         - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
-        imagePullPolicy: IfNotPresent
-        name: flytepropeller
-        ports:
-        - containerPort: 10254
+        - /etc/datacatalog/config/*.yaml
+        - migrate
+        - run
+        image: "cr.flyte.org/flyteorg/datacatalog:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: run-migrations
         volumeMounts:
-        - mountPath: /etc/flyte/config
+        
+        - mountPath: /etc/datacatalog/config
+          name: config-volume 
+      containers:
+      - command:
+        - datacatalog
+        - --config
+        - /etc/datacatalog/config/*.yaml
+        - serve
+        image: "cr.flyte.org/flyteorg/datacatalog:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: datacatalog
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        resources: 
+          limits:
+            cpu: 500m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+        
+        - mountPath: /etc/datacatalog/config
           name: config-volume
-        - mountPath: /etc/secrets/
-          name: auth
-      serviceAccountName: flytepropeller
+      serviceAccountName: datacatalog
       volumes:
+      
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
+          name: datacatalog-config
         name: config-volume
-      - name: auth
-        secret:
-          secretName: flyte-propeller-auth
 ---
+# Source: flyte/templates/minio/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
+  replicas: 1
   selector:
-    matchLabels:
-      app: minio
+    matchLabels: 
+      app.kubernetes.io/name: minio
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
-      labels:
-        app: minio
+      labels: 
+        app.kubernetes.io/name: minio
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - args:
+      - image: "minio/minio:RELEASE.2020-12-16T05-05-17Z"
+        imagePullPolicy: "IfNotPresent"
+        name: minio
+        args:
         - server
         - /data
         env:
@@ -3118,715 +3221,586 @@ spec:
           value: minio
         - name: MINIO_SECRET_KEY
           value: miniostorage
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
-        name: minio
         ports:
         - containerPort: 9000
           name: minio
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
         volumeMounts:
-        - mountPath: /data
-          name: minio-storage
-      initContainers:
-      - command:
-        - mkdir
-        - /data/my-s3-bucket
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
-        name: create-bucket
-        volumeMounts:
-        - mountPath: /data
-          name: minio-storage
+        - name: minio-storage
+          mountPath: /var/lib/minioql/data
       volumes:
-      - emptyDir: {}
-        name: minio-storage
+      - name: minio-storage
+        emptyDir: {}
 ---
+# Source: flyte/templates/postgres/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
   namespace: flyte
+  labels: 
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
+  replicas: 1
   selector:
-    matchLabels:
-      app: postgres
+    matchLabels: 
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
-      labels:
-        app: postgres
+      labels: 
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - env:
+      - image: "postgres:10.16-alpine"
+        imagePullPolicy: "IfNotPresent"
+        name: postgres
+        env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
-        image: postgres:10.16-alpine
-        name: postgres
         ports:
         - containerPort: 5432
           name: postgres
+        resources: 
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
         volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: postgres-storage
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
       volumes:
-      - emptyDir: {}
-        name: postgres-storage
+        - name: postgres-storage
+          emptyDir: {}
 ---
+# Source: flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    k8s-app: dashboard-metrics-scraper
-  name: dashboard-metrics-scraper
-  namespace: kubernetes-dashboard
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
-    matchLabels:
-      k8s-app: dashboard-metrics-scraper
+    matchLabels: 
+      app.kubernetes.io/name: flytepropeller
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        seccomp.security.alpha.kubernetes.io/pod: runtime/default
-      labels:
-        k8s-app: dashboard-metrics-scraper
-    spec:
-      containers:
-      - image: kubernetesui/metrics-scraper:v1.0.6
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        name: dashboard-metrics-scraper
-        ports:
-        - containerPort: 8000
-          protocol: TCP
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp-volume
-      nodeSelector:
-        kubernetes.io/os: linux
-      serviceAccountName: kubernetes-dashboard
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
-      volumes:
-      - emptyDir: {}
-        name: tmp-volume
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kubernetes-dashboard
-spec:
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      k8s-app: kubernetes-dashboard
-  template:
-    metadata:
-      labels:
-        k8s-app: kubernetes-dashboard
-    spec:
-      containers:
-      - args:
-        - --namespace=kubernetes-dashboard
-        - --enable-insecure-login
-        - --enable-skip-login
-        - --disable-settings-authorizer
-        image: kubernetesui/dashboard:v2.2.0
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 9090
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        name: kubernetes-dashboard
-        ports:
-        - containerPort: 9090
-          protocol: TCP
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp-volume
-      nodeSelector:
-        kubernetes.io/os: linux
-      serviceAccountName: kubernetes-dashboard
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
-      volumes:
-      - emptyDir: {}
-        name: tmp-volume
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: contour
-  name: contour
-  namespace: projectcontour
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: contour
-  strategy:
-    rollingUpdate:
-      maxSurge: 50%
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        prometheus.io/port: "8000"
-        prometheus.io/scrape: "true"
-      labels:
-        app: contour
-    spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app: contour
-              topologyKey: kubernetes.io/hostname
-            weight: 100
-      containers:
-      - args:
-        - serve
-        - --incluster
-        - --xds-address=0.0.0.0
-        - --xds-port=8001
-        - --envoy-service-http-port=80
-        - --envoy-service-https-port=443
-        - --contour-cafile=/certs/ca.crt
-        - --contour-cert-file=/certs/tls.crt
-        - --contour-key-file=/certs/tls.key
-        - --config-path=/config/contour.yaml
-        command:
-        - contour
-        env:
-        - name: CONTOUR_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        image: docker.io/projectcontour/contour:v1.13.1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8000
-        name: contour
-        ports:
-        - containerPort: 8001
-          name: xds
-          protocol: TCP
-        - containerPort: 8000
-          name: metrics
-          protocol: TCP
-        - containerPort: 6060
-          name: debug
-          protocol: TCP
-        readinessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          tcpSocket:
-            port: 8001
-        volumeMounts:
-        - mountPath: /certs
-          name: contourcert
-          readOnly: true
-        - mountPath: /config
-          name: contour-config
-          readOnly: true
-      dnsPolicy: ClusterFirst
-      securityContext:
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
-      serviceAccountName: contour
-      volumes:
-      - name: contourcert
-        secret:
-          secretName: contourcert
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: contour.yaml
-            path: contour.yaml
-          name: contour
-        name: contour-config
----
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: syncresources
-  namespace: flyte
-spec:
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - command:
-            - flyteadmin
-            - --config
-            - /etc/flyte/config/*.yaml
-            - clusterresource
-            - sync
-            image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
-            imagePullPolicy: IfNotPresent
-            name: sync-cluster-resources
-            volumeMounts:
-            - mountPath: /etc/flyte/clusterresource/templates
-              name: resource-templates
-            - mountPath: /etc/flyte/config
-              name: config-volume
-            - mountPath: /etc/db
-              name: db-pass
-          restartPolicy: OnFailure
-          serviceAccountName: flyteadmin
-          volumes:
-          - configMap:
-              name: clusterresource-template-dtg8ff28mt
-            name: resource-templates
-          - configMap:
-              name: flyte-admin-config-7gmg5ffhdd
-            name: config-volume
-          - name: db-pass
-            secret:
-              secretName: db-pass-9dgchhk2bm
-  schedule: '*/1 * * * *'
----
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    app: envoy
-  name: envoy
-  namespace: projectcontour
-spec:
-  selector:
-    matchLabels:
-      app: envoy
-  template:
-    metadata:
-      annotations:
-        prometheus.io/path: /stats/prometheus
-        prometheus.io/port: "8002"
-        prometheus.io/scrape: "true"
-      labels:
-        app: envoy
-    spec:
-      automountServiceAccountToken: false
-      containers:
-      - args:
-        - envoy
-        - shutdown-manager
-        command:
-        - /bin/contour
-        image: docker.io/projectcontour/contour:v1.13.1
-        imagePullPolicy: IfNotPresent
-        lifecycle:
-          preStop:
-            exec:
-              command:
-              - /bin/contour
-              - envoy
-              - shutdown
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8090
-          initialDelaySeconds: 3
-          periodSeconds: 10
-        name: shutdown-manager
-      - args:
-        - -c
-        - /config/envoy.json
-        - --service-cluster $(CONTOUR_NAMESPACE)
-        - --service-node $(ENVOY_POD_NAME)
-        - --log-level info
-        command:
-        - envoy
-        env:
-        - name: CONTOUR_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: ENVOY_POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        image: docker.io/envoyproxy/envoy:v1.17.1
-        imagePullPolicy: IfNotPresent
-        lifecycle:
-          preStop:
-            httpGet:
-              path: /shutdown
-              port: 8090
-              scheme: HTTP
-        name: envoy
-        ports:
-        - containerPort: 80
-          hostPort: 80
-          name: http
-          protocol: TCP
-        - containerPort: 443
-          hostPort: 443
-          name: https
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8002
-          initialDelaySeconds: 3
-          periodSeconds: 4
-        volumeMounts:
-        - mountPath: /config
-          name: envoy-config
-          readOnly: true
-        - mountPath: /certs
-          name: envoycert
-          readOnly: true
-      initContainers:
-      - args:
-        - bootstrap
-        - /config/envoy.json
-        - --xds-address=contour
-        - --xds-port=8001
-        - --xds-resource-version=v3
-        - --resources-dir=/config/resources
-        - --envoy-cafile=/certs/ca.crt
-        - --envoy-cert-file=/certs/tls.crt
-        - --envoy-key-file=/certs/tls.key
-        command:
-        - contour
-        env:
-        - name: CONTOUR_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: docker.io/projectcontour/contour:v1.13.1
-        imagePullPolicy: IfNotPresent
-        name: envoy-initconfig
-        volumeMounts:
-        - mountPath: /config
-          name: envoy-config
-        - mountPath: /certs
-          name: envoycert
-          readOnly: true
-      restartPolicy: Always
-      serviceAccountName: envoy
-      terminationGracePeriodSeconds: 300
-      volumes:
-      - emptyDir: {}
-        name: envoy-config
-      - name: envoycert
-        secret:
-          secretName: envoycert
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 10%
-    type: RollingUpdate
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: flyte-pod-webhook-secret
-  namespace: flyte
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - args:
-        - webhook
-        - init-certs
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      restartPolicy: Never
-      serviceAccountName: flyte-pod-webhook
-      volumes:
-      - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
-        name: config-volume
-  ttlSecondsAfterFinished: 0
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: contour-certgen-v1.13.1
-  namespace: projectcontour
-spec:
-  backoffLimit: 1
-  completions: 1
-  parallelism: 1
-  template:
-    metadata:
-      labels:
-        app: contour-certgen
+        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+      labels: 
+        app.kubernetes.io/name: flytepropeller
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
       - command:
-        - contour
-        - certgen
-        - --kube
-        - --incluster
-        - --overwrite
-        - --secrets-format=compact
-        - --namespace=$(CONTOUR_NAMESPACE)
+        - flytepropeller
+        - --config
+        - /etc/flyte/config/*.yaml
         env:
-        - name: CONTOUR_NAMESPACE
+        - name: POD_NAME
           valueFrom:
             fieldRef:
-              fieldPath: metadata.namespace
-        image: docker.io/projectcontour/contour:v1.13.1
-        imagePullPolicy: Always
-        name: contour
-      restartPolicy: Never
-      securityContext:
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
-      serviceAccountName: contour-certgen
+              fieldPath: metadata.name
+        image: "cr.flyte.org/flyteorg/flytepropeller:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: flytepropeller
+        ports:
+        - containerPort: 10254
+        resources: 
+          limits:
+            cpu: 200m
+            ephemeral-storage: 100Mi
+            memory: 200Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config
+          - name: auth
+            mountPath: /etc/secrets/
+      serviceAccountName: flytepropeller
+      volumes:
+      - configMap:
+          name: flyte-propeller-config
+        name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-propeller-auth
+---
+# Source: flyte/templates/propeller/webhook.yaml
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  labels:
+    app: flyte-pod-webhook
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: flyte-v0.15.0
+      annotations:
+        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+    spec:
+      serviceAccountName: flyte-pod-webhook
+      initContainers:
+      - name: generate-secrets
+        image: "cr.flyte.org/flyteorg/flytepropeller:flyte-v0.15.0"
+        imagePullPolicy: "IfNotPresent"
+        command:
+          - flytepropeller
+        args:
+          - webhook
+          - init-certs
+          - --config
+          - /etc/flyte/config/*.yaml
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config
+      containers:
+        - name: webhook
+          image: "cr.flyte.org/flyteorg/flytepropeller:flyte-v0.15.0"
+          imagePullPolicy: "IfNotPresent"
+          command:
+            - flytepropeller
+          args:
+            - webhook
+            - --config
+            - /etc/flyte/config/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+              readOnly: true
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: flyte-propeller-config
+        - name: webhook-certs
+          secret:
+            secretName: flyte-pod-webhook
+---
+# Source: flyte/templates/common/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: flyte
+  namespace: flyte
+spec:
+  rules:
+    - http:
+        paths:
+          # This is useful only for frontend development
+          - path: /__webpack_hmr
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 87
+          # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
+          - path: /console
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          - path: /console/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          - path: /api
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /api/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /healthcheck
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /v1/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /.well-known
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /.well-known/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /login
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /login/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /logout
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /logout/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /callback
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /callback/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /me
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /config
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /config/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+          - path: /flyteidl.service.AdminService
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /flyteidl.service.AuthMetadataService
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /flyteidl.service.AuthMetadataService/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /flyteidl.service.IdentityService
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /flyteidl.service.IdentityService/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/ingress.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/networkpolicy.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/pdb.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/psp.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: flyte/charts/contour/templates/certgen/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-contour-contour-certgen
+  namespace: flyte
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour-certgen
+---
+# Source: flyte/charts/contour/templates/certgen/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flyte-contour-contour-certgen
+  namespace: flyte
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour-certgen
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - update
+---
+# Source: flyte/charts/contour/templates/certgen/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: flyte-contour-contour-certgen
+  namespace: flyte
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour-certgen
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyte-contour-contour-certgen
+subjects:
+  - kind: ServiceAccount
+    name: flyte-contour-contour-certgen
+---
+# Source: flyte/charts/contour/templates/certgen/job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyte-contour-contour-certgen
+  namespace: flyte
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour-certgen
+spec:
   ttlSecondsAfterFinished: 0
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: flytesystem
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: flyteconsole
-            port:
-              number: 80
-        path: /__webpack_hmr
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 81
-        path: /flyteidl.service.AdminService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 81
-        path: /flyteidl.service.AuthMetadataService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 81
-        path: /flyteidl.service.IdentityService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 87
-        path: /openapi
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteconsole
-            port:
-              number: 80
-        path: /console
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteconsole
-            port:
-              number: 80
-        path: /console/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /api
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /api/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /healthcheck
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /v1/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /openapi/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /.well-known/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /login
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /login/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /logout
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /logout/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /callback
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /callback/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /me
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /config
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /config/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /oauth2
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: flyteadmin
-            port:
-              number: 80
-        path: /oauth2/*
-        pathType: ImplementationSpecific
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: minio
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: minio
-            port:
-              number: 9000
-        path: /minio
-        pathType: ImplementationSpecific
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: contour
+        helm.sh/chart: contour-4.1.2
+        app.kubernetes.io/instance: flyte
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: contour-certgen
+    spec:
+      
+      containers:
+        - name: contour
+          image: docker.io/bitnami/contour:1.12.0-debian-10-r0
+          imagePullPolicy: IfNotPresent
+          command:
+            - contour
+          args:
+            - certgen
+            - --kube
+            - --incluster
+            - --overwrite
+            - --secrets-format=compact
+            - --namespace=$(CONTOUR_NAMESPACE)
+          env:
+            - name: CONTOUR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources: 
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+      restartPolicy: Never
+      serviceAccountName: flyte-contour-contour-certgen
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 
+        runAsNonRoot: true
+  parallelism: 1
+  completions: 1
+  backoffLimit: 1

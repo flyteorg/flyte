@@ -38,7 +38,7 @@ metadata:
   name: {{ template "flyte.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   {{- with .Values.common.ingress.annotations }}
-  annotations: {{ tpl (toYaml .) $ | nindent 4}}
+  annotations: {{ toYaml . | nindent 4}}
   {{- end }}
 spec:
   rules:
@@ -192,7 +192,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   annotations:
   {{- with .Values.common.ingress.annotations }}
-  {{- tpl (toYaml .) $ | nindent 4}}
+  {{- toYaml . | nindent 4}}
   {{- end }}
   {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
   {{- toYaml . | nindent 4}}

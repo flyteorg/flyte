@@ -8,7 +8,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
   {{- with .Values.flyteadmin.serviceAccount.annotations }}
-  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- with .Values.flyteadmin.serviceAccount.imagePullSecrets }}
 imagePullSecrets: {{ toYaml . | nindent 2 }}
@@ -23,21 +23,20 @@ metadata:
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
 - apiGroups:
-  - ""
+#  - ""
   - flyte.lyft.com
-  - rbac.authorization.k8s.io
+#   - rbac.authorization.k8s.io
   resources:
-  - configmaps
   - flyteworkflows
-  - namespaces
-  - pods
-  - resourcequotas
-  - roles
-  - rolebindings
-  - secrets
-  - services
-  - serviceaccounts
-  - spark-role
+#  - configmaps
+#  - namespaces
+#  - pods
+#  - resourcequotas
+#  - roles
+#  - rolebindings
+#  - secrets
+#  - services
+#  - serviceaccounts
   verbs:
   - '*'
 

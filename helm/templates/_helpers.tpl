@@ -211,6 +211,6 @@ metadata:
   name: flyte-data-config
   namespace: {{`{{ namespace }}`}}
 data:
-  config.yaml: | {{ tpl (include "storage.base" .) $ | nindent 4 }}
+  config.yaml: | {{ include "storage.base" . | nindent 4 }}
       enable-multicontainer: true
 {{- end }}

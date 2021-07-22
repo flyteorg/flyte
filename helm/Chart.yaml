@@ -2,7 +2,7 @@ apiVersion: v2
 name: flyte
 description: A Helm chart for Flyte
 type: application
-version: v0.1.10 # VERSION
+version: 0.1.10 # VERSION
 dependencies:
   - name: contour
     version: 4.1.2
@@ -12,7 +12,7 @@ dependencies:
     alias: sparkoperator
     version: 1.0.6
     repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
-    condition: spark.enabled
+    condition: sparkoperator.enabled
   - name: kubernetes-dashboard
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/

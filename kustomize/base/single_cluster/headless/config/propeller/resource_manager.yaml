@@ -1,7 +1,0 @@
-propeller:
-  resourcemanager:
-    type: redis
-    resourceMaxQuota: 10000
-    redis:
-      hostPath: redis-resource-manager:6379
-      hostKey: mypassword

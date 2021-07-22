@@ -417,10 +417,10 @@ storage:
 
 # Database configuration
 db:
-  database:
+  database: {}
     # port: 5432
     # username: postgres
-    host: postgres
+    # host: postgres
     # dbname: flyte
     # passwordPath: /etc/db/pass.txt
     # options:
@@ -479,33 +479,6 @@ configmap:
       eventVersion: 1
       testing:
         host: http://flyteadmin
-    # -- Authentication configuration
-    auth:
-      authorizedUris:
-        # This should point at your public http Uri.
-        - https://localhost:30081
-        # This will be used by internal services in the same namespace as flyteadmin
-        - http://flyteadmin:80
-        # This will be used by internal services in the same cluster but different namespaces
-        - http://flyteadmin.flyte.svc.cluster.local:80
-
-      # Controls app authentication config
-      appAuth:
-        thirdPartyConfig:
-          flyteClient:
-            clientId: flytectl
-            redirectUri: http://localhost:53593/callback
-            scopes:
-              - offline
-              - all
-      # Controls user authentication
-      userAuth:
-        openId:
-          baseUrl: https://accounts.google.com
-          scopes:
-            - profile
-            - openid
-          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
 
   # -- Datacatalog server config
   datacatalogServer:
@@ -700,7 +673,6 @@ cluster_resource_manager:
     # -- ClusterResource parameters
     # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
     cluster_resources:
-      refreshInterval: 5m
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:

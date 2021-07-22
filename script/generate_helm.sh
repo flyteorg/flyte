@@ -5,7 +5,7 @@ set -ex
 echo "Generating Helm"
 helm version
 # All the values files to be built
-DEPLOYMENT=${1:-sandbox eks gcp}
+DEPLOYMENT=${1:-sandbox jpm}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 

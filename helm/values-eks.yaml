@@ -1,12 +1,3 @@
-userSettings:
-  accountNumber: <ACCOUNT_NUMBER>
-  accountRegion: <AWS_REGION>
-  certificateArn: <CERTIFICATE_ARN>
-  dbPassword: <DB_PASSWORD>
-  rdsHost: <RDS_HOST>
-  bucketName: <BUCKET_NAME>
-  logGroup: <LOG_GROUP_NAME>
-
 #
 # FLYTEADMIN
 #
@@ -19,7 +10,7 @@ flyteadmin:
     # you can change the name of this role
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 
   resources:
     limits:
@@ -57,7 +48,7 @@ datacatalog:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 500m
@@ -91,7 +82,7 @@ flytepropeller:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 1
@@ -182,7 +173,7 @@ common:
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
       # -- This is the certificate arn of the cert imported in AWS certificate manager. 
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
+      alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
@@ -204,7 +195,7 @@ common:
       type: Opaque
       stringData:
         # -- If using plain text you can provide the password here
-        pass.txt: "{{ .Values.userSettings.dbPassword }}"
+        pass.txt: <DB_PASSWORD>
 
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform
@@ -218,16 +209,16 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: s3
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: "{{ .Values.userSettings.bucketName }}"
+  bucketName: <BUCKET_NAME>
   s3:
-    region: "{{ .Values.userSettings.accountRegion }}"
+    region: <AWS_REGION>
 
 db:
   database:
     port: 5432
     # -- Create a user called flyteadmin
     username: flyteadmin
-    host: "{{ .Values.userSettings.rdsHost }}"
+    host: <RDS_HOST_DNS>
     # -- Create a DB called flyteadmin (OR change the name here)
     dbname: flyteadmin
     passwordPath: /etc/db/pass.txt
@@ -262,7 +253,7 @@ configmap:
 
   core:
     propeller:
-      rawoutput-prefix: "s3://{{ .Values.userSettings.bucketName }}/"
+      rawoutput-prefix: s3://<BUCKET_NAME>/
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
@@ -318,9 +309,9 @@ configmap:
         # You can even disable this
         cloudwatch-enabled: true
         # -- region where logs are hosted
-        cloudwatch-region: "{{ .Values.userSettings.accountRegion }}"
+        cloudwatch-region: <AWS_REGION>
         # -- cloudwatch log-group
-        cloudwatch-log-group: "{{ .Values.userSettings.logGroup }}"
+        cloudwatch-log-group: <LOG_GROUP_NAME>
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -337,15 +328,15 @@ workflow_scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
       eventScheduler:
         scheme: aws
-        region: "{{ .Values.userSettings.accountRegion }}"
-        scheduleRole: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte_cron_scheduler_role"
-        targetName: "arn:aws:sqs:{{ .Values.userSettings.accountRegion }}:{{ .Values.userSettings.accountNumber }}:flyte-helm-test-cron-scheduler-queue"
+        region: <AWS_REGION>
+        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
         scheduleNamePrefix: flyte
       workflowExecutor:
         scheme: aws
-        region: "{{ .Values.userSettings.accountRegion }}"
+        region: <AWS_REGION>
         scheduleQueueName: flyte-helm-test-cron-scheduler-queue
-        accountId: "{{ .Values.userSettings.accountNumber }}"
+        accountId: <ACCOUNT_NUMBER>
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
 
@@ -357,12 +348,12 @@ workflow_notifications:
   config:
     notifications:
       type: aws
-      region: "{{ .Values.userSettings.accountRegion }}"
+      region: <AWS_REGION>
       publisher:
-        topicName: "arn:aws:sns:{{ .Values.userSettings.accountRegion }}:{{ .Values.userSettings.accountNumber }}:flyte-notifications-topic"
+        topicName: arn:aws:sns:us-east-1:<ACCOUNT_NUMBER>:flyte-notifications-topic
       processor:
         queueName: flyte-notifications-queue
-        accountId: "{{ .Values.userSettings.accountNumber }}"
+        accountId: <ACCOUNT_NUMBER>
       emailer:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
         sender: "flyte@example.com"
@@ -385,21 +376,21 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "4000Mi"
             - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
 
   templates:
     # -- Template for namespaces resources
@@ -531,11 +522,11 @@ tf_operator:
 # Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
 sagemaker:
   enabled: false
-#  plugin_config:
-#    plugins:
-#      sagemaker:
-#        roleArn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/<ROLE_FOR_SAGEMAKER>
-#        region: {{ .Values.userSettings.accountRegion }}
+  plugin_config:
+    plugins:
+      sagemaker:
+        roleArn: arn:aws:iam::<ACCOUNT_NUMBER>:role/<ROLE_FOR_SAGEMAKER>
+        region: <AWS_REGION>
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
