@@ -249,9 +249,9 @@ data:
     domains:
     - id: dev
       name: Development
-    - id: test
+    - id: stg
       name: Test
-    - id: prod
+    - id: prd
       name: Production
   logger.yaml: | 
     logger:
@@ -268,6 +268,8 @@ data:
       roleNameKey: iam.amazonaws.com/role
       testing:
         host: http://flyteadmin
+    namespace_mapping:
+      template: 10302-flytepoc-{{ project }}-{{ domain }}-jpdev
     server:
       grpcPort: 8089
       httpPort: 8088
@@ -2939,7 +2941,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9b7508db7dfe3e047c148901e91161fb5417d57331ac566f38ac1f106abd92f"
+        configChecksum: "8af47ee286bf4f7cbd872460cebc861d3a55f8c9e704d2bd396aeda9119ce9e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -2959,7 +2961,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -2975,7 +2977,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -2983,7 +2985,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3004,7 +3006,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.15.0"
+        image: "cr.flyte.org/flyteorg/flyteadmin:flyte-v0.16.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:

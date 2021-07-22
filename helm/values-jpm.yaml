@@ -11,8 +11,7 @@
 
 flyteadmin:
   image:
-    tag: flyte-v0.15.0
-  namespace_mapping: domain
+    tag: flyte-v0.16.3
 
 #
 # DATACATALOG
@@ -140,14 +139,17 @@ db:
 #
 
 configmap:
+  adminServer:
+    namespace_mapping:
+      template: "10302-flytepoc-{{ project }}-{{ domain }}-jpdev"
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
     domains:
     - id: dev
       name: Development
-    - id: test
+    - id: stg
       name: Test
-    - id: prod
+    - id: prd
       name: Production
 
   # Task default resources configuration
