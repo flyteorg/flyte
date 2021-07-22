@@ -42,7 +42,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -56,7 +56,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
@@ -70,7 +70,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
@@ -107,7 +107,7 @@ kind: Secret
 metadata:
   name: db-pass
 stringData:
-  pass.txt: <DB_PASSWORD>
+  pass.txt: '{{ .Values.userSettings.dbPassword }}'
 type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
@@ -251,7 +251,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: '{{ .Values.userSettings.rdsHost }}'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -318,10 +318,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "{{ .Values.userSettings.bucketName }}"
       connection:
         auth-type: iam
-        region: <AWS_REGION>
+        region: {{ .Values.userSettings.accountRegion }}
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -344,22 +344,23 @@ data:
         - projectQuotaMemory:
             value: 4000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role
       refresh: 5m
+      refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
 # Source: flyte/templates/console/configmap.yaml
@@ -393,7 +394,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: '{{ .Values.userSettings.rdsHost }}'
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -413,10 +414,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "{{ .Values.userSettings.bucketName }}"
       connection:
         auth-type: iam
-        region: <AWS_REGION>
+        region: {{ .Values.userSettings.accountRegion }}
       limits:
         maxDownloadMBs: 10
 ---
@@ -566,8 +567,8 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: true
-        cloudwatch-log-group: <LOG_GROUP_NAME>
-        cloudwatch-region: <AWS_REGION>
+        cloudwatch-log-group: '<LOG_GROUP_NAME>'
+        cloudwatch-region: '<AWS_REGION>'
         kubernetes-enabled: false
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
@@ -1326,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "946b15fa099f61d7285a6264594569e7a596e6d452cbba115956223ff42957d"
+        configChecksum: "beaa4259c628986312c359bf8ebc8f6a7a743d11bb525f5d5456d12f41e748d"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1548,7 +1549,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8ed5710602cdb84df59a4c4cb642b695f643af6908953661ff22d854c7f7919"
+        configChecksum: "33c7c6584b9a3a309e005c581b35f8eadacff2fa00266ae1d3a63e6044da236"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1634,7 +1635,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "be1167826c5b79e2f8be53be18f9247a46193fa8987e249982030b0f7b3cad7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1706,7 +1707,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.12.9
       annotations:
-        configChecksum: "be1167826c5b79e2f8be53be18f9247a46193fa8987e249982030b0f7b3cad7"
+        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -1948,7 +1949,7 @@ metadata:
   annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
+    alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -2062,6 +2063,16 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -2074,7 +2085,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
+    alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing

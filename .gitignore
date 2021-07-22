@@ -17,7 +17,8 @@ docs/
 release/
 __pycache__/
 charts/flyte/charts/
-Chart.lock
+charts/flyte/charts/Chart.lock
+charts/flyte-core/charts/Chart.lock
 **/*.bak-
 .cr-release-packages/
 .cr-index/

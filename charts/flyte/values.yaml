@@ -417,10 +417,10 @@ storage:
 
 # Database configuration
 db:
-  database: {}
+  database:
     # port: 5432
     # username: postgres
-    # host: postgres
+    host: postgres
     # dbname: flyte
     # passwordPath: /etc/db/pass.txt
     # options:
@@ -700,6 +700,7 @@ cluster_resource_manager:
     # -- ClusterResource parameters
     # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
     cluster_resources:
+      refreshInterval: 5m
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:

@@ -38,7 +38,7 @@ metadata:
   name: {{ template "flyte.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   {{- with .Values.common.ingress.annotations }}
-  annotations: {{ toYaml . | nindent 4}}
+  annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
   rules:
@@ -157,6 +157,16 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
           {{- if not .Values.common.ingress.separateGrpcIngress }}
           {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
@@ -182,7 +192,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   annotations:
   {{- with .Values.common.ingress.annotations }}
-  {{- toYaml . | nindent 4}}
+  {{- tpl (toYaml .) $ | nindent 4}}
   {{- end }}
   {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
   {{- toYaml . | nindent 4}}

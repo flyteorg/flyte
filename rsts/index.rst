@@ -86,7 +86,7 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
                greeting = greet(name=name)
                return add_question(greeting=greeting)
 
-           welcome("Traveler")
+           welcome(name="Traveler")
            # Output: "Welcome, Traveler! How are you?"
 
     .. tab:: java

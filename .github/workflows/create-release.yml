@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'version name. example v0.1.1'
+        description: "version name. example v0.1.1"
         required: true
 
 jobs:
@@ -17,16 +17,6 @@ jobs:
         with:
           fetch-depth: "0"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v1
-        with:
-          version: v3.4.0
-            
-      - name: Configure Git
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.17.2
@@ -36,15 +26,53 @@ jobs:
           CUSTOM_TAG: ${{ github.event.inputs.version }}
           RELEASE_BRANCHES: master
 
-      - uses: actions/checkout@v2
+  helm-release:
+    name: Flyte helm release
+    runs-on: ubuntu-latest
+    needs: [ bump-version ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-          ref: ${{ github.event.inputs.version }}
+          
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+
+      - name: Preprare Flyte Helm Release
+        run: |
+          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${{ needs.bump-version.outputs.version }} # VERSION/g"
+          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-core/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${{ needs.bump-version.outputs.version }} # VERSION/g"
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add googlecloudplatform https://googlecloudplatform.github.io/spark-on-k8s-operator
+          helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.1.0
+        with:
+          charts_dir: charts
+        env:
+          CR_TOKEN: "${{ secrets.FLYTE_BOT_PAT }}"
+
+
+  manifest-release:
+    name: Flyte manifest release
+    runs-on: ubuntu-latest
+    needs: [ bump-version ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
 
       - name: Preprare Flyte Release
-        env:
-          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-          VERSION: ${{ github.event.inputs.version }}
         run: |
           make prepare_artifacts
 
@@ -55,14 +83,4 @@ jobs:
           args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-
-      - name: Release helm registry
-        env:
-          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-          VERSION: ${{ github.event.inputs.version }}
-        run: |
-          grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
-          # Commit Chart registry to github gh-pages
-          bin/cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${FLYTE_BOT_PAT} --release-name-template="{{ .Version }}"
-
           

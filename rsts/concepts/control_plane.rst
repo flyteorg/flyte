@@ -1,3 +1,5 @@
+.. _control-plane:
+
 ################
 Control Plane
 ################
