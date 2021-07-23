@@ -141,7 +141,7 @@ db:
 configmap:
   adminServer:
     namespace_mapping:
-      template: "10302-flytepoc-{{ project }}-{{ domain }}-jpdev"
+      template: "10302-flytepoc-{{ project }}-{{ domain }}-dev"
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
     domains:

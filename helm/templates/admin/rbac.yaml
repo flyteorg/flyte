@@ -63,8 +63,8 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-jpdev
-  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
 - apiGroups:
@@ -77,13 +77,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-jpdev-binding
-  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-jpdev
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev
 subjects:
 - kind: ServiceAccount
   name: {{ template "flyteadmin.name" . }}
