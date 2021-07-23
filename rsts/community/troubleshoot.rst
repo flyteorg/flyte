@@ -59,6 +59,15 @@ Another useful way to debug docker is::
  docker system df
 
 
+Troubles with ``flyte sandbox`` log viewing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- When testing locally using flyte-sandbox, one way to view the logs is by the link ``Kubernetes Logs (User)`` in the FlyteConsole. 
+- This might take you to the kubernetes dashboard, and require a login.
+
+Note that there is a ``skip`` button, which will take you straight to the logs without needing to login.
+
+
 Troubles with ``make start`` command in flytesnacks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
