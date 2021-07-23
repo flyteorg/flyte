@@ -55,32 +55,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: envoy
 ---
-# Source: flyte/charts/kubernetes-dashboard/templates/serviceaccount.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-  name: flyte-kubernetes-dashboard
----
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -124,62 +98,6 @@ kind: ServiceAccount
 metadata:
   name: flyte-pod-webhook
   namespace: flyte
----
-# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# kubernetes-dashboard-certs
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-  name: flyte-kubernetes-dashboard-certs
-type: Opaque
----
-# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
-# kubernetes-dashboard-csrf
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-  name: kubernetes-dashboard-csrf
-type: Opaque
----
-# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
-# kubernetes-dashboard-key-holder
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-  name: kubernetes-dashboard-key-holder
-type: Opaque
 ---
 # Source: flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
@@ -229,33 +147,6 @@ data:
     leaderelection:
       configmap-namespace: 'flyte'
     tls: {}
----
-# Source: flyte/charts/kubernetes-dashboard/templates/configmap.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-  name: kubernetes-dashboard-settings
-data:
 ---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1
@@ -1942,37 +1833,6 @@ rules:
       - get
       - update
 ---
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: "flyte-kubernetes-dashboard-metrics"
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-rules:
-  # Allow Metrics Scraper to get metrics from the Metrics server
-  - apiGroups: ["metrics.k8s.io"]
-    resources: ["pods", "nodes"]
-    verbs: ["get", "list", "watch"]
----
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -2085,40 +1945,6 @@ subjects:
     name: flyte-contour-contour
     namespace: flyte
 ---
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-metrics.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: "flyte-kubernetes-dashboard-metrics"
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-kubernetes-dashboard-metrics
-subjects:
-  - kind: ServiceAccount
-    name: flyte-kubernetes-dashboard
-    namespace: flyte
----
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -2154,52 +1980,6 @@ subjects:
     name: flyte-pod-webhook
     namespace: flyte
 ---
-# Source: flyte/charts/kubernetes-dashboard/templates/role.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: flyte-kubernetes-dashboard
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-rules:
-    # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
-  - apiGroups: [""]
-    resources: ["secrets"]
-    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
-    verbs: ["get", "update", "delete"]
-    # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    resourceNames: ["kubernetes-dashboard-settings"]
-    verbs: ["get", "update"]
-    # Allow Dashboard to get metrics.
-  - apiGroups: [""]
-    resources: ["services"]
-    resourceNames: ["heapster", "dashboard-metrics-scraper"]
-    verbs: ["proxy"]
-  - apiGroups: [""]
-    resources: ["services/proxy"]
-    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
-    verbs: ["get"]
----
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -2234,39 +2014,24 @@ rules:
   verbs:
   - '*'
 ---
-# Source: flyte/charts/kubernetes-dashboard/templates/rolebinding.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: Role
 metadata:
-  name: flyte-kubernetes-dashboard
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev
+  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  labels: 
+    app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
+    helm.sh/chart: flyte-0.1.10
     app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: flyte-kubernetes-dashboard
-subjects:
-  - kind: ServiceAccount
-    name: flyte-kubernetes-dashboard
-    namespace: flyte
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - '*'
 ---
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -2283,6 +2048,26 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: flyteadmin
+subjects:
+- kind: ServiceAccount
+  name: flyteadmin
+  namespace: flyte
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
@@ -2350,44 +2135,6 @@ spec:
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: envoy
   type: NodePort
----
-# Source: flyte/charts/kubernetes-dashboard/templates/service.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-kubernetes-dashboard
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: kubernetes-dashboard
-    kubernetes.io/cluster-service: "true"
-spec:
-  type: NodePort
-  ports:
-  - port: 30082
-    targetPort: http
-    name: http
-  selector:
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: kubernetes-dashboard
 ---
 # Source: flyte/templates/admin/service.yaml
 apiVersion: v1
@@ -2859,103 +2606,6 @@ spec:
             items:
               - key: contour.yaml
                 path: contour.yaml
----
-# Source: flyte/charts/kubernetes-dashboard/templates/deployment.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flyte-kubernetes-dashboard
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.2.0"
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: kubernetes-dashboard
-spec:
-  replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: kubernetes-dashboard
-      app.kubernetes.io/instance: flyte
-      app.kubernetes.io/component: kubernetes-dashboard
-  template:
-    metadata:
-      annotations:
-        seccomp.security.alpha.kubernetes.io/pod: runtime/default
-      labels:
-        app.kubernetes.io/name: kubernetes-dashboard
-        helm.sh/chart: kubernetes-dashboard-4.0.2
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/version: "2.2.0"
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/component: kubernetes-dashboard
-    spec:
-      serviceAccountName: flyte-kubernetes-dashboard
-      containers:
-      - name: kubernetes-dashboard
-        image: "kubernetesui/dashboard:v2.2.0"
-        imagePullPolicy: IfNotPresent
-        args:
-          - --namespace=flyte
-          - --metrics-provider=none
-          - --enable-skip-login
-          - --enable-insecure-login
-          - --disable-settings-authorizer
-        ports:
-        - name: http
-          containerPort: 9090
-          protocol: TCP
-        volumeMounts:
-        - name: kubernetes-dashboard-certs
-          mountPath: /certs
-          # Create on-disk volume to store exec logs
-        - mountPath: /tmp
-          name: tmp-volume
-        livenessProbe:
-          httpGet:
-            scheme: HTTP
-            path: /
-            port: 9090
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        resources:
-          limits:
-            cpu: 2
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-      volumes:
-      - name: kubernetes-dashboard-certs
-        secret:
-          secretName: flyte-kubernetes-dashboard-certs
-      - name: tmp-volume
-        emptyDir: {}
 ---
 # Source: flyte/templates/admin/deployment.yaml
 apiVersion: apps/v1
@@ -3625,96 +3275,6 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
----
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/ingress.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/networkpolicy.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/pdb.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/psp.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 ---
 # Source: flyte/charts/contour/templates/certgen/serviceaccount.yaml
 apiVersion: v1

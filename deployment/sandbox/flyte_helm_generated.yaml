@@ -2310,6 +2310,25 @@ rules:
   verbs:
   - '*'
 ---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev
+  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - '*'
+---
 # Source: flyte/charts/kubernetes-dashboard/templates/rolebinding.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
@@ -2359,6 +2378,26 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: flyteadmin
+subjects:
+- kind: ServiceAccount
+  name: flyteadmin
+  namespace: flyte
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-jpdev
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-jpdev
 subjects:
 - kind: ServiceAccount
   name: flyteadmin

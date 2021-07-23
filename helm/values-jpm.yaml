@@ -85,7 +85,7 @@ contour:
 # KUBERNETES DASHBOARD
 #
 kubernetes-dashboard:
-  enabled: true
+  enabled: false
   extraArgs:
     - --enable-skip-login
     - --enable-insecure-login
