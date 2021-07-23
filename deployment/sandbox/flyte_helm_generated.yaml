@@ -2049,39 +2049,6 @@ rules:
     resources: ["pods", "nodes"]
     verbs: ["get", "list", "watch"]
 ---
-# Source: flyte/templates/admin/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: flyteadmin
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-#  - configmaps
-#  - namespaces
-#  - pods
-#  - resourcequotas
-#  - roles
-#  - rolebindings
-#  - secrets
-#  - services
-#  - serviceaccounts
-  verbs:
-  - '*'
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - '*'
----
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -2228,25 +2195,6 @@ subjects:
     name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
-# Source: flyte/templates/admin/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: flyteadmin-binding
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
-    app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyteadmin
-subjects:
-- kind: ServiceAccount
-  name: flyteadmin
-  namespace: flyte
----
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -2328,6 +2276,40 @@ rules:
     resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
     verbs: ["get"]
 ---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+#  - configmaps
+#  - namespaces
+#  - pods
+#  - resourcequotas
+#  - roles
+#  - rolebindings
+#  - secrets
+#  - services
+#  - serviceaccounts
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - '*'
+---
 # Source: flyte/charts/kubernetes-dashboard/templates/rolebinding.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
@@ -2361,6 +2343,26 @@ subjects:
   - kind: ServiceAccount
     name: flyte-kubernetes-dashboard
     namespace: flyte
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flyteadmin-binding
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyteadmin
+subjects:
+- kind: ServiceAccount
+  name: flyteadmin
+  namespace: flyte
 ---
 # Source: flyte/charts/contour/templates/contour/service.yaml
 apiVersion: v1

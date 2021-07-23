@@ -17,9 +17,10 @@ imagePullSecrets: {{ toYaml . | nindent 2 }}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
 - apiGroups:
@@ -46,13 +47,14 @@ rules:
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: {{ template "flyteadmin.name" . }}-binding
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: {{ template "flyteadmin.name" . }}
 subjects:
 - kind: ServiceAccount
