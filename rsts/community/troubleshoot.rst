@@ -83,7 +83,9 @@ Troubles with ``flyte sandbox`` log viewing
                  - --enable-skip-login
                  - --disable-settings-authorizer
 
-Note that there is a ``skip`` button, which will take you straight to the logs without needing to login.
+.. note::
+
+   There is a ``skip`` button, which will take you straight to the logs without needing to login.
 
 
 Troubles with ``make start`` command in flytesnacks
