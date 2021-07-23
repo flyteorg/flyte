@@ -85,7 +85,7 @@ Troubles with ``flyte sandbox`` log viewing
 
 .. note::
 
-   There is a ``skip`` button, which will take you straight to the logs without needing to login.
+   There is a ``skip`` button, which will take you straight to the logs without needing to log in.
 
 
 Troubles with ``make start`` command in flytesnacks
