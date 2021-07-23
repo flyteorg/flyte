@@ -116,6 +116,11 @@ export const nodeExecutionPhaseConstants: {
         text: 'Skipped',
         textColor: secondaryTextColor
     },
+    [NodeExecutionPhase.RECOVERED]: {
+        badgeColor: statusColors.SUCCESS,
+        text: 'Recovered',
+        textColor: positiveTextColor
+    },
     [NodeExecutionPhase.UNDEFINED]: {
         badgeColor: statusColors.UNKNOWN,
         text: 'Unknown',
