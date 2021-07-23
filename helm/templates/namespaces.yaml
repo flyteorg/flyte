@@ -6,17 +6,17 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: 10302-flytepoc-flytesnacks-dev-jpdev
+  name: 10302-flytepoc-flytesnacks-dev-dev
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: 10302-flytepoc-flytesnacks-stg-jpdev
+  name: 10302-flytepoc-flytesnacks-stg-dev
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: 10302-flytepoc-flytesnacks-prd-jpdev
+  name: 10302-flytepoc-flytesnacks-prd-dev
 ---
 apiVersion: v1
 kind: Namespace

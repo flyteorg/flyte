@@ -17,15 +17,14 @@ imagePullSecrets: {{ toYaml . | nindent 2 }}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
 - apiGroups:
-#  - ""
   - flyte.lyft.com
-#   - rbac.authorization.k8s.io
   resources:
   - flyteworkflows
 #  - configmaps
@@ -39,17 +38,52 @@ rules:
 #  - serviceaccounts
   verbs:
   - '*'
-
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: {{ template "flyteadmin.name" . }}-binding
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: {{ template "flyteadmin.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "flyteadmin.name" . }}-10302-flytepoc-flytesnacks-dev-dev
 subjects:
 - kind: ServiceAccount
   name: {{ template "flyteadmin.name" . }}
