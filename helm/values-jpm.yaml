@@ -260,3 +260,7 @@ pytorchoperator:
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
+
+webhook:
+  # -- enable or disable secrets webhook
+  enabled: false
