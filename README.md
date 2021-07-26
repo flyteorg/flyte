@@ -26,6 +26,7 @@ To play around with this version in sandbox mode, follow the instructions on the
   ```k3d cluster create -p "30081:30081" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
   ```
 1. Enable it with `kubectl config use-context k3d-flyte`
+1. Create the Flyte namespace.  `kubectl create ns flyte`. Newer versions of Helm no longer create one for you.
 1. Create a `flytectl` config
     ```
     cat > ~/.flyte/config-k3d.yaml

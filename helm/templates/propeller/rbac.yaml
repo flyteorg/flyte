@@ -175,7 +175,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "flytepropeller.name" . }}
+  name: {{ template "flytepropeller.name" . }}-10302-flytepoc-flytesnacks-dev-dev
 subjects:
 - kind: ServiceAccount
   name: {{ template "flytepropeller.name" . }}

@@ -318,7 +318,7 @@ data:
           namespace: flyte
         renew-deadline: 10s
         retry-period: 2s
-      limit-namespace: all
+      limit-namespace: 10302-flytepoc-flytesnacks-dev-dev
       max-workflow-retries: 30
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
@@ -2102,7 +2102,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: flytepropeller
+  name: flytepropeller-10302-flytepoc-flytesnacks-dev-dev
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
@@ -3012,7 +3012,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "ed29cd6d7bc6294c38771fd8d984e81afd8f46822abfbb58b584e5398f1bea1"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
