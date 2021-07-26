@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/errors"
+
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/graymeta/stow/azure"
@@ -19,8 +21,6 @@ import (
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flytestdlib/errors"
 
 	"github.com/flyteorg/flytestdlib/promutils"
 
@@ -230,8 +230,10 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		return nil, err
 	}
 
-	if sizeMbs := sizeBytes / MiB; sizeMbs > GetConfig().Limits.GetLimitMegabytes {
-		return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %vmb > %vmb.", sizeMbs, GetConfig().Limits.GetLimitMegabytes)
+	if GetConfig().Limits.GetLimitMegabytes != 0 {
+		if sizeMbs := sizeBytes / MiB; sizeMbs > GetConfig().Limits.GetLimitMegabytes {
+			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %vmb > %vmb.", sizeMbs, GetConfig().Limits.GetLimitMegabytes)
+		}
 	}
 
 	return item.Open()

@@ -181,6 +181,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	t.Run("Exceeds limit", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
+
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
 				if id == container {
@@ -205,6 +206,35 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		assert.Error(t, err)
 		assert.True(t, IsExceedsLimit(err))
 		assert.NotNil(t, errors.Cause(err))
+	})
+
+	t.Run("No Limit", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		fn := fQNFn["s3"]
+		GetConfig().Limits.GetLimitMegabytes = 0
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, false, testScope)
+		assert.NoError(t, err)
+		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
+		assert.NoError(t, err)
+		metadata, err := s.Head(context.TODO(), DataReference("s3://container/path"))
+		assert.NoError(t, err)
+		assert.True(t, metadata.Exists())
+		_, err = s.ReadRaw(context.TODO(), DataReference("s3://container/path"))
+		assert.Nil(t, err)
 	})
 
 	t.Run("Happy Path multi-container enabled", func(t *testing.T) {
