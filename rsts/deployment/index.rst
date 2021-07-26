@@ -26,10 +26,10 @@ solution). The following pages will help you effectively deploy and manage an en
 
     .. link-button:: sandbox
        :type: ref
-       :text: Sandbox: Under the hood!
+       :text: Sandbox Deployment
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    What is flyte-sandbox? What is the difference from an actual Flyte deployment? Why did we build it?
+    A stand-alone minimal environment for running a Flyte backend.
 
     ---
 
