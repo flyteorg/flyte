@@ -16,9 +16,10 @@ imagePullSecrets: {{ toYaml . | nindent 2 }}
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
 rules:
 # Allow RO access to PODS
@@ -81,17 +82,100 @@ rules:
   - patch
   - post
   - deletecollection
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: {{ template "flytepropeller.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "flytepropeller.name" . }}-10302-flytepoc-flytesnacks-dev-dev
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+rules:
+# Allow RO access to PODS
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# Allow Event recording access
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access All plugin objects
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access to CRD
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+# Allow Access to all resources under flyte.lyft.com
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  - flyteworkflows/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ template "flytepropeller.name" . }}-10302-flytepoc-flytesnacks-dev-dev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "flytepropeller.name" . }}-10302-flytepoc-flytesnacks-dev-dev
 subjects:
 - kind: ServiceAccount
   name: {{ template "flytepropeller.name" . }}

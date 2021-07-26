@@ -161,6 +161,7 @@ configmap:
   # Core propeller configuration
   core:
     propeller:
+      limit-namespace: 10302-flytepoc-flytesnacks-dev-dev
       rawoutput-prefix: s3://my-s3-bucket/
       workers: 20
       max-workflow-retries: 30
@@ -260,3 +261,7 @@ pytorchoperator:
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
+
+webhook:
+  # -- enable or disable secrets webhook
+  enabled: false

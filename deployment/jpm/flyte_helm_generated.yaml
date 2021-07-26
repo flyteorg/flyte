@@ -3,12 +3,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: flyte
----
-# Source: flyte/templates/namespaces.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
   name: 10302-flytepoc-flytesnacks-dev-dev
 ---
 # Source: flyte/templates/namespaces.yaml
@@ -91,14 +85,6 @@ metadata:
     helm.sh/chart: flyte-0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte/templates/propeller/webhook.yaml
-# Create a Service Account for webhook
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
----
 # Source: flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
@@ -117,15 +103,6 @@ metadata:
 type: Opaque
 stringData:
   client_secret: foobar
----
-# Source: flyte/templates/propeller/webhook.yaml
-# Create an empty secret that the first propeller pod will populate
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
-type: Opaque
 ---
 # Source: flyte/charts/contour/templates/contour/configmap.yaml
 apiVersion: v1
@@ -341,7 +318,7 @@ data:
           namespace: flyte
         renew-deadline: 10s
         retry-period: 2s
-      limit-namespace: all
+      limit-namespace: 10302-flytepoc-flytesnacks-dev-dev
       max-workflow-retries: 30
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
@@ -1833,11 +1810,84 @@ rules:
       - get
       - update
 ---
+# Source: flyte/charts/contour/templates/contour/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-contour-contour
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-4.1.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-contour-contour
+subjects:
+  - kind: ServiceAccount
+    name: flyte-contour-contour
+    namespace: flyte
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+#  - configmaps
+#  - namespaces
+#  - pods
+#  - resourcequotas
+#  - roles
+#  - rolebindings
+#  - secrets
+#  - services
+#  - serviceaccounts
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - '*'
+---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flyteadmin-10302-flytepoc-flytesnacks-dev-dev
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - '*'
+---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: flytepropeller
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -1905,133 +1955,78 @@ rules:
   - post
   - deletecollection
 ---
-# Source: flyte/templates/propeller/webhook.yaml
-# Create a ClusterRole for the webhook
-# https://kubernetes.io/docs/admin/authorization/rbac/
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
-rules:
-  - apiGroups:
-      - "*"
-    resources:
-      - mutatingwebhookconfigurations
-      - secrets
-      - pods
-    verbs:
-      - get
-      - create
-      - update
-      - patch
----
-# Source: flyte/charts/contour/templates/contour/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: flyte-contour-contour
-  labels:
-    app.kubernetes.io/name: contour
-    helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-contour-contour
-subjects:
-  - kind: ServiceAccount
-    name: flyte-contour-contour
-    namespace: flyte
----
 # Source: flyte/templates/propeller/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
-  name: flytepropeller
+  name: flytepropeller-10302-flytepoc-flytesnacks-dev-dev
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-0.1.10
     app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flytepropeller
-subjects:
-- kind: ServiceAccount
-  name: flytepropeller
-  namespace: flyte
----
-# Source: flyte/templates/propeller/webhook.yaml
-# Create a binding from Role -> ServiceAccount
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-pod-webhook
-subjects:
-  - kind: ServiceAccount
-    name: flyte-pod-webhook
-    namespace: flyte
----
-# Source: flyte/templates/admin/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: flyteadmin
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
-    app.kubernetes.io/managed-by: Helm
 rules:
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-#  - configmaps
-#  - namespaces
-#  - pods
-#  - resourcequotas
-#  - roles
-#  - rolebindings
-#  - secrets
-#  - services
-#  - serviceaccounts
-  verbs:
-  - '*'
+# Allow RO access to PODS
 - apiGroups:
   - ""
   resources:
-  - secrets
+  - pods
   verbs:
+  - get
+  - list
+  - watch
+# Allow Event recording access
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access All plugin objects
+- apiGroups:
   - '*'
----
-# Source: flyte/templates/admin/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: flyteadmin-10302-flytepoc-flytesnacks-dev-dev
-  namespace: 10302-flytepoc-flytesnacks-dev-dev
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules:
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access to CRD
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+# Allow Access to all resources under flyte.lyft.com
 - apiGroups:
   - flyte.lyft.com
   resources:
   - flyteworkflows
+  - flyteworkflows/finalizers
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
 ---
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -2071,6 +2066,46 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
+  namespace: flyte
+---
+# Source: flyte/templates/propeller/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flytepropeller
+subjects:
+- kind: ServiceAccount
+  name: flytepropeller
+  namespace: flyte
+---
+# Source: flyte/templates/propeller/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flytepropeller-10302-flytepoc-flytesnacks-dev-dev-binding
+  namespace: 10302-flytepoc-flytesnacks-dev-dev
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flytepropeller-10302-flytepoc-flytesnacks-dev-dev
+subjects:
+- kind: ServiceAccount
+  name: flytepropeller
   namespace: flyte
 ---
 # Source: flyte/charts/contour/templates/contour/service.yaml
@@ -2267,24 +2302,6 @@ spec:
   selector: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
----
-# Source: flyte/templates/propeller/webhook.yaml
-# Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
-spec:
-  selector:
-    app: flyte-pod-webhook
-  ports:
-    - name: https
-      protocol: TCP
-      port: 443
-      targetPort: 9443
 ---
 # Source: flyte/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
@@ -2995,7 +3012,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
+        configChecksum: "ed29cd6d7bc6294c38771fd8d984e81afd8f46822abfbb58b584e5398f1bea1"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3039,86 +3056,6 @@ spec:
       - name: auth
         secret:
           secretName: flyte-propeller-auth
----
-# Source: flyte/templates/propeller/webhook.yaml
-# Create the actual deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flyte-pod-webhook
-  namespace: flyte
-  labels:
-    app: flyte-pod-webhook
-spec:
-  selector:
-    matchLabels:
-      app: flyte-pod-webhook
-  template:
-    metadata:
-      labels:
-        app: flyte-pod-webhook
-        app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: flyte-v0.15.0
-      annotations:
-        configChecksum: "f7c6c0a2de3d0778cd355241c59de9a50775f2b8eb609aa6b01932fe6171022"
-    spec:
-      serviceAccountName: flyte-pod-webhook
-      initContainers:
-      - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:flyte-v0.15.0"
-        imagePullPolicy: "IfNotPresent"
-        command:
-          - flytepropeller
-        args:
-          - webhook
-          - init-certs
-          - --config
-          - /etc/flyte/config/*.yaml
-        env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-        volumeMounts:
-          - name: config-volume
-            mountPath: /etc/flyte/config
-      containers:
-        - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:flyte-v0.15.0"
-          imagePullPolicy: "IfNotPresent"
-          command:
-            - flytepropeller
-          args:
-            - webhook
-            - --config
-            - /etc/flyte/config/*.yaml
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-              readOnly: true
-            - name: webhook-certs
-              mountPath: /etc/webhook/certs
-              readOnly: true
-      volumes:
-        - name: config-volume
-          configMap:
-            name: flyte-propeller-config
-        - name: webhook-certs
-          secret:
-            secretName: flyte-pod-webhook
 ---
 # Source: flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1
