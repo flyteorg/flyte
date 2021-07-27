@@ -1,3 +1,5 @@
+.. _kf-pytorch-op:
+
 Pytorch Operator
 =================
 

@@ -1,3 +1,5 @@
+.. _aws-sagemaker:
+
 Sagemaker
 =========
 This section provides examples of Flyte Plugins that are designed to work with

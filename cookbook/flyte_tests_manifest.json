@@ -86,5 +86,13 @@
      "exit_success": true,
      "exit_message": ""
    }
- }]
+ },{
+  "name": "case-studies-mnist-classifier",
+  "priority": "P2",
+  "path": "case_studies/ml_training/mnist_classifier",
+  "exitCondition": {
+    "exit_success": true,
+    "exit_message": ""
+  }
+}]
 
