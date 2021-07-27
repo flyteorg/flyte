@@ -40,9 +40,9 @@ black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.17.107
+boto3==1.18.7
     # via sagemaker-training
-botocore==1.20.107
+botocore==1.21.7
     # via
     #   boto3
     #   s3transfer
@@ -52,12 +52,12 @@ certifi==2021.5.30
     # via
     #   kubernetes
     #   requests
-cffi==1.14.5
+cffi==1.14.6
     # via
     #   bcrypt
     #   cryptography
     #   pynacl
-chardet==4.0.0
+charset-normalizer==2.0.3
     # via requests
 click==7.1.2
     # via
@@ -83,7 +83,7 @@ dill==0.3.4
     # via tensorflow-datasets
 dirhash==0.2.1
     # via flytekit
-docker-image-py==0.1.10
+docker-image-py==0.1.12
     # via flytekit
 docutils==0.16
     # via
@@ -94,20 +94,20 @@ docutils==0.16
     #   sphinx-tabs
 dolt-integrations==0.1.5
     # via flytekitplugins.dolt
-doltcli==0.1.9
+doltcli==0.1.11
     # via dolt-integrations
 flake8==3.9.2
     # via
     #   -r dev-requirements.in
     #   flake8-black
     #   flake8-isort
-flake8-black==0.2.1
+flake8-black==0.2.3
     # via -r dev-requirements.in
 flake8-isort==4.0.0
     # via -r dev-requirements.in
 flatbuffers==1.12
     # via tensorflow
-flyteidl==0.19.11
+flyteidl==0.19.15
     # via flytekit
 flytekit==0.20.1
     # via
@@ -148,7 +148,7 @@ gast==0.4.0
     # via tensorflow
 gevent==21.1.2
     # via sagemaker-training
-google-auth==1.32.1
+google-auth==1.33.1
     # via
     #   google-auth-oauthlib
     #   kubernetes
@@ -168,7 +168,7 @@ grpcio==1.34.1
     #   tensorflow
 h5py==3.1.0
     # via tensorflow
-idna==2.10
+idna==3.2
     # via requests
 imagesize==1.2.0
     # via sphinx
@@ -178,7 +178,7 @@ iniconfig==1.1.1
     # via pytest
 inotify_simple==1.2.1
     # via sagemaker-training
-isort==5.9.1
+isort==5.9.2
     # via
     #   -r dev-requirements.in
     #   flake8-isort
@@ -210,7 +210,7 @@ markdown==3.3.4
     # via tensorboard
 markupsafe==2.0.1
     # via jinja2
-marshmallow==3.12.2
+marshmallow==3.13.0
     # via
     #   dataclasses-json
     #   marshmallow-enum
@@ -263,13 +263,13 @@ packaging==21.0
     # via
     #   pytest
     #   sphinx
-pandas==1.3.0
+pandas==1.3.1
     # via
     #   dolt-integrations
     #   flytekit
 paramiko==2.7.2
     # via sagemaker-training
-pathspec==0.8.1
+pathspec==0.9.0
     # via
     #   black
     #   scantree
@@ -356,7 +356,7 @@ regex==2021.7.6
     # via
     #   black
     #   docker-image-py
-requests==2.25.1
+requests==2.26.0
     # via
     #   flytekit
     #   kubernetes
@@ -377,7 +377,7 @@ retrying==1.3.3
     # via sagemaker-training
 rsa==4.7.2
     # via google-auth
-s3transfer==0.4.2
+s3transfer==0.5.0
     # via boto3
 sagemaker-training==3.9.2
     # via flytekitplugins-awssagemaker
@@ -423,7 +423,7 @@ sortedcontainers==2.4.0
     # via flytekit
 soupsieve==2.2.1
     # via beautifulsoup4
-sphinx==3.5.4
+sphinx==4.1.2
     # via
     #   -r ./docs-requirements.in
     #   furo
@@ -437,7 +437,7 @@ sphinx==3.5.4
     #   sphinx-rtd-theme
     #   sphinx-tabs
     #   sphinxext-remoteliteralinclude
-sphinx-autoapi==1.8.1
+sphinx-autoapi==1.8.2
     # via -r ./docs-requirements.in
 sphinx-code-include==1.1.1
     # via -r ./docs-requirements.in
@@ -463,13 +463,13 @@ sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-mermaid==0.7
+sphinxcontrib-mermaid==0.7.1
     # via -r ./docs-requirements.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sphinxext-remoteliteralinclude==0.2.0
+sphinxext-remoteliteralinclude==0.3.0
     # via -r ./docs-requirements.in
 statsd==3.3.0
     # via flytekit
@@ -499,13 +499,14 @@ termcolor==1.1.0
     # via
     #   tensorflow
     #   tensorflow-datasets
-testfixtures==6.17.1
+testfixtures==6.18.0
     # via flake8-isort
-threadpoolctl==2.1.0
+threadpoolctl==2.2.0
     # via scikit-learn
 toml==0.10.2
     # via
     #   black
+    #   flake8-black
     #   pytest
 tqdm==4.61.2
     # via tensorflow-datasets
