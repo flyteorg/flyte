@@ -753,6 +753,10 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if overrides != nil {
 		executeWorkflowInputs.TaskPluginOverrides = overrides
 	}
+	if request.Spec.Metadata != nil && request.Spec.Metadata.ReferenceExecution != nil &&
+		request.Spec.Metadata.Mode == admin.ExecutionMetadata_RECOVERED {
+		executeWorkflowInputs.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
+	}
 
 	execInfo, err := m.workflowExecutor.ExecuteWorkflow(ctx, executeWorkflowInputs)
 	if err != nil {
@@ -896,6 +900,57 @@ func (m *ExecutionManager) RelaunchExecution(
 		return nil, err
 	}
 	logger.Debugf(ctx, "Successfully relaunched [%+v] as [%+v]", request.Id, workflowExecutionIdentifier)
+	return &admin.ExecutionCreateResponse{
+		Id: workflowExecutionIdentifier,
+	}, nil
+}
+
+func (m *ExecutionManager) RecoverExecution(
+	ctx context.Context, request admin.ExecutionRecoverRequest, requestedAt time.Time) (
+	*admin.ExecutionCreateResponse, error) {
+	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, *request.Id)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
+		return nil, err
+	}
+	existingExecution, err := transformers.FromExecutionModel(*existingExecutionModel)
+	if err != nil {
+		return nil, err
+	}
+
+	executionSpec := existingExecution.Spec
+	if executionSpec.Metadata == nil {
+		executionSpec.Metadata = &admin.ExecutionMetadata{}
+	}
+	var inputs *core.LiteralMap
+	if len(existingExecutionModel.UserInputsURI) > 0 {
+		inputs = &core.LiteralMap{}
+		if err := m.storageClient.ReadProtobuf(ctx, existingExecutionModel.UserInputsURI, inputs); err != nil {
+			return nil, err
+		}
+	}
+	if request.Metadata != nil {
+		executionSpec.Metadata.ParentNodeExecution = request.Metadata.ParentNodeExecution
+	}
+	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RECOVERED
+	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
+	var executionModel *models.Execution
+	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+		Project: request.Id.Project,
+		Domain:  request.Id.Domain,
+		Name:    request.Name,
+		Spec:    executionSpec,
+		Inputs:  inputs,
+	}, requestedAt)
+	if err != nil {
+		return nil, err
+	}
+	executionModel.SourceExecutionID = existingExecutionModel.ID
+	workflowExecutionIdentifier, err := m.createExecutionModel(ctx, executionModel)
+	if err != nil {
+		return nil, err
+	}
+	logger.Infof(ctx, "Successfully recovered [%+v] as [%+v]", request.Id, workflowExecutionIdentifier)
 	return &admin.ExecutionCreateResponse{
 		Id: workflowExecutionIdentifier,
 	}, nil

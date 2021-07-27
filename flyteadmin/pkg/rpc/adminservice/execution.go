@@ -66,6 +66,31 @@ func (m *AdminService) RelaunchExecution(
 	return response, nil
 }
 
+func (m *AdminService) RecoverExecution(
+	ctx context.Context, request *admin.ExecutionRecoverRequest) (*admin.ExecutionCreateResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ExecutionCreateResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.recover.Time(func() {
+		response, err = m.ExecutionManager.RecoverExecution(ctx, *request, requestedAt)
+	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ExecutionCreateRequest",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.relaunch)
+	}
+	m.Metrics.executionEndpointMetrics.relaunch.Success()
+	return response, nil
+}
+
 func (m *AdminService) CreateWorkflowEvent(
 	ctx context.Context, request *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error) {
 	defer m.interceptPanic(ctx, request)

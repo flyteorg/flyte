@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	interfaces2 "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
@@ -140,6 +142,11 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 			FlyteClient: &FakeK8FlyteClient{},
 		}, nil
 	})
+	recoveryNodeExecutionID := &core.WorkflowExecutionIdentifier{
+		Project: "p",
+		Domain:  "d",
+		Name:    "original",
+	}
 	fakeFlyteWorkflow := FakeFlyteWorkflow{
 		createCallback: func(workflow *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error) {
 			assert.EqualValues(t, map[string]string{
@@ -159,6 +166,7 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 			}, workflow.ExecutionConfig.TaskPluginImpls)
 			assert.Empty(t, opts)
 			assert.Equal(t, workflow.ServiceAccountName, testK8sServiceAccount)
+			assert.True(t, proto.Equal(recoveryNodeExecutionID, workflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
 			return nil, nil
 		},
 	}
@@ -206,6 +214,7 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 				AssumableIamRole:         testRole,
 				KubernetesServiceAccount: testK8sServiceAccount,
 			},
+			RecoveryExecution: recoveryNodeExecutionID,
 		})
 	assert.Nil(t, err)
 	assert.NotNil(t, execInfo)
@@ -463,7 +472,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(overrides, nil, workflow)
+		addExecutionOverrides(overrides, nil, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.TaskPluginImpls, map[string]v1alpha1.TaskPluginOverride{
 			"taskType1": {
 				PluginIDs:             []string{"Plugin1", "Plugin2"},
@@ -476,7 +485,17 @@ func TestAddExecutionOverrides(t *testing.T) {
 			MaxParallelism: 100,
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.MaxParallelism, uint32(100))
+	})
+	t.Run("recovery execution", func(t *testing.T) {
+		recoveryExecutionID := &core.WorkflowExecutionIdentifier{
+			Project: "p",
+			Domain:  "d",
+			Name:    "n",
+		}
+		workflow := &v1alpha1.FlyteWorkflow{}
+		addExecutionOverrides(nil, nil, recoveryExecutionID, workflow)
+		assert.True(t, proto.Equal(recoveryExecutionID, workflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
 	})
 }

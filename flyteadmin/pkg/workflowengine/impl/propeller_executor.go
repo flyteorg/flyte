@@ -86,9 +86,12 @@ func (c *FlytePropeller) addPermissions(auth *admin.AuthRole, flyteWf *v1alpha1.
 }
 
 func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
-	workflowExecutionConfig *admin.WorkflowExecutionConfig, flyteWf *v1alpha1.FlyteWorkflow) {
+	workflowExecutionConfig *admin.WorkflowExecutionConfig, recoveryExecution *core.WorkflowExecutionIdentifier, flyteWf *v1alpha1.FlyteWorkflow) {
 	executionConfig := v1alpha1.ExecutionConfig{
 		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
+		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
+			WorkflowExecutionIdentifier: recoveryExecution,
+		},
 	}
 	for _, override := range taskPluginOverrides {
 		executionConfig.TaskPluginImpls[override.TaskType] = v1alpha1.TaskPluginOverride{
@@ -137,7 +140,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 		flyteWf.WorkflowMeta = &v1alpha1.WorkflowMeta{}
 	}
 	flyteWf.WorkflowMeta.EventVersion = c.eventVersion
-	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, input.RecoveryExecution, flyteWf)
 
 	if input.Reference.Spec.RawOutputDataConfig != nil {
 		flyteWf.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{
@@ -220,7 +223,7 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
-	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, nil, flyteWf)
 
 	/*
 		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.
