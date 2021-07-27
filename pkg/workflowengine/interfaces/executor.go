@@ -21,6 +21,7 @@ type ExecuteWorkflowInput struct {
 	TaskPluginOverrides []*admin.PluginOverride
 	ExecutionConfig     *admin.WorkflowExecutionConfig
 	Auth                *admin.AuthRole
+	RecoveryExecution   *core.WorkflowExecutionIdentifier
 }
 
 type ExecuteTaskInput struct {

@@ -12,6 +12,7 @@ type executionEndpointMetrics struct {
 
 	create      util.RequestMetrics
 	relaunch    util.RequestMetrics
+	recover     util.RequestMetrics
 	createEvent util.RequestMetrics
 	get         util.RequestMetrics
 	getData     util.RequestMetrics
@@ -121,6 +122,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			scope:       adminScope,
 			create:      util.NewRequestMetrics(adminScope, "create_execution"),
 			relaunch:    util.NewRequestMetrics(adminScope, "relaunch_execution"),
+			recover:     util.NewRequestMetrics(adminScope, "recover_execution"),
 			createEvent: util.NewRequestMetrics(adminScope, "create_execution_event"),
 			get:         util.NewRequestMetrics(adminScope, "get_execution"),
 			getData:     util.NewRequestMetrics(adminScope, "get_execution_data"),
