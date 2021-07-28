@@ -77,6 +77,15 @@ var requestedAt = time.Now()
 var testCluster = "C1"
 var outputURI = "output uri"
 
+var resourceDefaults = runtimeInterfaces.TaskResourceSet{
+	CPU:    "200m",
+	Memory: "200Gi",
+}
+var resourceLimits = runtimeInterfaces.TaskResourceSet{
+	CPU:    "300m",
+	Memory: "500Gi",
+}
+
 func getLegacySpec() *admin.ExecutionSpec {
 	executionRequest := testutils.GetExecutionRequest()
 	legacySpec := executionRequest.Spec
@@ -113,7 +122,8 @@ func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 		testutils.GetApplicationConfigWithDefaultDomains(),
 		runtimeMocks.NewMockQueueConfigurationProvider(
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
-		nil, nil, nil, nil)
+		nil,
+		runtimeMocks.NewMockTaskResourceConfiguration(resourceDefaults, resourceLimits), nil, nil)
 	mockExecutionsConfigProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	return mockExecutionsConfigProvider
@@ -229,6 +239,28 @@ func TestCreateExecution(t *testing.T) {
 		})
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.NewMockExecutor()
+	resources := &core.Resources{
+		Requests: []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: "200m",
+			},
+			{
+				Name:  core.Resources_MEMORY,
+				Value: "200Gi",
+			},
+		},
+		Limits: []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: "300m",
+			},
+			{
+				Name:  core.Resources_MEMORY,
+				Value: "500Gi",
+			},
+		},
+	}
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
 		func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 			assert.EqualValues(t, map[string]string{
@@ -241,6 +273,13 @@ func TestCreateExecution(t *testing.T) {
 				"annotation4": "4",
 			}, inputs.Annotations)
 			assert.EqualValues(t, 10*time.Minute, inputs.QueueingBudget)
+			tasks := inputs.WfClosure.GetTasks()
+			for _, task := range tasks {
+				assert.EqualValues(t, resources.Requests,
+					task.Template.GetContainer().Resources.Requests)
+				assert.EqualValues(t, resources.Limits,
+					task.Template.GetContainer().Resources.Limits)
+			}
 			return &workflowengineInterfaces.ExecutionInfo{
 				Cluster: testCluster,
 			}, nil
@@ -419,7 +458,8 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 				Tags:   []string{"tag"},
 			},
 		}),
-		nil, nil, nil, nil)
+		nil,
+		runtimeMocks.NewMockTaskResourceConfiguration(resourceDefaults, resourceLimits), nil, nil)
 	configProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	mockExecutor := workflowengineMocks.NewMockExecutor()
@@ -2823,11 +2863,11 @@ func TestSetDefaults(t *testing.T) {
 				Limits: []*core.Resources_ResourceEntry{
 					{
 						Name:  core.Resources_CPU,
-						Value: "200m",
+						Value: "300m",
 					},
 					{
 						Name:  core.Resources_MEMORY,
-						Value: "200Gi",
+						Value: "500Gi",
 					},
 				},
 			},
@@ -2890,7 +2930,7 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 				Limits: []*core.Resources_ResourceEntry{
 					{
 						Name:  core.Resources_CPU,
-						Value: "200m",
+						Value: "300m",
 					},
 					{
 						Name:  core.Resources_MEMORY,
@@ -2923,10 +2963,26 @@ func TestCreateTaskDefaultLimits(t *testing.T) {
 			},
 		},
 	}
+	t.Run("missing_limits_in_config", func(t *testing.T) {
+		limits := runtimeInterfaces.TaskResourceSet{}
 
-	defaultLimits := createTaskDefaultLimits(context.Background(), task)
-	assert.Equal(t, "200Mi", defaultLimits.Memory)
-	assert.Equal(t, "200m", defaultLimits.CPU)
+		defaultLimits := createTaskDefaultLimits(context.Background(), task, limits)
+		assert.Equal(t, "200Mi", defaultLimits.Memory)
+		assert.Equal(t, "200m", defaultLimits.CPU)
+	})
+	t.Run("use_limits_from_config", func(t *testing.T) {
+		defaultLimits := createTaskDefaultLimits(context.Background(), task, resourceLimits)
+		assert.Equal(t, "500Gi", defaultLimits.Memory)
+		assert.Equal(t, "300m", defaultLimits.CPU)
+	})
+	t.Run("use_limits_from_config", func(t *testing.T) {
+		limits := runtimeInterfaces.TaskResourceSet{
+			CPU: "300m",
+		}
+		defaultLimits := createTaskDefaultLimits(context.Background(), task, limits)
+		assert.Equal(t, "200Mi", defaultLimits.Memory)
+		assert.Equal(t, "300m", defaultLimits.CPU)
+	})
 }
 
 func TestCreateSingleTaskExecution(t *testing.T) {

@@ -18,6 +18,13 @@ func GetValidTaskRequest() admin.TaskCreateRequest {
 		},
 		Spec: &admin.TaskSpec{
 			Template: &core.TaskTemplate{
+				Id: &core.Identifier{
+					ResourceType: core.ResourceType_TASK,
+					Project:      "project",
+					Domain:       "domain",
+					Name:         "name",
+					Version:      "version",
+				},
 				Type: "type",
 				Metadata: &core.TaskMetadata{
 					Runtime: &core.RuntimeMetadata{
