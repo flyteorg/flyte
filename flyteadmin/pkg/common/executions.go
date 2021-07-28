@@ -39,6 +39,7 @@ var terminalNodeExecutionPhases = map[core.NodeExecution_Phase]bool{
 	core.NodeExecution_TIMED_OUT: true,
 	core.NodeExecution_ABORTED:   true,
 	core.NodeExecution_SKIPPED:   true,
+	core.NodeExecution_RECOVERED: true,
 }
 
 var terminalTaskExecutionPhases = map[core.TaskExecution_Phase]bool{
