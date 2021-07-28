@@ -19,11 +19,10 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-auth-migration
        :type: ref
-       :text: Auth More
+       :text: Auth Migration Guide
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte previously shipped with only a barebones OIDC setup, and relied on an external authorization server. This
-    migration guide helps you move to Admin's own authorization server.
+    Migration guide to help you move to Admin's own authorization server.
 
     ---
 
