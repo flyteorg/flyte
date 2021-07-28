@@ -2281,6 +2281,28 @@ spec:
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/minio/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-direct
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+  - nodePort: 30084
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
+  selector: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte/templates/postgres/service.yaml
 apiVersion: v1
 kind: Service

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio-direct
+  namespace: flyte
+spec:
+  externalTrafficPolicy: "Local"
+  ports:
+  - nodePort: 30084
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: jpm
+  type: NodePort

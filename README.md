@@ -23,7 +23,7 @@ To play around with this version in sandbox mode, follow the instructions on the
 
 1. Make sure that other Flyte sandboxes are shut down since the ports will interfere, and `unset KUBECONFIG` if you have it set since it interferes with `k3d`.
 1. Start the cluster
-  ```k3d cluster create -p "30081:30081" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
+  ```k3d cluster create -p "30081:30081" -p "30084:30084" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
   ```
 1. Enable it with `kubectl config use-context k3d-flyte`
 1. Create the Flyte namespace.  `kubectl create ns flyte`. Newer versions of Helm no longer create one for you.
