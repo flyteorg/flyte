@@ -42,12 +42,9 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
-    .. link-button:: deployment-gcp
-       :type: ref
-       :text: GCP
-       :classes: btn-block stretched-link
+    GCP
     ^^^^^^^^^^^^
-    Deployment guides with detailed instructions specific to GCP. (Coming soon).
+    Deployment guides with detailed instructions specific to GCP. *(Coming soon)*
 
     ---
 
