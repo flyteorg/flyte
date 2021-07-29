@@ -1,8 +1,12 @@
-#!/usr/bin/env bash
-
 # WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
 # ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
-# 
+#
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
-goimports -w $(find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./pkg/client/*" -not -path "./boilerplate/*")
+.PHONY: end2end_execute
+end2end_execute:
+	./boilerplate/flyte/end2end/end2end.sh
+	
+.PHONY: k8s_integration_execute
+k8s_integration_execute:
+	echo "pass"
