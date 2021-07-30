@@ -25,4 +25,4 @@ charts/flyte-sandbox/Chart.lock
 bin/-
 bin/
 release/
-.python-version-
+.python-version
