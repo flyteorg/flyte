@@ -6,6 +6,7 @@ package coreutils
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -386,6 +388,30 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.NoError(t, err)
 		literalVal := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
 			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("IntegerComingInAsFloatOverFlow", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}
+		_, err := MakeLiteralForType(literalType, 8.888888e+19)
+		assert.NotNil(t, err)
+		numError := &strconv.NumError{
+			Func: "ParseInt",
+			Num:  "88888880000000000000",
+			Err:  fmt.Errorf("value out of range"),
+		}
+		parseIntError := errors.WithMessage(numError, "failed to parse integer value")
+		assert.Equal(t, errors.WithStack(parseIntError).Error(), err.Error())
+	})
+
+	t.Run("IntegerComingInAsFloat", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}
+		val, err := MakeLiteralForType(literalType, 8.888888e+18)
+		assert.NoError(t, err)
+		literalVal := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 8.888888e+18}}}}}}
 		expectedVal, _ := ExtractFromLiteral(literalVal)
 		actualVal, _ := ExtractFromLiteral(val)
 		assert.Equal(t, expectedVal, actualVal)

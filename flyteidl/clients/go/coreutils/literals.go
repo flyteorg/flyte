@@ -4,6 +4,7 @@ package coreutils
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -492,7 +493,13 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if v == nil {
 			strValue = ""
 		}
-
+		// Note this is to support large integers which by default when passed from an unmarshalled json will be
+		// converted to float64 and printed as exponential format by Sprintf.
+		// eg : 8888888 get converted to 8.888888e+06 and which causes strconv.ParseInt to fail
+		// Inorder to avoid this we explicitly add this check.
+		if f, ok := v.(float64); ok && math.Trunc(f) == f {
+			strValue = fmt.Sprintf("%.0f", math.Trunc(f))
+		}
 		if newT.Simple == core.SimpleType_STRUCT {
 			if _, isValueStringType := v.(string); !isValueStringType {
 				byteValue, err := json.Marshal(v)
