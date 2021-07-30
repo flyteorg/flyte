@@ -4,49 +4,6 @@
 
 A Helm chart for Flyte
 
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | contour | 4.1.2 |
-| https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.0.6 |
-| https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
-
-### SANDBOX INSTALLATION:
-- [Install helm 3](https://helm.sh/docs/intro/install/)
-- Fetch chart dependencies `helm dep up`
-- Install Flyte sandbox:
-
-```bash
-cd helm
-helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
-```
-
-Customize your installation by changing settings in `values-sandbox.yaml`.
-You can use the helm diff plugin to review any value changes you've made to your values:
-
-```bash
-helm plugin install https://github.com/databus23/helm-diff
-helm diff upgrade -f values-sandbox.yaml flyte .
-```
-
-Then apply your changes:
-```bash
-helm upgrade -f values-sandbox.yaml flyte .
-```
-
-#### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
-- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
-
-- When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
-- Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
-
-### CONFIGURATION NOTES:
-- The docker images, their tags and other default parameters are configured in `values.yaml` file.
-- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
-- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
-
 ## Values
 
 | Key | Type | Default | Description |
@@ -57,7 +14,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | cluster_resource_manager.enabled | bool | `true` | Enables the Cluster resource manager component |
 | cluster_resource_manager.templates | list | `[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]` | Resource templates that should be applied |
 | cluster_resource_manager.templates[0] | object | `{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"}` | Template for namespaces resources |
-| common.databaseSecret.name | string | `""` | Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret  |
+| common.databaseSecret.name | string | `"db-pass"` | Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret |
 | common.databaseSecret.secretManifest | object | `{}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets |
 | common.flyteNamespaceTemplate.enabled | bool | `false` |  |
 | common.ingress.albSSLRedirect | bool | `false` |  |
@@ -95,15 +52,6 @@ helm upgrade -f values-sandbox.yaml flyte .
 | configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `false` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
 | configmap.task_resource_defaults.task_resources | object | `{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}` | Task default resources parameters |
-| contour.affinity | object | `{}` | affinity for Contour deployment |
-| contour.contour.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Contour |
-| contour.enabled | bool | `true` |  |
-| contour.envoy.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Envoy |
-| contour.nodeSelector | object | `{}` | nodeSelector for Contour deployment |
-| contour.podAnnotations | object | `{}` | Annotations for Contour pods |
-| contour.replicaCount | int | `1` | Replicas count for Contour deployment |
-| contour.serviceAccountAnnotations | object | `{}` | Annotations for ServiceAccount attached to Contour pods |
-| contour.tolerations | list | `[]` | tolerations for Contour deployment |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -162,31 +110,8 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
-| kubernetes-dashboard.enabled | bool | `false` |  |
-| minio.affinity | object | `{}` | affinity for Minio deployment |
-| minio.enabled | bool | `true` |  |
-| minio.image.pullPolicy | string | `"IfNotPresent"` |  |
-| minio.image.repository | string | `"minio/minio"` | Docker image for Minio deployment |
-| minio.image.tag | string | `"RELEASE.2020-12-16T05-05-17Z"` |  |
-| minio.nodeSelector | object | `{}` | nodeSelector for Minio deployment |
-| minio.podAnnotations | object | `{}` | Annotations for Minio pods |
-| minio.replicaCount | int | `1` | Replicas count for Minio deployment |
-| minio.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Minio deployment |
-| minio.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Minio |
-| minio.tolerations | list | `[]` | tolerations for Minio deployment |
-| postgres.affinity | object | `{}` | affinity for Postgres deployment |
-| postgres.enabled | bool | `true` |  |
-| postgres.image.pullPolicy | string | `"IfNotPresent"` |  |
-| postgres.image.repository | string | `"postgres"` | Docker image for Postgres deployment |
-| postgres.image.tag | string | `"10.16"` |  |
-| postgres.nodeSelector | object | `{}` | nodeSelector for Postgres deployment |
-| postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
-| postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |
-| postgres.resources | object | `{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Postgres deployment |
-| postgres.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Postgres |
-| postgres.tolerations | list | `[]` | tolerations for Postgres deployment |
 | pytorchoperator.affinity | object | `{}` | affinity for Pytorchoperator deployment |
-| pytorchoperator.enabled | bool | `true` |  |
+| pytorchoperator.enabled | bool | `false` |  |
 | pytorchoperator.image.pullPolicy | string | `"IfNotPresent"` |  |
 | pytorchoperator.image.repository | string | `"gcr.io/kubeflow-images-public/pytorch-operator"` | Docker image for Pytorchoperator |
 | pytorchoperator.image.tag | string | `"v1.0.0-g047cf0f"` |  |
@@ -211,7 +136,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | sagemaker.enabled | bool | `false` |  |
 | sagemaker.plugin_config.plugins.sagemaker.region | string | `"<region>"` |  |
 | sagemaker.plugin_config.plugins.sagemaker.roleArn | string | `"<arn>"` |  |
-| sparkoperator.enabled | bool | `true` |  |
+| sparkoperator.enabled | bool | `false` |  |
 | sparkoperator.image.tag | string | `"v1beta2-1.2.0-3.0.0"` | Docker image for Sparkoperator |
 | sparkoperator.plugin_config | object | `{"plugins":{"spark":{"spark-config-default":[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]}}}` | Spark plugin configuration |
 | sparkoperator.plugin_config.plugins.spark.spark-config-default | list | `[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]` | Spark default configuration |
@@ -232,3 +157,4 @@ helm upgrade -f values-sandbox.yaml flyte .
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler.config | object | `{}` |  |
 | workflow_scheduler.enabled | bool | `false` |  |
+

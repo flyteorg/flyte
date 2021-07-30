@@ -217,7 +217,7 @@ redis:
   # -- Replicas count for Redis Statefulset
   replicaCount: 1
   image:
-      # -- Docker image for Redis Statefulset
+    # -- Docker image for Redis Statefulset
     repository: docker.io/bitnami/redis
     tag: 4.0.2-r1
     pullPolicy: IfNotPresent
@@ -242,131 +242,10 @@ redis:
   # -- affinity for Redis Statefulset
   affinity: {}
 
-#
-# POSTGRES SETTINGS
-#
-
-postgres:
-  # --- enable or disable Postgres deployment installation
-  enabled: true
-  # -- Replicas count for Postgres deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Postgres deployment
-    repository: postgres
-    tag: "10.16"
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Postgres deployment
-  resources:
-    requests:
-      cpu: 10m
-      memory: 128Mi
-    limits:
-      cpu: 1000m
-      memory: 512Mi
-  # -- Service settings for Postgres
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for Postgres pods
-  podAnnotations: {}
-  # -- nodeSelector for Postgres deployment
-  nodeSelector: {}
-  # -- tolerations for Postgres deployment
-  tolerations: []
-  # -- affinity for Postgres deployment
-  affinity: {}
-
-#
-# MINIO SETTINGS
-#
-
-minio:
-  # --- enable or disable Minio deployment installation
-  enabled: true
-  # -- Replicas count for Minio deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Minio deployment
-    repository: minio/minio
-    tag: RELEASE.2020-12-16T05-05-17Z
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Minio deployment
-  resources:
-    requests:
-      cpu: 10m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 512Mi
-  # -- Service settings for Minio
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for Minio pods
-  podAnnotations: {}
-  # -- nodeSelector for Minio deployment
-  nodeSelector: {}
-  # -- tolerations for Minio deployment
-  tolerations: []
-  # -- affinity for Minio deployment
-  affinity: {}
-
-#
-# CONTOUR SETTINGS
-#
-
-contour:
-  # --- enable or disable Contour deployment installation
-  enabled: true
-  # -- Replicas count for Contour deployment
-  replicaCount: 1
-  contour:
-    # -- Default resources requests and limits for Contour
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-      limits:
-        cpu: 100m
-        memory: 100Mi
-  envoy:
-    # -- Default resources requests and limits for Envoy
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-      limits:
-        cpu: 100m
-        memory: 100Mi
-  # -- Annotations for ServiceAccount attached to Contour pods
-  serviceAccountAnnotations: {}
-  # -- Annotations for Contour pods
-  podAnnotations: {}
-  # -- nodeSelector for Contour deployment
-  nodeSelector: {}
-  # -- tolerations for Contour deployment
-  tolerations: []
-  # -- affinity for Contour deployment
-  affinity: {}
-
-
-#
-# KUBERNETES DASHBOARD
-#
-
-kubernetes-dashboard:
-  enabled: false
-
-# ------------------------------------------------
-#
-# COMMON SETTINGS
-#
-
 common:
   databaseSecret:
-    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret 
-    name: ""
+    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
+    name: "db-pass"
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
@@ -410,8 +289,8 @@ storage:
     region: us-east-1
   # -- settings for storage type gcs
   gcs:
-    # -- GCP project ID. Required for storage type gcs.
-    # projectId:
+  # -- GCP project ID. Required for storage type gcs.
+  # projectId:
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
 
@@ -443,12 +322,12 @@ configmap:
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
     domains:
-    - id: development
-      name: development
-    - id: staging
-      name: staging
-    - id: production
-      name: production
+      - id: development
+        name: development
+      - id: staging
+        name: staging
+      - id: production
+        name: production
 
   # -- FlyteAdmin server configuration
   adminServer:
@@ -685,8 +564,8 @@ workflow_scheduler:
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-    enabled: false
-    config: {}
+  enabled: false
+  config: {}
 
 
 
@@ -704,26 +583,26 @@ cluster_resource_manager:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:
-          - projectQuotaCpu:
-              value: "5"
-          - projectQuotaMemory:
-              value: "4000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+            - defaultIamRole:
+                value: ""
         - staging:
-          - projectQuotaCpu:
-              value: "2"
-          - projectQuotaMemory:
-              value: "3000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
         - development:
-          - projectQuotaCpu:
-              value: "4"
-          - projectQuotaMemory:
-              value: "3000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
       refresh: 5m
 
   # -- Resource templates that should be applied
@@ -758,7 +637,7 @@ cluster_resource_manager:
 # -- Optional: Spark Plugin using the Spark Operator
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
-  enabled: true
+  enabled: false
   # -- Replicas count for Sparkoperator deployment
   replicaCount: 1
   image:
@@ -804,7 +683,7 @@ sparkoperator:
 
 pytorchoperator:
   # --- enable or disable Pytorchoperator deployment installation
-  enabled: true   # Set false to disable
+  enabled: false   # Set false to disable
   # -- Replicas count for Pytorchoperator deployment
   replicaCount: 1
   image:
@@ -854,5 +733,3 @@ sagemaker:
         region: <region>
 
 
-# ---------------------------
-# -- Flink jobs using the Flink Operator: this is work in progress

@@ -49,6 +49,7 @@ jobs:
       - name: Preprare Flyte Helm Release
         env:
           VERSION: ${{ needs.bump-version.outputs.version }}
+          REPOSITORY: "https://flyteorg.github.io/flyte"
         run: |
           make prepare_artifacts
 
