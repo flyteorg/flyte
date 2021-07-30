@@ -71,8 +71,7 @@ Open Source Community Sync
 --------------------------
 
 We host an Open Source Community Sync every other Tuesday, 9:00 AM PDT/PST.
-Please check out the `calendar <https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles>`_
-and feel free to pop in!
+Please check out and subscribe to the `calendar <https://www.addevent.com/calendar/kE355955>`_, or just pop in!
 
 .. link-button:: https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success
     :type: url
