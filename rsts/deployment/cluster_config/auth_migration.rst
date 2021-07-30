@@ -4,6 +4,9 @@
 Migrating Your Authentication Config
 ####################################
 
+Flyte previously shipped with only a barebones OIDC setup, and relied on an external authorization server. This
+migration guide helps you move to Admin's own authorization server.
+
 Using Okta as an example, you would have previously seen something like the following:
 
 Okta Config changes
