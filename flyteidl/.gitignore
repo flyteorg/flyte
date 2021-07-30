@@ -14,3 +14,4 @@ docs/build/
 
 .vscode/
 tmp/
+.python-version
