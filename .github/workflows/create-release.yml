@@ -51,6 +51,7 @@ jobs:
           VERSION: ${{ needs.bump-version.outputs.version }}
         run: |
           make prepare_artifacts
+          make helm
 
       - name: Run chart-releaser
         uses: stefanprodan/helm-gh-pages@v1.4.1

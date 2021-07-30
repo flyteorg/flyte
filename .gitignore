@@ -16,9 +16,9 @@ docs/searchindex.js
 docs/
 release/
 __pycache__/
-charts/flyte/charts/
-charts/flyte/Chart.lock
-charts/flyte-core/Chart.lock
+charts/flyte-sandbox/charts/
+charts/flyte-sandbox/Chart.lock
+charts/flyte-sandbox/Chart.lock
 **/*.bak-
 .cr-release-packages/
 .cr-index/
