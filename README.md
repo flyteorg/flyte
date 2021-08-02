@@ -159,10 +159,11 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 ### In Progress
 
-- Helm chart for Flyte (coming soon - June)
-- Flink-K8s (coming soon - June)
-- One click deploy to AWS
-- Reactive pipelines & Events
+- Demos; Distributed Pytorch, feature engineering, etc.
+- Integrations; Great Expectations, Feast
+- Least-privilege Minimal Helm Chart
+- Relaunch execution in recover mode
+- Documentation as code
 
 ## 🔌 Available Plugins
 
@@ -288,4 +289,6 @@ A big thank you to the community for making Flyte possible!
 - [@surindersinghp](https://github.com/surindersinghp)
 - [@vsbus](https://github.com/vsbus)
 - [@catalinii](https://github.com/catalinii)
+- [@pmahindrakar-oss](https://github.com/pmahindrakar-oss)
+- [@milton0825](https://github.com/milton0825)
 - [@kumare3](https://github.com/kumare3)
