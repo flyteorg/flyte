@@ -81,6 +81,37 @@ func TestApplyResourceOverrides_OverrideMemory(t *testing.T) {
 	assert.EqualValues(t, cpuLimit, overrides.Requests[v1.ResourceCPU])
 }
 
+func TestApplyResourceOverrides_OverrideEphemeralStorage(t *testing.T) {
+	ephemeralStorageRequest := resource.MustParse("1")
+	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceEphemeralStorage: ephemeralStorageRequest,
+		},
+	})
+	assert.EqualValues(t, ephemeralStorageRequest, overrides.Requests[v1.ResourceEphemeralStorage])
+	assert.EqualValues(t, ephemeralStorageRequest, overrides.Limits[v1.ResourceEphemeralStorage])
+
+	ephemeralStorageLimit := resource.MustParse("2")
+	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceEphemeralStorage: ephemeralStorageRequest,
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceEphemeralStorage: ephemeralStorageLimit,
+		},
+	})
+	assert.EqualValues(t, ephemeralStorageRequest, overrides.Requests[v1.ResourceEphemeralStorage])
+	assert.EqualValues(t, ephemeralStorageLimit, overrides.Limits[v1.ResourceEphemeralStorage])
+
+	// request equals limit if not set
+	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+		Limits: v1.ResourceList{
+			v1.ResourceEphemeralStorage: ephemeralStorageLimit,
+		},
+	})
+	assert.EqualValues(t, ephemeralStorageLimit, overrides.Requests[v1.ResourceEphemeralStorage])
+}
+
 func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 	requestedResourceQuantity := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
@@ -97,13 +128,15 @@ func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 		},
 	})
 	assert.EqualValues(t, v1.ResourceList{
-		v1.ResourceMemory: requestedResourceQuantity,
-		v1.ResourceCPU:    requestedResourceQuantity,
+		v1.ResourceMemory:           requestedResourceQuantity,
+		v1.ResourceCPU:              requestedResourceQuantity,
+		v1.ResourceEphemeralStorage: requestedResourceQuantity,
 	}, overrides.Requests)
 
 	assert.EqualValues(t, v1.ResourceList{
-		v1.ResourceMemory: requestedResourceQuantity,
-		v1.ResourceCPU:    requestedResourceQuantity,
+		v1.ResourceMemory:           requestedResourceQuantity,
+		v1.ResourceCPU:              requestedResourceQuantity,
+		v1.ResourceEphemeralStorage: requestedResourceQuantity,
 	}, overrides.Limits)
 }
 

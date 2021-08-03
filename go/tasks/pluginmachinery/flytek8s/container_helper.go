@@ -60,13 +60,20 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 		resources.Limits[v1.ResourceMemory] = resources.Requests[v1.ResourceMemory]
 	}
 
+	// Ephemeral storage resources aren't required but if one of requests or limits is set and the other isn't, we'll
+	// just use the same values.
+	if _, requested := resources.Requests[v1.ResourceEphemeralStorage]; !requested {
+		if _, limitSet := resources.Limits[v1.ResourceEphemeralStorage]; limitSet {
+			resources.Requests[v1.ResourceEphemeralStorage] = resources.Limits[v1.ResourceEphemeralStorage]
+		}
+	} else if _, limitSet := resources.Limits[v1.ResourceEphemeralStorage]; !limitSet {
+		resources.Limits[v1.ResourceEphemeralStorage] = resources.Requests[v1.ResourceEphemeralStorage]
+	}
+
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
 	delete(resources.Requests, v1.ResourceStorage)
-	delete(resources.Requests, v1.ResourceEphemeralStorage)
-
 	delete(resources.Limits, v1.ResourceStorage)
-	delete(resources.Limits, v1.ResourceEphemeralStorage)
 
 	// Override GPU
 	if res, found := resources.Requests[resourceGPU]; found {
