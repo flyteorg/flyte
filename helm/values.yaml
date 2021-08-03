@@ -157,7 +157,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole
-    tag: v0.20.2 # FLYTECONSOLE_TAG
+    tag: v0.20.1 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -217,7 +217,7 @@ redis:
   # -- Replicas count for Redis Statefulset
   replicaCount: 1
   image:
-      # -- Docker image for Redis Statefulset
+    # -- Docker image for Redis Statefulset
     repository: docker.io/bitnami/redis
     tag: 4.0.2-r1
     pullPolicy: IfNotPresent
@@ -350,7 +350,6 @@ contour:
   # -- affinity for Contour deployment
   affinity: {}
 
-
 #
 # KUBERNETES DASHBOARD
 #
@@ -365,7 +364,7 @@ kubernetes-dashboard:
 
 common:
   databaseSecret:
-    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret 
+    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
     name: ""
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
@@ -390,7 +389,6 @@ common:
   flyteNamespaceTemplate:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
-
 
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform
@@ -425,7 +423,6 @@ db:
     # passwordPath: /etc/db/pass.txt
     # options:
 
-
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
 # -------------------------------------------------------------------
@@ -443,12 +440,12 @@ configmap:
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
     domains:
-    - id: development
-      name: development
-    - id: staging
-      name: staging
-    - id: production
-      name: production
+      - id: development
+        name: development
+      - id: staging
+        name: staging
+      - id: production
+        name: production
 
   # -- FlyteAdmin server configuration
   adminServer:
@@ -679,16 +676,12 @@ workflow_scheduler:
   enabled: false
   config: {}
 
-
-
 # -- **Optional Component**
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-    enabled: false
-    config: {}
-
-
+  enabled: false
+  config: {}
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
@@ -704,26 +697,26 @@ cluster_resource_manager:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:
-          - projectQuotaCpu:
-              value: "5"
-          - projectQuotaMemory:
-              value: "4000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+            - defaultIamRole:
+                value: ""
         - staging:
-          - projectQuotaCpu:
-              value: "2"
-          - projectQuotaMemory:
-              value: "3000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
         - development:
-          - projectQuotaCpu:
-              value: "4"
-          - projectQuotaMemory:
-              value: "3000Mi"
-          - defaultIamRole:
-              value: ""
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
       refresh: 5m
 
   # -- Resource templates that should be applied
@@ -797,14 +790,13 @@ sparkoperator:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-
 # ----------------------
 # Distributed Pytorch execution using the K8s Pytorch operator
 #
 
 pytorchoperator:
   # --- enable or disable Pytorchoperator deployment installation
-  enabled: true   # Set false to disable
+  enabled: true # Set false to disable
   # -- Replicas count for Pytorchoperator deployment
   replicaCount: 1
   image:
@@ -841,7 +833,6 @@ pytorchoperator:
 tf_operator:
   enabled: false
 
-
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
 # Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
@@ -852,7 +843,5 @@ sagemaker:
       sagemaker:
         roleArn: <arn>
         region: <region>
-
-
 # ---------------------------
 # -- Flink jobs using the Flink Operator: this is work in progress
