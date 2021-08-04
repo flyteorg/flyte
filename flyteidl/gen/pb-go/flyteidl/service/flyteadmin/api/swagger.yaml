@@ -2692,13 +2692,16 @@ definitions:
       value: "value"
   ResourcesResourceName:
     type: "string"
-    description: "Known resource names."
+    description: "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based\
+      \ deployments, pods use ephemeral local storage for scratch space, caching,\
+      \ and for logs."
     enum:
     - "UNKNOWN"
     - "CPU"
     - "GPU"
     - "MEMORY"
     - "STORAGE"
+    - "EPHEMERAL_STORAGE"
     default: "UNKNOWN"
   RuntimeMetadataRuntimeType:
     type: "string"

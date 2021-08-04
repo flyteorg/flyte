@@ -2117,6 +2117,7 @@ Known resource names.
    "GPU", "2", ""
    "MEMORY", "3", ""
    "STORAGE", "4", ""
+   "EPHEMERAL_STORAGE", "5", "For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
 
 
 
