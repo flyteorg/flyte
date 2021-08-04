@@ -9567,6 +9567,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number} GPU=2 GPU value
              * @property {number} MEMORY=3 MEMORY value
              * @property {number} STORAGE=4 STORAGE value
+             * @property {number} EPHEMERAL_STORAGE=5 EPHEMERAL_STORAGE value
              */
             Resources.ResourceName = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
@@ -9575,6 +9576,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 values[valuesById[2] = "GPU"] = 2;
                 values[valuesById[3] = "MEMORY"] = 3;
                 values[valuesById[4] = "STORAGE"] = 4;
+                values[valuesById[5] = "EPHEMERAL_STORAGE"] = 5;
                 return values;
             })();
 
@@ -9702,6 +9704,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value"))

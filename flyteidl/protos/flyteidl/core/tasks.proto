@@ -21,6 +21,8 @@ message Resources {
         GPU = 2;
         MEMORY = 3;
         STORAGE = 4;
+        // For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
+        EPHEMERAL_STORAGE = 5;
     }
 
     // Encapsulates a resource name and value.

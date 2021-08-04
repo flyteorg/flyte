@@ -4016,7 +4016,8 @@ export namespace flyteidl {
                 CPU = 1,
                 GPU = 2,
                 MEMORY = 3,
-                STORAGE = 4
+                STORAGE = 4,
+                EPHEMERAL_STORAGE = 5
             }
 
             /** Properties of a ResourceEntry. */

@@ -131,12 +131,13 @@ enum Resources_ResourceName {
   Resources_ResourceName_GPU = 2,
   Resources_ResourceName_MEMORY = 3,
   Resources_ResourceName_STORAGE = 4,
+  Resources_ResourceName_EPHEMERAL_STORAGE = 5,
   Resources_ResourceName_Resources_ResourceName_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   Resources_ResourceName_Resources_ResourceName_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool Resources_ResourceName_IsValid(int value);
 const Resources_ResourceName Resources_ResourceName_ResourceName_MIN = Resources_ResourceName_UNKNOWN;
-const Resources_ResourceName Resources_ResourceName_ResourceName_MAX = Resources_ResourceName_STORAGE;
+const Resources_ResourceName Resources_ResourceName_ResourceName_MAX = Resources_ResourceName_EPHEMERAL_STORAGE;
 const int Resources_ResourceName_ResourceName_ARRAYSIZE = Resources_ResourceName_ResourceName_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Resources_ResourceName_descriptor();
@@ -471,6 +472,8 @@ class Resources final :
     Resources_ResourceName_MEMORY;
   static const ResourceName STORAGE =
     Resources_ResourceName_STORAGE;
+  static const ResourceName EPHEMERAL_STORAGE =
+    Resources_ResourceName_EPHEMERAL_STORAGE;
   static inline bool ResourceName_IsValid(int value) {
     return Resources_ResourceName_IsValid(value);
   }

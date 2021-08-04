@@ -31,6 +31,7 @@ class ResourcesResourceName(object):
     GPU = "GPU"
     MEMORY = "MEMORY"
     STORAGE = "STORAGE"
+    EPHEMERAL_STORAGE = "EPHEMERAL_STORAGE"
 
     """
     Attributes:
