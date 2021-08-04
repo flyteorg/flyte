@@ -242,6 +242,14 @@ public final class Tasks {
        * <code>STORAGE = 4;</code>
        */
       STORAGE(4),
+      /**
+       * <pre>
+       * For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
+       * </pre>
+       *
+       * <code>EPHEMERAL_STORAGE = 5;</code>
+       */
+      EPHEMERAL_STORAGE(5),
       UNRECOGNIZED(-1),
       ;
 
@@ -265,6 +273,14 @@ public final class Tasks {
        * <code>STORAGE = 4;</code>
        */
       public static final int STORAGE_VALUE = 4;
+      /**
+       * <pre>
+       * For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
+       * </pre>
+       *
+       * <code>EPHEMERAL_STORAGE = 5;</code>
+       */
+      public static final int EPHEMERAL_STORAGE_VALUE = 5;
 
 
       public final int getNumber() {
@@ -290,6 +306,7 @@ public final class Tasks {
           case 2: return GPU;
           case 3: return MEMORY;
           case 4: return STORAGE;
+          case 5: return EPHEMERAL_STORAGE;
           default: return null;
         }
       }
@@ -16249,70 +16266,71 @@ public final class Tasks {
       "eidl/core/interface.proto\032\034flyteidl/core" +
       "/literals.proto\032\034flyteidl/core/security." +
       "proto\032\036google/protobuf/duration.proto\032\034g" +
-      "oogle/protobuf/struct.proto\"\232\002\n\tResource" +
+      "oogle/protobuf/struct.proto\"\261\002\n\tResource" +
       "s\0228\n\010requests\030\001 \003(\0132&.flyteidl.core.Reso" +
       "urces.ResourceEntry\0226\n\006limits\030\002 \003(\0132&.fl" +
       "yteidl.core.Resources.ResourceEntry\032S\n\rR" +
       "esourceEntry\0223\n\004name\030\001 \001(\0162%.flyteidl.co" +
       "re.Resources.ResourceName\022\r\n\005value\030\002 \001(\t" +
-      "\"F\n\014ResourceName\022\013\n\007UNKNOWN\020\000\022\007\n\003CPU\020\001\022\007" +
-      "\n\003GPU\020\002\022\n\n\006MEMORY\020\003\022\013\n\007STORAGE\020\004\"\225\001\n\017Run" +
-      "timeMetadata\0228\n\004type\030\001 \001(\0162*.flyteidl.co" +
-      "re.RuntimeMetadata.RuntimeType\022\017\n\007versio" +
-      "n\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013RuntimeType\022\t" +
-      "\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\235\002\n\014TaskMetadat" +
-      "a\022\024\n\014discoverable\030\001 \001(\010\022/\n\007runtime\030\002 \001(\013" +
-      "2\036.flyteidl.core.RuntimeMetadata\022*\n\007time" +
-      "out\030\004 \001(\0132\031.google.protobuf.Duration\022-\n\007" +
-      "retries\030\005 \001(\0132\034.flyteidl.core.RetryStrat" +
-      "egy\022\031\n\021discovery_version\030\006 \001(\t\022 \n\030deprec" +
-      "ated_error_message\030\007 \001(\t\022\027\n\rinterruptibl" +
-      "e\030\010 \001(\010H\000B\025\n\023interruptible_value\"\355\003\n\014Tas" +
-      "kTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
-      "entifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\013" +
-      "2\033.flyteidl.core.TaskMetadata\0220\n\tinterfa" +
-      "ce\030\004 \001(\0132\035.flyteidl.core.TypedInterface\022" +
-      "\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Struct" +
-      "\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Cont" +
-      "ainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl.core" +
-      ".K8sPodH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020" +
-      "security_context\030\010 \001(\0132\036.flyteidl.core.S" +
-      "ecurityContext\0227\n\006config\030\020 \003(\0132\'.flyteid" +
-      "l.core.TaskTemplate.ConfigEntry\032-\n\013Confi" +
-      "gEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010" +
-      "\n\006target\"\'\n\rContainerPort\022\026\n\016container_p" +
-      "ort\030\001 \001(\r\"\245\002\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017" +
-      "\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresourc" +
-      "es\030\004 \001(\0132\030.flyteidl.core.Resources\022(\n\003en" +
-      "v\030\005 \003(\0132\033.flyteidl.core.KeyValuePair\022/\n\006" +
-      "config\030\006 \003(\0132\033.flyteidl.core.KeyValuePai" +
-      "rB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Con" +
-      "tainerPort\0225\n\013data_config\030\t \001(\0132 .flytei" +
-      "dl.core.DataLoadingConfig\"\233\002\n\nIOStrategy" +
-      "\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.core." +
-      "IOStrategy.DownloadMode\0229\n\013upload_mode\030\002" +
-      " \001(\0162$.flyteidl.core.IOStrategy.UploadMo" +
-      "de\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023" +
-      "\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002" +
-      "\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UP" +
-      "LOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021Data" +
-      "LoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_" +
-      "path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006forma" +
-      "t\030\004 \001(\01621.flyteidl.core.DataLoadingConfi" +
-      "g.LiteralMapFormat\022.\n\013io_strategy\030\005 \001(\0132" +
-      "\031.flyteidl.core.IOStrategy\"1\n\020LiteralMap" +
-      "Format\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n" +
-      "\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .flyteidl.cor" +
-      "e.K8sObjectMetadata\022)\n\010pod_spec\030\002 \001(\0132\027." +
-      "google.protobuf.Struct\"\374\001\n\021K8sObjectMeta" +
-      "data\022<\n\006labels\030\001 \003(\0132,.flyteidl.core.K8s" +
-      "ObjectMetadata.LabelsEntry\022F\n\013annotation" +
-      "s\030\002 \003(\01321.flyteidl.core.K8sObjectMetadat" +
-      "a.AnnotationsEntry\032-\n\013LabelsEntry\022\013\n\003key" +
-      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Annotations" +
-      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B6Z" +
-      "4github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/coreb\006proto3"
+      "\"]\n\014ResourceName\022\013\n\007UNKNOWN\020\000\022\007\n\003CPU\020\001\022\007" +
+      "\n\003GPU\020\002\022\n\n\006MEMORY\020\003\022\013\n\007STORAGE\020\004\022\025\n\021EPHE" +
+      "MERAL_STORAGE\020\005\"\225\001\n\017RuntimeMetadata\0228\n\004t" +
+      "ype\030\001 \001(\0162*.flyteidl.core.RuntimeMetadat" +
+      "a.RuntimeType\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor" +
+      "\030\003 \001(\t\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFLYT" +
+      "E_SDK\020\001\"\235\002\n\014TaskMetadata\022\024\n\014discoverable" +
+      "\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.core." +
+      "RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.googl" +
+      "e.protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.f" +
+      "lyteidl.core.RetryStrategy\022\031\n\021discovery_" +
+      "version\030\006 \001(\t\022 \n\030deprecated_error_messag" +
+      "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000B\025\n\023inte" +
+      "rruptible_value\"\355\003\n\014TaskTemplate\022%\n\002id\030\001" +
+      " \001(\0132\031.flyteidl.core.Identifier\022\014\n\004type\030" +
+      "\002 \001(\t\022-\n\010metadata\030\003 \001(\0132\033.flyteidl.core." +
+      "TaskMetadata\0220\n\tinterface\030\004 \001(\0132\035.flytei" +
+      "dl.core.TypedInterface\022\'\n\006custom\030\005 \001(\0132\027" +
+      ".google.protobuf.Struct\022-\n\tcontainer\030\006 \001" +
+      "(\0132\030.flyteidl.core.ContainerH\000\022(\n\007k8s_po" +
+      "d\030\021 \001(\0132\025.flyteidl.core.K8sPodH\000\022\031\n\021task" +
+      "_type_version\030\007 \001(\005\0228\n\020security_context\030" +
+      "\010 \001(\0132\036.flyteidl.core.SecurityContext\0227\n" +
+      "\006config\030\020 \003(\0132\'.flyteidl.core.TaskTempla" +
+      "te.ConfigEntry\032-\n\013ConfigEntry\022\013\n\003key\030\001 \001" +
+      "(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rConta" +
+      "inerPort\022\026\n\016container_port\030\001 \001(\r\"\245\002\n\tCon" +
+      "tainer\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014" +
+      "\n\004args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flytei" +
+      "dl.core.Resources\022(\n\003env\030\005 \003(\0132\033.flyteid" +
+      "l.core.KeyValuePair\022/\n\006config\030\006 \003(\0132\033.fl" +
+      "yteidl.core.KeyValuePairB\002\030\001\022+\n\005ports\030\007 " +
+      "\003(\0132\034.flyteidl.core.ContainerPort\0225\n\013dat" +
+      "a_config\030\t \001(\0132 .flyteidl.core.DataLoadi" +
+      "ngConfig\"\233\002\n\nIOStrategy\022=\n\rdownload_mode" +
+      "\030\001 \001(\0162&.flyteidl.core.IOStrategy.Downlo" +
+      "adMode\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl.c" +
+      "ore.IOStrategy.UploadMode\"L\n\014DownloadMod" +
+      "e\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM" +
+      "\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n" +
+      "\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rD" +
+      "O_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007" +
+      "enabled\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013out" +
+      "put_path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteid" +
+      "l.core.DataLoadingConfig.LiteralMapForma" +
+      "t\022.\n\013io_strategy\030\005 \001(\0132\031.flyteidl.core.I" +
+      "OStrategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022" +
+      "\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metada" +
+      "ta\030\001 \001(\0132 .flyteidl.core.K8sObjectMetada" +
+      "ta\022)\n\010pod_spec\030\002 \001(\0132\027.google.protobuf.S" +
+      "truct\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 " +
+      "\003(\0132,.flyteidl.core.K8sObjectMetadata.La" +
+      "belsEntry\022F\n\013annotations\030\002 \003(\01321.flyteid" +
+      "l.core.K8sObjectMetadata.AnnotationsEntr" +
+      "y\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
+      " \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(" +
+      "\t\022\r\n\005value\030\002 \001(\t:\0028\001B6Z4github.com/flyte" +
+      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

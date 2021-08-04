@@ -8,7 +8,7 @@
  */
 
 package flyteadmin
-// ResourcesResourceName : Known resource names.
+// ResourcesResourceName : Known resource names.   - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
 type ResourcesResourceName string
 
 // List of ResourcesResourceName
@@ -18,4 +18,5 @@ const (
 	ResourcesResourceNameGPU ResourcesResourceName = "GPU"
 	ResourcesResourceNameMEMORY ResourcesResourceName = "MEMORY"
 	ResourcesResourceNameSTORAGE ResourcesResourceName = "STORAGE"
+	ResourcesResourceNameEPHEMERAL_STORAGE ResourcesResourceName = "EPHEMERAL_STORAGE"
 )
