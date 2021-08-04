@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](http://github.com/lyft/flyteconsole/compare/v0.21.0...v0.22.0) (2021-08-04)
+
+
+### Features
+
+* add enum input type in launch form ([#178](http://github.com/lyft/flyteconsole/issues/178)) ([847461f](http://github.com/lyft/flyteconsole/commit/847461f5339921e1a2f68512057a38d8a495a814))
+
 # [0.21.0](http://github.com/lyft/flyteconsole/compare/v0.20.1...v0.21.0) (2021-08-03)
 
 
