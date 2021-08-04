@@ -22,6 +22,7 @@ const inputHelpers: Record<InputType, InputHelper> = {
     [InputType.Collection]: collectionHelper,
     [InputType.Datetime]: datetimeHelper,
     [InputType.Duration]: durationHelper,
+    [InputType.Enum]: stringHelper,
     [InputType.Error]: unsupportedHelper,
     [InputType.Float]: floatHelper,
     [InputType.Integer]: integerHelper,

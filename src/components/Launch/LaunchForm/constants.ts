@@ -37,6 +37,7 @@ export const typeLabels: { [k in InputType]: string } = {
     [InputType.Datetime]: 'datetime - UTC',
     [InputType.Duration]: 'duration - ms',
     [InputType.Error]: 'error',
+    [InputType.Enum]: 'enum',
     [InputType.Float]: 'float',
     [InputType.Integer]: 'integer',
     [InputType.Map]: '',

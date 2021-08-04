@@ -168,6 +168,8 @@ export function getInputDefintionForLiteralType(
         result.type = InputType.Schema;
     } else if (literalType.simple) {
         result.type = simpleTypeToInputType[literalType.simple];
+    } else if (literalType.enumType) {
+        result.type = InputType.Enum;
     }
     return result;
 }

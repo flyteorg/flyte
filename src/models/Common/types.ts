@@ -141,10 +141,13 @@ export interface LiteralType extends Core.ILiteralType {
     metadata?: ProtobufStruct;
     schema?: SchemaType;
     simple?: SimpleType;
+    enumType?: EnumType;
 }
 
 export type SimpleType = Core.SimpleType;
 export const SimpleType = Core.SimpleType;
+export type EnumType = Core.EnumType;
+export const EnumType = Core.EnumType;
 
 export interface Variable extends Core.IVariable {
     type: LiteralType;

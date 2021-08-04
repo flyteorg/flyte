@@ -46,6 +46,7 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
         case InputType.Blob:
         case InputType.Datetime:
         case InputType.Duration:
+        case InputType.Enum:
         case InputType.Float:
         case InputType.Integer:
         case InputType.Schema:

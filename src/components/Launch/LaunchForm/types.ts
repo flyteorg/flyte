@@ -147,6 +147,7 @@ export enum InputType {
     Datetime = 'DATETIME',
     Duration = 'DURATION',
     Error = 'ERROR',
+    Enum = 'ENUM',
     Float = 'FLOAT',
     Integer = 'INTEGER',
     Map = 'MAP',

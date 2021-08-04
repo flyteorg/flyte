@@ -2,15 +2,24 @@ import {
     FormControl,
     FormControlLabel,
     FormHelperText,
+    MenuItem,
+    Select,
     Switch,
     TextField
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { DatetimeInput } from './DatetimeInput';
 import { makeStringChangeHandler, makeSwitchChangeHandler } from './handlers';
 import { InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { getLaunchInputId } from './utils';
+
+const useStyles = makeStyles(theme => ({
+    formControl: {
+        minWidth: '100%'
+    }
+}));
 
 /** Handles rendering of the input component for any primitive-type input */
 export const SimpleInput: React.FC<InputProps> = props => {
@@ -19,11 +28,17 @@ export const SimpleInput: React.FC<InputProps> = props => {
         label,
         name,
         onChange,
-        typeDefinition: { type },
+        typeDefinition: { type, literalType },
         value = ''
     } = props;
     const hasError = !!error;
     const helperText = hasError ? error : props.helperText;
+    const classes = useStyles();
+
+    const handleEnumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        onChange(event.target.value as string);
+    };
+
     switch (type) {
         case InputType.Boolean:
             return (
@@ -60,6 +75,23 @@ export const SimpleInput: React.FC<InputProps> = props => {
                     value={value}
                     variant="outlined"
                 />
+            );
+        case InputType.Enum:
+            return (
+                <FormControl className={classes.formControl}>
+                    <Select
+                        id={getLaunchInputId(name)}
+                        label={label}
+                        value={value}
+                        onChange={handleEnumChange}
+                    >
+                        {literalType &&
+                            literalType.enumType?.values.map(item => (
+                                <MenuItem value={item}>{item}</MenuItem>
+                            ))}
+                    </Select>
+                    <FormHelperText>{label}</FormHelperText>
+                </FormControl>
             );
         default:
             return <UnsupportedInput {...props} />;
