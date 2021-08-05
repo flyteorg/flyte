@@ -39,6 +39,8 @@ message TaskResourceSpec {
   string memory = 3;
 
   string storage = 4;  
+
+  string ephemeral_storage = 5;
 }
 
 // Defines task resource defaults and limits that will be applied at task registration.

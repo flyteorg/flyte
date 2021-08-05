@@ -10204,6 +10204,9 @@ export namespace flyteidl {
 
             /** TaskResourceSpec storage */
             storage?: (string|null);
+
+            /** TaskResourceSpec ephemeralStorage */
+            ephemeralStorage?: (string|null);
         }
 
         /** Represents a TaskResourceSpec. */
@@ -10226,6 +10229,9 @@ export namespace flyteidl {
 
             /** TaskResourceSpec storage. */
             public storage: string;
+
+            /** TaskResourceSpec ephemeralStorage. */
+            public ephemeralStorage: string;
 
             /**
              * Creates a new TaskResourceSpec instance using the specified properties.

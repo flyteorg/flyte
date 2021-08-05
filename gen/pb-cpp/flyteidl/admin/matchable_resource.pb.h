@@ -316,6 +316,20 @@ class TaskResourceSpec final :
   ::std::string* release_storage();
   void set_allocated_storage(::std::string* storage);
 
+  // string ephemeral_storage = 5;
+  void clear_ephemeral_storage();
+  static const int kEphemeralStorageFieldNumber = 5;
+  const ::std::string& ephemeral_storage() const;
+  void set_ephemeral_storage(const ::std::string& value);
+  #if LANG_CXX11
+  void set_ephemeral_storage(::std::string&& value);
+  #endif
+  void set_ephemeral_storage(const char* value);
+  void set_ephemeral_storage(const char* value, size_t size);
+  ::std::string* mutable_ephemeral_storage();
+  ::std::string* release_ephemeral_storage();
+  void set_allocated_ephemeral_storage(::std::string* ephemeral_storage);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskResourceSpec)
  private:
   class HasBitSetters;
@@ -325,6 +339,7 @@ class TaskResourceSpec final :
   ::google::protobuf::internal::ArenaStringPtr gpu_;
   ::google::protobuf::internal::ArenaStringPtr memory_;
   ::google::protobuf::internal::ArenaStringPtr storage_;
+  ::google::protobuf::internal::ArenaStringPtr ephemeral_storage_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 };
@@ -2081,6 +2096,59 @@ inline void TaskResourceSpec::set_allocated_storage(::std::string* storage) {
   }
   storage_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), storage);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskResourceSpec.storage)
+}
+
+// string ephemeral_storage = 5;
+inline void TaskResourceSpec::clear_ephemeral_storage() {
+  ephemeral_storage_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& TaskResourceSpec::ephemeral_storage() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+  return ephemeral_storage_.GetNoArena();
+}
+inline void TaskResourceSpec::set_ephemeral_storage(const ::std::string& value) {
+  
+  ephemeral_storage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+}
+#if LANG_CXX11
+inline void TaskResourceSpec::set_ephemeral_storage(::std::string&& value) {
+  
+  ephemeral_storage_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+}
+#endif
+inline void TaskResourceSpec::set_ephemeral_storage(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  ephemeral_storage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+}
+inline void TaskResourceSpec::set_ephemeral_storage(const char* value, size_t size) {
+  
+  ephemeral_storage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+}
+inline ::std::string* TaskResourceSpec::mutable_ephemeral_storage() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+  return ephemeral_storage_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* TaskResourceSpec::release_ephemeral_storage() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
+  
+  return ephemeral_storage_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void TaskResourceSpec::set_allocated_ephemeral_storage(::std::string* ephemeral_storage) {
+  if (ephemeral_storage != nullptr) {
+    
+  } else {
+    
+  }
+  ephemeral_storage_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ephemeral_storage);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskResourceSpec.ephemeral_storage)
 }
 
 // -------------------------------------------------------------------

@@ -1831,6 +1831,7 @@ Defines a set of overridable task resource attributes set during task registrati
    "gpu", ":ref:`ref_string`", "", ""
    "memory", ":ref:`ref_string`", "", ""
    "storage", ":ref:`ref_string`", "", ""
+   "ephemeral_storage", ":ref:`ref_string`", "", ""
 
 
 
