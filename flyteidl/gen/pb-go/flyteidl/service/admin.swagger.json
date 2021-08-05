@@ -4500,6 +4500,9 @@
         },
         "storage": {
           "type": "string"
+        },
+        "ephemeral_storage": {
+          "type": "string"
         }
       },
       "description": "Defines a set of overridable task resource attributes set during task registration."

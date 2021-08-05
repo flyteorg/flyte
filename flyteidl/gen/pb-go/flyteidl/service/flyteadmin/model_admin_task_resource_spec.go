@@ -15,4 +15,5 @@ type AdminTaskResourceSpec struct {
 	Gpu string `json:"gpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
 	Storage string `json:"storage,omitempty"`
+	EphemeralStorage string `json:"ephemeral_storage,omitempty"`
 }

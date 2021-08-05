@@ -34,23 +34,26 @@ class AdminTaskResourceSpec(object):
         'cpu': 'str',
         'gpu': 'str',
         'memory': 'str',
-        'storage': 'str'
+        'storage': 'str',
+        'ephemeral_storage': 'str'
     }
 
     attribute_map = {
         'cpu': 'cpu',
         'gpu': 'gpu',
         'memory': 'memory',
-        'storage': 'storage'
+        'storage': 'storage',
+        'ephemeral_storage': 'ephemeral_storage'
     }
 
-    def __init__(self, cpu=None, gpu=None, memory=None, storage=None):  # noqa: E501
+    def __init__(self, cpu=None, gpu=None, memory=None, storage=None, ephemeral_storage=None):  # noqa: E501
         """AdminTaskResourceSpec - a model defined in Swagger"""  # noqa: E501
 
         self._cpu = None
         self._gpu = None
         self._memory = None
         self._storage = None
+        self._ephemeral_storage = None
         self.discriminator = None
 
         if cpu is not None:
@@ -61,6 +64,8 @@ class AdminTaskResourceSpec(object):
             self.memory = memory
         if storage is not None:
             self.storage = storage
+        if ephemeral_storage is not None:
+            self.ephemeral_storage = ephemeral_storage
 
     @property
     def cpu(self):
@@ -145,6 +150,27 @@ class AdminTaskResourceSpec(object):
         """
 
         self._storage = storage
+
+    @property
+    def ephemeral_storage(self):
+        """Gets the ephemeral_storage of this AdminTaskResourceSpec.  # noqa: E501
+
+
+        :return: The ephemeral_storage of this AdminTaskResourceSpec.  # noqa: E501
+        :rtype: str
+        """
+        return self._ephemeral_storage
+
+    @ephemeral_storage.setter
+    def ephemeral_storage(self, ephemeral_storage):
+        """Sets the ephemeral_storage of this AdminTaskResourceSpec.
+
+
+        :param ephemeral_storage: The ephemeral_storage of this AdminTaskResourceSpec.  # noqa: E501
+        :type: str
+        """
+
+        self._ephemeral_storage = ephemeral_storage
 
     def to_dict(self):
         """Returns the model properties as a dict"""

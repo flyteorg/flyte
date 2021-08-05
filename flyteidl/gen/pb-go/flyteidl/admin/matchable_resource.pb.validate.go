@@ -52,6 +52,8 @@ func (m *TaskResourceSpec) Validate() error {
 
 	// no validation rules for Storage
 
+	// no validation rules for EphemeralStorage
+
 	return nil
 }
 

@@ -5425,11 +5425,13 @@ definitions:
             defaults:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
             limits:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
           execution_cluster_label:
@@ -5468,11 +5470,13 @@ definitions:
             defaults:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
             limits:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
           execution_cluster_label:
@@ -5544,11 +5548,13 @@ definitions:
           defaults:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
           limits:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
         execution_cluster_label:
@@ -5623,11 +5629,13 @@ definitions:
         defaults:
           memory: "memory"
           cpu: "cpu"
+          ephemeral_storage: "ephemeral_storage"
           storage: "storage"
           gpu: "gpu"
         limits:
           memory: "memory"
           cpu: "cpu"
+          ephemeral_storage: "ephemeral_storage"
           storage: "storage"
           gpu: "gpu"
       execution_cluster_label:
@@ -9276,11 +9284,13 @@ definitions:
           defaults:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
           limits:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
         execution_cluster_label:
@@ -9343,11 +9353,13 @@ definitions:
             defaults:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
             limits:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
           execution_cluster_label:
@@ -10663,11 +10675,13 @@ definitions:
       defaults:
         memory: "memory"
         cpu: "cpu"
+        ephemeral_storage: "ephemeral_storage"
         storage: "storage"
         gpu: "gpu"
       limits:
         memory: "memory"
         cpu: "cpu"
+        ephemeral_storage: "ephemeral_storage"
         storage: "storage"
         gpu: "gpu"
   adminTaskResourceSpec:
@@ -10681,11 +10695,14 @@ definitions:
         type: "string"
       storage:
         type: "string"
+      ephemeral_storage:
+        type: "string"
     description: "Defines a set of overridable task resource attributes set during\
       \ task registration."
     example:
       memory: "memory"
       cpu: "cpu"
+      ephemeral_storage: "ephemeral_storage"
       storage: "storage"
       gpu: "gpu"
   adminTaskSpec:
@@ -13794,11 +13811,13 @@ definitions:
           defaults:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
           limits:
             memory: "memory"
             cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
             storage: "storage"
             gpu: "gpu"
         execution_cluster_label:
@@ -13864,11 +13883,13 @@ definitions:
             defaults:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
             limits:
               memory: "memory"
               cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
               storage: "storage"
               gpu: "gpu"
           execution_cluster_label:
