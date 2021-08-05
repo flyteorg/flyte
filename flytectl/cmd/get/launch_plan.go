@@ -104,6 +104,8 @@ var launchplanColumns = []printer.Column{
 	{Header: "Type", JSONPath: "$.closure.compiledTask.template.type"},
 	{Header: "State", JSONPath: "$.spec.state"},
 	{Header: "Schedule", JSONPath: "$.spec.entityMetadata.schedule"},
+	{Header: "Inputs", JSONPath: "$.closure.expectedInputs.parameters." + printer.DefaultFormattedDescriptionsKey + ".var.description"},
+	{Header: "Outputs", JSONPath: "$.closure.expectedOutputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
 }
 
 // Column structure for get all launchplans
@@ -122,6 +124,21 @@ func LaunchplanToProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 	return messages
 }
 
+func LaunchplanToTableProtoMessages(l []*admin.LaunchPlan) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		m := proto.Clone(m).(*admin.LaunchPlan)
+		if m.Closure.ExpectedInputs != nil {
+			printer.FormatParameterDescriptions(m.Closure.ExpectedInputs.Parameters)
+		}
+		if m.Closure.ExpectedOutputs != nil {
+			printer.FormatVariableDescriptions(m.Closure.ExpectedOutputs.Variables)
+		}
+		messages = append(messages, m)
+	}
+	return messages
+}
+
 func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	launchPlanPrinter := printer.Printer{}
 	var launchPlans []*admin.LaunchPlan
@@ -134,8 +151,13 @@ func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved %v launch plans", len(launchPlans))
-		err = launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplanColumns,
-			LaunchplanToProtoMessages(launchPlans)...)
+		if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
+			err = launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplanColumns,
+				LaunchplanToTableProtoMessages(launchPlans)...)
+		} else {
+			err = launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplanColumns,
+				LaunchplanToProtoMessages(launchPlans)...)
+		}
 		if err != nil {
 			return err
 		}
@@ -148,8 +170,13 @@ func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 	}
 
 	logger.Debugf(ctx, "Retrieved %v launch plans", len(launchPlans))
+	if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
+		return launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplansColumns,
+			LaunchplanToTableProtoMessages(launchPlans)...)
+	}
 	return launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplansColumns,
 		LaunchplanToProtoMessages(launchPlans)...)
+
 }
 
 // FetchLPForName fetches the launchplan give it name.

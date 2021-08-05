@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"sort"
+	"strings"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flytectl/pkg/visualize"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -51,8 +55,10 @@ type Column struct {
 type Printer struct{}
 
 const (
-	empty = ""
-	tab   = "\t"
+	empty                           = ""
+	tab                             = "\t"
+	DefaultFormattedDescriptionsKey = "_formatted_descriptions"
+	defaultLineWidth                = 25
 )
 
 // Projects the columns in one row of data from the given JSON using the []Column map
@@ -162,6 +168,61 @@ func printJSONYaml(format OutputFormat, v interface{}) error {
 		fmt.Println(string(v))
 	}
 	return nil
+}
+
+func FormatVariableDescriptions(variableMap map[string]*core.Variable) {
+	keys := make([]string, 0, len(variableMap))
+	// sort the keys for testing and consistency with other output formats
+	for k := range variableMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var descriptions []string
+	for _, k := range keys {
+		v := variableMap[k]
+		// a: a isn't very helpful
+		if k != v.Description {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Description)))
+		} else {
+			descriptions = append(descriptions, getTruncatedLine(k))
+		}
+
+	}
+	variableMap[DefaultFormattedDescriptionsKey] = &core.Variable{Description: strings.Join(descriptions, "\n")}
+}
+
+func FormatParameterDescriptions(parameterMap map[string]*core.Parameter) {
+	keys := make([]string, 0, len(parameterMap))
+	// sort the keys for testing and consistency with other output formats
+	for k := range parameterMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var descriptions []string
+	for _, k := range keys {
+		v := parameterMap[k]
+		if v.Var == nil {
+			continue
+		}
+		// a: a isn't very helpful
+		if k != v.Var.Description {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Var.Description)))
+		} else {
+			descriptions = append(descriptions, getTruncatedLine(k))
+		}
+	}
+	parameterMap[DefaultFormattedDescriptionsKey] = &core.Parameter{Var: &core.Variable{Description: strings.Join(descriptions, "\n")}}
+}
+
+func getTruncatedLine(line string) string {
+	// TODO: maybe add width to function signature later
+	width := defaultLineWidth
+	if len(line) > width {
+		return line[:width-3] + "..."
+	}
+	return line
 }
 
 func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.Message) error {

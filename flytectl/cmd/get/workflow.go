@@ -87,12 +87,29 @@ Usage
 var workflowColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
 	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Inputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.inputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
+	{Header: "Outputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.outputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
 	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 
 func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
+}
+
+func WorkflowToTableProtoMessages(l []*admin.Workflow) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		m := proto.Clone(m).(*admin.Workflow)
+		if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil {
+			printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables)
+		}
+		if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil {
+			printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables)
+		}
 		messages = append(messages, m)
 	}
 	return messages
@@ -108,6 +125,9 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved %v workflow", len(workflows))
+		if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
+			return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToTableProtoMessages(workflows)...)
+		}
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows)...)
 	}
 
@@ -117,6 +137,9 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 	}
 
 	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
+	if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToTableProtoMessages(workflows)...)
+	}
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows)...)
 }
 
