@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flytectl/pkg/filters"
 
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
@@ -48,6 +49,7 @@ func getLaunchPlanSetup() {
 						},
 					},
 				},
+				Description: "short desc",
 			},
 		},
 		"numbers_count": {
@@ -57,6 +59,7 @@ func getLaunchPlanSetup() {
 						Simple: core.SimpleType_INTEGER,
 					},
 				},
+				Description: "long description will be truncated in table",
 			},
 		},
 		"run_local_at_count": {
@@ -66,6 +69,7 @@ func getLaunchPlanSetup() {
 						Simple: core.SimpleType_INTEGER,
 					},
 				},
+				Description: "run_local_at_count",
 			},
 			Behavior: &core.Parameter_Default{
 				Default: &core.Literal{
@@ -258,21 +262,24 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 								"collectionType": {
 									"simple": "INTEGER"
 								}
-							}
+							},
+							"description": "short desc"
 						}
 					},
 					"numbers_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "long description will be truncated in table"
 						}
 					},
 					"run_local_at_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "run_local_at_count"
 						},
 						"default": {
 							"scalar": {
@@ -294,21 +301,24 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 								"collectionType": {
 									"simple": "INTEGER"
 								}
-							}
+							},
+							"description": "short desc"
 						}
 					},
 					"numbers_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "long description will be truncated in table"
 						}
 					},
 					"run_local_at_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "run_local_at_count"
 						},
 						"default": {
 							"scalar": {
@@ -337,21 +347,24 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 								"collectionType": {
 									"simple": "INTEGER"
 								}
-							}
+							},
+							"description": "short desc"
 						}
 					},
 					"numbers_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "long description will be truncated in table"
 						}
 					},
 					"run_local_at_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "run_local_at_count"
 						},
 						"default": {
 							"scalar": {
@@ -373,21 +386,24 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 								"collectionType": {
 									"simple": "INTEGER"
 								}
-							}
+							},
+							"description": "short desc"
 						}
 					},
 					"numbers_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "long description will be truncated in table"
 						}
 					},
 					"run_local_at_count": {
 						"var": {
 							"type": {
 								"simple": "INTEGER"
-							}
+							},
+							"description": "run_local_at_count"
 						},
 						"default": {
 							"scalar": {
@@ -429,21 +445,24 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -465,21 +484,24 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -520,21 +542,24 @@ func TestGetLaunchPlanWithVersion(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -556,21 +581,24 @@ func TestGetLaunchPlanWithVersion(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -595,7 +623,7 @@ func TestGetLaunchPlans(t *testing.T) {
 	argsLp = []string{}
 	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}}}},"numbers_count": {"var": {"type": {"simple": "INTEGER"}}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"}},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}}}},"numbers_count": {"var": {"type": {"simple": "INTEGER"}}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"}},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}}}},"numbers_count": {"var": {"type": {"simple": "INTEGER"}}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"}},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}}}},"numbers_count": {"var": {"type": {"simple": "INTEGER"}}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"}},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	tearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 }
 
 func TestGetLaunchPlansWithExecFile(t *testing.T) {
@@ -624,21 +652,24 @@ func TestGetLaunchPlansWithExecFile(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -660,21 +691,24 @@ func TestGetLaunchPlansWithExecFile(t *testing.T) {
 							"collectionType": {
 								"simple": "INTEGER"
 							}
-						}
+						},
+						"description": "short desc"
 					}
 				},
 				"numbers_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "long description will be truncated in table"
 					}
 				},
 				"run_local_at_count": {
 					"var": {
 						"type": {
 							"simple": "INTEGER"
-						}
+						},
+						"description": "run_local_at_count"
 					},
 					"default": {
 						"scalar": {
@@ -689,4 +723,29 @@ func TestGetLaunchPlansWithExecFile(t *testing.T) {
 		"createdAt": "1970-01-01T00:00:01Z"
 	}
 }`)
+}
+
+func TestGetLaunchPlanTableFunc(t *testing.T) {
+	setup()
+	getLaunchPlanSetup()
+	mockClient.OnListLaunchPlansMatch(ctx, resourceGetRequest).Return(launchPlanListResponse, nil)
+	mockClient.OnGetLaunchPlanMatch(ctx, objectGetRequest).Return(launchPlan2, nil)
+	mockClient.OnListLaunchPlanIdsMatch(ctx, namedIDRequest).Return(namedIdentifierList, nil)
+	config.GetConfig().Output = "table"
+	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
+	assert.Nil(t, err)
+	mockClient.AssertCalled(t, "ListLaunchPlans", ctx, resourceGetRequest)
+	tearDownAndVerify(t, `
+--------- ------------- ------ ------- ---------- --------------------------- --------- 
+| VERSION | NAME        | TYPE | STATE | SCHEDULE | INPUTS                    | OUTPUTS | 
+--------- ------------- ------ ------- ---------- --------------------------- --------- 
+| v2      | launchplan1 |      |       |          | numbers: short desc       |         |
+|         |             |      |       |          | numbers_count: long de... |         |
+|         |             |      |       |          | run_local_at_count        |         | 
+--------- ------------- ------ ------- ---------- --------------------------- --------- 
+| v1      | launchplan1 |      |       |          | numbers: short desc       |         |
+|         |             |      |       |          | numbers_count: long de... |         |
+|         |             |      |       |          | run_local_at_count        |         | 
+--------- ------------- ------ ------- ---------- --------------------------- --------- 
+2 rows`)
 }

@@ -253,3 +253,57 @@ func TestPrint(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf("no template found in the sub workflow template:<> "), errors.Unwrap(err))
 }
+
+func TestGetTruncatedLine(t *testing.T) {
+	testStrings := map[string]string{
+		"foo":                        "foo",
+		"":                           "",
+		"short description":          "short description",
+		"1234567890123456789012345":  "1234567890123456789012345",
+		"12345678901234567890123456": "1234567890123456789012...",
+		"long description probably needs truncate": "long description proba...",
+	}
+	for k, v := range testStrings {
+		assert.Equal(t, v, getTruncatedLine(k))
+	}
+}
+
+func TestFormatVariableDescriptions(t *testing.T) {
+	fooVar := &core.Variable{
+		Description: "foo",
+	}
+	barVar := &core.Variable{
+		Description: "bar",
+	}
+	variableMap := map[string]*core.Variable{
+		"var1": fooVar,
+		"var2": barVar,
+		"foo":  fooVar,
+		"bar":  barVar,
+	}
+	FormatVariableDescriptions(variableMap)
+	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", variableMap[DefaultFormattedDescriptionsKey].Description)
+}
+
+func TestFormatParameterDescriptions(t *testing.T) {
+	fooParam := &core.Parameter{
+		Var: &core.Variable{
+			Description: "foo",
+		},
+	}
+	barParam := &core.Parameter{
+		Var: &core.Variable{
+			Description: "bar",
+		},
+	}
+	emptyParam := &core.Parameter{}
+	paramMap := map[string]*core.Parameter{
+		"var1":  fooParam,
+		"var2":  barParam,
+		"foo":   fooParam,
+		"bar":   barParam,
+		"empty": emptyParam,
+	}
+	FormatParameterDescriptions(paramMap)
+	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", paramMap[DefaultFormattedDescriptionsKey].Var.Description)
+}

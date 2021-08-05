@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/config"
+
 	taskConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 
 	"github.com/flyteorg/flytectl/pkg/filters"
@@ -50,6 +52,7 @@ func getTaskSetup() {
 				},
 			},
 		},
+		Description: "var description",
 	}
 	variableMap := map[string]*core.Variable{
 		"sorted_list1": &sortedListLiteralType,
@@ -257,14 +260,16 @@ func TestGetTaskFunc(t *testing.T) {
 										"collectionType": {
 											"simple": "INTEGER"
 										}
-									}
+									},
+									"description": "var description"
 								},
 								"sorted_list2": {
 									"type": {
 										"collectionType": {
 											"simple": "INTEGER"
 										}
-									}
+									},
+									"description": "var description"
 								}
 							}
 						}
@@ -290,14 +295,16 @@ func TestGetTaskFunc(t *testing.T) {
 										"collectionType": {
 											"simple": "INTEGER"
 										}
-									}
+									},
+									"description": "var description"
 								},
 								"sorted_list2": {
 									"type": {
 										"collectionType": {
 											"simple": "INTEGER"
 										}
-									}
+									},
+									"description": "var description"
 								}
 							}
 						}
@@ -308,6 +315,28 @@ func TestGetTaskFunc(t *testing.T) {
 		}
 	}
 ]`)
+}
+
+func TestGetTaskTableFunc(t *testing.T) {
+	setup()
+	getTaskSetup()
+	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
+	config.GetConfig().Output = "table"
+	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	assert.Nil(t, err)
+	mockClient.AssertCalled(t, "ListTasks", ctx, resourceListRequestTask)
+	tearDownAndVerify(t, `
+--------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
+| VERSION | NAME  | TYPE | INPUTS                    | OUTPUTS | DISCOVERABLE | DISCOVERY VERSION | CREATED AT           | 
+--------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
+| v2      | task1 |      | sorted_list1: var desc... |         |              |                   | 1970-01-01T00:00:01Z |
+|         |       |      | sorted_list2: var desc... |         |              |                   |                      | 
+--------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
+| v1      | task1 |      | sorted_list1: var desc... |         |              |                   | 1970-01-01T00:00:00Z |
+|         |       |      | sorted_list2: var desc... |         |              |                   |                      | 
+--------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
+2 rows`)
 }
 
 func TestGetTaskFuncLatest(t *testing.T) {
@@ -336,14 +365,16 @@ func TestGetTaskFuncLatest(t *testing.T) {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							},
 							"sorted_list2": {
 								"type": {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							}
 						}
 					}
@@ -382,14 +413,16 @@ func TestGetTaskWithVersion(t *testing.T) {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							},
 							"sorted_list2": {
 								"type": {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							}
 						}
 					}
@@ -408,7 +441,7 @@ func TestGetTasks(t *testing.T) {
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `[{"id": {"name": "task1","version": "v2"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}}},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}}}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}}},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}}}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	tearDownAndVerify(t, `[{"id": {"name": "task1","version": "v2"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 }
 
 func TestGetTasksFilters(t *testing.T) {
@@ -420,7 +453,7 @@ func TestGetTasksFilters(t *testing.T) {
 	mockClient.OnListTasksMatch(ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}}},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}}}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}`)
+	tearDownAndVerify(t, `{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}`)
 }
 
 func TestGetTaskWithExecFile(t *testing.T) {
@@ -451,14 +484,16 @@ func TestGetTaskWithExecFile(t *testing.T) {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							},
 							"sorted_list2": {
 								"type": {
 									"collectionType": {
 										"simple": "INTEGER"
 									}
-								}
+								},
+								"description": "var description"
 							}
 						}
 					}

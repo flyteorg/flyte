@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -68,10 +69,12 @@ func TearDownAndVerify(t *testing.T, expectedLog string) {
 	os.Stderr = stderr
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, reader); err == nil {
-		assert.Equal(t, santizeString(expectedLog), santizeString(buf.String()))
+		assert.Equal(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
 	}
 }
 
-func santizeString(str string) string {
-	return strings.Trim(strings.ReplaceAll(strings.ReplaceAll(str, "\n", ""), "\t", ""), " \t")
+func sanitizeString(str string) string {
+	// Not the most comprehensive ANSI pattern, but this should capture common color operations such as \x1b[107;0m and \x1b[0m. Expand if needed (insert regex 2 problems joke here).
+	ansiRegex := regexp.MustCompile("\u001B\\[[\\d+\\;]*\\d+m")
+	return ansiRegex.ReplaceAllString(strings.Trim(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(str, "\n", ""), "\t", ""), "", ""), " \t"), "")
 }
