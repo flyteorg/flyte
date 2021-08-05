@@ -24405,6 +24405,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [gpu] TaskResourceSpec gpu
              * @property {string|null} [memory] TaskResourceSpec memory
              * @property {string|null} [storage] TaskResourceSpec storage
+             * @property {string|null} [ephemeralStorage] TaskResourceSpec ephemeralStorage
              */
 
             /**
@@ -24455,6 +24456,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskResourceSpec.prototype.storage = "";
 
             /**
+             * TaskResourceSpec ephemeralStorage.
+             * @member {string} ephemeralStorage
+             * @memberof flyteidl.admin.TaskResourceSpec
+             * @instance
+             */
+            TaskResourceSpec.prototype.ephemeralStorage = "";
+
+            /**
              * Creates a new TaskResourceSpec instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.TaskResourceSpec
@@ -24486,6 +24495,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 3, wireType 2 =*/26).string(message.memory);
                 if (message.storage != null && message.hasOwnProperty("storage"))
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.storage);
+                if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
+                    writer.uint32(/* id 5, wireType 2 =*/42).string(message.ephemeralStorage);
                 return writer;
             };
 
@@ -24519,6 +24530,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 4:
                         message.storage = reader.string();
                         break;
+                    case 5:
+                        message.ephemeralStorage = reader.string();
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -24550,6 +24564,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.storage != null && message.hasOwnProperty("storage"))
                     if (!$util.isString(message.storage))
                         return "storage: string expected";
+                if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
+                    if (!$util.isString(message.ephemeralStorage))
+                        return "ephemeralStorage: string expected";
                 return null;
             };
 

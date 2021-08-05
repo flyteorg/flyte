@@ -261,6 +261,16 @@ public final class MatchableResourceOuterClass {
      */
     com.google.protobuf.ByteString
         getStorageBytes();
+
+    /**
+     * <code>string ephemeral_storage = 5;</code>
+     */
+    java.lang.String getEphemeralStorage();
+    /**
+     * <code>string ephemeral_storage = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getEphemeralStorageBytes();
   }
   /**
    * <pre>
@@ -283,6 +293,7 @@ public final class MatchableResourceOuterClass {
       gpu_ = "";
       memory_ = "";
       storage_ = "";
+      ephemeralStorage_ = "";
     }
 
     @java.lang.Override
@@ -331,6 +342,12 @@ public final class MatchableResourceOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               storage_ = s;
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              ephemeralStorage_ = s;
               break;
             }
             default: {
@@ -501,6 +518,40 @@ public final class MatchableResourceOuterClass {
       }
     }
 
+    public static final int EPHEMERAL_STORAGE_FIELD_NUMBER = 5;
+    private volatile java.lang.Object ephemeralStorage_;
+    /**
+     * <code>string ephemeral_storage = 5;</code>
+     */
+    public java.lang.String getEphemeralStorage() {
+      java.lang.Object ref = ephemeralStorage_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        ephemeralStorage_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string ephemeral_storage = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getEphemeralStorageBytes() {
+      java.lang.Object ref = ephemeralStorage_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        ephemeralStorage_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -527,6 +578,9 @@ public final class MatchableResourceOuterClass {
       if (!getStorageBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, storage_);
       }
+      if (!getEphemeralStorageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, ephemeralStorage_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -547,6 +601,9 @@ public final class MatchableResourceOuterClass {
       }
       if (!getStorageBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, storage_);
+      }
+      if (!getEphemeralStorageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, ephemeralStorage_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -571,6 +628,8 @@ public final class MatchableResourceOuterClass {
           .equals(other.getMemory())) return false;
       if (!getStorage()
           .equals(other.getStorage())) return false;
+      if (!getEphemeralStorage()
+          .equals(other.getEphemeralStorage())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -590,6 +649,8 @@ public final class MatchableResourceOuterClass {
       hash = (53 * hash) + getMemory().hashCode();
       hash = (37 * hash) + STORAGE_FIELD_NUMBER;
       hash = (53 * hash) + getStorage().hashCode();
+      hash = (37 * hash) + EPHEMERAL_STORAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getEphemeralStorage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -735,6 +796,8 @@ public final class MatchableResourceOuterClass {
 
         storage_ = "";
 
+        ephemeralStorage_ = "";
+
         return this;
       }
 
@@ -765,6 +828,7 @@ public final class MatchableResourceOuterClass {
         result.gpu_ = gpu_;
         result.memory_ = memory_;
         result.storage_ = storage_;
+        result.ephemeralStorage_ = ephemeralStorage_;
         onBuilt();
         return result;
       }
@@ -827,6 +891,10 @@ public final class MatchableResourceOuterClass {
         }
         if (!other.getStorage().isEmpty()) {
           storage_ = other.storage_;
+          onChanged();
+        }
+        if (!other.getEphemeralStorage().isEmpty()) {
+          ephemeralStorage_ = other.ephemeralStorage_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -1130,6 +1198,75 @@ public final class MatchableResourceOuterClass {
   checkByteStringIsUtf8(value);
         
         storage_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object ephemeralStorage_ = "";
+      /**
+       * <code>string ephemeral_storage = 5;</code>
+       */
+      public java.lang.String getEphemeralStorage() {
+        java.lang.Object ref = ephemeralStorage_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          ephemeralStorage_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string ephemeral_storage = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getEphemeralStorageBytes() {
+        java.lang.Object ref = ephemeralStorage_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          ephemeralStorage_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string ephemeral_storage = 5;</code>
+       */
+      public Builder setEphemeralStorage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        ephemeralStorage_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ephemeral_storage = 5;</code>
+       */
+      public Builder clearEphemeralStorage() {
+        
+        ephemeralStorage_ = getDefaultInstance().getEphemeralStorage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ephemeral_storage = 5;</code>
+       */
+      public Builder setEphemeralStorageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        ephemeralStorage_ = value;
         onChanged();
         return this;
       }
@@ -11047,55 +11184,56 @@ public final class MatchableResourceOuterClass {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/matchable_resource.prot" +
       "o\022\016flyteidl.admin\032\035flyteidl/core/executi" +
-      "on.proto\"M\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001(" +
+      "on.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001(" +
       "\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storag" +
-      "e\030\004 \001(\t\"~\n\026TaskResourceAttributes\0222\n\010def" +
-      "aults\030\001 \001(\0132 .flyteidl.admin.TaskResourc" +
-      "eSpec\0220\n\006limits\030\002 \001(\0132 .flyteidl.admin.T" +
-      "askResourceSpec\"\235\001\n\031ClusterResourceAttri" +
-      "butes\022M\n\nattributes\030\001 \003(\01329.flyteidl.adm" +
-      "in.ClusterResourceAttributes.AttributesE" +
-      "ntry\0321\n\017AttributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005" +
-      "value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQueueAttribu" +
-      "tes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionClusterLab" +
-      "el\022\r\n\005value\030\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\t" +
-      "task_type\030\001 \001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027mi" +
-      "ssing_plugin_behavior\030\004 \001(\01624.flyteidl.a" +
-      "dmin.PluginOverride.MissingPluginBehavio" +
-      "r\"2\n\025MissingPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013" +
-      "USE_DEFAULT\020\001\"D\n\017PluginOverrides\0221\n\tover" +
-      "rides\030\001 \003(\0132\036.flyteidl.admin.PluginOverr" +
-      "ide\"2\n\027WorkflowExecutionConfig\022\027\n\017max_pa" +
-      "rallelism\030\001 \001(\005\"\240\004\n\022MatchingAttributes\022J" +
-      "\n\030task_resource_attributes\030\001 \001(\0132&.flyte" +
-      "idl.admin.TaskResourceAttributesH\000\022P\n\033cl" +
-      "uster_resource_attributes\030\002 \001(\0132).flytei" +
-      "dl.admin.ClusterResourceAttributesH\000\022N\n\032" +
-      "execution_queue_attributes\030\003 \001(\0132(.flyte" +
-      "idl.admin.ExecutionQueueAttributesH\000\022H\n\027" +
-      "execution_cluster_label\030\004 \001(\0132%.flyteidl" +
-      ".admin.ExecutionClusterLabelH\000\022=\n\022qualit" +
-      "y_of_service\030\005 \001(\0132\037.flyteidl.core.Quali" +
-      "tyOfServiceH\000\022;\n\020plugin_overrides\030\006 \001(\0132" +
-      "\037.flyteidl.admin.PluginOverridesH\000\022L\n\031wo" +
-      "rkflow_execution_config\030\007 \001(\0132\'.flyteidl" +
-      ".admin.WorkflowExecutionConfigH\000B\010\n\006targ" +
-      "et\"\242\001\n MatchableAttributesConfiguration\022" +
-      "6\n\nattributes\030\001 \001(\0132\".flyteidl.admin.Mat" +
-      "chingAttributes\022\016\n\006domain\030\002 \001(\t\022\017\n\007proje" +
-      "ct\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023\n\013launch_pla" +
-      "n\030\005 \001(\t\"Z\n\036ListMatchableAttributesReques" +
-      "t\0228\n\rresource_type\030\001 \001(\0162!.flyteidl.admi" +
-      "n.MatchableResource\"k\n\037ListMatchableAttr" +
-      "ibutesResponse\022H\n\016configurations\030\001 \003(\01320" +
-      ".flyteidl.admin.MatchableAttributesConfi" +
-      "guration*\310\001\n\021MatchableResource\022\021\n\rTASK_R" +
-      "ESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXECU" +
-      "TION_QUEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABEL\020" +
-      "\003\022$\n QUALITY_OF_SERVICE_SPECIFICATION\020\004\022" +
-      "\023\n\017PLUGIN_OVERRIDE\020\005\022\035\n\031WORKFLOW_EXECUTI" +
-      "ON_CONFIG\020\006B7Z5github.com/flyteorg/flyte" +
-      "idl/gen/pb-go/flyteidl/adminb\006proto3"
+      "e\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026Ta" +
+      "skResourceAttributes\0222\n\010defaults\030\001 \001(\0132 " +
+      ".flyteidl.admin.TaskResourceSpec\0220\n\006limi" +
+      "ts\030\002 \001(\0132 .flyteidl.admin.TaskResourceSp" +
+      "ec\"\235\001\n\031ClusterResourceAttributes\022M\n\nattr" +
+      "ibutes\030\001 \003(\01329.flyteidl.admin.ClusterRes" +
+      "ourceAttributes.AttributesEntry\0321\n\017Attri" +
+      "butesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
+      "8\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030\001" +
+      " \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030\001" +
+      " \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 \001" +
+      "(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin_" +
+      "behavior\030\004 \001(\01624.flyteidl.admin.PluginOv" +
+      "erride.MissingPluginBehavior\"2\n\025MissingP" +
+      "luginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020\001" +
+      "\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132\036" +
+      ".flyteidl.admin.PluginOverride\"2\n\027Workfl" +
+      "owExecutionConfig\022\027\n\017max_parallelism\030\001 \001" +
+      "(\005\"\240\004\n\022MatchingAttributes\022J\n\030task_resour" +
+      "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas" +
+      "kResourceAttributesH\000\022P\n\033cluster_resourc" +
+      "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus" +
+      "terResourceAttributesH\000\022N\n\032execution_que" +
+      "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe" +
+      "cutionQueueAttributesH\000\022H\n\027execution_clu" +
+      "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut" +
+      "ionClusterLabelH\000\022=\n\022quality_of_service\030" +
+      "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000" +
+      "\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.ad" +
+      "min.PluginOverridesH\000\022L\n\031workflow_execut" +
+      "ion_config\030\007 \001(\0132\'.flyteidl.admin.Workfl" +
+      "owExecutionConfigH\000B\010\n\006target\"\242\001\n Matcha" +
+      "bleAttributesConfiguration\0226\n\nattributes" +
+      "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut" +
+      "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w" +
+      "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li" +
+      "stMatchableAttributesRequest\0228\n\rresource" +
+      "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe" +
+      "source\"k\n\037ListMatchableAttributesRespons" +
+      "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm" +
+      "in.MatchableAttributesConfiguration*\310\001\n\021" +
+      "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020" +
+      "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022" +
+      "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_" +
+      "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE" +
+      "RRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION_CONFIG\020\006B7" +
+      "Z5github.com/flyteorg/flyteidl/gen/pb-go" +
+      "/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11115,7 +11253,7 @@ public final class MatchableResourceOuterClass {
     internal_static_flyteidl_admin_TaskResourceSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskResourceSpec_descriptor,
-        new java.lang.String[] { "Cpu", "Gpu", "Memory", "Storage", });
+        new java.lang.String[] { "Cpu", "Gpu", "Memory", "Storage", "EphemeralStorage", });
     internal_static_flyteidl_admin_TaskResourceAttributes_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_TaskResourceAttributes_fieldAccessorTable = new
