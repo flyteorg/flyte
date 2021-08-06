@@ -2675,31 +2675,63 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 
 func TestAssignResourcesIfUnset(t *testing.T) {
 	platformValues := runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
+		CPU:              "200m",
+		GPU:              "8",
+		Memory:           "200Gi",
+		EphemeralStorage: "500Mi",
 	}
-	taskResourceSpec := &admin.TaskResourceSpec{
-		Cpu:    "400m",
-		Memory: "400Gi",
-	}
-	assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
-		Project: "project",
-		Domain:  "domain",
-		Name:    "name",
-		Version: "version",
-	}, platformValues, []*core.Resources_ResourceEntry{}, taskResourceSpec)
+	t.Run("Set in task resource spec", func(t *testing.T) {
+		taskResourceSpec := &admin.TaskResourceSpec{
+			Cpu:              "400m",
+			Memory:           "400Gi",
+			EphemeralStorage: "600Mi",
+		}
+		assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+			Version: "version",
+		}, platformValues, []*core.Resources_ResourceEntry{}, taskResourceSpec)
 
-	assert.EqualValues(t, []*core.Resources_ResourceEntry{
-		{
-			Name:  core.Resources_CPU,
-			Value: taskResourceSpec.Cpu,
-		},
-		{
-			Name:  core.Resources_MEMORY,
-			Value: taskResourceSpec.Memory,
-		},
-	}, assignedResources)
+		assert.EqualValues(t, []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: taskResourceSpec.Cpu,
+			},
+			{
+				Name:  core.Resources_MEMORY,
+				Value: taskResourceSpec.Memory,
+			},
+			{
+				Name:  core.Resources_EPHEMERAL_STORAGE,
+				Value: taskResourceSpec.EphemeralStorage,
+			},
+		}, assignedResources)
+	})
+	t.Run("Unset in task resource spec", func(t *testing.T) {
+		assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+			Version: "version",
+		}, platformValues, []*core.Resources_ResourceEntry{}, &admin.TaskResourceSpec{})
+
+		assert.EqualValues(t, []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: platformValues.CPU,
+			},
+			{
+				Name:  core.Resources_MEMORY,
+				Value: platformValues.Memory,
+			},
+			{
+				Name:  core.Resources_EPHEMERAL_STORAGE,
+				Value: platformValues.EphemeralStorage,
+			},
+		}, assignedResources)
+	})
+
 }
 
 func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
@@ -2722,6 +2754,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 					Name:  core.Resources_MEMORY,
 					Value: "2",
 				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "300Mi",
+				},
 			},
 			Limits: []*core.Resources_ResourceEntry{
 				{
@@ -2731,6 +2767,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 				{
 					Name:  core.Resources_MEMORY,
 					Value: "1",
+				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "100Mi",
 				},
 			},
 		}
@@ -2745,6 +2785,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 					Name:  core.Resources_MEMORY,
 					Value: "1",
 				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "100Mi",
+				},
 			},
 			Limits: []*core.Resources_ResourceEntry{
 				{
@@ -2754,6 +2798,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 				{
 					Name:  core.Resources_MEMORY,
 					Value: "1",
+				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "100Mi",
 				},
 			},
 		}, resources))
@@ -2769,6 +2817,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 					Name:  core.Resources_MEMORY,
 					Value: "1",
 				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "100Mi",
+				},
 			},
 			Limits: []*core.Resources_ResourceEntry{
 				{
@@ -2778,6 +2830,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 				{
 					Name:  core.Resources_MEMORY,
 					Value: "1.5",
+				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "200Mi",
 				},
 			},
 		}
@@ -2792,6 +2848,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 					Name:  core.Resources_MEMORY,
 					Value: "1",
 				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "100Mi",
+				},
 			},
 			Limits: []*core.Resources_ResourceEntry{
 				{
@@ -2801,6 +2861,10 @@ func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
 				{
 					Name:  core.Resources_MEMORY,
 					Value: "1.5",
+				},
+				{
+					Name:  core.Resources_EPHEMERAL_STORAGE,
+					Value: "200Mi",
 				},
 			},
 		}, resources))
@@ -2833,14 +2897,16 @@ func TestSetDefaults(t *testing.T) {
 
 	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
 	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
+		CPU:              "200m",
+		GPU:              "8",
+		Memory:           "200Gi",
+		EphemeralStorage: "500Mi",
 	}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU:    "300m",
-		GPU:    "8",
-		Memory: "500Gi",
+		CPU:              "300m",
+		GPU:              "8",
+		Memory:           "500Gi",
+		EphemeralStorage: "501Mi",
 	}
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
@@ -2859,6 +2925,10 @@ func TestSetDefaults(t *testing.T) {
 						Name:  core.Resources_MEMORY,
 						Value: "200Gi",
 					},
+					{
+						Name:  core.Resources_EPHEMERAL_STORAGE,
+						Value: "500Mi",
+					},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{
@@ -2868,6 +2938,10 @@ func TestSetDefaults(t *testing.T) {
 					{
 						Name:  core.Resources_MEMORY,
 						Value: "500Gi",
+					},
+					{
+						Name:  core.Resources_EPHEMERAL_STORAGE,
+						Value: "501Mi",
 					},
 				},
 			},
