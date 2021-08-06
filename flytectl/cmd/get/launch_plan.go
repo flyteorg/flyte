@@ -128,11 +128,13 @@ func LaunchplanToTableProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.LaunchPlan)
-		if m.Closure.ExpectedInputs != nil {
-			printer.FormatParameterDescriptions(m.Closure.ExpectedInputs.Parameters)
-		}
-		if m.Closure.ExpectedOutputs != nil {
-			printer.FormatVariableDescriptions(m.Closure.ExpectedOutputs.Variables)
+		if m.Closure != nil {
+			if m.Closure.ExpectedInputs != nil {
+				printer.FormatParameterDescriptions(m.Closure.ExpectedInputs.Parameters)
+			}
+			if m.Closure.ExpectedOutputs != nil {
+				printer.FormatVariableDescriptions(m.Closure.ExpectedOutputs.Variables)
+			}
 		}
 		messages = append(messages, m)
 	}
