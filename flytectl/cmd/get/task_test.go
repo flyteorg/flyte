@@ -174,6 +174,7 @@ func getTaskSetup() {
 	taskConfig.DefaultConfig.Latest = false
 	taskConfig.DefaultConfig.ExecFile = ""
 	taskConfig.DefaultConfig.Version = ""
+	taskConfig.DefaultConfig.Filter = filters.DefaultFilter
 }
 
 func TestGetTaskFuncWithError(t *testing.T) {
@@ -238,6 +239,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 func TestGetTaskFunc(t *testing.T) {
 	setup()
 	getTaskSetup()
+	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
@@ -320,6 +322,7 @@ func TestGetTaskFunc(t *testing.T) {
 func TestGetTaskTableFunc(t *testing.T) {
 	setup()
 	getTaskSetup()
+	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	config.GetConfig().Output = "table"
@@ -342,6 +345,7 @@ func TestGetTaskTableFunc(t *testing.T) {
 func TestGetTaskFuncLatest(t *testing.T) {
 	setup()
 	getTaskSetup()
+	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
@@ -389,6 +393,7 @@ func TestGetTaskFuncLatest(t *testing.T) {
 func TestGetTaskWithVersion(t *testing.T) {
 	setup()
 	getTaskSetup()
+	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
@@ -437,6 +442,7 @@ func TestGetTaskWithVersion(t *testing.T) {
 func TestGetTasks(t *testing.T) {
 	setup()
 	getTaskSetup()
+	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
