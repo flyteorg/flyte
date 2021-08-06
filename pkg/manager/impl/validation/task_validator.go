@@ -111,6 +111,10 @@ func taskResourceSetToMap(
 		gpuQuantity := resource.MustParse(resourceSet.GPU)
 		resourceMap[core.Resources_GPU] = &gpuQuantity
 	}
+	if resourceSet.EphemeralStorage != "" {
+		ephemeralStorageQuantity := resource.MustParse(resourceSet.EphemeralStorage)
+		resourceMap[core.Resources_EPHEMERAL_STORAGE] = &ephemeralStorageQuantity
+	}
 	return resourceMap
 }
 
@@ -158,6 +162,11 @@ func requestedResourcesToQuantity(
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"gpu for [%+v] must be a whole number, got: %s instead", identifier, limitEntry.Value)
 			}
+		case core.Resources_EPHEMERAL_STORAGE:
+			err := addResourceEntryToMap(identifier, limitEntry, &requestedToQuantity)
+			if err != nil {
+				return nil, err
+			}
 		default:
 			continue
 		}
@@ -183,6 +192,8 @@ func validateTaskResources(
 	for resourceName, defaultQuantity := range requestedResourceDefaults {
 		switch resourceName {
 		case core.Resources_CPU:
+			fallthrough
+		case core.Resources_EPHEMERAL_STORAGE:
 			fallthrough
 		case core.Resources_MEMORY:
 			limitQuantity, ok := requestedResourceLimits[resourceName]

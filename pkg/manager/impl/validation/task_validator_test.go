@@ -174,15 +174,17 @@ func TestValidateTaskTypeWhitelist(t *testing.T) {
 
 func TestTaskResourceSetToMap(t *testing.T) {
 	resourceSet := runtimeInterfaces.TaskResourceSet{
-		CPU:    "100Mi",
-		GPU:    "2",
-		Memory: "1.5Gi",
+		CPU:              "100Mi",
+		GPU:              "2",
+		Memory:           "1.5Gi",
+		EphemeralStorage: "500Mi",
 	}
 	resourceSetMap := taskResourceSetToMap(resourceSet)
-	assert.Len(t, resourceSetMap, 3)
+	assert.Len(t, resourceSetMap, 4)
 	assert.Equal(t, resourceSetMap[core.Resources_CPU].Value(), int64(104857600))
 	assert.Equal(t, resourceSetMap[core.Resources_GPU].Value(), int64(2))
 	assert.Equal(t, resourceSetMap[core.Resources_MEMORY].Value(), int64(1610612736))
+	assert.Equal(t, resourceSetMap[core.Resources_EPHEMERAL_STORAGE].Value(), int64(524288000))
 }
 
 func TestAddResourceEntryToMap(t *testing.T) {
@@ -263,6 +265,10 @@ func TestValidateTaskResources(t *testing.T) {
 			Name:  core.Resources_GPU,
 			Value: "2",
 		},
+		{
+			Name:  core.Resources_EPHEMERAL_STORAGE,
+			Value: "500Mi",
+		},
 	}
 
 	requestedTaskResourceLimits := []*core.Resources_ResourceEntry{
@@ -273,6 +279,10 @@ func TestValidateTaskResources(t *testing.T) {
 		{
 			Name:  core.Resources_GPU,
 			Value: "2",
+		},
+		{
+			Name:  core.Resources_EPHEMERAL_STORAGE,
+			Value: "501Mi",
 		},
 	}
 	assert.Nil(t, validateTaskResources(&core.Identifier{}, runtimeInterfaces.TaskResourceSet{},
