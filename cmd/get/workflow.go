@@ -104,11 +104,19 @@ func WorkflowToTableProtoMessages(l []*admin.Workflow) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.Workflow)
-		if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil {
-			printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables)
-		}
-		if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil {
-			printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables)
+		if m.Closure != nil && m.Closure.CompiledWorkflow != nil {
+			if m.Closure.CompiledWorkflow.Primary != nil {
+				if m.Closure.CompiledWorkflow.Primary.Template != nil {
+					if m.Closure.CompiledWorkflow.Primary.Template.Interface != nil {
+						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil {
+							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables)
+						}
+						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil {
+							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables)
+						}
+					}
+				}
+			}
 		}
 		messages = append(messages, m)
 	}

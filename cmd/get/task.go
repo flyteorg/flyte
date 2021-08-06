@@ -116,11 +116,17 @@ func TaskToTableProtoMessages(l []*admin.Task) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.Task)
-		if m.Closure.CompiledTask.Template.Interface.Inputs != nil {
-			printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Inputs.Variables)
-		}
-		if m.Closure.CompiledTask.Template.Interface.Outputs != nil {
-			printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Outputs.Variables)
+		if m.Closure != nil && m.Closure.CompiledTask != nil {
+			if m.Closure.CompiledTask.Template != nil {
+				if m.Closure.CompiledTask.Template.Interface != nil {
+					if m.Closure.CompiledTask.Template.Interface.Inputs != nil {
+						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Inputs.Variables)
+					}
+					if m.Closure.CompiledTask.Template.Interface.Outputs != nil {
+						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Outputs.Variables)
+					}
+				}
+			}
 		}
 		messages = append(messages, m)
 	}
