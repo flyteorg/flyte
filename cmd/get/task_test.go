@@ -319,7 +319,7 @@ func TestGetTaskFunc(t *testing.T) {
 ]`)
 }
 
-func TestGetTaskTableFunc(t *testing.T) {
+func TestGetTaskFuncWithTable(t *testing.T) {
 	setup()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}

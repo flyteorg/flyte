@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/printer"
+
 	"github.com/flyteorg/flytectl/pkg/filters"
 
 	"github.com/flyteorg/flytectl/cmd/config"
@@ -731,7 +733,7 @@ func TestGetLaunchPlanTableFunc(t *testing.T) {
 	mockClient.OnListLaunchPlansMatch(ctx, resourceGetRequest).Return(launchPlanListResponse, nil)
 	mockClient.OnGetLaunchPlanMatch(ctx, objectGetRequest).Return(launchPlan2, nil)
 	mockClient.OnListLaunchPlanIdsMatch(ctx, namedIDRequest).Return(namedIdentifierList, nil)
-	config.GetConfig().Output = "table"
+	config.GetConfig().Output = printer.OutputFormatTABLE.String()
 	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "ListLaunchPlans", ctx, resourceGetRequest)
