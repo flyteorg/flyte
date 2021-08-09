@@ -92,6 +92,12 @@ var workflowColumns = []printer.Column{
 	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 
+var listWorkflowColumns = []printer.Column{
+	{Header: "Version", JSONPath: "$.id.version"},
+	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Created At", JSONPath: "$.closure.createdAt"},
+}
+
 func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
@@ -129,14 +135,19 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 	var err error
 	if len(args) > 0 {
 		name := args[0]
-		if workflows, err = FetchWorkflowForName(ctx, cmdCtx.AdminFetcherExt(), name, config.GetConfig().Project, config.GetConfig().Domain); err != nil {
+		var isList bool
+		if workflows, isList, err = FetchWorkflowForName(ctx, cmdCtx.AdminFetcherExt(), name, config.GetConfig().Project, config.GetConfig().Domain); err != nil {
 			return err
+		}
+		columns := workflowColumns
+		if isList {
+			columns = listWorkflowColumns
 		}
 		logger.Debugf(ctx, "Retrieved %v workflow", len(workflows))
 		if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
-			return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToTableProtoMessages(workflows)...)
+			return adminPrinter.Print(config.GetConfig().MustOutputFormat(), columns, WorkflowToTableProtoMessages(workflows)...)
 		}
-		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows)...)
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), columns, WorkflowToProtoMessages(workflows)...)
 	}
 
 	workflows, err = cmdCtx.AdminFetcherExt().FetchAllVerOfWorkflow(ctx, "", config.GetConfig().Project, config.GetConfig().Domain, workflowconfig.DefaultConfig.Filter)
@@ -146,32 +157,31 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 
 	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
 	if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
-		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToTableProtoMessages(workflows)...)
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), listWorkflowColumns, WorkflowToTableProtoMessages(workflows)...)
 	}
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows)...)
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), listWorkflowColumns, WorkflowToProtoMessages(workflows)...)
 }
 
 // FetchWorkflowForName fetches the workflow give it name.
 func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface, name, project,
-	domain string) ([]*admin.Workflow, error) {
-	var workflows []*admin.Workflow
+	domain string) (workflows []*admin.Workflow, isList bool, err error) {
 	var workflow *admin.Workflow
-	var err error
 	if workflowconfig.DefaultConfig.Latest {
 		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain, workflowconfig.DefaultConfig.Filter); err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		workflows = append(workflows, workflow)
 	} else if workflowconfig.DefaultConfig.Version != "" {
 		if workflow, err = fetcher.FetchWorkflowVersion(ctx, name, workflowconfig.DefaultConfig.Version, project, domain); err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		workflows = append(workflows, workflow)
 	} else {
 		workflows, err = fetcher.FetchAllVerOfWorkflow(ctx, name, project, domain, workflowconfig.DefaultConfig.Filter)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
+		isList = true
 	}
-	return workflows, nil
+	return workflows, isList, nil
 }
