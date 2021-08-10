@@ -57,6 +57,10 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 			if !v.IsZero() {
 				k8sResources[ResourceNvidiaGPU] = v
 			}
+		case core.Resources_EPHEMERAL_STORAGE:
+			if !v.IsZero() {
+				k8sResources[v1.ResourceEphemeralStorage] = v
+			}
 		}
 	}
 	return k8sResources, nil

@@ -37,6 +37,7 @@ func TestToK8sResourceList(t *testing.T) {
 			{Name: core.Resources_GPU, Value: "1"},
 			{Name: core.Resources_MEMORY, Value: "1024Mi"},
 			{Name: core.Resources_STORAGE, Value: "1024Mi"},
+			{Name: core.Resources_EPHEMERAL_STORAGE, Value: "1024Mi"},
 		})
 
 		assert.NoError(t, err)
@@ -46,6 +47,7 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.Equal(t, resource.MustParse("1"), r[ResourceNvidiaGPU])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceMemory])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceStorage])
+		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
 	}
 	{
 		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{})
