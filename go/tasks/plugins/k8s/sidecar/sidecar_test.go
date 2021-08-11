@@ -35,8 +35,8 @@ const ResourceNvidiaGPU = "nvidia.com/gpu"
 
 var resourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
-		v1.ResourceCPU:     resource.MustParse("1024m"),
-		v1.ResourceStorage: resource.MustParse("100M"),
+		v1.ResourceCPU:              resource.MustParse("2048m"),
+		v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 	},
 }
 
@@ -243,6 +243,17 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 	checkUserTolerations(t, res)
 
+	// Assert resource requirements are correctly set
+	expectedCPURequest := resource.MustParse("1")
+	assert.Equal(t, expectedCPURequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Cpu().Value())
+	expectedMemRequest := resource.MustParse("100Mi")
+	assert.Equal(t, expectedMemRequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Memory().Value())
+	expectedCPULimit := resource.MustParse("2048m")
+	assert.Equal(t, expectedCPULimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Cpu().Value())
+	expectedMemLimit := resource.MustParse("200Mi")
+	assert.Equal(t, expectedMemLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Memory().Value())
+	expectedEphemeralStorageLimit := resource.MustParse("100M")
+	assert.Equal(t, expectedEphemeralStorageLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.StorageEphemeral().Value())
 }
 
 func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
@@ -330,6 +341,18 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
 	checkUserTolerations(t, res)
+
+	// Assert resource requirements are correctly set
+	expectedCPURequest := resource.MustParse("1")
+	assert.Equal(t, expectedCPURequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Cpu().Value())
+	expectedMemRequest := resource.MustParse("100Mi")
+	assert.Equal(t, expectedMemRequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Memory().Value())
+	expectedCPULimit := resource.MustParse("2048m")
+	assert.Equal(t, expectedCPULimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Cpu().Value())
+	expectedMemLimit := resource.MustParse("200Mi")
+	assert.Equal(t, expectedMemLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Memory().Value())
+	expectedEphemeralStorageLimit := resource.MustParse("100M")
+	assert.Equal(t, expectedEphemeralStorageLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.StorageEphemeral().Value())
 }
 
 func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
@@ -453,6 +476,18 @@ func TestBuildSidecarResource(t *testing.T) {
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}
+
+	// Assert resource requirements are correctly set
+	expectedCPURequest := resource.MustParse("1024m")
+	assert.Equal(t, expectedCPURequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Cpu().Value())
+	expectedMemRequest := resource.MustParse("1024Mi")
+	assert.Equal(t, expectedMemRequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Memory().Value())
+	expectedCPULimit := resource.MustParse("2048m")
+	assert.Equal(t, expectedCPULimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Cpu().Value())
+	expectedMemLimit := resource.MustParse("1024Mi")
+	assert.Equal(t, expectedMemLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Memory().Value())
+	expectedEphemeralStorageLimit := resource.MustParse("100M")
+	assert.Equal(t, expectedEphemeralStorageLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.StorageEphemeral().Value())
 }
 
 func TestBuildSidecarReosurceMissingAnnotationsAndLabels(t *testing.T) {

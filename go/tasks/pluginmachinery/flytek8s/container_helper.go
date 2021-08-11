@@ -22,6 +22,23 @@ const resourceGPU = "gpu"
 // Copied from: k8s.io/autoscaler/cluster-autoscaler/utils/gpu/gpu.go
 const ResourceNvidiaGPU = "nvidia.com/gpu"
 
+func MergeResources(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
+	if out.Limits == nil {
+		out.Limits = in.Limits
+	} else if in.Limits != nil {
+		for key, val := range in.Limits {
+			out.Limits[key] = val
+		}
+	}
+	if out.Requests == nil {
+		out.Requests = in.Requests
+	} else if in.Requests != nil {
+		for key, val := range in.Requests {
+			out.Requests[key] = val
+		}
+	}
+}
+
 func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequirements) *v1.ResourceRequirements {
 	// set memory and cpu to default if not provided by user.
 	if len(resources.Requests) == 0 {
