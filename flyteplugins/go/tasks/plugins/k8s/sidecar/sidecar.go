@@ -39,6 +39,11 @@ func validateAndFinalizePod(
 	for index, container := range pod.Spec.Containers {
 		if container.Name == primaryContainerName {
 			hasPrimaryContainer = true
+			container.Resources = *flytek8s.ApplyResourceOverrides(ctx, container.Resources)
+			if taskCtx.TaskExecutionMetadata().GetOverrides() != nil && taskCtx.TaskExecutionMetadata().GetOverrides().GetResources() != nil {
+				resOverrides := taskCtx.TaskExecutionMetadata().GetOverrides().GetResources()
+				flytek8s.MergeResources(*resOverrides, &container.Resources)
+			}
 		}
 		modifiedCommand, err := template.Render(ctx, container.Command, template.Parameters{
 			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
@@ -62,8 +67,7 @@ func validateAndFinalizePod(
 		}
 		container.Args = modifiedArgs
 		container.Env = flytek8s.DecorateEnvVars(ctx, container.Env, taskCtx.TaskExecutionMetadata().GetTaskExecutionID())
-		resources := flytek8s.ApplyResourceOverrides(ctx, container.Resources)
-		resReqs = append(resReqs, *resources)
+		resReqs = append(resReqs, container.Resources)
 		finalizedContainers[index] = container
 	}
 	if !hasPrimaryContainer {

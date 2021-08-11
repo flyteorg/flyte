@@ -156,3 +156,84 @@ func TestApplyResourceOverrides_OverrideGpu(t *testing.T) {
 	})
 	assert.EqualValues(t, gpuRequest, overrides.Limits[ResourceNvidiaGPU])
 }
+
+func TestMergeResources_EmptyIn(t *testing.T) {
+	requestedResourceQuantity := resource.MustParse("1")
+	expectedResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceMemory:           requestedResourceQuantity,
+			v1.ResourceCPU:              requestedResourceQuantity,
+			v1.ResourceEphemeralStorage: requestedResourceQuantity,
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceStorage:          requestedResourceQuantity,
+			v1.ResourceMemory:           requestedResourceQuantity,
+			v1.ResourceEphemeralStorage: requestedResourceQuantity,
+		},
+	}
+	outResources := expectedResources.DeepCopy()
+	MergeResources(v1.ResourceRequirements{}, outResources)
+	assert.EqualValues(t, *outResources, expectedResources)
+}
+
+func TestMergeResources_EmptyOut(t *testing.T) {
+	requestedResourceQuantity := resource.MustParse("1")
+	expectedResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceMemory:           requestedResourceQuantity,
+			v1.ResourceCPU:              requestedResourceQuantity,
+			v1.ResourceEphemeralStorage: requestedResourceQuantity,
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceStorage:          requestedResourceQuantity,
+			v1.ResourceMemory:           requestedResourceQuantity,
+			v1.ResourceEphemeralStorage: requestedResourceQuantity,
+		},
+	}
+	outResources := v1.ResourceRequirements{}
+	MergeResources(expectedResources, &outResources)
+	assert.EqualValues(t, outResources, expectedResources)
+}
+
+func TestMergeResources_PartialRequirements(t *testing.T) {
+	requestedResourceQuantity := resource.MustParse("1")
+	resourceList := v1.ResourceList{
+		v1.ResourceMemory:           requestedResourceQuantity,
+		v1.ResourceCPU:              requestedResourceQuantity,
+		v1.ResourceEphemeralStorage: requestedResourceQuantity,
+	}
+	inResources := v1.ResourceRequirements{Requests: resourceList}
+	outResources := v1.ResourceRequirements{Limits: resourceList}
+	MergeResources(inResources, &outResources)
+	assert.EqualValues(t, outResources, v1.ResourceRequirements{
+		Requests: resourceList,
+		Limits:   resourceList,
+	})
+}
+
+func TestMergeResources_PartialResourceKeys(t *testing.T) {
+	requestedResourceQuantity := resource.MustParse("1")
+	resourceList1 := v1.ResourceList{
+		v1.ResourceMemory:           requestedResourceQuantity,
+		v1.ResourceEphemeralStorage: requestedResourceQuantity,
+	}
+	resourceList2 := v1.ResourceList{v1.ResourceCPU: requestedResourceQuantity}
+	expectedResourceList := v1.ResourceList{
+		v1.ResourceCPU:              requestedResourceQuantity,
+		v1.ResourceMemory:           requestedResourceQuantity,
+		v1.ResourceEphemeralStorage: requestedResourceQuantity,
+	}
+	inResources := v1.ResourceRequirements{
+		Requests: resourceList1,
+		Limits:   resourceList2,
+	}
+	outResources := v1.ResourceRequirements{
+		Requests: resourceList2,
+		Limits:   resourceList1,
+	}
+	MergeResources(inResources, &outResources)
+	assert.EqualValues(t, outResources, v1.ResourceRequirements{
+		Requests: expectedResourceList,
+		Limits:   expectedResourceList,
+	})
+}
