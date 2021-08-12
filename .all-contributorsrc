@@ -187,6 +187,16 @@
         "code",
         "plugin"
       ]
+    },
+    {
+      "login": "sbrunk",
+      "name": "Sören Brunk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3939659?v=4",
+      "profile": "https://brunk.io/",
+      "contributions": [
+        "code",
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7
