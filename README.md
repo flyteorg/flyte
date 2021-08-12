@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -261,7 +261,7 @@ Here are some resources to help you learn more about Flyte.
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
 
-## Contributors ✨
+## Contributors 💞
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
@@ -273,6 +273,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://allasamhita.io/"><img src="https://avatars.githubusercontent.com/u/27777173?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Samhita Alla</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Documentation">📖</a> <a href="#tutorial-samhita-alla" title="Tutorials">✅</a> <a href="#blog-samhita-alla" title="Blogposts">📝</a> <a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Code">💻</a> <a href="#plugin-samhita-alla" title="Plugin/utility libraries">🔌</a></td>
     <td align="center"><a href="https://github.com/kumare3"><img src="https://avatars.githubusercontent.com/u/16888709?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Ketan Umare</b></sub></a><br /><a href="#maintenance-kumare3" title="Maintenance">🚧</a> <a href="#ideas-kumare3" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-kumare3" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-kumare3" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/flyteorg/flyte/commits?author=kumare3" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Akumare3" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/EngHabu"><img src="https://avatars.githubusercontent.com/u/27159?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Haytham Abuelfutuh</b></sub></a><br /><a href="#maintenance-EngHabu" title="Maintenance">🚧</a> <a href="#ideas-EngHabu" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-EngHabu" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-EngHabu" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/flyteorg/flyte/commits?author=EngHabu" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3AEngHabu" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/katrogan"><img src="https://avatars.githubusercontent.com/u/953358?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Katrina Rogan</b></sub></a><br /><a href="#maintenance-katrogan" title="Maintenance">🚧</a> <a href="#ideas-katrogan" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-katrogan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/flyteorg/flyte/commits?author=katrogan" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Akatrogan" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 

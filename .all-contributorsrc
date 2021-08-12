@@ -50,6 +50,19 @@
         "code",
         "review"
       ]
+    },
+    {
+      "login": "katrogan",
+      "name": "Katrina Rogan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/953358?v=4",
+      "profile": "https://github.com/katrogan",
+      "contributions": [
+        "maintenance",
+        "ideas",
+        "infra",
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7
