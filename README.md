@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-30-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -307,6 +307,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/matthewphsmith"><img src="https://avatars.githubusercontent.com/u/7597118?v=4?s=50" width="50px;" alt=""/><br /><sub><b>matthewphsmith</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=matthewphsmith" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Amatthewphsmith" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="http://slai.github.io/"><img src="https://avatars.githubusercontent.com/u/70988?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Sam Lai</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/issues?q=author%3Aslai" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

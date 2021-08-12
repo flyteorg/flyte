@@ -324,6 +324,15 @@
         "code",
         "review"
       ]
+    },
+    {
+      "login": "slai",
+      "name": "Sam Lai",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70988?v=4",
+      "profile": "http://slai.github.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
