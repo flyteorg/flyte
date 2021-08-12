@@ -314,6 +314,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "matthewphsmith",
+      "name": "matthewphsmith",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7597118?v=4",
+      "profile": "https://github.com/matthewphsmith",
+      "contributions": [
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7

@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -304,6 +304,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/varshaparthay"><img src="https://avatars.githubusercontent.com/u/57967031?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Varsha Parthasarathy</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=varshaparthay" title="Code">💻</a></td>
     <td align="center"><a href="https://medium.com/@lu4nm3"><img src="https://avatars.githubusercontent.com/u/3936213?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Luis Medina</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=lu4nm3" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/RubenBarragan"><img src="https://avatars.githubusercontent.com/u/4308533?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Rubén Barragán</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=RubenBarragan" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/matthewphsmith"><img src="https://avatars.githubusercontent.com/u/7597118?v=4?s=50" width="50px;" alt=""/><br /><sub><b>matthewphsmith</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=matthewphsmith" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Amatthewphsmith" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 
