@@ -16,7 +16,11 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/27777173?v=4",
       "profile": "https://allasamhita.io/",
       "contributions": [
-        "doc"
+        "doc",
+        "tutorial",
+        "blog",
+        "code",
+        "plugin"
       ]
     }
   ],

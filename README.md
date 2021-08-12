@@ -1,7 +1,4 @@
 <html>
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center"> 
   <img src="rsts/images/flyte-and-lf.png" alt="Flyte and LF AI & Data Logo" width="300">
 </p>
@@ -42,6 +39,9 @@
   <a href="https://forms.gle/UVuek9WfBoweiqcJA">
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
+  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
 <h3 align="center">
@@ -270,7 +270,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://allasamhita.io/"><img src="https://avatars.githubusercontent.com/u/27777173?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Samhita Alla</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://allasamhita.io/"><img src="https://avatars.githubusercontent.com/u/27777173?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Samhita Alla</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Documentation">📖</a> <a href="#tutorial-samhita-alla" title="Tutorials">✅</a> <a href="#blog-samhita-alla" title="Blogposts">📝</a> <a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Code">💻</a> <a href="#plugin-samhita-alla" title="Plugin/utility libraries">🔌</a></td>
   </tr>
 </table>
 
