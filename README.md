@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -299,6 +299,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/bnsblue"><img src="https://avatars.githubusercontent.com/u/1518524?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Chang-Hong Hsu</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=bnsblue" title="Code">💻</a> <a href="#plugin-bnsblue" title="Plugin/utility libraries">🔌</a></td>
     <td align="center"><a href="https://github.com/narape"><img src="https://avatars.githubusercontent.com/u/7515359?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Nelson Arapé</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=narape" title="Code">💻</a> <a href="#plugin-narape" title="Plugin/utility libraries">🔌</a> <a href="#maintenance-narape" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/kanterov"><img src="https://avatars.githubusercontent.com/u/467927?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Gleb Kanterov</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=kanterov" title="Code">💻</a> <a href="#plugin-kanterov" title="Plugin/utility libraries">🔌</a> <a href="#maintenance-kanterov" title="Maintenance">🚧</a> <a href="#ideas-kanterov" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-kanterov" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 

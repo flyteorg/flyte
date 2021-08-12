@@ -263,6 +263,19 @@
         "plugin",
         "maintenance"
       ]
+    },
+    {
+      "login": "kanterov",
+      "name": "Gleb Kanterov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/467927?v=4",
+      "profile": "https://github.com/kanterov",
+      "contributions": [
+        "code",
+        "plugin",
+        "maintenance",
+        "ideas",
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7
