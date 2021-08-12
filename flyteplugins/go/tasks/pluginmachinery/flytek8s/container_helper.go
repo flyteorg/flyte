@@ -60,7 +60,7 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 
 	if _, found := resources.Requests[v1.ResourceMemory]; !found {
 		// use memory limit if set else default to config
-		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
+		if _, limitSet := resources.Limits[v1.ResourceMemory]; limitSet {
 			resources.Requests[v1.ResourceMemory] = resources.Limits[v1.ResourceMemory]
 		} else {
 			resources.Requests[v1.ResourceMemory] = resource.MustParse(config.GetK8sPluginConfig().DefaultMemoryRequest)

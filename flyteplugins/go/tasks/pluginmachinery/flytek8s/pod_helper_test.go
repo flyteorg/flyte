@@ -197,8 +197,10 @@ func TestToK8sPod(t *testing.T) {
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
-		}}),
-	)
+		},
+		DefaultCPURequest:    "1024m",
+		DefaultMemoryRequest: "1024Mi",
+	}))
 
 	op := &pluginsIOMock.OutputFilePaths{}
 	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))
@@ -262,7 +264,9 @@ func TestToK8sPod(t *testing.T) {
 			DefaultNodeSelector: map[string]string{
 				"nodeId": "123",
 			},
-			SchedulerName: "myScheduler",
+			SchedulerName:        "myScheduler",
+			DefaultCPURequest:    "1024m",
+			DefaultMemoryRequest: "1024Mi",
 		}))
 
 		p, err := ToK8sPodSpec(ctx, x)

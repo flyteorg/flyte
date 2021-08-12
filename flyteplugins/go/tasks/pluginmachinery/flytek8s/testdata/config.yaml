@@ -6,6 +6,8 @@ plugins:
   # All k8s plugins default configuration
   k8s:
     scheduler-name: flyte-scheduler
+    default-cpus: 1024m
+    default-memory: 1024Mi
     default-annotations:
       - annotationKey1: annotationValue1
       - annotationKey2: annotationValue2
