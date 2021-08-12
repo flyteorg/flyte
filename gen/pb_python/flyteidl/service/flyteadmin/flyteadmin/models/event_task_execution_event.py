@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
@@ -49,6 +50,7 @@ class EventTaskExecutionEvent(object):
         'input_uri': 'str',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
+        'output_data': 'CoreLiteralMap',
         'custom_info': 'ProtobufStruct',
         'phase_version': 'int',
         'reason': 'str',
@@ -67,6 +69,7 @@ class EventTaskExecutionEvent(object):
         'input_uri': 'input_uri',
         'output_uri': 'output_uri',
         'error': 'error',
+        'output_data': 'output_data',
         'custom_info': 'custom_info',
         'phase_version': 'phase_version',
         'reason': 'reason',
@@ -74,7 +77,7 @@ class EventTaskExecutionEvent(object):
         'metadata': 'metadata'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -87,6 +90,7 @@ class EventTaskExecutionEvent(object):
         self._input_uri = None
         self._output_uri = None
         self._error = None
+        self._output_data = None
         self._custom_info = None
         self._phase_version = None
         self._reason = None
@@ -114,6 +118,8 @@ class EventTaskExecutionEvent(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if output_data is not None:
+            self.output_data = output_data
         if custom_info is not None:
             self.custom_info = custom_info
         if phase_version is not None:
@@ -342,6 +348,29 @@ class EventTaskExecutionEvent(object):
         """
 
         self._error = error
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this EventTaskExecutionEvent.  # noqa: E501
+
+        Raw output metadata produced by this task execution.  # noqa: E501
+
+        :return: The output_data of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this EventTaskExecutionEvent.
+
+        Raw output metadata produced by this task execution.  # noqa: E501
+
+        :param output_data: The output_data of this EventTaskExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     @property
     def custom_info(self):

@@ -6160,6 +6160,10 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this node execution."
+        },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
         },
@@ -6267,6 +6271,10 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this task execution."
+        },
         "custom_info": {
           "$ref": "#/definitions/protobufStruct",
           "description": "Custom data that the task plugin sends back. This is extensible to allow various plugins in the system."
@@ -6348,6 +6356,10 @@
         "error": {
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this workflow execution."
         }
       }
     },
