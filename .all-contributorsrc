@@ -361,6 +361,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "chanadian",
+      "name": "Andrew Chan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4967458?v=4",
+      "profile": "https://github.com/chanadian",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7

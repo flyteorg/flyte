@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -311,6 +311,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://medium.com/@derwiki"><img src="https://avatars.githubusercontent.com/u/155087?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Adam Derewecki</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=derwiki" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/tnsetting"><img src="https://avatars.githubusercontent.com/u/38207208?v=4?s=50" width="50px;" alt=""/><br /><sub><b>tnsetting</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=tnsetting" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/issues?q=author%3Atnsetting" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/jbrambleDC"><img src="https://avatars.githubusercontent.com/u/6984748?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Jordan Bramble</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=jbrambleDC" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/chanadian"><img src="https://avatars.githubusercontent.com/u/4967458?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Andrew Chan</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/issues?q=author%3Achanadian" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
