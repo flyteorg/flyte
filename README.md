@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -271,6 +271,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://allasamhita.io/"><img src="https://avatars.githubusercontent.com/u/27777173?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Samhita Alla</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Documentation">📖</a> <a href="#tutorial-samhita-alla" title="Tutorials">✅</a> <a href="#blog-samhita-alla" title="Blogposts">📝</a> <a href="https://github.com/flyteorg/flyte/commits?author=samhita-alla" title="Code">💻</a> <a href="#plugin-samhita-alla" title="Plugin/utility libraries">🔌</a></td>
+    <td align="center"><a href="https://github.com/kumare3"><img src="https://avatars.githubusercontent.com/u/16888709?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Ketan Umare</b></sub></a><br /><a href="#maintenance-kumare3" title="Maintenance">🚧</a> <a href="#ideas-kumare3" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-kumare3" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-kumare3" title="Mentoring">🧑‍🏫</a></td>
   </tr>
 </table>
 

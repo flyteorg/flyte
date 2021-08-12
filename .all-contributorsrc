@@ -22,6 +22,18 @@
         "code",
         "plugin"
       ]
+    },
+    {
+      "login": "kumare3",
+      "name": "Ketan Umare",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16888709?v=4",
+      "profile": "https://github.com/kumare3",
+      "contributions": [
+        "maintenance",
+        "ideas",
+        "infra",
+        "mentoring"
+      ]
     }
   ],
   "contributorsPerLine": 7
