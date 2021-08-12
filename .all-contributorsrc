@@ -252,6 +252,16 @@
         "code",
         "plugin"
       ]
+    },
+    {
+      "login": "narape",
+      "name": "Nelson Arapé",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7515359?v=4",
+      "profile": "https://github.com/narape",
+      "contributions": [
+        "code",
+        "plugin"
+      ]
     }
   ],
   "contributorsPerLine": 7

@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -298,6 +298,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/bnsblue"><img src="https://avatars.githubusercontent.com/u/1518524?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Chang-Hong Hsu</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=bnsblue" title="Code">💻</a> <a href="#plugin-bnsblue" title="Plugin/utility libraries">🔌</a></td>
+    <td align="center"><a href="https://github.com/narape"><img src="https://avatars.githubusercontent.com/u/7515359?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Nelson Arapé</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=narape" title="Code">💻</a> <a href="#plugin-narape" title="Plugin/utility libraries">🔌</a></td>
   </tr>
 </table>
 
