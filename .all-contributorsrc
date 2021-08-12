@@ -352,6 +352,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "jbrambleDC",
+      "name": "Jordan Bramble",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6984748?v=4",
+      "profile": "https://github.com/jbrambleDC",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
