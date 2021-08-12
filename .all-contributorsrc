@@ -111,6 +111,16 @@
         "test",
         "userTesting"
       ]
+    },
+    {
+      "login": "honnix",
+      "name": "Honnix",
+      "avatar_url": "https://avatars.githubusercontent.com/u/158892?v=4",
+      "profile": "https://honnix.com/",
+      "contributions": [
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7
