@@ -133,6 +133,16 @@
         "ideas",
         "bug"
       ]
+    },
+    {
+      "login": "georgesnelling",
+      "name": "George Snelling",
+      "avatar_url": "https://avatars.githubusercontent.com/u/405480?v=4",
+      "profile": "https://georgesnelling.com/",
+      "contributions": [
+        "business",
+        "eventOrganizing"
+      ]
     }
   ],
   "contributorsPerLine": 7
