@@ -143,6 +143,18 @@
         "business",
         "eventOrganizing"
       ]
+    },
+    {
+      "login": "pmahindrakar-oss",
+      "name": "pmahindrakar-oss",
+      "avatar_url": "https://avatars.githubusercontent.com/u/77798312?v=4",
+      "profile": "https://github.com/pmahindrakar-oss",
+      "contributions": [
+        "code",
+        "doc",
+        "infra",
+        "tool"
+      ]
     }
   ],
   "contributorsPerLine": 7
