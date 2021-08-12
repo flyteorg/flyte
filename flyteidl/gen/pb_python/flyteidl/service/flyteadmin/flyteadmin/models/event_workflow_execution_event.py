@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
 
@@ -40,7 +41,8 @@ class EventWorkflowExecutionEvent(object):
         'phase': 'CoreWorkflowExecutionPhase',
         'occurred_at': 'datetime',
         'output_uri': 'str',
-        'error': 'CoreExecutionError'
+        'error': 'CoreExecutionError',
+        'output_data': 'CoreLiteralMap'
     }
 
     attribute_map = {
@@ -49,10 +51,11 @@ class EventWorkflowExecutionEvent(object):
         'phase': 'phase',
         'occurred_at': 'occurred_at',
         'output_uri': 'output_uri',
-        'error': 'error'
+        'error': 'error',
+        'output_data': 'output_data'
     }
 
-    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None):  # noqa: E501
+    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, output_data=None):  # noqa: E501
         """EventWorkflowExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._execution_id = None
@@ -61,6 +64,7 @@ class EventWorkflowExecutionEvent(object):
         self._occurred_at = None
         self._output_uri = None
         self._error = None
+        self._output_data = None
         self.discriminator = None
 
         if execution_id is not None:
@@ -75,6 +79,8 @@ class EventWorkflowExecutionEvent(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if output_data is not None:
+            self.output_data = output_data
 
     @property
     def execution_id(self):
@@ -205,6 +211,29 @@ class EventWorkflowExecutionEvent(object):
         """
 
         self._error = error
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+
+        Raw output metadata produced by this workflow execution.  # noqa: E501
+
+        :return: The output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this EventWorkflowExecutionEvent.
+
+        Raw output metadata produced by this workflow execution.  # noqa: E501
+
+        :param output_data: The output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     def to_dict(self):
         """Returns the model properties as a dict"""

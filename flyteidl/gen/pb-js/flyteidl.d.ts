@@ -5414,6 +5414,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
+
+            /** WorkflowExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents a WorkflowExecutionEvent. */
@@ -5443,8 +5446,11 @@ export namespace flyteidl {
             /** WorkflowExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** WorkflowExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** WorkflowExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error");
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /**
              * Creates a new WorkflowExecutionEvent instance using the specified properties.
@@ -5503,6 +5509,9 @@ export namespace flyteidl {
             /** NodeExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent workflowNodeMetadata */
             workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
 
@@ -5555,6 +5564,9 @@ export namespace flyteidl {
             /** NodeExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent workflowNodeMetadata. */
             public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
 
@@ -5577,7 +5589,7 @@ export namespace flyteidl {
             public nodeName: string;
 
             /** NodeExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error");
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /** NodeExecutionEvent targetMetadata. */
             public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
@@ -5926,6 +5938,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent customInfo */
             customInfo?: (google.protobuf.IStruct|null);
 
@@ -5981,6 +5996,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
 
@@ -5997,7 +6015,7 @@ export namespace flyteidl {
             public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
 
             /** TaskExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error");
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /**
              * Creates a new TaskExecutionEvent instance using the specified properties.

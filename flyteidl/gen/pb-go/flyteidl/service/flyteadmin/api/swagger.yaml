@@ -30764,6 +30764,9 @@ definitions:
       error:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
+      output_data:
+        description: "Raw output metadata produced by this node execution."
+        $ref: "#/definitions/coreLiteralMap"
       workflow_node_metadata:
         $ref: "#/definitions/flyteidleventWorkflowNodeMetadata"
       task_node_metadata:
@@ -30857,6 +30860,9 @@ definitions:
       error:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
+      output_data:
+        description: "Raw output metadata produced by this task execution."
+        $ref: "#/definitions/coreLiteralMap"
       custom_info:
         description: "Custom data that the task plugin sends back. This is extensible\
           \ to allow various plugins in the system."
@@ -30947,6 +30953,9 @@ definitions:
       error:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
+      output_data:
+        description: "Raw output metadata produced by this workflow execution."
+        $ref: "#/definitions/coreLiteralMap"
   flyteidladminDynamicWorkflowNodeMetadata:
     type: "object"
     properties:

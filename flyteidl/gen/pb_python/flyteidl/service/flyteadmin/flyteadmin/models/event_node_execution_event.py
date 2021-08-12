@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.event_parent_node_execution_metadata import EventParentNodeExecutionMetadata  # noqa: F401,E501
@@ -46,6 +47,7 @@ class EventNodeExecutionEvent(object):
         'input_uri': 'str',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
+        'output_data': 'CoreLiteralMap',
         'workflow_node_metadata': 'FlyteidleventWorkflowNodeMetadata',
         'task_node_metadata': 'FlyteidleventTaskNodeMetadata',
         'parent_task_metadata': 'EventParentTaskExecutionMetadata',
@@ -63,6 +65,7 @@ class EventNodeExecutionEvent(object):
         'input_uri': 'input_uri',
         'output_uri': 'output_uri',
         'error': 'error',
+        'output_data': 'output_data',
         'workflow_node_metadata': 'workflow_node_metadata',
         'task_node_metadata': 'task_node_metadata',
         'parent_task_metadata': 'parent_task_metadata',
@@ -72,7 +75,7 @@ class EventNodeExecutionEvent(object):
         'node_name': 'node_name'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -82,6 +85,7 @@ class EventNodeExecutionEvent(object):
         self._input_uri = None
         self._output_uri = None
         self._error = None
+        self._output_data = None
         self._workflow_node_metadata = None
         self._task_node_metadata = None
         self._parent_task_metadata = None
@@ -105,6 +109,8 @@ class EventNodeExecutionEvent(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if output_data is not None:
+            self.output_data = output_data
         if workflow_node_metadata is not None:
             self.workflow_node_metadata = workflow_node_metadata
         if task_node_metadata is not None:
@@ -270,6 +276,29 @@ class EventNodeExecutionEvent(object):
         """
 
         self._error = error
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this EventNodeExecutionEvent.  # noqa: E501
+
+        Raw output metadata produced by this node execution.  # noqa: E501
+
+        :return: The output_data of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this EventNodeExecutionEvent.
+
+        Raw output metadata produced by this node execution.  # noqa: E501
+
+        :param output_data: The output_data of this EventNodeExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     @property
     def workflow_node_metadata(self):

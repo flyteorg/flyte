@@ -4,6 +4,7 @@ package flyteidl.event;
 
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event";
 
+import "flyteidl/core/literals.proto";
 import "flyteidl/core/compiler.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
@@ -31,6 +32,9 @@ message WorkflowExecutionEvent {
 
         // Error information for the execution
         core.ExecutionError error = 6;
+
+        // Raw output metadata produced by this workflow execution.
+        core.LiteralMap output_data = 7;
     }
 }
 
@@ -45,7 +49,7 @@ message NodeExecutionEvent {
 
     // This timestamp represents when the original event occurred, it is generated
     // by the executor of the node.
-    google.protobuf.Timestamp occurred_at           = 4;
+    google.protobuf.Timestamp occurred_at = 4;
 
     string input_uri = 5;
 
@@ -56,6 +60,9 @@ message NodeExecutionEvent {
 
         // Error information for the execution
         core.ExecutionError error = 7;
+
+        // Raw output metadata produced by this node execution.
+        core.LiteralMap output_data = 15;
     }
 
     // Additional metadata to do with this event's node target based
@@ -66,10 +73,10 @@ message NodeExecutionEvent {
     }
 
     // [To be deprecated] Specifies which task (if any) launched this node.
-    ParentTaskExecutionMetadata parent_task_metadata         = 9;
+    ParentTaskExecutionMetadata parent_task_metadata = 9;
 
     // Specifies the parent node of the current node execution. Node executions at level zero will not have a parent node.
-    ParentNodeExecutionMetadata parent_node_metadata	= 10;
+    ParentNodeExecutionMetadata parent_node_metadata = 10;
 
     // Retry group to indicate grouping of nodes by retries
     string retry_group = 11;
@@ -100,7 +107,7 @@ message TaskNodeMetadata {
 // For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated.
 message DynamicWorkflowNodeMetadata {
     // id represents the unique identifier of the workflow.
-    core.Identifier id     = 1;
+    core.Identifier id = 1;
 
     // Represents the compiled representation of the embedded dynamic workflow.
     core.CompiledWorkflowClosure compiled_workflow = 2;
@@ -136,7 +143,7 @@ message TaskExecutionEvent {
     string producer_id = 5;
 
     // log information for the task execution
-    repeated core.TaskLog logs           = 6;
+    repeated core.TaskLog logs = 6;
 
     // This timestamp represents when the original event occurred, it is generated
     // by the executor of the task.
@@ -144,36 +151,39 @@ message TaskExecutionEvent {
 
     // URI of the input file, it encodes all the information
     // including Cloud source provider. ie., s3://...
-    string input_uri                      = 8;
+    string input_uri = 8;
 
     oneof output_result {
         // URI to the output of the execution, it will be in a format that encodes all the information
         // including Cloud source provider. ie., s3://...
-        string output_uri                 = 9;
+        string output_uri = 9;
 
         // Error information for the execution
-        core.ExecutionError error         = 10;
+        core.ExecutionError error = 10;
+
+        // Raw output metadata produced by this task execution.
+        core.LiteralMap output_data = 17;
     }
 
     // Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.
-    google.protobuf.Struct custom_info    = 11;
+    google.protobuf.Struct custom_info = 11;
 
     // Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc)
     // that should be recorded regardless of the lack of phase change.
     // The version field should be incremented when metadata changes across the duration of an individual phase.
-    uint32 phase_version                  = 12;    
+    uint32 phase_version = 12;
 
     // An optional explanation for the phase transition.
-    string reason                         = 13;
+    string reason = 13;
 
 
     // A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
     // this type will be identical, but not all task executions necessarily use pre-registered definitions and this
     // type is useful to render the task in the UI, filter task executions, etc.
-    string task_type                      = 14;
+    string task_type = 14;
 
     // Metadata around how a task was executed.
-    TaskExecutionMetadata metadata        = 16;
+    TaskExecutionMetadata metadata = 16;
 }
 
 // This message contains metadata about external resources produced or used by a specific task execution.
@@ -188,10 +198,10 @@ message ExternalResourceInfo {
 // executions for a project namespace.
 message ResourcePoolInfo {
     // Unique resource ID used to identify this execution when allocating a token.
-    string allocation_token               = 1;
+    string allocation_token = 1;
 
     // Namespace under which this task execution requested an allocation token.
-    string namespace                      = 2;
+    string namespace = 2;
 }
 
 // Holds metadata around how a task was executed.
@@ -216,7 +226,7 @@ message TaskExecutionMetadata {
     // Includes the broad category of machine used for this specific task execution.
     enum InstanceClass {
         // The default instance class configured for the flyte application platform.
-        DEFAULT = 0; 
+        DEFAULT = 0;
 
         // The instance class configured for interruptible tasks.
         INTERRUPTIBLE = 1;
