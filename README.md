@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -275,6 +275,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/EngHabu"><img src="https://avatars.githubusercontent.com/u/27159?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Haytham Abuelfutuh</b></sub></a><br /><a href="#maintenance-EngHabu" title="Maintenance">🚧</a> <a href="#ideas-EngHabu" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-EngHabu" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-EngHabu" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/flyteorg/flyte/commits?author=EngHabu" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3AEngHabu" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/katrogan"><img src="https://avatars.githubusercontent.com/u/953358?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Katrina Rogan</b></sub></a><br /><a href="#maintenance-katrogan" title="Maintenance">🚧</a> <a href="#ideas-katrogan" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-katrogan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/flyteorg/flyte/commits?author=katrogan" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Akatrogan" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/wild-endeavor"><img src="https://avatars.githubusercontent.com/u/2896568?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Yee Hing Tong</b></sub></a><br /><a href="#maintenance-wild-endeavor" title="Maintenance">🚧</a> <a href="#ideas-wild-endeavor" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-wild-endeavor" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/flyteorg/flyte/commits?author=wild-endeavor" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Awild-endeavor" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/SandraGH5"><img src="https://avatars.githubusercontent.com/u/80421934?v=4?s=50" width="50px;" alt=""/><br /><sub><b>SandraGH5</b></sub></a><br /><a href="#content-SandraGH5" title="Content">🖋</a> <a href="https://github.com/flyteorg/flyte/commits?author=SandraGH5" title="Documentation">📖</a> <a href="#eventOrganizing-SandraGH5" title="Event Organizing">📋</a></td>
   </tr>
 </table>
 

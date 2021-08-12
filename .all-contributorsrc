@@ -76,6 +76,17 @@
         "code",
         "review"
       ]
+    },
+    {
+      "login": "SandraGH5",
+      "name": "SandraGH5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/80421934?v=4",
+      "profile": "https://github.com/SandraGH5",
+      "contributions": [
+        "content",
+        "doc",
+        "eventOrganizing"
+      ]
     }
   ],
   "contributorsPerLine": 7
