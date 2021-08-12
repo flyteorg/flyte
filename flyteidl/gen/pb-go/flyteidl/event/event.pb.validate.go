@@ -95,6 +95,18 @@ func (m *WorkflowExecutionEvent) Validate() error {
 			}
 		}
 
+	case *WorkflowExecutionEvent_OutputData:
+
+		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WorkflowExecutionEventValidationError{
+					field:  "OutputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -227,6 +239,18 @@ func (m *NodeExecutionEvent) Validate() error {
 			if err := v.Validate(); err != nil {
 				return NodeExecutionEventValidationError{
 					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *NodeExecutionEvent_OutputData:
+
+		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "OutputData",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -820,6 +844,18 @@ func (m *TaskExecutionEvent) Validate() error {
 			if err := v.Validate(); err != nil {
 				return TaskExecutionEventValidationError{
 					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *TaskExecutionEvent_OutputData:
+
+		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  "OutputData",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
