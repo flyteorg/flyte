@@ -34,6 +34,20 @@
         "infra",
         "mentoring"
       ]
+    },
+    {
+      "login": "EngHabu",
+      "name": "Haytham Abuelfutuh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27159?v=4",
+      "profile": "https://github.com/EngHabu",
+      "contributions": [
+        "maintenance",
+        "ideas",
+        "infra",
+        "mentoring",
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7
