@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -286,6 +286,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/pmahindrakar-oss"><img src="https://avatars.githubusercontent.com/u/77798312?v=4?s=50" width="50px;" alt=""/><br /><sub><b>pmahindrakar-oss</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=pmahindrakar-oss" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/commits?author=pmahindrakar-oss" title="Documentation">📖</a> <a href="#infra-pmahindrakar-oss" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#tool-pmahindrakar-oss" title="Tools">🔧</a></td>
     <td align="center"><a href="https://github.com/akhurana001"><img src="https://avatars.githubusercontent.com/u/34587798?v=4?s=50" width="50px;" alt=""/><br /><sub><b>akhurana001</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=akhurana001" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/issues?q=author%3Aakhurana001" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/dschaller"><img src="https://avatars.githubusercontent.com/u/1004789?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Derek</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=dschaller" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/issues?q=author%3Adschaller" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/jonathanburns"><img src="https://avatars.githubusercontent.com/u/3880645?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Johnny Burns</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=jonathanburns" title="Code">💻</a> <a href="#plugin-jonathanburns" title="Plugin/utility libraries">🔌</a></td>
   </tr>
 </table>
 

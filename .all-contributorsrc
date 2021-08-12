@@ -177,6 +177,16 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "jonathanburns",
+      "name": "Johnny Burns",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3880645?v=4",
+      "profile": "https://github.com/jonathanburns",
+      "contributions": [
+        "code",
+        "plugin"
+      ]
     }
   ],
   "contributorsPerLine": 7
