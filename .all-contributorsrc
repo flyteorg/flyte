@@ -157,6 +157,16 @@
         "infra",
         "tool"
       ]
+    },
+    {
+      "login": "akhurana001",
+      "name": "akhurana001",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34587798?v=4",
+      "profile": "https://github.com/akhurana001",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7

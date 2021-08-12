@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -284,6 +284,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/jeevb"><img src="https://avatars.githubusercontent.com/u/10869815?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Jeev B</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=jeevb" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Ajeevb" title="Reviewed Pull Requests">👀</a> <a href="#ideas-jeevb" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/flyteorg/flyte/issues?q=author%3Ajeevb" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://georgesnelling.com/"><img src="https://avatars.githubusercontent.com/u/405480?v=4?s=50" width="50px;" alt=""/><br /><sub><b>George Snelling</b></sub></a><br /><a href="#business-georgesnelling" title="Business development">💼</a> <a href="#eventOrganizing-georgesnelling" title="Event Organizing">📋</a></td>
     <td align="center"><a href="https://github.com/pmahindrakar-oss"><img src="https://avatars.githubusercontent.com/u/77798312?v=4?s=50" width="50px;" alt=""/><br /><sub><b>pmahindrakar-oss</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=pmahindrakar-oss" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/commits?author=pmahindrakar-oss" title="Documentation">📖</a> <a href="#infra-pmahindrakar-oss" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#tool-pmahindrakar-oss" title="Tools">🔧</a></td>
+    <td align="center"><a href="https://github.com/akhurana001"><img src="https://avatars.githubusercontent.com/u/34587798?v=4?s=50" width="50px;" alt=""/><br /><sub><b>akhurana001</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=akhurana001" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/issues?q=author%3Aakhurana001" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
