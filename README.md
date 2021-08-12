@@ -298,7 +298,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/bnsblue"><img src="https://avatars.githubusercontent.com/u/1518524?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Chang-Hong Hsu</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=bnsblue" title="Code">💻</a> <a href="#plugin-bnsblue" title="Plugin/utility libraries">🔌</a></td>
-    <td align="center"><a href="https://github.com/narape"><img src="https://avatars.githubusercontent.com/u/7515359?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Nelson Arapé</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=narape" title="Code">💻</a> <a href="#plugin-narape" title="Plugin/utility libraries">🔌</a></td>
+    <td align="center"><a href="https://github.com/narape"><img src="https://avatars.githubusercontent.com/u/7515359?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Nelson Arapé</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=narape" title="Code">💻</a> <a href="#plugin-narape" title="Plugin/utility libraries">🔌</a> <a href="#maintenance-narape" title="Maintenance">🚧</a></td>
   </tr>
 </table>
 
