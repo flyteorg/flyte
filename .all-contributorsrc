@@ -342,6 +342,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tnsetting",
+      "name": "tnsetting",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38207208?v=4",
+      "profile": "https://github.com/tnsetting",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
