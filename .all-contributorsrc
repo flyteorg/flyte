@@ -388,6 +388,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "catalinii",
+      "name": "catalinii",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8200209?v=4",
+      "profile": "https://github.com/catalinii",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

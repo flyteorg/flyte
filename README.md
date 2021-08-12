@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-36-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-37-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -316,6 +316,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/vsbus"><img src="https://avatars.githubusercontent.com/u/5026554?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Viktor Barinov</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/issues?q=author%3Avsbus" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/catalinii"><img src="https://avatars.githubusercontent.com/u/8200209?v=4?s=50" width="50px;" alt=""/><br /><sub><b>catalinii</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=catalinii" title="Code">💻</a></td>
   </tr>
 </table>
 
