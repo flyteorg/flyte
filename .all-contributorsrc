@@ -7,8 +7,7 @@
     "README.md"
   ],
   "imageSize": 50,
-  "commit": true,
-  "commitConvention": "none",
+  "commit": false,
   "contributors": [
     {
       "login": "samhita-alla",
