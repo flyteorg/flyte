@@ -224,6 +224,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "igorvalko",
+      "name": "Igor Valko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1330233?v=4",
+      "profile": "https://github.com/igorvalko",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
