@@ -242,6 +242,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "bnsblue",
+      "name": "Chang-Hong Hsu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1518524?v=4",
+      "profile": "https://github.com/bnsblue",
+      "contributions": [
+        "code",
+        "plugin"
+      ]
     }
   ],
   "contributorsPerLine": 7
