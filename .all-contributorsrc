@@ -277,6 +277,16 @@
         "ideas",
         "infra"
       ]
+    },
+    {
+      "login": "anandswaminathan",
+      "name": "Anand Swaminathan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18408237?v=4",
+      "profile": "https://github.com/anandswaminathan",
+      "contributions": [
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7
