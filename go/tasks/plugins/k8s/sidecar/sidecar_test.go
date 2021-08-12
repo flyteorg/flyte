@@ -478,7 +478,7 @@ func TestBuildSidecarResource(t *testing.T) {
 	}
 
 	// Assert resource requirements are correctly set
-	expectedCPURequest := resource.MustParse("1024m")
+	expectedCPURequest := resource.MustParse("2048m")
 	assert.Equal(t, expectedCPURequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Cpu().Value())
 	expectedMemRequest := resource.MustParse("1024Mi")
 	assert.Equal(t, expectedMemRequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Memory().Value())
