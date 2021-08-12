@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -294,6 +294,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/schottra"><img src="https://avatars.githubusercontent.com/u/1815175?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Randy Schott</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=schottra" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/pingsutw"><img src="https://avatars.githubusercontent.com/u/37936015?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Kevin Su</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=pingsutw" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/igorvalko"><img src="https://avatars.githubusercontent.com/u/1330233?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Igor Valko</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=igorvalko" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/mayitbeegh"><img src="https://avatars.githubusercontent.com/u/6239450?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Sean Lin</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=mayitbeegh" title="Code">💻</a></td>
   </tr>
 </table>
 
