@@ -100,6 +100,17 @@
         "ideas",
         "plugin"
       ]
+    },
+    {
+      "login": "evalsocket",
+      "name": "Yuvraj ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10830562?v=4",
+      "profile": "https://github.com/evalsocket",
+      "contributions": [
+        "code",
+        "test",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7
