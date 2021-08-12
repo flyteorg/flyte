@@ -121,6 +121,18 @@
         "code",
         "review"
       ]
+    },
+    {
+      "login": "jeevb",
+      "name": "Jeev B",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10869815?v=4",
+      "profile": "https://github.com/jeevb",
+      "contributions": [
+        "code",
+        "review",
+        "ideas",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
