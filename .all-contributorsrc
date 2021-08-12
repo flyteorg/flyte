@@ -379,6 +379,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vsbus",
+      "name": "Viktor Barinov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5026554?v=4",
+      "profile": "https://github.com/vsbus",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
