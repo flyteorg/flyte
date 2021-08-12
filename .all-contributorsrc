@@ -87,6 +87,19 @@
         "doc",
         "eventOrganizing"
       ]
+    },
+    {
+      "login": "cosmicBboy",
+      "name": "Niels Bantilan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2816689?v=4",
+      "profile": "http://cosmicbboy.github.io/",
+      "contributions": [
+        "code",
+        "doc",
+        "tutorial",
+        "ideas",
+        "plugin"
+      ]
     }
   ],
   "contributorsPerLine": 7
