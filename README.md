@@ -40,7 +40,7 @@
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
   </a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-18-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -292,6 +292,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://brunk.io/"><img src="https://avatars.githubusercontent.com/u/3939659?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Sören Brunk</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=sbrunk" title="Code">💻</a> <a href="#infra-sbrunk" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/migueltol22"><img src="https://avatars.githubusercontent.com/u/19375241?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Miguel Toledo</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=migueltol22" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/schottra"><img src="https://avatars.githubusercontent.com/u/1815175?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Randy Schott</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=schottra" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/pingsutw"><img src="https://avatars.githubusercontent.com/u/37936015?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Kevin Su</b></sub></a><br /><a href="https://github.com/flyteorg/flyte/commits?author=pingsutw" title="Code">💻</a></td>
   </tr>
 </table>
 
