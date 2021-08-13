@@ -94,40 +94,6 @@ func buildPodMapTask(task *idlCore.TaskTemplate, metadata core.TaskExecutionMeta
 	return pod, nil
 }
 
-// Here we customize the k8sPod primary container by templatizing args.
-// The call to ToK8sPodSpec for the task container target
-// case already handles this but we must explicitly do so for K8sPod task targets.
-func modifyMapPodTaskPrimaryContainer(ctx context.Context, tCtx core.TaskExecutionContext, arrTCtx *arrayTaskContext, container *v1.Container) error {
-	var err error
-	container.Args, err = template.Render(ctx, container.Args,
-		template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           arrTCtx.arrayInputReader,
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		})
-	if err != nil {
-		return err
-	}
-	container.Command, err = template.Render(ctx, container.Command,
-		template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           arrTCtx.arrayInputReader,
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		})
-	if err != nil {
-		return err
-	}
-	resources := flytek8s.ApplyResourceOverrides(ctx, container.Resources)
-	if resources != nil {
-		container.Resources = *resources
-	}
-
-	container.Env = flytek8s.DecorateEnvVars(ctx, container.Env, tCtx.TaskExecutionMetadata().GetTaskExecutionID())
-	return nil
-}
-
 // Note that Name is not set on the result object.
 // It's up to the caller to set the Name before creating the object in K8s.
 func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionContext, namespaceTemplate string) (
@@ -193,7 +159,14 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		if err != nil {
 			return v1.Pod{}, nil, err
 		}
-		err = modifyMapPodTaskPrimaryContainer(ctx, tCtx, arrTCtx, &pod.Spec.Containers[containerIndex])
+		templateParameters := template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           arrTCtx.arrayInputReader,
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		}
+		err = flytek8s.AddFlyteCustomizationsToContainer(
+			ctx, templateParameters, flytek8s.MergeExistingResources, &pod.Spec.Containers[containerIndex])
 		if err != nil {
 			return v1.Pod{}, nil, err
 		}
