@@ -94,5 +94,21 @@
     "exit_success": true,
     "exit_message": ""
   }
+ },{ 
+    "name": "case-studies-eda",
+    "priority": "P2",
+    "path": "case_studies/feature_engineering/eda",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""    
+  }
+ },{ 
+    "name": "case-studies-sqlite-datacleaning",
+    "priority": "P2",
+    "path": "case_studies/feature_engineering/sqlite_datacleaning",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""    
+  }
 }]
 

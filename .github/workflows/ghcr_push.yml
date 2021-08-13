@@ -43,6 +43,8 @@ jobs:
             path: case_studies/ml_training
           - name: mnist_classifier
             path: case_studies/ml_training
+          - name: eda
+            path: case_studies/feature_engineering
     steps:
       - uses: actions/checkout@v2
         with:

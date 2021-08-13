@@ -131,6 +131,9 @@ class CustomSorter(FileNameSortKey):
         "datacleaning_tasks.py",
         "datacleaning_workflow.py",
         "single_node.py",
+        "notebook.py",
+        "notebook_and_task.py",
+        "notebook_as_tasks.py",
     ]
     """
     Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
@@ -241,6 +244,7 @@ examples_dirs = [
     "../case_studies/ml_training/house_price_prediction",
     "../case_studies/ml_training/mnist_classifier",
     "../case_studies/feature_engineering/sqlite_datacleaning",
+    "../case_studies/feature_engineering/eda",
     "../testing",
     "../core/containerization",
     "../deployment",
@@ -268,6 +272,7 @@ gallery_dirs = [
     "auto/case_studies/ml_training/house_price_prediction",
     "auto/case_studies/ml_training/mnist_classifier",
     "auto/case_studies/feature_engineering/sqlite_datacleaning",
+    "auto/case_studies/feature_engineering/eda",
     "auto/testing",
     "auto/core/containerization",
     "auto/deployment",
