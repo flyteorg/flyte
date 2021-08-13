@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"reflect"
 	"sync"
 	"time"
 
@@ -319,7 +320,7 @@ func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error
 
 	var cfgMap stow.ConfigMap
 	var kind string
-	if cfg.Stow != nil {
+	if !reflect.DeepEqual(cfg.Stow, StowConfig{}) {
 		kind = cfg.Stow.Kind
 		cfgMap = cfg.Stow.Config
 	} else {
