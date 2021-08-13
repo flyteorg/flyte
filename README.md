@@ -259,7 +259,7 @@ Here are some resources to help you learn more about Flyte.
 
 ## 💖 Top Contributors
 
-A big thank you to the community for making Flyte possible!
+A big thank you to the community for making Flyte possible ([emoji key](https://allcontributors.org/docs/en/emoji-key))!
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
