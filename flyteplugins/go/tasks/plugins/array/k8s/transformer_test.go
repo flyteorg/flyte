@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -168,6 +169,16 @@ func TestFlyteArrayJobToK8sPodTemplate(t *testing.T) {
 	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
 	tMeta.OnGetSecurityContext().Return(core.SecurityContext{})
 	tMeta.OnGetK8sServiceAccount().Return("sa")
+	mockResourceOverrides := mocks.TaskOverrides{}
+	mockResourceOverrides.OnGetResources().Return(&v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			"ephemeral-storage": resource.MustParse("1024Mi"),
+		},
+		Limits: v1.ResourceList{
+			"ephemeral-storage": resource.MustParse("2048Mi"),
+		},
+	})
+	tMeta.OnGetOverrides().Return(&mockResourceOverrides)
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -214,14 +225,16 @@ func TestFlyteArrayJobToK8sPodTemplate(t *testing.T) {
 	defaultMemoryFromConfig := resource.MustParse("1024Mi")
 	assert.EqualValues(t, v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse("1"),
-			v1.ResourceMemory: defaultMemoryFromConfig,
+			v1.ResourceCPU:              resource.MustParse("1"),
+			v1.ResourceMemory:           defaultMemoryFromConfig,
+			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse("1"),
-			v1.ResourceMemory: defaultMemoryFromConfig,
+			v1.ResourceCPU:              resource.MustParse("1"),
+			v1.ResourceMemory:           defaultMemoryFromConfig,
+			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
 		},
-	}, pod.Spec.Containers[0].Resources)
+	}, pod.Spec.Containers[0].Resources, fmt.Sprintf("%+v", pod.Spec.Containers[0].Resources))
 	assert.EqualValues(t, []v1.EnvVar{
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_ID",

@@ -4,6 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/stretchr/testify/mock"
+	"k8s.io/apimachinery/pkg/util/validation"
+
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -228,4 +236,132 @@ func TestMergeResources_PartialResourceKeys(t *testing.T) {
 		Requests: expectedResourceList,
 		Limits:   expectedResourceList,
 	})
+}
+
+func TestToK8sContainer(t *testing.T) {
+	taskContainer := &core.Container{
+		Image: "myimage",
+		Args: []string{
+			"arg1",
+			"arg2",
+			"arg3",
+		},
+		Command: []string{
+			"com1",
+			"com2",
+			"com3",
+		},
+		Env: []*core.KeyValuePair{
+			{
+				Key:   "k",
+				Value: "v",
+			},
+		},
+	}
+
+	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
+	mockTaskOverrides := mocks.TaskOverrides{}
+	mockTaskOverrides.OnGetResources().Return(&v1.ResourceRequirements{
+		Limits: v1.ResourceList{
+			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
+		},
+	})
+	mockTaskExecMetadata.OnGetOverrides().Return(&mockTaskOverrides)
+	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
+	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
+
+	templateParameters := template.Parameters{
+		TaskExecMetadata: &mockTaskExecMetadata,
+	}
+
+	container, err := ToK8sContainer(context.TODO(), taskContainer, nil, templateParameters)
+	assert.NoError(t, err)
+	assert.Equal(t, container.Image, "myimage")
+	assert.EqualValues(t, []string{
+		"arg1",
+		"arg2",
+		"arg3",
+	}, container.Args)
+	assert.EqualValues(t, []string{
+		"com1",
+		"com2",
+		"com3",
+	}, container.Command)
+	assert.EqualValues(t, []v1.EnvVar{
+		{
+			Name:  "k",
+			Value: "v",
+		},
+	}, container.Env)
+	errs := validation.IsDNS1123Label(container.Name)
+	assert.Nil(t, errs)
+}
+
+func TestAddFlyteCustomizationsToContainer(t *testing.T) {
+	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
+	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
+	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "p1",
+			Domain:       "d1",
+			Name:         "task_name",
+			Version:      "v1",
+		},
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "node_id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "p2",
+				Domain:  "d2",
+				Name:    "n2",
+			},
+		},
+		RetryAttempt: 1,
+	})
+	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
+
+	mockOverrides := mocks.TaskOverrides{}
+	mockOverrides.OnGetResources().Return(&v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
+		},
+	})
+	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
+
+	mockInputReader := mocks2.InputReader{}
+	mockInputPath := storage.DataReference("s3://input/path")
+	mockInputReader.OnGetInputPath().Return(mockInputPath)
+	mockInputReader.OnGetInputPrefixPath().Return(mockInputPath)
+	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
+
+	mockOutputPath := mocks2.OutputFilePaths{}
+	mockOutputPathPrefix := storage.DataReference("s3://output/path")
+	mockOutputPath.OnGetRawOutputPrefix().Return(mockOutputPathPrefix)
+	mockOutputPath.OnGetOutputPrefixPath().Return(mockOutputPathPrefix)
+
+	templateParameters := template.Parameters{
+		TaskExecMetadata: &mockTaskExecMetadata,
+		Inputs:           &mockInputReader,
+		OutputPath:       &mockOutputPath,
+	}
+	container := &v1.Container{
+		Command: []string{
+			"{{ .Input }}",
+		},
+		Args: []string{
+			"{{ .OutputPrefix }}",
+		},
+	}
+	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, AssignResources, container)
+	assert.NoError(t, err)
+	assert.EqualValues(t, container.Args, []string{"s3://output/path"})
+	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
+	assert.Len(t, container.Resources.Limits, 3)
+	assert.Len(t, container.Resources.Requests, 3)
+	assert.Len(t, container.Env, 12)
 }

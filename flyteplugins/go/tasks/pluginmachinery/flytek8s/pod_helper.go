@@ -56,12 +56,17 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 		logger.Errorf(ctx, "Default Pod creation logic works for default container in the task template only.")
 		return nil, fmt.Errorf("container not specified in task template")
 	}
-	c, err := ToK8sContainer(ctx, task.GetContainer(), task.Interface, template.Parameters{
+	templateParameters := template.Parameters{
 		Task:             tCtx.TaskReader(),
 		Inputs:           tCtx.InputReader(),
 		OutputPath:       tCtx.OutputWriter(),
 		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-	})
+	}
+	c, err := ToK8sContainer(ctx, task.GetContainer(), task.Interface, templateParameters)
+	if err != nil {
+		return nil, err
+	}
+	err = AddFlyteCustomizationsToContainer(ctx, templateParameters, AssignResources, c)
 	if err != nil {
 		return nil, err
 	}

@@ -105,53 +105,74 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 	return &resources
 }
 
-// Returns a K8s Container for the execution
+// Transforms a task template target of type core.Container into a bare-bones kubernetes container, which can be further
+// modified with flyte-specific customizations specified by various static and run-time attributes.
 func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *core.TypedInterface, parameters template.Parameters) (*v1.Container, error) {
-	modifiedCommand, err := template.Render(ctx, taskContainer.GetCommand(), parameters)
-	if err != nil {
-		return nil, err
-	}
-
-	modifiedArgs, err := template.Render(ctx, taskContainer.GetArgs(), parameters)
-	if err != nil {
-		return nil, err
-	}
-
-	envVars := DecorateEnvVars(ctx, ToK8sEnvVar(taskContainer.GetEnv()), parameters.TaskExecMetadata.GetTaskExecutionID())
-
+	// Perform preliminary validations
 	if parameters.TaskExecMetadata.GetOverrides() == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "platform/compiler error, overrides not set for task")
 	}
 	if parameters.TaskExecMetadata.GetOverrides() == nil || parameters.TaskExecMetadata.GetOverrides().GetResources() == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "resource requirements not found for container task, required!")
 	}
-
-	res := parameters.TaskExecMetadata.GetOverrides().GetResources()
-	if res != nil {
-		res = ApplyResourceOverrides(ctx, *res)
-	}
-
 	// Make the container name the same as the pod name, unless it violates K8s naming conventions
 	// Container names are subject to the DNS-1123 standard
 	containerName := parameters.TaskExecMetadata.GetTaskExecutionID().GetGeneratedName()
 	if errs := validation.IsDNS1123Label(containerName); len(errs) > 0 {
 		containerName = rand.String(4)
 	}
-	c := &v1.Container{
+	container := &v1.Container{
 		Name:                     containerName,
 		Image:                    taskContainer.GetImage(),
-		Args:                     modifiedArgs,
-		Command:                  modifiedCommand,
-		Env:                      envVars,
+		Args:                     taskContainer.GetArgs(),
+		Command:                  taskContainer.GetCommand(),
+		Env:                      ToK8sEnvVar(taskContainer.GetEnv()),
 		TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 	}
-
-	if res != nil {
-		c.Resources = *res
-	}
-
-	if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot, c, iFace, taskContainer.DataConfig); err != nil {
+	if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot, container, iFace, taskContainer.DataConfig); err != nil {
 		return nil, err
 	}
-	return c, nil
+	return container, nil
+}
+
+type ResourceCustomizationMode int
+
+const (
+	AssignResources ResourceCustomizationMode = iota
+	MergeExistingResources
+	LeaveResourcesUnmodified
+)
+
+// Takes a container definition which specifies how to run a Flyte task and fills in templated command and argument
+// values, updates resources and decorates environment variables with platform and task-specific customizations.
+func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.Parameters,
+	mode ResourceCustomizationMode, container *v1.Container) error {
+	modifiedCommand, err := template.Render(ctx, container.Command, parameters)
+	if err != nil {
+		return err
+	}
+	container.Command = modifiedCommand
+
+	modifiedArgs, err := template.Render(ctx, container.Args, parameters)
+	if err != nil {
+		return err
+	}
+	container.Args = modifiedArgs
+
+	container.Env = DecorateEnvVars(ctx, container.Env, parameters.TaskExecMetadata.GetTaskExecutionID())
+
+	if parameters.TaskExecMetadata.GetOverrides() != nil && parameters.TaskExecMetadata.GetOverrides().GetResources() != nil {
+		res := parameters.TaskExecMetadata.GetOverrides().GetResources()
+		switch mode {
+		case AssignResources:
+			if res = ApplyResourceOverrides(ctx, *res); res != nil {
+				container.Resources = *res
+			}
+		case MergeExistingResources:
+			MergeResources(*res, &container.Resources)
+			container.Resources = *ApplyResourceOverrides(ctx, container.Resources)
+		case LeaveResourcesUnmodified:
+		}
+	}
+	return nil
 }
