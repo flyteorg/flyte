@@ -10,19 +10,6 @@
   "commit": false,
   "contributors": [
     {
-      "login": "samhita-alla",
-      "name": "Samhita Alla",
-      "avatar_url": "https://avatars.githubusercontent.com/u/27777173?v=4",
-      "profile": "https://allasamhita.io/",
-      "contributions": [
-        "doc",
-        "tutorial",
-        "blog",
-        "code",
-        "plugin"
-      ]
-    },
-    {
       "login": "kumare3",
       "name": "Ketan Umare",
       "avatar_url": "https://avatars.githubusercontent.com/u/16888709?v=4",
@@ -77,14 +64,60 @@
       ]
     },
     {
-      "login": "SandraGH5",
-      "name": "SandraGH5",
-      "avatar_url": "https://avatars.githubusercontent.com/u/80421934?v=4",
-      "profile": "https://github.com/SandraGH5",
+      "login": "georgesnelling",
+      "name": "George Snelling",
+      "avatar_url": "https://avatars.githubusercontent.com/u/405480?v=4",
+      "profile": "https://georgesnelling.com/",
       "contributions": [
-        "content",
-        "doc",
+        "business",
         "eventOrganizing"
+      ]
+    },
+    {
+      "login": "jeevb",
+      "name": "Jeev B",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10869815?v=4",
+      "profile": "https://github.com/jeevb",
+      "contributions": [
+        "code",
+        "review",
+        "ideas",
+        "bug"
+      ]
+    },
+    {
+      "login": "kanterov",
+      "name": "Gleb Kanterov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/467927?v=4",
+      "profile": "https://github.com/kanterov",
+      "contributions": [
+        "code",
+        "plugin",
+        "maintenance",
+        "ideas",
+        "infra"
+      ]
+    },
+    {
+      "login": "narape",
+      "name": "Nelson Arapé",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7515359?v=4",
+      "profile": "https://github.com/narape",
+      "contributions": [
+        "code",
+        "plugin",
+        "maintenance",
+        "infra"
+      ]
+    },
+    {
+      "login": "sbrunk",
+      "name": "Sören Brunk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3939659?v=4",
+      "profile": "https://brunk.io/",
+      "contributions": [
+        "code",
+        "infra"
       ]
     },
     {
@@ -98,6 +131,17 @@
         "tutorial",
         "ideas",
         "plugin"
+      ]
+    },
+    {
+      "login": "SandraGH5",
+      "name": "SandraGH5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/80421934?v=4",
+      "profile": "https://github.com/SandraGH5",
+      "contributions": [
+        "content",
+        "doc",
+        "eventOrganizing"
       ]
     },
     {
@@ -124,28 +168,6 @@
       ]
     },
     {
-      "login": "jeevb",
-      "name": "Jeev B",
-      "avatar_url": "https://avatars.githubusercontent.com/u/10869815?v=4",
-      "profile": "https://github.com/jeevb",
-      "contributions": [
-        "code",
-        "review",
-        "ideas",
-        "bug"
-      ]
-    },
-    {
-      "login": "georgesnelling",
-      "name": "George Snelling",
-      "avatar_url": "https://avatars.githubusercontent.com/u/405480?v=4",
-      "profile": "https://georgesnelling.com/",
-      "contributions": [
-        "business",
-        "eventOrganizing"
-      ]
-    },
-    {
       "login": "pmahindrakar-oss",
       "name": "pmahindrakar-oss",
       "avatar_url": "https://avatars.githubusercontent.com/u/77798312?v=4",
@@ -158,23 +180,16 @@
       ]
     },
     {
-      "login": "akhurana001",
-      "name": "akhurana001",
-      "avatar_url": "https://avatars.githubusercontent.com/u/34587798?v=4",
-      "profile": "https://github.com/akhurana001",
+      "login": "samhita-alla",
+      "name": "Samhita Alla",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27777173?v=4",
+      "profile": "https://allasamhita.io/",
       "contributions": [
         "code",
-        "bug"
-      ]
-    },
-    {
-      "login": "dschaller",
-      "name": "Derek",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1004789?v=4",
-      "profile": "https://github.com/dschaller",
-      "contributions": [
-        "code",
-        "bug"
+        "doc",
+        "blog",
+        "tutorial",
+        "plugin"
       ]
     },
     {
@@ -188,13 +203,13 @@
       ]
     },
     {
-      "login": "sbrunk",
-      "name": "Sören Brunk",
-      "avatar_url": "https://avatars.githubusercontent.com/u/3939659?v=4",
-      "profile": "https://brunk.io/",
+      "login": "anandswaminathan",
+      "name": "Anand Swaminathan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18408237?v=4",
+      "profile": "https://github.com/anandswaminathan",
       "contributions": [
         "code",
-        "infra"
+        "review"
       ]
     },
     {
@@ -225,19 +240,19 @@
       ]
     },
     {
-      "login": "igorvalko",
-      "name": "Igor Valko",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1330233?v=4",
-      "profile": "https://github.com/igorvalko",
+      "login": "mayitbeegh",
+      "name": "Sean Lin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6239450?v=4",
+      "profile": "https://github.com/mayitbeegh",
       "contributions": [
         "code"
       ]
     },
     {
-      "login": "mayitbeegh",
-      "name": "Sean Lin",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6239450?v=4",
-      "profile": "https://github.com/mayitbeegh",
+      "login": "igorvalko",
+      "name": "Igor Valko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1330233?v=4",
+      "profile": "https://github.com/igorvalko",
       "contributions": [
         "code"
       ]
@@ -250,41 +265,6 @@
       "contributions": [
         "code",
         "plugin"
-      ]
-    },
-    {
-      "login": "narape",
-      "name": "Nelson Arapé",
-      "avatar_url": "https://avatars.githubusercontent.com/u/7515359?v=4",
-      "profile": "https://github.com/narape",
-      "contributions": [
-        "code",
-        "plugin",
-        "maintenance",
-        "infra"
-      ]
-    },
-    {
-      "login": "kanterov",
-      "name": "Gleb Kanterov",
-      "avatar_url": "https://avatars.githubusercontent.com/u/467927?v=4",
-      "profile": "https://github.com/kanterov",
-      "contributions": [
-        "code",
-        "plugin",
-        "maintenance",
-        "ideas",
-        "infra"
-      ]
-    },
-    {
-      "login": "anandswaminathan",
-      "name": "Anand Swaminathan",
-      "avatar_url": "https://avatars.githubusercontent.com/u/18408237?v=4",
-      "profile": "https://github.com/anandswaminathan",
-      "contributions": [
-        "code",
-        "review"
       ]
     },
     {
@@ -312,6 +292,26 @@
       "profile": "https://github.com/RubenBarragan",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "akhurana001",
+      "name": "akhurana001",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34587798?v=4",
+      "profile": "https://github.com/akhurana001",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "dschaller",
+      "name": "Derek",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1004789?v=4",
+      "profile": "https://github.com/dschaller",
+      "contributions": [
+        "code",
+        "bug"
       ]
     },
     {
@@ -407,5 +407,6 @@
       ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "commitConvention": "none"
 }
