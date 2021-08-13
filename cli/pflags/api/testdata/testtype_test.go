@@ -295,6 +295,34 @@ func TestTestType_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_storage.stow.kind", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("storage.stow.kind", testValue)
+			if vString, err := cmdFlags.GetString("storage.stow.kind"); err == nil {
+				testDecodeJson_TestType(t, fmt.Sprintf("%v", vString), &actual.StorageConfig.Stow.Kind)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_storage.stow.config", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "a=1,b=2"
+
+			cmdFlags.Set("storage.stow.config", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("storage.stow.config"); err == nil {
+				testDecodeRaw_TestType(t, vStringToString, &actual.StorageConfig.Stow.Config)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_storage.container", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

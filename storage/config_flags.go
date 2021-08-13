@@ -28,6 +28,15 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (Config) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (Config) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -48,7 +57,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.secret-key"), defaultConfig.Connection.SecretKey, "Secret to use when accesskey is set.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.region"), defaultConfig.Connection.Region, "Region to connect to.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "connection.disable-ssl"), defaultConfig.Connection.DisableSSL, "Disables SSL connection. Should only be used for development.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "container"), defaultConfig.InitContainer, "Initial container to create -if it doesn't exist-.'")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stow.kind"), defaultConfig.Stow.Kind, "Kind of Stow backend to use. Refer to github/graymeta/stow")
+	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "stow.config"), defaultConfig.Stow.Config, "Configuration for stow backend. Refer to github/graymeta/stow")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "container"), defaultConfig.InitContainer, "Initial container (in s3 a bucket) to create -if it doesn't exist-.'")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-multicontainer"), defaultConfig.MultiContainerEnabled, "If this is true,  then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.max_size_mbs"), defaultConfig.Cache.MaxSizeMegabytes, "Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.target_gc_percent"), defaultConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")

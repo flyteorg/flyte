@@ -303,7 +303,7 @@ func TestNewLocalStore(t *testing.T) {
 	t.Run("Valid config", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
 		store, err := newStowRawStore(&Config{
-			Stow: &StowConfig{
+			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
 					local.ConfigKeyPath: "./",
@@ -339,7 +339,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NotNil(t, stats)
 
 		store, err := newStowRawStore(&Config{
-			Stow: &StowConfig{
+			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
 					local.ConfigKeyPath: tmpDir,
@@ -368,7 +368,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NotNil(t, stats)
 
 		store, err := newStowRawStore(&Config{
-			Stow: &StowConfig{
+			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
 					local.ConfigKeyPath: tmpDir,
@@ -390,7 +390,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NotNil(t, stats)
 
 		store, err := newStowRawStore(&Config{
-			Stow: &StowConfig{
+			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
 					local.ConfigKeyPath: tmpDir,
@@ -424,7 +424,7 @@ func Test_newStowRawStore(t *testing.T) {
 		{"fail", args{&Config{}, promutils.NewTestScope()}, true},
 		{"google", args{&Config{
 			InitContainer: "flyte",
-			Stow: &StowConfig{
+			Stow: StowConfig{
 				Kind: google.Kind,
 				Config: map[string]string{
 					google.ConfigProjectId: "x",
