@@ -277,7 +277,7 @@ func TestCreateExecution(t *testing.T) {
 			for _, task := range tasks {
 				assert.EqualValues(t, resources.Requests,
 					task.Template.GetContainer().Resources.Requests)
-				assert.EqualValues(t, resources.Limits,
+				assert.EqualValues(t, resources.Requests,
 					task.Template.GetContainer().Resources.Limits)
 			}
 			return &workflowengineInterfaces.ExecutionInfo{
@@ -2933,15 +2933,15 @@ func TestSetDefaults(t *testing.T) {
 				Limits: []*core.Resources_ResourceEntry{
 					{
 						Name:  core.Resources_CPU,
-						Value: "300m",
+						Value: "200m",
 					},
 					{
 						Name:  core.Resources_MEMORY,
-						Value: "500Gi",
+						Value: "200Gi",
 					},
 					{
 						Name:  core.Resources_EPHEMERAL_STORAGE,
-						Value: "501Mi",
+						Value: "500Mi",
 					},
 				},
 			},
@@ -3004,7 +3004,7 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 				Limits: []*core.Resources_ResourceEntry{
 					{
 						Name:  core.Resources_CPU,
-						Value: "300m",
+						Value: "200m",
 					},
 					{
 						Name:  core.Resources_MEMORY,
