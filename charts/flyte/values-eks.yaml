@@ -498,33 +498,6 @@ cluster_resource_manager:
 
 sparkoperator:
   enabled: true
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1000Mi
-    requests:
-      cpu: 50m
-      memory: 250Mi
-
-#
-# PYTORCHOPERATOR
-#
-
-pytorchoperator:
-  enabled: true
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1000Mi
-    requests:
-      cpu: 50m
-      memory: 250Mi
-
-# ----------------------
-# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
-# There is no helm chart maintained and hence it might need an independent installation
-tf_operator:
-  enabled: false
 
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)

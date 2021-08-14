@@ -4,6 +4,41 @@
 
 A Helm chart for Flyte
 
+### SANDBOX INSTALLATION:
+- [Install helm 3](https://helm.sh/docs/intro/install/)
+- Fetch chart dependencies `helm dep up`
+- Install Flyte sandbox:
+
+```bash
+cd helm
+helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+```
+
+Customize your installation by changing settings in `values-sandbox.yaml`.
+You can use the helm diff plugin to review any value changes you've made to your values:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+helm diff upgrade -f values-sandbox.yaml flyte .
+```
+
+Then apply your changes:
+```bash
+helm upgrade -f values-sandbox.yaml flyte .
+```
+
+#### Alternative: Generate raw kubernetes yaml with helm template
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
+
+- When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
+- Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
+
+### CONFIGURATION NOTES:
+- The docker images, their tags and other default parameters are configured in `values.yaml` file.
+- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
+- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -110,18 +145,6 @@ A Helm chart for Flyte
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
-| pytorchoperator.affinity | object | `{}` | affinity for Pytorchoperator deployment |
-| pytorchoperator.enabled | bool | `false` |  |
-| pytorchoperator.image.pullPolicy | string | `"IfNotPresent"` |  |
-| pytorchoperator.image.repository | string | `"gcr.io/kubeflow-images-public/pytorch-operator"` | Docker image for Pytorchoperator |
-| pytorchoperator.image.tag | string | `"v1.0.0-g047cf0f"` |  |
-| pytorchoperator.nodeSelector | object | `{}` | nodeSelector for Pytorchoperator deployment |
-| pytorchoperator.podAnnotations | object | `{}` | Annotations for Pytorchoperator pods |
-| pytorchoperator.replicaCount | int | `1` | Replicas count for Pytorchoperator deployment |
-| pytorchoperator.resources | object | `{"limits":{"cpu":"500m","memory":"1000M"},"requests":{"cpu":"10m","memory":"50M"}}` | Default resources requests and limits for Pytorchoperator |
-| pytorchoperator.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Pytorchoperator |
-| pytorchoperator.serviceAccountAnnotations | object | `{}` | Annotations for ServiceAccount attached to Pytorchoperator pods |
-| pytorchoperator.tolerations | list | `[]` | tolerations for Pytorchoperator deployment |
 | redis.affinity | object | `{}` | affinity for Redis Statefulset |
 | redis.enabled | bool | `true` |  |
 | redis.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -137,17 +160,13 @@ A Helm chart for Flyte
 | sagemaker.plugin_config.plugins.sagemaker.region | string | `"<region>"` |  |
 | sagemaker.plugin_config.plugins.sagemaker.roleArn | string | `"<arn>"` |  |
 | sparkoperator.enabled | bool | `false` |  |
-| sparkoperator.image.tag | string | `"v1beta2-1.2.0-3.0.0"` | Docker image for Sparkoperator |
 | sparkoperator.plugin_config | object | `{"plugins":{"spark":{"spark-config-default":[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]}}}` | Spark plugin configuration |
 | sparkoperator.plugin_config.plugins.spark.spark-config-default | list | `[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]` | Spark default configuration |
-| sparkoperator.replicaCount | int | `1` | Replicas count for Sparkoperator deployment |
-| sparkoperator.resources | object | `{"limits":{"cpu":"1000m","memory":"500M"},"requests":{"cpu":"10m","memory":"50M"}}` | Default resources requests and limits for Sparkoperator |
 | storage.bucketName | string | `"my-s3-bucket"` | bucketName defines the storage bucket flyte will use. Required for all types except for sandbox. |
 | storage.custom | object | `{}` | GCP project ID. Required for storage type gcs. projectId: -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings. |
 | storage.gcs | string | `nil` | settings for storage type gcs |
 | storage.s3 | object | `{"region":"us-east-1"}` | settings for storage type s3 |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
-| tf_operator.enabled | bool | `false` |  |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
 | webhook.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for the webhook |
 | webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for the webhook |
@@ -157,4 +176,3 @@ A Helm chart for Flyte
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler.config | object | `{}` |  |
 | workflow_scheduler.enabled | bool | `false` |  |
-

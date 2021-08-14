@@ -3709,12 +3709,7 @@ spec:
         - -metrics-prefix=
         - -enable-resource-quota-enforcement=false
         resources:
-          limits:
-            cpu: 1000m
-            memory: 500M
-          requests:
-            cpu: 10m
-            memory: 50M
+          {}
 ---
 # Source: flyte-sandbox/templates/minio/deployment.yaml
 apiVersion: apps/v1
@@ -3940,11 +3935,11 @@ spec:
               name: flyte-admin-config
             name: config-volume
 ---
-# Source: flyte-sandbox/templates/common/ingress.yaml
+# Source: flyte-sandbox/charts/flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: flyte-sandbox
+  name: flyte
   namespace: flyte-sandbox
 spec:
   rules:

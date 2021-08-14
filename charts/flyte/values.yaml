@@ -638,20 +638,6 @@ cluster_resource_manager:
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
   enabled: false
-  # -- Replicas count for Sparkoperator deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Sparkoperator
-    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
-  # -- Default resources requests and limits for Sparkoperator
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 500M
-    requests:
-      cpu: 10m
-      memory: 50M
-
   # -- Spark plugin configuration
   plugin_config:
     plugins:
@@ -676,49 +662,6 @@ sparkoperator:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-
-# ----------------------
-# Distributed Pytorch execution using the K8s Pytorch operator
-#
-
-pytorchoperator:
-  # --- enable or disable Pytorchoperator deployment installation
-  enabled: false   # Set false to disable
-  # -- Replicas count for Pytorchoperator deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Pytorchoperator
-    repository: gcr.io/kubeflow-images-public/pytorch-operator
-    tag: v1.0.0-g047cf0f
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Pytorchoperator
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1000M
-    requests:
-      cpu: 10m
-      memory: 50M
-  # -- Service settings for Pytorchoperator
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for ServiceAccount attached to Pytorchoperator pods
-  serviceAccountAnnotations: {}
-  # -- Annotations for Pytorchoperator pods
-  podAnnotations: {}
-  # -- nodeSelector for Pytorchoperator deployment
-  nodeSelector: {}
-  # -- tolerations for Pytorchoperator deployment
-  tolerations: []
-  # -- affinity for Pytorchoperator deployment
-  affinity: {}
-
-# ----------------------
-# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
-# There is no helm chart maintained and hence it might need an independent installation
-tf_operator:
-  enabled: false
 
 
 # -----------------

@@ -13,6 +13,41 @@ A Helm chart for Flyte
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.0.6 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
+### SANDBOX INSTALLATION:
+- [Install helm 3](https://helm.sh/docs/intro/install/)
+- Fetch chart dependencies `helm dep up`
+- Install Flyte sandbox:
+
+```bash
+cd helm
+helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+```
+
+Customize your installation by changing settings in `values-sandbox.yaml`.
+You can use the helm diff plugin to review any value changes you've made to your values:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+helm diff upgrade -f values-sandbox.yaml flyte .
+```
+
+Then apply your changes:
+```bash
+helm upgrade -f values-sandbox.yaml flyte .
+```
+
+#### Alternative: Generate raw kubernetes yaml with helm template
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
+
+- When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
+- Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
+
+### CONFIGURATION NOTES:
+- The docker images, their tags and other default parameters are configured in `values.yaml` file.
+- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
+- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -181,4 +216,3 @@ A Helm chart for Flyte
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler.config | object | `{}` |  |
 | workflow_scheduler.enabled | bool | `false` |  |
-
