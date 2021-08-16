@@ -90,6 +90,11 @@ export interface NodeExecution extends Admin.INodeExecution {
     closure: NodeExecutionClosure;
     metadata?: NodeExecutionMetadata;
 }
+
+export interface NodeExecutionsById {
+    [k: string]: NodeExecution;
+}
+
 export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
     createdAt: Protobuf.ITimestamp;
     duration?: Protobuf.Duration;

@@ -6,7 +6,6 @@ import { DetailsPanel } from 'components/common/DetailsPanel';
 import { extractTaskTemplates } from 'components/hooks/utils';
 import { CompiledWorkflowClosure, Workflow } from 'models/Workflow/types';
 import * as React from 'react';
-import { TaskNodeRenderer } from '../TaskNodeRenderer';
 import { WorkflowGraph } from '../WorkflowGraph';
 import * as graphData from './rich.json';
 
@@ -52,6 +51,5 @@ stories.add('TaskNodeRenderer', () => (
     <WorkflowGraph
         onNodeSelectionChanged={onNodeSelectionChanged}
         workflow={workflow}
-        nodeRenderer={TaskNodeRenderer}
     />
 ));

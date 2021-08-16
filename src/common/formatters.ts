@@ -71,7 +71,7 @@ export function millisecondsToHMS(valueMS: number): string {
     }
 
     const duration = moment.duration(valueMS);
-    const parts = [];
+    const parts: string[] = [];
 
     // Using asHours() because if it's greater than 24, we'll just show the total
     if (duration.asHours() >= 1) {
@@ -95,7 +95,7 @@ export function durationToYMWDHMS(duration: moment.Duration): string {
         return '';
     }
 
-    const parts = [];
+    const parts: string[] = [];
 
     if (duration.years() !== 0) {
         parts.push(`${Math.abs(duration.years())}y`);

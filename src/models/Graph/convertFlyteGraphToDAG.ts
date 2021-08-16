@@ -16,6 +16,7 @@ const log = createDebugLogger('models/Workflow');
 export function convertFlyteGraphToDAG(
     workflow: CompiledWorkflowClosure
 ): DAGNode[] {
+
     const timer = createTimer();
 
     const {
@@ -48,6 +49,7 @@ export function convertFlyteGraphToDAG(
 
     const nodeMap: Record<string, DAGNode> = keyBy(nodes, 'id');
     const connectionMap: Map<string, Map<string, boolean>> = new Map();
+
     Object.keys(connections.downstream).forEach(parentId => {
         const edges = connections.downstream[parentId];
         edges.ids.forEach(id => {

@@ -225,6 +225,7 @@ async function fetchGroupsForParentNodeExecution(
             [nodeExecutionQueryParams.parentNodeId]: nodeExecution.id.nodeId
         }
     };
+
     const children = await fetchNodeExecutionList(
         queryClient,
         nodeExecution.id.executionId,
@@ -252,7 +253,6 @@ function fetchChildNodeExecutionGroups(
     config: RequestConfig
 ) {
     const { workflowNodeMetadata } = nodeExecution.closure;
-
     // Newer NodeExecution structures can directly indicate their parent
     // status and have their children fetched in bulk.
     if (isParentNode(nodeExecution)) {
@@ -276,6 +276,68 @@ function fetchChildNodeExecutionGroups(
         );
     }
     return fetchGroupsForTaskExecutionNode(queryClient, nodeExecution, config);
+}
+
+/**
+ * Query returns all children for a list of `nodeExecutions`
+ * Note: diffrent from fetchGroupsForParentNodeExecution in that it expects a
+ * list of nodeExecitions
+ */
+async function fetchAllChildNodeExecutions(
+    queryClient: QueryClient,
+    nodeExecutions: NodeExecution[],
+    config: RequestConfig
+): Promise<Array<NodeExecutionGroup[]>> {
+    const executions: Array<NodeExecutionGroup[]> = await Promise.all(
+        nodeExecutions.map(exe => {
+            return fetchChildNodeExecutionGroups(queryClient, exe, config);
+        })
+    );
+    return executions;
+}
+
+/**
+ *
+ * @param nodeExecutions list of parent node executionId's
+ * @param config
+ * @returns
+ */
+export function useAllChildNodeExecutionGroupsQuery(
+    nodeExecutions: NodeExecution[],
+    config: RequestConfig
+): QueryObserverResult<Array<NodeExecutionGroup[]>, Error> {
+    const queryClient = useQueryClient();
+    const shouldEnableFn = groups => {
+        if (nodeExecutions[0] && groups.length > 0) {
+            if (!nodeExecutionIsTerminal(nodeExecutions[0])) {
+                return true;
+            }
+            return groups.some(group => {
+                if (group.nodeExecutions?.length > 0) {
+                    return group.nodeExecutions.some(ne => {
+                        return !nodeExecutionIsTerminal(ne);
+                    });
+                } else {
+                    return false;
+                }
+            });
+        } else {
+            return false;
+        }
+    };
+
+    return useConditionalQuery<Array<NodeExecutionGroup[]>>(
+        {
+            queryKey: [
+                QueryType.NodeExecutionChildList,
+                nodeExecutions[0]?.id,
+                config
+            ],
+            queryFn: () =>
+                fetchAllChildNodeExecutions(queryClient, nodeExecutions, config)
+        },
+        shouldEnableFn
+    );
 }
 
 /** Fetches and groups `NodeExecution`s which are direct children of the given

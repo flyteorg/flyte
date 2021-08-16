@@ -158,7 +158,7 @@ const NodeExecutionTabs: React.FC<{
     const styles = useStyles();
     const tabState = useTabState(tabIds, defaultTab);
 
-    let tabContent = null;
+    let tabContent: JSX.Element | null = null;
     switch (tabState.value) {
         case tabIds.executions: {
             tabContent = <TaskExecutionsList nodeExecution={nodeExecution} />;

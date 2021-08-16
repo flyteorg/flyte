@@ -6,12 +6,13 @@ import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
 import { Execution, NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
 import { tabs } from './constants';
-import { ExecutionWorkflowGraph } from './ExecutionWorkflowGraph';
+import { ExecutionChildrenLoader } from './ExecutionChildrenLoader';
 import { useExecutionNodeViewsState } from './useExecutionNodeViewsState';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,6 +43,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
     const styles = useStyles();
     const filterState = useNodeExecutionFiltersState();
     const tabState = useTabState(tabs, tabs.nodes.id);
+    const [graphStateReady, setGraphStateReady] = useState(false);
 
     /* We want to maintain the filter selection when switching away from the Nodes
     tab and back, but do not want to filter the nodes when viewing the graph. So,
@@ -62,12 +64,14 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
         </NodeExecutionsRequestConfigContext.Provider>
     );
 
-    const renderExecutionWorkflowGraph = (nodeExecutions: NodeExecution[]) => (
-        <ExecutionWorkflowGraph
-            nodeExecutions={nodeExecutions}
-            workflowId={execution.closure.workflowId}
-        />
-    );
+    const renderExecutionLoader = (nodeExecutions: NodeExecution[]) => {
+        return (
+            <ExecutionChildrenLoader
+                nodeExecutions={nodeExecutions}
+                workflowId={execution.closure.workflowId}
+            />
+        );
+    };
 
     return (
         <>
@@ -94,7 +98,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                         errorComponent={DataError}
                         query={nodeExecutionsQuery}
                     >
-                        {renderExecutionWorkflowGraph}
+                        {renderExecutionLoader}
                     </WaitForQuery>
                 )}
             </div>
