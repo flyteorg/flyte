@@ -4,7 +4,7 @@ For information related to contributing to Flyte, please check out the [Contribu
 
 ## Add a Contributor
 
-To add a contributor, simply comment on an issue or pull request. For example:
+To add a contributor to README, comment on an issue or pull request. For example:
 
 ```
 @all-contributors please add @kumare3 for code,review,infra
