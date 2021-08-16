@@ -264,7 +264,7 @@ A big thank you to the community for making Flyte possible ([emoji key](https://
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table style="border-collapse: separate;border-spacing: 1em 1em;">
+<table>
   <tr>
     <td align="center"><a href="https://github.com/kumare3"><img src="https://avatars.githubusercontent.com/u/16888709?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Ketan Umare</b></sub></a><br /><a href="#maintenance-kumare3" title="Maintenance">🚧</a> <a href="#ideas-kumare3" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-kumare3" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-kumare3" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/flyteorg/flyte/commits?author=kumare3" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3Akumare3" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/EngHabu"><img src="https://avatars.githubusercontent.com/u/27159?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Haytham Abuelfutuh</b></sub></a><br /><a href="#maintenance-EngHabu" title="Maintenance">🚧</a> <a href="#ideas-EngHabu" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-EngHabu" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#mentoring-EngHabu" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/flyteorg/flyte/commits?author=EngHabu" title="Code">💻</a> <a href="https://github.com/flyteorg/flyte/pulls?q=is%3Apr+reviewed-by%3AEngHabu" title="Reviewed Pull Requests">👀</a></td>
