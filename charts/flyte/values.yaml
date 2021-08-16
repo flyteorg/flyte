@@ -15,7 +15,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
-    tag: v0.6.10 # FLYTEADMIN_TAG
+    tag: v0.6.16 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -68,7 +68,7 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog
-    tag: v0.3.5 # DATACATALOG_TAG
+    tag: v0.3.6 # DATACATALOG_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -114,7 +114,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller
-    tag: v0.12.9 # FLYTEPROPELLER_TAG
+    tag: v0.13.4 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -270,7 +270,6 @@ common:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
 
-
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform
 # Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
@@ -303,7 +302,6 @@ db:
     # dbname: flyte
     # passwordPath: /etc/db/pass.txt
     # options:
-
 
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
@@ -408,7 +406,7 @@ configmap:
         storage: 5Mi
       limits:
         cpu: 2
-        memory: 8Gi
+        memory: 1Gi
         storage: 20Mi
         gpu: 1
 
@@ -558,8 +556,6 @@ workflow_scheduler:
   enabled: false
   config: {}
 
-
-
 # -- **Optional Component**
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
@@ -661,7 +657,6 @@ sparkoperator:
           - spark.blacklist.enabled: "true"
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
-
 
 
 # -----------------

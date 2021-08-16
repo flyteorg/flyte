@@ -11,7 +11,7 @@ spec:
       command:
         - bash
         - -c
-      image: cr.flyte.org/flyteorg/flytetools:1655806d60e77775c76c1aaa01781f6c6211530f
+      image: cr.flyte.org/flyteorg/flytetools:1f3a7c4d74da801cf0ea60b99367070434c79da3
       imagePullPolicy: IfNotPresent
       name: flytetester
       resources:

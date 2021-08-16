@@ -159,10 +159,11 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 ### In Progress
 
-- Helm chart for Flyte (coming soon - June)
-- Flink-K8s (coming soon - June)
-- One click deploy to AWS
-- Reactive pipelines & Events
+- Demos; Distributed Pytorch, feature engineering, etc.
+- Integrations; Great Expectations, Feast
+- Least-privilege Minimal Helm Chart
+- Relaunch execution in recover mode
+- Documentation as code
 
 ## 🔌 Available Plugins
 
@@ -222,16 +223,17 @@ Here are some resources to help you learn more about Flyte.
 
 ### Communication Channels
 
-- [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)
+- [Slack](https://forms.gle/UVuek9WfBoweiqcJA)
 - [Email list](https://groups.google.com/u/0/a/flyte.org/g/users)
 - [Twitter](https://twitter.com/flyteorg) 
 - [LinkedIn Discussion Group](https://www.linkedin.com/groups/13962256/)
+- [GitHub Discussions](https://github.com/flyteorg/flyte/discussions)
 
 ### Biweekly Community Sync
 
-- 📣 **Flyte OSS Community Sync** happens every other Tuesday, 9am-10am PDT ([Checkout the events calendar](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)). Here's the [zoom link](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
-- Meeting notes and backlog of topics are captured in [doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
-- If you'd like to revisit any community sync meeting that has happened, you can access the [video recordings](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
+- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Checkout the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting times. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- Upcoming meeting agenda, previous meeting notes and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
+- If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
 ### Conference Talks
 
@@ -243,10 +245,11 @@ Here are some resources to help you learn more about Flyte.
 - Datacouncil [video](https://www.youtube.com/watch?v=1BjXC5TZAiI) | [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 - FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)
 - [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)
+- [OSPOCon 2021](https://events.linuxfoundation.org/ospocon/) Catch a variety of Flyte talks - final schedule and topics to be released soon.
 
 ### Blog Posts
 
-[Flyte blog site](https://blog.flyte.org/)
+- [Flyte blog site](https://blog.flyte.org/)
 
 ### Podcasts
 
@@ -286,4 +289,6 @@ A big thank you to the community for making Flyte possible!
 - [@surindersinghp](https://github.com/surindersinghp)
 - [@vsbus](https://github.com/vsbus)
 - [@catalinii](https://github.com/catalinii)
+- [@pmahindrakar-oss](https://github.com/pmahindrakar-oss)
+- [@milton0825](https://github.com/milton0825)
 - [@kumare3](https://github.com/kumare3)
