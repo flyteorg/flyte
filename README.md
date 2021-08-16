@@ -76,7 +76,7 @@ Here are the setup instructions to start contributing to `flytesnacks` repo:
         * Run the `make start` command in the root directory of the flytesnacks repo
         * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in flytesnacks/cookbook/core directory
         * To fetch new dependencies and rebuild the image, run `make register`
-        * If examples from a different directory (other than `core`) have to registered, run the command `SANDBOX=1 make -C <directory> register` in the `flytesnacks` repo.
+        * If examples from a different directory (other than `core`) have to registered, enter the sandbox first: `make shell` and then run `make -C <directory> register`.
 
 ### 📝 Contribute to documentation
 
