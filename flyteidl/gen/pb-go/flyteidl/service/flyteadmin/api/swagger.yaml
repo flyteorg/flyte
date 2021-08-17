@@ -3115,7 +3115,7 @@ definitions:
           \ the user and their supplied cause."
         $ref: "#/definitions/adminAbortMetadata"
       output_data:
-        description: "Raw output metadata produced by this execution."
+        description: "Raw output data produced by this execution."
         $ref: "#/definitions/coreLiteralMap"
       computed_inputs:
         title: "Inputs computed and passed for execution.\ncomputed_inputs depends\
@@ -5820,7 +5820,7 @@ definitions:
         title: "Error information for the Node"
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output metadata produced by this node execution."
+        description: "Raw output data produced by this node execution."
         $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this node execution."
@@ -9989,7 +9989,7 @@ definitions:
           \ failed."
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output metadata produced by this task execution."
+        description: "Raw output data produced by this task execution."
         $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this task execution."
@@ -30794,7 +30794,7 @@ definitions:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output metadata produced by this node execution."
+        description: "Raw output data produced by this node execution."
         $ref: "#/definitions/coreLiteralMap"
       workflow_node_metadata:
         $ref: "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -30890,7 +30890,7 @@ definitions:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output metadata produced by this task execution."
+        description: "Raw output data produced by this task execution."
         $ref: "#/definitions/coreLiteralMap"
       custom_info:
         description: "Custom data that the task plugin sends back. This is extensible\
@@ -30983,7 +30983,7 @@ definitions:
         title: "Error information for the execution"
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output metadata produced by this workflow execution."
+        description: "Raw output data produced by this workflow execution."
         $ref: "#/definitions/coreLiteralMap"
   flyteidladminDynamicWorkflowNodeMetadata:
     type: "object"

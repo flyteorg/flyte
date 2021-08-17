@@ -29,7 +29,7 @@ type EventTaskExecutionEvent struct {
 	// URI to the output of the execution, it will be in a format that encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
-	// Raw output metadata produced by this task execution.
+	// Raw output data produced by this task execution.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.
 	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`

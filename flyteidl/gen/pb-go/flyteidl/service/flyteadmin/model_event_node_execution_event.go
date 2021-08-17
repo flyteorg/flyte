@@ -23,7 +23,7 @@ type EventNodeExecutionEvent struct {
 	// URL to the output of the execution, it encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
-	// Raw output metadata produced by this node execution.
+	// Raw output data produced by this node execution.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	WorkflowNodeMetadata *FlyteidleventWorkflowNodeMetadata `json:"workflow_node_metadata,omitempty"`
 	TaskNodeMetadata *FlyteidleventTaskNodeMetadata `json:"task_node_metadata,omitempty"`
