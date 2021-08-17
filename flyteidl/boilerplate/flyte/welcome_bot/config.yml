@@ -3,6 +3,7 @@ newPRWelcomeComment: >
   Thank you for opening this pull request! 🙌
 
   These tips will help get your PR across the finish line:
+  
   - Most of the repos have a PR template; if not, fill it out to the best of your knowledge.
   - Sign off your commits (Reference: [DCO Guide](https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md)).
 

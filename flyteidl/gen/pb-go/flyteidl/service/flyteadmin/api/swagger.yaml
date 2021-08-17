@@ -2927,13 +2927,19 @@ definitions:
             literals: {}
           uri: "uri"
         phase: {}
-        duration: "duration"
         workflow_id:
           domain: "domain"
           resource_type: {}
           name: "name"
           project: "project"
           version: "version"
+        created_at: "2000-01-23T04:56:07.000+00:00"
+        error:
+          code: "code"
+          kind: {}
+          message: "message"
+          error_uri: "error_uri"
+        duration: "duration"
         computed_inputs:
           literals: {}
         abort_metadata:
@@ -2941,13 +2947,9 @@ definitions:
           cause: "cause"
         updated_at: "2000-01-23T04:56:07.000+00:00"
         started_at: "2000-01-23T04:56:07.000+00:00"
-        created_at: "2000-01-23T04:56:07.000+00:00"
-        error:
-          code: "code"
-          kind: {}
-          message: "message"
-          error_uri: "error_uri"
         abort_cause: "abort_cause"
+        output_data:
+          literals: {}
         notifications:
         - pager_duty:
             recipients_email:
@@ -3112,6 +3114,9 @@ definitions:
         description: "In the case of a user-specified abort, this will pass along\
           \ the user and their supplied cause."
         $ref: "#/definitions/adminAbortMetadata"
+      output_data:
+        description: "Raw output metadata produced by this execution."
+        $ref: "#/definitions/coreLiteralMap"
       computed_inputs:
         title: "Inputs computed and passed for execution.\ncomputed_inputs depends\
           \ on inputs in ExecutionSpec, fixed and default inputs in launch plan"
@@ -3152,13 +3157,19 @@ definitions:
           literals: {}
         uri: "uri"
       phase: {}
-      duration: "duration"
       workflow_id:
         domain: "domain"
         resource_type: {}
         name: "name"
         project: "project"
         version: "version"
+      created_at: "2000-01-23T04:56:07.000+00:00"
+      error:
+        code: "code"
+        kind: {}
+        message: "message"
+        error_uri: "error_uri"
+      duration: "duration"
       computed_inputs:
         literals: {}
       abort_metadata:
@@ -3166,13 +3177,9 @@ definitions:
         cause: "cause"
       updated_at: "2000-01-23T04:56:07.000+00:00"
       started_at: "2000-01-23T04:56:07.000+00:00"
-      created_at: "2000-01-23T04:56:07.000+00:00"
-      error:
-        code: "code"
-        kind: {}
-        message: "message"
-        error_uri: "error_uri"
       abort_cause: "abort_cause"
+      output_data:
+        literals: {}
       notifications:
       - pager_duty:
           recipients_email:
@@ -3275,13 +3282,19 @@ definitions:
               literals: {}
             uri: "uri"
           phase: {}
-          duration: "duration"
           workflow_id:
             domain: "domain"
             resource_type: {}
             name: "name"
             project: "project"
             version: "version"
+          created_at: "2000-01-23T04:56:07.000+00:00"
+          error:
+            code: "code"
+            kind: {}
+            message: "message"
+            error_uri: "error_uri"
+          duration: "duration"
           computed_inputs:
             literals: {}
           abort_metadata:
@@ -3289,13 +3302,9 @@ definitions:
             cause: "cause"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           started_at: "2000-01-23T04:56:07.000+00:00"
-          created_at: "2000-01-23T04:56:07.000+00:00"
-          error:
-            code: "code"
-            kind: {}
-            message: "message"
-            error_uri: "error_uri"
           abort_cause: "abort_cause"
+          output_data:
+            literals: {}
           notifications:
           - pager_duty:
               recipients_email:
@@ -3453,13 +3462,19 @@ definitions:
               literals: {}
             uri: "uri"
           phase: {}
-          duration: "duration"
           workflow_id:
             domain: "domain"
             resource_type: {}
             name: "name"
             project: "project"
             version: "version"
+          created_at: "2000-01-23T04:56:07.000+00:00"
+          error:
+            code: "code"
+            kind: {}
+            message: "message"
+            error_uri: "error_uri"
+          duration: "duration"
           computed_inputs:
             literals: {}
           abort_metadata:
@@ -3467,13 +3482,9 @@ definitions:
             cause: "cause"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           started_at: "2000-01-23T04:56:07.000+00:00"
-          created_at: "2000-01-23T04:56:07.000+00:00"
-          error:
-            code: "code"
-            kind: {}
-            message: "message"
-            error_uri: "error_uri"
           abort_cause: "abort_cause"
+          output_data:
+            literals: {}
           notifications:
           - pager_duty:
               recipients_email:
@@ -5808,6 +5819,9 @@ definitions:
       error:
         title: "Error information for the Node"
         $ref: "#/definitions/coreExecutionError"
+      output_data:
+        description: "Raw output metadata produced by this node execution."
+        $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this node execution."
         $ref: "#/definitions/coreNodeExecutionPhase"
@@ -5874,6 +5888,8 @@ definitions:
         kind: {}
         message: "message"
         error_uri: "error_uri"
+      output_data:
+        literals: {}
   adminNodeExecutionEventRequest:
     type: "object"
     properties:
@@ -9004,6 +9020,8 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
+          output_data:
+            literals: {}
       - metadata:
           retry_group: "retry_group"
           is_parent_node: true
@@ -9058,6 +9076,8 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
+          output_data:
+            literals: {}
       token: "token"
   adminNodeExecutionMetaData:
     type: "object"
@@ -9968,6 +9988,9 @@ definitions:
         description: "Error information for the task execution. Populated if the execution\
           \ failed."
         $ref: "#/definitions/coreExecutionError"
+      output_data:
+        description: "Raw output metadata produced by this task execution."
+        $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this task execution."
         $ref: "#/definitions/coreTaskExecutionPhase"
@@ -10007,7 +10030,6 @@ definitions:
     description: "Container for task execution details and results."
     example:
       phase: {}
-      duration: "duration"
       reason: "reason"
       metadata:
         external_resources:
@@ -10021,6 +10043,13 @@ definitions:
           namespace: "namespace"
         generated_name: "generated_name"
         plugin_identifier: "plugin_identifier"
+      created_at: "2000-01-23T04:56:07.000+00:00"
+      error:
+        code: "code"
+        kind: {}
+        message: "message"
+        error_uri: "error_uri"
+      duration: "duration"
       updated_at: "2000-01-23T04:56:07.000+00:00"
       custom_info:
         fields:
@@ -10035,13 +10064,9 @@ definitions:
             bool_value: true
       output_uri: "output_uri"
       started_at: "2000-01-23T04:56:07.000+00:00"
-      created_at: "2000-01-23T04:56:07.000+00:00"
-      error:
-        code: "code"
-        kind: {}
-        message: "message"
-        error_uri: "error_uri"
       task_type: "task_type"
+      output_data:
+        literals: {}
       logs:
       - message_format: {}
         name: "name"
@@ -10129,7 +10154,6 @@ definitions:
         is_parent: true
         closure:
           phase: {}
-          duration: "duration"
           reason: "reason"
           metadata:
             external_resources:
@@ -10143,6 +10167,13 @@ definitions:
               namespace: "namespace"
             generated_name: "generated_name"
             plugin_identifier: "plugin_identifier"
+          created_at: "2000-01-23T04:56:07.000+00:00"
+          error:
+            code: "code"
+            kind: {}
+            message: "message"
+            error_uri: "error_uri"
+          duration: "duration"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -10157,13 +10188,9 @@ definitions:
                 bool_value: true
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
-          created_at: "2000-01-23T04:56:07.000+00:00"
-          error:
-            code: "code"
-            kind: {}
-            message: "message"
-            error_uri: "error_uri"
           task_type: "task_type"
+          output_data:
+            literals: {}
           logs:
           - message_format: {}
             name: "name"
@@ -10191,7 +10218,6 @@ definitions:
         is_parent: true
         closure:
           phase: {}
-          duration: "duration"
           reason: "reason"
           metadata:
             external_resources:
@@ -10205,6 +10231,13 @@ definitions:
               namespace: "namespace"
             generated_name: "generated_name"
             plugin_identifier: "plugin_identifier"
+          created_at: "2000-01-23T04:56:07.000+00:00"
+          error:
+            code: "code"
+            kind: {}
+            message: "message"
+            error_uri: "error_uri"
+          duration: "duration"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -10219,13 +10252,9 @@ definitions:
                 bool_value: true
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
-          created_at: "2000-01-23T04:56:07.000+00:00"
-          error:
-            code: "code"
-            kind: {}
-            message: "message"
-            error_uri: "error_uri"
           task_type: "task_type"
+          output_data:
+            literals: {}
           logs:
           - message_format: {}
             name: "name"
@@ -34054,6 +34083,8 @@ definitions:
           kind: {}
           message: "message"
           error_uri: "error_uri"
+        output_data:
+          literals: {}
   flyteidladminTaskExecution:
     type: "object"
     properties:
@@ -34093,7 +34124,6 @@ definitions:
       is_parent: true
       closure:
         phase: {}
-        duration: "duration"
         reason: "reason"
         metadata:
           external_resources:
@@ -34107,6 +34137,13 @@ definitions:
             namespace: "namespace"
           generated_name: "generated_name"
           plugin_identifier: "plugin_identifier"
+        created_at: "2000-01-23T04:56:07.000+00:00"
+        error:
+          code: "code"
+          kind: {}
+          message: "message"
+          error_uri: "error_uri"
+        duration: "duration"
         updated_at: "2000-01-23T04:56:07.000+00:00"
         custom_info:
           fields:
@@ -34121,13 +34158,9 @@ definitions:
               bool_value: true
         output_uri: "output_uri"
         started_at: "2000-01-23T04:56:07.000+00:00"
-        created_at: "2000-01-23T04:56:07.000+00:00"
-        error:
-          code: "code"
-          kind: {}
-          message: "message"
-          error_uri: "error_uri"
         task_type: "task_type"
+        output_data:
+          literals: {}
         logs:
         - message_format: {}
           name: "name"

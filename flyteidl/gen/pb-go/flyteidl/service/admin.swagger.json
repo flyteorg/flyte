@@ -3224,6 +3224,10 @@
           "$ref": "#/definitions/adminAbortMetadata",
           "description": "In the case of a user-specified abort, this will pass along the user and their supplied cause."
         },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this execution."
+        },
         "computed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "title": "Inputs computed and passed for execution.\ncomputed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan"
@@ -3914,6 +3918,10 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the Node"
         },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this node execution."
+        },
         "phase": {
           "$ref": "#/definitions/coreNodeExecutionPhase",
           "description": "The last recorded phase for this node execution."
@@ -4352,6 +4360,10 @@
         "error": {
           "$ref": "#/definitions/coreExecutionError",
           "description": "Error information for the task execution. Populated if the execution failed."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output metadata produced by this task execution."
         },
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",

@@ -689,6 +689,7 @@ class TaskExecutionClosure final :
   enum OutputResultCase {
     kOutputUri = 1,
     kError = 2,
+    kOutputData = 12,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -881,6 +882,15 @@ class TaskExecutionClosure final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
+  // .flyteidl.core.LiteralMap output_data = 12;
+  bool has_output_data() const;
+  void clear_output_data();
+  static const int kOutputDataFieldNumber = 12;
+  const ::flyteidl::core::LiteralMap& output_data() const;
+  ::flyteidl::core::LiteralMap* release_output_data();
+  ::flyteidl::core::LiteralMap* mutable_output_data();
+  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+
   void clear_output_result();
   OutputResultCase output_result_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionClosure)
@@ -888,6 +898,7 @@ class TaskExecutionClosure final :
   class HasBitSetters;
   void set_has_output_uri();
   void set_has_error();
+  void set_has_output_data();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -907,6 +918,7 @@ class TaskExecutionClosure final :
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
+    ::flyteidl::core::LiteralMap* output_data_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1826,6 +1838,41 @@ inline ::flyteidl::core::ExecutionError* TaskExecutionClosure::mutable_error() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionClosure.error)
   return output_result_.error_;
+}
+
+// .flyteidl.core.LiteralMap output_data = 12;
+inline bool TaskExecutionClosure::has_output_data() const {
+  return output_result_case() == kOutputData;
+}
+inline void TaskExecutionClosure::set_has_output_data() {
+  _oneof_case_[0] = kOutputData;
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionClosure::release_output_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionClosure.output_data)
+  if (has_output_data()) {
+    clear_has_output_result();
+      ::flyteidl::core::LiteralMap* temp = output_result_.output_data_;
+    output_result_.output_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& TaskExecutionClosure::output_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionClosure.output_data)
+  return has_output_data()
+      ? *output_result_.output_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionClosure::mutable_output_data() {
+  if (!has_output_data()) {
+    clear_output_result();
+    set_has_output_data();
+    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionClosure.output_data)
+  return output_result_.output_data_;
 }
 
 // .flyteidl.core.TaskExecution.Phase phase = 3;

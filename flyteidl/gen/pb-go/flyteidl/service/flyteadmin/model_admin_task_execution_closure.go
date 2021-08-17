@@ -19,6 +19,8 @@ type AdminTaskExecutionClosure struct {
 	OutputUri string `json:"output_uri,omitempty"`
 	// Error information for the task execution. Populated if the execution failed.
 	Error_ *CoreExecutionError `json:"error,omitempty"`
+	// Raw output metadata produced by this task execution.
+	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// The last recorded phase for this task execution.
 	Phase *CoreTaskExecutionPhase `json:"phase,omitempty"`
 	// Detailed log information output by the task execution.
