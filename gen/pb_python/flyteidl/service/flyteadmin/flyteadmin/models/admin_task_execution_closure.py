@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
 from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: F401,E501
@@ -39,6 +40,7 @@ class AdminTaskExecutionClosure(object):
     swagger_types = {
         'output_uri': 'str',
         'error': 'CoreExecutionError',
+        'output_data': 'CoreLiteralMap',
         'phase': 'CoreTaskExecutionPhase',
         'logs': 'list[CoreTaskLog]',
         'started_at': 'datetime',
@@ -54,6 +56,7 @@ class AdminTaskExecutionClosure(object):
     attribute_map = {
         'output_uri': 'output_uri',
         'error': 'error',
+        'output_data': 'output_data',
         'phase': 'phase',
         'logs': 'logs',
         'started_at': 'started_at',
@@ -66,11 +69,12 @@ class AdminTaskExecutionClosure(object):
         'metadata': 'metadata'
     }
 
-    def __init__(self, output_uri=None, error=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None):  # noqa: E501
         """AdminTaskExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
         self._error = None
+        self._output_data = None
         self._phase = None
         self._logs = None
         self._started_at = None
@@ -87,6 +91,8 @@ class AdminTaskExecutionClosure(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if output_data is not None:
+            self.output_data = output_data
         if phase is not None:
             self.phase = phase
         if logs is not None:
@@ -153,6 +159,29 @@ class AdminTaskExecutionClosure(object):
         """
 
         self._error = error
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this AdminTaskExecutionClosure.  # noqa: E501
+
+        Raw output metadata produced by this task execution.  # noqa: E501
+
+        :return: The output_data of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this AdminTaskExecutionClosure.
+
+        Raw output metadata produced by this task execution.  # noqa: E501
+
+        :param output_data: The output_data of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     @property
     def phase(self):

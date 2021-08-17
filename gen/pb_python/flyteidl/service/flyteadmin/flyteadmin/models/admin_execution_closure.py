@@ -43,6 +43,7 @@ class AdminExecutionClosure(object):
         'error': 'CoreExecutionError',
         'abort_cause': 'str',
         'abort_metadata': 'AdminAbortMetadata',
+        'output_data': 'CoreLiteralMap',
         'computed_inputs': 'CoreLiteralMap',
         'phase': 'CoreWorkflowExecutionPhase',
         'started_at': 'datetime',
@@ -58,6 +59,7 @@ class AdminExecutionClosure(object):
         'error': 'error',
         'abort_cause': 'abort_cause',
         'abort_metadata': 'abort_metadata',
+        'output_data': 'output_data',
         'computed_inputs': 'computed_inputs',
         'phase': 'phase',
         'started_at': 'started_at',
@@ -68,13 +70,14 @@ class AdminExecutionClosure(object):
         'workflow_id': 'workflow_id'
     }
 
-    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None):  # noqa: E501
+    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, output_data=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None):  # noqa: E501
         """AdminExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._outputs = None
         self._error = None
         self._abort_cause = None
         self._abort_metadata = None
+        self._output_data = None
         self._computed_inputs = None
         self._phase = None
         self._started_at = None
@@ -93,6 +96,8 @@ class AdminExecutionClosure(object):
             self.abort_cause = abort_cause
         if abort_metadata is not None:
             self.abort_metadata = abort_metadata
+        if output_data is not None:
+            self.output_data = output_data
         if computed_inputs is not None:
             self.computed_inputs = computed_inputs
         if phase is not None:
@@ -201,6 +206,29 @@ class AdminExecutionClosure(object):
         """
 
         self._abort_metadata = abort_metadata
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this AdminExecutionClosure.  # noqa: E501
+
+        Raw output metadata produced by this execution.  # noqa: E501
+
+        :return: The output_data of this AdminExecutionClosure.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this AdminExecutionClosure.
+
+        Raw output metadata produced by this execution.  # noqa: E501
+
+        :param output_data: The output_data of this AdminExecutionClosure.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     @property
     def computed_inputs(self):

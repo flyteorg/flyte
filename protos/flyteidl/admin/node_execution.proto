@@ -131,6 +131,9 @@ message NodeExecutionClosure {
 
         // Error information for the Node
         core.ExecutionError error          = 2;
+
+        // Raw output metadata produced by this node execution.
+        core.LiteralMap output_data        = 10;
     }
 
     // The last recorded phase for this node execution.

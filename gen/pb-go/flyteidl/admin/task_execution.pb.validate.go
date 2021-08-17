@@ -489,6 +489,18 @@ func (m *TaskExecutionClosure) Validate() error {
 			}
 		}
 
+	case *TaskExecutionClosure_OutputData:
+
+		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionClosureValidationError{
+					field:  "OutputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
