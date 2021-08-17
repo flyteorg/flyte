@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.flyteidladmin_task_node_metadata import FlyteidladminTaskNodeMetadata  # noqa: F401,E501
 from flyteadmin.models.flyteidladmin_workflow_node_metadata import FlyteidladminWorkflowNodeMetadata  # noqa: F401,E501
@@ -38,6 +39,7 @@ class AdminNodeExecutionClosure(object):
     swagger_types = {
         'output_uri': 'str',
         'error': 'CoreExecutionError',
+        'output_data': 'CoreLiteralMap',
         'phase': 'CoreNodeExecutionPhase',
         'started_at': 'datetime',
         'duration': 'str',
@@ -50,6 +52,7 @@ class AdminNodeExecutionClosure(object):
     attribute_map = {
         'output_uri': 'output_uri',
         'error': 'error',
+        'output_data': 'output_data',
         'phase': 'phase',
         'started_at': 'started_at',
         'duration': 'duration',
@@ -59,11 +62,12 @@ class AdminNodeExecutionClosure(object):
         'task_node_metadata': 'task_node_metadata'
     }
 
-    def __init__(self, output_uri=None, error=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None):  # noqa: E501
         """AdminNodeExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
         self._error = None
+        self._output_data = None
         self._phase = None
         self._started_at = None
         self._duration = None
@@ -77,6 +81,8 @@ class AdminNodeExecutionClosure(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if output_data is not None:
+            self.output_data = output_data
         if phase is not None:
             self.phase = phase
         if started_at is not None:
@@ -135,6 +141,29 @@ class AdminNodeExecutionClosure(object):
         """
 
         self._error = error
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this AdminNodeExecutionClosure.  # noqa: E501
+
+        Raw output metadata produced by this node execution.  # noqa: E501
+
+        :return: The output_data of this AdminNodeExecutionClosure.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this AdminNodeExecutionClosure.
+
+        Raw output metadata produced by this node execution.  # noqa: E501
+
+        :param output_data: The output_data of this AdminNodeExecutionClosure.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._output_data = output_data
 
     @property
     def phase(self):

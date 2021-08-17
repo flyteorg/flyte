@@ -629,6 +629,18 @@ func (m *NodeExecutionClosure) Validate() error {
 			}
 		}
 
+	case *NodeExecutionClosure_OutputData:
+
+		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionClosureValidationError{
+					field:  "OutputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	switch m.TargetMetadata.(type) {

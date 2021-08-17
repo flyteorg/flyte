@@ -6954,6 +6954,31 @@ public final class NodeExecutionOuterClass {
 
     /**
      * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    boolean hasOutputData();
+    /**
+     * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getOutputData();
+    /**
+     * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
+
+    /**
+     * <pre>
      * The last recorded phase for this node execution.
      * </pre>
      *
@@ -7249,6 +7274,20 @@ public final class NodeExecutionOuterClass {
               targetMetadataCase_ = 9;
               break;
             }
+            case 82: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (outputResultCase_ == 10) {
+                subBuilder = ((flyteidl.core.Literals.LiteralMap) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.LiteralMap) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 10;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -7287,6 +7326,7 @@ public final class NodeExecutionOuterClass {
         implements com.google.protobuf.Internal.EnumLite {
       OUTPUT_URI(1),
       ERROR(2),
+      OUTPUT_DATA(10),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -7304,6 +7344,7 @@ public final class NodeExecutionOuterClass {
         switch (value) {
           case 1: return OUTPUT_URI;
           case 2: return ERROR;
+          case 10: return OUTPUT_DATA;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -7444,6 +7485,44 @@ public final class NodeExecutionOuterClass {
          return (flyteidl.core.Execution.ExecutionError) outputResult_;
       }
       return flyteidl.core.Execution.ExecutionError.getDefaultInstance();
+    }
+
+    public static final int OUTPUT_DATA_FIELD_NUMBER = 10;
+    /**
+     * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    public boolean hasOutputData() {
+      return outputResultCase_ == 10;
+    }
+    /**
+     * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getOutputData() {
+      if (outputResultCase_ == 10) {
+         return (flyteidl.core.Literals.LiteralMap) outputResult_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output metadata produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+      if (outputResultCase_ == 10) {
+         return (flyteidl.core.Literals.LiteralMap) outputResult_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
     }
 
     public static final int PHASE_FIELD_NUMBER = 3;
@@ -7696,6 +7775,9 @@ public final class NodeExecutionOuterClass {
       if (targetMetadataCase_ == 9) {
         output.writeMessage(9, (flyteidl.admin.NodeExecutionOuterClass.TaskNodeMetadata) targetMetadata_);
       }
+      if (outputResultCase_ == 10) {
+        output.writeMessage(10, (flyteidl.core.Literals.LiteralMap) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -7739,6 +7821,10 @@ public final class NodeExecutionOuterClass {
       if (targetMetadataCase_ == 9) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, (flyteidl.admin.NodeExecutionOuterClass.TaskNodeMetadata) targetMetadata_);
+      }
+      if (outputResultCase_ == 10) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, (flyteidl.core.Literals.LiteralMap) outputResult_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7785,6 +7871,10 @@ public final class NodeExecutionOuterClass {
         case 2:
           if (!getError()
               .equals(other.getError())) return false;
+          break;
+        case 10:
+          if (!getOutputData()
+              .equals(other.getOutputData())) return false;
           break;
         case 0:
         default:
@@ -7839,6 +7929,10 @@ public final class NodeExecutionOuterClass {
         case 2:
           hash = (37 * hash) + ERROR_FIELD_NUMBER;
           hash = (53 * hash) + getError().hashCode();
+          break;
+        case 10:
+          hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getOutputData().hashCode();
           break;
         case 0:
         default:
@@ -8058,6 +8152,13 @@ public final class NodeExecutionOuterClass {
             result.outputResult_ = errorBuilder_.build();
           }
         }
+        if (outputResultCase_ == 10) {
+          if (outputDataBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = outputDataBuilder_.build();
+          }
+        }
         result.phase_ = phase_;
         if (startedAtBuilder_ == null) {
           result.startedAt_ = startedAt_;
@@ -8167,6 +8268,10 @@ public final class NodeExecutionOuterClass {
           }
           case ERROR: {
             mergeError(other.getError());
+            break;
+          }
+          case OUTPUT_DATA: {
+            mergeOutputData(other.getOutputData());
             break;
           }
           case OUTPUTRESULT_NOT_SET: {
@@ -8515,6 +8620,178 @@ public final class NodeExecutionOuterClass {
         outputResultCase_ = 2;
         onChanged();;
         return errorBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public boolean hasOutputData() {
+        return outputResultCase_ == 10;
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 10) {
+            return (flyteidl.core.Literals.LiteralMap) outputResult_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 10) {
+            return outputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (outputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public Builder setOutputData(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (outputDataBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 10 &&
+              outputResult_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 10) {
+            outputDataBuilder_.mergeFrom(value);
+          }
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public Builder clearOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 10) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 10) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          outputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
+        return getOutputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+        if ((outputResultCase_ == 10) && (outputDataBuilder_ != null)) {
+          return outputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 10) {
+            return (flyteidl.core.Literals.LiteralMap) outputResult_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output metadata produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getOutputDataFieldBuilder() {
+        if (outputDataBuilder_ == null) {
+          if (!(outputResultCase_ == 10)) {
+            outputResult_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 10;
+        onChanged();;
+        return outputDataBuilder_;
       }
 
       private int phase_ = 0;
@@ -14418,39 +14695,41 @@ public final class NodeExecutionOuterClass {
       "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\"Z\n\021" +
       "NodeExecutionList\0226\n\017node_executions\030\001 \003" +
       "(\0132\035.flyteidl.admin.NodeExecution\022\r\n\005tok" +
-      "en\030\002 \001(\t\"\370\003\n\024NodeExecutionClosure\022\024\n\nout" +
+      "en\030\002 \001(\t\"\252\004\n\024NodeExecutionClosure\022\024\n\nout" +
       "put_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.flyteid" +
-      "l.core.ExecutionErrorH\000\0221\n\005phase\030\003 \001(\0162\"" +
-      ".flyteidl.core.NodeExecution.Phase\022.\n\nst" +
-      "arted_at\030\004 \001(\0132\032.google.protobuf.Timesta" +
-      "mp\022+\n\010duration\030\005 \001(\0132\031.google.protobuf.D" +
-      "uration\022.\n\ncreated_at\030\006 \001(\0132\032.google.pro" +
-      "tobuf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.go" +
-      "ogle.protobuf.Timestamp\022F\n\026workflow_node" +
-      "_metadata\030\010 \001(\0132$.flyteidl.admin.Workflo" +
-      "wNodeMetadataH\001\022>\n\022task_node_metadata\030\t " +
-      "\001(\0132 .flyteidl.admin.TaskNodeMetadataH\001B" +
-      "\017\n\routput_resultB\021\n\017target_metadata\"W\n\024W" +
-      "orkflowNodeMetadata\022?\n\013executionId\030\001 \001(\013" +
-      "2*.flyteidl.core.WorkflowExecutionIdenti" +
-      "fier\"\200\001\n\020TaskNodeMetadata\0227\n\014cache_statu" +
-      "s\030\001 \001(\0162!.flyteidl.core.CatalogCacheStat" +
-      "us\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl.core." +
-      "CatalogMetadata\"\207\001\n\033DynamicWorkflowNodeM" +
-      "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden" +
-      "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt" +
-      "eidl.core.CompiledWorkflowClosure\"Q\n\033Nod" +
-      "eExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.f" +
-      "lyteidl.core.NodeExecutionIdentifier\"\241\002\n" +
-      "\034NodeExecutionGetDataResponse\022+\n\006inputs\030" +
-      "\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007ou" +
-      "tputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001" +
-      "\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Li" +
-      "teralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteid" +
-      "l.core.LiteralMap\022E\n\020dynamic_workflow\030\020 " +
-      "\001(\0132+.flyteidl.admin.DynamicWorkflowNode" +
-      "MetadataB7Z5github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "l.core.ExecutionErrorH\000\0220\n\013output_data\030\n" +
+      " \001(\0132\031.flyteidl.core.LiteralMapH\000\0221\n\005pha" +
+      "se\030\003 \001(\0162\".flyteidl.core.NodeExecution.P" +
+      "hase\022.\n\nstarted_at\030\004 \001(\0132\032.google.protob" +
+      "uf.Timestamp\022+\n\010duration\030\005 \001(\0132\031.google." +
+      "protobuf.Duration\022.\n\ncreated_at\030\006 \001(\0132\032." +
+      "google.protobuf.Timestamp\022.\n\nupdated_at\030" +
+      "\007 \001(\0132\032.google.protobuf.Timestamp\022F\n\026wor" +
+      "kflow_node_metadata\030\010 \001(\0132$.flyteidl.adm" +
+      "in.WorkflowNodeMetadataH\001\022>\n\022task_node_m" +
+      "etadata\030\t \001(\0132 .flyteidl.admin.TaskNodeM" +
+      "etadataH\001B\017\n\routput_resultB\021\n\017target_met" +
+      "adata\"W\n\024WorkflowNodeMetadata\022?\n\013executi" +
+      "onId\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
+      "tionIdentifier\"\200\001\n\020TaskNodeMetadata\0227\n\014c" +
+      "ache_status\030\001 \001(\0162!.flyteidl.core.Catalo" +
+      "gCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036.flyt" +
+      "eidl.core.CatalogMetadata\"\207\001\n\033DynamicWor" +
+      "kflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.flyteidl" +
+      ".core.Identifier\022A\n\021compiled_workflow\030\002 " +
+      "\001(\0132&.flyteidl.core.CompiledWorkflowClos" +
+      "ure\"Q\n\033NodeExecutionGetDataRequest\0222\n\002id" +
+      "\030\001 \001(\0132&.flyteidl.core.NodeExecutionIden" +
+      "tifier\"\241\002\n\034NodeExecutionGetDataResponse\022" +
+      "+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob" +
+      "B\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.U" +
+      "rlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flytei" +
+      "dl.core.LiteralMap\022/\n\014full_outputs\030\004 \001(\013" +
+      "2\031.flyteidl.core.LiteralMap\022E\n\020dynamic_w" +
+      "orkflow\030\020 \001(\0132+.flyteidl.admin.DynamicWo" +
+      "rkflowNodeMetadataB7Z5github.com/flyteor" +
+      "g/flyteidl/gen/pb-go/flyteidl/adminb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14513,7 +14792,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_admin_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_WorkflowNodeMetadata_fieldAccessorTable = new

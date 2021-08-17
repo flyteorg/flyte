@@ -8569,6 +8569,9 @@ export namespace flyteidl {
             /** ExecutionClosure abortMetadata */
             abortMetadata?: (flyteidl.admin.IAbortMetadata|null);
 
+            /** ExecutionClosure outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** ExecutionClosure computedInputs */
             computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -8615,6 +8618,9 @@ export namespace flyteidl {
             /** ExecutionClosure abortMetadata. */
             public abortMetadata?: (flyteidl.admin.IAbortMetadata|null);
 
+            /** ExecutionClosure outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** ExecutionClosure computedInputs. */
             public computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -8640,7 +8646,7 @@ export namespace flyteidl {
             public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /** ExecutionClosure outputResult. */
-            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata");
+            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData");
 
             /**
              * Creates a new ExecutionClosure instance using the specified properties.
@@ -11357,6 +11363,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionClosure outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionClosure phase */
             phase?: (flyteidl.core.NodeExecution.Phase|null);
 
@@ -11394,6 +11403,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionClosure outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionClosure phase. */
             public phase: flyteidl.core.NodeExecution.Phase;
 
@@ -11416,7 +11428,7 @@ export namespace flyteidl {
             public taskNodeMetadata?: (flyteidl.admin.ITaskNodeMetadata|null);
 
             /** NodeExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error");
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /** NodeExecutionClosure targetMetadata. */
             public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
@@ -13225,6 +13237,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionClosure outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionClosure phase */
             phase?: (flyteidl.core.TaskExecution.Phase|null);
 
@@ -13271,6 +13286,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionClosure outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionClosure phase. */
             public phase: flyteidl.core.TaskExecution.Phase;
 
@@ -13302,7 +13320,7 @@ export namespace flyteidl {
             public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
 
             /** TaskExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error");
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /**
              * Creates a new TaskExecutionClosure instance using the specified properties.
