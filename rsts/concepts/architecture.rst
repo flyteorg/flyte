@@ -11,7 +11,7 @@ FlyteIDL
 
 In Flyte, entities like "Workflows", "Tasks", "Launch Plans", and "Schedules" are recognized by multiple system components. In order for components to communicate effectively, they need a shared understanding about the structure of these entities.
 
-The Flyte IDL (Interface Definition Language) is where shared Flyte entities are defined. This IDL also defines the RPC service definition for the :std:ref:`core Flyte API <protos/docs/service/index:rest/and/grpc/interface/for/the/flyte/admin/service>`.
+The Flyte IDL (Interface Definition Language) is where shared Flyte entities are defined. This IDL also defines the RPC service definition for the :std:ref:`core Flyte API <protos/docs/service/index>`.
 
 FlyteIDL uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ schema to describe entities. Clients are generated for Python, Golang, and JavaScript and imported by Flyte components.
 

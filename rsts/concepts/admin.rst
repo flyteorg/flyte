@@ -18,7 +18,7 @@ RPC
 FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gateway>`__ library to serve
 incoming gRPC and HTTP requests with identical handlers. For a more detailed overview of the API,
 including request and response entities, see the admin
-service :std:ref:`definition <protos/docs/service/index:rest/and/grpc/interface/for/the/flyte/admin/service>`. The
+service :std:ref:`definition <protos/docs/service/index>`. The
 RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <divedeep-admin-manager>`.
 methods to process requests.
 
@@ -145,7 +145,7 @@ FlyteAdmin Service Background
 Entities
 ---------
 
-The  :std:ref:`admin service definition <protos/docs/service/index:rest/and/grpc/interface/for/the/flyte/admin/service>` defines REST operations for the entities
+The  :std:ref:`admin service definition <protos/docs/service/index>` defines REST operations for the entities
 flyteadmin administers.
 
 As a refresher, the primary :ref:`entities <divedeep>` across Flyte map similarly to FlyteAdmin entities.
