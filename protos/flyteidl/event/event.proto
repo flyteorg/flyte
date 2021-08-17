@@ -33,7 +33,7 @@ message WorkflowExecutionEvent {
         // Error information for the execution
         core.ExecutionError error = 6;
 
-        // Raw output metadata produced by this workflow execution.
+        // Raw output data produced by this workflow execution.
         core.LiteralMap output_data = 7;
     }
 }
@@ -61,7 +61,7 @@ message NodeExecutionEvent {
         // Error information for the execution
         core.ExecutionError error = 7;
 
-        // Raw output metadata produced by this node execution.
+        // Raw output data produced by this node execution.
         core.LiteralMap output_data = 15;
     }
 
@@ -161,7 +161,7 @@ message TaskExecutionEvent {
         // Error information for the execution
         core.ExecutionError error = 10;
 
-        // Raw output metadata produced by this task execution.
+        // Raw output data produced by this task execution.
         core.LiteralMap output_data = 17;
     }
 

@@ -132,7 +132,7 @@ message NodeExecutionClosure {
         // Error information for the Node
         core.ExecutionError error          = 2;
 
-        // Raw output metadata produced by this node execution.
+        // Raw output data produced by this node execution.
         core.LiteralMap output_data        = 10;
     }
 

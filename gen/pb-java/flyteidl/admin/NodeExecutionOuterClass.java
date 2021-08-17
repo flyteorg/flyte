@@ -6954,7 +6954,7 @@ public final class NodeExecutionOuterClass {
 
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -6962,7 +6962,7 @@ public final class NodeExecutionOuterClass {
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -6970,7 +6970,7 @@ public final class NodeExecutionOuterClass {
     flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -7490,7 +7490,7 @@ public final class NodeExecutionOuterClass {
     public static final int OUTPUT_DATA_FIELD_NUMBER = 10;
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -7500,7 +7500,7 @@ public final class NodeExecutionOuterClass {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -7513,7 +7513,7 @@ public final class NodeExecutionOuterClass {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8626,7 +8626,7 @@ public final class NodeExecutionOuterClass {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8636,7 +8636,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8656,7 +8656,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8676,7 +8676,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8694,7 +8694,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8720,7 +8720,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8743,7 +8743,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8753,7 +8753,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
@@ -8770,7 +8770,7 @@ public final class NodeExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 10;</code>

@@ -8834,7 +8834,7 @@ public final class ExecutionOuterClass {
 
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -8842,7 +8842,7 @@ public final class ExecutionOuterClass {
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -8850,7 +8850,7 @@ public final class ExecutionOuterClass {
     flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -9531,7 +9531,7 @@ public final class ExecutionOuterClass {
     public static final int OUTPUT_DATA_FIELD_NUMBER = 13;
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -9541,7 +9541,7 @@ public final class ExecutionOuterClass {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -9554,7 +9554,7 @@ public final class ExecutionOuterClass {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this execution.
+     * Raw output data produced by this execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11180,7 +11180,7 @@ public final class ExecutionOuterClass {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11190,7 +11190,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11210,7 +11210,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11230,7 +11230,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11248,7 +11248,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11274,7 +11274,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11297,7 +11297,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11307,7 +11307,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>
@@ -11324,7 +11324,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this execution.
+       * Raw output data produced by this execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 13;</code>

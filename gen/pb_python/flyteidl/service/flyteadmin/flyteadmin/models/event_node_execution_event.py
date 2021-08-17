@@ -281,7 +281,7 @@ class EventNodeExecutionEvent(object):
     def output_data(self):
         """Gets the output_data of this EventNodeExecutionEvent.  # noqa: E501
 
-        Raw output metadata produced by this node execution.  # noqa: E501
+        Raw output data produced by this node execution.  # noqa: E501
 
         :return: The output_data of this EventNodeExecutionEvent.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -292,7 +292,7 @@ class EventNodeExecutionEvent(object):
     def output_data(self, output_data):
         """Sets the output_data of this EventNodeExecutionEvent.
 
-        Raw output metadata produced by this node execution.  # noqa: E501
+        Raw output data produced by this node execution.  # noqa: E501
 
         :param output_data: The output_data of this EventNodeExecutionEvent.  # noqa: E501
         :type: CoreLiteralMap

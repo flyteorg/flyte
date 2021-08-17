@@ -3226,7 +3226,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this execution."
+          "description": "Raw output data produced by this execution."
         },
         "computed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
@@ -3920,7 +3920,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this node execution."
+          "description": "Raw output data produced by this node execution."
         },
         "phase": {
           "$ref": "#/definitions/coreNodeExecutionPhase",
@@ -4363,7 +4363,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this task execution."
+          "description": "Raw output data produced by this task execution."
         },
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",
@@ -6174,7 +6174,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this node execution."
+          "description": "Raw output data produced by this node execution."
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -6285,7 +6285,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this task execution."
+          "description": "Raw output data produced by this task execution."
         },
         "custom_info": {
           "$ref": "#/definitions/protobufStruct",
@@ -6371,7 +6371,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output metadata produced by this workflow execution."
+          "description": "Raw output data produced by this workflow execution."
         }
       }
     },

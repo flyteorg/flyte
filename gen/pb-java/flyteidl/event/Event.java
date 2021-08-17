@@ -145,7 +145,7 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -153,7 +153,7 @@ public final class Event {
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -161,7 +161,7 @@ public final class Event {
     flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -577,7 +577,7 @@ public final class Event {
     public static final int OUTPUT_DATA_FIELD_NUMBER = 7;
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -587,7 +587,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -600,7 +600,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this workflow execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1827,7 +1827,7 @@ public final class Event {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1837,7 +1837,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1857,7 +1857,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1877,7 +1877,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1895,7 +1895,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1921,7 +1921,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1944,7 +1944,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1954,7 +1954,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -1971,7 +1971,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this workflow execution.
+       * Raw output data produced by this workflow execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
@@ -2188,7 +2188,7 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -2196,7 +2196,7 @@ public final class Event {
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -2204,7 +2204,7 @@ public final class Event {
     flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -2908,7 +2908,7 @@ public final class Event {
     public static final int OUTPUT_DATA_FIELD_NUMBER = 15;
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -2918,7 +2918,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -2931,7 +2931,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this node execution.
+     * Raw output data produced by this node execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4685,7 +4685,7 @@ public final class Event {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4695,7 +4695,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4715,7 +4715,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4735,7 +4735,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4753,7 +4753,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4779,7 +4779,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4802,7 +4802,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4812,7 +4812,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -4829,7 +4829,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this node execution.
+       * Raw output data produced by this node execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
@@ -9790,7 +9790,7 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -9798,7 +9798,7 @@ public final class Event {
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -9806,7 +9806,7 @@ public final class Event {
     flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -10570,7 +10570,7 @@ public final class Event {
     public static final int OUTPUT_DATA_FIELD_NUMBER = 17;
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -10580,7 +10580,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -10593,7 +10593,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output metadata produced by this task execution.
+     * Raw output data produced by this task execution.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12862,7 +12862,7 @@ public final class Event {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12872,7 +12872,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12892,7 +12892,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12912,7 +12912,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12930,7 +12930,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12956,7 +12956,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12979,7 +12979,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -12989,7 +12989,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
@@ -13006,7 +13006,7 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output metadata produced by this task execution.
+       * Raw output data produced by this task execution.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap output_data = 17;</code>

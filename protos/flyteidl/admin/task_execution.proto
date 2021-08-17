@@ -82,7 +82,7 @@ message TaskExecutionClosure {
         // Error information for the task execution. Populated if the execution failed.
         core.ExecutionError error          = 2;
 
-        // Raw output metadata produced by this task execution.
+        // Raw output data produced by this task execution.
         core.LiteralMap output_data        = 12;
     }
 
