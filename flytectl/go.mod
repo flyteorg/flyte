@@ -11,8 +11,8 @@ require (
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/flyteorg/flyteidl v0.19.14
-	github.com/flyteorg/flytestdlib v0.3.30
+	github.com/flyteorg/flyteidl v0.19.24
+	github.com/flyteorg/flytestdlib v0.3.33
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-github v17.0.0+incompatible
@@ -47,7 +47,7 @@ require (
 	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3
