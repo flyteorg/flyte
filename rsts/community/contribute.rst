@@ -26,7 +26,7 @@ Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flyteprop
 #. To improve code coverage, write unit tests to test your code.
 
 .. note::
-    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
+    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). Refer to `Effective Go <https://golang.org/doc/effective_go>`_ and `Black <https://github.com/psf/black>`_ for full coding standards.
 
 Component Reference
 ===================
@@ -320,3 +320,6 @@ Output:
 :py:func:`Function <python:typing.cast>`
 
 :py:meth:`Method <python:pprint.PrettyPrinter.format>`
+
+
+For feedback at any point in the contribution process, feel free to reach out to us using the links on our `Community <https://docs.flyte.org/en/latest/community/index.html>`_ page.
