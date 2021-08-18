@@ -7,7 +7,7 @@ import (
 type ExecutionEvent struct {
 	BaseModel
 	ExecutionKey
-	RequestID  string
+	RequestID  string `valid:"length(0|255)"`
 	OccurredAt time.Time
 	Phase      string `gorm:"primary_key"`
 }

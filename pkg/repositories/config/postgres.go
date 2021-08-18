@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
+	"github.com/qor/validations"
 )
 
 const Postgres = "postgres"
@@ -77,5 +78,6 @@ func OpenDbConnection(config DbConnectionConfigProvider) *gorm.DB {
 		panic(err)
 	}
 	db.LogMode(config.IsDebug())
+	validations.RegisterCallbacks(db)
 	return db
 }
