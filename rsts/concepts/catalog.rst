@@ -3,7 +3,7 @@
 What is Data Catalog?
 =====================
 
-Data Catalog (https://github.com/lyft/datacatalog) is a service for indexing parameterized, strongly-typed data artifacts across revisions. It allows for clients to query artifacts based on meta information and tags.
+Data Catalog (https://github.com/flyteorg/datacatalog) is a service for indexing parameterized, strongly-typed data artifacts across revisions. It allows for clients to query artifacts based on meta information and tags.
 
 
 How Flyte Memoizes Task Executions on Data Catalog
