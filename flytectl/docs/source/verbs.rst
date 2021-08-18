@@ -15,3 +15,4 @@ Flytectl verbs specify the actions to be performed on the resources like create/
     gen/flytectl_config
     gen/flytectl_sandbox
     gen/flytectl_version
+    gen/flytectl_upgrade

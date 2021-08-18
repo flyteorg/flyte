@@ -6,6 +6,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/configutil"
+	"github.com/flyteorg/flytectl/pkg/util"
+
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/docker/docker/api/types"
@@ -47,6 +50,8 @@ func TestTearDownFunc(t *testing.T) {
 }
 
 func TestTearDownClusterFunc(t *testing.T) {
+	_ = util.SetupFlyteDir()
+	_ = util.WriteIntoFile([]byte("data"), configutil.FlytectlConfig)
 	mockOutStream := new(io.Writer)
 	ctx := context.Background()
 	cmdCtx := cmdCore.NewCommandContext(nil, *mockOutStream)

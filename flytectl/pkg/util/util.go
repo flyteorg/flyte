@@ -1,49 +1,27 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/enescakir/emoji"
+	"github.com/flyteorg/flytectl/pkg/configutil"
+	"github.com/flyteorg/flytectl/pkg/docker"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	hversion "github.com/hashicorp/go-version"
 )
 
 const (
-	HTTPRequestErrorMessage = "something went wrong. Received status code [%v] while sending a request to [%s]"
+	progressSuccessMessage = "Flyte is ready! Flyte UI is available at http://localhost:30081/console"
 )
 
-type githubversion struct {
-	TagName string `json:"tag_name"`
-}
+var Ext string
 
-func GetRequest(baseURL, url string) ([]byte, error) {
-	response, err := http.Get(fmt.Sprintf("%s%s", baseURL, url))
-	if err != nil {
-		return []byte(""), err
-	}
-	defer response.Body.Close()
-	if response.StatusCode == 200 {
-		data, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return []byte(""), err
-		}
-		return data, nil
-	}
-	return []byte(""), fmt.Errorf(HTTPRequestErrorMessage, response.StatusCode, fmt.Sprintf("%s%s", baseURL, url))
-}
-
-func ParseGithubTag(data []byte) (string, error) {
-	var result = githubversion{}
-	err := json.Unmarshal(data, &result)
-	if err != nil {
-		return "", err
-	}
-	return result.TagName, nil
-}
-
+// WriteIntoFile will write content in a file
 func WriteIntoFile(data []byte, file string) error {
 	err := ioutil.WriteFile(file, data, os.ModePerm)
 	if err != nil {
@@ -60,6 +38,7 @@ func SetupFlyteDir() error {
 	return nil
 }
 
+// IsVersionGreaterThan check version if it's greater then other
 func IsVersionGreaterThan(version1, version2 string) (bool, error) {
 	semanticVersion1, err := hversion.NewVersion(version1)
 	if err != nil {
@@ -70,4 +49,32 @@ func IsVersionGreaterThan(version1, version2 string) (bool, error) {
 		return false, err
 	}
 	return semanticVersion2.LessThanOrEqual(semanticVersion1), nil
+}
+
+// PrintSandboxMessage will print sandbox success message
+func PrintSandboxMessage() {
+	kubeconfig := strings.Join([]string{
+		"$KUBECONFIG",
+		f.FilePathJoin(f.UserHomeDir(), ".kube", "config"),
+		docker.Kubeconfig,
+	}, ":")
+
+	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, progressSuccessMessage, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
+	fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
+	fmt.Printf("export KUBECONFIG=%v \n", kubeconfig)
+	fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
+}
+
+// SendRequest will create request and return the response
+func SendRequest(method, url string, option io.Reader) (*http.Response, error) {
+	client := &http.Client{}
+	req, _ := http.NewRequest(method, url, option)
+	response, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != 200 {
+		return nil, fmt.Errorf("someting goes wrong while sending request to %s. Got status code %v", url, response.StatusCode)
+	}
+	return response, nil
 }

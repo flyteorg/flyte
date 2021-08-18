@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"runtime"
+
+	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+
+	"github.com/flyteorg/flytectl/pkg/util/platformutil"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/util"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
@@ -22,14 +26,9 @@ Example version.
 
  bin/flytectl version
 `
-	flytectlAppName       = "flytectl"
-	controlPlanAppName    = "controlPlane"
-	GithubAPIURL          = "https://api.github.com"
-	latestVersionMessage  = "Installed flytectl version is the latest"
-	upgradeVersionMessage = "A newer version of flytectl is available [%v] Please upgrade using - https://docs.flyte.org/projects/flytectl/en/latest/index.html"
+	flytectlAppName    = "flytectl"
+	controlPlanAppName = "controlPlane"
 )
-
-var flytectlReleasePath = "/repos/flyteorg/flytectl/releases/latest"
 
 type versionOutput struct {
 	// Specifies the Name of app
@@ -53,22 +52,20 @@ func GetVersionCommand(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 }
 
 func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	latest, err := getLatestVersion(flytectlReleasePath)
+	goos := platformutil.Platform(runtime.GOOS)
+	version, err := githubutil.FlytectlReleaseConfig.GetLatestVersion()
 	if err != nil {
-		logger.Errorf(ctx, "Get latest version of flyte got failed", err)
+		logger.Error(ctx, "Not able to get latest version because %v", err)
+	} else {
+		message, err := githubutil.GetUpgradeMessage(version, goos)
+		if err != nil {
+			logger.Error(ctx, "Not able to detect new version because %v", err)
+		}
+		if len(message) > 0 {
+			fmt.Println(message)
+		}
 	}
 
-	isGreater, err := util.IsVersionGreaterThan(latest, stdlibversion.Version)
-	if err != nil {
-		logger.Errorf(ctx, "Error while comparing the flytectl version", err)
-	}
-
-	message := latestVersionMessage
-	if isGreater {
-		message = fmt.Sprintf(upgradeVersionMessage, latest)
-	}
-
-	fmt.Println(message)
 	// Print Flytectl
 	if err := printVersion(versionOutput{
 		Build:     stdlibversion.Build,
@@ -110,12 +107,4 @@ func getControlPlaneVersion(ctx context.Context, cmdCtx cmdCore.CommandContext) 
 		return fmt.Errorf("not able to get control plane version..Please try again: %v", err)
 	}
 	return nil
-}
-
-func getLatestVersion(path string) (string, error) {
-	response, err := util.GetRequest(GithubAPIURL, path)
-	if err != nil {
-		return "", err
-	}
-	return util.ParseGithubTag(response)
 }

@@ -11,8 +11,6 @@ import (
 
 	"github.com/flyteorg/flytectl/clierrors"
 
-	"github.com/flyteorg/flytectl/pkg/configutil"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -25,7 +23,7 @@ import (
 
 var (
 	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
-	SuccessMessage          = "Flyte is ready! Flyte UI is available at http://localhost:30081/console"
+	SuccessMessage          = "Deploying Flyte..."
 	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox:dind"
 	FlyteSandboxClusterName = "flyte-sandbox"
 	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
@@ -122,11 +120,6 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 	return resp.ID, nil
 }
 
-// WatchError will return channel for watching errors of a container
-func WatchError(ctx context.Context, cli Docker, id string) (<-chan container.ContainerWaitOKBody, <-chan error) {
-	return cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
-}
-
 // ReadLogs will return io scanner for reading the logs of a container
 func ReadLogs(ctx context.Context, cli Docker, id string) (*bufio.Scanner, error) {
 	reader, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{
@@ -145,19 +138,6 @@ func ReadLogs(ctx context.Context, cli Docker, id string) (*bufio.Scanner, error
 func WaitForSandbox(reader *bufio.Scanner, message string) bool {
 	for reader.Scan() {
 		if strings.Contains(reader.Text(), message) {
-			kubeconfig := strings.Join([]string{
-				"$KUBECONFIG",
-				f.FilePathJoin(f.UserHomeDir(), ".kube", "config"),
-				Kubeconfig,
-			}, ":")
-
-			fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, message, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
-			fmt.Printf("Please visit https://github.com/flyteorg/flytesnacks for more example %v \n", emoji.Rocket)
-			fmt.Printf("Register all flytesnacks example by running 'flytectl register examples  -d development  -p flytesnacks' \n")
-
-			fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
-			fmt.Printf("export KUBECONFIG=%v \n", kubeconfig)
-			fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
 			return true
 		}
 		fmt.Println(reader.Text())

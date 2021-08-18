@@ -25,12 +25,12 @@ func sandboxClusterExec(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 		return err
 	}
 	if len(args) > 0 {
-		return Execute(ctx, cli, args)
+		return execute(ctx, cli, args)
 	}
 	return fmt.Errorf("missing argument. Please check usage examples by running flytectl sandbox exec --help")
 }
 
-func Execute(ctx context.Context, cli docker.Docker, args []string) error {
+func execute(ctx context.Context, cli docker.Docker, args []string) error {
 	c := docker.GetSandbox(ctx, cli)
 	if c != nil {
 		exec, err := docker.ExecCommend(ctx, cli, c.ID, args)
