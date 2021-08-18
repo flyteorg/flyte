@@ -6,52 +6,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const flytectlReleaseURL = "/repos/flyteorg/flytectl/releases/latest"
-const baseURL = "https://api.github.com"
-const wrongBaseURL = "htts://api.github.com"
 const testVersion = "v0.1.20"
-
-func TestGetRequest(t *testing.T) {
-	t.Run("Get request with 200", func(t *testing.T) {
-		_, err := GetRequest(baseURL, flytectlReleaseURL)
-		assert.Nil(t, err)
-	})
-	t.Run("Get request with 200", func(t *testing.T) {
-		_, err := GetRequest(wrongBaseURL, flytectlReleaseURL)
-		assert.NotNil(t, err)
-	})
-	t.Run("Get request with 400", func(t *testing.T) {
-		_, err := GetRequest("https://github.com", "/flyteorg/flyte/releases/download/latest/flyte_eks_manifest.yaml")
-		assert.NotNil(t, err)
-	})
-}
-
-func TestParseGithubTag(t *testing.T) {
-	t.Run("Parse Github tag with success", func(t *testing.T) {
-		data, err := GetRequest(baseURL, flytectlReleaseURL)
-		assert.Nil(t, err)
-		tag, err := ParseGithubTag(data)
-		assert.Nil(t, err)
-		assert.Contains(t, tag, "v")
-	})
-	t.Run("Get request with 200", func(t *testing.T) {
-		_, err := ParseGithubTag([]byte("string"))
-		assert.NotNil(t, err)
-	})
-}
 
 func TestWriteIntoFile(t *testing.T) {
 	t.Run("Successfully write into a file", func(t *testing.T) {
-		data, err := GetRequest(baseURL, flytectlReleaseURL)
-		assert.Nil(t, err)
-		err = WriteIntoFile(data, "version.yaml")
+		err := WriteIntoFile([]byte(""), "version.yaml")
 		assert.Nil(t, err)
 	})
 	t.Run("Error in writing file", func(t *testing.T) {
-		data, err := GetRequest(baseURL, flytectlReleaseURL)
+		err := WriteIntoFile([]byte(""), "version.yaml")
 		assert.Nil(t, err)
-		err = WriteIntoFile(data, "/githubtest/version.yaml")
-		assert.NotNil(t, err)
 	})
 }
 
@@ -85,5 +49,29 @@ func TestIsVersionGreaterThan(t *testing.T) {
 	t.Run("Error in compare flytectl version", func(t *testing.T) {
 		_, err := IsVersionGreaterThan(testVersion, "vvvvvvvv")
 		assert.NotNil(t, err)
+	})
+}
+
+func TestPrintSandboxMessage(t *testing.T) {
+	t.Run("Print Sandbox Message", func(t *testing.T) {
+		PrintSandboxMessage()
+	})
+}
+
+func TestSendRequest(t *testing.T) {
+	t.Run("Successful get request", func(t *testing.T) {
+		response, err := SendRequest("GET", "https://github.com", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, response)
+	})
+	t.Run("Successful get request failed", func(t *testing.T) {
+		response, err := SendRequest("GET", "htp://github.com", nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, response)
+	})
+	t.Run("Successful get request failed", func(t *testing.T) {
+		response, err := SendRequest("GET", "https://github.com/evalsocket/flyte/archive/refs/tags/source-code.zip", nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, response)
 	})
 }

@@ -45,3 +45,4 @@ Flytectl noun specify the resource on which the action needs to be performed eg:
     gen/flytectl_sandbox_status
     gen/flytectl_sandbox_teardown
     gen/flytectl_sandbox_exec
+    gen/flytectl_upgrade

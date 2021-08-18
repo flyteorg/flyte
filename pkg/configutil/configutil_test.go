@@ -5,8 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/flyteorg/flytectl/pkg/util"
-
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -41,8 +39,6 @@ func TestSetupFlytectlConfig(t *testing.T) {
 	if os.IsNotExist(err) {
 		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
 	}
-	err = util.SetupFlyteDir()
-	assert.Nil(t, err)
 	err = SetupConfig("version.yaml", AdminConfigTemplate, templateValue)
 	assert.Nil(t, err)
 	_, err = os.Stat("version.yaml")

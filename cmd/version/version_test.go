@@ -66,6 +66,21 @@ func TestVersionCommandFunc(t *testing.T) {
 	mockClient.AssertCalled(t, "GetVersion", ctx, versionRequest)
 }
 
+func TestVersionCommandFuncError(t *testing.T) {
+	ctx := context.Background()
+	var args []string
+	mockClient := new(mocks.AdminServiceClient)
+	mockOutStream := new(io.Writer)
+	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
+	stdlibversion.Build = ""
+	stdlibversion.BuildTime = ""
+	stdlibversion.Version = "v"
+	mockClient.OnGetVersionMatch(ctx, versionRequest).Return(versionResponse, nil)
+	err := getVersion(ctx, args, cmdCtx)
+	assert.Nil(t, err)
+	mockClient.AssertCalled(t, "GetVersion", ctx, versionRequest)
+}
+
 func TestVersionCommandFuncErr(t *testing.T) {
 	ctx := context.Background()
 	var args []string
@@ -85,11 +100,6 @@ func TestVersionUtilFunc(t *testing.T) {
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion
-	t.Run("Get latest release with wrong url", func(t *testing.T) {
-		tag, err := getLatestVersion("h://api.github.com/repos/flyteorg/flytectreleases/latest")
-		assert.NotNil(t, err)
-		assert.Equal(t, len(tag), 0)
-	})
 	t.Run("Error in getting control plan version", func(t *testing.T) {
 		ctx := context.Background()
 		mockClient := new(mocks.AdminServiceClient)
@@ -103,7 +113,6 @@ func TestVersionUtilFunc(t *testing.T) {
 		ctx := context.Background()
 		mockClient := new(mocks.AdminServiceClient)
 		mockOutStream := new(io.Writer)
-		flytectlReleasePath = "/release"
 		cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 		mockClient.OnGetVersionMatch(ctx, &admin.GetVersionRequest{}).Return(nil, fmt.Errorf("error"))
 		err := getVersion(ctx, []string{}, cmdCtx)
