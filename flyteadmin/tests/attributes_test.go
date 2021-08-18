@@ -5,6 +5,7 @@ package tests
 import (
 	"context"
 	"testing"
+	"fmt"
 
 	"github.com/golang/protobuf/proto"
 
@@ -42,6 +43,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	}
 
 	_, err := client.UpdateProjectDomainAttributes(ctx, &req)
+	fmt.Println(err)
 	assert.Nil(t, err)
 
 	response, err := client.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
@@ -49,6 +51,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Domain:       "development",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.ProjectDomainAttributesGetResponse{
 		Attributes: &admin.ProjectDomainAttributes{
@@ -64,6 +67,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, err)
 	// Testing that if overrides are not set at workflow level, the one from Project-Domain is returned
 	assert.True(t, proto.Equal(&admin.WorkflowAttributesGetResponse{
@@ -80,6 +84,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Domain:       "development",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, err)
 
 	response, err = client.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
@@ -87,6 +92,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Domain:       "development",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, response)
 	assert.EqualError(t, err, "rpc error: code = NotFound desc = Resource [{Project:admintests Domain:development Workflow: LaunchPlan: ResourceType:TASK_RESOURCE}] not found")
 }
@@ -110,6 +116,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	}
 
 	_, err := client.UpdateWorkflowAttributes(ctx, &req)
+	fmt.Println(err)
 	assert.Nil(t, err)
 
 	response, err := client.GetWorkflowAttributes(ctx, &admin.WorkflowAttributesGetRequest{
@@ -118,6 +125,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowAttributesGetResponse{
 		Attributes: &admin.WorkflowAttributes{
@@ -134,6 +142,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
+	fmt.Println(err)
 	assert.Nil(t, err)
 
 	_, err = client.GetWorkflowAttributes(ctx, &admin.WorkflowAttributesGetRequest{

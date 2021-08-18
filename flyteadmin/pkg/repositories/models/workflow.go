@@ -2,9 +2,9 @@ package models
 
 // Workflow primary key
 type WorkflowKey struct {
-	Project string `gorm:"primary_key;index:workflow_project_domain_name_idx,workflow_project_domain_idx"`
-	Domain  string `gorm:"primary_key;index:workflow_project_domain_name_idx,workflow_project_domain_idx"`
-	Name    string `gorm:"primary_key;index:workflow_project_domain_name_idx"`
+	Project string `gorm:"primary_key;index:workflow_project_domain_name_idx,workflow_project_domain_idx"  valid:"length(0|255)"`
+	Domain  string `gorm:"primary_key;index:workflow_project_domain_name_idx,workflow_project_domain_idx"  valid:"length(0|255)"`
+	Name    string `gorm:"primary_key;index:workflow_project_domain_name_idx"  valid:"length(0|255)"`
 	Version string `gorm:"primary_key"`
 }
 
@@ -13,7 +13,7 @@ type Workflow struct {
 	BaseModel
 	WorkflowKey
 	TypedInterface          []byte
-	RemoteClosureIdentifier string `gorm:"not null"`
+	RemoteClosureIdentifier string `gorm:"not null" valid:"length(0|255)"`
 	LaunchPlans             []LaunchPlan
 	Executions              []Execution
 	// Hash of the compiled workflow closure
