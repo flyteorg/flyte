@@ -15,12 +15,13 @@ A Helm chart for Flyte
 
 ### SANDBOX INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
-- Fetch chart dependencies `helm dep up`
+- Fetch chart dependencies ``
 - Install Flyte sandbox:
 
 ```bash
-cd helm
-helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+helm repo add flyte https://flyteorg.github.io/flyte
+helm dep up
+helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte-sandbox
 ```
 
 Customize your installation by changing settings in `values-sandbox.yaml`.
@@ -28,25 +29,20 @@ You can use the helm diff plugin to review any value changes you've made to your
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
-helm diff upgrade -f values-sandbox.yaml flyte .
+helm diff upgrade -f values.yaml flyte flyte/flyte-sandbox
 ```
 
 Then apply your changes:
 ```bash
-helm upgrade -f values-sandbox.yaml flyte .
+helm upgrade -f values.yaml flyte flyte/flyte-sandbox
 ```
 
 #### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- `helm template --name-template=flyte-sandbox flyte/flyte-sandbox -n flyte -f values.yaml > flyte_generated_sandbox.yaml`
 - Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
 
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
 - Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
-
-### CONFIGURATION NOTES:
-- The docker images, their tags and other default parameters are configured in `values.yaml` file.
-- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
-- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
 
 ## Values
 
