@@ -25,3 +25,4 @@ _build/
 .python-version
 cookbook/release-snacks
 .kube/
+.docker/
