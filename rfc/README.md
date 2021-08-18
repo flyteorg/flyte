@@ -1,5 +1,7 @@
 # RFC Process
 
+[![hackmd-github-sync-badge](https://hackmd.io/0F2E71vhTk-zPE5qAmBFZA/badge)](https://hackmd.io/0F2E71vhTk-zPE5qAmBFZA)
+
 An RFC - Request For Change - is a document issued mainly to recommend new features to the language and standard libraries. It provides the opportunity for all stakeholders to review and approve the changes before they are implemented. 
 
 Not all changes will require an RFC. Bug fixes and documentation improvements can be carried out using GitHub pull requests (PRs).
