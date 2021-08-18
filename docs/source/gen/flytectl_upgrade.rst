@@ -1,35 +1,38 @@
-.. _flytectl_sandbox_status:
+.. _flytectl_upgrade:
 
-flytectl sandbox status
------------------------
+flytectl upgrade
+----------------
 
-Get the status of the sandbox environment.
+Used for upgrade/rollback flyte version
 
 Synopsis
 ~~~~~~~~
 
 
 
-Status will retrieve the status of the Sandbox environment. Currently FlyteSandbox runs as a local docker container.
-This will return the docker status for this container
-
-Usage
+Upgrade flytectl
 ::
 
- bin/flytectl sandbox status 
+ bin/flytectl upgrade
+	
+Rollback flytectl binary
+::
 
+ bin/flytectl upgrade rollback
+
+Note: Upgrade is not available on windows
 
 
 ::
 
-  flytectl sandbox status [flags]
+  flytectl upgrade [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for status
+  -h, --help   help for upgrade
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,5 +81,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl` 	 - flyetcl CLI tool
 

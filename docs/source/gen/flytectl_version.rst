@@ -63,10 +63,12 @@ Options inherited from parent commands
       --storage.connection.endpoint string         URL for storage client to connect to.
       --storage.connection.region string           Region to connect to. (default "us-east-1")
       --storage.connection.secret-key string       Secret to use when accesskey is set.
-      --storage.container string                   Initial container to create -if it doesn't exist-.'
+      --storage.container string                   Initial container (in s3 a bucket) to create -if it doesn't exist-.'
       --storage.defaultHttpClient.timeout string   Sets time out on the http client. (default "0s")
       --storage.enable-multicontainer              If this is true,  then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
       --storage.limits.maxDownloadMBs int          Maximum allowed download size (in MBs) per call. (default 2)
+      --storage.stow.config stringToString         Configuration for stow backend. Refer to github/graymeta/stow (default [])
+      --storage.stow.kind string                   Kind of Stow backend to use. Refer to github/graymeta/stow
       --storage.type string                        Sets the type of storage to configure [s3/minio/local/mem/stow]. (default "s3")
 
 SEE ALSO
