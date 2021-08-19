@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.1](http://github.com/lyft/flyteconsole/compare/v0.22.0...v0.22.1) (2021-08-19)
+
+
+### Bug Fixes
+
+* duration is not always calculated for task executions ([#185](http://github.com/lyft/flyteconsole/issues/185)) ([2e12418](http://github.com/lyft/flyteconsole/commit/2e124189d39f09375fb90b20e562a1575e88405d))
+
 # [0.22.0](http://github.com/lyft/flyteconsole/compare/v0.21.0...v0.22.0) (2021-08-04)
 
 
