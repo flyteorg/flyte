@@ -47,7 +47,7 @@ Mount your source code repository inside sandbox
 
  bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
-Run specific version of flyte, Only available after v0.14.0+
+Run specific version of flyte, Only available after v0.13.0+
 ::
 
  bin/flytectl sandbox start  --version=v0.14.0
@@ -55,7 +55,7 @@ Run specific version of flyte, Only available after v0.14.0+
 Usage
 	`
 	k8sEndpoint                  = "https://127.0.0.1:30086"
-	flyteMinimumVersionSupported = "v0.14.0"
+	flyteMinimumVersionSupported = "v0.13.0"
 	generatedManifest            = "/flyteorg/share/flyte_generated.yaml"
 	flyteNamespace               = "flyte"
 	diskPressureTaint            = "node.kubernetes.io/disk-pressure"

@@ -20,9 +20,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
       - name: Build Flytectl binary
         run: make compile
-      - name: Setup env
-        run: |
-          mkdir -p ~/.flyte/k3s && touch ~/.flyte/k3s/k3s.yaml && chmod 666 ~/.flyte/k3s/k3s.yaml
       - name: Create a sandbox cluster
         run: bin/flytectl sandbox start
       - name: Setup flytectl config

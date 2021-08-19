@@ -33,6 +33,11 @@ func TestIsVersionGreaterThan(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, true, ok)
 	})
+	t.Run("Compare flytectl version greater then for equal value", func(t *testing.T) {
+		ok, err := IsVersionGreaterThan(testVersion, testVersion)
+		assert.Nil(t, err)
+		assert.Equal(t, false, ok)
+	})
 	t.Run("Compare flytectl version smaller then", func(t *testing.T) {
 		ok, err := IsVersionGreaterThan("v0.1.19", testVersion)
 		assert.Nil(t, err)
