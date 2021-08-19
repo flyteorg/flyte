@@ -32,6 +32,8 @@ Upgrade flytectl
 
  bin/flytectl upgrade
 	
+Note: Please use upgrade with sudo, Without sudo it will cause permission issue
+	
 Rollback flytectl binary
 ::
 

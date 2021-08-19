@@ -32,7 +32,11 @@ func WriteIntoFile(data []byte, file string) error {
 
 // SetupFlyteDir will create .flyte dir if not exist
 func SetupFlyteDir() error {
-	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), os.ModePerm); err != nil {
+	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm); err != nil {
+		return err
+	}
+	// Created a empty file with right permission
+	if err := ioutil.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
 		return err
 	}
 	return nil
@@ -48,7 +52,7 @@ func IsVersionGreaterThan(version1, version2 string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return semanticVersion2.LessThanOrEqual(semanticVersion1), nil
+	return semanticVersion1.GreaterThan(semanticVersion2), nil
 }
 
 // PrintSandboxMessage will print sandbox success message
