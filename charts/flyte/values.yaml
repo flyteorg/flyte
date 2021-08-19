@@ -219,13 +219,17 @@ redis:
   image:
     # -- Docker image for Redis Statefulset
     repository: docker.io/bitnami/redis
+    # -- Docker image tag
     tag: 4.0.2-r1
+    # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Redis Statefulset
   resources:
+    # -- Requests are the minimum required resources for this pod.
     requests:
       cpu: 10m
       memory: 50Mi
+    # -- Limits are the maximum needed resources for this pod.
     limits:
       cpu: 1000m
       memory: 1Gi

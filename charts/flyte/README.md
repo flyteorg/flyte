@@ -193,11 +193,16 @@ helm upgrade -f values-sandbox.yaml flyte .
 | redis | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"docker.io/bitnami/redis","tag":"4.0.2-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` | -------------------------------------------- Sandbox Configuration Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop. This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal for a high performance setup, but are great to try out flyte ----------------------------------------------- REDIS SETTINGS |
 | redis.affinity | object | `{}` | affinity for Redis Statefulset |
 | redis.enabled | bool | `true` | - enable or disable Redis Statefulset installation |
+| redis.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | redis.image.repository | string | `"docker.io/bitnami/redis"` | Docker image for Redis Statefulset |
+| redis.image.tag | string | `"4.0.2-r1"` | Docker image tag |
 | redis.nodeSelector | object | `{}` | nodeSelector for Redis Statefulset |
 | redis.podAnnotations | object | `{}` | Annotations for Redis pods |
 | redis.replicaCount | int | `1` | Replicas count for Redis Statefulset |
 | redis.resources | object | `{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Redis Statefulset |
+| redis.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum required resources for this pod. |
+| redis.resources.requests.cpu | string | `"10m"` | CPU Request |
+| redis.resources.requests.memory | string | `"50Mi"` | Memory Request |
 | redis.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Redis |
 | redis.tolerations | list | `[]` | tolerations for Redis Statefulset |
 | sagemaker | object | `{"enabled":false,"plugin_config":{"plugins":{"sagemaker":{"region":"<region>","roleArn":"<arn>"}}}}` | --------------- -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased) Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information |
