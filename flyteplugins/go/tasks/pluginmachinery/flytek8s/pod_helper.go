@@ -23,6 +23,41 @@ const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
 const SIGKILL = 137
 
+func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
+	// Determine node selector terms to add to node affinity
+	var nodeSelectorRequirement v1.NodeSelectorRequirement
+	if interruptible {
+		if config.GetK8sPluginConfig().InterruptibleNodeSelectorRequirement == nil {
+			return
+		}
+		nodeSelectorRequirement = *config.GetK8sPluginConfig().InterruptibleNodeSelectorRequirement
+	} else {
+		if config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement == nil {
+			return
+		}
+		nodeSelectorRequirement = *config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement
+	}
+
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+	if podSpec.Affinity.NodeAffinity == nil {
+		podSpec.Affinity.NodeAffinity = &v1.NodeAffinity{}
+	}
+	if podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
+		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
+	}
+	if len(podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
+		nodeSelectorTerms := podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+		for i := range nodeSelectorTerms {
+			nst := &nodeSelectorTerms[i]
+			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
+		}
+	} else {
+		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
+	}
+}
+
 // Updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
 func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	resourceRequirements []v1.ResourceRequirements, podSpec *v1.PodSpec) {
@@ -44,6 +79,7 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	if podSpec.Affinity == nil {
 		podSpec.Affinity = config.GetK8sPluginConfig().DefaultAffinity
 	}
+	ApplyInterruptibleNodeAffinity(taskExecutionMetadata.IsInterruptible(), podSpec)
 }
 
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error) {
