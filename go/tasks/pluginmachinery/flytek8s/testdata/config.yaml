@@ -32,6 +32,14 @@ plugins:
         value: interruptible
         operator: Equal
         effect: NoSchedule
+    interruptible-node-selector-requirement:
+      key:  x/interruptible
+      operator: In
+      values:
+        - "true"
+    non-interruptible-node-selector-requirement:
+      key:  x/interruptible
+      operator: DoesNotExist
     default-env-vars:
       - AWS_METADATA_SERVICE_TIMEOUT: 5
       - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20

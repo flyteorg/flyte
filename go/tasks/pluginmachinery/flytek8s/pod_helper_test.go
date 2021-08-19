@@ -101,8 +101,93 @@ func TestPodSetup(t *testing.T) {
 	err := configAccessor.UpdateConfig(context.TODO())
 	assert.NoError(t, err)
 
+	t.Run("ApplyInterruptibleNodeAffinity", TestApplyInterruptibleNodeAffinity)
 	t.Run("UpdatePod", updatePod)
 	t.Run("ToK8sPodInterruptible", toK8sPodInterruptible)
+}
+
+func TestApplyInterruptibleNodeAffinity(t *testing.T) {
+	t.Run("WithInterruptibleNodeSelectorRequirement", func(t *testing.T) {
+		podSpec := v1.PodSpec{}
+		ApplyInterruptibleNodeAffinity(true, &podSpec)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "x/interruptible",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"true"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("WithNonInterruptibleNodeSelectorRequirement", func(t *testing.T) {
+		podSpec := v1.PodSpec{}
+		ApplyInterruptibleNodeAffinity(false, &podSpec)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "x/interruptible",
+							Operator: v1.NodeSelectorOpDoesNotExist,
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("WithExistingAffinityWithInterruptibleNodeSelectorRequirement", func(t *testing.T) {
+		podSpec := v1.PodSpec{
+			Affinity: &v1.Affinity{
+				NodeAffinity: &v1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+						NodeSelectorTerms: []v1.NodeSelectorTerm{
+							v1.NodeSelectorTerm{
+								MatchExpressions: []v1.NodeSelectorRequirement{
+									v1.NodeSelectorRequirement{
+										Key:      "node selector requirement",
+										Operator: v1.NodeSelectorOpIn,
+										Values:   []string{"exists"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		ApplyInterruptibleNodeAffinity(true, &podSpec)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "node selector requirement",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"exists"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "x/interruptible",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"true"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
 }
 
 func updatePod(t *testing.T) {
@@ -150,6 +235,21 @@ func updatePod(t *testing.T) {
 		"x/interruptible": "true",
 		"user":            "also configured",
 	}, pod.Spec.NodeSelector)
+	assert.EqualValues(
+		t,
+		[]v1.NodeSelectorTerm{
+			v1.NodeSelectorTerm{
+				MatchExpressions: []v1.NodeSelectorRequirement{
+					v1.NodeSelectorRequirement{
+						Key:      "x/interruptible",
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"true"},
+					},
+				},
+			},
+		},
+		pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
 }
 
 func toK8sPodInterruptible(t *testing.T) {
@@ -174,6 +274,21 @@ func toK8sPodInterruptible(t *testing.T) {
 	assert.Equal(t, "interruptible", p.Tolerations[1].Value)
 	assert.Equal(t, 1, len(p.NodeSelector))
 	assert.Equal(t, "true", p.NodeSelector["x/interruptible"])
+	assert.EqualValues(
+		t,
+		[]v1.NodeSelectorTerm{
+			v1.NodeSelectorTerm{
+				MatchExpressions: []v1.NodeSelectorRequirement{
+					v1.NodeSelectorRequirement{
+						Key:      "x/interruptible",
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"true"},
+					},
+				},
+			},
+		},
+		p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
 }
 
 func TestToK8sPod(t *testing.T) {

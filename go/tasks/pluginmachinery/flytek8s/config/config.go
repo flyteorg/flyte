@@ -89,7 +89,12 @@ type K8sPluginConfig struct {
 	InterruptibleTolerations []v1.Toleration `json:"interruptible-tolerations"  pflag:"-,Tolerations to be applied for interruptible pods"`
 	// Node Selector Labels for interruptible pods: Similar to InterruptibleTolerations, these node selector labels are added for pods that can tolerate
 	// eviction.
+	// Deprecated: Please use InterruptibleNodeSelectorRequirement/NonInterruptibleNodeSelectorRequirement
 	InterruptibleNodeSelector map[string]string `json:"interruptible-node-selector" pflag:"-,Defines a set of node selector labels to add to the interruptible pods."`
+	// Node Selector Requirements to be added to interruptible and non-interruptible
+	// pods respectively
+	InterruptibleNodeSelectorRequirement    *v1.NodeSelectorRequirement `json:"interruptible-node-selector-requirement" pflag:"-,Node selector requirement to add to interruptible pods"`
+	NonInterruptibleNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"non-interruptible-node-selector-requirement" pflag:"-,Node selector requirement to add to non-interruptible pods"`
 
 	// ----------------------------------------------------------------------
 	// Specific tolerations that are added for certain resources. Useful for maintaining gpu resources separate in the cluster
