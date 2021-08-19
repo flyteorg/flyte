@@ -1,3 +1,4 @@
+
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -613,7 +614,6 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
-
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
