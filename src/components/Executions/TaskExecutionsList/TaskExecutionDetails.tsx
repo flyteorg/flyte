@@ -10,30 +10,42 @@ import * as React from 'react';
 export const TaskExecutionDetails: React.FC<{
     taskExecution: TaskExecution;
 }> = ({ taskExecution }) => {
+    const labelWidthGridUnits = taskExecution.closure.startedAt ? 7 : 10;
+    const detailItems = React.useMemo(() => {
+        if (taskExecution.closure.startedAt) {
+            return [
+                {
+                    name: 'started',
+                    content: dateWithFromNow(
+                        timestampToDate(taskExecution.closure.startedAt)
+                    )
+                },
+                {
+                    name: 'run time',
+                    content: taskExecution.closure.duration
+                        ? protobufDurationToHMS(taskExecution.closure.duration)
+                        : unknownValueString
+                }
+            ];
+        } else {
+            return [
+                {
+                    name: 'last updated',
+                    content: taskExecution.closure.updatedAt
+                        ? dateWithFromNow(
+                              timestampToDate(taskExecution.closure.updatedAt)
+                          )
+                        : unknownValueString
+                }
+            ];
+        }
+    }, [taskExecution]);
+
     return (
         <section>
             <DetailsGroup
-                labelWidthGridUnits={7}
-                items={[
-                    {
-                        name: 'started',
-                        content: taskExecution.closure.startedAt
-                            ? dateWithFromNow(
-                                  timestampToDate(
-                                      taskExecution.closure.startedAt
-                                  )
-                              )
-                            : unknownValueString
-                    },
-                    {
-                        name: 'run time',
-                        content: taskExecution.closure.duration
-                            ? protobufDurationToHMS(
-                                  taskExecution.closure.duration
-                              )
-                            : unknownValueString
-                    }
-                ]}
+                labelWidthGridUnits={labelWidthGridUnits}
+                items={detailItems}
             />
         </section>
     );
