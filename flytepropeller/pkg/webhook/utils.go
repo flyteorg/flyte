@@ -37,7 +37,8 @@ func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 
 func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
 	return corev1.Volume{
-		Name: utils.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.Key + EnvVarGroupKeySeparator + secret.GroupVersion)),
+		// we don't want to create different volume for the same secret group
+		Name: utils.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.GroupVersion)),
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName: secret.Group,
@@ -101,4 +102,16 @@ func appendVolumeMountIfNotExists(volumes []corev1.VolumeMount, vol corev1.Volum
 	}
 
 	return append(volumes, vol)
+}
+
+func AppendVolume(volumes []corev1.Volume, volume corev1.Volume) []corev1.Volume {
+	for _, v := range volumes {
+		// append secret items to existing volume for secret within same secret group
+		if v.Secret.SecretName == volume.Secret.SecretName {
+			v.Secret.Items = append(v.Secret.Items, volume.Secret.Items...)
+			return volumes
+		}
+	}
+
+	return append(volumes, volume)
 }

@@ -51,7 +51,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		// file.
 
 		volume := CreateVolumeForSecret(secret)
-		p.Spec.Volumes = append(p.Spec.Volumes, volume)
+		p.Spec.Volumes = AppendVolume(p.Spec.Volumes, volume)
 
 		// Mount the secret to all containers in the given pod.
 		mount := CreateVolumeMountForSecret(volume.Name, secret)
