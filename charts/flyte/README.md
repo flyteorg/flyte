@@ -97,8 +97,12 @@ helm upgrade -f values-sandbox.yaml flyte .
 | contour | object | `{"affinity":{},"contour":{"resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}},"enabled":true,"envoy":{"resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"serviceAccountAnnotations":{},"tolerations":[]}` |  CONTOUR SETTINGS |
 | contour.affinity | object | `{}` | affinity for Contour deployment |
 | contour.contour.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Contour |
+| contour.contour.resources.limits | object | `{"cpu":"100m","memory":"100Mi"}` | Limits are the maximum set of resources needed for this pod |
+| contour.contour.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum set of resources needed for this pod |
 | contour.enabled | bool | `true` | - enable or disable Contour deployment installation |
 | contour.envoy.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Envoy |
+| contour.envoy.resources.limits | object | `{"cpu":"100m","memory":"100Mi"}` | Limits are the maximum set of resources needed for this pod |
+| contour.envoy.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum set of resources needed for this pod |
 | contour.nodeSelector | object | `{}` | nodeSelector for Contour deployment |
 | contour.podAnnotations | object | `{}` | Annotations for Contour pods |
 | contour.replicaCount | int | `1` | Replicas count for Contour deployment |
@@ -107,7 +111,9 @@ helm upgrade -f values-sandbox.yaml flyte .
 | datacatalog | object | `{"affinity":{},"configPath":"/etc/datacatalog/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/datacatalog","tag":"v0.3.6"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"service":{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  DATACATALOG SETTINGS |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
+| datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
+| datacatalog.image.tag | string | `"v0.3.6"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
@@ -121,9 +127,9 @@ helm upgrade -f values-sandbox.yaml flyte .
 | db.database.host | string | `"postgres"` |  username: postgres |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
+| flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.16"` |  |
+| flyteadmin.image.tag | string | `"v0.6.16"` | Docker image tag |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -138,7 +144,9 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteconsole | object | `{"affinity":{},"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flyteconsole","tag":"v0.20.1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  FLYTECONSOLE SETTINGS |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
+| flyteconsole.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
+| flyteconsole.image.tag | string | `"v0.20.1"` | Docker image tag |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
@@ -148,7 +156,9 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flytepropeller | object | `{"affinity":{},"cacheSizeMbs":0,"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytepropeller","tag":"v0.13.4"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTEPROPELLER SETTINGS |
 | flytepropeller.affinity | object | `{}` | affinity for Flytepropeller deployment |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
+| flytepropeller.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
+| flytepropeller.image.tag | string | `"v0.13.4"` | Docker image tag |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
@@ -162,17 +172,23 @@ helm upgrade -f values-sandbox.yaml flyte .
 | minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"minio/minio","tag":"RELEASE.2020-12-16T05-05-17Z"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
 | minio.affinity | object | `{}` | affinity for Minio deployment |
 | minio.enabled | bool | `true` | - enable or disable Minio deployment installation |
+| minio.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | minio.image.repository | string | `"minio/minio"` | Docker image for Minio deployment |
+| minio.image.tag | string | `"RELEASE.2020-12-16T05-05-17Z"` | Docker image tag |
 | minio.nodeSelector | object | `{}` | nodeSelector for Minio deployment |
 | minio.podAnnotations | object | `{}` | Annotations for Minio pods |
 | minio.replicaCount | int | `1` | Replicas count for Minio deployment |
 | minio.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Minio deployment |
+| minio.resources.limits | object | `{"cpu":"200m","memory":"512Mi"}` | Limits are the maximum set of resources needed for this pod |
+| minio.resources.requests | object | `{"cpu":"10m","memory":"128Mi"}` | Requests are the minimum set of resources needed for this pod |
 | minio.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Minio |
 | minio.tolerations | list | `[]` | tolerations for Minio deployment |
 | postgres | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"postgres","tag":"10.16"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  POSTGRES SETTINGS |
 | postgres.affinity | object | `{}` | affinity for Postgres deployment |
 | postgres.enabled | bool | `true` | - enable or disable Postgres deployment installation |
+| postgres.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | postgres.image.repository | string | `"postgres"` | Docker image for Postgres deployment |
+| postgres.image.tag | string | `"10.16"` | Docker image tag |
 | postgres.nodeSelector | object | `{}` | nodeSelector for Postgres deployment |
 | postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
 | postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |
@@ -182,7 +198,9 @@ helm upgrade -f values-sandbox.yaml flyte .
 | pytorchoperator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"gcr.io/kubeflow-images-public/pytorch-operator","tag":"v1.0.0-g047cf0f"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"1000M"},"requests":{"cpu":"10m","memory":"50M"}},"service":{"annotations":{},"type":"ClusterIP"},"serviceAccountAnnotations":{},"tolerations":[]}` | -------------------- Distributed Pytorch execution using the K8s Pytorch operator |
 | pytorchoperator.affinity | object | `{}` | affinity for Pytorchoperator deployment |
 | pytorchoperator.enabled | bool | `true` | - enable or disable Pytorchoperator deployment installation |
+| pytorchoperator.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | pytorchoperator.image.repository | string | `"gcr.io/kubeflow-images-public/pytorch-operator"` | Docker image for Pytorchoperator |
+| pytorchoperator.image.tag | string | `"v1.0.0-g047cf0f"` | Docker image tag |
 | pytorchoperator.nodeSelector | object | `{}` | nodeSelector for Pytorchoperator deployment |
 | pytorchoperator.podAnnotations | object | `{}` | Annotations for Pytorchoperator pods |
 | pytorchoperator.replicaCount | int | `1` | Replicas count for Pytorchoperator deployment |
@@ -193,11 +211,15 @@ helm upgrade -f values-sandbox.yaml flyte .
 | redis | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"docker.io/bitnami/redis","tag":"4.0.2-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` | -------------------------------------------- Sandbox Configuration Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop. This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal for a high performance setup, but are great to try out flyte ----------------------------------------------- REDIS SETTINGS |
 | redis.affinity | object | `{}` | affinity for Redis Statefulset |
 | redis.enabled | bool | `true` | - enable or disable Redis Statefulset installation |
+| redis.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | redis.image.repository | string | `"docker.io/bitnami/redis"` | Docker image for Redis Statefulset |
+| redis.image.tag | string | `"4.0.2-r1"` | Docker image tag |
 | redis.nodeSelector | object | `{}` | nodeSelector for Redis Statefulset |
 | redis.podAnnotations | object | `{}` | Annotations for Redis pods |
 | redis.replicaCount | int | `1` | Replicas count for Redis Statefulset |
 | redis.resources | object | `{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Redis Statefulset |
+| redis.resources.limits | object | `{"cpu":"1000m","memory":"1Gi"}` | Limits are the maximum needed resources for this pod. |
+| redis.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum required resources for this pod. |
 | redis.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Redis |
 | redis.tolerations | list | `[]` | tolerations for Redis Statefulset |
 | sagemaker | object | `{"enabled":false,"plugin_config":{"plugins":{"sagemaker":{"region":"<region>","roleArn":"<arn>"}}}}` | --------------- -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased) Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information |
