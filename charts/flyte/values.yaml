@@ -1,4 +1,3 @@
-
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -255,8 +254,6 @@ redis:
   # -- affinity for Redis Statefulset
   affinity: {}
 
-<<<<<<< HEAD:charts/flyte-core/values.yaml
-=======
 #
 # POSTGRES SETTINGS
 #
@@ -387,11 +384,10 @@ kubernetes-dashboard:
 # COMMON SETTINGS
 #
 
->>>>>>> eca085f7c13c63b6ca6aa3ad2acf1f97af6b21b7:charts/flyte/values.yaml
 common:
   databaseSecret:
     # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
-    name: "db-pass"
+    name: ""
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
@@ -434,8 +430,8 @@ storage:
     region: us-east-1
   # -- settings for storage type gcs
   gcs:
-  # -- GCP project ID. Required for storage type gcs.
-  # projectId:
+    # -- GCP project ID. Required for storage type gcs.
+    # projectId:
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
 
@@ -709,8 +705,6 @@ workflow_notifications:
   enabled: false
   config: {}
 
-
-
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
@@ -759,6 +753,7 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
+
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
@@ -778,7 +773,21 @@ cluster_resource_manager:
 # -- Optional: Spark Plugin using the Spark Operator
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
-  enabled: false
+  enabled: true
+  # -- Replicas count for Sparkoperator deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Sparkoperator
+    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
+  # -- Default resources requests and limits for Sparkoperator
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 500M
+    requests:
+      cpu: 10m
+      memory: 50M
+
   # -- Spark plugin configuration
   plugin_config:
     plugins:
@@ -803,8 +812,6 @@ sparkoperator:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-<<<<<<< HEAD:charts/flyte-core/values.yaml
-=======
 # ----------------------
 # Distributed Pytorch execution using the K8s Pytorch operator
 #
@@ -849,7 +856,6 @@ pytorchoperator:
 # There is no helm chart maintained and hence it might need an independent installation
 tf_operator:
   enabled: false
->>>>>>> eca085f7c13c63b6ca6aa3ad2acf1f97af6b21b7:charts/flyte/values.yaml
 
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
@@ -861,5 +867,5 @@ sagemaker:
       sagemaker:
         roleArn: <arn>
         region: <region>
-
-
+# ---------------------------
+# -- Flink jobs using the Flink Operator: this is work in progress

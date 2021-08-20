@@ -181,7 +181,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      # -- This is the certificate arn of the cert imported in AWS certificate manager.
+      # -- This is the certificate arn of the cert imported in AWS certificate manager. 
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
@@ -498,6 +498,33 @@ cluster_resource_manager:
 
 sparkoperator:
   enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+# ----------------------
+# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
+# There is no helm chart maintained and hence it might need an independent installation
+tf_operator:
+  enabled: false
 
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
