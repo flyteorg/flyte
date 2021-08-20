@@ -54,7 +54,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 		Spec: corev1.PodSpec{
 			Volumes: []corev1.Volume{
 				{
-					Name: "m4zg54lql4ugk2dmn4pq",
+					Name: "m4zg54lql3",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName: "group",
@@ -74,7 +74,54 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					Name: "container1",
 					VolumeMounts: []corev1.VolumeMount{
 						{
-							Name:      "m4zg54lql4ugk2dmn4pq",
+							Name:      "m4zg54lql3",
+							MountPath: "/etc/flyte/secrets/group",
+							ReadOnly:  true,
+						},
+					},
+					Env: []corev1.EnvVar{
+						{
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
+						},
+						{
+							Name: "FLYTE_SECRETS_FILE_PREFIX",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	successPodMultiFiles := corev1.Pod{
+		Spec: corev1.PodSpec{
+			Volumes: []corev1.Volume{
+				{
+					Name: "m4zg54lql3",
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: "group",
+							Items: []corev1.KeyToPath{
+								{
+									Key:  "hello",
+									Path: "hello",
+								},
+								{
+									Key:  "world",
+									Path: "world",
+								},
+							},
+						},
+					},
+				},
+			},
+			InitContainers: []corev1.Container{},
+			Containers: []corev1.Container{
+				{
+					Name: "container1",
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "m4zg54lql3",
 							MountPath: "/etc/flyte/secrets/group",
 							ReadOnly:  true,
 						},
@@ -148,6 +195,9 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 		{name: "require file single", args: args{secret: &coreIdl.Secret{Group: "group", Key: "hello", MountRequirement: coreIdl.Secret_FILE},
 			p: inputPod.DeepCopy()},
 			want: &successPodFile, wantErr: false},
+		{name: "require file multiple from same secret group", args: args{secret: &coreIdl.Secret{Group: "group", Key: "world", MountRequirement: coreIdl.Secret_FILE},
+			p: successPodFile.DeepCopy()},
+			want: &successPodMultiFiles, wantErr: false},
 		{name: "require file all keys", args: args{secret: &coreIdl.Secret{Key: "hello", MountRequirement: coreIdl.Secret_FILE},
 			p: inputPod.DeepCopy()},
 			want: &successPodFileAllKeys, wantErr: true},
