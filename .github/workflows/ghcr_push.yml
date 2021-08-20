@@ -37,7 +37,7 @@ jobs:
             path: case_studies/ml_training
           - name: papermilltasks
             path: integrations/flytekit_plugins
-          - name: pandera
+          - name: pandera_examples
             path: integrations/flytekit_plugins
           - name: house_price_prediction
             path: case_studies/ml_training

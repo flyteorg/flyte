@@ -36,7 +36,7 @@ You can find the plugins maintained by the core flyte team `here <https://github
 
    ---
 
-   .. link-button:: auto/integrations/flytekit_plugins/pandera/index
+   .. link-button:: auto/integrations/flytekit_plugins/pandera_examples/index
       :type: ref
       :text: Pandera
       :classes: btn-block stretched-link
@@ -60,5 +60,5 @@ You can find the plugins maintained by the core flyte team `here <https://github
 
    auto/integrations/flytekit_plugins/sql/index
    auto/integrations/flytekit_plugins/papermilltasks/index
-   auto/integrations/flytekit_plugins/pandera/index
+   auto/integrations/flytekit_plugins/pandera_examples/index
    auto/integrations/flytekit_plugins/dolt/index

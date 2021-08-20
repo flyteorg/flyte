@@ -12,7 +12,7 @@ FLYTE_DIR := ~/.flyte
 
 
 # Module of cookbook examples to register
-EXAMPLES_MODULE := core
+EXAMPLES_MODULE ?= core
 
 define LOG
 echo "$(shell tput bold)$(shell tput setaf 2)$(1)$(shell tput sgr0)"

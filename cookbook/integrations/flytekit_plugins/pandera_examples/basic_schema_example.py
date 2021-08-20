@@ -7,6 +7,8 @@ to annotate dataframe inputs and outputs in your flyte tasks.
 
 """
 
+import typing
+
 import flytekitplugins.pandera
 import pandas as pd
 import pandera as pa
@@ -88,24 +90,34 @@ class OutSchema(IntermediateSchema):
 # annotating the inputs and outputs of those functions with the pandera schemas:
 
 @task
+def dict_to_dataframe(data: dict) -> DataFrame[InSchema]:
+    """Helper task to convert a dictionary input to a dataframe."""
+    return pd.DataFrame(data)
+
+@task
 def total_pay(df: DataFrame[InSchema]) -> DataFrame[IntermediateSchema]:
     return df.assign(total_pay=df.hourly_pay * df.hours_worked)
 
 @task
-def add_id(df: DataFrame[IntermediateSchema], worker_id: str) -> DataFrame[OutSchema]:
-    return df.assign(worker_id=worker_id)
+def add_ids(df: DataFrame[IntermediateSchema], worker_ids: typing.List[str]) -> DataFrame[OutSchema]:
+    return df.assign(worker_id=worker_ids)
 
 @workflow
-def process_data(df: DataFrame[InSchema], worker_id: str) -> DataFrame[OutSchema]:
-    return add_id(df=total_pay(df=df), worker_id=worker_id)
+def process_data(
+    data: dict = {"hourly_pay": [12.0, 13.5, 10.1], "hours_worked": [30.5, 40.0, 41.75]},
+    worker_ids: typing.List[str] = ["a", "b", "c"]
+) -> DataFrame[OutSchema]:
+    return add_ids(
+        df=total_pay(df=dict_to_dataframe(data=data)), worker_ids=worker_ids
+    )
 
 if __name__ == "__main__":
     print(f"Running {__file__} main...")
-    df = pd.DataFrame(
-        {"hourly_pay": [12.0, 13.5, 10.1], "hours_worked": [30.5, 40.0, 41.75]}
+    result = process_data(
+        data={"hourly_pay": [12.0, 13.5, 10.1], "hours_worked": [30.5, 40.0, 41.75]}, worker_ids=["a", "b", "c"]
     )
-    result = process_data(df=df, worker_id="qwerty")
     print(f"Running wf(), returns dataframe\n{result}\n{result.dtypes}")
 
 
-# %% Now your workflows and tasks are guarded against unexpected data at runtime!
+# %%
+# Now your workflows and tasks are guarded against unexpected data at runtime!
