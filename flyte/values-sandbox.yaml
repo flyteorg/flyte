@@ -9,7 +9,7 @@
 # FLYTEADMIN
 #
 
-flyteadmin: {} # use default configredis
+flyteadmin: {} # use default config
 
 #
 # DATACATALOG

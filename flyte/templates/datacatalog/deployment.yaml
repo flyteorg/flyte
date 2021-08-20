@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "datacatalog.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "datacatalog.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.datacatalog.replicaCount }}
+  selector:
+    matchLabels: {{ include "datacatalog.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/datacatalog/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.datacatalog.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "datacatalog.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - command:
+        - datacatalog
+        - --config
+        - {{ .Values.datacatalog.configPath }}
+        - migrate
+        - run
+        image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
+        imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
+        name: run-migrations
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/datacatalog/config
+          name: config-volume 
+      containers:
+      - command:
+        - datacatalog
+        - --config
+        - {{ .Values.datacatalog.configPath }}
+        {{- with .Values.datacatalog.extraArgs }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - serve
+        image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
+        imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
+        name: datacatalog
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        resources: {{ toYaml .Values.datacatalog.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/datacatalog/config
+          name: config-volume
+      serviceAccountName: {{ template "datacatalog.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: datacatalog-config
+        name: config-volume
+      {{- with .Values.datacatalog.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.datacatalog.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.datacatalog.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
