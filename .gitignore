@@ -16,11 +16,9 @@ docs/searchindex.js
 docs/
 release/
 __pycache__/
-/helm/charts/
-Chart.lock
+/charts/flyte/charts
+/charts/flyte/Chart.lock
 **/*.bak-
-.cr-release-packages/
-.cr-index/
 bin/-
 bin/
 .python-version

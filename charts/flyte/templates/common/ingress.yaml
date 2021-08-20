@@ -1,0 +1,222 @@
+{{- define "grpcRoutes" -}}
+# NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+- path: /flyteidl.service.AdminService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AdminService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AuthMetadataService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AuthMetadataService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.IdentityService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.IdentityService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
+{{- if .Values.common.ingress.enabled }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with .Values.common.ingress.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4}}
+  {{- end }}
+spec:
+  rules:
+    - http:
+        paths:
+          {{- if .Values.common.ingress.albSSLRedirect }}
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: ssl-redirect
+              servicePort: use-annotation
+          {{- end }}
+          # This is useful only for frontend development
+          {{- if .Values.common.ingress.webpackHMR }}
+          - path: /__webpack_hmr
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          {{- end }}
+          # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 87
+          # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
+          - path: /console
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          - path: /console/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteconsole
+              servicePort: 80
+          - path: /api
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /api/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /healthcheck
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /v1/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /.well-known
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /.well-known/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /login
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /login/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /logout
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /logout/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /callback
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /callback/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /me
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /config
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /config/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          - path: /oauth2/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
+          {{- if not .Values.common.ingress.separateGrpcIngress }}
+          {{- include "grpcRoutes" . | nindent 10 -}}
+          {{- end }}
+      {{- with .Values.common.ingress.host }}
+      host: {{ . }}
+      {{- end }}
+  {{- if .Values.common.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Release.Name }}-flyte-tls
+      hosts:
+        - {{ .Values.common.ingress.host }}
+  {{ end }}
+
+
+{{- if .Values.common.ingress.separateGrpcIngress }}
+# Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
+# enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}-grpc
+  namespace: {{ template "flyte.namespace" . }}
+  annotations:
+  {{- with .Values.common.ingress.annotations }}
+  {{- tpl (toYaml .) $ | nindent 4}}
+  {{- end }}
+  {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
+  {{- toYaml . | nindent 4}}
+  {{- end }}
+spec:
+  rules:
+    - http:
+        paths:
+          # {{- if .Values.common.ingress.albSSLRedirect }}
+          # - backend:
+          #     serviceName: ssl-redirect
+          #     servicePort: use-annotation
+          #   path: /*
+          #   pathType: ImplementationSpecific
+          # {{- end }}
+          {{- include "grpcRoutes" . | nindent 10 -}}
+      {{- with .Values.common.ingress.host }}
+      host: {{ . }}
+      {{- end }}
+  {{- if .Values.common.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Release.Name }}-flyte-tls
+      hosts:
+        - {{ .Values.common.ingress.host }}
+  {{ end }}
+{{- end }}
+{{- end }}
