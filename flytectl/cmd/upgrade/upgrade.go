@@ -102,7 +102,7 @@ func upgrade(u *updater.Updater) (string, error) {
 		}
 		return fmt.Sprintf("Successfully updated to version %s", latestVersion), nil
 	}
-	return "", u.Rollback()
+	return "", nil
 }
 
 func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
