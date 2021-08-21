@@ -52,5 +52,6 @@ func (cfg ProjectConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("ProjectConfig", pflag.ExitOnError)
 	cmdFlags.BoolVar(&DefaultProjectConfig.ActivateProject, fmt.Sprintf("%v%v", prefix, "activateProject"), DefaultProjectConfig.ActivateProject, "Activates the project specified as argument.")
 	cmdFlags.BoolVar(&DefaultProjectConfig.ArchiveProject, fmt.Sprintf("%v%v", prefix, "archiveProject"), DefaultProjectConfig.ArchiveProject, "Archives the project specified as argument.")
+	cmdFlags.BoolVar(&DefaultProjectConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultProjectConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

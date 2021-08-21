@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/flyteorg/flytectl/cmd/config"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -64,16 +65,20 @@ func terminateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.C
 	for i := 0; i < len(args); i++ {
 		name := args[i]
 		logger.Infof(ctx, "Terminating execution of %v execution ", name)
-		_, err := cmdCtx.AdminClient().TerminateExecution(ctx, &admin.ExecutionTerminateRequest{
-			Id: &core.WorkflowExecutionIdentifier{
-				Project: config.GetConfig().Project,
-				Domain:  config.GetConfig().Domain,
-				Name:    name,
-			},
-		})
-		if err != nil {
-			logger.Errorf(ctx, "Failed in terminating execution of %v execution due to %v ", name, err)
-			return err
+		if execution.DefaultExecDeleteConfig.DryRun {
+			logger.Infof(ctx, "skipping TerminateExecution request (dryRun)")
+		} else {
+			_, err := cmdCtx.AdminClient().TerminateExecution(ctx, &admin.ExecutionTerminateRequest{
+				Id: &core.WorkflowExecutionIdentifier{
+					Project: config.GetConfig().Project,
+					Domain:  config.GetConfig().Domain,
+					Name:    name,
+				},
+			})
+			if err != nil {
+				logger.Errorf(ctx, "Failed in terminating execution of %v execution due to %v ", name, err)
+				return err
+			}
 		}
 		logger.Infof(ctx, "Terminated execution of %v execution ", name)
 	}

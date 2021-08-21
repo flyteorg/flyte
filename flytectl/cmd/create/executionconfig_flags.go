@@ -56,6 +56,7 @@ func (cfg ExecutionConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&executionConfig.KubeServiceAcct, fmt.Sprintf("%v%v", prefix, "kubeServiceAcct"), executionConfig.KubeServiceAcct, "kubernetes service account AuthRole for launching execution.")
 	cmdFlags.StringVar(&executionConfig.IamRoleARN, fmt.Sprintf("%v%v", prefix, "iamRoleARN"), executionConfig.IamRoleARN, "iam role ARN AuthRole for launching execution.")
 	cmdFlags.StringVar(&executionConfig.Relaunch, fmt.Sprintf("%v%v", prefix, "relaunch"), executionConfig.Relaunch, "execution id to be relaunched.")
-	cmdFlags.StringVar(&executionConfig.Recover, fmt.Sprintf("%v%v", prefix, "recover"), executionConfig.Relaunch, "execution id to be recreated from the last known failure point.")
+	cmdFlags.StringVar(&executionConfig.Recover, fmt.Sprintf("%v%v", prefix, "recover"), executionConfig.Recover, "execution id to be recreated from the last known failure point.")
+	cmdFlags.BoolVar(&executionConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), executionConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

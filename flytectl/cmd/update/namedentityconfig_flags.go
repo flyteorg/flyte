@@ -53,5 +53,6 @@ func (cfg NamedEntityConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.BoolVar(&namedEntityConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), namedEntityConfig.Archive, "archive named entity.")
 	cmdFlags.BoolVar(&namedEntityConfig.Activate, fmt.Sprintf("%v%v", prefix, "activate"), namedEntityConfig.Activate, "activate the named entity.")
 	cmdFlags.StringVar(&namedEntityConfig.Description, fmt.Sprintf("%v%v", prefix, "description"), namedEntityConfig.Description, "description of the named entity.")
+	cmdFlags.BoolVar(&namedEntityConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), namedEntityConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

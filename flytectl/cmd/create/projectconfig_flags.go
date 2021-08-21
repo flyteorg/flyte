@@ -55,5 +55,6 @@ func (cfg ProjectConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&projectConfig.File, fmt.Sprintf("%v%v", prefix, "file"), projectConfig.File, "file for the project definition.")
 	cmdFlags.StringVar(&projectConfig.Description, fmt.Sprintf("%v%v", prefix, "description"), projectConfig.Description, "description for the project specified as argument.")
 	cmdFlags.StringToStringVar(&projectConfig.Labels, fmt.Sprintf("%v%v", prefix, "labels"), projectConfig.Labels, "labels for the project specified as argument.")
+	cmdFlags.BoolVar(&projectConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), projectConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

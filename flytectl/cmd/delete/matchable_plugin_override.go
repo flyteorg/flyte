@@ -75,7 +75,7 @@ func deletePluginOverride(ctx context.Context, args []string, cmdCtx cmdCore.Com
 
 	// Deletes the matchable attributes using the AttrFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_PLUGIN_OVERRIDE); err != nil {
+		admin.MatchableResource_PLUGIN_OVERRIDE, delConfig.DryRun); err != nil {
 		return err
 	}
 

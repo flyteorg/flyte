@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 //go:generate pflags ProjectConfig --default-var DefaultProjectConfig --bind-default-var
@@ -17,6 +18,7 @@ import (
 type ProjectConfig struct {
 	ActivateProject bool `json:"activateProject" pflag:",Activates the project specified as argument."`
 	ArchiveProject  bool `json:"archiveProject" pflag:",Archives the project specified as argument."`
+	DryRun          bool `json:"dryRun" pflag:",execute command without making any modifications."`
 }
 
 const (
@@ -73,13 +75,17 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 	if archiveProject {
 		projectState = admin.Project_ARCHIVED
 	}
-	_, err := cmdCtx.AdminClient().UpdateProject(ctx, &admin.Project{
-		Id:    id,
-		State: projectState,
-	})
-	if err != nil {
-		fmt.Printf(clierrors.ErrFailedProjectUpdate, id, projectState, err)
-		return err
+	if DefaultProjectConfig.DryRun {
+		logger.Infof(ctx, "skipping UpdateProject request (dryRun)")
+	} else {
+		_, err := cmdCtx.AdminClient().UpdateProject(ctx, &admin.Project{
+			Id:    id,
+			State: projectState,
+		})
+		if err != nil {
+			fmt.Printf(clierrors.ErrFailedProjectUpdate, id, projectState, err)
+			return err
+		}
 	}
 	fmt.Printf("Project %v updated to %v state\n", id, projectState)
 	return nil

@@ -51,5 +51,6 @@ func (AttrUpdateConfig) mustMarshalJSON(v json.Marshaler) string {
 func (cfg AttrUpdateConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("AttrUpdateConfig", pflag.ExitOnError)
 	cmdFlags.StringVar(&DefaultUpdateConfig.AttrFile, fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultUpdateConfig.AttrFile, "attribute file name to be used for updating attribute for the resource type.")
+	cmdFlags.BoolVar(&DefaultUpdateConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultUpdateConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }
