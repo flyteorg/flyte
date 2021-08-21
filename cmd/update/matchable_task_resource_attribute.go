@@ -79,7 +79,7 @@ func updateTaskResourceAttributesFunc(ctx context.Context, args []string, cmdCtx
 
 	// Updates the admin matchable attribute from taskResourceAttrFileConfig
 	if err := DecorateAndUpdateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminUpdaterExt(),
-		taskResourceAttrFileConfig); err != nil {
+		taskResourceAttrFileConfig, updateConfig.DryRun); err != nil {
 		return err
 	}
 	return nil

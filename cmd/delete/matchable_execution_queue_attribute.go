@@ -74,7 +74,7 @@ func deleteExecutionQueueAttributes(ctx context.Context, args []string, cmdCtx c
 
 	// Deletes the matchable attributes using the AttrFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_EXECUTION_QUEUE); err != nil {
+		admin.MatchableResource_EXECUTION_QUEUE, delConfig.DryRun); err != nil {
 		return err
 	}
 

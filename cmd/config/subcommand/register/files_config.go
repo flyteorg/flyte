@@ -18,4 +18,5 @@ type FilesConfig struct {
 	K8ServiceAccount     string `json:"k8ServiceAccount" pflag:", custom kubernetes service account auth role to register launch plans with."`
 	OutputLocationPrefix string `json:"outputLocationPrefix" pflag:", custom output location prefix for offloaded types (files/schemas)."`
 	SourceUploadPath     string `json:"sourceUploadPath" pflag:", Location for source code in storage."`
+	DryRun               bool   `json:"dryRun" pflag:",execute command without making any modifications."`
 }

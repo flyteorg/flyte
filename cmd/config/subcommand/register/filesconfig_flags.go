@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// If v` is a pointer, it will get its element value or the zero value of the element type.
+// If v is a pointer, it will get its element value or the zero value of the element type.
 // If v is not a pointer, it will return it as is.
 func (FilesConfig) elemValueOrNil(v interface{}) interface{} {
 	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
@@ -57,5 +57,6 @@ func (cfg FilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultFilesConfig.K8ServiceAccount, fmt.Sprintf("%v%v", prefix, "k8ServiceAccount"), DefaultFilesConfig.K8ServiceAccount, " custom kubernetes service account auth role to register launch plans with.")
 	cmdFlags.StringVar(&DefaultFilesConfig.OutputLocationPrefix, fmt.Sprintf("%v%v", prefix, "outputLocationPrefix"), DefaultFilesConfig.OutputLocationPrefix, " custom output location prefix for offloaded types (files/schemas).")
 	cmdFlags.StringVar(&DefaultFilesConfig.SourceUploadPath, fmt.Sprintf("%v%v", prefix, "sourceUploadPath"), DefaultFilesConfig.SourceUploadPath, " Location for source code in storage.")
+	cmdFlags.BoolVar(&DefaultFilesConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultFilesConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

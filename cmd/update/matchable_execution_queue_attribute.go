@@ -77,7 +77,7 @@ func updateExecutionQueueAttributesFunc(ctx context.Context, args []string, cmdC
 
 	// Updates the admin matchable attribute from executionQueueAttrFileConfig
 	if err := DecorateAndUpdateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminUpdaterExt(),
-		executionQueueAttrFileConfig); err != nil {
+		executionQueueAttrFileConfig, updateConfig.DryRun); err != nil {
 		return err
 	}
 	return nil

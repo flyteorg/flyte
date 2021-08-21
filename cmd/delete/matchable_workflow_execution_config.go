@@ -71,7 +71,7 @@ func deleteWorkflowExecutionConfig(ctx context.Context, args []string, cmdCtx cm
 
 	// Deletes the matchable attributes using the WorkflowExecutionConfigFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG); err != nil {
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, delConfig.DryRun); err != nil {
 		return err
 	}
 

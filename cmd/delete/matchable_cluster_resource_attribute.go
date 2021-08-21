@@ -72,7 +72,7 @@ func deleteClusterResourceAttributes(ctx context.Context, args []string, cmdCtx 
 
 	// Deletes the matchable attributes using the taskResourceAttrFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_CLUSTER_RESOURCE); err != nil {
+		admin.MatchableResource_CLUSTER_RESOURCE, delConfig.DryRun); err != nil {
 		return err
 	}
 

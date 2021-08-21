@@ -51,5 +51,6 @@ func (AttrDeleteConfig) mustMarshalJSON(v json.Marshaler) string {
 func (cfg AttrDeleteConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("AttrDeleteConfig", pflag.ExitOnError)
 	cmdFlags.StringVar(&DefaultDelConfig.AttrFile, fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultDelConfig.AttrFile, "attribute file name to be used for delete attribute for the resource type.")
+	cmdFlags.BoolVar(&DefaultDelConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultDelConfig.DryRun, "execute command without making any modifications.")
 	return cmdFlags
 }

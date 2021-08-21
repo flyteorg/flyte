@@ -70,7 +70,7 @@ func updateWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCt
 
 	// Updates the admin matchable attribute from workflowExecutionConfigFileConfig
 	if err := DecorateAndUpdateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminUpdaterExt(),
-		workflowExecutionConfigFileConfig); err != nil {
+		workflowExecutionConfigFileConfig, updateConfig.DryRun); err != nil {
 		return err
 	}
 	return nil

@@ -10,6 +10,7 @@ import (
 	cmdGet "github.com/flyteorg/flytectl/cmd/get"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
@@ -93,6 +94,10 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
 	cmdCtx cmdCore.CommandContext) error {
+	if executionConfig.DryRun {
+		logger.Debugf(ctx, "skipping RelaunchExecution request (DryRun)")
+		return nil
+	}
 	relaunchedExec, err := cmdCtx.AdminClient().RelaunchExecution(ctx, &admin.ExecutionRelaunchRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    executionName,
@@ -109,6 +114,10 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 
 func recoverExecution(ctx context.Context, executionName string, project string, domain string,
 	cmdCtx cmdCore.CommandContext) error {
+	if executionConfig.DryRun {
+		logger.Debugf(ctx, "skipping RecoverExecution request (DryRun)")
+		return nil
+	}
 	recoveredExec, err := cmdCtx.AdminClient().RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    executionName,
@@ -157,6 +166,7 @@ func readExecConfigFromFile(fileName string) (*ExecutionConfig, error) {
 }
 
 func resolveOverrides(toBeOverridden *ExecutionConfig, project string, domain string) {
+	toBeOverridden.DryRun = executionConfig.DryRun
 	if executionConfig.KubeServiceAcct != "" {
 		toBeOverridden.KubeServiceAcct = executionConfig.KubeServiceAcct
 	}

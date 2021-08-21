@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (
@@ -45,6 +46,7 @@ type ProjectConfig struct {
 	File        string            `json:"file" pflag:",file for the project definition."`
 	Description string            `json:"description" pflag:",description for the project specified as argument."`
 	Labels      map[string]string `json:"labels" pflag:",labels for the project specified as argument."`
+	DryRun      bool              `json:"dryRun" pflag:",execute command without making any modifications."`
 }
 
 var (
@@ -77,18 +79,22 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 	if project.Name == "" {
 		return fmt.Errorf("project name is required flag")
 	}
-	_, err := cmdCtx.AdminClient().RegisterProject(ctx, &admin.ProjectRegisterRequest{
-		Project: &admin.Project{
-			Id:          project.ID,
-			Name:        project.Name,
-			Description: project.Description,
-			Labels: &admin.Labels{
-				Values: project.Labels,
+	if projectConfig.DryRun {
+		logger.Debugf(ctx, "skipping RegisterProject request (DryRun)")
+	} else {
+		_, err := cmdCtx.AdminClient().RegisterProject(ctx, &admin.ProjectRegisterRequest{
+			Project: &admin.Project{
+				Id:          project.ID,
+				Name:        project.Name,
+				Description: project.Description,
+				Labels: &admin.Labels{
+					Values: project.Labels,
+				},
 			},
-		},
-	})
-	if err != nil {
-		return err
+		})
+		if err != nil {
+			return err
+		}
 	}
 	fmt.Println("project Created successfully")
 	return nil

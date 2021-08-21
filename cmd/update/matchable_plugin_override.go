@@ -79,7 +79,7 @@ func updatePluginOverridesFunc(ctx context.Context, args []string, cmdCtx cmdCor
 
 	// Updates the admin matchable attribute from pluginOverrideFileConfig
 	if err := DecorateAndUpdateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminUpdaterExt(),
-		pluginOverrideFileConfig); err != nil {
+		pluginOverrideFileConfig, updateConfig.DryRun); err != nil {
 		return err
 	}
 	return nil

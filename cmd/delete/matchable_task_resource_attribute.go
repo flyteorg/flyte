@@ -75,7 +75,7 @@ func deleteTaskResourceAttributes(ctx context.Context, args []string, cmdCtx cmd
 
 	// Deletes the matchable attributes using the taskResourceAttrFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_TASK_RESOURCE); err != nil {
+		admin.MatchableResource_TASK_RESOURCE, delConfig.DryRun); err != nil {
 		return err
 	}
 

@@ -70,7 +70,7 @@ func deleteExecutionClusterLabel(ctx context.Context, args []string, cmdCtx cmdC
 
 	// Deletes the matchable attributes using the ExecClusterLabelFileConfig
 	if err := deleteMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminDeleterExt(),
-		admin.MatchableResource_EXECUTION_CLUSTER_LABEL); err != nil {
+		admin.MatchableResource_EXECUTION_CLUSTER_LABEL, delConfig.DryRun); err != nil {
 		return err
 	}
 

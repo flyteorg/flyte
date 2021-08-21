@@ -113,4 +113,18 @@ func TestAttrDeleteConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_dryRun", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("dryRun", testValue)
+			if vBool, err := cmdFlags.GetBool("dryRun"); err == nil {
+				testDecodeJson_AttrDeleteConfig(t, fmt.Sprintf("%v", vBool), &actual.DryRun)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
