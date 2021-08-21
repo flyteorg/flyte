@@ -202,46 +202,6 @@ webhook:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
 
-# ----------------------------------------------
-# Sandbox Configuration
-# Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop.
-# This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal
-# for a high performance setup, but are great to try out flyte
-# -----------------------------------------------
-#
-# REDIS SETTINGS
-#
-
-redis:
-  # --- enable or disable Redis Statefulset installation
-  enabled: true
-  # -- Replicas count for Redis Statefulset
-  replicaCount: 1
-  image:
-    # -- Docker image for Redis Statefulset
-    repository: docker.io/bitnami/redis
-    tag: 4.0.2-r1
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Redis Statefulset
-  resources:
-    requests:
-      cpu: 10m
-      memory: 50Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-  # -- Service settings for Redis
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for Redis pods
-  podAnnotations: {}
-  # -- nodeSelector for Redis Statefulset
-  nodeSelector: {}
-  # -- tolerations for Redis Statefulset
-  tolerations: []
-  # -- affinity for Redis Statefulset
-  affinity: {}
 
 common:
   databaseSecret:
@@ -527,7 +487,8 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type: redis
+        type:
+
         resourceMaxQuota: 10000
         redis:
           hostPath: redis-resource-manager:6379

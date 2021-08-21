@@ -80,23 +80,6 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-
-{{- define "redis.name" -}}
-redis
-{{- end -}}
-
-{{- define "redis.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "redis.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{- define "redis.labels" -}}
-{{ include "redis.selectorLabels" . }}
-helm.sh/chart: {{ include "flyte.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-
 # Optional blocks for secret mount
 
 {{- define "databaseSecret.volume" -}}
