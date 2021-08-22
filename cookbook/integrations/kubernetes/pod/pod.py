@@ -136,7 +136,7 @@ from flytekit import map_task, TaskMetadata
         primary_container_name="primary",
     )
 )
-def my_pod_task(stringify: int) -> str:
+def my_pod_map_task(stringify: int) -> str:
     return str(stringify)
 
 
@@ -148,7 +148,7 @@ def coalesce(b: List[str]) -> str:
 
 @workflow
 def my_map_workflow(a: List[int]) -> str:
-    mapped_out = map_task(my_pod_task, metadata=TaskMetadata(retries=1))(stringify=a)
+    mapped_out = map_task(my_pod_map_task, metadata=TaskMetadata(retries=1))(stringify=a)
     coalesced = coalesce(b=mapped_out)
     return coalesced
 
