@@ -78,10 +78,10 @@ func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
 // GetSandboxPorts will return sandbox ports
 func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
 	return nat.ParsePortSpecs([]string{
-		"127.0.0.1:30086:30086",
-		"127.0.0.1:30081:30081",
-		"127.0.0.1:30082:30082",
-		"127.0.0.1:30084:30084",
+		"0.0.0.0:30086:30086",
+		"0.0.0.0:30081:30081",
+		"0.0.0.0:30082:30082",
+		"0.0.0.0:30084:30084",
 	})
 }
 
