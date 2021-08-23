@@ -140,6 +140,7 @@ Options
 
 ::
 
+      --dryRun                   execute command without making any modifications.
       --execFile string          file for the execution params.If not specified defaults to <<workflow/task>_name>.execution_spec.yaml
   -h, --help                     help for execution
       --iamRoleARN string        iam role ARN AuthRole for launching execution.

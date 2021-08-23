@@ -54,6 +54,7 @@ Options
 
       --activateProject   Activates the project specified as argument.
       --archiveProject    Archives the project specified as argument.
+      --dryRun            execute command without making any modifications.
   -h, --help              help for project
 
 Options inherited from parent commands

@@ -60,6 +60,7 @@ Options
 ::
 
       --attrFile string   attribute file name to be used for delete attribute for the resource type.
+      --dryRun            execute command without making any modifications.
   -h, --help              help for plugin-override
 
 Options inherited from parent commands

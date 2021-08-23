@@ -41,6 +41,7 @@ Options
 ::
 
       --description string      description for the project specified as argument.
+      --dryRun                  execute command without making any modifications.
       --file string             file for the project definition.
   -h, --help                    help for project
       --id string               id for the project specified as argument.

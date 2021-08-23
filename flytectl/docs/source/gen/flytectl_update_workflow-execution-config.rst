@@ -58,6 +58,7 @@ Options
 ::
 
       --attrFile string   attribute file name to be used for updating attribute for the resource type.
+      --dryRun            execute command without making any modifications.
   -h, --help              help for workflow-execution-config
 
 Options inherited from parent commands

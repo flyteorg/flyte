@@ -55,6 +55,7 @@ Options
 ::
 
       --attrFile string   attribute file name to be used for delete attribute for the resource type.
+      --dryRun            execute command without making any modifications.
   -h, --help              help for execution-cluster-label
 
 Options inherited from parent commands

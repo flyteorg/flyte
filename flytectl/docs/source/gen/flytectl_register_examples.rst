@@ -31,6 +31,7 @@ Options
       --archive                       pass in archive file either an http link or local path.
       --assumableIamRole string        custom assumable iam auth role to register launch plans with.
       --continueOnError               continue on error when registering files.
+      --dryRun                        execute command without making any modifications.
   -h, --help                          help for examples
       --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
       --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
