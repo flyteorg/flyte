@@ -40,6 +40,9 @@ var (
 		},
 		DefaultCPURequest:    defaultCPURequest,
 		DefaultMemoryRequest: defaultMemoryRequest,
+		CreateContainerErrorGracePeriod: config2.Duration{
+			Duration: time.Minute * 3,
+		},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -110,6 +113,11 @@ type K8sPluginConfig struct {
 	// are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as
 	// soon as the resource is finalized.
 	DeleteResourceOnFinalize bool `json:"delete-resource-on-finalize" pflag:",Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized."`
+
+	// Time to wait for transient CreateContainerError errors to be resolved. If the
+	// error persists past this grace period, it will be inferred to be a permanent
+	// one, and the corresponding task marked as failed
+	CreateContainerErrorGracePeriod config2.Duration `json:"create-container-error-grace-period" pflag:"-,Time to wait for transient CreateContainerError errors to be resolved."`
 }
 
 type FlyteCoPilotConfig struct {
