@@ -64,7 +64,8 @@ Options
 
 ::
 
-  -h, --help   help for execution
+      --dryRun   execute command without making any modifications.
+  -h, --help     help for execution
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

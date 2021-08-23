@@ -40,6 +40,7 @@ Options
       --activate             activate the named entity.
       --archive              archive named entity.
       --description string   description of the named entity.
+      --dryRun               execute command without making any modifications.
   -h, --help                 help for workflow
 
 Options inherited from parent commands
