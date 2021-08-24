@@ -253,6 +253,58 @@ func updatePod(t *testing.T) {
 	)
 }
 
+func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *testing.T) {
+	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{})
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: &v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+					NodeSelectorTerms: []v1.NodeSelectorTerm{
+						v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "default node affinity",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"exists"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		InterruptibleNodeSelectorRequirement: &v1.NodeSelectorRequirement{
+			Key:      "x/interruptible",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"true"},
+		},
+	}))
+	for i := 0; i < 3; i++ {
+		podSpec := v1.PodSpec{}
+		UpdatePod(taskExecutionMetadata, []v1.ResourceRequirements{}, &podSpec)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "default node affinity",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"exists"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "x/interruptible",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"true"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	}
+}
+
 func toK8sPodInterruptible(t *testing.T) {
 	ctx := context.TODO()
 

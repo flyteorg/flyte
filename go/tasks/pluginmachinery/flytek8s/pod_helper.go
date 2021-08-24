@@ -76,8 +76,8 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	if taskExecutionMetadata.IsInterruptible() {
 		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().InterruptibleNodeSelector)
 	}
-	if podSpec.Affinity == nil {
-		podSpec.Affinity = config.GetK8sPluginConfig().DefaultAffinity
+	if podSpec.Affinity == nil && config.GetK8sPluginConfig().DefaultAffinity != nil {
+		podSpec.Affinity = config.GetK8sPluginConfig().DefaultAffinity.DeepCopy()
 	}
 	ApplyInterruptibleNodeAffinity(taskExecutionMetadata.IsInterruptible(), podSpec)
 }
