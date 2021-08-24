@@ -5,7 +5,7 @@ import { structPath } from './constants';
 import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
-type PrimitiveType = string | number | boolean | null | object;
+export type PrimitiveType = string | number | boolean | null | object;
 
 function asValueWithKind(value: Protobuf.IValue): Protobuf.Value {
     return value instanceof Protobuf.Value
@@ -13,7 +13,7 @@ function asValueWithKind(value: Protobuf.IValue): Protobuf.Value {
         : Protobuf.Value.create(value);
 }
 
-function protobufValueToPrimitive(
+export function protobufValueToPrimitive(
     value: Protobuf.IValue
 ): PrimitiveType | PrimitiveType[] {
     const valueWithKind = asValueWithKind(value);
