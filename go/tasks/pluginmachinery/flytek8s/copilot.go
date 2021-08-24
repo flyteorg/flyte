@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -40,7 +39,6 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	if err != nil {
 		return v1.Container{}, err
 	}
-
 	return v1.Container{
 		Name:       cfg.NamePrefix + name,
 		Image:      cfg.Image,
@@ -68,13 +66,13 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
 	}
-	if !reflect.DeepEqual(storageConfig.Stow, storage.StowConfig{}) {
+	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
 		var cfg string
 		for key, val := range storageConfig.Stow.Config {
 			cfg += fmt.Sprintf("%s=%s,", key, val)
 		}
 		commands = append(commands, []string{
-			fmt.Sprintf("--storage.stow.config=%s", cfg),
+			fmt.Sprintf("--storage.stow.config %s", cfg),
 			fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind),
 		}...)
 	}
