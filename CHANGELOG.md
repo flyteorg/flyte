@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.23.0](http://github.com/lyft/flyteconsole/compare/v0.22.1...v0.23.0) (2021-08-24)
+
+
+### Features
+
+* schema validator for struct type execution ([#186](http://github.com/lyft/flyteconsole/issues/186)) ([9744894](http://github.com/lyft/flyteconsole/commit/974489493e6444ac1ff4af87de3d7848336c12b3))
+
 ## [0.22.1](http://github.com/lyft/flyteconsole/compare/v0.22.0...v0.22.1) (2021-08-19)
 
 
