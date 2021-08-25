@@ -127,6 +127,10 @@ helm upgrade -f values-sandbox.yaml flyte .
 | db.database.host | string | `"postgres"` |  username: postgres |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteadmin.flytescheduler | object | `{"enabled":false,"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"v0.6.16"}}` | Flytescheduler spec |
+| flyteadmin.flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flyteadmin.flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
+| flyteadmin.flytescheduler.image.tag | string | `"v0.6.16"` | Docker image tag |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
 | flyteadmin.image.tag | string | `"v0.6.16"` | Docker image tag |

@@ -248,6 +248,16 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  admin.yaml: | 
+    admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -1327,7 +1337,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f69f77a814f4fa2371ee9d84500b74ec85a8001cd0db86005a2368a13f87dca"
+        configChecksum: "ba8b14b6654d1e86179a19c41afb5c7579f846a547454fbff3f57588df97074"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1448,6 +1458,7 @@ spec:
           limits:
             cpu: "0.1"
             memory: 200Mi
+
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass

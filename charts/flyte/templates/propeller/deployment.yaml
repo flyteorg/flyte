@@ -48,7 +48,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-common-auth
       {{- with .Values.flytepropeller.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

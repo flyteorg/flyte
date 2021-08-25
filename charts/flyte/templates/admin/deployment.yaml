@@ -142,6 +142,8 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
       {{- end }}
 
       serviceAccountName: {{ template "flyteadmin.name" . }}
@@ -151,6 +153,9 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
+        - name: auth
+          secret:
+            secretName: flyte-common-auth
         {{- if .Values.cluster_resource_manager.enabled }}
         - configMap:
             name: clusterresource-template
