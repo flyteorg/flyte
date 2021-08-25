@@ -44,7 +44,7 @@ Quickstart
        export ADMIN_API_URL=http://localhost:30081
        export DISABLE_AUTH=1
 
-  .. note::
+   .. note::
 
      You can persist these environment variables in a ``.env`` file at the root
      of the repository. This will persist the settings across multiple terminal
@@ -147,16 +147,81 @@ Admin API requests).
 
 .. _cors-proxying:
 
-==============
-CORS Proxying
-==============
+================================
+CORS Proxying: Recommended setup
+================================
 
 In the common hosting arrangement, all API requests will be to the same origin
-serving the client application, making CORS unnecessary. For any requests which
-do not share the same ``origin`` value, the client application will route
-requests through a special endpoint on the NodeJS server. One example would be
+serving the client application, making CORS unnecessary. However, if you would like
+to setup your local dev enviornment to target a FlyteAdmin service running on a different
+domain you will need to configure your enviornment support CORS. One example would be
 hosting the Admin API on a different domain than the console. Another example is
-when fetching execution data from external storage such as S3. This is done to
+when fetching execution data from external storage such as S3.
+
+The fastest (recommended) way to setup a CORS solution is to do so within the browser. 
+If you would like to handle this at the Node level you will need to disable authentication
+(see below)
+
+  .. note:: Do not configure for both browser and Node solutions. 
+
+These instructions require using Google Chrome. You will also need to identify the 
+URL of your target FlyteAdmin API instance. These instructions will use
+`https://demo.nuclyde.io` as an example.
+
+
+#. Export value for `ADMIN_API_URL`
+   
+   .. code:: bash
+
+      export ADMIN_API_URL=https://demo.nuclyde.io
+
+   .. note:: Hint: 
+      Add this to your local bash profile (eg, `./profile`) to prevent having to do this step each time
+
+#. Add new record to hosts file
+
+   .. code:: bash
+      
+      sudo vim /etc/hosts
+
+   Add: `127.0.0.1 localhost.demo.nuclyde.io`
+
+#. Install Chrome plugin: `Allow CORS: Access-Control-Allow-Origin <https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf>`_
+
+   .. note:: Activate plugin (toggle to "on")
+
+#. Install Chrome plugin: `ModHeader <https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj?hl=en>`_
+
+   .. note:: Configure ModHead by adding record:
+
+      - Header: `Host`
+      - Value: `demo.nuclyde.io`
+
+#. Set Schemeful Same-Site to disabled
+
+   - Enter `chrome://flags` in url bar
+   - Find 'Schemeful Same-Site' and set to `disabled`
+
+#. Restart Chrome
+
+#. Start `flyteconsole`
+
+   .. code:: bash
+
+      yarn start
+
+   Your new localhost is `localhost.demo.nuclyde.io <http://localhost.demo.nuclyde.io>`_
+
+.. note:: Hint:
+
+   Ensure you don't have `ADMIN_API_URL` or `DISABLE_AUTH` set (eg, in your `/.profile`.)
+
+=================================
+CORS Proxying: Node configuration
+=================================
+
+For any requests which do not share the same ``origin`` value, the client application will route
+requests through a special endpoint on the NodeJS server. This is done to
 minimize the amount of extra configuration required for ingress to the Admin API
 and data storage, as well as to simplify local development of the console without
 the need to grant CORS access to ``localhost``. To proxy requests for local
