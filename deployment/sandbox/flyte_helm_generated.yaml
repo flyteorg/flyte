@@ -185,11 +185,11 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte/templates/propeller/secret-auth.yaml
+# Source: flyte/templates/common/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-propeller-auth
+  name: flyte-common-auth
   namespace: flyte
 type: Opaque
 stringData:
@@ -3431,6 +3431,9 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
+        - name: auth
+          secret:
+            secretName: flyte-common-auth
         - configMap:
             name: clusterresource-template
           name: resource-templates
@@ -3729,7 +3732,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-common-auth
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create the actual deployment
