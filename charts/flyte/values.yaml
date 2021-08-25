@@ -31,6 +31,18 @@ flyteadmin:
       memory: 50Mi
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
+
+  # -- Flytescheduler spec
+  flytescheduler:
+    enabled: false
+    image:
+      # -- Docker image for Flytescheduler deployment
+      repository: cr.flyte.org/flyteorg/flytescheduler
+      # -- Docker image tag
+      tag: v0.6.16 # FLYTESCHEDULER_TAG
+      # -- Docker image pull policy
+      pullPolicy: IfNotPresent
+
   # -- Initial projects to create
   initialProjects:
     - flytesnacks
@@ -59,6 +71,7 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
+
 
 #
 # DATACATALOG SETTINGS
