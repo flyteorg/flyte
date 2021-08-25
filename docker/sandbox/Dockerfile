@@ -28,8 +28,8 @@ RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/inst
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
-# Copy flyte manifest
-COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
+# Copy flyte chart
+COPY charts/flyte/ /flyteorg/share/flyte
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
@@ -40,12 +40,14 @@ FROM base_ AS default
 # Install dependencies
 RUN apk add --no-cache bash git make tini
 
+# Install Helm
+RUN wget -q -O get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+    && chmod 700 get_helm.sh \
+    && ./get_helm.sh
+
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 COPY docker/sandbox/bashrc /root/.bashrc
-
-# Copy kustomization template
-COPY docker/sandbox/kustomization.yaml  /flyteorg/share/kustomization.yaml
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -67,14 +69,16 @@ FROM docker:20.10.7-dind AS dind
 # Install dependencies
 RUN apk add --no-cache bash git make tini
 
+# Install Helm
+RUN wget -q -O get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+    && chmod 700 get_helm.sh \
+    && ./get_helm.sh
+
 # Copy artifacts from base
 COPY --from=base_ /flyteorg/ /flyteorg/
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
-
-# Copy kustomization template 
-COPY docker/sandbox/kustomization.yaml  /flyteorg/share/kustomization.yaml
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
