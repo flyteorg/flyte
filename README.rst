@@ -162,21 +162,21 @@ The fastest (recommended) way to setup a CORS solution is to do so within the br
 If you would like to handle this at the Node level you will need to disable authentication
 (see below)
 
-  .. note:: Do not configure for both browser and Node solutions. 
+   .. note:: Do not configure for both browser and Node solutions. 
 
 These instructions require using Google Chrome. You will also need to identify the 
 URL of your target FlyteAdmin API instance. These instructions will use
-`https://demo.nuclyde.io` as an example.
+`https://different.admin.service.com` as an example.
 
 
 #. Export value for `ADMIN_API_URL`
    
    .. code:: bash
 
-      export ADMIN_API_URL=https://demo.nuclyde.io
+      export ADMIN_API_URL=https://different.admin.service.com
 
-   .. note:: Hint: 
-      Add this to your local bash profile (eg, `./profile`) to prevent having to do this step each time
+      .. note:: Hint
+         Add this to your local profile (eg, `./profile`) to prevent having to do this step each time
 
 #. Add new record to hosts file
 
@@ -184,18 +184,22 @@ URL of your target FlyteAdmin API instance. These instructions will use
       
       sudo vim /etc/hosts
 
-   Add: `127.0.0.1 localhost.demo.nuclyde.io`
+   Add the following record
+   
+   .. code:: bash
+   
+      127.0.0.1 localhost.different.admin.service.com
 
 #. Install Chrome plugin: `Allow CORS: Access-Control-Allow-Origin <https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf>`_
 
-   .. note:: Activate plugin (toggle to "on")
+      .. note:: Activate plugin (toggle to "on")
 
 #. Install Chrome plugin: `ModHeader <https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj?hl=en>`_
 
-   .. note:: Configure ModHead by adding record:
-
-      - Header: `Host`
-      - Value: `demo.nuclyde.io`
+      .. note:: Configure ModHead by adding record
+      
+         - Header: `Host`
+         - Value: `different.admin.service.com`
 
 #. Set Schemeful Same-Site to disabled
 
@@ -210,9 +214,9 @@ URL of your target FlyteAdmin API instance. These instructions will use
 
       yarn start
 
-   Your new localhost is `localhost.demo.nuclyde.io <http://localhost.demo.nuclyde.io>`_
+   Your new localhost is `localhost.different.admin.service.com <http://localhost.different.admin.service.com>`_
 
-.. note:: Hint:
+.. note:: Hint
 
    Ensure you don't have `ADMIN_API_URL` or `DISABLE_AUTH` set (eg, in your `/.profile`.)
 
