@@ -42,16 +42,16 @@ Here are the setup instructions to start contributing to `flytesnacks` repo:
 ### 💻 Contribute to examples
 
 1. Determine where to put your new code:
-   * [Core](https://github.com/flyteorg/blob/master/cookbook/core)
+   * [Core](https://github.com/flyteorg/flytesnacks/tree/master/cookbook/core)
        
        Contains examples that demonstrates functionality available within core flytekit. These examples should be runnable
        locally.
        
-   * [Integrations](https://github.com/flyteorg/blob/master/cookbook/integrations)
+   * [Integrations](https://github.com/flyteorg/flytesnacks/tree/master/cookbook/integrations)
        
        Contains examples that leverage one or more of the available plugins.
        
-   * [Case Studies](https://github.com/flyteorg/blob/master/cookbook/case_studies)
+   * [Case Studies](https://github.com/flyteorg/flytesnacks/tree/master/cookbook/case_studies)
        
        Contains examples that demonstrates usage of Flyte to solve real world problems. These are more generally more complex
        examples that may require extra setup or that can only run on larger clusters.
