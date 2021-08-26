@@ -17,7 +17,8 @@ echo "Done."
 
 # Deploy flyte
 echo "Deploying Flyte..."
-k3s kubectl apply -k /flyteorg/share
+helm install -n flyte -f /flyteorg/share/flyte/values-sandbox.yaml --create-namespace flyte /flyteorg/share/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml
+
 wait-for-flyte.sh
 
 wait ${K3S_PID}

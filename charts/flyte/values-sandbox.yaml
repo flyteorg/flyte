@@ -208,7 +208,38 @@ workflow_notifications:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  config:
+    cluster_resources:
+      refreshInterval: 5m
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        - production:
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+        - staging:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+        - development:
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
 
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
 # --------------------------------------------------------
 # Optional Plugins
 # --------------------------------------------------------

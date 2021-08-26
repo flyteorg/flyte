@@ -273,17 +273,6 @@ data:
       finalizers:
       - kubernetes
     
-  ab_project_resource_quota.yaml: | 
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }}
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }}
-        limits.memory: {{ projectQuotaMemory }}
-    
   zz_copilot_config.yaml: | 
     kind: ConfigMap
     apiVersion: v1
@@ -415,22 +404,16 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
-        - defaultIamRole:
-            value: ""
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -3289,7 +3272,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "7b4bf0d87ac252a431343fdebac335507fc65fbfe0855951d4edcc5e114d69a"
+        configChecksum: "f8cc690f5252c5823dff67d042eec35fbff19a431ca7d51775ff7150759677a"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
