@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytestdlib/logger"
 
@@ -19,6 +21,7 @@ import (
 // Subworkflow handler handles inline subWorkflows
 type subworkflowHandler struct {
 	nodeExecutor executors.Node
+	eventConfig  *config.EventConfig
 }
 
 // Helper method that extracts the SubWorkflow from the ExecutionContext
@@ -236,8 +239,9 @@ func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeE
 	return s.nodeExecutor.AbortHandler(ctx, execContext, subWorkflow, nodeLookup, subWorkflow.StartNode(), reason)
 }
 
-func newSubworkflowHandler(nodeExecutor executors.Node) subworkflowHandler {
+func newSubworkflowHandler(nodeExecutor executors.Node, eventConfig *config.EventConfig) subworkflowHandler {
 	return subworkflowHandler{
 		nodeExecutor: nodeExecutor,
+		eventConfig:  eventConfig,
 	}
 }

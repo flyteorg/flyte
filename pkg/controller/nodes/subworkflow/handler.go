@@ -3,6 +3,8 @@ package subworkflow
 import (
 	"context"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -127,13 +129,14 @@ func (w *workflowNodeHandler) Finalize(ctx context.Context, _ handler.NodeExecut
 	return nil
 }
 
-func New(executor executors.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client, scope promutils.Scope) handler.Node {
+func New(executor executors.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
 	workflowScope := scope.NewSubScope("workflow")
 	return &workflowNodeHandler{
-		subWfHandler: newSubworkflowHandler(executor),
+		subWfHandler: newSubworkflowHandler(executor, eventConfig),
 		lpHandler: launchPlanHandler{
 			launchPlan:     workflowLauncher,
 			recoveryClient: recoveryClient,
+			eventConfig:    eventConfig,
 		},
 		metrics: newMetrics(workflowScope),
 	}

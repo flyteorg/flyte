@@ -6,8 +6,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
@@ -22,6 +20,7 @@ import (
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	pluginK8s "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	controllerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -172,6 +171,7 @@ type Handler struct {
 	barrierCache    *barrier
 	cfg             *config.Config
 	pluginScope     promutils.Scope
+	eventConfig     *controllerConfig.EventConfig
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -429,7 +429,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		// This code only exists to support Dynamic tasks. Eventually dynamic tasks will use closure nodes to execute
 		// Until then we have to check if the Handler executed resulted in a dynamic node being generated, if so, then
 		// we will not check for outputs or call onTaskSuccess. The reason is that outputs have not yet been materialized.
-		// Outputs for the parent node will only get generated after the subtasks complete. We have to wait for the completion
+		// Output for the parent node will only get generated after the subtasks complete. We have to wait for the completion
 		// the dynamic.handler will call onTaskSuccess for the parent node
 
 		f, err := NewRemoteFutureFileReader(ctx, tCtx.ow.GetOutputPrefixPath(), tCtx.DataStore())
@@ -593,7 +593,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
-		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo); err != nil {
+		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
 			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
 			// Check for idempotency
 			// Check for terminate state error
@@ -618,7 +618,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		return handler.UnknownTransition, err
 	}
 	if evInfo != nil {
-		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo); err != nil {
+		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
 			// Check for idempotency
 			// Check for terminate state error
 			logger.Errorf(ctx, "failed to send event to Admin. error: %s", err.Error())
@@ -705,7 +705,7 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 				Code:    "Task Aborted",
 				Message: reason,
 			}},
-	}); err != nil {
+	}, t.eventConfig); err != nil {
 		logger.Errorf(ctx, "failed to send event to Admin. error: %s", err.Error())
 		return err
 	}
@@ -740,7 +740,7 @@ func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext
 	}()
 }
 
-func New(ctx context.Context, kubeClient executors.Client, client catalog.Client, recoveryClient recovery.Client, scope promutils.Scope) (*Handler, error) {
+func New(ctx context.Context, kubeClient executors.Client, client catalog.Client, eventConfig *controllerConfig.EventConfig, scope promutils.Scope) (*Handler, error) {
 	// TODO New should take a pointer
 	async, err := catalog.NewAsyncClient(client, *catalog.GetConfig(), scope.NewSubScope("async_catalog"))
 	if err != nil {
@@ -777,5 +777,6 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
 		barrierCache:    newLRUBarrier(ctx, cfg.BarrierConfig),
 		cfg:             cfg,
+		eventConfig:     eventConfig,
 	}, nil
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -26,6 +28,10 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
+
+var eventConfig = &config.EventConfig{
+	RawOutputPolicy: config.RawOutputPolicyReference,
+}
 
 type branchNodeStateHolder struct {
 	s handler.BranchNodeState
@@ -197,7 +203,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 				childNodeStatus.On("SetDataDir", storage.DataReference("parent-data-dir")).Once()
 				childNodeStatus.On("SetOutputDir", storage.DataReference("parent-output-dir")).Once()
 			}
-			branch := New(mockNodeExecutor, promutils.NewTestScope()).(*branchHandler)
+			branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope()).(*branchHandler)
 			h, err := branch.recurseDownstream(ctx, nCtx, test.nodeStatus, test.branchTakenNode)
 			if test.isErr {
 				assert.Error(t, err)
@@ -278,7 +284,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetParentInfo().Return(nil)
 		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil, eCtx)
-		branch := New(mockNodeExecutor, promutils.NewTestScope())
+		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.NoError(t, err)
 	})
@@ -296,7 +302,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		nl.OnGetNode(*s.s.FinalizedNodeID).Return(n, true)
-		branch := New(mockNodeExecutor, promutils.NewTestScope())
+		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.NoError(t, err)
 	})
@@ -305,7 +311,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 func TestBranchHandler_Initialize(t *testing.T) {
 	ctx := context.TODO()
 	mockNodeExecutor := &execMocks.Node{}
-	branch := New(mockNodeExecutor, promutils.NewTestScope())
+	branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 	assert.NoError(t, branch.Setup(ctx, nil))
 }
 
@@ -313,7 +319,7 @@ func TestBranchHandler_Initialize(t *testing.T) {
 func TestBranchHandler_HandleNode(t *testing.T) {
 	ctx := context.TODO()
 	mockNodeExecutor := &execMocks.Node{}
-	branch := New(mockNodeExecutor, promutils.NewTestScope())
+	branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 	childNodeID := "child"
 	childDatadir := v1alpha1.DataReference("test")
 	w := &v1alpha1.FlyteWorkflow{

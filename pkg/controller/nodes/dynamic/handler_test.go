@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -54,6 +56,10 @@ func (t *dynamicNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState)
 }
 
 var tID = "task-1"
+
+var eventConfig = &config.EventConfig{
+	RawOutputPolicy: config.RawOutputPolicyReference,
+}
 
 func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 	createNodeContext := func(ttype string) *nodeMocks.NodeExecutionContext {
@@ -181,7 +187,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			} else {
 				h.OnHandleMatch(mock.Anything, mock.Anything).Return(tt.args.trns, nil)
 			}
-			d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.isErr {
 				t.Errorf("Handle() error = %v, wantErr %v", err, tt.want.isErr)
@@ -293,7 +299,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		got, err := d.Handle(context.TODO(), nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning.String(), got.Info().GetPhase().String())
@@ -313,7 +319,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		_, err = d.Handle(context.TODO(), nCtx)
 		assert.Error(t, err)
 	})
@@ -566,7 +572,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			execContext.OnGetParentInfo().Return(&immutableParentInfo)
 			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
-			d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
 				assert.Error(t, err)
@@ -753,7 +759,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			execContext.OnGetParentInfo().Return(nil)
 			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
-			d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
 				assert.Error(t, err)
@@ -823,7 +829,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
@@ -955,7 +961,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
@@ -976,7 +982,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.OnFinalize(ctx, nCtx).Return(fmt.Errorf("err"))
 		n := &executorMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
@@ -997,7 +1003,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
-		d := New(h, n, mockLPLauncher, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)

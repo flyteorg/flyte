@@ -3,7 +3,9 @@ package nodes
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/events"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/pkg/errors"
@@ -15,8 +17,8 @@ type taskEventRecorder struct {
 	events.TaskEventRecorder
 }
 
-func (t taskEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent) error {
-	if err := t.TaskEventRecorder.RecordTaskEvent(ctx, ev); err != nil {
+func (t taskEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+	if err := t.TaskEventRecorder.RecordTaskEvent(ctx, ev, eventConfig); err != nil {
 		if eventsErr.IsAlreadyExists(err) {
 			logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.Phase)
 			return nil

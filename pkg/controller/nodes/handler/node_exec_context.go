@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytepropeller/pkg/controller/events"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

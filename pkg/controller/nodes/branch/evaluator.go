@@ -15,6 +15,7 @@ import (
 const ErrorCodeUserProvidedError = "UserProvidedError"
 const ErrorCodeMalformedBranch = "MalformedBranchUserError"
 const ErrorCodeCompilerError = "CompilerError"
+const ErrorCodeFailedFetchOutputs = "FailedFetchOutputs"
 
 func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
