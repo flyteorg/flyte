@@ -11,6 +11,8 @@ import { interactiveTextDisabledColor } from 'components/Theme/constants';
 import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { history } from 'routes/history';
+import { Routes } from 'routes/routes';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TerminateExecutionButton } from '../TerminateExecution/TerminateExecutionButton';
@@ -79,12 +81,20 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const { domain, name, project } = execution.id;
     const { phase } = execution.closure;
     const sourceId = getExecutionSourceId(execution);
-    const { backLink = getExecutionBackLink(execution) } = useLocationState();
+    const {
+        backLink: originalBackLink = getExecutionBackLink(execution)
+    } = useLocationState();
     const isRunning = executionIsRunning(execution);
     const isTerminal = executionIsTerminal(execution);
     const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
     const onClickRelaunch = () => setShowRelaunchForm(true);
     const onCloseRelaunch = () => setShowRelaunchForm(false);
+    const fromExecutionNav = new URLSearchParams(history.location.search).get(
+        'fromExecutionNav'
+    );
+    const backLink = fromExecutionNav
+        ? Routes.ProjectDetails.sections.executions.makeUrl(project, domain)
+        : originalBackLink;
 
     let modalContent: JSX.Element | null = null;
     if (showInputsOutputs) {
