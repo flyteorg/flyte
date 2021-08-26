@@ -106,6 +106,8 @@ class CustomSorter(FileNameSortKey):
         "quickstart_example.py",
         "dolt_quickstart_example.py",
         "dolt_branch_example.py",
+        "task_example.py",
+        "type_example.py",
         ## Kubernetes
         "pod.py",
         "pyspark_pi.py",
@@ -250,6 +252,7 @@ examples_dirs = [
     "../deployment",
     "../remote_access",
     "../integrations/flytekit_plugins/sql",
+    "../integrations/flytekit_plugins/greatexpectations",
     "../integrations/flytekit_plugins/papermilltasks",
     "../integrations/flytekit_plugins/pandera_examples",
     "../integrations/flytekit_plugins/dolt",
@@ -278,6 +281,7 @@ gallery_dirs = [
     "auto/deployment",
     "auto/remote_access",
     "auto/integrations/flytekit_plugins/sql",
+    "auto/integrations/flytekit_plugins/greatexpectations",
     "auto/integrations/flytekit_plugins/papermilltasks",
     "auto/integrations/flytekit_plugins/pandera_examples",
     "auto/integrations/flytekit_plugins/dolt",
@@ -428,6 +432,7 @@ intersphinx_mapping = {
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
     "flytectl": ("https://docs.flyte.org/projects/flytectl/en/latest/", None),
     "pytorch": ("https://pytorch.org/docs/stable/", None),
+    "greatexpectations": ("https://legacy.docs.greatexpectations.io/en/latest", None),
 }
 
 # Sphinx-tabs config
