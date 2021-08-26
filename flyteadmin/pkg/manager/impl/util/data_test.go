@@ -26,6 +26,13 @@ func TestShouldFetchData(t *testing.T) {
 			Bytes: 200,
 		}))
 	})
+	t.Run("no config", func(t *testing.T) {
+		assert.True(t, ShouldFetchData(&interfaces.RemoteDataConfig{
+			Scheme: common.None,
+		}, admin.UrlBlob{
+			Bytes: 200,
+		}))
+	})
 	t.Run("max size under limit", func(t *testing.T) {
 		assert.True(t, ShouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
