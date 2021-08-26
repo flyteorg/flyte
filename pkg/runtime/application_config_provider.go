@@ -21,6 +21,9 @@ const externalEvents = "externalEvents"
 
 const postgres = "postgres"
 
+const KB = 1024
+const MB = KB * KB
+
 var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfigSection{
 	Port:         5432,
 	User:         postgres,
@@ -44,7 +47,8 @@ var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.Schedule
 	},
 })
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{
-	Scheme: common.None,
+	Scheme:         common.None,
+	MaxSizeInBytes: 2 * MB,
 })
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
