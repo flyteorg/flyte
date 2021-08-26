@@ -34,6 +34,7 @@ import (
 	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	controllerEvents "github.com/flyteorg/flytepropeller/pkg/controller/events"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -88,8 +89,8 @@ type nodeExecutor struct {
 	nodeHandlerFactory              HandlerFactory
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	store                           *storage.DataStore
-	nodeRecorder                    events.NodeEventRecorder
-	taskRecorder                    events.TaskEventRecorder
+	nodeRecorder                    controllerEvents.NodeEventRecorder
+	taskRecorder                    controllerEvents.TaskEventRecorder
 	metrics                         *nodeMetrics
 	maxDatasetSizeBytes             int64
 	outputResolver                  OutputResolver
@@ -100,6 +101,7 @@ type nodeExecutor struct {
 	defaultDataSandbox              storage.DataReference
 	shardSelector                   ioutils.ShardSelector
 	recoveryClient                  recovery.Client
+	eventConfig                     *config.EventConfig
 }
 
 func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {
@@ -128,7 +130,7 @@ func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *eve
 	}
 
 	logger.Infof(ctx, "Recording event p[%+v]", nodeEvent)
-	err := c.nodeRecorder.RecordNodeEvent(ctx, nodeEvent)
+	err := c.nodeRecorder.RecordNodeEvent(ctx, nodeEvent, c.eventConfig)
 	if err != nil {
 		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
 			return nil
@@ -224,6 +226,8 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 	var outputs = &core.LiteralMap{}
 	if recoveredData.FullOutputs != nil {
 		outputs = recoveredData.FullOutputs
+	} else if recovered.Closure.GetOutputData() != nil {
+		outputs = recovered.Closure.GetOutputData()
 	} else if len(recovered.Closure.GetOutputUri()) > 0 {
 		if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.Closure.GetOutputUri()), outputs); err != nil {
 			return handler.PhaseInfoUndefined, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read output data [%v].", recovered.Closure.GetOutputUri())
@@ -1047,7 +1051,7 @@ func (c *nodeExecutor) Initialize(ctx context.Context) error {
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64,
 	defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
-	catalogClient catalog.Client, recoveryClient recovery.Client, scope promutils.Scope) (executors.Node, error) {
+	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, scope promutils.Scope) (executors.Node, error) {
 
 	// TODO we may want to make this configurable.
 	shardSelector, err := ioutils.NewBase36PrefixShardSelector(ctx)
@@ -1059,8 +1063,8 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	exec := &nodeExecutor{
 		store:               store,
 		enqueueWorkflow:     enQWorkflow,
-		nodeRecorder:        events.NewNodeEventRecorder(eventSink, nodeScope),
-		taskRecorder:        events.NewTaskEventRecorder(eventSink, scope.NewSubScope("task")),
+		nodeRecorder:        controllerEvents.NewNodeEventRecorder(eventSink, nodeScope, store),
+		taskRecorder:        controllerEvents.NewTaskEventRecorder(eventSink, scope.NewSubScope("task"), store),
 		maxDatasetSizeBytes: maxDatasetSize,
 		metrics: &nodeMetrics{
 			Scope:                         nodeScope,
@@ -1092,8 +1096,9 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		shardSelector:                   shardSelector,
 		recoveryClient:                  recoveryClient,
+		eventConfig:                     eventConfig,
 	}
-	nodeHandlerFactory, err := NewHandlerFactory(ctx, exec, workflowLauncher, launchPlanReader, kubeClient, catalogClient, recoveryClient, nodeScope)
+	nodeHandlerFactory, err := NewHandlerFactory(ctx, exec, workflowLauncher, launchPlanReader, kubeClient, catalogClient, recoveryClient, eventConfig, nodeScope)
 	exec.nodeHandlerFactory = nodeHandlerFactory
 	return exec, err
 }

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/events"
+
 	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -15,7 +17,7 @@ type fakeTaskEventsRecorder struct {
 	err error
 }
 
-func (f fakeTaskEventsRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent) error {
+func (f fakeTaskEventsRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
 	if f.err != nil {
 		return f.err
 	}
@@ -48,7 +50,9 @@ func Test_taskEventRecorder_RecordTaskEvent(t1 *testing.T) {
 			ev := &event.TaskExecutionEvent{
 				Phase: tt.p,
 			}
-			if err := t.RecordTaskEvent(context.TODO(), ev); (err != nil) != tt.wantErr {
+			if err := t.RecordTaskEvent(context.TODO(), ev, &config.EventConfig{
+				RawOutputPolicy: config.RawOutputPolicyReference,
+			}); (err != nil) != tt.wantErr {
 				t1.Errorf("RecordTaskEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -88,7 +88,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnNodeID().Return("n1")
 
 		nodeExec := &execMocks.Node{}
-		s := newSubworkflowHandler(nodeExec)
+		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
 		nodeExec.OnAbortHandlerMatch(mock.Anything, ectx, swf, mock.Anything, n, "reason").Return(nil)
@@ -121,7 +121,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 
 		nodeExec := &execMocks.Node{}
-		s := newSubworkflowHandler(nodeExec)
+		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
 		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt())
@@ -155,7 +155,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 
 		nodeExec := &execMocks.Node{}
-		s := newSubworkflowHandler(nodeExec)
+		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
 		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt())

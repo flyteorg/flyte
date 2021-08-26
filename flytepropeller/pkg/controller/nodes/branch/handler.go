@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	stdErrors "github.com/flyteorg/flytestdlib/errors"
@@ -23,6 +25,7 @@ type metrics struct {
 type branchHandler struct {
 	nodeExecutor executors.Node
 	m            metrics
+	eventConfig  *config.EventConfig
 }
 
 func (b *branchHandler) FinalizeRequired() bool {
@@ -241,9 +244,10 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx handler.NodeExecution
 	return b.nodeExecutor.FinalizeHandler(ctx, execContext, dag, nCtx.ContextualNodeLookup(), branchTakenNode)
 }
 
-func New(executor executors.Node, scope promutils.Scope) handler.Node {
+func New(executor executors.Node, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
 	return &branchHandler{
 		nodeExecutor: executor,
 		m:            metrics{scope: scope},
+		eventConfig:  eventConfig,
 	}
 }

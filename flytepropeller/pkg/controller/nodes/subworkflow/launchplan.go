@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,6 +25,7 @@ import (
 type launchPlanHandler struct {
 	launchPlan     launchplan.Executor
 	recoveryClient recovery.Client
+	eventConfig    *config.EventConfig
 }
 
 func getParentNodeExecutionID(nCtx handler.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {

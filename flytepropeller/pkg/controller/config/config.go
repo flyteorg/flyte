@@ -105,6 +105,9 @@ var (
 		MetadataPrefix:      "metadata/propeller",
 		EnableAdminLauncher: true,
 		MetricsPrefix:       "flyte",
+		EventConfig: EventConfig{
+			RawOutputPolicy: RawOutputPolicyReference,
+		},
 	}
 )
 
@@ -133,6 +136,7 @@ type Config struct {
 	KubeConfig             KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
 	NodeConfig             NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
 	MaxStreakLength        int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
+	EventConfig            EventConfig          `json:"event-config,omitempty" pflag:",Configures execution event behavior."`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -213,6 +217,21 @@ type LeaderElectionConfig struct {
 
 	// RetryPeriod is the duration the LeaderElector clients should wait between tries of actions.
 	RetryPeriod config.Duration `json:"retry-period" pflag:",Duration the LeaderElector clients should wait between tries of actions."`
+}
+
+// Defines how output data should be passed along in execution events.
+type RawOutputPolicy = string
+
+const (
+	// Only send output data as a URI referencing where outputs have been uploaded
+	RawOutputPolicyReference RawOutputPolicy = "reference"
+	// Send raw output data in events.
+	RawOutputPolicyInline RawOutputPolicy = "inline"
+)
+
+type EventConfig struct {
+	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
+	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.

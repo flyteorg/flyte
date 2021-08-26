@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flytepropeller/pkg/controller/events"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/storage"
 	"k8s.io/apimachinery/pkg/types"

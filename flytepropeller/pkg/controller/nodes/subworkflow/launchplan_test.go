@@ -347,7 +347,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 
 		// tODO ssingh: do we need mockStore
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		op := &core.LiteralMap{
@@ -391,7 +392,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockStore := createInmemoryStore(t)
 		mockLPExec := &mocks.Executor{}
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		op := &core.LiteralMap{
@@ -432,7 +434,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -461,7 +464,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -484,7 +488,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -507,7 +512,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -528,7 +534,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -550,7 +557,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		op := &core.LiteralMap{
@@ -588,7 +596,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		uri := storage.DataReference("uri")
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",
@@ -621,7 +630,8 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		uri := storage.DataReference("uri")
 
 		h := launchPlanHandler{
-			launchPlan: mockLPExec,
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
 		}
 
 		mockLPExec.On("GetStatus",

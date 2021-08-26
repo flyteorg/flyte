@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flyteidl/clients/go/events"
 	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	controllerEvents "github.com/flyteorg/flytepropeller/pkg/controller/events"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -59,11 +62,12 @@ func StatusFailed(err *core.ExecutionError) Status {
 type workflowExecutor struct {
 	enqueueWorkflow v1alpha1.EnqueueWorkflow
 	store           *storage.DataStore
-	wfRecorder      events.WorkflowEventRecorder
+	wfRecorder      controllerEvents.WorkflowEventRecorder
 	k8sRecorder     record.EventRecorder
 	metadataPrefix  storage.DataReference
 	nodeExecutor    executors.Node
 	metrics         *workflowMetrics
+	eventConfig     *config.EventConfig
 }
 
 func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, w *v1alpha1.FlyteWorkflow) (storage.DataReference, error) {
@@ -252,7 +256,7 @@ func convertToExecutionError(err *core.ExecutionError, alternateErr *core.Execut
 }
 
 func (c *workflowExecutor) IdempotentReportEvent(ctx context.Context, e *event.WorkflowExecutionEvent) error {
-	err := c.wfRecorder.RecordWorkflowEvent(ctx, e)
+	err := c.wfRecorder.RecordWorkflowEvent(ctx, e, c.eventConfig)
 	if err != nil && eventsErr.IsAlreadyExists(err) {
 		logger.Infof(ctx, "Workflow event phase: %s, executionId %s already exist",
 			e.Phase.String(), e.ExecutionId)
@@ -480,7 +484,9 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 	return nil
 }
 
-func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink, k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor executors.Node, scope promutils.Scope) (executors.Workflow, error) {
+func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
+	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor executors.Node, eventConfig *config.EventConfig,
+	scope promutils.Scope) (executors.Workflow, error) {
 	basePrefix := store.GetBaseContainerFQN(ctx)
 	if metadataPrefix != "" {
 		var err error
@@ -497,10 +503,11 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 		nodeExecutor:    nodeExecutor,
 		store:           store,
 		enqueueWorkflow: enQWorkflow,
-		wfRecorder:      events.NewWorkflowEventRecorder(eventSink, workflowScope),
+		wfRecorder:      controllerEvents.NewWorkflowEventRecorder(eventSink, workflowScope, store),
 		k8sRecorder:     k8sEventRecorder,
 		metadataPrefix:  basePrefix,
 		metrics:         newMetrics(workflowScope),
+		eventConfig:     eventConfig,
 	}, nil
 }
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
@@ -60,6 +62,7 @@ type dynamicNodeTaskNodeHandler struct {
 	metrics      metrics
 	nodeExecutor executors.Node
 	lpReader     launchplan.Reader
+	eventConfig  *config.EventConfig
 }
 
 func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx handler.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
@@ -297,12 +300,13 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	return nil
 }
 
-func New(underlying TaskNodeHandler, nodeExecutor executors.Node, launchPlanReader launchplan.Reader, scope promutils.Scope) handler.Node {
+func New(underlying TaskNodeHandler, nodeExecutor executors.Node, launchPlanReader launchplan.Reader, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
 
 	return &dynamicNodeTaskNodeHandler{
 		TaskNodeHandler: underlying,
 		metrics:         newMetrics(scope),
 		nodeExecutor:    nodeExecutor,
 		lpReader:        launchPlanReader,
+		eventConfig:     eventConfig,
 	}
 }
