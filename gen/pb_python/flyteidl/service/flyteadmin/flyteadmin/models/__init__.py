@@ -174,6 +174,7 @@ from flyteadmin.models.core_operand import CoreOperand
 from flyteadmin.models.core_output_reference import CoreOutputReference
 from flyteadmin.models.core_parameter import CoreParameter
 from flyteadmin.models.core_parameter_map import CoreParameterMap
+from flyteadmin.models.core_parameter_map_entry import CoreParameterMapEntry
 from flyteadmin.models.core_primitive import CorePrimitive
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService
 from flyteadmin.models.core_quality_of_service_spec import CoreQualityOfServiceSpec
@@ -196,6 +197,7 @@ from flyteadmin.models.core_task_template import CoreTaskTemplate
 from flyteadmin.models.core_typed_interface import CoreTypedInterface
 from flyteadmin.models.core_variable import CoreVariable
 from flyteadmin.models.core_variable_map import CoreVariableMap
+from flyteadmin.models.core_variable_map_entry import CoreVariableMapEntry
 from flyteadmin.models.core_void import CoreVoid
 from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase
