@@ -62,6 +62,7 @@ extensions = [
     # "sphinx_search.extension",
     "sphinx_panels",
     "sphinxcontrib.mermaid",
+    "sphinxcontrib.yt",
 ]
 
 extlinks = {
