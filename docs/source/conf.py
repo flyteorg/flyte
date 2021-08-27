@@ -44,6 +44,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_fontawesome",
     "sphinx_tabs.tabs",
+    "sphinxcontrib.yt",
 ]
 
 # build the templated autosummary files
