@@ -12,7 +12,7 @@ var (
 		LogConfig: LogConfig{
 			Mixed: logs.LogConfig{
 				IsKubernetesEnabled:   true,
-				KubernetesTemplateURI: "http://localhost:30084/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}",
+				KubernetesTemplateURI: "http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}",
 			},
 		},
 	}
