@@ -1,53 +1,147 @@
+userSettings:
+  googleProjectId: lunar-prism-326111
+  dbHost: 10.35.208.3
+  dbPassword: kharghar
+  bucketName: flytebucket2
+  serviceAcct: |
+           {
+              "type": "service_account",
+              "project_id": "lunar-prism-326111",
+              "private_key_id": "ef7b0e904492f2155c8cb3728325e1dd74d24156",
+              "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDdRC1stcm6sW3+\nTb9y5S/sp2x0Vs59DJ/apfUqx+Xw5O5PrBxpC5LKDrOBH0dVYtlQPsYuMnllmSAF\nqP9z3EFel2ge9G4t5KLU3Wz8p/mwd6dUz8r0N6tB+0OFXEDwzcMcev9+GoBWUuxr\nrp9hYKJlmp727DSS7Ue7PiN3tXQernqDB+4WjXKIlTqz/HENKIO+t9fFERi1/pUG\nI5RW4lBVliQgKkiNN/PTWStK0EDlajSCP/Pr47ZBh8q/E8EGSGxP9ogI+Erjrq0r\nCE2HvAWEEOuINb75/GZ/VSM0HmruJU19ul9RnYNHk8e06RhOdX/VZpmgHjxKblku\n6evBsYFfAgMBAAECggEAAkYN1yxdkkUcJJrtlbr1Xot48kLUF6BlSIQxUYKneZhS\nOvrjiqW5Ox7EjYC/z94JuyjttQE4GyCXYiVfc/Qpncxh5FnwDAh6t3cLrxavuHIx\nyAU5ZiqSiwm6TYaudNFm3BdLVYmggpOj5SeBtSjA4WGIQ8XjyeC3k/I3SDfsetdH\nUHBEVZ5TVicxvxctLn/MpKzRrvjwwDLjX2/20x+Mlra0uLtCu+o7Zoaayq3Zhpmg\njAZe1435S1g7USNIFyywJaJfBxp0az7Bxfr22RfSktO6HxvpTsjzfjy6AjG16E1f\nRSte9NMvFStraDt2uUv9UuTQfXeM+EcKax419zSBFQKBgQD2/zLRabdjVmD32j7S\nN8/2k5EXZF35B3Y7rDmp6SBRupt1GTs6Cad7GArMkwW4cj8Eb8Fek4FOyAvpEf4x\n3aNBimnugnriJo9tBtwEqApRMS4Ce9KGwHrd3npv5UF/eR1JwoXigZtYn+dt9o8E\nGTzb7eD5HoyFnGRYbPsWdNSkMwKBgQDlVOElvaDYDvDMgWzTWlOeaU5gwz+nPO53\nQjeEXZLdeJ3Qel08HWUq6EmfzemM+t8t+W++vu2K8olT65R9iW/24vPcUC/dTYjL\n0QWQE+/RzcxwLM0YaH6TsePLMsnfwbAzHn67aSb2H9kJ6CP2pdokUpFnoZ/+L7oJ\nD3IDez0iJQKBgQCsZZ1ju0UMKetOs98rPVeDRKZ9zEknG0U0C1bIOHaddQEyr2S+\ncqSab0KCXZAdmGhRwWsXhx83DLv7dtqUlZ1wjpq3pgz9Mmrjb2k8OsnQt+HkS+a6\ntThNCg8tcLfRsIh3xjVKzqnOJvYSs4hJFRB8dUGUv/TXATys14w9tVgCLwKBgDz9\nHsdfr+flyUpJ3Tw0GGrXjJ2VL1d1j+GtfYA5NnapviaUdDkphB8uGW5jX4o7qaDb\nZklvE1NRfw4PZ7UfGOSqpLnhpWkQVqIFm5oegzfjqEvozj6Ag7EZrP/8KM3V/9sI\ncCG9LDxmad0FnJLatrHUN5E83YTHAo2oSuT8IFz1AoGBAK+gWuH/WC/BaE7Izmyt\n46RTN6K2bYGv1ToT0CACS+FEe8VcBfkNwIq+/PsxV6cAh7Iq8kQEplHRwS0XV/g7\nBWIlmhQUFaP6E902f0wkzqwxXkqTPIAg204C352sovAMYLoyiGjZGgiBvM5KaDkv\nGTfgglUa+RiCVMJXwOFc6YKd\n-----END PRIVATE KEY-----\n",
+              "client_email": "flyte-datacatalog@lunar-prism-326111.iam.gserviceaccount.com",
+              "client_id": "107183682474063272119",
+              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+              "token_uri": "https://oauth2.googleapis.com/token",
+              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+              "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/flyte-datacatalog%40lunar-prism-326111.iam.gserviceaccount.com"
+            }
+
 #
-# FlyteAdmin
+# FLYTEADMIN
 #
 
 flyteadmin:
-  deployRedoc: false
+  replicaCount: 1
+  serviceAccount:
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
+    create: true
+    annotations:
+      # Needed for gcp workload identity to function
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      iam.gke.io/gcp-service-account: flyteadmin@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+  resources:
+    limits:
+      ephemeral-storage: 1Gi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 1Gi
+      memory: 200Mi
+  service:
+    annotations:
+      # Required for the ingress to properly route grpc traffic to grpc port
+      cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteadmin
+          topologyKey: kubernetes.io/hostname
 
 #
-# COMMON
+# DATACATALOG
 #
 
-common:
-  databaseSecret: {}
-  ingress: {}
+datacatalog:
+  replicaCount: 1
+  serviceAccount:
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
+    create: true
+    annotations:
+      # Needed for gcp workload identity to function
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      iam.gke.io/gcp-service-account: flyte-datacatalog@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 200Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+  service:
+    annotations:
+      # Required for the ingress to properly route grpc traffic to grpc port
+      cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: datacatalog
+          topologyKey: kubernetes.io/hostname
 
-# -----------------------------------------------------
-# Core dependencies that should be configured for Flyte to work on any platform
-# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
-# ------------------------------------------------------
 #
-# STORAGE SETTINGS
+# FLYTEPROPELLER
 #
 
-storage:
-  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
-  type: gcs
-  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: <BUCKET_NAME>
-  gcs:
-    projectId: <GOOGLE_PROJECT_ID>
+flytepropeller:
+  replicaCount: 1
+  serviceAccount:
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
+    create: true
+    annotations:
+      # Needed for gcp workload identity to function
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      iam.gke.io/gcp-service-account: flytepropeller@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 1Gi
+      memory: 1Gi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 1Gi
+      memory: 1Gi
+  cacheSizeMbs: 1024
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flytepropeller
+          topologyKey: kubernetes.io/hostname
 
 #
-# CONFIGMAPS
+# FLYTECONSOLE
 #
 
-configmap:
-  remoteData:
-    remoteData:
-      scheme: "gcp"
+flyteconsole:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 250m
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteconsole
+          topologyKey: kubernetes.io/hostname
 
-  tasks:
-    max-plugin-phase-versions: 1000000
-    task-plugins:
-      enabled-plugins:
-        - container
-        - sidecar
-        - k8s-array
-      default-for-task-types:
-        container: container
-        container_array: k8s-array
+#
+# REDIS
+#
+
+redis:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 250Mi
 
 #
 # POSTGRES
@@ -70,6 +164,336 @@ minio:
 contour:
   enabled: false
 
-workflow_scheduler:
+#
+# FlyteAdmin
+#
+
+flyteadmin:
+  deployRedoc: false
+
+#
+# COMMON
+#
+
+common:
+  ingress:  
+    spec:
+      tls:
+      - hosts:
+        - dev.gcp.union.ai
+        secretName: dev-gcp-union-ai-tls
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      cert-manager.io/issuer: "letsencrypt-production"
+    # --- separateGrpcIngress puts GRPC routes into a separate ingress if true. Required for certain ingress controllers like nginx.
+    separateGrpcIngress: true
+    # --- Extra Ingress annotations applied only to the GRPC ingress. Only makes sense if `separateGrpcIngress` is enabled.
+    separateGrpcIngressAnnotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+  databaseSecret:
+    name: db-pass
+    secretManifest:
+      # -- Leave it empty if your secret already exists
+      # Else you can create your own secret object. You can use Kubernetes secrets, else you can configure external secrets
+      # For external secrets please install Necessary dependencies, like, of your choice
+      # - https://github.com/hashicorp/vault
+      # - https://github.com/godaddy/kubernetes-external-secrets
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: db-pass
+      type: Opaque
+      stringData:
+        # -- If using plain text you can provide the password here
+        pass.txt: "{{ .Values.userSettings.dbPassword }}"
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
+#
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: gcs
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: "{{ .Values.userSettings.bucketName }}"
+  # -- settings for storage type s3
+  gcs:
+    # -- GCP project ID. Required for storage type gcs.
+    projectId: "{{ .Values.userSettings.googleProjectId }}"
+    # -- GCP service account key for GSA with bucket access. Leave empty if you use workload identity.
+    serviceAccountKey: "{{ .Values.userSettings.serviceAcct }}"
+
+db:
+
+  datacatalog:
+    database:
+      port: 5432
+      # -- Create a user called flyteadmin
+      username: flyteadmin
+      host: "{{ .Values.userSettings.dbHost }}"
+      # -- Create a DB called datacatalog (OR change the name here)
+      dbname: flyteadmin
+      passwordPath: /etc/db/pass.txt
+ 
+  admin:
+    database:
+      port: 5432
+      # -- Create a user called flyteadmin
+      username: flyteadmin
+      host: "{{ .Values.userSettings.dbHost }}"
+      # -- Create a DB called flyteadmin (OR change the name here)
+      dbname: flyteadmin
+      passwordPath: /etc/db/pass.txt
+
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+  adminServer:
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        secure: false
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+
+  task_resource_defaults:
+    task_resources:
+      defaults:
+        cpu: 1000m
+        memory: 1000Mi
+        storage: 1000Mi
+      limits:
+        storage: 2000Mi
+
+  core:
+    propeller:
+      rawoutput-prefix: "gs://{{ .Values.userSettings.bucketName }}/"
+      workers: 40
+      gc-interval: 12h
+      max-workflow-retries: 50
+      kube-client-config:
+        qps: 100
+        burst: 25
+        timeout: 30s
+      queue:
+        sub-queue:
+          type: bucket
+          rate: 100
+          capacity: 1000
+
+  enabled_plugins:
+    # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+    tasks:
+      # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+      task-plugins:
+        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+        # plugins
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
+          - k8s-array
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          spark: spark
+          container_array: k8s-array
+
+  logger:
+    logger:
+      level: 5
+
+  # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
+  # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
+  # logging engines
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: false
+        # Enable GCP stackdriver integration for log display
+        stackdriver-enabled: true
+        stackdriver-logresourcename: k8s_container
+      k8s-array:
+        logs:
+          config:
+            stackdriver-enabled: true
+            stackdriver-logresourcename: k8s_container
+
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
   enabled: true
-  type: native
+  config:
+    cluster_resources:
+      customData:
+        - production:
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+            - defaultIamRole:
+                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+        - staging:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+        - development:
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    # -- Patch default service account
+    - key: aab_default_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: default
+          namespace: {{ namespace }}
+          annotations:
+            # Needed for gcp workload identity to function
+            # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+            iam.gke.io/gcp-service-account: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
+
+    # -- Template for spark role
+    - key: ad_spark_role
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: Role
+        metadata:
+          name: spark-role
+          namespace: {{ namespace }}
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - '*'
+
+    # -- Template for spark SA
+    - key: ae_spark_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: spark
+          namespace: {{ namespace }}
+          annotations:
+            # Needed for gcp workload identity to function
+            # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+            iam.gke.io/gcp-service-account: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+
+    # -- Template for spark role binding
+    - key: af_spark_role_binding
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: RoleBinding
+        metadata:
+          name: spark-role-binding
+          namespace: {{ namespace }}
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: Role
+          name: spark-role
+        subjects:
+        - kind: ServiceAccount
+          name: spark
+          namespace: {{ namespace }}
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: false
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: false
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+# ----------------------
+# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
+# There is no helm chart maintained and hence it might need an independent installation
+tf_operator:
+  enabled: false
