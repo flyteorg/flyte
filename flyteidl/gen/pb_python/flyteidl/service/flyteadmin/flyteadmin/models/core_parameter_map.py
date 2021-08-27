@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_parameter import CoreParameter  # noqa: F401,E501
+from flyteadmin.models.core_parameter_map_entry import CoreParameterMapEntry  # noqa: F401,E501
 
 
 class CoreParameterMap(object):
@@ -33,7 +33,7 @@ class CoreParameterMap(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'parameters': 'dict(str, CoreParameter)'
+        'parameters': 'list[CoreParameterMapEntry]'
     }
 
     attribute_map = {
@@ -56,7 +56,7 @@ class CoreParameterMap(object):
         Defines a map of parameter names to parameters.  # noqa: E501
 
         :return: The parameters of this CoreParameterMap.  # noqa: E501
-        :rtype: dict(str, CoreParameter)
+        :rtype: list[CoreParameterMapEntry]
         """
         return self._parameters
 
@@ -67,7 +67,7 @@ class CoreParameterMap(object):
         Defines a map of parameter names to parameters.  # noqa: E501
 
         :param parameters: The parameters of this CoreParameterMap.  # noqa: E501
-        :type: dict(str, CoreParameter)
+        :type: list[CoreParameterMapEntry]
         """
 
         self._parameters = parameters

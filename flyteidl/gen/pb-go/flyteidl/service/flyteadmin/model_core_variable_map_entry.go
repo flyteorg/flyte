@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-type CoreVariableMap struct {
-	// Defines a map of variable names to variables.
-	Variables []CoreVariableMapEntry `json:"variables,omitempty"`
+type CoreVariableMapEntry struct {
+	Name string `json:"name,omitempty"`
+	Var_ *CoreVariable `json:"var,omitempty"`
 }

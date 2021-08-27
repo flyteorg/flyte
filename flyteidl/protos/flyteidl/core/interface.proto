@@ -16,10 +16,16 @@ message Variable {
     string description = 2;
 }
 
-// A map of Variables
+// A map of Variables in the form of repeated map entries
 message VariableMap {
     // Defines a map of variable names to variables.
-    map<string, Variable> variables = 1;
+    repeated VariableMapEntry variables = 1;
+}
+
+// Map entry of VariableMap
+message VariableMapEntry {
+    string name = 1;
+    Variable var = 2;
 }
 
 // Defines strongly typed inputs and outputs.
@@ -44,8 +50,14 @@ message Parameter {
     }
 }
 
-// A map of Parameters.
+// A map of Parameters in the form of repeated map entries.
 message ParameterMap {
     // Defines a map of parameter names to parameters.
-    map<string, Parameter> parameters = 1;
+    repeated ParameterMapEntry parameters = 1;
+}
+
+// Map entry of ParameterMap
+message ParameterMapEntry {
+    string name = 1;
+    Parameter parameter = 2;
 }
