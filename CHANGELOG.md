@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.24.0](http://github.com/lyft/flyteconsole/compare/v0.23.1...v0.24.0) (2021-08-27)
+
+
+### Features
+
+* add recover option to workflows ([#192](http://github.com/lyft/flyteconsole/issues/192)) ([818c686](http://github.com/lyft/flyteconsole/commit/818c6869ea9bbeea5f82d9b7f0131e927ce36fb3))
+
 ## [0.23.1](http://github.com/lyft/flyteconsole/compare/v0.23.0...v0.23.1) (2021-08-26)
 
 
