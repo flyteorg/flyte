@@ -19,6 +19,7 @@ import { defaultExecutionPrincipal } from './constants';
 import {
     Execution,
     ExecutionData,
+    ExecutionMetadata,
     NodeExecution,
     NodeExecutionIdentifier,
     TaskExecution,
@@ -176,6 +177,33 @@ export const relaunchWorkflowExecution = (
             data: { id, name },
             path: endpointPrefixes.relaunchExecution,
             requestMessageType: Admin.ExecutionRelaunchRequest,
+            responseMessageType: Admin.ExecutionCreateResponse
+        },
+        config
+    );
+
+interface RecoverParams {
+    id: WorkflowExecutionIdentifier;
+    name?: string;
+    metadata?: ExecutionMetadata;
+}
+
+/**
+ * Submits a request to recover a WorkflowExecution
+ */
+
+export const recoverWorkflowExecution = (
+    { id, name, metadata }: RecoverParams,
+    config?: RequestConfig
+) =>
+    postAdminEntity<
+        Admin.IExecutionRecoverRequest,
+        Admin.ExecutionCreateResponse
+    >(
+        {
+            data: { id, name, metadata },
+            path: endpointPrefixes.recoverExecution,
+            requestMessageType: Admin.ExecutionRecoverRequest,
             responseMessageType: Admin.ExecutionCreateResponse
         },
         config

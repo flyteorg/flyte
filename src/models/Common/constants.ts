@@ -11,6 +11,7 @@ export const endpointPrefixes = {
     nodeExecution: '/node_executions',
     project: '/projects',
     relaunchExecution: '/executions/relaunch',
+    recoverExecution: '/executions/recover',
     task: '/tasks',
     taskExecution: '/task_executions',
     taskExecutionChildren: '/children/task_executions',

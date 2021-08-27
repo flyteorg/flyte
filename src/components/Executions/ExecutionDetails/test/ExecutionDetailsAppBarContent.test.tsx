@@ -16,6 +16,8 @@ import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
 import { MemoryRouter } from 'react-router';
 import { Routes } from 'routes/routes';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { createTestQueryClient } from 'test/utils';
 import { backLinkTitle, executionActionStrings } from '../constants';
 import { ExecutionDetailsAppBarContent } from '../ExecutionDetailsAppBarContent';
 
@@ -27,6 +29,7 @@ describe('ExecutionDetailsAppBarContent', () => {
     let execution: Execution;
     let executionContext: ExecutionContextData;
     let sourceId: Identifier;
+    let queryClient: QueryClient;
 
     beforeEach(() => {
         execution = createMockExecution();
@@ -35,15 +38,19 @@ describe('ExecutionDetailsAppBarContent', () => {
         executionContext = {
             execution
         };
+
+        queryClient = createTestQueryClient();
     });
 
     const renderContent = () =>
         render(
-            <MemoryRouter>
-                <ExecutionContext.Provider value={executionContext}>
-                    <ExecutionDetailsAppBarContent execution={execution} />
-                </ExecutionContext.Provider>
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <ExecutionContext.Provider value={executionContext}>
+                        <ExecutionDetailsAppBarContent execution={execution} />
+                    </ExecutionContext.Provider>
+                </MemoryRouter>
+            </QueryClientProvider>
         );
 
     describe('for running executions', () => {
