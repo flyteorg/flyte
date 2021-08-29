@@ -774,6 +774,38 @@ func TestConvertPodFailureToError(t *testing.T) {
 		})
 		assert.Equal(t, code, "OOMKilled")
 	})
+
+	t.Run("OOMKilled", func(t *testing.T) {
+		code, _ := ConvertPodFailureToError(v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   OOMKilled,
+							ExitCode: 137,
+						},
+					},
+				},
+			},
+		})
+		assert.Equal(t, code, "OOMKilled")
+	})
+
+	t.Run("SIGKILL", func(t *testing.T) {
+		code, _ := ConvertPodFailureToError(v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "some reason",
+							ExitCode: SIGKILL,
+						},
+					},
+				},
+			},
+		})
+		assert.Equal(t, code, "Interrupted")
+	})
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
