@@ -1,0 +1,634 @@
+
+# ---------------------------------------------------------------------
+# Core System settings
+# This section consists of Core components of Flyte and their deployment
+# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
+# Flyteconsole
+# ---------------------------------------------------------------------
+
+#
+# FLYTEADMIN SETTINGS
+#
+
+flyteadmin:
+  # -- Replicas count for Flyteadmin deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Flyteadmin deployment
+    repository: cr.flyte.org/flyteorg/flyteadmin
+    tag: v0.6.16 # FLYTEADMIN_TAG
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flyteadmin deployment
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyte/config/*.yaml
+  # -- Initial projects to create
+  initialProjects:
+    - flytesnacks
+    - flytetester
+    - flyteexamples
+  # -- Service settings for Flyteadmin
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: ClusterIP
+    loadBalancerSourceRanges: []
+  # -- Configuration for service accounts for FlyteAdmin
+  serviceAccount:
+    # -- Should a service account be created for flyteadmin
+    create: true
+    # -- Annotations for ServiceAccount attached to Flyteadmin pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Flyteadmin pods
+  podAnnotations: {}
+  # -- nodeSelector for Flyteadmin deployment
+  nodeSelector: {}
+  # -- tolerations for Flyteadmin deployment
+  tolerations: []
+  # -- affinity for Flyteadmin deployment
+  affinity: {}
+  secrets: {}
+
+#
+# DATACATALOG SETTINGS
+#
+
+datacatalog:
+  # -- Replicas count for Datacatalog deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Datacatalog deployment
+    repository: cr.flyte.org/flyteorg/datacatalog
+    tag: v0.3.6 # DATACATALOG_TAG
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Datacatalog deployment
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/datacatalog/config/*.yaml
+  # -- Service settings for Datacatalog
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: NodePort
+  # -- Configuration for service accounts for Datacatalog
+  serviceAccount:
+    # -- Should a service account be created for Datacatalog
+    create: true
+    # -- Annotations for ServiceAccount attached to Datacatalog pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Datacatalog pods
+  podAnnotations: {}
+  # -- nodeSelector for Datacatalog deployment
+  nodeSelector: {}
+  # -- tolerations for Datacatalog deployment
+  tolerations: []
+  # -- affinity for Datacatalog deployment
+  affinity: {}
+
+#
+# FLYTEPROPELLER SETTINGS
+#
+
+flytepropeller:
+  # -- Replicas count for Flytepropeller deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Flytepropeller deployment
+    repository: cr.flyte.org/flyteorg/flytepropeller
+    tag: v0.13.4 # FLYTEPROPELLER_TAG
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flytepropeller deployment
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 100Mi
+      memory: 200Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  cacheSizeMbs: 0
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyte/config/*.yaml
+
+  # -- Configuration for service accounts for FlytePropeller
+  serviceAccount:
+    # -- Should a service account be created for FlytePropeller
+    create: true
+    # -- Annotations for ServiceAccount attached to FlytePropeller pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Flytepropeller pods
+  podAnnotations: {}
+  # -- nodeSelector for Flytepropeller deployment
+  nodeSelector: {}
+  # -- tolerations for Flytepropeller deployment
+  tolerations: []
+  # -- affinity for Flytepropeller deployment
+  affinity: {}
+
+#
+# FLYTECONSOLE SETTINGS
+#
+
+flyteconsole:
+  # -- Replicas count for Flyteconsole deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Flyteconsole deployment
+    repository: cr.flyte.org/flyteorg/flyteconsole
+    tag: v0.20.1 # FLYTECONSOLE_TAG
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flyteconsole deployment
+  resources:
+    limits:
+      cpu: 500m
+      memory: 250Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+  # -- Service settings for Flyteconsole
+  service:
+    annotations: {}
+    type: ClusterIP
+  # -- Annotations for Flyteconsole pods
+  podAnnotations: {}
+  # -- nodeSelector for Flyteconsole deployment
+  nodeSelector: {}
+  # -- tolerations for Flyteconsole deployment
+  tolerations: []
+  # -- affinity for Flyteconsole deployment
+  affinity: {}
+
+#
+# WEBHOOK SETTINGS
+#
+
+webhook:
+  # -- enable or disable secrets webhook
+  enabled: true
+  # -- Configuration for service accounts for the webhook
+  serviceAccount:
+    # -- Should a service account be created for the webhook
+    create: true
+    # -- Annotations for ServiceAccount attached to the webhook
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Service settings for the webhook
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: ClusterIP
+
+
+common:
+  databaseSecret:
+    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
+    name: "db-pass"
+    # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
+    secretManifest: {}
+  ingress:
+    # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
+    enabled: true
+    # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
+    webpackHMR: false
+    # --- separateGrpcIngress puts GRPC routes into a separate ingress if true. Required for certain ingress controllers like nginx.
+    separateGrpcIngress: false
+    # --- Extra Ingress annotations applied only to the GRPC ingress. Only makes sense if `separateGrpcIngress` is enabled.
+    separateGrpcIngressAnnotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    # --- Ingress annotations applied to both HTTP and GRPC ingresses.
+    annotations: {}
+    # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
+    albSSLRedirect: false
+    # --- Ingress hostname
+    # host:
+    tls:
+      enabled: false
+  flyteNamespaceTemplate:
+    # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
+    enabled: false
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
+#
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: sandbox
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: my-s3-bucket
+  # -- settings for storage type s3
+  s3:
+    region: us-east-1
+  # -- settings for storage type gcs
+  gcs:
+  # -- GCP project ID. Required for storage type gcs.
+  # projectId:
+  # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
+  custom: {}
+
+# Database configuration
+db:
+  database:
+    # port: 5432
+    # username: postgres
+    host: postgres
+    # dbname: flyte
+    # passwordPath: /etc/db/pass.txt
+    # options:
+
+# --------------------------------------------------------------------
+# Specializing your deployment using configuration
+# -------------------------------------------------------------------
+#
+# CONFIGMAPS SETTINGS
+#
+
+configmap:
+  # -- Configuration for Flyte console UI
+  console:
+    BASE_URL: /console
+    CONFIG_DIR: /etc/flyte/config
+    DISABLE_AUTH: "1"
+
+  # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
+  domain:
+    domains:
+      - id: development
+        name: development
+      - id: staging
+        name: staging
+      - id: production
+        name: production
+
+  # -- FlyteAdmin server configuration
+  adminServer:
+    # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        # -- Controls whether to serve requests over SSL/TLS.
+        secure: false
+        # -- Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+          - "flyte-authorization"
+    # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
+      profilerPort: 10254
+      metricsScope: "flyte:"
+      metadataStoragePrefix:
+        - "metadata"
+        - "admin"
+      eventVersion: 1
+      testing:
+        host: http://flyteadmin
+    # -- Authentication configuration
+    auth:
+      authorizedUris:
+        # This should point at your public http Uri.
+        - https://localhost:30081
+        # This will be used by internal services in the same namespace as flyteadmin
+        - http://flyteadmin:80
+        # This will be used by internal services in the same cluster but different namespaces
+        - http://flyteadmin.flyte.svc.cluster.local:80
+
+      # Controls app authentication config
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: http://localhost:53593/callback
+            scopes:
+              - offline
+              - all
+      # Controls user authentication
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          scopes:
+            - profile
+            - openid
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+
+  # -- Datacatalog server config
+  datacatalogServer:
+    datacatalog:
+      storage-prefix: metadata/datacatalog
+      metrics-scope: datacatalog
+      profiler-port: 10254
+    application:
+      grpcPort: 8089
+      httpPort: 8080
+      grpcServerReflection: true
+
+  # -- Task default resources configuration
+  # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).
+  task_resource_defaults:
+    # -- Task default resources parameters
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 100Mi
+        storage: 5Mi
+      limits:
+        cpu: 2
+        memory: 1Gi
+        storage: 20Mi
+        gpu: 1
+
+  # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
+  admin:
+    event:
+      type: admin
+      rate: 500
+      capacity: 1000
+    admin:
+      endpoint: flyteadmin:81
+      insecure: true
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+
+  # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
+  # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
+  catalog:
+    catalog-cache:
+      endpoint: datacatalog:89
+      type: datacatalog
+      insecure: true
+
+  # -- Copilot configuration
+  copilot:
+    plugins:
+      k8s:
+        # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
+        co-pilot:
+          name: flyte-copilot-
+          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          start-timeout: 30s
+
+  # -- Core propeller configuration
+  core:
+    # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
+    propeller:
+      rawoutput-prefix: s3://my-s3-bucket/
+      metadata-prefix: metadata/propeller
+      workers: 4
+      max-workflow-retries: 30
+      workflow-reeval-duration: 30s
+      downstream-eval-duration: 30s
+      limit-namespace: "all"
+      prof-port: 10254
+      metrics-prefix: flyte
+      enable-admin-launcher: true
+      leader-election:
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        enabled: true
+        lease-duration: 15s
+        renew-deadline: 10s
+        retry-period: 2s
+      queue:
+        type: batch
+        batching-interval: 2s
+        batch-size: -1
+        queue:
+          type: maxof
+          rate: 100
+          capacity: 1000
+          base-delay: 5s
+          max-delay: 120s
+        sub-queue:
+          type: bucket
+          rate: 10
+          capacity: 100
+    webhook:
+      certDir: /etc/webhook/certs
+      serviceName: flyte-pod-webhook
+    # -- For Workflow store use configuration [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/workflowstore#Config)
+    #
+
+  enabled_plugins:
+    # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+    tasks:
+      # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+      task-plugins:
+        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+        # plugins
+        enabled-plugins:
+          - container
+          - sidecar
+          - k8s-array
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          container_array: k8s-array
+
+  # -- Kubernetes specific Flyte configuration
+  k8s:
+    plugins:
+      # -- Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config)
+      k8s:
+        default-env-vars: []
+        #  DEFAULT_ENV_VAR: VALUE
+        default-cpus: 100m
+        default-memory: 100Mi
+
+  # -- Logger configuration
+  logger:
+    logger:
+      show-source: true
+      level: 4
+
+  remoteData:
+    remoteData:
+      region: "us-east-1"
+      scheme: "local"
+      signedUrls:
+        durationMinutes: 3
+
+  # -- Resource manager configuration
+  resource_manager:
+    # -- resource manager configuration
+    propeller:
+      resourcemanager:
+        type:
+
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager:6379
+          hostKey: mypassword
+
+  # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
+  # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
+  # logging engines
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: false
+        # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
+        cloudwatch-enabled: false
+
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
+
+# -- **Optional Component**
+# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans / workflows.
+# Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows
+workflow_scheduler:
+  enabled: false
+  config: {}
+
+# -- **Optional Component**
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+  enabled: false
+  config: {}
+
+
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  # -- Configmap for ClusterResource parameters
+  config:
+    # -- ClusterResource parameters
+    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
+    cluster_resources:
+      refreshInterval: 5m
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        - production:
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+            - defaultIamRole:
+                value: ""
+        - staging:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
+        - development:
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: ""
+      refresh: 5m
+
+  # -- Resource templates that should be applied
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
+
+# --------------------------------------------------------
+# Optional Plugins
+# --------------------------------------------------------
+
+# -- Optional: Spark Plugin using the Spark Operator
+sparkoperator:
+  # --- enable or disable Sparkoperator deployment installation
+  enabled: false
+  # -- Spark plugin configuration
+  plugin_config:
+    plugins:
+      spark:
+        # -- Spark default configuration
+        spark-config-default:
+          # We override the default credentials chain provider for Hadoop so that
+          # it can use the serviceAccount based IAM role or ec2 metadata based.
+          # This is more in line with how AWS works
+          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+          - spark.kubernetes.allocation.batch.size: "50"
+          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+          - spark.blacklist.enabled: "true"
+          - spark.blacklist.timeout: "5m"
+          - spark.task.maxfailures: "8"
+
+
+# -----------------
+# -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
+# Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
+sagemaker:
+  enabled: false
+  plugin_config:
+    plugins:
+      sagemaker:
+        roleArn: <arn>
+        region: <region>
+
+

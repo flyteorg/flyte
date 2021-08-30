@@ -22,6 +22,7 @@ then
 fi
 
 ${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../charts/flyte/README.md.gotmpl ${DIR}/../charts/flyte/
+${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../charts/flyte-core/README.md.gotmpl ${DIR}/../charts/flyte-core/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then

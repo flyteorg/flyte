@@ -1,0 +1,48 @@
+#
+# COMMON
+#
+
+common:
+  databaseSecret: {}
+  ingress: {}
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
+#
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: gcs
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: <BUCKET_NAME>
+  gcs:
+    projectId: <GOOGLE_PROJECT_ID>
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+  remoteData:
+    remoteData:
+      scheme: "gcp"
+
+  tasks:
+    max-plugin-phase-versions: 1000000
+    task-plugins:
+      enabled-plugins:
+        - container
+        - sidecar
+        - spark
+        - k8s-array
+        - pytorch
+      default-for-task-types:
+        container: container
+        sidecar: sidecar
+        spark: spark
+        container_array: k8s-array
+        pytorch: pytorch
