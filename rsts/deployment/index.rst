@@ -48,6 +48,12 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    Plugin Setup
+    ^^^^^^^^^^^^
+    Plugin Setup guides with detailed instructions.
+
+    ---
+
     .. link-button:: deployment-cluster-config
        :type: ref
        :text: Cluster Configuration
@@ -66,3 +72,4 @@ solution). The following pages will help you effectively deploy and manage an en
     gcp/index
     cluster_config/index
     sandbox
+    plugin_setup/index
