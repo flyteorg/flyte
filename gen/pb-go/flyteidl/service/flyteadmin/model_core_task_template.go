@@ -23,6 +23,7 @@ type CoreTaskTemplate struct {
 	Custom *ProtobufStruct `json:"custom,omitempty"`
 	Container *CoreContainer `json:"container,omitempty"`
 	K8sPod *CoreK8sPod `json:"k8s_pod,omitempty"`
+	Sql *CoreSql `json:"sql,omitempty"`
 	// This can be used to customize task handling at execution time for the same task type.
 	TaskTypeVersion int32 `json:"task_type_version,omitempty"`
 	// security_context encapsulates security attributes requested to run this task.

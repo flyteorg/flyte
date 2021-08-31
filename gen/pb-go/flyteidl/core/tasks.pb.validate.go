@@ -399,6 +399,18 @@ func (m *TaskTemplate) Validate() error {
 			}
 		}
 
+	case *TaskTemplate_Sql:
+
+		if v, ok := interface{}(m.GetSql()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskTemplateValidationError{
+					field:  "Sql",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -963,6 +975,74 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = K8SObjectMetadataValidationError{}
+
+// Validate checks the field values on Sql with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Sql) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Statement
+
+	// no validation rules for Dialect
+
+	return nil
+}
+
+// SqlValidationError is the validation error returned by Sql.Validate if the
+// designated constraints aren't met.
+type SqlValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SqlValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SqlValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SqlValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SqlValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SqlValidationError) ErrorName() string { return "SqlValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SqlValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSql.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SqlValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SqlValidationError{}
 
 // Validate checks the field values on Resources_ResourceEntry with the rules
 // defined in the proto definition for this message. If any rules are

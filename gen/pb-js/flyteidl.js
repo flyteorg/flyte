@@ -10376,6 +10376,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {google.protobuf.IStruct|null} [custom] TaskTemplate custom
              * @property {flyteidl.core.IContainer|null} [container] TaskTemplate container
              * @property {flyteidl.core.IK8sPod|null} [k8sPod] TaskTemplate k8sPod
+             * @property {flyteidl.core.ISql|null} [sql] TaskTemplate sql
              * @property {number|null} [taskTypeVersion] TaskTemplate taskTypeVersion
              * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskTemplate securityContext
              * @property {Object.<string,string>|null} [config] TaskTemplate config
@@ -10454,6 +10455,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskTemplate.prototype.k8sPod = null;
 
             /**
+             * TaskTemplate sql.
+             * @member {flyteidl.core.ISql|null|undefined} sql
+             * @memberof flyteidl.core.TaskTemplate
+             * @instance
+             */
+            TaskTemplate.prototype.sql = null;
+
+            /**
              * TaskTemplate taskTypeVersion.
              * @member {number} taskTypeVersion
              * @memberof flyteidl.core.TaskTemplate
@@ -10482,12 +10491,12 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * TaskTemplate target.
-             * @member {"container"|"k8sPod"|undefined} target
+             * @member {"container"|"k8sPod"|"sql"|undefined} target
              * @memberof flyteidl.core.TaskTemplate
              * @instance
              */
             Object.defineProperty(TaskTemplate.prototype, "target", {
-                get: $util.oneOfGetter($oneOfFields = ["container", "k8sPod"]),
+                get: $util.oneOfGetter($oneOfFields = ["container", "k8sPod", "sql"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -10536,6 +10545,8 @@ export const flyteidl = $root.flyteidl = (() => {
                         writer.uint32(/* id 16, wireType 2 =*/130).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.config[keys[i]]).ldelim();
                 if (message.k8sPod != null && message.hasOwnProperty("k8sPod"))
                     $root.flyteidl.core.K8sPod.encode(message.k8sPod, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
+                if (message.sql != null && message.hasOwnProperty("sql"))
+                    $root.flyteidl.core.Sql.encode(message.sql, writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
                 return writer;
             };
 
@@ -10577,6 +10588,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 17:
                         message.k8sPod = $root.flyteidl.core.K8sPod.decode(reader, reader.uint32());
+                        break;
+                    case 18:
+                        message.sql = $root.flyteidl.core.Sql.decode(reader, reader.uint32());
                         break;
                     case 7:
                         message.taskTypeVersion = reader.int32();
@@ -10651,6 +10665,16 @@ export const flyteidl = $root.flyteidl = (() => {
                         let error = $root.flyteidl.core.K8sPod.verify(message.k8sPod);
                         if (error)
                             return "k8sPod." + error;
+                    }
+                }
+                if (message.sql != null && message.hasOwnProperty("sql")) {
+                    if (properties.target === 1)
+                        return "target: multiple values";
+                    properties.target = 1;
+                    {
+                        let error = $root.flyteidl.core.Sql.verify(message.sql);
+                        if (error)
+                            return "sql." + error;
                     }
                 }
                 if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
@@ -11717,6 +11741,158 @@ export const flyteidl = $root.flyteidl = (() => {
             };
 
             return K8sObjectMetadata;
+        })();
+
+        core.Sql = (function() {
+
+            /**
+             * Properties of a Sql.
+             * @memberof flyteidl.core
+             * @interface ISql
+             * @property {string|null} [statement] Sql statement
+             * @property {flyteidl.core.Sql.Dialect|null} [dialect] Sql dialect
+             */
+
+            /**
+             * Constructs a new Sql.
+             * @memberof flyteidl.core
+             * @classdesc Represents a Sql.
+             * @implements ISql
+             * @constructor
+             * @param {flyteidl.core.ISql=} [properties] Properties to set
+             */
+            function Sql(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Sql statement.
+             * @member {string} statement
+             * @memberof flyteidl.core.Sql
+             * @instance
+             */
+            Sql.prototype.statement = "";
+
+            /**
+             * Sql dialect.
+             * @member {flyteidl.core.Sql.Dialect} dialect
+             * @memberof flyteidl.core.Sql
+             * @instance
+             */
+            Sql.prototype.dialect = 0;
+
+            /**
+             * Creates a new Sql instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.Sql
+             * @static
+             * @param {flyteidl.core.ISql=} [properties] Properties to set
+             * @returns {flyteidl.core.Sql} Sql instance
+             */
+            Sql.create = function create(properties) {
+                return new Sql(properties);
+            };
+
+            /**
+             * Encodes the specified Sql message. Does not implicitly {@link flyteidl.core.Sql.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.Sql
+             * @static
+             * @param {flyteidl.core.ISql} message Sql message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Sql.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.statement != null && message.hasOwnProperty("statement"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.statement);
+                if (message.dialect != null && message.hasOwnProperty("dialect"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.dialect);
+                return writer;
+            };
+
+            /**
+             * Decodes a Sql message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.Sql
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.Sql} Sql
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Sql.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Sql();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.statement = reader.string();
+                        break;
+                    case 2:
+                        message.dialect = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a Sql message.
+             * @function verify
+             * @memberof flyteidl.core.Sql
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Sql.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.statement != null && message.hasOwnProperty("statement"))
+                    if (!$util.isString(message.statement))
+                        return "statement: string expected";
+                if (message.dialect != null && message.hasOwnProperty("dialect"))
+                    switch (message.dialect) {
+                    default:
+                        return "dialect: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * Dialect enum.
+             * @name flyteidl.core.Sql.Dialect
+             * @enum {string}
+             * @property {number} UNDEFINED=0 UNDEFINED value
+             * @property {number} ANSI=1 ANSI value
+             * @property {number} HIVE=2 HIVE value
+             * @property {number} OTHER=3 OTHER value
+             */
+            Sql.Dialect = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNDEFINED"] = 0;
+                values[valuesById[1] = "ANSI"] = 1;
+                values[valuesById[2] = "HIVE"] = 2;
+                values[valuesById[3] = "OTHER"] = 3;
+                return values;
+            })();
+
+            return Sql;
         })();
 
         core.Secret = (function() {
