@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	interfaces2 "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -86,7 +88,8 @@ func (c *FlytePropeller) addPermissions(auth *admin.AuthRole, flyteWf *v1alpha1.
 }
 
 func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
-	workflowExecutionConfig *admin.WorkflowExecutionConfig, recoveryExecution *core.WorkflowExecutionIdentifier, flyteWf *v1alpha1.FlyteWorkflow) {
+	workflowExecutionConfig *admin.WorkflowExecutionConfig, recoveryExecution *core.WorkflowExecutionIdentifier,
+	taskResources *admin.TaskResourceAttributes, flyteWf *v1alpha1.FlyteWorkflow) {
 	executionConfig := v1alpha1.ExecutionConfig{
 		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
@@ -102,6 +105,42 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 	}
 	if workflowExecutionConfig != nil {
 		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism)
+	}
+	if taskResources != nil {
+		var requests = v1alpha1.TaskResourceSpec{}
+		if taskResources.Defaults != nil {
+			if len(taskResources.Defaults.Cpu) > 0 {
+				requests.CPU = resource.MustParse(taskResources.Defaults.Cpu)
+			}
+			if len(taskResources.Defaults.Memory) > 0 {
+				requests.Memory = resource.MustParse(taskResources.Defaults.Memory)
+			}
+			if len(taskResources.Defaults.EphemeralStorage) > 0 {
+				requests.EphemeralStorage = resource.MustParse(taskResources.Defaults.EphemeralStorage)
+			}
+			if len(taskResources.Defaults.Storage) > 0 {
+				requests.Storage = resource.MustParse(taskResources.Defaults.Storage)
+			}
+		}
+		var limits = v1alpha1.TaskResourceSpec{}
+		if taskResources.Limits != nil {
+			if len(taskResources.Limits.Cpu) > 0 {
+				limits.CPU = resource.MustParse(taskResources.Limits.Cpu)
+			}
+			if len(taskResources.Limits.Memory) > 0 {
+				limits.Memory = resource.MustParse(taskResources.Limits.Memory)
+			}
+			if len(taskResources.Limits.EphemeralStorage) > 0 {
+				limits.EphemeralStorage = resource.MustParse(taskResources.Limits.EphemeralStorage)
+			}
+			if len(taskResources.Limits.Storage) > 0 {
+				limits.Storage = resource.MustParse(taskResources.Limits.Storage)
+			}
+		}
+		executionConfig.TaskResources = v1alpha1.TaskResources{
+			Requests: requests,
+			Limits:   limits,
+		}
 	}
 	flyteWf.ExecutionConfig = executionConfig
 }
@@ -140,7 +179,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 		flyteWf.WorkflowMeta = &v1alpha1.WorkflowMeta{}
 	}
 	flyteWf.WorkflowMeta.EventVersion = c.eventVersion
-	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, input.RecoveryExecution, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, input.RecoveryExecution, input.TaskResources, flyteWf)
 
 	if input.Reference.Spec.RawOutputDataConfig != nil {
 		flyteWf.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{
@@ -223,7 +262,7 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
-	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, nil, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, nil, input.TaskResources, flyteWf)
 
 	/*
 		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.

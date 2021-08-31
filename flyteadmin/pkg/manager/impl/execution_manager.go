@@ -360,6 +360,7 @@ func checkTaskRequestsLessThanLimits(ctx context.Context, identifier *core.Ident
 	taskResources.Requests = finalizedResourceRequests
 }
 
+// TODO: Delete this code usage after the flyte v0.17.0 release
 // Assumes input contains a compiled task with a valid container resource execConfig.
 //
 // Note: The system will assign a system-default value for request but for limit it will deduce it from the request
@@ -413,6 +414,44 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		ctx, task.Template.Id, createTaskDefaultLimits(ctx, task, m.config.TaskResourceConfiguration().GetDefaults()), task.Template.GetContainer().Resources.Limits,
 		taskResourceSpec)
 	checkTaskRequestsLessThanLimits(ctx, task.Template.Id, task.Template.GetContainer().Resources)
+}
+
+func (m *ExecutionManager) getTaskResources(ctx context.Context, workflow *core.Identifier) *admin.TaskResourceAttributes {
+	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Project:      workflow.Project,
+		Domain:       workflow.Domain,
+		Workflow:     workflow.Name,
+		ResourceType: admin.MatchableResource_TASK_RESOURCE,
+	})
+
+	if err != nil {
+		logger.Warningf(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
+			workflow, err)
+	}
+	logger.Debugf(ctx, "Assigning task requested resources for [%+v]", workflow)
+	var taskResourceAttributes = &admin.TaskResourceAttributes{}
+	if resource != nil && resource.Attributes != nil && resource.Attributes.GetTaskResourceAttributes() != nil {
+		taskResourceAttributes.Defaults = resource.Attributes.GetTaskResourceAttributes().Defaults
+		taskResourceAttributes.Limits = resource.Attributes.GetTaskResourceAttributes().Limits
+	} else {
+		taskResourceAttributes = &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:              m.config.TaskResourceConfiguration().GetDefaults().CPU,
+				Memory:           m.config.TaskResourceConfiguration().GetDefaults().Memory,
+				EphemeralStorage: m.config.TaskResourceConfiguration().GetDefaults().EphemeralStorage,
+				Storage:          m.config.TaskResourceConfiguration().GetDefaults().Storage,
+				Gpu:              m.config.TaskResourceConfiguration().GetDefaults().GPU,
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:              m.config.TaskResourceConfiguration().GetLimits().CPU,
+				Memory:           m.config.TaskResourceConfiguration().GetLimits().Memory,
+				EphemeralStorage: m.config.TaskResourceConfiguration().GetLimits().EphemeralStorage,
+				Storage:          m.config.TaskResourceConfiguration().GetLimits().Storage,
+				Gpu:              m.config.TaskResourceConfiguration().GetLimits().GPU,
+			},
+		}
+	}
+	return taskResourceAttributes
 }
 
 // Fetches inherited execution metadata including the parent node execution db model id and the source execution model id
@@ -588,6 +627,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Auth:            requestSpec.AuthRole,
 		QueueingBudget:  qualityOfService.QueuingBudget,
 		ExecutionConfig: executionConfig,
+		TaskResources:   m.getTaskResources(ctx, workflow.Id),
 	}
 	if requestSpec.Labels != nil {
 		executeTaskInputs.Labels = requestSpec.Labels.Values
@@ -784,6 +824,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		QueueingBudget:  qualityOfService.QueuingBudget,
 		ExecutionConfig: executionConfig,
 		Auth:            resolvePermissions(&request, launchPlan),
+		TaskResources:   m.getTaskResources(ctx, workflow.Id),
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
 	if err != nil {

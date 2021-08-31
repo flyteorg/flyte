@@ -22,6 +22,7 @@ type ExecuteWorkflowInput struct {
 	ExecutionConfig     *admin.WorkflowExecutionConfig
 	Auth                *admin.AuthRole
 	RecoveryExecution   *core.WorkflowExecutionIdentifier
+	TaskResources       *admin.TaskResourceAttributes
 }
 
 type ExecuteTaskInput struct {
@@ -36,6 +37,7 @@ type ExecuteTaskInput struct {
 	QueueingBudget      time.Duration
 	TaskPluginOverrides []*admin.PluginOverride
 	ExecutionConfig     *admin.WorkflowExecutionConfig
+	TaskResources       *admin.TaskResourceAttributes
 }
 
 type TerminateWorkflowInput struct {
