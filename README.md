@@ -160,19 +160,17 @@ Making changes to CRD
 *Remember* changes to CRD should be carefully done, they should be backwards compatible or else you should use proper
 operator versioning system. Once you do the changes, you have to follow the following steps.
 
-- ensure the propeller code is checked out in $GOPATH/github.com/flyteorg/flytepropeller
+- Ensure the propeller code is checked out in `$GOPATH/github.com/flyteorg/flytepropeller`
 - Uncomment https://github.com/flyteorg/flytepropeller/blob/master/hack/tools.go#L5
--
 
- ```bash
-  go mod vendor
+```bash
+    $ go mod vendor
 ```
 
 - Now generate the code
 
 ```bash
-make op_code_generate
-    $make op_code_generate
+    $ make op_code_generate
 ```
 
 **Why do we have to do this?**
