@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.25.0](http://github.com/lyft/flyteconsole/compare/v0.24.0...v0.25.0) (2021-08-31)
+
+
+### Features
+
+* add workflow versions table ([#193](http://github.com/lyft/flyteconsole/issues/193)) ([6fff87e](http://github.com/lyft/flyteconsole/commit/6fff87e40007fd15faae634eb6402045c067dd2c))
+
 # [0.24.0](http://github.com/lyft/flyteconsole/compare/v0.23.1...v0.24.0) (2021-08-27)
 
 
