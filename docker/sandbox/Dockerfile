@@ -22,14 +22,22 @@ ARG K3S_VERSION="v1.21.1%2Bk3s1"
 RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s \
     && chmod +x /flyteorg/bin/k3s
 
+# Install Helm
+ENV HELM_URL="https://get.helm.sh"
+ARG HELM_VERSION="v3.6.3"
+RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xz && \
+    mv linux-amd64/helm /flyteorg/bin/helm && \
+    chmod +x /flyteorg/bin/helm && \
+    rm -rf linux-amd64
+
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
-# Copy flyte manifest
-COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
+# Copy flyte chart
+COPY charts/flyte/ /flyteorg/share/flyte
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
@@ -43,9 +51,6 @@ RUN apk add --no-cache bash git make tini
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 COPY docker/sandbox/bashrc /root/.bashrc
-
-# Copy kustomization template
-COPY docker/sandbox/kustomization.yaml  /flyteorg/share/kustomization.yaml
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -72,9 +77,6 @@ COPY --from=base_ /flyteorg/ /flyteorg/
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
-
-# Copy kustomization template 
-COPY docker/sandbox/kustomization.yaml  /flyteorg/share/kustomization.yaml
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"

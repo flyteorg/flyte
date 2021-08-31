@@ -83,10 +83,10 @@ producer-consumer order create a workflow.
 </h2>
 </html>
 
-With [docker installed](https://docs.docker.com/get-docker/), run the following command:
+With [Docker installed](https://docs.docker.com/get-docker/) and [Flytectl installed](https://docs.flyte.org/projects/flytectl/en/stable/index.html), run the following command:
 
 ```bash
-  docker run --rm --privileged -p 30081:30081 -p 30084:30084 cr.flyte.org/flyteorg/flyte-sandbox
+  flytectl sandbox start
 ```
 
 This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.

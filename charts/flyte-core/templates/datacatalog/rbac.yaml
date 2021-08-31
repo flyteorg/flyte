@@ -1,0 +1,16 @@
+
+---
+{{- if .Values.datacatalog.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "datacatalog.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "datacatalog.labels" . | nindent 4 }}
+  {{- with .Values.datacatalog.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- with .Values.datacatalog.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}

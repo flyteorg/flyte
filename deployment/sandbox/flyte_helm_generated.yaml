@@ -273,17 +273,6 @@ data:
       finalizers:
       - kubernetes
     
-  ab_project_resource_quota.yaml: | 
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }}
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }}
-        limits.memory: {{ projectQuotaMemory }}
-    
   zz_copilot_config.yaml: | 
     kind: ConfigMap
     apiVersion: v1
@@ -319,6 +308,7 @@ data:
   admin.yaml: | 
     admin:
       clientId: flytepropeller
+      clientSecret: foobar
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -425,22 +415,16 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
-        - defaultIamRole:
-            value: ""
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -521,6 +505,7 @@ data:
   admin.yaml: | 
     admin:
       clientId: flytepropeller
+      clientSecret: foobar
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -3299,7 +3284,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "301db8745ebf36397322d6f2a2983edddf243f7620ec8dd7fb85dd4471e5d37"
+        configChecksum: "bf73e162971a6a5797397808dea605df59d08eb2527db5cb006cb2baeb77d1d"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3689,7 +3674,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "77b895cdd5f689eecbbf2a08824f405d3cad3205f1ce2d5356378b9034a33ca"
+        configChecksum: "803c0778b776d3837b0770300316061a91ac4fb9ed66eccebc8430dd9f8164d"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3754,7 +3739,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.13.4
       annotations:
-        configChecksum: "77b895cdd5f689eecbbf2a08824f405d3cad3205f1ce2d5356378b9034a33ca"
+        configChecksum: "803c0778b776d3837b0770300316061a91ac4fb9ed66eccebc8430dd9f8164d"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
