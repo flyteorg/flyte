@@ -14,7 +14,11 @@ grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -0 sed -
 grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG/g"
 
 # bump latest release of flyte component in helm
-sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./helm/values.yaml
-sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./helm/values.yaml
-sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," ./helm/values.yaml
-sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG," ./helm/values.yaml
+sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./charts/flyte-core/values.yaml
+sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./charts/flyte-core/values.yaml
+sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," ./charts/flyte-core/values.yaml
+sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG," ./charts/flyte-core/values.yaml
