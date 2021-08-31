@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/golang/protobuf/proto"
 
 	interfaces2 "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
@@ -472,7 +474,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(overrides, nil, nil, workflow)
+		addExecutionOverrides(overrides, nil, nil, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.TaskPluginImpls, map[string]v1alpha1.TaskPluginOverride{
 			"taskType1": {
 				PluginIDs:             []string{"Plugin1", "Plugin2"},
@@ -485,7 +487,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			MaxParallelism: 100,
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, nil, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.MaxParallelism, uint32(100))
 	})
 	t.Run("recovery execution", func(t *testing.T) {
@@ -495,7 +497,34 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Name:    "n",
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, nil, recoveryExecutionID, workflow)
+		addExecutionOverrides(nil, nil, recoveryExecutionID, nil, workflow)
 		assert.True(t, proto.Equal(recoveryExecutionID, workflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
+	})
+	t.Run("task resources", func(t *testing.T) {
+		workflow := &v1alpha1.FlyteWorkflow{}
+		addExecutionOverrides(nil, nil, nil, &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:    "1",
+				Memory: "100Gi",
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:              "2",
+				Memory:           "200Gi",
+				Storage:          "5Gi",
+				EphemeralStorage: "1Gi",
+				Gpu:              "1",
+			},
+		}, workflow)
+		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
+			CPU:    resource.MustParse("1"),
+			Memory: resource.MustParse("100Gi"),
+		}, workflow.ExecutionConfig.TaskResources.Requests)
+
+		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
+			CPU:              resource.MustParse("2"),
+			Memory:           resource.MustParse("200Gi"),
+			Storage:          resource.MustParse("5Gi"),
+			EphemeralStorage: resource.MustParse("1Gi"),
+		}, workflow.ExecutionConfig.TaskResources.Limits)
 	})
 }

@@ -3386,3 +3386,100 @@ func TestResolvePermissions(t *testing.T) {
 		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
 	})
 }
+
+func TestGetTaskResources(t *testing.T) {
+	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
+	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
+		CPU:              "200m",
+		GPU:              "8",
+		Memory:           "200Gi",
+		EphemeralStorage: "500Mi",
+		Storage:          "400Mi",
+	}
+	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
+		CPU:              "300m",
+		GPU:              "8",
+		Memory:           "500Gi",
+		EphemeralStorage: "501Mi",
+		Storage:          "450Mi",
+	}
+	mockConfig := runtimeMocks.NewMockConfigurationProvider(
+		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
+		runtimeMocks.NewMockWhitelistConfiguration(), nil)
+
+	t.Run("use runtime application values", func(t *testing.T) {
+		execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), mockConfig, getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+		taskResourceAttrs := execManager.(*ExecutionManager).getTaskResources(context.TODO(), &workflowIdentifier)
+		assert.True(t, proto.Equal(taskResourceAttrs, &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:              "200m",
+				Gpu:              "8",
+				Memory:           "200Gi",
+				EphemeralStorage: "500Mi",
+				Storage:          "400Mi",
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:              "300m",
+				Gpu:              "8",
+				Memory:           "500Gi",
+				EphemeralStorage: "501Mi",
+				Storage:          "450Mi",
+			},
+		}))
+	})
+	t.Run("use specific overrides", func(t *testing.T) {
+		resourceManager := managerMocks.MockResourceManager{}
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				Workflow:     workflowIdentifier.Name,
+				ResourceType: admin.MatchableResource_TASK_RESOURCE,
+			})
+			return &managerInterfaces.ResourceResponse{
+				Attributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_TaskResourceAttributes{
+						TaskResourceAttributes: &admin.TaskResourceAttributes{
+							Defaults: &admin.TaskResourceSpec{
+								Cpu:              "1200m",
+								Gpu:              "18",
+								Memory:           "1200Gi",
+								EphemeralStorage: "1500Mi",
+								Storage:          "1400Mi",
+							},
+							Limits: &admin.TaskResourceSpec{
+								Cpu:              "300m",
+								Gpu:              "8",
+								Memory:           "500Gi",
+								EphemeralStorage: "501Mi",
+								Storage:          "450Mi",
+							},
+						},
+					},
+				},
+			}, nil
+		}
+		executionManager := ExecutionManager{
+			resourceManager: &resourceManager,
+			config:          mockConfig,
+		}
+		taskResourceAttrs := executionManager.getTaskResources(context.TODO(), &workflowIdentifier)
+		assert.True(t, proto.Equal(taskResourceAttrs, &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:              "1200m",
+				Gpu:              "18",
+				Memory:           "1200Gi",
+				EphemeralStorage: "1500Mi",
+				Storage:          "1400Mi",
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:              "300m",
+				Gpu:              "8",
+				Memory:           "500Gi",
+				EphemeralStorage: "501Mi",
+				Storage:          "450Mi",
+			},
+		}))
+	})
+}

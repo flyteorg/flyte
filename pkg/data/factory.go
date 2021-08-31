@@ -59,7 +59,7 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 		accessKeyID := ""
 		secret := ""
 		endpoint := ""
-		if storageCfg.Stow != nil {
+		if len(storageCfg.Stow.Config) > 0 {
 			stowCfg := stow.ConfigMap(storageCfg.Stow.Config)
 			accessKeyID, _ = stowCfg.Config(s3.ConfigAccessKeyID)
 			secret, _ = stowCfg.Config(s3.ConfigSecretKey)

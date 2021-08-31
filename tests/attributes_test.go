@@ -4,8 +4,8 @@ package tests
 
 import (
 	"context"
-	"testing"
 	"fmt"
+	"testing"
 
 	"github.com/golang/protobuf/proto"
 
