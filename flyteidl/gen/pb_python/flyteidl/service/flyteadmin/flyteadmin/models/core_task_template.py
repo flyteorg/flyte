@@ -20,6 +20,7 @@ from flyteadmin.models.core_container import CoreContainer  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_k8s_pod import CoreK8sPod  # noqa: F401,E501
 from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
+from flyteadmin.models.core_sql import CoreSql  # noqa: F401,E501
 from flyteadmin.models.core_task_metadata import CoreTaskMetadata  # noqa: F401,E501
 from flyteadmin.models.core_typed_interface import CoreTypedInterface  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
@@ -46,6 +47,7 @@ class CoreTaskTemplate(object):
         'custom': 'ProtobufStruct',
         'container': 'CoreContainer',
         'k8s_pod': 'CoreK8sPod',
+        'sql': 'CoreSql',
         'task_type_version': 'int',
         'security_context': 'CoreSecurityContext',
         'config': 'dict(str, str)'
@@ -59,12 +61,13 @@ class CoreTaskTemplate(object):
         'custom': 'custom',
         'container': 'container',
         'k8s_pod': 'k8s_pod',
+        'sql': 'sql',
         'task_type_version': 'task_type_version',
         'security_context': 'security_context',
         'config': 'config'
     }
 
-    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, task_type_version=None, security_context=None, config=None):  # noqa: E501
+    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, sql=None, task_type_version=None, security_context=None, config=None):  # noqa: E501
         """CoreTaskTemplate - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -74,6 +77,7 @@ class CoreTaskTemplate(object):
         self._custom = None
         self._container = None
         self._k8s_pod = None
+        self._sql = None
         self._task_type_version = None
         self._security_context = None
         self._config = None
@@ -93,6 +97,8 @@ class CoreTaskTemplate(object):
             self.container = container
         if k8s_pod is not None:
             self.k8s_pod = k8s_pod
+        if sql is not None:
+            self.sql = sql
         if task_type_version is not None:
             self.task_type_version = task_type_version
         if security_context is not None:
@@ -256,6 +262,27 @@ class CoreTaskTemplate(object):
         """
 
         self._k8s_pod = k8s_pod
+
+    @property
+    def sql(self):
+        """Gets the sql of this CoreTaskTemplate.  # noqa: E501
+
+
+        :return: The sql of this CoreTaskTemplate.  # noqa: E501
+        :rtype: CoreSql
+        """
+        return self._sql
+
+    @sql.setter
+    def sql(self, sql):
+        """Sets the sql of this CoreTaskTemplate.
+
+
+        :param sql: The sql of this CoreTaskTemplate.  # noqa: E501
+        :type: CoreSql
+        """
+
+        self._sql = sql
 
     @property
     def task_type_version(self):

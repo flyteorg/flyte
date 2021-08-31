@@ -5227,6 +5227,19 @@ public final class Tasks {
     flyteidl.core.Tasks.K8sPodOrBuilder getK8SPodOrBuilder();
 
     /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    boolean hasSql();
+    /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    flyteidl.core.Tasks.Sql getSql();
+    /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    flyteidl.core.Tasks.SqlOrBuilder getSqlOrBuilder();
+
+    /**
      * <pre>
      * This can be used to customize task handling at execution time for the same task type.
      * </pre>
@@ -5462,10 +5475,10 @@ public final class Tasks {
               break;
             }
             case 130: {
-              if (!((mutable_bitField0_ & 0x00000200) != 0)) {
+              if (!((mutable_bitField0_ & 0x00000400) != 0)) {
                 config_ = com.google.protobuf.MapField.newMapField(
                     ConfigDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000200;
+                mutable_bitField0_ |= 0x00000400;
               }
               com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
               config__ = input.readMessage(
@@ -5486,6 +5499,20 @@ public final class Tasks {
                 target_ = subBuilder.buildPartial();
               }
               targetCase_ = 17;
+              break;
+            }
+            case 146: {
+              flyteidl.core.Tasks.Sql.Builder subBuilder = null;
+              if (targetCase_ == 18) {
+                subBuilder = ((flyteidl.core.Tasks.Sql) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.core.Tasks.Sql.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Tasks.Sql) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 18;
               break;
             }
             default: {
@@ -5539,6 +5566,7 @@ public final class Tasks {
         implements com.google.protobuf.Internal.EnumLite {
       CONTAINER(6),
       K8S_POD(17),
+      SQL(18),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -5556,6 +5584,7 @@ public final class Tasks {
         switch (value) {
           case 6: return CONTAINER;
           case 17: return K8S_POD;
+          case 18: return SQL;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -5804,6 +5833,32 @@ public final class Tasks {
       return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
     }
 
+    public static final int SQL_FIELD_NUMBER = 18;
+    /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    public boolean hasSql() {
+      return targetCase_ == 18;
+    }
+    /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    public flyteidl.core.Tasks.Sql getSql() {
+      if (targetCase_ == 18) {
+         return (flyteidl.core.Tasks.Sql) target_;
+      }
+      return flyteidl.core.Tasks.Sql.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.core.Sql sql = 18;</code>
+     */
+    public flyteidl.core.Tasks.SqlOrBuilder getSqlOrBuilder() {
+      if (targetCase_ == 18) {
+         return (flyteidl.core.Tasks.Sql) target_;
+      }
+      return flyteidl.core.Tasks.Sql.getDefaultInstance();
+    }
+
     public static final int TASK_TYPE_VERSION_FIELD_NUMBER = 7;
     private int taskTypeVersion_;
     /**
@@ -5997,6 +6052,9 @@ public final class Tasks {
       if (targetCase_ == 17) {
         output.writeMessage(17, (flyteidl.core.Tasks.K8sPod) target_);
       }
+      if (targetCase_ == 18) {
+        output.writeMessage(18, (flyteidl.core.Tasks.Sql) target_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -6050,6 +6108,10 @@ public final class Tasks {
       if (targetCase_ == 17) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, (flyteidl.core.Tasks.K8sPod) target_);
+      }
+      if (targetCase_ == 18) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, (flyteidl.core.Tasks.Sql) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6107,6 +6169,10 @@ public final class Tasks {
           if (!getK8SPod()
               .equals(other.getK8SPod())) return false;
           break;
+        case 18:
+          if (!getSql()
+              .equals(other.getSql())) return false;
+          break;
         case 0:
         default:
       }
@@ -6157,6 +6223,10 @@ public final class Tasks {
         case 17:
           hash = (37 * hash) + K8S_POD_FIELD_NUMBER;
           hash = (53 * hash) + getK8SPod().hashCode();
+          break;
+        case 18:
+          hash = (37 * hash) + SQL_FIELD_NUMBER;
+          hash = (53 * hash) + getSql().hashCode();
           break;
         case 0:
         default:
@@ -6421,6 +6491,13 @@ public final class Tasks {
             result.target_ = k8SPodBuilder_.build();
           }
         }
+        if (targetCase_ == 18) {
+          if (sqlBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = sqlBuilder_.build();
+          }
+        }
         result.taskTypeVersion_ = taskTypeVersion_;
         if (securityContextBuilder_ == null) {
           result.securityContext_ = securityContext_;
@@ -6510,6 +6587,10 @@ public final class Tasks {
           }
           case K8S_POD: {
             mergeK8SPod(other.getK8SPod());
+            break;
+          }
+          case SQL: {
+            mergeSql(other.getSql());
             break;
           }
           case TARGET_NOT_SET: {
@@ -7551,6 +7632,142 @@ public final class Tasks {
         targetCase_ = 17;
         onChanged();;
         return k8SPodBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.Sql, flyteidl.core.Tasks.Sql.Builder, flyteidl.core.Tasks.SqlOrBuilder> sqlBuilder_;
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public boolean hasSql() {
+        return targetCase_ == 18;
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public flyteidl.core.Tasks.Sql getSql() {
+        if (sqlBuilder_ == null) {
+          if (targetCase_ == 18) {
+            return (flyteidl.core.Tasks.Sql) target_;
+          }
+          return flyteidl.core.Tasks.Sql.getDefaultInstance();
+        } else {
+          if (targetCase_ == 18) {
+            return sqlBuilder_.getMessage();
+          }
+          return flyteidl.core.Tasks.Sql.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public Builder setSql(flyteidl.core.Tasks.Sql value) {
+        if (sqlBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          sqlBuilder_.setMessage(value);
+        }
+        targetCase_ = 18;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public Builder setSql(
+          flyteidl.core.Tasks.Sql.Builder builderForValue) {
+        if (sqlBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          sqlBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 18;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public Builder mergeSql(flyteidl.core.Tasks.Sql value) {
+        if (sqlBuilder_ == null) {
+          if (targetCase_ == 18 &&
+              target_ != flyteidl.core.Tasks.Sql.getDefaultInstance()) {
+            target_ = flyteidl.core.Tasks.Sql.newBuilder((flyteidl.core.Tasks.Sql) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 18) {
+            sqlBuilder_.mergeFrom(value);
+          }
+          sqlBuilder_.setMessage(value);
+        }
+        targetCase_ = 18;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public Builder clearSql() {
+        if (sqlBuilder_ == null) {
+          if (targetCase_ == 18) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 18) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          sqlBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public flyteidl.core.Tasks.Sql.Builder getSqlBuilder() {
+        return getSqlFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      public flyteidl.core.Tasks.SqlOrBuilder getSqlOrBuilder() {
+        if ((targetCase_ == 18) && (sqlBuilder_ != null)) {
+          return sqlBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 18) {
+            return (flyteidl.core.Tasks.Sql) target_;
+          }
+          return flyteidl.core.Tasks.Sql.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Sql sql = 18;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.Sql, flyteidl.core.Tasks.Sql.Builder, flyteidl.core.Tasks.SqlOrBuilder> 
+          getSqlFieldBuilder() {
+        if (sqlBuilder_ == null) {
+          if (!(targetCase_ == 18)) {
+            target_ = flyteidl.core.Tasks.Sql.getDefaultInstance();
+          }
+          sqlBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.Sql, flyteidl.core.Tasks.Sql.Builder, flyteidl.core.Tasks.SqlOrBuilder>(
+                  (flyteidl.core.Tasks.Sql) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 18;
+        onChanged();;
+        return sqlBuilder_;
       }
 
       private int taskTypeVersion_ ;
@@ -16182,6 +16399,887 @@ public final class Tasks {
 
   }
 
+  public interface SqlOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.Sql)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * The actual query to run, the query can have templated parameters.
+     * We use Flyte's Golang templating format for Query templating.
+     * Refer to the templating documentation.
+     * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+     * For example,
+     * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+     * select *
+     * from my_table
+     * where ds = '{{ .Inputs.ds }}'
+     * </pre>
+     *
+     * <code>string statement = 1;</code>
+     */
+    java.lang.String getStatement();
+    /**
+     * <pre>
+     * The actual query to run, the query can have templated parameters.
+     * We use Flyte's Golang templating format for Query templating.
+     * Refer to the templating documentation.
+     * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+     * For example,
+     * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+     * select *
+     * from my_table
+     * where ds = '{{ .Inputs.ds }}'
+     * </pre>
+     *
+     * <code>string statement = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getStatementBytes();
+
+    /**
+     * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+     */
+    int getDialectValue();
+    /**
+     * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+     */
+    flyteidl.core.Tasks.Sql.Dialect getDialect();
+  }
+  /**
+   * <pre>
+   * Sql represents a generic sql workload with a statement and dialect.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.Sql}
+   */
+  public  static final class Sql extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.Sql)
+      SqlOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Sql.newBuilder() to construct.
+    private Sql(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Sql() {
+      statement_ = "";
+      dialect_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Sql(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              statement_ = s;
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+
+              dialect_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_Sql_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_Sql_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.Sql.class, flyteidl.core.Tasks.Sql.Builder.class);
+    }
+
+    /**
+     * <pre>
+     * The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid
+     * expensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.
+     * We support the following dialect: ansi, hive.
+     * </pre>
+     *
+     * Protobuf enum {@code flyteidl.core.Sql.Dialect}
+     */
+    public enum Dialect
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>UNDEFINED = 0;</code>
+       */
+      UNDEFINED(0),
+      /**
+       * <code>ANSI = 1;</code>
+       */
+      ANSI(1),
+      /**
+       * <code>HIVE = 2;</code>
+       */
+      HIVE(2),
+      /**
+       * <code>OTHER = 3;</code>
+       */
+      OTHER(3),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>UNDEFINED = 0;</code>
+       */
+      public static final int UNDEFINED_VALUE = 0;
+      /**
+       * <code>ANSI = 1;</code>
+       */
+      public static final int ANSI_VALUE = 1;
+      /**
+       * <code>HIVE = 2;</code>
+       */
+      public static final int HIVE_VALUE = 2;
+      /**
+       * <code>OTHER = 3;</code>
+       */
+      public static final int OTHER_VALUE = 3;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static Dialect valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static Dialect forNumber(int value) {
+        switch (value) {
+          case 0: return UNDEFINED;
+          case 1: return ANSI;
+          case 2: return HIVE;
+          case 3: return OTHER;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Dialect>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Dialect> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Dialect>() {
+              public Dialect findValueByNumber(int number) {
+                return Dialect.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.Sql.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Dialect[] VALUES = values();
+
+      public static Dialect valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private Dialect(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.Sql.Dialect)
+    }
+
+    public static final int STATEMENT_FIELD_NUMBER = 1;
+    private volatile java.lang.Object statement_;
+    /**
+     * <pre>
+     * The actual query to run, the query can have templated parameters.
+     * We use Flyte's Golang templating format for Query templating.
+     * Refer to the templating documentation.
+     * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+     * For example,
+     * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+     * select *
+     * from my_table
+     * where ds = '{{ .Inputs.ds }}'
+     * </pre>
+     *
+     * <code>string statement = 1;</code>
+     */
+    public java.lang.String getStatement() {
+      java.lang.Object ref = statement_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        statement_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The actual query to run, the query can have templated parameters.
+     * We use Flyte's Golang templating format for Query templating.
+     * Refer to the templating documentation.
+     * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+     * For example,
+     * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+     * select *
+     * from my_table
+     * where ds = '{{ .Inputs.ds }}'
+     * </pre>
+     *
+     * <code>string statement = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStatementBytes() {
+      java.lang.Object ref = statement_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        statement_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DIALECT_FIELD_NUMBER = 2;
+    private int dialect_;
+    /**
+     * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+     */
+    public int getDialectValue() {
+      return dialect_;
+    }
+    /**
+     * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+     */
+    public flyteidl.core.Tasks.Sql.Dialect getDialect() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Tasks.Sql.Dialect result = flyteidl.core.Tasks.Sql.Dialect.valueOf(dialect_);
+      return result == null ? flyteidl.core.Tasks.Sql.Dialect.UNRECOGNIZED : result;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getStatementBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, statement_);
+      }
+      if (dialect_ != flyteidl.core.Tasks.Sql.Dialect.UNDEFINED.getNumber()) {
+        output.writeEnum(2, dialect_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getStatementBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, statement_);
+      }
+      if (dialect_ != flyteidl.core.Tasks.Sql.Dialect.UNDEFINED.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, dialect_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.Sql)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.Sql other = (flyteidl.core.Tasks.Sql) obj;
+
+      if (!getStatement()
+          .equals(other.getStatement())) return false;
+      if (dialect_ != other.dialect_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + STATEMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getStatement().hashCode();
+      hash = (37 * hash) + DIALECT_FIELD_NUMBER;
+      hash = (53 * hash) + dialect_;
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.Sql parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.Sql parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.Sql parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.Sql prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Sql represents a generic sql workload with a statement and dialect.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.Sql}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.Sql)
+        flyteidl.core.Tasks.SqlOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_Sql_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_Sql_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.Sql.class, flyteidl.core.Tasks.Sql.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.Sql.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        statement_ = "";
+
+        dialect_ = 0;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_Sql_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.Sql getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.Sql.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.Sql build() {
+        flyteidl.core.Tasks.Sql result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.Sql buildPartial() {
+        flyteidl.core.Tasks.Sql result = new flyteidl.core.Tasks.Sql(this);
+        result.statement_ = statement_;
+        result.dialect_ = dialect_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.Sql) {
+          return mergeFrom((flyteidl.core.Tasks.Sql)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.Sql other) {
+        if (other == flyteidl.core.Tasks.Sql.getDefaultInstance()) return this;
+        if (!other.getStatement().isEmpty()) {
+          statement_ = other.statement_;
+          onChanged();
+        }
+        if (other.dialect_ != 0) {
+          setDialectValue(other.getDialectValue());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.Sql parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.Sql) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object statement_ = "";
+      /**
+       * <pre>
+       * The actual query to run, the query can have templated parameters.
+       * We use Flyte's Golang templating format for Query templating.
+       * Refer to the templating documentation.
+       * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+       * For example,
+       * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+       * select *
+       * from my_table
+       * where ds = '{{ .Inputs.ds }}'
+       * </pre>
+       *
+       * <code>string statement = 1;</code>
+       */
+      public java.lang.String getStatement() {
+        java.lang.Object ref = statement_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          statement_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The actual query to run, the query can have templated parameters.
+       * We use Flyte's Golang templating format for Query templating.
+       * Refer to the templating documentation.
+       * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+       * For example,
+       * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+       * select *
+       * from my_table
+       * where ds = '{{ .Inputs.ds }}'
+       * </pre>
+       *
+       * <code>string statement = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStatementBytes() {
+        java.lang.Object ref = statement_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          statement_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The actual query to run, the query can have templated parameters.
+       * We use Flyte's Golang templating format for Query templating.
+       * Refer to the templating documentation.
+       * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+       * For example,
+       * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+       * select *
+       * from my_table
+       * where ds = '{{ .Inputs.ds }}'
+       * </pre>
+       *
+       * <code>string statement = 1;</code>
+       */
+      public Builder setStatement(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        statement_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The actual query to run, the query can have templated parameters.
+       * We use Flyte's Golang templating format for Query templating.
+       * Refer to the templating documentation.
+       * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+       * For example,
+       * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+       * select *
+       * from my_table
+       * where ds = '{{ .Inputs.ds }}'
+       * </pre>
+       *
+       * <code>string statement = 1;</code>
+       */
+      public Builder clearStatement() {
+        
+        statement_ = getDefaultInstance().getStatement();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The actual query to run, the query can have templated parameters.
+       * We use Flyte's Golang templating format for Query templating.
+       * Refer to the templating documentation.
+       * https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+       * For example,
+       * insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+       * select *
+       * from my_table
+       * where ds = '{{ .Inputs.ds }}'
+       * </pre>
+       *
+       * <code>string statement = 1;</code>
+       */
+      public Builder setStatementBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        statement_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int dialect_ = 0;
+      /**
+       * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+       */
+      public int getDialectValue() {
+        return dialect_;
+      }
+      /**
+       * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+       */
+      public Builder setDialectValue(int value) {
+        dialect_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+       */
+      public flyteidl.core.Tasks.Sql.Dialect getDialect() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Tasks.Sql.Dialect result = flyteidl.core.Tasks.Sql.Dialect.valueOf(dialect_);
+        return result == null ? flyteidl.core.Tasks.Sql.Dialect.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+       */
+      public Builder setDialect(flyteidl.core.Tasks.Sql.Dialect value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        dialect_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Sql.Dialect dialect = 2;</code>
+       */
+      public Builder clearDialect() {
+        
+        dialect_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.Sql)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.Sql)
+    private static final flyteidl.core.Tasks.Sql DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.Sql();
+    }
+
+    public static flyteidl.core.Tasks.Sql getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Sql>
+        PARSER = new com.google.protobuf.AbstractParser<Sql>() {
+      @java.lang.Override
+      public Sql parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Sql(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Sql> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Sql> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.Sql getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Resources_descriptor;
   private static final 
@@ -16252,6 +17350,11 @@ public final class Tasks {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_Sql_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_Sql_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -16285,52 +17388,56 @@ public final class Tasks {
       "lyteidl.core.RetryStrategy\022\031\n\021discovery_" +
       "version\030\006 \001(\t\022 \n\030deprecated_error_messag" +
       "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000B\025\n\023inte" +
-      "rruptible_value\"\355\003\n\014TaskTemplate\022%\n\002id\030\001" +
+      "rruptible_value\"\220\004\n\014TaskTemplate\022%\n\002id\030\001" +
       " \001(\0132\031.flyteidl.core.Identifier\022\014\n\004type\030" +
       "\002 \001(\t\022-\n\010metadata\030\003 \001(\0132\033.flyteidl.core." +
       "TaskMetadata\0220\n\tinterface\030\004 \001(\0132\035.flytei" +
       "dl.core.TypedInterface\022\'\n\006custom\030\005 \001(\0132\027" +
       ".google.protobuf.Struct\022-\n\tcontainer\030\006 \001" +
       "(\0132\030.flyteidl.core.ContainerH\000\022(\n\007k8s_po" +
-      "d\030\021 \001(\0132\025.flyteidl.core.K8sPodH\000\022\031\n\021task" +
-      "_type_version\030\007 \001(\005\0228\n\020security_context\030" +
-      "\010 \001(\0132\036.flyteidl.core.SecurityContext\0227\n" +
-      "\006config\030\020 \003(\0132\'.flyteidl.core.TaskTempla" +
-      "te.ConfigEntry\032-\n\013ConfigEntry\022\013\n\003key\030\001 \001" +
-      "(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rConta" +
-      "inerPort\022\026\n\016container_port\030\001 \001(\r\"\245\002\n\tCon" +
-      "tainer\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014" +
-      "\n\004args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flytei" +
-      "dl.core.Resources\022(\n\003env\030\005 \003(\0132\033.flyteid" +
-      "l.core.KeyValuePair\022/\n\006config\030\006 \003(\0132\033.fl" +
-      "yteidl.core.KeyValuePairB\002\030\001\022+\n\005ports\030\007 " +
-      "\003(\0132\034.flyteidl.core.ContainerPort\0225\n\013dat" +
-      "a_config\030\t \001(\0132 .flyteidl.core.DataLoadi" +
-      "ngConfig\"\233\002\n\nIOStrategy\022=\n\rdownload_mode" +
-      "\030\001 \001(\0162&.flyteidl.core.IOStrategy.Downlo" +
-      "adMode\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl.c" +
-      "ore.IOStrategy.UploadMode\"L\n\014DownloadMod" +
-      "e\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM" +
-      "\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n" +
-      "\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rD" +
-      "O_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007" +
-      "enabled\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013out" +
-      "put_path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteid" +
-      "l.core.DataLoadingConfig.LiteralMapForma" +
-      "t\022.\n\013io_strategy\030\005 \001(\0132\031.flyteidl.core.I" +
-      "OStrategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022" +
-      "\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metada" +
-      "ta\030\001 \001(\0132 .flyteidl.core.K8sObjectMetada" +
-      "ta\022)\n\010pod_spec\030\002 \001(\0132\027.google.protobuf.S" +
-      "truct\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 " +
-      "\003(\0132,.flyteidl.core.K8sObjectMetadata.La" +
-      "belsEntry\022F\n\013annotations\030\002 \003(\01321.flyteid" +
-      "l.core.K8sObjectMetadata.AnnotationsEntr" +
-      "y\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
-      " \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(" +
-      "\t\022\r\n\005value\030\002 \001(\t:\0028\001B6Z4github.com/flyte" +
-      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
-      "oto3"
+      "d\030\021 \001(\0132\025.flyteidl.core.K8sPodH\000\022!\n\003sql\030" +
+      "\022 \001(\0132\022.flyteidl.core.SqlH\000\022\031\n\021task_type" +
+      "_version\030\007 \001(\005\0228\n\020security_context\030\010 \001(\013" +
+      "2\036.flyteidl.core.SecurityContext\0227\n\006conf" +
+      "ig\030\020 \003(\0132\'.flyteidl.core.TaskTemplate.Co" +
+      "nfigEntry\032-\n\013ConfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
+      "\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rContainerP" +
+      "ort\022\026\n\016container_port\030\001 \001(\r\"\245\002\n\tContaine" +
+      "r\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004arg" +
+      "s\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.co" +
+      "re.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.cor" +
+      "e.KeyValuePair\022/\n\006config\030\006 \003(\0132\033.flyteid" +
+      "l.core.KeyValuePairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034" +
+      ".flyteidl.core.ContainerPort\0225\n\013data_con" +
+      "fig\030\t \001(\0132 .flyteidl.core.DataLoadingCon" +
+      "fig\"\233\002\n\nIOStrategy\022=\n\rdownload_mode\030\001 \001(" +
+      "\0162&.flyteidl.core.IOStrategy.DownloadMod" +
+      "e\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl.core.I" +
+      "OStrategy.UploadMode\"L\n\014DownloadMode\022\022\n\016" +
+      "DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n" +
+      "\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLO" +
+      "AD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT" +
+      "_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabl" +
+      "ed\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_p" +
+      "ath\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteidl.cor" +
+      "e.DataLoadingConfig.LiteralMapFormat\022.\n\013" +
+      "io_strategy\030\005 \001(\0132\031.flyteidl.core.IOStra" +
+      "tegy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YA" +
+      "ML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metadata\030\001 " +
+      "\001(\0132 .flyteidl.core.K8sObjectMetadata\022)\n" +
+      "\010pod_spec\030\002 \001(\0132\027.google.protobuf.Struct" +
+      "\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 \003(\0132," +
+      ".flyteidl.core.K8sObjectMetadata.LabelsE" +
+      "ntry\022F\n\013annotations\030\002 \003(\01321.flyteidl.cor" +
+      "e.K8sObjectMetadata.AnnotationsEntry\032-\n\013" +
+      "LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
+      "\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005" +
+      "value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001(" +
+      "\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core.Sql.D" +
+      "ialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANSI" +
+      "\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4github.com/fl" +
+      "yteorg/flyteidl/gen/pb-go/flyteidl/coreb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16379,7 +17486,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
-        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "K8SPod", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
+        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "K8SPod", "Sql", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor =
       internal_static_flyteidl_core_TaskTemplate_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_fieldAccessorTable = new
@@ -16434,6 +17541,12 @@ public final class Tasks {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_core_Sql_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_flyteidl_core_Sql_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_Sql_descriptor,
+        new java.lang.String[] { "Statement", "Dialect", });
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
     flyteidl.core.Literals.getDescriptor();

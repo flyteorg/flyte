@@ -4383,6 +4383,9 @@ export namespace flyteidl {
             /** TaskTemplate k8sPod */
             k8sPod?: (flyteidl.core.IK8sPod|null);
 
+            /** TaskTemplate sql */
+            sql?: (flyteidl.core.ISql|null);
+
             /** TaskTemplate taskTypeVersion */
             taskTypeVersion?: (number|null);
 
@@ -4423,6 +4426,9 @@ export namespace flyteidl {
             /** TaskTemplate k8sPod. */
             public k8sPod?: (flyteidl.core.IK8sPod|null);
 
+            /** TaskTemplate sql. */
+            public sql?: (flyteidl.core.ISql|null);
+
             /** TaskTemplate taskTypeVersion. */
             public taskTypeVersion: number;
 
@@ -4433,7 +4439,7 @@ export namespace flyteidl {
             public config: { [k: string]: string };
 
             /** TaskTemplate target. */
-            public target?: ("container"|"k8sPod");
+            public target?: ("container"|"k8sPod"|"sql");
 
             /**
              * Creates a new TaskTemplate instance using the specified properties.
@@ -4889,6 +4895,75 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Sql. */
+        interface ISql {
+
+            /** Sql statement */
+            statement?: (string|null);
+
+            /** Sql dialect */
+            dialect?: (flyteidl.core.Sql.Dialect|null);
+        }
+
+        /** Represents a Sql. */
+        class Sql implements ISql {
+
+            /**
+             * Constructs a new Sql.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISql);
+
+            /** Sql statement. */
+            public statement: string;
+
+            /** Sql dialect. */
+            public dialect: flyteidl.core.Sql.Dialect;
+
+            /**
+             * Creates a new Sql instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Sql instance
+             */
+            public static create(properties?: flyteidl.core.ISql): flyteidl.core.Sql;
+
+            /**
+             * Encodes the specified Sql message. Does not implicitly {@link flyteidl.core.Sql.verify|verify} messages.
+             * @param message Sql message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISql, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Sql message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Sql
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Sql;
+
+            /**
+             * Verifies a Sql message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Sql {
+
+            /** Dialect enum. */
+            enum Dialect {
+                UNDEFINED = 0,
+                ANSI = 1,
+                HIVE = 2,
+                OTHER = 3
+            }
         }
 
         /** Properties of a Secret. */

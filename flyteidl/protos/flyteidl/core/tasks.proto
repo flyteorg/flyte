@@ -121,6 +121,7 @@ message TaskTemplate {
     oneof target {
         Container container = 6;
         K8sPod k8s_pod = 17;
+        Sql sql = 18;
     }
 
     // This can be used to customize task handling at execution time for the same task type.
@@ -262,4 +263,28 @@ message K8sObjectMetadata {
 
   // Optional annotations to add to the pod definition.
   map<string, string> annotations = 2;
+}
+
+// Sql represents a generic sql workload with a statement and dialect.
+message Sql {
+    // The actual query to run, the query can have templated parameters.
+    // We use Flyte's Golang templating format for Query templating.
+    // Refer to the templating documentation.
+    // https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+    // For example,
+    // insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+    // select *
+    // from my_table
+    // where ds = '{{ .Inputs.ds }}'
+    string statement = 1;
+    // The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid
+    // expensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.
+    // We support the following dialect: ansi, hive.
+    enum Dialect {
+        UNDEFINED = 0;
+        ANSI = 1;
+        HIVE = 2;
+        OTHER = 3;
+    }
+    Dialect dialect = 2;
 }
