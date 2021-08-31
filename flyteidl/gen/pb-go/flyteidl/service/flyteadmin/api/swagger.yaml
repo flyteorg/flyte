@@ -2749,6 +2749,18 @@ definitions:
     - "DESCENDING"
     - "ASCENDING"
     default: "DESCENDING"
+  SqlDialect:
+    type: "string"
+    description: "The dialect of the SQL statement. This is used to validate and parse\
+      \ SQL statements at compilation time to avoid\nexpensive runtime operations.\
+      \ If set to an unsupported dialect, no validation will be done on the statement.\n\
+      We support the following dialect: ansi, hive."
+    enum:
+    - "UNDEFINED"
+    - "ANSI"
+    - "HIVE"
+    - "OTHER"
+    default: "UNDEFINED"
   TaskExecutionMetadataInstanceClass:
     type: "string"
     description: "Includes the broad category of machine used for this specific task\
@@ -8805,6 +8817,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
           - template:
               container:
                 args:
@@ -9060,6 +9075,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
           primary:
             template:
               outputs:
@@ -10864,6 +10882,9 @@ definitions:
                 group_version: "group_version"
                 key: "key"
                 group: "group"
+            sql:
+              dialect: {}
+              statement: "statement"
   adminTaskClosure:
     type: "object"
     properties:
@@ -11135,6 +11156,9 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
+          sql:
+            dialect: {}
+            statement: "statement"
   adminTaskCreateRequest:
     type: "object"
     properties:
@@ -11718,6 +11742,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
       - id:
           domain: "domain"
           resource_type: {}
@@ -11982,6 +12009,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
       token: "token"
   adminTaskResourceAttributes:
     type: "object"
@@ -14206,6 +14236,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
           - template:
               container:
                 args:
@@ -14461,6 +14494,9 @@ definitions:
                   group_version: "group_version"
                   key: "key"
                   group: "group"
+              sql:
+                dialect: {}
+                statement: "statement"
           primary:
             template:
               outputs:
@@ -17669,6 +17705,9 @@ definitions:
                 group_version: "group_version"
                 key: "key"
                 group: "group"
+            sql:
+              dialect: {}
+              statement: "statement"
         - template:
             container:
               args:
@@ -17924,6 +17963,9 @@ definitions:
                 group_version: "group_version"
                 key: "key"
                 group: "group"
+            sql:
+              dialect: {}
+              statement: "statement"
         primary:
           template:
             outputs:
@@ -21068,6 +21110,9 @@ definitions:
                     group_version: "group_version"
                     key: "key"
                     group: "group"
+                sql:
+                  dialect: {}
+                  statement: "statement"
             - template:
                 container:
                   args:
@@ -21323,6 +21368,9 @@ definitions:
                     group_version: "group_version"
                     key: "key"
                     group: "group"
+                sql:
+                  dialect: {}
+                  statement: "statement"
             primary:
               template:
                 outputs:
@@ -24380,6 +24428,9 @@ definitions:
                     group_version: "group_version"
                     key: "key"
                     group: "group"
+                sql:
+                  dialect: {}
+                  statement: "statement"
             - template:
                 container:
                   args:
@@ -24635,6 +24686,9 @@ definitions:
                     group_version: "group_version"
                     key: "key"
                     group: "group"
+                sql:
+                  dialect: {}
+                  statement: "statement"
             primary:
               template:
                 outputs:
@@ -26291,6 +26345,9 @@ definitions:
             group_version: "group_version"
             key: "key"
             group: "group"
+        sql:
+          dialect: {}
+          statement: "statement"
   coreCompiledWorkflow:
     type: "object"
     properties:
@@ -29377,6 +29434,9 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
+          sql:
+            dialect: {}
+            statement: "statement"
       - template:
           container:
             args:
@@ -29632,6 +29692,9 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
+          sql:
+            dialect: {}
+            statement: "statement"
       primary:
         template:
           outputs:
@@ -32298,6 +32361,22 @@ definitions:
     - "ERROR"
     - "STRUCT"
     default: "NONE"
+  coreSql:
+    type: "object"
+    properties:
+      statement:
+        type: "string"
+        title: "The actual query to run, the query can have templated parameters.\n\
+          We use Flyte's Golang templating format for Query templating.\nRefer to\
+          \ the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\n\
+          For example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored\
+          \ as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+      dialect:
+        $ref: "#/definitions/SqlDialect"
+    description: "Sql represents a generic sql workload with a statement and dialect."
+    example:
+      dialect: {}
+      statement: "statement"
   coreTaskExecutionIdentifier:
     type: "object"
     properties:
@@ -32478,6 +32557,8 @@ definitions:
         $ref: "#/definitions/coreContainer"
       k8s_pod:
         $ref: "#/definitions/coreK8sPod"
+      sql:
+        $ref: "#/definitions/coreSql"
       task_type_version:
         type: "integer"
         format: "int32"
@@ -32751,6 +32832,9 @@ definitions:
           group_version: "group_version"
           key: "key"
           group: "group"
+      sql:
+        dialect: {}
+        statement: "statement"
   coreTypedInterface:
     type: "object"
     properties:
@@ -36442,6 +36526,9 @@ definitions:
                 group_version: "group_version"
                 key: "key"
                 group: "group"
+            sql:
+              dialect: {}
+              statement: "statement"
         - template:
             container:
               args:
@@ -36697,6 +36784,9 @@ definitions:
                 group_version: "group_version"
                 key: "key"
                 group: "group"
+            sql:
+              dialect: {}
+              statement: "statement"
         primary:
           template:
             outputs:

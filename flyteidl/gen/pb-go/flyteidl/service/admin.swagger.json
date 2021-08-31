@@ -3051,6 +3051,17 @@
       "default": "DESCENDING",
       "description": " - DESCENDING: By default, fields are sorted in descending order."
     },
+    "SqlDialect": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "ANSI",
+        "HIVE",
+        "OTHER"
+      ],
+      "default": "UNDEFINED",
+      "description": "The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid\nexpensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.\nWe support the following dialect: ansi, hive."
+    },
     "TaskExecutionMetadataInstanceClass": {
       "type": "string",
       "enum": [
@@ -5833,6 +5844,19 @@
       "default": "NONE",
       "description": "Define a set of simple types."
     },
+    "coreSql": {
+      "type": "object",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+        },
+        "dialect": {
+          "$ref": "#/definitions/SqlDialect"
+        }
+      },
+      "description": "Sql represents a generic sql workload with a statement and dialect."
+    },
     "coreTaskExecutionIdentifier": {
       "type": "object",
       "properties": {
@@ -5969,6 +5993,9 @@
         },
         "k8s_pod": {
           "$ref": "#/definitions/coreK8sPod"
+        },
+        "sql": {
+          "$ref": "#/definitions/coreSql"
         },
         "task_type_version": {
           "type": "integer",

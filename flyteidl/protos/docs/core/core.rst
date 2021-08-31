@@ -1965,6 +1965,28 @@ Runtime information. This is loosely defined to allow for extensibility.
 
 
 
+.. _ref_flyteidl.core.Sql:
+
+Sql
+------------------------------------------------------------------
+
+Sql represents a generic sql workload with a statement and dialect.
+
+
+
+.. csv-table:: Sql type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "statement", ":ref:`ref_string`", "", "The actual query to run, the query can have templated parameters. We use Flyte&#39;s Golang templating format for Query templating. Refer to the templating documentation. https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py For example, insert overwrite directory &#39;{{ .rawOutputDataPrefix }}&#39; stored as parquet select * from my_table where ds = &#39;{{ .Inputs.ds }}&#39;"
+   "dialect", ":ref:`ref_flyteidl.core.Sql.Dialect`", "", ""
+
+
+
+
+
+
+
 .. _ref_flyteidl.core.TaskMetadata:
 
 TaskMetadata
@@ -2013,6 +2035,7 @@ Tasks are registered as a first step in the system.
    "custom", ":ref:`ref_google.protobuf.Struct`", "", "Custom data about the task. This is extensible to allow various plugins in the system."
    "container", ":ref:`ref_flyteidl.core.Container`", "", ""
    "k8s_pod", ":ref:`ref_flyteidl.core.K8sPod`", "", ""
+   "sql", ":ref:`ref_flyteidl.core.Sql`", "", ""
    "task_type_version", ":ref:`ref_int32`", "", "This can be used to customize task handling at execution time for the same task type."
    "security_context", ":ref:`ref_flyteidl.core.SecurityContext`", "", "security_context encapsulates security attributes requested to run this task."
    "config", ":ref:`ref_flyteidl.core.TaskTemplate.ConfigEntry`", "repeated", "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system to use as required. reserve the field numbers 1 through 15 for very frequently occurring message elements"
@@ -2134,6 +2157,26 @@ RuntimeMetadata.RuntimeType
 
    "OTHER", "0", ""
    "FLYTE_SDK", "1", ""
+
+
+
+.. _ref_flyteidl.core.Sql.Dialect:
+
+Sql.Dialect
+------------------------------------------------------------------
+
+The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid
+expensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.
+We support the following dialect: ansi, hive.
+
+.. csv-table:: Enum Sql.Dialect values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "UNDEFINED", "0", ""
+   "ANSI", "1", ""
+   "HIVE", "2", ""
+   "OTHER", "3", ""
 
  
 
@@ -2372,6 +2415,46 @@ Define a set of simple types.
    "BINARY", "7", ""
    "ERROR", "8", ""
    "STRUCT", "9", ""
+
+ 
+
+ 
+
+ 
+
+
+
+
+.. _ref_flyteidl/core/workflow_closure.proto:
+
+flyteidl/core/workflow_closure.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.core.WorkflowClosure:
+
+WorkflowClosure
+------------------------------------------------------------------
+
+Defines an enclosed package of workflow and tasks it references.
+
+
+
+.. csv-table:: WorkflowClosure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
+   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
+
+
+
+
+
+ 
 
  
 
@@ -2692,46 +2775,6 @@ Failure Handling Strategy
 
    "FAIL_IMMEDIATELY", "0", "FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It&#39;ll automatically abort all currently running nodes and clean up resources before finally marking the workflow executions as failed."
    "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE", "1", "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will not alter the dependencies of the execution graph so any node that depend on the failed node will not be run. Other nodes that will be executed to completion before cleaning up resources and marking the workflow execution as failed."
-
- 
-
- 
-
- 
-
-
-
-
-.. _ref_flyteidl/core/workflow_closure.proto:
-
-flyteidl/core/workflow_closure.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.core.WorkflowClosure:
-
-WorkflowClosure
-------------------------------------------------------------------
-
-Defines an enclosed package of workflow and tasks it references.
-
-
-
-.. csv-table:: WorkflowClosure type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
-   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
-
-
-
-
-
- 
 
  
 
