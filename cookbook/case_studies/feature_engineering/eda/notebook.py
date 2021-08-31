@@ -15,7 +15,8 @@ from flytekit import Resources, kwtypes, workflow
 from flytekitplugins.papermill import NotebookTask
 
 # %%
-# We define a ``NotebookTask`` to run the Jupyter notebook.
+# We define a ``NotebookTask`` to run the `Jupyter notebook 
+# <https://github.com/flyteorg/flytesnacks/blob/master/cookbook/case_studies/feature_engineering/eda/supermarket_regression.ipynb>`__.
 #
 # .. list-table:: ``NotebookTask`` Parameters
 #    :widths: 25 25
