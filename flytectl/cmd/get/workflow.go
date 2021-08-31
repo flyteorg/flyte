@@ -114,10 +114,10 @@ func WorkflowToTableProtoMessages(l []*admin.Workflow) []proto.Message {
 			if m.Closure.CompiledWorkflow.Primary != nil {
 				if m.Closure.CompiledWorkflow.Primary.Template != nil {
 					if m.Closure.CompiledWorkflow.Primary.Template.Interface != nil {
-						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil {
+						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables != nil {
 							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables)
 						}
-						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil {
+						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables != nil {
 							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables)
 						}
 					}

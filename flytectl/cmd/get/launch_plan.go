@@ -132,7 +132,7 @@ func LaunchplanToTableProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 			if m.Closure.ExpectedInputs != nil {
 				printer.FormatParameterDescriptions(m.Closure.ExpectedInputs.Parameters)
 			}
-			if m.Closure.ExpectedOutputs != nil {
+			if m.Closure.ExpectedOutputs != nil && m.Closure.ExpectedOutputs.Variables != nil {
 				printer.FormatVariableDescriptions(m.Closure.ExpectedOutputs.Variables)
 			}
 		}
