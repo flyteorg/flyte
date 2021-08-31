@@ -6,6 +6,9 @@ userSettings:
   rdsHost: <RDS_HOST>
   bucketName: <BUCKET_NAME>
   logGroup: <LOG_GROUP_NAME>
+  redisHostUrl: <REDIS_HOST_URL>
+  redisHostKey: <REDIS_HOST_KEY>
+
 
 #
 # FLYTEADMIN
@@ -276,6 +279,18 @@ configmap:
           rate: 100
           capacity: 1000
 
+  # -- Resource manager configuration
+  resource_manager:
+    # -- resource manager configuration
+    propeller:
+      resourcemanager:
+        type:
+
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: "{{ .Values.userSettings.redisHostUrl }}"
+          hostKey: "{{ .Values.userSettings.redisHostKey }}"
+
   enabled_plugins:
     # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
     tasks:
@@ -286,20 +301,14 @@ configmap:
         enabled-plugins:
           - container
           - sidecar
-          - spark
           - k8s-array
-          - pytorch
-          - athena
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training
         default-for-task-types:
           container: container
           sidecar: sidecar
-          spark: spark
           container_array: k8s-array
-          pytorch: pytorch
-          hive: athena
   #          sagemaker_custom_training_task: sagemaker_custom_training
   #          sagemaker_custom_training_job_task: sagemaker_custom_training
 
@@ -436,68 +445,12 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
-    # -- Template for spark role
-    - key: ad_spark_role
-      value: |
-        apiVersion: rbac.authorization.k8s.io/v1beta1
-        kind: Role
-        metadata:
-          name: spark-role
-          namespace: {{ namespace }}
-        rules:
-        - apiGroups:
-          - ""
-          resources:
-          - pods
-          verbs:
-          - '*'
-        - apiGroups:
-          - ""
-          resources:
-          - services
-          verbs:
-          - '*'
-        - apiGroups:
-          - ""
-          resources:
-          - configmaps
-          verbs:
-          - '*'
-
-    # -- Template for spark SA
-    - key: ae_spark_service_account
-      value: |
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: spark
-          namespace: {{ namespace }}
-          annotations:
-            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
-
-    # -- Template for spark role binding
-    - key: af_spark_role_binding
-      value: |
-        apiVersion: rbac.authorization.k8s.io/v1beta1
-        kind: RoleBinding
-        metadata:
-          name: spark-role-binding
-          namespace: {{ namespace }}
-        roleRef:
-          apiGroup: rbac.authorization.k8s.io
-          kind: Role
-          name: spark-role
-        subjects:
-        - kind: ServiceAccount
-          name: spark
-          namespace: {{ namespace }}
-
 #
 # SPARKOPERATOR
 #
 
 sparkoperator:
-  enabled: true
+  enabled: false
 
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
