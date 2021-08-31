@@ -284,8 +284,7 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type:
-
+        type: redis
         resourceMaxQuota: 10000
         redis:
           hostPath: "{{ .Values.userSettings.redisHostUrl }}"
