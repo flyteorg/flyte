@@ -119,10 +119,10 @@ func TaskToTableProtoMessages(l []*admin.Task) []proto.Message {
 		if m.Closure != nil && m.Closure.CompiledTask != nil {
 			if m.Closure.CompiledTask.Template != nil {
 				if m.Closure.CompiledTask.Template.Interface != nil {
-					if m.Closure.CompiledTask.Template.Interface.Inputs != nil {
+					if m.Closure.CompiledTask.Template.Interface.Inputs != nil && m.Closure.CompiledTask.Template.Interface.Inputs.Variables != nil {
 						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Inputs.Variables)
 					}
-					if m.Closure.CompiledTask.Template.Interface.Outputs != nil {
+					if m.Closure.CompiledTask.Template.Interface.Outputs != nil && m.Closure.CompiledTask.Template.Interface.Outputs.Variables != nil {
 						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Outputs.Variables)
 					}
 				}
