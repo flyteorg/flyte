@@ -7,6 +7,7 @@ export const dashedValueString = '----';
 export const noDescriptionString = '(No description)';
 export const noneString = '(none)';
 export const noExecutionsFoundString = 'No executions found.';
+export const noWorkflowVersionsFoundString = 'No workflow versions found.';
 export const zeroSecondsString = '0s';
 
 export enum KeyCodes {

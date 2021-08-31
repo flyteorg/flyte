@@ -3,6 +3,7 @@ import {
     NodeExecution,
     NodeExecutionIdentifier
 } from 'models/Execution/types';
+import { Workflow } from 'models/Workflow/types';
 
 export interface WorkflowExecutionsTableState {
     selectedIOExecution: Execution | null;
@@ -36,4 +37,13 @@ export interface WorkflowExecutionCellRendererData {
 }
 export type WorkflowExecutionColumnDefinition = ColumnDefinition<
     WorkflowExecutionCellRendererData
+>;
+
+export interface WorkflowVersionCellRendererData {
+    workflow: Workflow;
+    state: WorkflowExecutionsTableState;
+}
+
+export type WorkflowVersionColumnDefinition = ColumnDefinition<
+    WorkflowVersionCellRendererData
 >;

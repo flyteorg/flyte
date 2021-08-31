@@ -11,6 +11,7 @@ import { entitySections } from './constants';
 import { EntityDetailsHeader } from './EntityDetailsHeader';
 import { EntityExecutions } from './EntityExecutions';
 import { EntitySchedules } from './EntitySchedules';
+import { EntityVersions } from './EntityVersions';
 
 const useStyles = makeStyles((theme: Theme) => ({
     metadataContainer: {
@@ -28,6 +29,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         flex: '1 1 auto',
         flexDirection: 'column',
         margin: `0 -${theme.spacing(contentMarginGridUnits)}px`
+    },
+    versionsContainer: {
+        display: 'flex',
+        flex: '1 1 auto',
+        flexDirection: 'column'
     },
     schedulesContainer: {
         flex: '1 2 auto',
@@ -79,6 +85,11 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({ id }) => {
                     </div>
                 ) : null}
             </div>
+            {sections.versions ? (
+                <div className={styles.versionsContainer}>
+                    <EntityVersions id={id} />
+                </div>
+            ) : null}
             {sections.executions ? (
                 <div className={styles.executionsContainer}>
                     <EntityExecutions id={id} />

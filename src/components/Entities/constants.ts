@@ -33,6 +33,7 @@ export interface EntitySectionsFlags {
     executions?: boolean;
     launch?: boolean;
     schedules?: boolean;
+    versions?: boolean;
 }
 
 export const entitySections: { [k in ResourceType]: EntitySectionsFlags } = {
@@ -49,6 +50,9 @@ export const entitySections: { [k in ResourceType]: EntitySectionsFlags } = {
         description: true,
         executions: true,
         launch: true,
-        schedules: true
+        schedules: true,
+        versions: true
     }
 };
+
+export const WorkflowVersionsTablePageSize = 5;

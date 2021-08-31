@@ -21,3 +21,10 @@ export const titleStrings = {
     expandRow: 'Expand row',
     groupName: 'Group name'
 };
+
+export const workflowVersionsTableColumnWidths = {
+    name: 380,
+    release: 150,
+    lastRun: 175,
+    createdAt: 260
+};

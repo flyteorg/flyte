@@ -10,7 +10,8 @@ import {
 } from 'components/Theme/constants';
 import {
     nodeExecutionsTableColumnWidths,
-    workflowExecutionsTableColumnWidths
+    workflowExecutionsTableColumnWidths,
+    workflowVersionsTableColumnWidths
 } from './constants';
 
 export const selectedClassName = 'selected';
@@ -186,5 +187,25 @@ export const useWorkflowExecutionsColumnStyles = makeStyles((theme: Theme) => ({
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         textAlign: 'left'
+    }
+}));
+
+/** Style overrides specific to columns in `WorkflowVersionsTable`. */
+export const useWorkflowVersionsColumnStyles = makeStyles((theme: Theme) => ({
+    columnName: {
+        flexBasis: workflowVersionsTableColumnWidths.name,
+        whiteSpace: 'normal'
+    },
+    columnRelease: {
+        flexBasis: workflowVersionsTableColumnWidths.release
+    },
+    columnCreatedAt: {
+        flexBasis: workflowVersionsTableColumnWidths.createdAt
+    },
+    columnLastRun: {
+        flexBasis: workflowVersionsTableColumnWidths.lastRun
+    },
+    columnRecentRun: {
+        flexGrow: 1
     }
 }));
