@@ -445,6 +445,12 @@ Search and replace the following
    * - ``<CERTIFICATE_ARN>``
      - ARN of the self-signed (or official) certificate
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
+   * - ``<REDIS_HOST_URL>``
+     - DNS entry for your redis instance
+     - ``redis-resource-manager:6379``
+   * - ``<REDIS_HOST_KEY>``
+     - The password in plaintext for your Redis instance
+     - ``mypassword``
 
 #. Install Flyte
 

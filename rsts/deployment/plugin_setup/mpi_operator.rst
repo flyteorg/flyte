@@ -3,7 +3,7 @@
 MPI Operator Setup
 ------------------------
 
-.. _install-mpi-appendix:
+.. _mpi-operator:
 
 ##############
 Install MPI Operator
@@ -27,7 +27,7 @@ Install MPI Operator
 
    kustomize build overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
 
-Create a values-mpi.yaml
+Create a file values-mpi.yaml and add the below values
 
 .. code-block::
 
