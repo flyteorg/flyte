@@ -3416,7 +3416,7 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
-        - name: auth
+        - name: common-auth
           secret:
             secretName: flyte-common-auth
         - configMap:
