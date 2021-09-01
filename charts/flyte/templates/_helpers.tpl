@@ -192,7 +192,7 @@ storage:
   stow:
     kind: google
     config:
-      json: ""
+      json: {{ .Values.storage.gcs.serviceAccountKey }}
       project_id: {{ .Values.storage.gcs.projectId }}
       scopes: https://www.googleapis.com/auth/devstorage.read_write
   container: {{ .Values.storage.bucketName | quote }}

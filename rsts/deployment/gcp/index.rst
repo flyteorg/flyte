@@ -11,7 +11,7 @@ This guide helps you set up Flyte from scratch, on GCE, without using an automat
 
 Prerequisites
 =============
-* Access to [GCE console](https://console.cloud.google.com/)
+* Access to `GCE console <https://console.cloud.google.com/>`__
 * A domain name for the Flyte installation like flyte.example.org that allows you to set a DNS A record.
 
 Before you begin, please ensure that you have the following tools installed.
@@ -24,7 +24,8 @@ Create GCE Project
 ==================
 .. code-block::
 
-  gcloud create project <my-project>
+  export GCP_PROJECT=<my-project>
+  gcloud create project $GCP_PROJECT
 
 Of course you can also use an existing project if your account has appropriate permissions to create the required resources.
 
@@ -32,7 +33,7 @@ Set project <my-project> as default in gcloud:
 
 .. code-block::
 
-  gcloud config set project <my-project>
+  gcloud config set project ${GCP_PROJECT}
 
 We assume that for the <my-project> has been set as default for all gcloud commands below.
 
@@ -43,48 +44,51 @@ Configure `workload identity <https://cloud.google.com/kubernetes-engine/docs/ho
 
 .. code-block:: bash
 
-  gcloud iam service-accounts create flyte
+  gcloud iam service-accounts create flyteadmin
+  gcloud iam service-accounts create flyte-datacatalog
+  gcloud iam service-accounts create flytepropeller
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:<my-project>.svc.id.goog[flyte/flyteadmin]" \
-    flyte@<my-project>.iam.gserviceaccount.com
+    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flyteadmin]" \
+    flyteadmin@${GCP_PROJECT}.iam.gserviceaccount.com
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:<my-project>.svc.id.goog[flyte/datacatalog]" \
-    flyte@<my-project>.iam.gserviceaccount.com
+    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/datacatalog]" \
+    flyte-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:<my-project>.svc.id.goog[flyte/flytepropeller]" \
-    flyte@<my-project>.iam.gserviceaccount.com
+    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flytepropeller]" \
+    flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
 
 Create GKE Cluster
 ==================
 .. code-block::
 
   gcloud container clusters create <my-flyte-cluster> \
+    --workload-pool=${GCP_PROJECT}.svc.id.goog
     --region us-west1 \
     --num-nodes 1
 
 Create Cloud SQL Database
 =========================
-Next create a relational `Cloud SQL for PostgreSQL https://cloud.google.com/sql/docs/postgres/introduction` database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
+Next create a relational `Cloud SQL for PostgreSQL <https://cloud.google.com/sql/docs/postgres/introduction>`__ database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
 
-.. code-block::
-  gcloud sql instances create <myinstance> \
+.. code-block:: bash
+
+  gcloud sql instances create <my-flyte-db> \
     --database-version=POSTGRES_13 \
     --cpu=1 \
     --memory=3840MB \
-    --region=us-
+    --region=us-west1
     
 TODO get DB password
 
 SSL Certificate
 ===============
-In order to use SSL (which we need to use gRPC clients), we next need to create an SSL certificate. We'll use [Google-managed SSL certificates](
-https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs)
+In order to use SSL (which we need to use gRPC clients), we next need to create an SSL certificate. We'll use `Google-managed SSL certificates <https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs>`__
 
 Save the following certificate resource definition as `flyte-certificate.yaml`:
 
@@ -120,6 +124,7 @@ Create GCS Bucket
 =================
 
 .. code-block:: bash
+
   gsutil mb -b on -l us-west1 gs://my-flyte-bucket/
 
 TODO bucket permissions
@@ -201,7 +206,6 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
     admin:
      # For GRPC endpoints you might want to use dns:///flyte.myexample.com
      endpoint: dns:///<FLYTE-ENDPOINT>
-     insecureSkipVerify: true # only required if using a self-signed cert. Caution: not to be used in production
      insecure: true
     logger:
      show-source: true
