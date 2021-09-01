@@ -13,6 +13,8 @@ ENV PYTHONPATH /root
 # Install the AWS cli for AWS support
 RUN pip install awscli
 
+RUN apt-get update && apt-get install -y make build-essential libssl-dev curl
+
 # Virtual environment
 ENV VENV /opt/venv
 RUN python3 -m venv ${VENV}

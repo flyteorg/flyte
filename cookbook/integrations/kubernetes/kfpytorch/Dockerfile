@@ -5,6 +5,8 @@ WORKDIR /root
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONPATH /root
+ENV DEBIAN_FRONTEND noninteractive
+ENV TERM linux
 
 # Install basics
 RUN apt-get update && apt-get install -y make build-essential libssl-dev curl

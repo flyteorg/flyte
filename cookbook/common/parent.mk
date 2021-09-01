@@ -47,6 +47,7 @@ serialize: ## Builds and serializes all docker images, workflows and tasks in al
 docker_push: ## Builds and pushes all docker images.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
+		test -f $$dir/Dockerfile && \
 		test -f $$dir/Makefile && \
 		$(MAKE) -C $$dir docker_push; \
 	done
