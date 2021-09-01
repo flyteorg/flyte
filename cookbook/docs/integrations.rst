@@ -49,6 +49,9 @@ Flyte is designed to be highly extensible and can be customized in multiple ways
     - `flytekit <https://github.com/flyteorg/flytekit>`_: Flyte Python SDK
     - `flytekit-java <https://github.com/spotify/flytekit-java>`_: Flyte Java/SCALA SDK
 
+
+.. _enable-backend-plugins:
+
 Enabling Backend Plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 To enable a backend plugin you have to add the ``ID`` of the plugin to the enabled plugins list. The ``enabled-plugins`` is available under the ``tasks > task-plugins`` section of FlytePropeller's configuration.
