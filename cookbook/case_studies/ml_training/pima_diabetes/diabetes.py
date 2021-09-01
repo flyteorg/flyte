@@ -1,10 +1,10 @@
 """
 Train and Validate a Diabetes Classification XGBoost Model
 -----------------------------------------------------------
-# %%
-# Watch a demo of sandbox creation and a sample execution of the pima diabetes pipeline below.
-#
-# ..  youtube:: YEvs0MHXZnY
+
+Watch a demo of sandbox creation and a sample execution of the pima diabetes pipeline below.
+
+..  youtube:: YEvs0MHXZnY
 
 """
 import typing
