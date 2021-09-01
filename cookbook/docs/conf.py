@@ -175,6 +175,7 @@ extensions = [
     "sphinx_panels",
     "sphinx_tabs.tabs",
     "sphinxcontrib.mermaid",
+    "sphinxcontrib.yt",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
