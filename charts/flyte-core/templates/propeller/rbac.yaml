@@ -1,0 +1,98 @@
+
+---
+{{- if .Values.flytepropeller.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+  {{- with .Values.flytepropeller.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end}}
+{{- with .Values.flytepropeller.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "flytepropeller.name" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+rules:
+# Allow RO access to PODS
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# Allow Event recording access
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access All plugin objects
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access to CRD
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+# Allow Access to all resources under flyte.lyft.com
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  - flyteworkflows/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "flytepropeller.name" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "flytepropeller.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}

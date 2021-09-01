@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datacatalog-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "datacatalog.labels" . | nindent 4 }}
+data:
+{{- with .Values.db }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.logger }}
+  logger.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.datacatalogServer }}
+  server.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
+
