@@ -8,6 +8,7 @@ resources:
   - ../../admindeployment
   - ../../datacatalog
   - ../../wf_crd
+  - ../../pod_webhook
   - ../../propeller
   - ../../adminserviceaccount
 

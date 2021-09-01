@@ -1,0 +1,41 @@
+# Create a ClusterRole for the webhook
+# https://kubernetes.io/docs/admin/authorization/rbac/
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+rules:
+  - apiGroups:
+      - "*"
+    resources:
+      - mutatingwebhookconfigurations
+      - secrets
+      - pods
+    verbs:
+      - get
+      - create
+      - update
+      - patch
+---
+# Create a Service Account for webhook
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+# Create a binding from Role -> ServiceAccount
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+  - kind: ServiceAccount
+    name: flyte-pod-webhook
+    namespace: flyte
