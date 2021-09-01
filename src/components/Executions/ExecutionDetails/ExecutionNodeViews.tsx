@@ -44,6 +44,9 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
     const filterState = useNodeExecutionFiltersState();
     const tabState = useTabState(tabs, tabs.nodes.id);
     const [graphStateReady, setGraphStateReady] = useState(false);
+    const {
+        closure: { abortMetadata }
+    } = execution;
 
     /* We want to maintain the filter selection when switching away from the Nodes
     tab and back, but do not want to filter the nodes when viewing the graph. So,
@@ -60,7 +63,10 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
         <NodeExecutionsRequestConfigContext.Provider
             value={nodeExecutionsRequestConfig}
         >
-            <NodeExecutionsTable nodeExecutions={nodeExecutions} />
+            <NodeExecutionsTable
+                abortMetadata={abortMetadata ?? undefined}
+                nodeExecutions={nodeExecutions}
+            />
         </NodeExecutionsRequestConfigContext.Provider>
     );
 

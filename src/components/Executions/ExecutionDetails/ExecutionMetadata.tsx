@@ -66,7 +66,13 @@ export const ExecutionMetadata: React.FC<{
     const styles = useStyles();
 
     const { domain } = execution.id;
-    const { duration, error, startedAt, workflowId } = execution.closure;
+    const {
+        abortMetadata,
+        duration,
+        error,
+        startedAt,
+        workflowId
+    } = execution.closure;
     const { referenceExecution, systemMetadata } = execution.spec.metadata;
     const cluster = systemMetadata?.executionCluster ?? dashedValueString;
 
@@ -134,7 +140,12 @@ export const ExecutionMetadata: React.FC<{
                 ))}
             </div>
 
-            {error ? <ExpandableExecutionError error={error} /> : null}
+            {error || abortMetadata ? (
+                <ExpandableExecutionError
+                    abortMetadata={abortMetadata ?? undefined}
+                    error={error}
+                />
+            ) : null}
         </div>
     );
 };

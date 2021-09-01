@@ -35,7 +35,7 @@ export const WorkflowExecutionRow: React.FC<WorkflowExecutionRowProps> = ({
     state,
     style
 }) => {
-    const { error } = execution.closure;
+    const { abortMetadata, error } = execution.closure;
     const tableStyles = useExecutionTableStyles();
     const styles = useStyles();
 
@@ -61,11 +61,12 @@ export const WorkflowExecutionRow: React.FC<WorkflowExecutionRowProps> = ({
                     </div>
                 ))}
             </div>
-            {error ? (
+            {error || abortMetadata ? (
                 <ExpandableExecutionError
                     onExpandCollapse={onExpandCollapseError}
                     initialExpansionState={errorExpanded}
                     error={error}
+                    abortMetadata={abortMetadata ?? undefined}
                 />
             ) : null}
         </div>

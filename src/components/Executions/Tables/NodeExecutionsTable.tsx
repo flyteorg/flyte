@@ -1,4 +1,5 @@
 import * as classnames from 'classnames';
+import { Admin } from 'flyteidl';
 import { getCacheKey } from 'components/Cache/utils';
 import { DetailsPanel } from 'components/common/DetailsPanel';
 import { useCommonStyles } from 'components/common/styles';
@@ -14,6 +15,7 @@ import { NoExecutionsContent } from './NoExecutionsContent';
 import { useColumnStyles, useExecutionTableStyles } from './styles';
 
 export interface NodeExecutionsTableProps {
+    abortMetadata?: Admin.IAbortMetadata;
     nodeExecutions: NodeExecution[];
 }
 
@@ -25,6 +27,7 @@ const scrollbarPadding = scrollbarSize();
  * TaskExecutions
  */
 export const NodeExecutionsTable: React.FC<NodeExecutionsTableProps> = ({
+    abortMetadata,
     nodeExecutions
 }) => {
     const [
@@ -65,6 +68,7 @@ export const NodeExecutionsTable: React.FC<NodeExecutionsTableProps> = ({
                 return (
                     <NodeExecutionRow
                         {...rowProps}
+                        abortMetadata={abortMetadata}
                         index={index}
                         key={cacheKey}
                         execution={nodeExecution}

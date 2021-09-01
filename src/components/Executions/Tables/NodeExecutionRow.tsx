@@ -1,4 +1,5 @@
 import { CircularProgress, IconButton } from '@material-ui/core';
+import { Admin } from 'flyteidl';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import * as classnames from 'classnames';
 import { useTheme } from 'components/Theme/useTheme';
@@ -16,6 +17,7 @@ import { selectedClassName, useExecutionTableStyles } from './styles';
 import { calculateNodeExecutionRowLeftSpacing } from './utils';
 
 interface NodeExecutionRowProps {
+    abortMetadata?: Admin.IAbortMetadata;
     index: number;
     execution: NodeExecution;
     level?: number;
@@ -42,6 +44,7 @@ const ChildFetchErrorIcon: React.FC<{
 
 /** Renders a NodeExecution as a row inside a `NodeExecutionsTable` */
 export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
+    abortMetadata,
     execution: nodeExecution,
     index,
     level = 0,
@@ -88,7 +91,7 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
     ) : null;
 
     const errorContent = error ? (
-        <ExpandableExecutionError error={error} />
+        <ExpandableExecutionError error={error} abortMetadata={abortMetadata} />
     ) : null;
 
     const extraContent = expanded ? (
@@ -98,6 +101,7 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
             })}
         >
             <NodeExecutionChildren
+                abortMetadata={abortMetadata}
                 childGroups={childGroups}
                 level={level + 1}
             />
