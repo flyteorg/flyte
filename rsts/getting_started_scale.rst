@@ -100,7 +100,7 @@ Install flytectl
 
      .. prompt:: bash $
 
-         # flytectl config init --host={FLYTEADMIN_URL} --storage
+         flytectl config init --host={FLYTEADMIN_URL} --storage
 
 
 Build & Deploy Your Application to the Cluster
