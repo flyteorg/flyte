@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     versionsContainer: {
         display: 'flex',
-        flex: '1 1 auto',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        height: theme.spacing(45)
     },
     schedulesContainer: {
         flex: '1 2 auto',
