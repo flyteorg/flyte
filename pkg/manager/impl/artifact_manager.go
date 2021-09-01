@@ -161,7 +161,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.
 
 		if err != nil {
 			if errors.IsDoesNotExistError(err) {
-				logger.Warnf(ctx, "Artifact does not exist tag: %+v, err %v", request.GetTagName(), err)
+				logger.Infof(ctx, "Artifact does not exist tag: %+v, err %v", request.GetTagName(), err)
 				m.systemMetrics.doesNotExistCounter.Inc(ctx)
 			} else {
 				logger.Errorf(ctx, "Unable to retrieve Artifact by tag %v, err: %v", request.GetTagName(), err)
