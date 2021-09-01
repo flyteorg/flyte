@@ -239,9 +239,9 @@ def sum_diff(a: float, b: float) -> float:
 #   A useful mental model for consuming outputs of conditions is to think of them like ternary operators in programming
 #   languages. The only difference being they can be n-ary. In python this is equivalent to
 #
-#       .. code-block:: python
+#   .. code-block:: python
 #
-#           x = 0 if m < 0 else 1
+#      x = 0 if m < 0 else 1
 @workflow
 def consume_outputs(my_input: float, seed: int = 5) -> float:
     is_heads = coin_toss(seed=seed)
@@ -261,5 +261,7 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
 # %%
 # As usual local execution does not change
 if __name__ == "__main__":
-    print(f"consume_outputs(0.4) with default seed=5. This should return output of sum_diff => {consume_outputs(my_input=0.4)}")
-    print(f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}")
+    print(
+        f"consume_outputs(0.4) with default seed=5. This should return output of sum_diff => {consume_outputs(my_input=0.4)}")
+    print(
+        f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}")

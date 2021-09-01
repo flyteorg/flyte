@@ -36,37 +36,37 @@ def no_io_wf():
 # `AWS docs <https://docs.aws.amazon.com/quicksight/latest/user/create-a-data-set-athena.html>`__.
 # The data is formatted according to this schema:
 #
-#     +----------------------------------------------+
-#     | country (string)                             |
-#     +----------------------------------------------+
-#     | iso_code (string)                            |
-#     +----------------------------------------------+
-#     | date (string)                                |
-#     +----------------------------------------------+
-#     | total_vaccinations (string)                  |
-#     +----------------------------------------------+
-#     | people_vaccinated (string)                   |
-#     +----------------------------------------------+
-#     | people_fully_vaccinated (string)             |
-#     +----------------------------------------------+
-#     | daily_vaccinations_raw (string)              |
-#     +----------------------------------------------+
-#     | daily_vaccinations (string)                  |
-#     +----------------------------------------------+
-#     | total_vaccinations_per_hundred (string)      |
-#     +----------------------------------------------+
-#     | people_vaccinated_per_hundred (string)       |
-#     +----------------------------------------------+
-#     | people_fully_vaccinated_per_hundred (string) |
-#     +----------------------------------------------+
-#     | daily_vaccinations_per_million (string)      |
-#     +----------------------------------------------+
-#     | vaccines (string)                            |
-#     +----------------------------------------------+
-#     | source_name (string)                         |
-#     +----------------------------------------------+
-#     | source_website (string)                      |
-#     +----------------------------------------------+
+# +----------------------------------------------+
+# | country (string)                             |
+# +----------------------------------------------+
+# | iso_code (string)                            |
+# +----------------------------------------------+
+# | date (string)                                |
+# +----------------------------------------------+
+# | total_vaccinations (string)                  |
+# +----------------------------------------------+
+# | people_vaccinated (string)                   |
+# +----------------------------------------------+
+# | people_fully_vaccinated (string)             |
+# +----------------------------------------------+
+# | daily_vaccinations_raw (string)              |
+# +----------------------------------------------+
+# | daily_vaccinations (string)                  |
+# +----------------------------------------------+
+# | total_vaccinations_per_hundred (string)      |
+# +----------------------------------------------+
+# | people_vaccinated_per_hundred (string)       |
+# +----------------------------------------------+
+# | people_fully_vaccinated_per_hundred (string) |
+# +----------------------------------------------+
+# | daily_vaccinations_per_million (string)      |
+# +----------------------------------------------+
+# | vaccines (string)                            |
+# +----------------------------------------------+
+# | source_name (string)                         |
+# +----------------------------------------------+
+# | source_website (string)                      |
+# +----------------------------------------------+
 #
 # Let's look out how we can parameterize our query to filter results for a specific country, provided as a user input
 # specifying a country iso code.

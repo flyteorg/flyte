@@ -22,23 +22,23 @@ from flytekit.types.schema import FlyteSchema
 # Next, we define the reference tasks. A :py:func:`flytekit.reference_task` references the Flyte tasks that have already been defined, serialized, and registered.
 # The primary advantage of using a reference task is to reduce the redundancy; we needn't define the task(s) again if we have multiple datasets that need to be feature-engineered.
 #
-#  .. note::
+# .. note::
 #
-#     The Macro ``{{ registration.version }}`` is filled during the registration time by `flytectl register`. This is usually not required for using reference tasks, you should
-#     ideally bind to a specific version of the entity - task / launchplan. But, in the case of this example, we are registering both the actual task ``sqlite_datacleaning.tasks.mean_median_imputer`` and
-#     and the workflow that references it. Thus we want it to actually be updated to the version of a specific release of FlyteSnacks. This is why we use the ``{{ registration.version }}`` macro.
-#     A typical example of reference task would look more like
+#    The Macro ``{{ registration.version }}`` is filled during the registration time by `flytectl register`. This is usually not required for using reference tasks, you should
+#    ideally bind to a specific version of the entity - task / launchplan. But, in the case of this example, we are registering both the actual task ``sqlite_datacleaning.tasks.mean_median_imputer`` and
+#    and the workflow that references it. Thus we want it to actually be updated to the version of a specific release of FlyteSnacks. This is why we use the ``{{ registration.version }}`` macro.
+#    A typical example of reference task would look more like
 #
-#     .. code-block:: python
+#    .. code-block:: python
 #
-#          @reference_task(
-#               project="flytesnacks",
-#               domain="development",
-#               name="sqlite_datacleaning.tasks.mean_median_imputer",
-#               version="d06cebcfbeabc02b545eefa13a01c6ca992940c8", # If using GIT for versioning OR 0.16.0 is using semver
-#           )
-#           def mean_median_imputer()
-#               ...
+#       @reference_task(
+#            project="flytesnacks",
+#            domain="development",
+#            name="sqlite_datacleaning.tasks.mean_median_imputer",
+#            version="d06cebcfbeabc02b545eefa13a01c6ca992940c8", # If using GIT for versioning OR 0.16.0 is using semver
+#        )
+#        def mean_median_imputer()
+#            ...
 #
 @reference_task(
     project="flytesnacks",
