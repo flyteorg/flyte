@@ -495,7 +495,7 @@ data:
           hostKey: mypassword
           hostPath: redis-resource-manager:6379
         resourceMaxQuota: 10000
-        type: redis
+        type: noop
   spark.yaml: | 
     plugins:
       spark:
@@ -3513,7 +3513,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
+        configChecksum: "3413b76dbd585dbaafc0f91cc55e2a8e4fa98e65074c0ca510782c961cfa62f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3578,7 +3578,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.13.4
       annotations:
-        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
+        configChecksum: "3413b76dbd585dbaafc0f91cc55e2a8e4fa98e65074c0ca510782c961cfa62f"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
