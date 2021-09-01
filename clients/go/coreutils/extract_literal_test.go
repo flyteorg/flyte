@@ -5,6 +5,7 @@ package coreutils
 
 import (
 	"testing"
+	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -19,6 +20,24 @@ func TestFetchLiteral(t *testing.T) {
 		val, err := ExtractFromLiteral(lit)
 		assert.NoError(t, err)
 		assert.Equal(t, "test_string", val)
+	})
+
+	t.Run("Timestamp", func(t *testing.T) {
+		now := time.Now().UTC()
+		lit, err := MakeLiteral(now)
+		assert.NoError(t, err)
+		val, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, now, val)
+	})
+
+	t.Run("Duration", func(t *testing.T) {
+		duration := time.Second * 10
+		lit, err := MakeLiteral(duration)
+		assert.NoError(t, err)
+		val, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, duration, val)
 	})
 
 	t.Run("Array", func(t *testing.T) {
