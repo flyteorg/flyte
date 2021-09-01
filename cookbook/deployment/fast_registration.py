@@ -1,4 +1,6 @@
 """
+.. _deployment-fast-registration:
+
 #################
 Fast Registration
 #################

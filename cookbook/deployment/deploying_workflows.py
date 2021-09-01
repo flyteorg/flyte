@@ -1,11 +1,19 @@
 """
-Deploying Workflows
---------------------
+Deploying Workflows - Registration
+-----------------------------------
 
 Locally, Flytekit relies on the Python interpreter to execute both tasks and workflows.
 To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
 on any Kubernetes cluster (e.g. a local cluster like `kind <https://kind.sigs.k8s.io/>`__), in a cloud environment,
-or on-prem.
+or on-prem. This process of deploying your workflows to a Flyte cluster is called as Registration. It involves the
+following steps,
+
+1. Writing code, SQL etc
+2. Providing packaging in the form of Docker images, for code, when needed. Some cases you dont need packaging,
+   because the code itself is portable - example SQL, or the task references a remote service - Sagemaker Builtin
+   algorithms, or the code can be safely transferred over
+3. Alternatively, package with :ref:`deployment-fast-registration`
+4. Register the serialized workflows and tasks
 
 Using remote Flyte gives you the ability to:
 
