@@ -2494,8 +2494,6 @@ kind: Secret
 metadata:
   name: flyte-propeller-auth
   namespace: flyte
-stringData:
-  client_secret: foobar
 type: Opaque
 ---
 apiVersion: v1
