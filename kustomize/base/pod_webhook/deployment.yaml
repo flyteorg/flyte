@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  labels:
+    app: flyte-pod-webhook
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: 0.5.13
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: flyte-pod-webhook
+      initContainers:
+        - name: generate-secrets
+          image: flytepropeller:v0.5.13
+          imagePullPolicy: IfNotPresent
+          command:
+            - flytepropeller
+          args:
+            - webhook
+            - init-certs
+            - --config
+            - /etc/flyte/config/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+      containers:
+        - name: webhook
+          image: flytepropeller:v0.5.13
+          imagePullPolicy: IfNotPresent
+          command:
+            - flytepropeller
+          args:
+            - webhook
+            - --config
+            - /etc/flyte/config/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+              readOnly: true
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: flyte-propeller-config
+        - name: webhook-certs
+          secret:
+            secretName: flyte-pod-webhook
