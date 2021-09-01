@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/go-test/deep"
 
 	"github.com/golang/protobuf/proto"
@@ -68,6 +70,22 @@ func Test_cacheFlyteWorkflow(t *testing.T) {
 				DeprecatedConnections: v1alpha1.DeprecatedConnections{
 					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
 					UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
+				},
+			},
+			ExecutionConfig: v1alpha1.ExecutionConfig{
+				TaskResources: v1alpha1.TaskResources{
+					Requests: v1alpha1.TaskResourceSpec{
+						CPU:              resource.MustParse("1"),
+						Memory:           resource.MustParse("1"),
+						Storage:          resource.MustParse("1"),
+						EphemeralStorage: resource.MustParse("1"),
+					},
+					Limits: v1alpha1.TaskResourceSpec{
+						CPU:              resource.MustParse("1"),
+						Memory:           resource.MustParse("1"),
+						Storage:          resource.MustParse("1"),
+						EphemeralStorage: resource.MustParse("1"),
+					},
 				},
 			},
 		}

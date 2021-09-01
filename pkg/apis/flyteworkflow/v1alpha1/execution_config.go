@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
@@ -24,9 +25,29 @@ type ExecutionConfig struct {
 	MaxParallelism uint32
 	// Defines execution behavior for processing nodes.
 	RecoveryExecution WorkflowExecutionIdentifier
+	// Defines the resource requests and limits specified for tasks run as part of this execution that ought to be
+	// applied at execution time.
+	TaskResources TaskResources
 }
 
 type TaskPluginOverride struct {
 	PluginIDs             []string
 	MissingPluginBehavior admin.PluginOverride_MissingPluginBehavior
+}
+
+// Defines a set of configurable resources of different types that a task can request or apply as limits.
+type TaskResourceSpec struct {
+	CPU              resource.Quantity
+	Memory           resource.Quantity
+	EphemeralStorage resource.Quantity
+	Storage          resource.Quantity
+}
+
+// Defines the complete closure of compute resources a task can request and apply as limits.
+type TaskResources struct {
+	// If the node where a task is running has enough of a resource available, a
+	// container may use more resources than its request for that resource specifies.
+	Requests TaskResourceSpec
+	// A hard limit, a task cannot consume resources greater than the limit specifies.
+	Limits TaskResourceSpec
 }
