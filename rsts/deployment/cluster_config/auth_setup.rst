@@ -214,14 +214,18 @@ Apply Configuration
 
       kubectl edit secret -n flyte flyte-propeller-auth
 
-   Add a new key under `stringData`:
+   Create the `stringData` block if one does not already exist, and add the `client_secret` key under it, as follows:
 
    .. code-block:: yaml
 
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        ...
+      type: Opaque
       stringData:
         client_secret: <client_secret> from the previous step
-      data:
-        ...
+      ...
 
    Save and close your editor.
 
