@@ -2,9 +2,6 @@ package errors
 
 import (
 	"fmt"
-	"reflect"
-
-	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/jackc/pgconn"
 
@@ -25,7 +22,7 @@ type postgresErrorTransformer struct {
 const (
 	unexpectedType            = "unexpected error type for: %v"
 	uniqueConstraintViolation = "value with matching already exists (%s)"
-	defaultPgError            = "failed database operation with code [%s] and msg [%s]"
+	defaultPgError            = "failed database operation with %s"
 	unsupportedTableOperation = "cannot query with specified table attributes: %s"
 )
 
@@ -39,20 +36,18 @@ func (p *postgresErrorTransformer) fromGormError(err error) error {
 }
 
 func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
-	pqError, ok := err.(*pgconn.PgError)
+	cErr, ok := err.(ConnectError)
 	if !ok {
-		logger.InfofNoCtx("Unable to cast to pgconn.PgError. Error type: [%v]",
-			reflect.TypeOf(err))
 		return p.fromGormError(err)
 	}
-
+	pqError := cErr.Unwrap().(*pgconn.PgError)
 	switch pqError.Code {
 	case uniqueConstraintViolationCode:
 		return errors.NewDataCatalogErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Message)
 	case undefinedTable:
 		return errors.NewDataCatalogErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
 	default:
-		return errors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message))
+		return errors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Message))
 	}
 }
 
