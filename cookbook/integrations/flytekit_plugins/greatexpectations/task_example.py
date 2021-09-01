@@ -75,7 +75,7 @@ def simple_wf(dataset: str = DATASET_LOCAL) -> int:
 # The ``local_file_path`` argument helps in copying the remote file to the user-given path.
 #
 # .. note::
-#   ``local_file_path``'s directory and ``base_directory`` ought to be the same.
+#   ``local_file_path``'s directory and ``base_directory`` in Great Expectations config ought to be the same.
 file_task_object = GreatExpectationsTask(
     name="great_expectations_task_flytefile",
     datasource_name="data",

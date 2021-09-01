@@ -1,2 +1,2 @@
 -r ../../../common/requirements-common.in
-flytekitplugins-great_expectations>=v0.22.0b3
+flytekitplugins-great_expectations>=v0.22.0

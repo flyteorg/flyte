@@ -112,7 +112,10 @@ def file_wf() -> pd.DataFrame:
 # FlyteSchema
 # ===========
 #
-# We define a ``GreatExpectationsType`` to validate ``FlyteSchema``. The ``local_file_path`` is where we've our parquet file.
+# We define a ``GreatExpectationsType`` to validate ``FlyteSchema``. The ``local_file_path`` is where we would have our parquet file.
+#
+# .. note::
+#   ``local_file_path``'s directory and ``base_directory`` in Great Expectations config ought to be the same.
 @task(limits=Resources(mem="500Mi"))
 def schema_task(
     dataframe: GreatExpectationsType[

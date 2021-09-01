@@ -76,24 +76,24 @@ For example, this is how the error message looks like:
 Plugin Parameters
 -----------------
 
-- **data_source**: Data source, in general, is the "name" we use in the Great Expectations config file. 
-  When combined with the data to be validated, the data source helps Great Expectations ascertain the type of data. 
-  Moreover, data source assists in building batches out of data (for validation). 
-- **expectation_suite**: Defines the data validation.
-- **data_connector**: Tells how the data batches have to be identified.
+- **datasource_name**: Data source, in general, is the "name" we use in the Great Expectations config file. 
+  A Datasource brings together a way of interacting with data (like a database or Spark cluster) and some specific data 
+  (like a CSV file, or a database table). Moreover, data source assists in building batches out of data (for validation). 
+- **expectation_suite_name**: Defines the data validation.
+- **data_connector_name**: Tells how the data batches have to be identified.
 
 Optional Parameters
 ^^^^^^^^^^^^^^^^^^^
 
 - **context_root_dir**: Sets the path of the great expectations config directory. 
 - **checkpoint_params**: Optional :py:class:`greatexpectations:great_expectations.checkpoint.checkpoint.SimpleCheckpoint` class parameters.
-- **batchrequest_config**: Additional batch request configuration parameters.
+- **batch_request_config**: Additional batch request configuration parameters.
   
   - data_connector_query: Query to request a data batch
   - runtime_parameters: Parameters to be sent at run-time
   - batch_identifiers: Batch identifiers
   - batch_spec_passthrough: Reader method if your file doesn’t have an extension
-- **data_asset_name**: name of the data asset (to be used for ``RuntimeBatchRequest``)
+- **data_asset_name**: Name of the data asset (to be used for ``RuntimeBatchRequest``)
 - **local_file_path**: Helpful to download the given dataset to the user-given path
 
 .. note::
