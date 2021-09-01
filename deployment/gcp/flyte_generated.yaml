@@ -8407,6 +8407,13 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
   name: flyte-propeller-auth
   namespace: flyte
 stringData:
@@ -8744,6 +8751,29 @@ spec:
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
+      initContainers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
@@ -9185,46 +9215,6 @@ spec:
             secret:
               secretName: db-pass-bthd2588cc
   schedule: '*/1 * * * *'
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: flyte-pod-webhook-secret
-  namespace: flyte
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - args:
-        - webhook
-        - init-certs
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      restartPolicy: Never
-      serviceAccountName: flyte-pod-webhook
-      volumes:
-      - configMap:
-          name: flyte-propeller-config-dtk4mh9k2d
-        name: config-volume
-  ttlSecondsAfterFinished: 0
 ---
 apiVersion: batch/v1
 kind: Job
