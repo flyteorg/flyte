@@ -88,6 +88,7 @@ var executionColumns = []printer.Column{
 	{Header: "Launch Plan Name", JSONPath: "$.spec.launchPlan.name"},
 	{Header: "Type", JSONPath: "$.spec.launchPlan.resourceType"},
 	{Header: "Phase", JSONPath: "$.closure.phase"},
+	{Header: "Scheduled Time", JSONPath: "$.spec.metadata.scheduledAt"},
 	{Header: "Started", JSONPath: "$.closure.startedAt"},
 	{Header: "Elapsed Time", JSONPath: "$.closure.duration"},
 	{Header: "Abort data (Trunc)", JSONPath: "$.closure.abortMetadata[\"cause\"]", TruncateTo: &hundredChars},

@@ -32,19 +32,19 @@ func TestUpdateCommand(t *testing.T) {
 	assert.Equal(t, updateCommand.Use, updateUse)
 	assert.Equal(t, updateCommand.Short, updateShort)
 	assert.Equal(t, updateCommand.Long, updatecmdLong)
-	assert.Equal(t, len(updateCommand.Commands()), 10)
+	assert.Equal(t, len(updateCommand.Commands()), 11)
 	cmdNouns := updateCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
 		return cmdNouns[i].Use < cmdNouns[j].Use
 	})
 	useArray := []string{"cluster-resource-attribute", "execution-cluster-label", "execution-queue-attribute", "launchplan",
-		"plugin-override", "project", "task", "task-resource-attribute", "workflow", "workflow-execution-config"}
-	aliases := [][]string{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
-	shortArray := []string{clusterResourceAttributesShort, executionClusterLabelShort, executionQueueAttributesShort, updateLPShort,
-		pluginOverrideShort, projectShort, updateTaskShort, taskResourceAttributesShort, updateWorkflowShort, workflowExecutionConfigShort}
-	longArray := []string{clusterResourceAttributesLong, executionClusterLabelLong, executionQueueAttributesLong, updateLPLong,
-		pluginOverrideLong, projectLong, updateTaskLong, taskResourceAttributesLong, updateWorkflowLong, workflowExecutionConfigLong}
+		"launchplan-meta", "plugin-override", "project", "task-meta", "task-resource-attribute", "workflow-execution-config", "workflow-meta"}
+	aliases := [][]string{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+	shortArray := []string{clusterResourceAttributesShort, executionClusterLabelShort, executionQueueAttributesShort, updateLPShort, updateLPMetaShort,
+		pluginOverrideShort, projectShort, updateTaskShort, taskResourceAttributesShort, workflowExecutionConfigShort, updateWorkflowShort}
+	longArray := []string{clusterResourceAttributesLong, executionClusterLabelLong, executionQueueAttributesLong, updateLPLong, updateLPMetaLong,
+		pluginOverrideLong, projectLong, updateTaskLong, taskResourceAttributesLong, workflowExecutionConfigLong, updateWorkflowLong}
 	for i := range cmdNouns {
 		assert.Equal(t, cmdNouns[i].Use, useArray[i])
 		assert.Equal(t, cmdNouns[i].Aliases, aliases[i])
