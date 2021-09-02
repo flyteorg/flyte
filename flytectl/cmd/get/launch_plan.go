@@ -129,7 +129,7 @@ func LaunchplanToTableProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.LaunchPlan)
 		if m.Closure != nil {
-			if m.Closure.ExpectedInputs != nil {
+			if m.Closure.ExpectedInputs != nil && m.Closure.ExpectedInputs.Parameters != nil {
 				printer.FormatParameterDescriptions(m.Closure.ExpectedInputs.Parameters)
 			}
 			if m.Closure.ExpectedOutputs != nil && m.Closure.ExpectedOutputs.Variables != nil {
