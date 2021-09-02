@@ -76,11 +76,12 @@ SEE ALSO
 * :doc:`flytectl_update_cluster-resource-attribute` 	 - Updates matchable resources of cluster attributes
 * :doc:`flytectl_update_execution-cluster-label` 	 - Updates matchable resources of execution cluster label
 * :doc:`flytectl_update_execution-queue-attribute` 	 - Updates matchable resources of execution queue attributes
-* :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
+* :doc:`flytectl_update_launchplan` 	 - Updates launch plan status
+* :doc:`flytectl_update_launchplan-meta` 	 - Updates launch plan metadata
 * :doc:`flytectl_update_plugin-override` 	 - Updates matchable resources of plugin overrides
 * :doc:`flytectl_update_project` 	 - Updates project resources
-* :doc:`flytectl_update_task` 	 - Updates task metadata
+* :doc:`flytectl_update_task-meta` 	 - Updates task metadata
 * :doc:`flytectl_update_task-resource-attribute` 	 - Updates matchable resources of task attributes
-* :doc:`flytectl_update_workflow` 	 - Updates workflow metadata
 * :doc:`flytectl_update_workflow-execution-config` 	 - Updates matchable resources of workflow execution config
+* :doc:`flytectl_update_workflow-meta` 	 - Updates workflow metadata
 
