@@ -2,7 +2,8 @@
 
 ## Platform
 1. Recovery Mode: Executions that fail due to external system failures (e.g. external system being down) can now be rerun in recovery mode ([flytectl --recover docs](https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_create_execution.html)). It's also available in the UI:
-![](https://i.imgur.com/hYYzkLK.png)
+
+   ![](https://i.imgur.com/hYYzkLK.png =864x150)
 
 
 ## Flytekit
@@ -15,10 +16,12 @@ Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/
 
 ## UI
 1. Shiny new Graph UX. The graph rendering has been revamped to be more functional and accessible. More updates are coming for better visualization for nested executions and branches.
-![](https://i.imgur.com/HTfuios.png)
+
+   ![](https://i.imgur.com/HTfuios.png =888x555)
 1. JSON Validation for json-based types in the UI.
 1. Enum support in UI
-![](https://i.imgur.com/9bFZlei.png)
+
+   ![](https://i.imgur.com/9bFZlei.png)
 
 
 ## FlyteCtl
