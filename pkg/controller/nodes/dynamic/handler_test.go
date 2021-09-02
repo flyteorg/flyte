@@ -98,12 +98,11 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			},
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"x": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_BOOLEAN,
-								},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "x",
+							Var: &core.Variable{
+								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BOOLEAN}},
 							},
 						},
 					},
@@ -234,12 +233,11 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 			},
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"x": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_BOOLEAN,
-								},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "x",
+							Var: &core.Variable{
+								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BOOLEAN}},
 							},
 						},
 					},
@@ -334,10 +332,11 @@ func createDynamicJobSpec() *core.DynamicJobSpec {
 				Type: "container",
 				Interface: &core.TypedInterface{
 					Outputs: &core.VariableMap{
-						Variables: map[string]*core.Variable{
-							"x": {
-								Type: &core.LiteralType{
-									Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+						Variables: []*core.VariableMapEntry{
+							{
+								Name: "x",
+								Var: &core.Variable{
+									Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 								},
 							},
 						},
@@ -431,12 +430,11 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			},
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"x": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_INTEGER,
-								},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "x",
+							Var: &core.Variable{
+								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 							},
 						},
 					},
@@ -621,12 +619,11 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			},
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"x": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_INTEGER,
-								},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "x",
+							Var: &core.Variable{
+								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 							},
 						},
 					},
@@ -868,12 +865,11 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 			},
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"x": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_INTEGER,
-								},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "x",
+							Var: &core.Variable{
+								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 							},
 						},
 					},
