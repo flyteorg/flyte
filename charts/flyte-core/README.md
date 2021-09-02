@@ -91,7 +91,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `false` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"1Gi","storage":"20Mi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
 | configmap.task_resource_defaults.task_resources | object | `{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"1Gi","storage":"20Mi"}}` | Task default resources parameters |
-| datacatalog | object | `{"affinity":{},"configPath":"/etc/datacatalog/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/datacatalog","tag":"v0.3.6"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"service":{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  DATACATALOG SETTINGS |
+| datacatalog | object | `{"affinity":{},"configPath":"/etc/datacatalog/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/datacatalog","tag":"v0.3.9"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"service":{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  DATACATALOG SETTINGS |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
@@ -110,7 +110,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.16"` |  |
+| flyteadmin.image.tag | string | `"v0.6.22"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -123,7 +123,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
-| flyteconsole | object | `{"affinity":{},"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flyteconsole","tag":"v0.20.1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  FLYTECONSOLE SETTINGS |
+| flyteconsole | object | `{"affinity":{},"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flyteconsole","tag":"v0.25.0"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  FLYTECONSOLE SETTINGS |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
@@ -132,7 +132,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
-| flytepropeller | object | `{"affinity":{},"cacheSizeMbs":0,"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytepropeller","tag":"v0.13.4"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTEPROPELLER SETTINGS |
+| flytepropeller | object | `{"affinity":{},"cacheSizeMbs":0,"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytepropeller","tag":"v0.13.20"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTEPROPELLER SETTINGS |
 | flytepropeller.affinity | object | `{}` | affinity for Flytepropeller deployment |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
