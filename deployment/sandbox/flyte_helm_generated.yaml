@@ -3300,7 +3300,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:latest"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3316,7 +3316,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:latest"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3329,7 +3329,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:latest"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -3339,7 +3339,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:latest"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3360,7 +3360,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+        image: "cr.flyte.org/flyteorg/flyteadmin:latest"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -3403,7 +3403,6 @@ spec:
           limits:
             cpu: "0.1"
             memory: 200Mi
-
       serviceAccountName: flyteadmin
       volumes:
         
@@ -3418,6 +3417,65 @@ spec:
         - configMap:
             name: clusterresource-template
           name: resource-templates
+        - name: auth
+          secret:
+            secretName: flyte-admin-secrets
+---
+# Source: flyte/templates/admin/flytescheduler.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flytescheduler
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "21ece79be71fec2d8e53cda56188759626f9c055bed700b8ad6dc9d4426ce59"
+      labels: 
+        app.kubernetes.io/name: flytescheduler
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      initContainers:
+      - command: ["/bin/sleep","60"]
+        image: "alpine:3.3"
+        imagePullPolicy: "IfNotPresent"
+        name: sleep
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:latest"
+        imagePullPolicy: "IfNotPresent"
+        name: flytescheduler
+        volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
+      serviceAccountName: flyteadmin
+      volumes:
+        
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: flyte-admin-config
+          name: config-volume
         - name: auth
           secret:
             secretName: flyte-admin-secrets
@@ -3819,7 +3877,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+            image: "cr.flyte.org/flyteorg/flyteadmin:latest"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:

@@ -16,7 +16,7 @@ flyteadmin:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
     # -- Docker image tag
-    tag: v0.6.16 # FLYTEADMIN_TAG
+    tag: latest # FLYTEADMIN_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
@@ -31,17 +31,6 @@ flyteadmin:
       memory: 50Mi
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
-
-  # -- Flytescheduler spec
-  flytescheduler:
-    enabled: false
-    image:
-      # -- Docker image for Flytescheduler deployment
-      repository: cr.flyte.org/flyteorg/flytescheduler
-      # -- Docker image tag
-      tag: v0.6.16 # FLYTESCHEDULER_TAG
-      # -- Docker image pull policy
-      pullPolicy: IfNotPresent
 
   # -- Initial projects to create
   initialProjects:
@@ -72,6 +61,51 @@ flyteadmin:
   affinity: {}
   secrets: {}
 
+#
+# FLYTESCHEDULER SETTINGS
+#
+
+flytescheduler:
+  enabled: true
+  # -- Replicas count for Flyteadmin deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Flyteadmin deployment
+    repository:  cr.flyte.org/flyteorg/flytescheduler
+    # -- Docker image tag
+    tag: latest # FLYTEADMIN_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flyteadmin deployment
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyte/config/*.yaml
+
+  # -- Configuration for service accounts for FlyteAdmin
+  serviceAccount:
+    # -- Should a service account be created for flyteadmin
+    create: true
+    # -- Annotations for ServiceAccount attached to Flyteadmin pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Flyteadmin pods
+  podAnnotations: {}
+  # -- nodeSelector for Flyteadmin deployment
+  nodeSelector: {}
+  # -- tolerations for Flyteadmin deployment
+  tolerations: []
+  # -- affinity for Flyteadmin deployment
+  affinity: {}
+  secrets: {}
 
 #
 # DATACATALOG SETTINGS
