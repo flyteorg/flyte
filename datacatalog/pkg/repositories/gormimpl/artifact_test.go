@@ -275,7 +275,7 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
-	assert.Equal(t, dcErr.Code(), codes.AlreadyExists)
+	assert.Equal(t, dcErr.Code().String(), codes.AlreadyExists.String())
 }
 
 func TestListArtifactsWithPartition(t *testing.T) {
