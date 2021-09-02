@@ -1,7 +1,7 @@
-.. _flytectl_update_workflow:
+.. _flytectl_update_workflow-meta:
 
-flytectl update workflow
-------------------------
+flytectl update workflow-meta
+-----------------------------
 
 Updates workflow metadata
 
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  flytectl update workflow [flags]
+  flytectl update workflow-meta [flags]
 
 Options
 ~~~~~~~
@@ -41,7 +41,7 @@ Options
       --archive              archive named entity.
       --description string   description of the named entity.
       --dryRun               execute command without making any modifications.
-  -h, --help                 help for workflow
+  -h, --help                 help for workflow-meta
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

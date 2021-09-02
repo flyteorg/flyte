@@ -1,43 +1,47 @@
-.. _flytectl_update_launchplan:
+.. _flytectl_update_task-meta:
 
-flytectl update launchplan
---------------------------
+flytectl update task-meta
+-------------------------
 
-Updates launch plan status
+Updates task metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Activating launchplan activates the scheduled job associated with it
+Following command updates the description on the task.
 ::
 
- flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --activate
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --description "Merge sort example"
 
-Archiving launchplan deschedules any scheduled job associated with it
+Archiving task named entity is not supported and would throw an error.
 ::
 
- flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --archive
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --archive
 
+Activating task named entity would be a noop as archiving is not possible.
+::
+
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --activate
 
 Usage
 
 
 ::
 
-  flytectl update launchplan [flags]
+  flytectl update task-meta [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-      --activate         activate launchplan.
-      --archive          archive launchplan.
-      --dryRun           execute command without making any modifications.
-  -h, --help             help for launchplan
-      --version string   version of the launchplan to be fetched.
+      --activate             activate the named entity.
+      --archive              archive named entity.
+      --description string   description of the named entity.
+      --dryRun               execute command without making any modifications.
+  -h, --help                 help for task-meta
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
