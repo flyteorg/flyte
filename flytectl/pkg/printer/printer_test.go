@@ -150,9 +150,15 @@ func TestPrint(t *testing.T) {
 			},
 		},
 	}
-	variableMap := map[string]*core.Variable{
-		"sorted_list1": &sortedListLiteralType,
-		"sorted_list2": &sortedListLiteralType,
+	variableMap := []*core.VariableMapEntry{
+		{
+			Name: "sorted_list1",
+			Var:  &sortedListLiteralType,
+		},
+		{
+			Name: "sorted_list2",
+			Var:  &sortedListLiteralType,
+		},
 	}
 
 	var compiledTasks []*core.CompiledTask
@@ -275,14 +281,26 @@ func TestFormatVariableDescriptions(t *testing.T) {
 	barVar := &core.Variable{
 		Description: "bar",
 	}
-	variableMap := map[string]*core.Variable{
-		"var1": fooVar,
-		"var2": barVar,
-		"foo":  fooVar,
-		"bar":  barVar,
+	variableMap := []*core.VariableMapEntry{
+		{
+			Name: "var1",
+			Var:  fooVar,
+		},
+		{
+			Name: "var2",
+			Var:  barVar,
+		},
+		{
+			Name: "foo",
+			Var:  fooVar,
+		},
+		{
+			Name: "bar",
+			Var:  barVar,
+		},
 	}
 	FormatVariableDescriptions(variableMap)
-	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", variableMap[DefaultFormattedDescriptionsKey].Description)
+	assert.Equal(t, "var1: foo\nvar2: bar\nfoo\nbar", variableMap[0].Var.Description)
 }
 
 func TestFormatParameterDescriptions(t *testing.T) {
@@ -297,13 +315,28 @@ func TestFormatParameterDescriptions(t *testing.T) {
 		},
 	}
 	emptyParam := &core.Parameter{}
-	paramMap := map[string]*core.Parameter{
-		"var1":  fooParam,
-		"var2":  barParam,
-		"foo":   fooParam,
-		"bar":   barParam,
-		"empty": emptyParam,
+	paramMap := []*core.ParameterMapEntry{
+		{
+			Name:      "var1",
+			Parameter: fooParam,
+		},
+		{
+			Name:      "var2",
+			Parameter: barParam,
+		},
+		{
+			Name:      "foo",
+			Parameter: fooParam,
+		},
+		{
+			Name:      "bar",
+			Parameter: barParam,
+		},
+		{
+			Name:      "empty",
+			Parameter: emptyParam,
+		},
 	}
 	FormatParameterDescriptions(paramMap)
-	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", paramMap[DefaultFormattedDescriptionsKey].Var.Description)
+	assert.Equal(t, "var1: foo\nvar2: bar\nfoo\nbar", paramMap[0].Parameter.Var.Description)
 }

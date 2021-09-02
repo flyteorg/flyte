@@ -38,31 +38,35 @@ func getWorkflowSetup() {
 			Domain:  domainValue,
 		},
 	}
-
-	variableMap := map[string]*core.Variable{
-		"var1": {
-			Type: &core.LiteralType{
-				Type: &core.LiteralType_CollectionType{
-					CollectionType: &core.LiteralType{
-						Type: &core.LiteralType_Simple{
-							Simple: core.SimpleType_INTEGER,
+	variableMap := []*core.VariableMapEntry{
+		{
+			Name: "var1",
+			Var: &core.Variable{
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
 						},
 					},
 				},
+				Description: "var1",
 			},
-			Description: "var1",
-		},
-		"var2": {
-			Type: &core.LiteralType{
-				Type: &core.LiteralType_CollectionType{
-					CollectionType: &core.LiteralType{
-						Type: &core.LiteralType_Simple{
-							Simple: core.SimpleType_INTEGER,
+		}, {
+			Name: "var2",
+			Var: &core.Variable{
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
 						},
 					},
 				},
+				Description: "var2 long descriptions probably needs truncate",
 			},
-			Description: "var2 long descriptions probably needs truncate",
 		},
 	}
 	workflow1 = &admin.Workflow{

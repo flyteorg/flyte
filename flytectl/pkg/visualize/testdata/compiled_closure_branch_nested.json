@@ -11,24 +11,30 @@
       "metadata": {},
       "interface": {
         "inputs": {
-          "variables": {
-            "my_input": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "my_input"
+          "variables": [
+            {
+              "name": "my_input",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "my_input"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "nodes": [
@@ -227,7 +233,7 @@
                       ],
                       "error": {
                         "failedNodeId": "inner_fractions",
-                        "message": "Only \u003c0.7 allowed"
+                        "message": "Only <0.7 allowed"
                       }
                     }
                   }
@@ -424,24 +430,30 @@
         },
         "interface": {
           "inputs": {
-            "variables": {
-              "n": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
+            "variables": [
+              {
+                "name": "n",
+                "var": {
+                  "type": {
+                    "simple": "FLOAT"
+                  },
+                  "description": "n"
+                }
               }
-            }
+            ]
           },
           "outputs": {
-            "variables": {
-              "o0": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
+            "variables": [
+              {
+                "name": "o0",
+                "var": {
+                  "type": {
+                    "simple": "FLOAT"
+                  },
+                  "description": "o0"
+                }
               }
-            }
+            ]
           }
         },
         "container": {
@@ -497,24 +509,30 @@
         },
         "interface": {
           "inputs": {
-            "variables": {
-              "n": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
+            "variables": [
+              {
+                "name": "n",
+                "var": {
+                  "type": {
+                    "simple": "FLOAT"
+                  },
+                  "description": "n"
+                }
               }
-            }
+            ]
           },
           "outputs": {
-            "variables": {
-              "o0": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
+            "variables": [
+              {
+                "name": "o0",
+                "var": {
+                  "type": {
+                    "simple": "FLOAT"
+                  },
+                  "description": "o0"
+                }
               }
-            }
+            ]
           }
         },
         "container": {
