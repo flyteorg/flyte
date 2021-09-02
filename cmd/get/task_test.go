@@ -54,9 +54,14 @@ func getTaskSetup() {
 		},
 		Description: "var description",
 	}
-	variableMap := map[string]*core.Variable{
-		"sorted_list1": &sortedListLiteralType,
-		"sorted_list2": &sortedListLiteralType,
+	variableMap := []*core.VariableMapEntry{
+		{
+			Name: "sorted_list1",
+			Var:  &sortedListLiteralType,
+		}, {
+			Name: "sorted_list2",
+			Var:  &sortedListLiteralType,
+		},
 	}
 
 	task1 := &admin.Task{
@@ -256,24 +261,30 @@ func TestGetTaskFunc(t *testing.T) {
 				"template": {
 					"interface": {
 						"inputs": {
-							"variables": {
-								"sorted_list1": {
-									"type": {
-										"collectionType": {
-											"simple": "INTEGER"
-										}
-									},
-									"description": "var description"
+							"variables": [
+								{
+									"name": "sorted_list1",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
 								},
-								"sorted_list2": {
-									"type": {
-										"collectionType": {
-											"simple": "INTEGER"
-										}
-									},
-									"description": "var description"
+								{
+									"name": "sorted_list2",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
 								}
-							}
+							]
 						}
 					}
 				}
@@ -291,24 +302,30 @@ func TestGetTaskFunc(t *testing.T) {
 				"template": {
 					"interface": {
 						"inputs": {
-							"variables": {
-								"sorted_list1": {
-									"type": {
-										"collectionType": {
-											"simple": "INTEGER"
-										}
-									},
-									"description": "var description"
+							"variables": [
+								{
+									"name": "sorted_list1",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
 								},
-								"sorted_list2": {
-									"type": {
-										"collectionType": {
-											"simple": "INTEGER"
-										}
-									},
-									"description": "var description"
+								{
+									"name": "sorted_list2",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
 								}
-							}
+							]
 						}
 					}
 				}
@@ -363,24 +380,30 @@ func TestGetTaskFuncLatest(t *testing.T) {
 			"template": {
 				"interface": {
 					"inputs": {
-						"variables": {
-							"sorted_list1": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+						"variables": [
+							{
+								"name": "sorted_list1",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							},
-							"sorted_list2": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+							{
+								"name": "sorted_list2",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							}
-						}
+						]
 					}
 				}
 			}
@@ -412,24 +435,30 @@ func TestGetTaskWithVersion(t *testing.T) {
 			"template": {
 				"interface": {
 					"inputs": {
-						"variables": {
-							"sorted_list1": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+						"variables": [
+							{
+								"name": "sorted_list1",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							},
-							"sorted_list2": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+							{
+								"name": "sorted_list2",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							}
-						}
+						]
 					}
 				}
 			}
@@ -447,7 +476,90 @@ func TestGetTasks(t *testing.T) {
 	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `[{"id": {"name": "task1","version": "v2"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	tearDownAndVerify(t, `[
+	{
+		"id": {
+			"name": "task1",
+			"version": "v2"
+		},
+		"closure": {
+			"compiledTask": {
+				"template": {
+					"interface": {
+						"inputs": {
+							"variables": [
+								{
+									"name": "sorted_list1",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
+								},
+								{
+									"name": "sorted_list2",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"createdAt": "1970-01-01T00:00:01Z"
+		}
+	},
+	{
+		"id": {
+			"name": "task1",
+			"version": "v1"
+		},
+		"closure": {
+			"compiledTask": {
+				"template": {
+					"interface": {
+						"inputs": {
+							"variables": [
+								{
+									"name": "sorted_list1",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
+								},
+								{
+									"name": "sorted_list2",
+									"var": {
+										"type": {
+											"collectionType": {
+												"simple": "INTEGER"
+											}
+										},
+										"description": "var description"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"createdAt": "1970-01-01T00:00:00Z"
+		}
+	}
+]`)
 }
 
 func TestGetTasksFilters(t *testing.T) {
@@ -459,7 +571,47 @@ func TestGetTasksFilters(t *testing.T) {
 	mockClient.OnListTasksMatch(ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
 	err = getTaskFunc(ctx, argsTask, cmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}`)
+	tearDownAndVerify(t, `{
+	"id": {
+		"name": "task1",
+		"version": "v1"
+	},
+	"closure": {
+		"compiledTask": {
+			"template": {
+				"interface": {
+					"inputs": {
+						"variables": [
+							{
+								"name": "sorted_list1",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
+							},
+							{
+								"name": "sorted_list2",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"createdAt": "1970-01-01T00:00:00Z"
+	}
+}`)
 }
 
 func TestGetTaskWithExecFile(t *testing.T) {
@@ -484,24 +636,30 @@ func TestGetTaskWithExecFile(t *testing.T) {
 			"template": {
 				"interface": {
 					"inputs": {
-						"variables": {
-							"sorted_list1": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+						"variables": [
+							{
+								"name": "sorted_list1",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							},
-							"sorted_list2": {
-								"type": {
-									"collectionType": {
-										"simple": "INTEGER"
-									}
-								},
-								"description": "var description"
+							{
+								"name": "sorted_list2",
+								"var": {
+									"type": {
+										"collectionType": {
+											"simple": "INTEGER"
+										}
+									},
+									"description": "var description"
+								}
 							}
-						}
+						]
 					}
 				}
 			}

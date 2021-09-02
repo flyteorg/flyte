@@ -27,9 +27,10 @@ func getLaunchPlanFetcherSetup() {
 	adminClient = new(mocks.AdminServiceClient)
 	adminFetcherExt = AdminFetcherExtClient{AdminClient: adminClient}
 
-	parameterMap := map[string]*core.Parameter{
-		"numbers": {
-			Var: &core.Variable{
+	parameterMap := []*core.ParameterMapEntry{
+		{
+			Name: "numbers",
+			Parameter: &core.Parameter{Var: &core.Variable{
 				Type: &core.LiteralType{
 					Type: &core.LiteralType_CollectionType{
 						CollectionType: &core.LiteralType{
@@ -39,40 +40,42 @@ func getLaunchPlanFetcherSetup() {
 						},
 					},
 				},
-			},
+			}},
 		},
-		"numbers_count": {
-			Var: &core.Variable{
+		{
+			Name: "numbers_count",
+			Parameter: &core.Parameter{Var: &core.Variable{
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_INTEGER,
+					},
+				},
+			}},
+		},
+		{
+			Name: "run_local_at_count",
+			Parameter: &core.Parameter{Var: &core.Variable{
 				Type: &core.LiteralType{
 					Type: &core.LiteralType_Simple{
 						Simple: core.SimpleType_INTEGER,
 					},
 				},
 			},
-		},
-		"run_local_at_count": {
-			Var: &core.Variable{
-				Type: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_INTEGER,
-					},
-				},
-			},
-			Behavior: &core.Parameter_Default{
-				Default: &core.Literal{
-					Value: &core.Literal_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Primitive{
-								Primitive: &core.Primitive{
-									Value: &core.Primitive_Integer{
-										Integer: 10,
+				Behavior: &core.Parameter_Default{
+					Default: &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{
+										Value: &core.Primitive_Integer{
+											Integer: 10,
+										},
 									},
 								},
 							},
 						},
 					},
-				},
-			},
+				}},
 		},
 	}
 	launchPlan1 = &admin.LaunchPlan{

@@ -67,15 +67,16 @@ func TestMakeLiteralForParams(t *testing.T) {
 	}
 
 	t.Run("Happy path", func(t *testing.T) {
-		inputParams := map[string]*core.Parameter{
-			"a": {
-				Var: &core.Variable{
+		inputParams := []*core.ParameterMapEntry{
+			{
+				Name: "a",
+				Parameter: &core.Parameter{Var: &core.Variable{
 					Type: &core.LiteralType{
 						Type: &core.LiteralType_Simple{
 							Simple: core.SimpleType_STRING,
 						},
 					},
-				},
+				}},
 			},
 		}
 
@@ -85,8 +86,11 @@ func TestMakeLiteralForParams(t *testing.T) {
 	})
 
 	t.Run("Invalid Param", func(t *testing.T) {
-		inputParams := map[string]*core.Parameter{
-			"a": nil,
+		inputParams := []*core.ParameterMapEntry{
+			{
+				Name:      "a",
+				Parameter: nil,
+			},
 		}
 
 		_, err := MakeLiteralForParams(inputValues, inputParams)
@@ -94,9 +98,10 @@ func TestMakeLiteralForParams(t *testing.T) {
 	})
 
 	t.Run("Invalid Type", func(t *testing.T) {
-		inputParams := map[string]*core.Parameter{
-			"a": {
-				Var: &core.Variable{},
+		inputParams := []*core.ParameterMapEntry{
+			{
+				Name:      "a",
+				Parameter: &core.Parameter{Var: &core.Variable{}},
 			},
 		}
 
@@ -111,11 +116,14 @@ func TestMakeLiteralForVariables(t *testing.T) {
 	}
 
 	t.Run("Happy path", func(t *testing.T) {
-		inputVariables := map[string]*core.Variable{
-			"a": {
-				Type: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_STRING,
+		inputVariables := []*core.VariableMapEntry{
+			{
+				Name: "a",
+				Var: &core.Variable{
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_STRING,
+						},
 					},
 				},
 			},
@@ -127,8 +135,11 @@ func TestMakeLiteralForVariables(t *testing.T) {
 	})
 
 	t.Run("Invalid Variable", func(t *testing.T) {
-		inputVariables := map[string]*core.Variable{
-			"a": nil,
+		inputVariables := []*core.VariableMapEntry{
+			{
+				Name: "a",
+				Var:  nil,
+			},
 		}
 
 		_, err := MakeLiteralForVariables(inputValues, inputVariables)
@@ -136,9 +147,12 @@ func TestMakeLiteralForVariables(t *testing.T) {
 	})
 
 	t.Run("Invalid Type", func(t *testing.T) {
-		inputVariables := map[string]*core.Variable{
-			"a": {
-				Type: nil,
+		inputVariables := []*core.VariableMapEntry{
+			{
+				Name: "a",
+				Var: &core.Variable{
+					Type: nil,
+				},
 			},
 		}
 
