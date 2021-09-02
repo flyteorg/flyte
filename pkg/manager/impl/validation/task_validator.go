@@ -99,21 +99,17 @@ func ValidateTask(
 func taskResourceSetToMap(
 	resourceSet runtimeInterfaces.TaskResourceSet) map[core.Resources_ResourceName]*resource.Quantity {
 	resourceMap := make(map[core.Resources_ResourceName]*resource.Quantity)
-	if resourceSet.CPU != "" {
-		cpuQuantity := resource.MustParse(resourceSet.CPU)
-		resourceMap[core.Resources_CPU] = &cpuQuantity
+	if !resourceSet.CPU.IsZero() {
+		resourceMap[core.Resources_CPU] = &resourceSet.CPU
 	}
-	if resourceSet.Memory != "" {
-		memoryQuantity := resource.MustParse(resourceSet.Memory)
-		resourceMap[core.Resources_MEMORY] = &memoryQuantity
+	if !resourceSet.Memory.IsZero() {
+		resourceMap[core.Resources_MEMORY] = &resourceSet.Memory
 	}
-	if resourceSet.GPU != "" {
-		gpuQuantity := resource.MustParse(resourceSet.GPU)
-		resourceMap[core.Resources_GPU] = &gpuQuantity
+	if !resourceSet.GPU.IsZero() {
+		resourceMap[core.Resources_GPU] = &resourceSet.GPU
 	}
-	if resourceSet.EphemeralStorage != "" {
-		ephemeralStorageQuantity := resource.MustParse(resourceSet.EphemeralStorage)
-		resourceMap[core.Resources_EPHEMERAL_STORAGE] = &ephemeralStorageQuantity
+	if !resourceSet.EphemeralStorage.IsZero() {
+		resourceMap[core.Resources_EPHEMERAL_STORAGE] = &resourceSet.EphemeralStorage
 	}
 	return resourceMap
 }

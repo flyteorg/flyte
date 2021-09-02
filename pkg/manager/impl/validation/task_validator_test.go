@@ -17,9 +17,9 @@ import (
 func getMockTaskConfigProvider() runtimeInterfaces.TaskResourceConfiguration {
 	var taskConfig = runtimeMocks.MockTaskResourceConfiguration{}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		Memory: "500Mi",
-		CPU:    "200m",
-		GPU:    "8",
+		Memory: resource.MustParse("500Mi"),
+		CPU:    resource.MustParse("200m"),
+		GPU:    resource.MustParse("8"),
 	}
 
 	return &taskConfig
@@ -174,10 +174,10 @@ func TestValidateTaskTypeWhitelist(t *testing.T) {
 
 func TestTaskResourceSetToMap(t *testing.T) {
 	resourceSet := runtimeInterfaces.TaskResourceSet{
-		CPU:              "100Mi",
-		GPU:              "2",
-		Memory:           "1.5Gi",
-		EphemeralStorage: "500Mi",
+		CPU:              resource.MustParse("100Mi"),
+		GPU:              resource.MustParse("2"),
+		Memory:           resource.MustParse("1.5Gi"),
+		EphemeralStorage: resource.MustParse("500Mi"),
 	}
 	resourceSetMap := taskResourceSetToMap(resourceSet)
 	assert.Len(t, resourceSetMap, 4)
@@ -311,7 +311,7 @@ func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
 	err := validateTaskResources(&core.Identifier{
 		Name: "name",
 	}, runtimeInterfaces.TaskResourceSet{
-		CPU: "1Gi",
+		CPU: resource.MustParse("1Gi"),
 	},
 		[]*core.Resources_ResourceEntry{
 			{
@@ -331,7 +331,7 @@ func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
 	err := validateTaskResources(&core.Identifier{
 		Name: "name",
 	}, runtimeInterfaces.TaskResourceSet{
-		CPU: "1Gi",
+		CPU: resource.MustParse("1Gi"),
 	},
 		[]*core.Resources_ResourceEntry{
 			{
@@ -365,7 +365,7 @@ func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {
 	err := validateTaskResources(&core.Identifier{
 		Name: "name",
 	}, runtimeInterfaces.TaskResourceSet{
-		GPU: "1",
+		GPU: resource.MustParse("1"),
 	},
 		[]*core.Resources_ResourceEntry{
 			{
@@ -385,7 +385,7 @@ func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
 	err := validateTaskResources(&core.Identifier{
 		Name: "name",
 	}, runtimeInterfaces.TaskResourceSet{
-		GPU: "1",
+		GPU: resource.MustParse("1"),
 	},
 		[]*core.Resources_ResourceEntry{
 			{

@@ -4,10 +4,17 @@ import (
 	"context"
 	"time"
 
+	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
+
+type TaskResources struct {
+	Defaults runtime.TaskResourceSet
+	Limits   runtime.TaskResourceSet
+}
 
 type ExecuteWorkflowInput struct {
 	ExecutionID         *core.WorkflowExecutionIdentifier
@@ -22,7 +29,7 @@ type ExecuteWorkflowInput struct {
 	ExecutionConfig     *admin.WorkflowExecutionConfig
 	Auth                *admin.AuthRole
 	RecoveryExecution   *core.WorkflowExecutionIdentifier
-	TaskResources       *admin.TaskResourceAttributes
+	TaskResources       *TaskResources
 }
 
 type ExecuteTaskInput struct {
@@ -37,7 +44,7 @@ type ExecuteTaskInput struct {
 	QueueingBudget      time.Duration
 	TaskPluginOverrides []*admin.PluginOverride
 	ExecutionConfig     *admin.WorkflowExecutionConfig
-	TaskResources       *admin.TaskResourceAttributes
+	TaskResources       *TaskResources
 }
 
 type TerminateWorkflowInput struct {
