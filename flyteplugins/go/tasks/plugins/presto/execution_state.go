@@ -447,7 +447,11 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 		return err
 	}
 
-	results := taskTemplate.Interface.Outputs.Variables["results"]
+	results, exists := utils.GetResultsVariable(taskTemplate)
+	if !exists {
+		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return nil
+	}
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
 		&pb.LiteralMap{

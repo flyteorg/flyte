@@ -41,8 +41,11 @@ func Test_writeOutput(t *testing.T) {
 		taskReader.OnRead(ctx).Return(&core.TaskTemplate{
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"myOutput": &core.Variable{},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "myOutput",
+							Var:  &core.Variable{},
+						},
 					},
 				},
 			},
@@ -73,12 +76,15 @@ func Test_writeOutput(t *testing.T) {
 		taskReader.OnRead(ctx).Return(&core.TaskTemplate{
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
-					Variables: map[string]*core.Variable{
-						"results": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_Schema{
-									Schema: &core.SchemaType{
-										Columns: []*core.SchemaType_SchemaColumn{},
+					Variables: []*core.VariableMapEntry{
+						{
+							Name: "results",
+							Var: &core.Variable{
+								Type: &core.LiteralType{
+									Type: &core.LiteralType_Schema{
+										Schema: &core.SchemaType{
+											Columns: []*core.SchemaType_SchemaColumn{},
+										},
 									},
 								},
 							},
@@ -158,12 +164,15 @@ func Test_ExtractQueryInfo(t *testing.T) {
 				Type: validProto.taskType,
 				Interface: &core.TypedInterface{
 					Outputs: &core.VariableMap{
-						Variables: map[string]*core.Variable{
-							"results": {
-								Type: &core.LiteralType{
-									Type: &core.LiteralType_Schema{
-										Schema: &core.SchemaType{
-											Columns: []*core.SchemaType_SchemaColumn{},
+						Variables: []*core.VariableMapEntry{
+							{
+								Name: "results",
+								Var: &core.Variable{
+									Type: &core.LiteralType{
+										Type: &core.LiteralType_Schema{
+											Schema: &core.SchemaType{
+												Columns: []*core.SchemaType_SchemaColumn{},
+											},
 										},
 									},
 								},

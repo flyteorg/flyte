@@ -17,10 +17,11 @@ import (
 
 func createOutputLiteralMap(tk *core.TaskTemplate, outputPath string) *core.LiteralMap {
 	op := &core.LiteralMap{}
-	for k := range tk.Interface.Outputs.Variables {
+	for _, v := range tk.Interface.Outputs.Variables {
 		// if v != core.LiteralType_Blob{}
 		op.Literals = make(map[string]*core.Literal)
-		op.Literals[k] = &core.Literal{
+		// make literal map ordered?
+		op.Literals[v.Name] = &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Blob{
