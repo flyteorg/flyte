@@ -74,9 +74,19 @@ func TestVariableMapOrder(t *testing.T) {
 		CacheVersion: "1.0.0",
 		TypedInterface: core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"2": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableMapEntry{
+					{
+						Name: "2",
+						Var: &core.Variable{
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+						},
+					},
+					{
+						Name: "1",
+						Var: &core.Variable{
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+						},
+					},
 				},
 			},
 		},
@@ -87,9 +97,19 @@ func TestVariableMapOrder(t *testing.T) {
 	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetID.Version)
 
 	key.TypedInterface.Inputs = &core.VariableMap{
-		Variables: map[string]*core.Variable{
-			"2": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-			"1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+		Variables: []*core.VariableMapEntry{
+			{
+				Name: "2",
+				Var: &core.Variable{
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+				},
+			},
+			{
+				Name: "1",
+				Var: &core.Variable{
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+				},
+			},
 		},
 	}
 	datasetIDDupe, err := GenerateDatasetIDForTask(context.TODO(), key)

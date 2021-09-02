@@ -39,9 +39,9 @@ func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 	}
 
 	res := make(map[string]*core.Literal, len(iface.GetInputs().Variables))
-	for inputName, inputVar := range iface.GetInputs().Variables {
-		val := coreutils.MustMakeDefaultLiteralForType(inputVar.Type)
-		res[inputName] = val
+	for _, e := range iface.GetInputs().Variables {
+		val := coreutils.MustMakeDefaultLiteralForType(e.GetVar().Type)
+		res[e.GetName()] = val
 	}
 
 	return &core.LiteralMap{
@@ -137,14 +137,17 @@ func TestDynamic(t *testing.T) {
 					Version: "version",
 				},
 				Interface: &core.TypedInterface{
-					Inputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
-					Outputs: &core.VariableMap{Variables: map[string]*core.Variable{
-						"o0": {
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_CollectionType{
-									CollectionType: &core.LiteralType{
-										Type: &core.LiteralType_Simple{
-											Simple: core.SimpleType_INTEGER,
+					Inputs: &core.VariableMap{Variables: []*core.VariableMapEntry{}},
+					Outputs: &core.VariableMap{Variables: []*core.VariableMapEntry{
+						{
+							Name: "o0",
+							Var: &core.Variable{
+								Type: &core.LiteralType{
+									Type: &core.LiteralType_CollectionType{
+										CollectionType: &core.LiteralType{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
 										},
 									},
 								},
@@ -162,8 +165,8 @@ func TestDynamic(t *testing.T) {
 			}
 
 			inputs := map[string]interface{}{}
-			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
+			for _, e := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
+				inputs[e.GetName()] = coreutils.MustMakeDefaultLiteralForType(e.GetVar().Type)
 			}
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
@@ -379,7 +382,7 @@ func TestBranches(t *testing.T) {
 				}
 
 				if diff := deep.Equal(rawStr, string(goldenRaw)); diff != nil {
-					t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
+					t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v\nYou might need to run `make golden` to generate compiled json files.", diff, rawStr, string(goldenRaw))
 				}
 			}
 
@@ -390,8 +393,8 @@ func TestBranches(t *testing.T) {
 			}
 
 			inputs := map[string]interface{}{}
-			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
+			for _, e := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
+				inputs[e.GetName()] = coreutils.MustMakeDefaultLiteralForType(e.GetVar().Type)
 			}
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
@@ -421,7 +424,7 @@ func TestBranches(t *testing.T) {
 					}
 
 					if diff := deep.Equal(string(raw), string(goldenRaw)); diff != nil {
-						t.Errorf("K8sObject() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
+						t.Errorf("K8sObject() Diff = %v\r\n got = %v\r\n want = %v\nYou might need to run `make golden` to generate k8s object json files.", diff, rawStr, string(goldenRaw))
 					}
 
 				}

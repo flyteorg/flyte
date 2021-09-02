@@ -211,14 +211,17 @@
       }
     },
     "outputs": {
-      "variables": {
-        "o0": {
-          "type": {
-            "simple": "FLOAT"
-          },
-          "description": "o0"
+      "variables": [
+        {
+          "name": "o0",
+          "var": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "o0"
+          }
         }
-      }
+      ]
     },
     "outputBindings": [
       {
@@ -266,14 +269,17 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "BOOLEAN"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "BOOLEAN"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -328,24 +334,30 @@
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "n": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "n",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -400,24 +412,30 @@
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "n": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "n",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -472,36 +490,48 @@
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "a": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "a",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             },
-            "b": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+            {
+              "name": "b",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             },
-            "o1": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o1"
+            {
+              "name": "o1",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o1"
+              }
             }
-          }
+          ]
         }
       },
       "container": {

@@ -61,9 +61,12 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					},
 				},
 			},
 		}
@@ -90,9 +93,12 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
+					},
 				},
 			},
 		}
@@ -118,13 +124,16 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
-						EnumType: &core.EnumType{
-							Values: []string{"x", "y", "z"},
-						},
-					}},
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
+							EnumType: &core.EnumType{
+								Values: []string{"x", "y", "z"},
+							},
+						}},
+					},
 				},
 			},
 		}
@@ -150,13 +159,16 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
-						EnumType: &core.EnumType{
-							Values: []string{"x", "y", "z"},
-						},
-					}},
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
+							EnumType: &core.EnumType{
+								Values: []string{"x", "y", "z"},
+							},
+						}},
+					},
 				},
 			},
 		}
@@ -185,12 +197,15 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
-						map[string]interface{}{
-							"xy": 5,
-						})),
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
+							map[string]interface{}{
+								"xy": 5,
+							})),
+					},
 				},
 			},
 		}
@@ -208,10 +223,10 @@ func TestValidateBindings(t *testing.T) {
 		n.OnGetId().Return("node1")
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{},
+				Variables: []*core.VariableMapEntry{},
 			},
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{},
+				Variables: []*core.VariableMapEntry{},
 			},
 		})
 
@@ -220,12 +235,15 @@ func TestValidateBindings(t *testing.T) {
 		n2.OnGetOutputAliases().Return(nil)
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{},
+				Variables: []*core.VariableMapEntry{},
 			},
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+				Variables: []*core.VariableMapEntry{
+					{
+						Name: "n2_out",
+						Var: &core.Variable{
+							Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+						},
 					},
 				},
 			},
@@ -250,9 +268,12 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		vars := &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+			Variables: []*core.VariableMapEntry{
+				{
+					Name: "x",
+					Var: &core.Variable{
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					},
 				},
 			},
 		}

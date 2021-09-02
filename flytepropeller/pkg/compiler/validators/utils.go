@@ -18,12 +18,12 @@ func containsBindingByVariableName(bindings []*core.Binding, name string) (found
 	return false
 }
 
-func findVariableByName(vars *core.VariableMap, name string) (variable *core.Variable, found bool) {
-	if vars == nil || vars.Variables == nil {
+func findVariableByName(vars map[string]*core.Variable, name string) (variable *core.Variable, found bool) {
+	if vars == nil {
 		return nil, false
 	}
 
-	variable, found = vars.Variables[name]
+	variable, found = vars[name]
 	return
 }
 
@@ -84,9 +84,9 @@ func literalTypeForPrimitive(primitive *core.Primitive) *core.LiteralType {
 func buildVariablesIndex(params *core.VariableMap) (map[string]*core.Variable, sets.String) {
 	paramMap := make(map[string]*core.Variable, len(params.Variables))
 	paramSet := sets.NewString()
-	for paramName, param := range params.Variables {
-		paramMap[paramName] = param
-		paramSet.Insert(paramName)
+	for _, v := range params.Variables {
+		paramMap[v.GetName()] = v.GetVar()
+		paramSet.Insert(v.GetName())
 	}
 
 	return paramMap, paramSet
@@ -94,12 +94,15 @@ func buildVariablesIndex(params *core.VariableMap) (map[string]*core.Variable, s
 
 func filterVariables(vars *core.VariableMap, varNames sets.String) *core.VariableMap {
 	res := &core.VariableMap{
-		Variables: make(map[string]*core.Variable, len(varNames)),
+		Variables: make([]*core.VariableMapEntry, 0, len(varNames)),
 	}
 
-	for paramName, param := range vars.Variables {
-		if varNames.Has(paramName) {
-			res.Variables[paramName] = param
+	for _, v := range vars.Variables {
+		if varNames.Has(v.GetName()) {
+			res.Variables = append(res.Variables, &core.VariableMapEntry{
+				Name: v.GetName(),
+				Var:  v.GetVar(),
+			})
 		}
 	}
 
@@ -220,4 +223,12 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 	}
 
 	return nil
+}
+
+func VariableMapEntriesToMap(entries []*core.VariableMapEntry) (variableMap map[string]*core.Variable) {
+	variableMap = make(map[string]*core.Variable, len(entries))
+	for _, v := range entries {
+		variableMap[v.GetName()] = v.GetVar()
+	}
+	return
 }

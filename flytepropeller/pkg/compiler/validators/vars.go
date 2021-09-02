@@ -10,8 +10,10 @@ func validateOutputVar(n c.NodeBuilder, paramName string, errs errors.CompileErr
 	param *flyte.Variable, ok bool) {
 	if outputs, effectiveOk := validateEffectiveOutputParameters(n, errs.NewScope()); effectiveOk {
 		var paramFound bool
-		if param, paramFound = findVariableByName(outputs, paramName); !paramFound {
-			errs.Collect(errors.NewVariableNameNotFoundErr(n.GetId(), n.GetId(), paramName))
+		if outputs != nil { // redundant?
+			if param, paramFound = findVariableByName(VariableMapEntriesToMap(outputs.GetVariables()), paramName); !paramFound {
+				errs.Collect(errors.NewVariableNameNotFoundErr(n.GetId(), n.GetId(), paramName))
+			}
 		}
 	}
 
@@ -23,7 +25,11 @@ func validateInputVar(n c.NodeBuilder, paramName string, requireParamType bool, 
 		return nil, false
 	}
 
-	if param, ok = findVariableByName(n.GetInterface().GetInputs(), paramName); ok {
+	if n.GetInterface().GetInputs() == nil {
+		return
+	}
+
+	if param, ok = findVariableByName(VariableMapEntriesToMap(n.GetInterface().GetInputs().GetVariables()), paramName); ok {
 		return
 	}
 
@@ -48,12 +54,12 @@ func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 
 // Validate parameters have their required attributes set
 func validateVariables(nodeID c.NodeID, params *flyte.VariableMap, errs errors.CompileErrors) {
-	for paramName, param := range params.Variables {
-		if len(paramName) == 0 {
+	for _, e := range params.Variables {
+		if len(e.GetName()) == 0 {
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "paramName"))
 		}
 
-		if param.Type == nil {
+		if e.GetVar().Type == nil {
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "param.Type"))
 		}
 	}

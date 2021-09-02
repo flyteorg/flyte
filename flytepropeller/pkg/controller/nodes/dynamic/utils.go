@@ -82,10 +82,10 @@ func makeArrayInterface(varMap *core.VariableMap) *core.VariableMap {
 		return varMap
 	}
 
-	for _, val := range varMap.Variables {
-		val.Type = &core.LiteralType{
+	for _, e := range varMap.Variables {
+		e.Var.Type = &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
-				CollectionType: val.Type,
+				CollectionType: e.Var.Type,
 			},
 		}
 	}

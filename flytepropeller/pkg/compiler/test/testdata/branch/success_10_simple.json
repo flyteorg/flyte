@@ -7,20 +7,21 @@
       "name": "core.control_flow.run_conditions.basic_boolean_wf",
       "version": "abc"
     },
-    "metadata": {
-    },
+    "metadata": {},
     "interface": {
-      "inputs": {
-      },
+      "inputs": {},
       "outputs": {
-        "variables": {
-          "o0": {
-            "type": {
-              "simple": "INTEGER"
-            },
-            "description": "o0"
+        "variables": [
+          {
+            "name": "o0",
+            "var": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
+            }
           }
-        }
+        ]
       }
     },
     "nodes": [
@@ -28,8 +29,7 @@
         "id": "n0",
         "metadata": {
           "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.coin_toss",
-          "retries": {
-          },
+          "retries": {},
           "interruptible": false
         },
         "taskNode": {
@@ -46,8 +46,7 @@
         "id": "n1",
         "metadata": {
           "name": "test",
-          "retries": {
-          },
+          "retries": {},
           "interruptible": false
         },
         "inputs": [
@@ -83,8 +82,7 @@
                 "id": "n0",
                 "metadata": {
                   "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.success",
-                  "retries": {
-                  },
+                  "retries": {},
                   "interruptible": false
                 },
                 "taskNode": {
@@ -102,8 +100,7 @@
               "id": "n1",
               "metadata": {
                 "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.failed",
-                "retries": {
-                },
+                "retries": {},
                 "interruptible": false
               },
               "taskNode": {
@@ -131,8 +128,7 @@
         }
       }
     ],
-    "metadataDefaults": {
-    }
+    "metadataDefaults": {}
   },
   "tasks": [
     {
@@ -150,30 +146,35 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "n": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "n",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -191,8 +192,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     },
     {
@@ -210,22 +210,23 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
-        "inputs": {
-        },
+        "inputs": {},
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "INTEGER"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -243,8 +244,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     },
     {
@@ -262,22 +262,23 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
-        "inputs": {
-        },
+        "inputs": {},
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "INTEGER"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -295,8 +296,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     },
     {
@@ -314,42 +314,53 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "a": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "a",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             },
-            "b": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+            {
+              "name":"b",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             },
-            "o1": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o1"
+            {
+              "name":"o1",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o1"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -367,8 +378,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     },
     {
@@ -386,24 +396,25 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": {
-          }
+          "variables": []
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "BOOLEAN"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "BOOLEAN"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -421,8 +432,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     },
     {
@@ -440,30 +450,35 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {
-        },
+        "retries": {},
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "n": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "n"
+          "variables": [
+            {
+              "name": "n",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "o0": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
+          "variables": [
+            {
+              "name": "o0",
+              "var": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -481,8 +496,7 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {
-        }
+        "resources": {}
       }
     }
   ]

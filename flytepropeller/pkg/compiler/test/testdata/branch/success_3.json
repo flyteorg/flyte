@@ -10,24 +10,30 @@
     "metadata": {},
     "interface": {
       "inputs": {
-        "variables": {
-          "a": {
-            "type": {
-              "simple": "INTEGER"
-            },
-            "description": "a"
+        "variables": [
+          {
+            "name": "a",
+            "var": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "a"
+            }
           }
-        }
+        ]
       },
       "outputs": {
-        "variables": {
-          "out_0": {
-            "type": {
-              "simple": "INTEGER"
-            },
-            "description": "out_0"
+        "variables": [
+          {
+            "name": "out_0",
+            "var": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "out_0"
+            }
           }
-        }
+        ]
       }
     },
     "nodes": [
@@ -175,14 +181,17 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": {
-            "out_0": {
-              "type": {
-                "simple": "STRING"
-              },
-              "description": "out_0"
+          "variables": [
+            {
+              "name": "out_0",
+              "var": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "out_0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -224,14 +233,17 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": {
-            "out_0": {
-              "type": {
-                "simple": "STRING"
-              },
-              "description": "out_0"
+          "variables": [
+            {
+              "name": "out_0",
+              "var": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "out_0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {
@@ -272,24 +284,30 @@
       },
       "interface": {
         "inputs": {
-          "variables": {
-            "a": {
-              "type": {
-                "simple": "INTEGER"
-              },
-              "description": "a"
+          "variables": [
+            {
+              "name": "a",
+              "var": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "a"
+              }
             }
-          }
+          ]
         },
         "outputs": {
-          "variables": {
-            "out_0": {
-              "type": {
-                "simple": "INTEGER"
-              },
-              "description": "out_0"
+          "variables": [
+            {
+              "name": "out_0",
+              "var": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "out_0"
+              }
             }
-          }
+          ]
         }
       },
       "container": {

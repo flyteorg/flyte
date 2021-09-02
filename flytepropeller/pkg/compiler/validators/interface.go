@@ -20,13 +20,13 @@ func ValidateInterface(nodeID c.NodeID, iface *core.TypedInterface, errs errors.
 	if iface.Inputs != nil && iface.Inputs.Variables != nil {
 		validateVariables(nodeID, iface.Inputs, errs.NewScope())
 	} else {
-		iface.Inputs = &core.VariableMap{Variables: map[string]*core.Variable{}}
+		iface.Inputs = &core.VariableMap{Variables: []*core.VariableMapEntry{}}
 	}
 
 	if iface.Outputs != nil && iface.Outputs.Variables != nil {
 		validateVariables(nodeID, iface.Outputs, errs.NewScope())
 	} else {
-		iface.Outputs = &core.VariableMap{Variables: map[string]*core.Variable{}}
+		iface.Outputs = &core.VariableMap{Variables: []*core.VariableMapEntry{}}
 	}
 
 	return iface, !errs.HasErrors()
@@ -47,8 +47,8 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 			if iface == nil {
 				// Default value for no interface is nil, initialize an empty interface
 				iface = &core.TypedInterface{
-					Inputs:  &core.VariableMap{Variables: map[string]*core.Variable{}},
-					Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+					Inputs:  &core.VariableMap{Variables: []*core.VariableMapEntry{}},
+					Outputs: &core.VariableMap{Variables: []*core.VariableMapEntry{}},
 				}
 			}
 		} else {
@@ -73,13 +73,19 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 				}
 
 				// Compute exposed inputs as the union of all required inputs and any input overwritten by the node.
-				exposedInputs := map[string]*core.Variable{}
+				exposedInputs := []*core.VariableMapEntry{}
 				if inputs != nil && inputs.Parameters != nil {
-					for name, p := range inputs.Parameters {
-						if p.GetRequired() {
-							exposedInputs[name] = p.Var
-						} else if containsBindingByVariableName(node.GetInputs(), name) {
-							exposedInputs[name] = p.Var
+					for _, p := range inputs.Parameters {
+						if p.GetParameter().GetRequired() {
+							exposedInputs = append(exposedInputs, &core.VariableMapEntry{
+								Name: p.GetName(),
+								Var:  p.GetParameter().Var,
+							})
+						} else if containsBindingByVariableName(node.GetInputs(), p.GetName()) {
+							exposedInputs = append(exposedInputs, &core.VariableMapEntry{
+								Name: p.GetName(),
+								Var:  p.GetParameter().Var,
+							})
 						}
 						// else, the param has a default value and is not being overwritten by the node
 					}
