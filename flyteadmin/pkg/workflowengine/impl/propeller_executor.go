@@ -3,8 +3,6 @@ package impl
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-
 	interfaces2 "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -89,7 +87,7 @@ func (c *FlytePropeller) addPermissions(auth *admin.AuthRole, flyteWf *v1alpha1.
 
 func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 	workflowExecutionConfig *admin.WorkflowExecutionConfig, recoveryExecution *core.WorkflowExecutionIdentifier,
-	taskResources *admin.TaskResourceAttributes, flyteWf *v1alpha1.FlyteWorkflow) {
+	taskResources *interfaces.TaskResources, flyteWf *v1alpha1.FlyteWorkflow) {
 	executionConfig := v1alpha1.ExecutionConfig{
 		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
@@ -108,34 +106,31 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 	}
 	if taskResources != nil {
 		var requests = v1alpha1.TaskResourceSpec{}
-		if taskResources.Defaults != nil {
-			if len(taskResources.Defaults.Cpu) > 0 {
-				requests.CPU = resource.MustParse(taskResources.Defaults.Cpu)
-			}
-			if len(taskResources.Defaults.Memory) > 0 {
-				requests.Memory = resource.MustParse(taskResources.Defaults.Memory)
-			}
-			if len(taskResources.Defaults.EphemeralStorage) > 0 {
-				requests.EphemeralStorage = resource.MustParse(taskResources.Defaults.EphemeralStorage)
-			}
-			if len(taskResources.Defaults.Storage) > 0 {
-				requests.Storage = resource.MustParse(taskResources.Defaults.Storage)
-			}
+		if !taskResources.Defaults.CPU.IsZero() {
+			requests.CPU = taskResources.Defaults.CPU
 		}
+		if !taskResources.Defaults.Memory.IsZero() {
+			requests.Memory = taskResources.Defaults.Memory
+		}
+		if !taskResources.Defaults.EphemeralStorage.IsZero() {
+			requests.EphemeralStorage = taskResources.Defaults.EphemeralStorage
+		}
+		if !taskResources.Defaults.Storage.IsZero() {
+			requests.Storage = taskResources.Defaults.Storage
+		}
+
 		var limits = v1alpha1.TaskResourceSpec{}
-		if taskResources.Limits != nil {
-			if len(taskResources.Limits.Cpu) > 0 {
-				limits.CPU = resource.MustParse(taskResources.Limits.Cpu)
-			}
-			if len(taskResources.Limits.Memory) > 0 {
-				limits.Memory = resource.MustParse(taskResources.Limits.Memory)
-			}
-			if len(taskResources.Limits.EphemeralStorage) > 0 {
-				limits.EphemeralStorage = resource.MustParse(taskResources.Limits.EphemeralStorage)
-			}
-			if len(taskResources.Limits.Storage) > 0 {
-				limits.Storage = resource.MustParse(taskResources.Limits.Storage)
-			}
+		if !taskResources.Limits.CPU.IsZero() {
+			limits.CPU = taskResources.Limits.CPU
+		}
+		if !taskResources.Limits.Memory.IsZero() {
+			limits.Memory = taskResources.Limits.Memory
+		}
+		if !taskResources.Limits.EphemeralStorage.IsZero() {
+			limits.EphemeralStorage = taskResources.Limits.EphemeralStorage
+		}
+		if !taskResources.Limits.Storage.IsZero() {
+			limits.Storage = taskResources.Limits.Storage
 		}
 		executionConfig.TaskResources = v1alpha1.TaskResources{
 			Requests: requests,

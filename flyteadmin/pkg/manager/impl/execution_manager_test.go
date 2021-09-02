@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
 
@@ -78,12 +80,12 @@ var testCluster = "C1"
 var outputURI = "output uri"
 
 var resourceDefaults = runtimeInterfaces.TaskResourceSet{
-	CPU:    "200m",
-	Memory: "200Gi",
+	CPU:    resource.MustParse("200m"),
+	Memory: resource.MustParse("200Gi"),
 }
 var resourceLimits = runtimeInterfaces.TaskResourceSet{
-	CPU:    "300m",
-	Memory: "500Gi",
+	CPU:    resource.MustParse("300m"),
+	Memory: resource.MustParse("500Gi"),
 }
 
 func getLegacySpec() *admin.ExecutionSpec {
@@ -2675,10 +2677,10 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 
 func TestAssignResourcesIfUnset(t *testing.T) {
 	platformValues := runtimeInterfaces.TaskResourceSet{
-		CPU:              "200m",
-		GPU:              "8",
-		Memory:           "200Gi",
-		EphemeralStorage: "500Mi",
+		CPU:              resource.MustParse("200m"),
+		GPU:              resource.MustParse("8"),
+		Memory:           resource.MustParse("200Gi"),
+		EphemeralStorage: resource.MustParse("500Mi"),
 	}
 	t.Run("Set in task resource spec", func(t *testing.T) {
 		taskResourceSpec := &admin.TaskResourceSpec{
@@ -2719,15 +2721,15 @@ func TestAssignResourcesIfUnset(t *testing.T) {
 		assert.EqualValues(t, []*core.Resources_ResourceEntry{
 			{
 				Name:  core.Resources_CPU,
-				Value: platformValues.CPU,
+				Value: platformValues.CPU.String(),
 			},
 			{
 				Name:  core.Resources_MEMORY,
-				Value: platformValues.Memory,
+				Value: platformValues.Memory.String(),
 			},
 			{
 				Name:  core.Resources_EPHEMERAL_STORAGE,
-				Value: platformValues.EphemeralStorage,
+				Value: platformValues.EphemeralStorage.String(),
 			},
 		}, assignedResources)
 	})
@@ -2897,16 +2899,16 @@ func TestSetDefaults(t *testing.T) {
 
 	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
 	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:              "200m",
-		GPU:              "8",
-		Memory:           "200Gi",
-		EphemeralStorage: "500Mi",
+		CPU:              resource.MustParse("200m"),
+		GPU:              resource.MustParse("8"),
+		Memory:           resource.MustParse("200Gi"),
+		EphemeralStorage: resource.MustParse("500Mi"),
 	}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU:              "300m",
-		GPU:              "8",
-		Memory:           "500Gi",
-		EphemeralStorage: "501Mi",
+		CPU:              resource.MustParse("300m"),
+		GPU:              resource.MustParse("8"),
+		Memory:           resource.MustParse("500Gi"),
+		EphemeralStorage: resource.MustParse("501Mi"),
 	}
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
@@ -2975,13 +2977,13 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 
 	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
 	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
+		CPU:    resource.MustParse("200m"),
+		GPU:    resource.MustParse("8"),
+		Memory: resource.MustParse("200Gi"),
 	}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU: "300m",
-		GPU: "8",
+		CPU: resource.MustParse("300m"),
+		GPU: resource.MustParse("8"),
 	}
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
@@ -3041,21 +3043,21 @@ func TestCreateTaskDefaultLimits(t *testing.T) {
 		limits := runtimeInterfaces.TaskResourceSet{}
 
 		defaultLimits := createTaskDefaultLimits(context.Background(), task, limits)
-		assert.Equal(t, "200Mi", defaultLimits.Memory)
-		assert.Equal(t, "200m", defaultLimits.CPU)
+		assert.Equal(t, resource.MustParse("200Mi"), defaultLimits.Memory)
+		assert.Equal(t, resource.MustParse("200m"), defaultLimits.CPU)
 	})
 	t.Run("use_limits_from_config", func(t *testing.T) {
 		defaultLimits := createTaskDefaultLimits(context.Background(), task, resourceLimits)
-		assert.Equal(t, "500Gi", defaultLimits.Memory)
-		assert.Equal(t, "300m", defaultLimits.CPU)
+		assert.Equal(t, resource.MustParse("500Gi"), defaultLimits.Memory)
+		assert.Equal(t, resource.MustParse("300m"), defaultLimits.CPU)
 	})
 	t.Run("use_limits_from_config", func(t *testing.T) {
 		limits := runtimeInterfaces.TaskResourceSet{
-			CPU: "300m",
+			CPU: resource.MustParse("300m"),
 		}
 		defaultLimits := createTaskDefaultLimits(context.Background(), task, limits)
-		assert.Equal(t, "200Mi", defaultLimits.Memory)
-		assert.Equal(t, "300m", defaultLimits.CPU)
+		assert.Equal(t, resource.MustParse("200Mi"), defaultLimits.Memory)
+		assert.Equal(t, resource.MustParse("300m"), defaultLimits.CPU)
 	})
 }
 
@@ -3390,18 +3392,18 @@ func TestResolvePermissions(t *testing.T) {
 func TestGetTaskResources(t *testing.T) {
 	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
 	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:              "200m",
-		GPU:              "8",
-		Memory:           "200Gi",
-		EphemeralStorage: "500Mi",
-		Storage:          "400Mi",
+		CPU:              resource.MustParse("200m"),
+		GPU:              resource.MustParse("8"),
+		Memory:           resource.MustParse("200Gi"),
+		EphemeralStorage: resource.MustParse("500Mi"),
+		Storage:          resource.MustParse("400Mi"),
 	}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU:              "300m",
-		GPU:              "8",
-		Memory:           "500Gi",
-		EphemeralStorage: "501Mi",
-		Storage:          "450Mi",
+		CPU:              resource.MustParse("300m"),
+		GPU:              resource.MustParse("8"),
+		Memory:           resource.MustParse("500Gi"),
+		EphemeralStorage: resource.MustParse("501Mi"),
+		Storage:          resource.MustParse("450Mi"),
 	}
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
@@ -3410,22 +3412,22 @@ func TestGetTaskResources(t *testing.T) {
 	t.Run("use runtime application values", func(t *testing.T) {
 		execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), mockConfig, getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 		taskResourceAttrs := execManager.(*ExecutionManager).getTaskResources(context.TODO(), &workflowIdentifier)
-		assert.True(t, proto.Equal(taskResourceAttrs, &admin.TaskResourceAttributes{
-			Defaults: &admin.TaskResourceSpec{
-				Cpu:              "200m",
-				Gpu:              "8",
-				Memory:           "200Gi",
-				EphemeralStorage: "500Mi",
-				Storage:          "400Mi",
+		assert.EqualValues(t, taskResourceAttrs, &workflowengineInterfaces.TaskResources{
+			Defaults: runtimeInterfaces.TaskResourceSet{
+				CPU:              resource.MustParse("200m"),
+				GPU:              resource.MustParse("8"),
+				Memory:           resource.MustParse("200Gi"),
+				EphemeralStorage: resource.MustParse("500Mi"),
+				Storage:          resource.MustParse("400Mi"),
 			},
-			Limits: &admin.TaskResourceSpec{
-				Cpu:              "300m",
-				Gpu:              "8",
-				Memory:           "500Gi",
-				EphemeralStorage: "501Mi",
-				Storage:          "450Mi",
+			Limits: runtimeInterfaces.TaskResourceSet{
+				CPU:              resource.MustParse("300m"),
+				GPU:              resource.MustParse("8"),
+				Memory:           resource.MustParse("500Gi"),
+				EphemeralStorage: resource.MustParse("501Mi"),
+				Storage:          resource.MustParse("450Mi"),
 			},
-		}))
+		})
 	})
 	t.Run("use specific overrides", func(t *testing.T) {
 		resourceManager := managerMocks.MockResourceManager{}
@@ -3465,21 +3467,38 @@ func TestGetTaskResources(t *testing.T) {
 			config:          mockConfig,
 		}
 		taskResourceAttrs := executionManager.getTaskResources(context.TODO(), &workflowIdentifier)
-		assert.True(t, proto.Equal(taskResourceAttrs, &admin.TaskResourceAttributes{
-			Defaults: &admin.TaskResourceSpec{
-				Cpu:              "1200m",
-				Gpu:              "18",
-				Memory:           "1200Gi",
-				EphemeralStorage: "1500Mi",
-				Storage:          "1400Mi",
+		assert.EqualValues(t, taskResourceAttrs, &workflowengineInterfaces.TaskResources{
+			Defaults: runtimeInterfaces.TaskResourceSet{
+				CPU:              resource.MustParse("1200m"),
+				GPU:              resource.MustParse("18"),
+				Memory:           resource.MustParse("1200Gi"),
+				EphemeralStorage: resource.MustParse("1500Mi"),
+				Storage:          resource.MustParse("1400Mi"),
 			},
-			Limits: &admin.TaskResourceSpec{
-				Cpu:              "300m",
-				Gpu:              "8",
-				Memory:           "500Gi",
-				EphemeralStorage: "501Mi",
-				Storage:          "450Mi",
+			Limits: runtimeInterfaces.TaskResourceSet{
+				CPU:              resource.MustParse("300m"),
+				GPU:              resource.MustParse("8"),
+				Memory:           resource.MustParse("500Gi"),
+				EphemeralStorage: resource.MustParse("501Mi"),
+				Storage:          resource.MustParse("450Mi"),
 			},
-		}))
+		})
 	})
+}
+
+func TestFromAdminProtoTaskResourceSpec(t *testing.T) {
+	taskResourceSet := fromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
+		Cpu:              "1",
+		Memory:           "100",
+		Storage:          "200",
+		EphemeralStorage: "300",
+		Gpu:              "2",
+	})
+	assert.EqualValues(t, runtimeInterfaces.TaskResourceSet{
+		CPU:              resource.MustParse("1"),
+		Memory:           resource.MustParse("100"),
+		Storage:          resource.MustParse("200"),
+		EphemeralStorage: resource.MustParse("300"),
+		GPU:              resource.MustParse("2"),
+	}, taskResourceSet)
 }

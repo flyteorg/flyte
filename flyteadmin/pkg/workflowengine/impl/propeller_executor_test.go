@@ -23,6 +23,7 @@ import (
 	"errors"
 
 	flyte_admin_error "github.com/flyteorg/flyteadmin/pkg/errors"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -502,17 +503,17 @@ func TestAddExecutionOverrides(t *testing.T) {
 	})
 	t.Run("task resources", func(t *testing.T) {
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, nil, nil, &admin.TaskResourceAttributes{
-			Defaults: &admin.TaskResourceSpec{
-				Cpu:    "1",
-				Memory: "100Gi",
+		addExecutionOverrides(nil, nil, nil, &interfaces.TaskResources{
+			Defaults: runtimeInterfaces.TaskResourceSet{
+				CPU:    resource.MustParse("1"),
+				Memory: resource.MustParse("100Gi"),
 			},
-			Limits: &admin.TaskResourceSpec{
-				Cpu:              "2",
-				Memory:           "200Gi",
-				Storage:          "5Gi",
-				EphemeralStorage: "1Gi",
-				Gpu:              "1",
+			Limits: runtimeInterfaces.TaskResourceSet{
+				CPU:              resource.MustParse("2"),
+				Memory:           resource.MustParse("200Gi"),
+				Storage:          resource.MustParse("5Gi"),
+				EphemeralStorage: resource.MustParse("1Gi"),
+				GPU:              resource.MustParse("1"),
 			},
 		}, workflow)
 		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
