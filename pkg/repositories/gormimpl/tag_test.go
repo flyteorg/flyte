@@ -157,5 +157,5 @@ func TestTagAlreadyExists(t *testing.T) {
 	assert.Error(t, err)
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)
 	assert.True(t, ok)
-	assert.Equal(t, dcErr.Code(), codes.AlreadyExists)
+	assert.Equal(t, dcErr.Code().String(), codes.AlreadyExists.String())
 }

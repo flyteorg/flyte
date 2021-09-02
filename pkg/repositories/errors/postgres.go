@@ -1,11 +1,15 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
+
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/jackc/pgconn"
 
-	"github.com/flyteorg/datacatalog/pkg/errors"
+	catalogErrors "github.com/flyteorg/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 )
@@ -22,32 +26,38 @@ type postgresErrorTransformer struct {
 const (
 	unexpectedType            = "unexpected error type for: %v"
 	uniqueConstraintViolation = "value with matching already exists (%s)"
-	defaultPgError            = "failed database operation with %s"
+	defaultPgError            = "failed database operation with code [%s] and msg [%s]"
 	unsupportedTableOperation = "cannot query with specified table attributes: %s"
 )
 
 func (p *postgresErrorTransformer) fromGormError(err error) error {
 	switch err.Error() {
 	case gorm.ErrRecordNotFound.Error():
-		return errors.NewDataCatalogErrorf(codes.NotFound, "entry not found")
+		return catalogErrors.NewDataCatalogErrorf(codes.NotFound, "entry not found")
 	default:
-		return errors.NewDataCatalogErrorf(codes.Internal, unexpectedType, err)
+		return catalogErrors.NewDataCatalogErrorf(codes.Internal, unexpectedType, err)
 	}
 }
 
 func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
-	cErr, ok := err.(ConnectError)
+	if unwrappedErr := errors.Unwrap(err); unwrappedErr != nil {
+		err = unwrappedErr
+	}
+
+	pqError, ok := err.(*pgconn.PgError)
 	if !ok {
+		logger.InfofNoCtx("Unable to cast to pgconn.PgError. Error type: [%v]",
+			reflect.TypeOf(err))
 		return p.fromGormError(err)
 	}
-	pqError := cErr.Unwrap().(*pgconn.PgError)
+
 	switch pqError.Code {
 	case uniqueConstraintViolationCode:
-		return errors.NewDataCatalogErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Message)
+		return catalogErrors.NewDataCatalogErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Message)
 	case undefinedTable:
-		return errors.NewDataCatalogErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
+		return catalogErrors.NewDataCatalogErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
 	default:
-		return errors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Message))
+		return catalogErrors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message))
 	}
 }
 
