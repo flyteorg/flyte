@@ -3,8 +3,7 @@
 ## Platform
 1. Recovery Mode: Executions that fail due to external system failures (e.g. external system being down) can now be rerun in recovery mode ([flytectl --recover docs](https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_create_execution.html)). It's also available in the UI:
 
-   ![](https://i.imgur.com/hYYzkLK.png =864x150)
-
+   <img src="https://i.imgur.com/hYYzkLK.png" alt="UI For recover button" width="800"/>
 
 ## Flytekit
 1. Great Expectations Integration ([docs](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/greatexpectations/index.html#great-expectations)).
@@ -17,7 +16,7 @@ Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/
 ## UI
 1. Shiny new Graph UX. The graph rendering has been revamped to be more functional and accessible. More updates are coming for better visualization for nested executions and branches.
 
-   ![](https://i.imgur.com/HTfuios.png =888x555)
+   <img src="https://i.imgur.com/HTfuios.png" alt="UI For recover button" width="800"/>
 1. JSON Validation for json-based types in the UI.
 1. Enum support in UI
 
