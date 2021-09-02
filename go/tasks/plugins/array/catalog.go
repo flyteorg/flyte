@@ -344,14 +344,14 @@ func makeSingularTaskInterface(varMap *idlCore.VariableMap) *idlCore.VariableMap
 	}
 
 	res := &idlCore.VariableMap{
-		Variables: make(map[string]*idlCore.Variable, len(varMap.Variables)),
+		Variables: make([]*idlCore.VariableMapEntry, len(varMap.Variables)),
 	}
 
-	for key, val := range varMap.Variables {
-		if val.GetType().GetCollectionType() != nil {
-			res.Variables[key] = &idlCore.Variable{Type: val.GetType().GetCollectionType()}
+	for i, val := range varMap.Variables {
+		if val.GetVar().GetType().GetCollectionType() != nil {
+			res.Variables[i] = &idlCore.VariableMapEntry{Name: val.GetName(), Var: &idlCore.Variable{Type: val.GetVar().GetType().GetCollectionType()}}
 		} else {
-			res.Variables[key] = val
+			res.Variables[i] = val
 		}
 	}
 

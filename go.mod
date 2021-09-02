@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v0.19.2
+	github.com/flyteorg/flyteidl v0.20.0
 	github.com/flyteorg/flytestdlib v0.3.33
 	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/go-test/deep v1.0.7
