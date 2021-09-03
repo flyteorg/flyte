@@ -2714,10 +2714,10 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - name: minio
-    port: 9000
+    port: 30084
     protocol: TCP
     targetPort: minio
   selector: 

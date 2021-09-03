@@ -55,7 +55,10 @@ postgres:
 # MINIO
 #
 
-minio: {}
+minio:
+  service:
+    annotations: { }
+    type: NodePort
 
 #
 # CONTOUR
