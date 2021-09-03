@@ -17,7 +17,8 @@ echo "Done."
 
 # Deploy flyte
 echo "Deploying Flyte..."
-helm install -n flyte -f /flyteorg/share/flyte/values-sandbox.yaml --create-namespace flyte /flyteorg/share/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml
+helm repo add flyteorg https://flyteorg.github.io/flyte
+helm install -n flyte -f /flyteorg/share/values-sandbox.yaml --create-namespace flyte flyteorg/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml
 
 wait-for-flyte.sh
 
