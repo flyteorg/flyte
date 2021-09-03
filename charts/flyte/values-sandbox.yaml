@@ -87,6 +87,7 @@ kubernetes-dashboard:
   service:
     type: NodePort
     externalPort: 30082
+    nodePort: 30082
 
 # ------------------------------------------------
 #

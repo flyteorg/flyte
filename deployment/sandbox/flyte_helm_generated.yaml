@@ -2609,6 +2609,7 @@ spec:
   - port: 30082
     targetPort: http
     name: http
+    nodePort: 30082
   selector:
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/instance: flyte
@@ -2717,7 +2718,8 @@ spec:
   type: NodePort
   ports:
   - name: minio
-    port: 30084
+    nodePort: 30084
+    port: 9000
     protocol: TCP
     targetPort: minio
   selector: 
