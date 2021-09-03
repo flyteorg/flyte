@@ -45,10 +45,11 @@ var launchPlanIdentifier = core.Identifier{
 	Version:      version,
 }
 
-var launchPlanNamedIdentifier = admin.NamedEntityIdentifier{
+var launchPlanNamedIdentifier = core.Identifier{
 	Project: project,
 	Domain:  domain,
 	Name:    name,
+	Version: "version",
 }
 
 func getMockRepositoryForLpTest() repositories.RepositoryInterface {
@@ -512,6 +513,7 @@ func TestUpdateSchedules(t *testing.T) {
 				Project: project,
 				Domain:  domain,
 				Name:    name,
+				Version: "version",
 			},
 			Spec: newLaunchPlanSpecBytes,
 		},
@@ -520,6 +522,7 @@ func TestUpdateSchedules(t *testing.T) {
 				Project: project,
 				Domain:  domain,
 				Name:    name,
+				Version: "version",
 			},
 			Spec: oldLaunchPlanSpecBytes,
 		})
@@ -528,7 +531,7 @@ func TestUpdateSchedules(t *testing.T) {
 	assert.True(t, addCalled)
 }
 
-func TestUpdateSchedules_NothingToDisable(t *testing.T) {
+func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 	newScheduleExpression := admin.Schedule{
 		ScheduleExpression: &admin.Schedule_CronExpression{
 			CronExpression: "cron",
@@ -544,10 +547,11 @@ func TestUpdateSchedules_NothingToDisable(t *testing.T) {
 	var addCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
-			assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+			assert.True(t, proto.Equal(&core.Identifier{
 				Project: project,
 				Domain:  domain,
 				Name:    name,
+				Version: "v1",
 			}, &input.Identifier))
 			assert.True(t, proto.Equal(&newScheduleExpression, &input.ScheduleExpression))
 			addCalled = true
@@ -560,6 +564,7 @@ func TestUpdateSchedules_NothingToDisable(t *testing.T) {
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 		Spec: newLaunchPlanSpecBytes,
 	}, nil)
@@ -581,6 +586,7 @@ func TestUpdateSchedules_NothingToDisable(t *testing.T) {
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 		Spec: newLaunchPlanSpecBytes,
 	}, &models.LaunchPlan{
@@ -590,7 +596,7 @@ func TestUpdateSchedules_NothingToDisable(t *testing.T) {
 	assert.True(t, addCalled)
 }
 
-func TestUpdateSchedules_NothingToEnable(t *testing.T) {
+func TestUpdateSchedules_NothingToEnableButRedo(t *testing.T) {
 	oldScheduleExpression := admin.Schedule{
 		ScheduleExpression: &admin.Schedule_Rate{
 			Rate: &admin.FixedRate{
@@ -609,11 +615,13 @@ func TestUpdateSchedules_NothingToEnable(t *testing.T) {
 	var removeCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
-			assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+			areEqual := proto.Equal(&core.Identifier{
 				Project: project,
 				Domain:  domain,
 				Name:    name,
-			}, &input.Identifier))
+				Version: "v1",
+			}, &input.Identifier)
+			assert.True(t, areEqual)
 			removeCalled = true
 			return nil
 		})
@@ -625,12 +633,14 @@ func TestUpdateSchedules_NothingToEnable(t *testing.T) {
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 	}, &models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 		Spec: oldLaunchPlanSpecBytes,
 	})
@@ -638,7 +648,7 @@ func TestUpdateSchedules_NothingToEnable(t *testing.T) {
 	assert.True(t, removeCalled)
 }
 
-func TestUpdateSchedules_NothingToDo(t *testing.T) {
+func TestUpdateSchedules_NothingToDoButRedo(t *testing.T) {
 	scheduleExpression := admin.Schedule{
 		ScheduleExpression: &admin.Schedule_CronExpression{
 			CronExpression: "cron",
@@ -672,6 +682,7 @@ func TestUpdateSchedules_NothingToDo(t *testing.T) {
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 		Spec: launchPlanSpecBytes,
 	}, &models.LaunchPlan{
@@ -679,29 +690,32 @@ func TestUpdateSchedules_NothingToDo(t *testing.T) {
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 		Spec: launchPlanSpecBytes,
 	})
 	assert.Nil(t, err)
-	assert.False(t, removeCalled)
-	assert.False(t, addCalled)
+	assert.True(t, removeCalled)
+	assert.True(t, addCalled)
 
 	err = lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 	}, &models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
 			Domain:  domain,
 			Name:    name,
+			Version: "v1",
 		},
 	})
 	assert.Nil(t, err)
-	assert.False(t, removeCalled)
-	assert.False(t, addCalled)
+	assert.True(t, removeCalled)
+	assert.True(t, addCalled)
 }
 
 func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {

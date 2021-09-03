@@ -40,10 +40,17 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 })
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{
 	EventSchedulerConfig: interfaces.EventSchedulerConfig{
-		Scheme: common.Local,
+		Scheme:               common.Local,
+		FlyteSchedulerConfig: &interfaces.FlyteSchedulerConfig{},
 	},
 	WorkflowExecutorConfig: interfaces.WorkflowExecutorConfig{
 		Scheme: common.Local,
+		FlyteWorkflowExecutorConfig: &interfaces.FlyteWorkflowExecutorConfig{
+			AdminRateLimit: &interfaces.AdminRateLimit{
+				Tps:   100,
+				Burst: 10,
+			},
+		},
 	},
 })
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{

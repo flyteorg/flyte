@@ -25,6 +25,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.4.3
+	github.com/google/uuid v1.2.0
 	github.com/googleapis/gax-go/v2 v2.0.5
 	github.com/googleapis/gnostic v0.5.4 // indirect
 	github.com/gorilla/handlers v1.5.1
@@ -48,6 +49,7 @@ require (
 	github.com/prometheus/common v0.19.0 // indirect
 	github.com/qor/qor v1.2.0 // indirect
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/sendgrid/rest v2.6.4+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -56,6 +58,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b // indirect
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
+	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.1.2 // indirect
 	google.golang.org/api v0.42.0
 	google.golang.org/genproto v0.0.0-20210315173758-2651cd453018
@@ -72,3 +75,5 @@ require (
 	sigs.k8s.io/controller-runtime v0.8.3
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.0 // indirect
 )
+
+replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84

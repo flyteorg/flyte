@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	schedulerInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
@@ -34,6 +35,8 @@ type RepositoryInterface interface {
 	NodeExecutionEventRepo() interfaces.NodeExecutionEventRepoInterface
 	TaskExecutionRepo() interfaces.TaskExecutionRepoInterface
 	NamedEntityRepo() interfaces.NamedEntityRepoInterface
+	SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface
+	ScheduleEntitiesSnapshotRepo() schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
 }
 
 func GetRepository(repoType RepoConfig, dbConfig config.DbConfig, scope promutils.Scope) RepositoryInterface {

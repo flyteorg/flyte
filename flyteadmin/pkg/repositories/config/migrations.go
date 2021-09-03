@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	schedulerModels "github.com/flyteorg/flyteadmin/scheduler/repositories/models"
 	"github.com/jinzhu/gorm"
 	gormigrate "gopkg.in/gormigrate.v1"
 )
@@ -303,6 +304,26 @@ var Migrations = []*gormigrate.Migration{
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Model(&models.NodeExecution{}).DropColumn("dynamic_workflow_remote_closure_reference").Error
+		},
+	},
+
+	{
+		ID: "2021-07-22-schedulable_entities",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&schedulerModels.SchedulableEntity{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("schedulable_entities").Error
+		},
+	},
+
+	{
+		ID: "2021-08-05-schedulable_entities_snapshot",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&schedulerModels.ScheduleEntitiesSnapshot{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("schedulable_entities_snapshot").Error
 		},
 	},
 }

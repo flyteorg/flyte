@@ -1,5 +1,7 @@
 package interfaces
 
+import "golang.org/x/time/rate"
+
 // This configuration section is used to for initiating the database connection with the store that holds registered
 // entities (e.g. workflows, tasks, launch plans...)
 // This struct specifically maps to the flyteadmin config yaml structure.
@@ -69,6 +71,48 @@ type EventSchedulerConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
 	// scheme is used.
 	Scheme string `json:"scheme"`
+
+	// Deprecated : Some cloud providers require a region to be set.
+	Region string `json:"region"`
+	// Deprecated : The role assumed to register and activate schedules.
+	ScheduleRole string `json:"scheduleRole"`
+	// Deprecated : The name of the queue for which scheduled events should enqueue.
+	TargetName string `json:"targetName"`
+	// Deprecated : Optional: The application-wide prefix to be applied for schedule names.
+	ScheduleNamePrefix   string                `json:"scheduleNamePrefix"`
+	AWSSchedulerConfig   *AWSSchedulerConfig   `json:"aws"`
+	FlyteSchedulerConfig *FlyteSchedulerConfig `json:"local"`
+}
+
+func (e *EventSchedulerConfig) GetScheme() string {
+	return e.Scheme
+}
+
+func (e *EventSchedulerConfig) GetRegion() string {
+	return e.Region
+}
+
+func (e *EventSchedulerConfig) GetScheduleRole() string {
+	return e.ScheduleRole
+}
+
+func (e *EventSchedulerConfig) GetTargetName() string {
+	return e.TargetName
+}
+
+func (e *EventSchedulerConfig) GetScheduleNamePrefix() string {
+	return e.ScheduleNamePrefix
+}
+
+func (e *EventSchedulerConfig) GetAWSSchedulerConfig() *AWSSchedulerConfig {
+	return e.AWSSchedulerConfig
+}
+
+func (e *EventSchedulerConfig) GetFlyteSchedulerConfig() *FlyteSchedulerConfig {
+	return e.FlyteSchedulerConfig
+}
+
+type AWSSchedulerConfig struct {
 	// Some cloud providers require a region to be set.
 	Region string `json:"region"`
 	// The role assumed to register and activate schedules.
@@ -79,11 +123,67 @@ type EventSchedulerConfig struct {
 	ScheduleNamePrefix string `json:"scheduleNamePrefix"`
 }
 
+func (a *AWSSchedulerConfig) GetRegion() string {
+	return a.Region
+}
+
+func (a *AWSSchedulerConfig) GetScheduleRole() string {
+	return a.ScheduleRole
+}
+
+func (a *AWSSchedulerConfig) GetTargetName() string {
+	return a.TargetName
+}
+
+func (a *AWSSchedulerConfig) GetScheduleNamePrefix() string {
+	return a.ScheduleNamePrefix
+}
+
+// FlyteSchedulerConfig is the config for native or default flyte scheduler
+type FlyteSchedulerConfig struct {
+}
+
 // This section holds configuration for the executor that processes workflow scheduled events fired.
 type WorkflowExecutorConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
 	// scheme is used.
 	Scheme string `json:"scheme"`
+	// Deprecated : Some cloud providers require a region to be set.
+	Region string `json:"region"`
+	// Deprecated : The name of the queue onto which scheduled events will enqueue.
+	ScheduleQueueName string `json:"scheduleQueueName"`
+	// Deprecated : The account id (according to whichever cloud provider scheme is used) that has permission to read from the above
+	// queue.
+	AccountID                   string                       `json:"accountId"`
+	AWSWorkflowExecutorConfig   *AWSWorkflowExecutorConfig   `json:"aws"`
+	FlyteWorkflowExecutorConfig *FlyteWorkflowExecutorConfig `json:"local"`
+}
+
+func (w *WorkflowExecutorConfig) GetScheme() string {
+	return w.Scheme
+}
+
+func (w *WorkflowExecutorConfig) GetRegion() string {
+	return w.Region
+}
+
+func (w *WorkflowExecutorConfig) GetScheduleScheduleQueueName() string {
+	return w.ScheduleQueueName
+}
+
+func (w *WorkflowExecutorConfig) GetAccountID() string {
+	return w.AccountID
+}
+
+func (w *WorkflowExecutorConfig) GetAWSWorkflowExecutorConfig() *AWSWorkflowExecutorConfig {
+	return w.AWSWorkflowExecutorConfig
+}
+
+func (w *WorkflowExecutorConfig) GetFlyteWorkflowExecutorConfig() *FlyteWorkflowExecutorConfig {
+	return w.FlyteWorkflowExecutorConfig
+}
+
+type AWSWorkflowExecutorConfig struct {
 	// Some cloud providers require a region to be set.
 	Region string `json:"region"`
 	// The name of the queue onto which scheduled events will enqueue.
@@ -91,6 +191,43 @@ type WorkflowExecutorConfig struct {
 	// The account id (according to whichever cloud provider scheme is used) that has permission to read from the above
 	// queue.
 	AccountID string `json:"accountId"`
+}
+
+func (a *AWSWorkflowExecutorConfig) GetRegion() string {
+	return a.Region
+}
+
+func (a *AWSWorkflowExecutorConfig) GetScheduleScheduleQueueName() string {
+	return a.ScheduleQueueName
+}
+
+func (a *AWSWorkflowExecutorConfig) GetAccountID() string {
+	return a.AccountID
+}
+
+// FlyteWorkflowExecutorConfig specifies the workflow executor configuration for the native flyte scheduler
+type FlyteWorkflowExecutorConfig struct {
+	// This allows to control the number of TPS that hit admin using the scheduler.
+	// eg : 100 TPS will send at the max 100 schedule requests to admin per sec.
+	// Burst specifies burst traffic count
+	AdminRateLimit *AdminRateLimit `json:"adminRateLimit"`
+}
+
+func (f *FlyteWorkflowExecutorConfig) GetAdminRateLimit() *AdminRateLimit {
+	return f.AdminRateLimit
+}
+
+type AdminRateLimit struct {
+	Tps   rate.Limit `json:"tps"`
+	Burst int        `json:"burst"`
+}
+
+func (f *AdminRateLimit) GetTps() rate.Limit {
+	return f.Tps
+}
+
+func (f *AdminRateLimit) GetBurst() int {
+	return f.Burst
 }
 
 // This configuration is the base configuration for all scheduler-related set-up.
@@ -101,6 +238,22 @@ type SchedulerConfig struct {
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the workflow executor client.
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+}
+
+func (s *SchedulerConfig) GetEventSchedulerConfig() EventSchedulerConfig {
+	return s.EventSchedulerConfig
+}
+
+func (s *SchedulerConfig) GetWorkflowExecutorConfig() WorkflowExecutorConfig {
+	return s.WorkflowExecutorConfig
+}
+
+func (s *SchedulerConfig) GetReconnectAttempts() int {
+	return s.ReconnectAttempts
+}
+
+func (s *SchedulerConfig) GetReconnectDelaySeconds() int {
+	return s.ReconnectDelaySeconds
 }
 
 // Configuration specific to setting up signed urls.

@@ -1,4 +1,5 @@
 export REPOSITORY=flyteadmin
+export FLYTE_SCHEDULER_REPOSITORY=flytescheduler
 include boilerplate/flyte/docker_build/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 include boilerplate/flyte/end2end/Makefile
@@ -14,6 +15,10 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 update_boilerplate:
 	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
+
+.PHONY: docker_build_scheduler
+docker_build_scheduler:
+	docker build -t $$FLYTE_SCHEDULER_REPOSITORY:$(GIT_HASH) -f Dockerfile.scheduler .
 
 .PHONY: integration
 integration:
@@ -31,13 +36,28 @@ k8s_integration_execute:
 compile:
 	go build -o flyteadmin -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyteadmin ${GOPATH}/bin
 
+.PHONY: compile_scheduler
+compile_scheduler:
+	go build -o flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/ && mv ./flytescheduler ${GOPATH}/bin
+
+
 .PHONY: linux_compile
 linux_compile:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
 
+.PHONY: linux_compile_scheduler
+linux_compile_scheduler:
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
+
+
 .PHONY: server
 server:
 	go run cmd/main.go serve  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+
+.PHONY: scheduler
+scheduler:
+	go run scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+
 
 .PHONY: migrate
 migrate:

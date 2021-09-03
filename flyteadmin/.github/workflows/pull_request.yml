@@ -27,7 +27,21 @@ jobs:
           docker build -t flyteorg/${{ github.event.repository.name }}:latest --cache-from=flyteorg/${{ github.event.repository.name }}:builder .
 
       - name: Tag and cache docker image
-        run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+        run:  mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+
+      - name: Build Flytescheduler Docker Image
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: flytescheduler
+          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
+          push_git_tag: true
+          push_image_and_stages: false
+          dockerfile: Dockerfile.scheduler
+          registry: ghcr.io
+          build_extra_args: "--compress=true"
+
 
   endtoend:
     name: End to End tests

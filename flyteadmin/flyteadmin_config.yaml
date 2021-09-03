@@ -75,6 +75,10 @@ scheduler:
     scheduleNamePrefix: "flyte"
   workflowExecutor:
     scheme: local
+    local:
+      adminRateLimit:
+        tps: 100 # per sec how many requests to send to admin
+        burst: 10 # burst count of request to admin
     region: "my-region"
     scheduleQueueName: "won't-work-locally"
     accountId: "abc123"
