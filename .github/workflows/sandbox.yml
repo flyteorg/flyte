@@ -21,7 +21,7 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: latest,${{ github.sha }},${{ github.event.ref }}
+          image_tag: latest,${{ github.sha }}
           registry: ghcr.io
           build_extra_args: "--target=default --compress=true"
           context: ./
@@ -40,7 +40,7 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
+          image_tag: dind,dind-${{ github.sha }}
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
           context: ./
