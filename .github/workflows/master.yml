@@ -117,6 +117,17 @@ jobs:
           registry: ghcr.io
           build_extra_args: "--compress=true"
 
+      - name: Push Flytescheduler Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: flytescheduler
+          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
+          push_git_tag: true
+          dockerfile: Dockerfile.scheduler
+          registry: ghcr.io
+          build_extra_args: "--compress=true"
   tests-lint:
     name: Run tests and lint
     runs-on: ubuntu-latest

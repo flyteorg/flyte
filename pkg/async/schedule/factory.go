@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/async"
-
 	gizmoConfig "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/flyteorg/flyteadmin/pkg/async"
 	awsSchedule "github.com/flyteorg/flyteadmin/pkg/async/schedule/aws"
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/noop"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	flytescheduler "github.com/flyteorg/flyteadmin/scheduler/dbapi"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 )
@@ -56,7 +57,7 @@ func (w *workflowScheduler) GetWorkflowExecutor(
 	return w.workflowExecutor
 }
 
-func NewWorkflowScheduler(cfg WorkflowSchedulerConfig) WorkflowScheduler {
+func NewWorkflowScheduler(db repositories.RepositoryInterface, cfg WorkflowSchedulerConfig) WorkflowScheduler {
 	var eventScheduler interfaces.EventScheduler
 	var workflowExecutor interfaces.WorkflowExecutor
 
@@ -81,7 +82,9 @@ func NewWorkflowScheduler(cfg WorkflowSchedulerConfig) WorkflowScheduler {
 			cfg.SchedulerConfig.EventSchedulerConfig.ScheduleRole, cfg.SchedulerConfig.EventSchedulerConfig.TargetName, sess, awsConfig,
 			cfg.Scope.NewSubScope("cloudwatch_scheduler"))
 	case common.Local:
-		fallthrough
+		logger.Infof(context.Background(),
+			"Using default flyte scheduler implementation")
+		eventScheduler = flytescheduler.New(db)
 	default:
 		logger.Infof(context.Background(),
 			"Using default noop event scheduler implementation for cloud provider type [%s]",

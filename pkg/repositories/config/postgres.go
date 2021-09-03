@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flytestdlib/promutils"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
 	"github.com/qor/validations"
