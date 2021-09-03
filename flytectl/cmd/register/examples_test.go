@@ -16,11 +16,11 @@ func TestRegisterExamplesFunc(t *testing.T) {
 func TestRegisterExamplesFuncErr(t *testing.T) {
 	setup()
 	registerFilesSetup()
-	githubRepository = "testingsnacks"
+	flytesnacksRepository = "testingsnacks"
 	args = []string{""}
 
 	err := registerExamplesFunc(ctx, args, cmdCtx)
 	// TODO (Yuvraj) make test to success after fixing flytesnacks bug
 	assert.NotNil(t, err)
-	githubRepository = "flytesnacks"
+	flytesnacksRepository = "flytesnacks"
 }

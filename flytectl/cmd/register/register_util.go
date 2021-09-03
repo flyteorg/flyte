@@ -55,21 +55,7 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-var FlyteSnacksRelease []FlyteSnack
 var Client *storage.DataStore
-
-// FlyteSnack Defines flyte test manifest structure
-type FlyteSnack struct {
-	Name          string    `json:"name"`
-	Priority      string    `json:"priority"`
-	Path          string    `json:"path"`
-	ExitCondition Condition `json:"exitCondition"`
-}
-
-type Condition struct {
-	ExitSuccess bool   `json:"exit_success"`
-	ExitMessage string `json:"exit_message"`
-}
 
 var httpClient HTTPClient
 
@@ -242,12 +228,12 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
 
 func hydrateLaunchPlanSpec(lpSpec *admin.LaunchPlanSpec) {
 	assumableIamRole := len(rconfig.DefaultFilesConfig.AssumableIamRole) > 0
-	k8ServiceAcct := len(rconfig.DefaultFilesConfig.K8ServiceAccount) > 0
+	k8sServiceAcct := len(rconfig.DefaultFilesConfig.K8sServiceAccount) > 0
 	outputLocationPrefix := len(rconfig.DefaultFilesConfig.OutputLocationPrefix) > 0
-	if assumableIamRole || k8ServiceAcct {
+	if assumableIamRole || k8sServiceAcct {
 		lpSpec.AuthRole = &admin.AuthRole{
 			AssumableIamRole:         rconfig.DefaultFilesConfig.AssumableIamRole,
-			KubernetesServiceAccount: rconfig.DefaultFilesConfig.K8ServiceAccount,
+			KubernetesServiceAccount: rconfig.DefaultFilesConfig.K8sServiceAccount,
 		}
 	}
 	if outputLocationPrefix {
@@ -468,32 +454,34 @@ func getJSONSpec(message proto.Message) string {
 	return jsonSpec
 }
 
-func getFlyteTestManifest(org, repository string) ([]FlyteSnack, string, error) {
+func filterExampleFromRelease(releases github.RepositoryRelease) []github.ReleaseAsset {
+	var assets []github.ReleaseAsset
+	for _, v := range releases.Assets {
+		if strings.HasSuffix(*v.Name, ".tgz") {
+			assets = append(assets, v)
+		}
+	}
+	return assets
+}
+
+func getAllFlytesnacksExample(org, repository, release string) ([]github.ReleaseAsset, string, error) {
 	c := github.NewClient(nil)
 	opt := &github.ListOptions{Page: 1, PerPage: 1}
+	if len(release) > 0 {
+		releases, _, err := c.Repositories.GetReleaseByTag(context.Background(), org, repository, release)
+		if err != nil {
+			return nil, "", err
+		}
+		return filterExampleFromRelease(*releases), release, nil
+	}
 	releases, _, err := c.Repositories.ListReleases(context.Background(), org, repository, opt)
 	if err != nil {
 		return nil, "", err
 	}
 	if len(releases) == 0 {
-		return nil, "", fmt.Errorf("Repository doesn't have any release")
+		return nil, "", fmt.Errorf("repository doesn't have any release")
 	}
-	response, err := http.Get(fmt.Sprintf(flyteManifest, *releases[0].TagName))
-	if err != nil {
-		return nil, "", err
-	}
-	defer response.Body.Close()
-
-	data, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, "", err
-	}
-
-	err = json.Unmarshal(data, &FlyteSnacksRelease)
-	if err != nil {
-		return nil, "", err
-	}
-	return FlyteSnacksRelease, *releases[0].TagName, nil
+	return filterExampleFromRelease(*releases[0]), *releases[0].TagName, nil
 
 }
 
@@ -579,4 +567,11 @@ func segregateSourceAndProtos(dataRefs []string) (string, []string, []string) {
 		}
 	}
 	return sourceCode, validProto, InvalidFiles
+}
+
+func deprecatedCheck(ctx context.Context) {
+	if len(rconfig.DefaultFilesConfig.K8ServiceAccount) > 0 {
+		logger.Warning(ctx, "--K8ServiceAccount is deprecated, Please use --K8sServiceAccount")
+		rconfig.DefaultFilesConfig.K8sServiceAccount = rconfig.DefaultFilesConfig.K8ServiceAccount
+	}
 }

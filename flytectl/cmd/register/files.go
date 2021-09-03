@@ -99,6 +99,9 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	var _err error
 	var dataRefs []string
 
+	// Deprecated checks for --k8Service
+	deprecatedCheck(ctx)
+
 	// getSerializeOutputFiles will return you all proto and  source code compress file in sorted order
 	dataRefs, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	if err != nil {
