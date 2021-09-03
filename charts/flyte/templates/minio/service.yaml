@@ -14,7 +14,8 @@ spec:
   {{- end }}
   ports:
   - name: minio
-    port: 30084
+    nodePort: 30084
+    port: 9000
     protocol: TCP
     targetPort: minio
   selector: {{ include "minio.selectorLabels" . | nindent 4 }}

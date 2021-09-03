@@ -2,9 +2,8 @@ name: Build & Push Sandbox Docker Image
 
 on:
   pull_request:
-  push:
-    branches:
-      - master
+  release:
+    types: [published]
 
 jobs:
   push-sandbox-image:
@@ -21,12 +20,12 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: latest,${{ github.sha }}
+          image_tag: latest,${{ github.sha }},${{ github.event.ref }}
           registry: ghcr.io
           build_extra_args: "--target=default --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event_name != 'pull_request' }}
+          push_image_and_stages: ${{ github.event_name == 'release' }}
   push-sandbox-dind-image:
     name: Push sandbox DinD image to GHCR
     runs-on: ubuntu-latest
@@ -40,9 +39,9 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: dind,dind-${{ github.sha }}
+          image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event_name != 'pull_request' }}
+          push_image_and_stages: ${{ github.event_name == 'release' }}

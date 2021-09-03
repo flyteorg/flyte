@@ -2611,6 +2611,29 @@ spec:
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/minio/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - name: minio
+    nodePort: 30084
+    port: 9000
+    protocol: TCP
+    targetPort: minio
+  selector: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte/templates/postgres/service.yaml
 apiVersion: v1
 kind: Service
@@ -3367,6 +3390,60 @@ spec:
       - configMap:
           name: datacatalog-config
         name: config-volume
+---
+# Source: flyte/templates/minio/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: minio
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: minio
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+      - image: "minio/minio:RELEASE.2020-12-16T05-05-17Z"
+        imagePullPolicy: "IfNotPresent"
+        name: minio
+        args:
+        - server
+        - /data
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: minio
+        - name: MINIO_SECRET_KEY
+          value: miniostorage
+        ports:
+        - containerPort: 9000
+          name: minio
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /var/lib/minioql/data
+      volumes:
+      - name: minio-storage
+        emptyDir: {}
 ---
 # Source: flyte/templates/postgres/deployment.yaml
 apiVersion: apps/v1
