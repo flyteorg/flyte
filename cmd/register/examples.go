@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytestdlib/logger"
+
+	"github.com/google/go-github/github"
+
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
@@ -16,27 +20,42 @@ Registers all latest flytesnacks example
 
  bin/flytectl register examples  -d development  -p flytesnacks
 
+Registers specific release of flytesnacks example
+::
 
+ bin/flytectl register examples  -d development  -p flytesnacks v0.2.176
+	
+Note: register command automatically override the version with release version	
 Usage
 `
 )
 
 var (
-	githubOrg        = "flyteorg"
-	githubRepository = "flytesnacks"
-	snackReleaseURL  = "https://github.com/flyteorg/flytesnacks/releases/download/%s/flytesnacks-%s.tgz"
-	flyteManifest    = "https://github.com/flyteorg/flytesnacks/releases/download/%s/flyte_tests_manifest.json"
+	githubOrg             = "flyteorg"
+	flytesnacksRepository = "flytesnacks"
 )
 
 func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	flytesnacks, tag, err := getFlyteTestManifest(githubOrg, githubRepository)
+	var examples []github.ReleaseAsset
+	var release string
+
+	// Deprecated checks for --k8Service
+	deprecatedCheck(ctx)
+
+	if len(args) == 1 {
+		release = args[0]
+	}
+	examples, tag, err := getAllFlytesnacksExample(githubOrg, flytesnacksRepository, release)
 	if err != nil {
 		return err
 	}
+
+	logger.Infof(ctx, "Register started for %s %s release https://github.com/%s/%s/releases/tag/%s", flytesnacksRepository, tag, githubOrg, flytesnacksRepository, tag)
 	rconfig.DefaultFilesConfig.Archive = true
-	for _, v := range flytesnacks {
+	rconfig.DefaultFilesConfig.Version = tag
+	for _, v := range examples {
 		args := []string{
-			fmt.Sprintf(snackReleaseURL, tag, v.Name),
+			*v.BrowserDownloadURL,
 		}
 		if err := Register(ctx, args, cmdCtx); err != nil {
 			return fmt.Errorf("Example %v failed to register %v", v.Name, err)

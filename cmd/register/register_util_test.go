@@ -53,7 +53,7 @@ func registerFilesSetup() {
 	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
 
 	rconfig.DefaultFilesConfig.AssumableIamRole = ""
-	rconfig.DefaultFilesConfig.K8ServiceAccount = ""
+	rconfig.DefaultFilesConfig.K8sServiceAccount = ""
 	rconfig.DefaultFilesConfig.OutputLocationPrefix = ""
 }
 
@@ -278,19 +278,19 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		hydrateLaunchPlanSpec(lpSpec)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.AuthRole)
 	})
-	t.Run("k8Service account override", func(t *testing.T) {
+	t.Run("k8sService account override", func(t *testing.T) {
 		setup()
 		registerFilesSetup()
-		rconfig.DefaultFilesConfig.K8ServiceAccount = "k8Account"
+		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
 		lpSpec := &admin.LaunchPlanSpec{}
 		hydrateLaunchPlanSpec(lpSpec)
 		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
 	})
-	t.Run("Both k8Service and IamRole", func(t *testing.T) {
+	t.Run("Both k8sService and IamRole", func(t *testing.T) {
 		setup()
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.AssumableIamRole = "iamRole"
-		rconfig.DefaultFilesConfig.K8ServiceAccount = "k8Account"
+		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
 		lpSpec := &admin.LaunchPlanSpec{}
 		hydrateLaunchPlanSpec(lpSpec)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole",
@@ -304,13 +304,6 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		hydrateLaunchPlanSpec(lpSpec)
 		assert.Equal(t, &admin.RawOutputDataConfig{OutputLocationPrefix: "prefix"}, lpSpec.RawOutputDataConfig)
 	})
-}
-
-func TestFlyteManifest(t *testing.T) {
-	_, tag, err := getFlyteTestManifest(githubOrg, githubRepository)
-	assert.Nil(t, err)
-	assert.Contains(t, tag, "v")
-	assert.NotEmpty(t, tag)
 }
 
 func TestUploadFastRegisterArtifact(t *testing.T) {
@@ -358,22 +351,22 @@ func TestGetStorageClient(t *testing.T) {
 	})
 }
 
-func TestGetFlyteTestManifest(t *testing.T) {
+func TestGetAllFlytesnacksExample(t *testing.T) {
 	t.Run("Failed to get manifest with wrong name", func(t *testing.T) {
-		_, tag, err := getFlyteTestManifest("no////ne", "no////ne")
+		_, tag, err := getAllFlytesnacksExample("no////ne", "no////ne", "")
 		assert.NotNil(t, err)
 		assert.Equal(t, len(tag), 0)
 	})
 	t.Run("Failed to get release", func(t *testing.T) {
-		_, tag, err := getFlyteTestManifest("flyteorg", "homebrew-tap")
+		_, tag, err := getAllFlytesnacksExample("flyteorg", "homebrew-tap", "")
 		assert.NotNil(t, err)
 		assert.Equal(t, len(tag), 0)
 	})
-	t.Run("Failed to get manifest", func(t *testing.T) {
-		flyteManifest = ""
-		_, tag, err := getFlyteTestManifest("flyteorg", "flytesnacks")
-		assert.NotNil(t, err)
-		assert.Equal(t, len(tag), 0)
+	t.Run("Successfully get examples", func(t *testing.T) {
+		assets, tag, err := getAllFlytesnacksExample("flyteorg", "flytesnacks", "v0.2.175")
+		assert.Nil(t, err)
+		assert.Greater(t, len(tag), 0)
+		assert.Greater(t, len(assets), 0)
 	})
 }
 

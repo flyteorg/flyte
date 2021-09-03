@@ -155,6 +155,20 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_k8sServiceAccount", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("k8sServiceAccount", testValue)
+			if vString, err := cmdFlags.GetString("k8sServiceAccount"); err == nil {
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.K8sServiceAccount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_k8ServiceAccount", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
