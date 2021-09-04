@@ -50,6 +50,10 @@ simple_task_object = GreatExpectationsTask(
 # Next, we define a task that validates the data before returning the shape of the DataFrame.
 @task(limits=Resources(mem="500Mi"))
 def simple_task(csv_file: str) -> int:
+    # GreatExpectationsTask returns Great Expectations' checkpoint result.
+    # You can print the result to know more about the data within it.
+    # If the data validation fails, this will return a ValidationError.
+    result = simple_task_object(dataset=csv_file)
     df = pd.read_csv(os.path.join("greatexpectations", "data", csv_file))
     return df.shape[0]
 
@@ -58,11 +62,6 @@ def simple_task(csv_file: str) -> int:
 # Finally, we define a workflow.
 @workflow
 def simple_wf(dataset: str = DATASET_LOCAL) -> int:
-
-    # GreatExpectationsTask returns Great Expectations' checkpoint result.
-    # You can print the result to know more about the data within it.
-    # If the data validation fails, this will return a ValidationError.
-    result = simple_task_object(dataset=dataset)
     return simple_task(csv_file=dataset)
 
 
@@ -92,6 +91,7 @@ file_task_object = GreatExpectationsTask(
 def file_task(
     dataset: CSVFile,
 ) -> int:
+    file_task_object(dataset=dataset)
     return len(pd.read_csv(dataset))
 
 
@@ -101,7 +101,6 @@ def file_task(
 def file_wf(
     dataset: CSVFile = DATASET_REMOTE,
 ) -> int:
-    file_task_object(dataset=dataset)
     return file_task(dataset=dataset)
 
 
@@ -134,6 +133,7 @@ sql_to_df = SQLite3Task(
 # Next, we define a task that validates the data and returns the columns in it.
 @task(limits=Resources(mem="500Mi"))
 def schema_task(dataset: pd.DataFrame) -> typing.List[str]:
+    schema_task_object(dataset=dataset)
     return list(dataset.columns)
 
 
@@ -142,7 +142,6 @@ def schema_task(dataset: pd.DataFrame) -> typing.List[str]:
 @workflow
 def schema_wf() -> typing.List[str]:
     df = sql_to_df()
-    schema_task_object(dataset=df)
     return schema_task(dataset=df)
 
 
