@@ -43,7 +43,7 @@ from flytekit.types.schema import FlyteSchema
 @reference_task(
     project="flytesnacks",
     domain="development",
-    name="sqlite_datacleaning.tasks.mean_median_imputer",
+    name="sqlite_datacleaning.datacleaning_tasks.mean_median_imputer",
     version="{{ registration.version }}",
 )
 def mean_median_imputer(
@@ -56,7 +56,7 @@ def mean_median_imputer(
 @reference_task(
     project="flytesnacks",
     domain="development",
-    name="sqlite_datacleaning.tasks.univariate_selection",
+    name="sqlite_datacleaning.datacleaning_tasks.univariate_selection",
     version="{{ registration.version }}",
 )
 def univariate_selection(
