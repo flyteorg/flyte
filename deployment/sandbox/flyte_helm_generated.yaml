@@ -3753,7 +3753,7 @@ spec:
         name: minio
         args:
         - server
-        - /data
+        - /var/lib/minioql/data
         env:
         - name: MINIO_ACCESS_KEY
           value: minio
