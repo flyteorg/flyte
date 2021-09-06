@@ -567,8 +567,8 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: true
-        cloudwatch-log-group: '<LOG_GROUP_NAME>'
-        cloudwatch-region: '<AWS_REGION>'
+        cloudwatch-log-group: '{{ .Values.userSettings.logGroup }}'
+        cloudwatch-region: '{{ .Values.userSettings.accountRegion }}'
         kubernetes-enabled: false
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
@@ -1635,7 +1635,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "08ecba3dfce27eb9ba518185f130dd04e1133f60fa432e53e7ec2ddf9abc8de"
+        configChecksum: "8e8407880d5539b044085024a4c5d3eebb3d800e2a47b9e7cc72b001fbaa90d"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1707,7 +1707,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.13.20
       annotations:
-        configChecksum: "08ecba3dfce27eb9ba518185f130dd04e1133f60fa432e53e7ec2ddf9abc8de"
+        configChecksum: "8e8407880d5539b044085024a4c5d3eebb3d800e2a47b9e7cc72b001fbaa90d"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

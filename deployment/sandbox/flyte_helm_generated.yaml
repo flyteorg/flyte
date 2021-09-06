@@ -601,7 +601,8 @@ data:
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30082/#/log///pod?namespace=
+        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName
+          }}/pod?namespace={{ .namespace }}
 ---
 # Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
@@ -2047,6 +2048,156 @@ rules:
     resources: ["pods", "nodes"]
     verbs: ["get", "list", "watch"]
 ---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "flyte-kubernetes-dashboard-readonly"
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - persistentvolumeclaims
+      - pods
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - serviceaccounts
+      - services
+      - nodes
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - bindings
+      - events
+      - limitranges
+      - namespaces/status
+      - pods/log
+      - pods/status
+      - replicationcontrollers/status
+      - resourcequotas
+      - resourcequotas/status
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - ingresses
+      - networkpolicies
+      - replicasets
+      - replicasets/scale
+      - replicationcontrollers/scale
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterrolebindings
+      - clusterroles
+      - roles
+      - rolebindings
+    verbs:
+      - get
+      - list
+      - watch
+---
 # Source: flyte/charts/sparkoperator/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -2307,6 +2458,40 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: flyte-kubernetes-dashboard-metrics
+subjects:
+  - kind: ServiceAccount
+    name: flyte-kubernetes-dashboard
+    namespace: flyte
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-kubernetes-dashboard-readonly
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    helm.sh/chart: kubernetes-dashboard-4.0.2
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "2.2.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-kubernetes-dashboard-readonly
 subjects:
   - kind: ServiceAccount
     name: flyte-kubernetes-dashboard
@@ -3587,6 +3772,15 @@ spec:
         volumeMounts:
         - name: minio-storage
           mountPath: /var/lib/minioql/data
+      initContainers:
+      - command:
+          - mkdir
+          - /var/lib/minioql/data/my-s3-bucket
+        image: "minio/minio:RELEASE.2020-12-16T05-05-17Z"
+        name: create-bucket
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /var/lib/minioql/data
       volumes:
       - name: minio-storage
         emptyDir: {}
@@ -3660,7 +3854,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "77b895cdd5f689eecbbf2a08824f405d3cad3205f1ce2d5356378b9034a33ca"
+        configChecksum: "dd273223fd6cf71874dcefd6f177c770605d1debd3b944b692187b7046f82cf"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3725,7 +3919,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.13.20
       annotations:
-        configChecksum: "77b895cdd5f689eecbbf2a08824f405d3cad3205f1ce2d5356378b9034a33ca"
+        configChecksum: "dd273223fd6cf71874dcefd6f177c770605d1debd3b944b692187b7046f82cf"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -3984,36 +4178,6 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
----
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 ---
 # Source: flyte/charts/kubernetes-dashboard/templates/ingress.yaml
 # Copyright 2017 The Kubernetes Authors.

@@ -84,6 +84,8 @@ kubernetes-dashboard:
     - --enable-insecure-login
     - --disable-settings-authorizer
   protocolHttp: true
+  rbac:
+    clusterReadOnlyRole: true
   service:
     type: NodePort
     externalPort: 30082
