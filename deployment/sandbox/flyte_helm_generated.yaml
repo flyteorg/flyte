@@ -307,7 +307,7 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: postgres
+      dbname: 'flyte'
       host: postgres
       port: 5432
       username: postgres
@@ -448,7 +448,7 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: postgres
+      dbname: 'flyte'
       host: postgres
       port: 5432
       username: postgres
@@ -3459,7 +3459,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bd7b4216d7a02e1c7b1a22f15131c958500c4534ffd649e2d06754ebf41feab"
+        configChecksum: "aaee630c701aa8304299735eab5eeb8ba598df11b26148edb38fb258f36dea2"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3667,7 +3667,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1723c640ce4760dffe521770f582a5ec2e00698aa5b2f34e5ae8014c0c80912"
+        configChecksum: "90b98e1ff8372aad3e3163be94b4b8a87f5a6a28542f3bad8cb75f73f64d909"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -3817,6 +3817,8 @@ spec:
         env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
+        - name: POSTGRES_DB
+          value: "{{ .Values.userSettings.database }}"
         ports:
         - containerPort: 5432
           name: postgres

@@ -1,3 +1,6 @@
+userSettings:
+  database: "flyte"
+
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -50,6 +53,7 @@ postgres:
   image:
     # Override postgres image to use alpine based (rather smaller) docker image
     tag: "10.16-alpine"
+  database: "{{ .Values.userSettings.database }}"
 
 #
 # MINIO
@@ -125,7 +129,7 @@ db:
     port: 5432
     username: postgres
     host: postgres
-    dbname: postgres
+    dbname: "{{ .Values.userSettings.database }}"
 
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration

@@ -3486,6 +3486,8 @@ spec:
         env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
+        - name: POSTGRES_DB
+          value: ""
         ports:
         - containerPort: 5432
           name: postgres
