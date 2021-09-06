@@ -125,7 +125,7 @@ db:
     port: 5432
     username: postgres
     host: postgres
-    dbname: flyte_development
+    dbname: postgres
 
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
