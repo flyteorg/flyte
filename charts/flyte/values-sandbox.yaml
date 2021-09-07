@@ -55,7 +55,10 @@ postgres:
 # MINIO
 #
 
-minio: {}
+minio:
+  service:
+    annotations: { }
+    type: NodePort
 
 #
 # CONTOUR
@@ -84,6 +87,7 @@ kubernetes-dashboard:
   service:
     type: NodePort
     externalPort: 30082
+    nodePort: 30082
 
 # ------------------------------------------------
 #

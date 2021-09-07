@@ -496,6 +496,13 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
   name: flyte-propeller-auth
   namespace: flyte
 type: Opaque
@@ -612,7 +619,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.6
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -630,7 +637,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.6
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -687,7 +694,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -697,6 +704,29 @@ spec:
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
+      initContainers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
@@ -735,7 +765,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -788,7 +818,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -804,7 +834,7 @@ spec:
         - seed-projects
         - flytetester
         - flytesnacks
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -818,7 +848,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -838,7 +868,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -894,7 +924,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -986,46 +1016,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: postgres-storage
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: flyte-pod-webhook-secret
-  namespace: flyte
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - args:
-        - webhook
-        - init-certs
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      restartPolicy: Never
-      serviceAccountName: flyte-pod-webhook
-      volumes:
-      - configMap:
-          name: flyte-propeller-config-d9cm925f8m
-        name: config-volume
-  ttlSecondsAfterFinished: 0
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
