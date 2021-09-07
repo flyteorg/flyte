@@ -15,6 +15,10 @@ Type system.
 In this example, we will try to model an example user defined set and show how it can be integrated seamlessly with
 Flytekit's typing engine.
 
+The video below will walk you through the example.
+
+..  youtube:: 1xExpRzz8Tw
+
 
 """
 import os
