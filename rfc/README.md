@@ -16,9 +16,9 @@ Other more extensive changes need to be carefully tracked and reviewed, which is
 ## When you need to follow this process
 [When you need to follow this process]: #when-you-need-to-follow-this-process
 
-Extensive changes that would benefit from an RFC will depend on the organization, community norms and expectations, and where the changes will be implemented. Such changes can be :
+Significant changes to the system or changes to the user experience would require an RFC. Examples of changes can be:
 
-  - Semantics or syntax changes, other than bugfixes (e.g. introducing a new flytekit language feature)
+  - Semantics or syntax changes, other than bugfixes (e.g. introducing a new Flytekit language feature)
   - Core-Language updates (e.g. FlyteIdl changes that introuce new wire-format)
   - Documentation restructuring
   - Service-2-Service changes (e.g. new gRPC APIs)
@@ -28,9 +28,9 @@ Changes not requiring RFCs include:
   - Documentation rephrasing or reorganizing
   - Addition of images, tables, etc. to supplement documentation
   - Updates to code samples, links, examples, etc.
-  - Bug fixes
+  - Bug fixes that do not introduce changes listed above (use your judgement).
 
-New feature implementation will almost certainly require an RFC. PRs attempting to do so may be closed with a request to submit an RFC instead. 
+New feature implementation will almost certainly require an RFC. PRs attempting to do so will not be approved without a merged RFC.
 
 ## Before creating an RFC
 [Before creating an RFC]: #before-creating-an-rfc
@@ -39,11 +39,31 @@ Some good practices when starting an RFC include:
 - Gathering feedback from team or community members first, to confirm that the changes will indeed be useful.
 - Discussing the topic on [Slack](http://slack.flyte.org/) or [GitHub Discussions](https://github.com/flyteorg/flyte/discussions/categories/) to gauge interest
 - Making sure the changes align with short-term roadmaps (Brigning up the change in the Flyte Sync-Up meeting).
-- Taking the time to produce a well-written, well-thought-of document. A suggested RFC template can be found [here](insert link to RFC template) 
+- Taking the time to produce a well-written, well-thought-of document. A suggested RFC template can be found [here](insert link to RFC template)
 
-Generally speaking, proposals met with encouraging feedback from long-standing project developers and community members have a better chance of their RFC being approved.
+## The process
 
-At Flyte, we encourage RFCs to be initiated on HackMD (https://hackmd.io/), where they can be iterated on and when ready, pushed to GitHub as a PR, then approved for implementation. Details of the process can be found below. 
+```flow
+st=>start: Start
+e=>end: End
+op=>operation: My Operation
+op2=>operation: lalala
+cond=>condition: Yes or No?
+
+st->op->op2->cond
+cond(yes)->e
+cond(no)->op2
+```
+
+1. Write your RFC
+1. Collect & address feedback
+1. Merge your RFC
+
+### The bare-minimum
+
+RFCs must be introduced as a `.md` file in a PR into the flyte repo. Details of the location to store them can be [found below](#Where-to-store-RFCs).
+
+At Flyte, we encourage RFCs to be initiated on HackMD (https://hackmd.io/), where they can be iterated on and when ready, pushed to GitHub as a PR, then approved for implementation. Details of the process can be found below.
 
 ## Why HackMD?
 [Why HackMD?]: #why-hackmd?
@@ -75,11 +95,12 @@ After completing your RFC on HackMD, it is time to push to GitHub:
     | -------------------------- | -------------------------------------- |
     | Select Repo:               | flyteorg/flyte                         |
     | Select branch:             | <Insert a new or existing branch name> |
-    | Select file:               | rfcs/<category>/awesomefature.md       |
+    | Select file:               | rfcs/<category>/awesomefeature.md      |
     | Choose version(s) to push: | Fill in a descriptive name and a self-link to the hackmd note.  |
+
 - Go ahead and Push to GitHub
 
-(replace above starred points with one screenshot featuring correct selections)
+## Where to store RFCs
 
 The Flyte repo on GitHub has an RFC folder with 3 directories:
 - Core language: Changes to FlyteIdl that change the wire-format in any way are considered significant changes that require revision and approval.
@@ -91,15 +112,17 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
 - CI-CD: Significant changes to CI-CD System that have impact across different repositories.
 
   Lead reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
+  
+ Go to GitHub. You should be abe to push your PR from the branch created.
 
 ## Reviewing RFCs
 [Reviewing RFCs]: #reviewing-rfcs
 
-Once the RFC is created in a PR, reviewers can take up to three weeks to review, test, and either approve or recommend adjustments. They may call for meetings, demos, or other measures deemed necessary. 
+Once the RFC is created in a PR, reviewers can take up to 3 weeks to review, test, and either approve or recommend adjustments. They may call for meetings, demos, or other measures deemed necessary. 
 
-Once approved, the RFC will be pushed to GitHub to be implementated.
+Once approved, the RFC will be pushed to GitHub to be implemented.
 
-RFC PRs whose authors become unresponsive to reviewers comments will be closed.
+RFC PRs whose authors become unresponsive to reviewers' comments within 5 business days will be closed.
 
 ## Implementing RFCs
 [Implementing RFCs]: #implementing-rfcs
@@ -123,9 +146,8 @@ Alternatively, if an RFC is not likely to be implemented, it should be labelled 
 ## Contributions
 [Contributions]: #contributions
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Any contribution to FlyteOrg repos will be licensed with [Apache-2.0](https://github.com/flyteorg/flyte/blob/master/LICENSE) license without any additional terms or conditions.
 
-(do we need to include some sort of a liability or disclaimer statement like this?)
 
 Adapted from: 
 [Rust RFCs - Active RFC List](https://github.com/rust-lang/rfcs/blob/master/README.md) 
