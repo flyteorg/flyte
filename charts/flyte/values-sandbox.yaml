@@ -84,6 +84,8 @@ kubernetes-dashboard:
     - --enable-insecure-login
     - --disable-settings-authorizer
   protocolHttp: true
+  rbac:
+    clusterReadOnlyRole: true
   service:
     type: NodePort
     externalPort: 30082
@@ -123,7 +125,7 @@ db:
     port: 5432
     username: postgres
     host: postgres
-    dbname: flyte_development
+    dbname: "flyte"
 
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
@@ -187,7 +189,7 @@ configmap:
     plugins:
       logs:
         kubernetes-enabled: true
-        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
+        kubernetes-template-uri: "http://localhost:30082/#/log/{{ \"{{\" }} .namespace {{ \"}}\" }}/{{ \"{{\" }} .podName {{ \"}}\" }}/pod?namespace={{ \"{{\" }} .namespace {{ \"}}\" }}"
 
 # ----------------------------------------------------------------
 # Optional Modules
