@@ -150,7 +150,7 @@ An OAuth2 Authorization Server allows external clients to request to authenticat
 an OAuth2 Authorization Server enables Flyte administrators control over which apps can be installed and what scopes they are allowed to request or be granted (i.e. what privileges can they assume).
 
 BuiltIn Authorization Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Flyte comes with a built-in authorization server that can be statically configured with a set of clients to request and act on behalf of the user.
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/blob/12d6aa0a419ccec81b4c8289fd172e70a2ded525/auth/config/config.go#L86-L110>`__
@@ -159,9 +159,12 @@ and the corresponding section can be modified through configs.
 By default, the BuiltIn Authorization Server ships with 3 statically configured clients:
 
 1. **flyte-cli**: A public OAuth2 client that can be used with flyte-cli command line tool. This client does need a client_secret.
-1. **flytectl**: A public OAuth2 client that can be used with flytectl command line tool. This client does need a client_secret.
-1. **flytepropeller**: A client-credentials OAuth2 client that can be used with flytepropeller to talk to flyteAdmin to publish execution events.
+
+2. **flytectl**: A public OAuth2 client that can be used with flytectl command line tool. This client does need a client_secret.
+
+3. **flytepropeller**: A client-credentials OAuth2 client that can be used with flytepropeller to talk to flyteAdmin to publish execution events.
    The default secret set to `foobar`. In order for flytepropeller to pickup that secret, you will need to set the secret as follows:
+   
    .. prompt:: bash
 
       kubectl edit secret -n flyte flyte-propeller-auth
@@ -180,6 +183,7 @@ By default, the BuiltIn Authorization Server ships with 3 statically configured 
       ...
 
    Save and close your editor. And restart flytepropeller:
+
    .. prompt:: bash
 
       kubectl rollout restart deployment/flytepropeller -n flyte
@@ -208,12 +212,13 @@ It's also possible to override the list of statically configured clients by modi
                       grant_types: client_credentials
 
 Restart flyteadmin afterwards for the changes to take effect:
+
 .. prompt:: bash
 
    kubectl rollout restart deployment/flyteadmin -n flyte
 
 External Authorization Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To set up an external OAuth2 Authorization Server, please follow the instructions below:
 
