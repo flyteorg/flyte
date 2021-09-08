@@ -57,7 +57,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx-prompt",
     "sphinx_copybutton",
-    "sphinx_tabs.tabs",
+    # "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     # "sphinx_search.extension",
@@ -231,7 +231,7 @@ intersphinx_mapping = {
 }
 
 # Sphinx-tabs config
-sphinx_tabs_valid_builders = ["linkcheck"]
+# sphinx_tabs_valid_builders = ["linkcheck"]
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
