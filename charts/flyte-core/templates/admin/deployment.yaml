@@ -18,6 +18,14 @@ spec:
       labels: {{ include "flyteadmin.labels" . | nindent 8 }}
     spec:
       initContainers:
+        {{- if .Values.postgres.enabled }}
+        - name: check-db-ready
+          image: postgres:10.16-alpine
+          command:
+          - sh
+          - -c
+          - until pg_isready -h {{ tpl .Values.db.admin.database.host $ }} -p {{ .Values.db.admin.database.port }}; do echo waiting for database; sleep 2; done;
+        {{- end }}
         - command:
           - flyteadmin
           - --config

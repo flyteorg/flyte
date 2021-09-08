@@ -121,12 +121,18 @@ storage:
 
 # Database configuration
 db:
-  database:
-    port: 5432
-    username: postgres
-    host: postgres
-    dbname: "flyte"
-
+  datacatalog:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "datacatalog"
+  admin:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "flyteadmin"
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
 # -------------------------------------------------------------------
