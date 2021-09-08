@@ -46,3 +46,24 @@ configmap:
         spark: spark
         container_array: k8s-array
         pytorch: pytorch
+
+#
+# POSTGRES
+#
+
+postgres:
+  enabled: false
+
+#
+# MINIO
+#
+
+minio:
+  enabled: false
+
+#
+# CONTOUR
+#
+
+contour:
+  enabled: false

@@ -307,7 +307,7 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: flyte
+      dbname: flyteadmin
       host: postgres
       port: 5432
       username: postgres
@@ -448,7 +448,7 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: flyte
+      dbname: datacatalog
       host: postgres
       port: 5432
       username: postgres
@@ -3458,7 +3458,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "cdca9c24dcb1b240060351bdffa700cb168d0fb2b4f433c4db51e3fb9495e59"
+        configChecksum: "5586369315bb36bb445d651321bb90a11e8d8635e44dde1432295c1ed18b71a"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3666,7 +3666,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4b9e44cacfc07c01d735cc1ecd9d5201484659ea76b19296d036815a443cef4"
+        configChecksum: "90e37e01b80f8691d9c0ec86a13dbfb65ba66bb2d39afdf9840fa62e088fcd1"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -3674,6 +3674,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
+      - name: check-db-ready
+        image: postgres:10.16-alpine
+        command:
+          - sh
+          - -c
+          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
       - command:
         - datacatalog
         - --config
@@ -3686,7 +3692,7 @@ spec:
         volumeMounts:
         
         - mountPath: /etc/datacatalog/config
-          name: config-volume 
+          name: config-volume
       containers:
       - command:
         - datacatalog
@@ -3817,7 +3823,7 @@ spec:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
         - name: POSTGRES_DB
-          value: flyte
+          value: flyteadmin
         ports:
         - containerPort: 5432
           name: postgres
