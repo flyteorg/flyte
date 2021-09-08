@@ -62,7 +62,7 @@ extensions = [
     "sphinx_issues",
     # "sphinx_search.extension",
     "sphinx_panels",
-    # "sphinxcontrib.mermaid",
+    "sphinxcontrib.mermaid",
     "sphinxcontrib.yt",
 ]
 
@@ -234,9 +234,9 @@ intersphinx_mapping = {
 sphinx_tabs_valid_builders = ["linkcheck"]
 
 # Sphinx-mermaid config
-# mermaid_output_format = 'raw'
-# mermaid_version = 'latest'
-# mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
+mermaid_output_format = "raw"
+mermaid_version = "latest"
+mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "

@@ -18,11 +18,10 @@ certifi==2021.5.30
     # via requests
 charset-normalizer==2.0.4
     # via requests
-docutils==0.16
+docutils==0.17.1
     # via
     #   sphinx
     #   sphinx-panels
-    #   sphinx-tabs
 git+git://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==3.2
@@ -43,7 +42,6 @@ pygments==2.10.0
     # via
     #   sphinx
     #   sphinx-prompt
-    #   sphinx-tabs
 pyparsing==2.4.7
     # via packaging
 pytz==2021.1
@@ -71,7 +69,6 @@ sphinx==4.1.2
     #   sphinx-issues
     #   sphinx-panels
     #   sphinx-prompt
-    #   sphinx-tabs
     #   sphinxcontrib-yt
     #   sphinxext-remoteliteralinclude
 sphinx-autoapi==1.8.4
@@ -88,8 +85,6 @@ sphinx-panels==0.6.0
     # via -r doc-requirements.in
 sphinx-prompt==1.5.0
     # via -r doc-requirements.in
-sphinx-tabs==3.2.0
-    # via -r doc-requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -98,6 +93,8 @@ sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
+sphinxcontrib-mermaid==0.7.1
+    # via -r doc-requirements.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5

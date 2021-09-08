@@ -4,10 +4,10 @@ sphinx-prompt
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
-sphinx-tabs
+# sphinx-tabs
 sphinxext-remoteliteralinclude
 sphinx-issues
 sphinx_fontawesome
 sphinx-panels
-# sphinxcontrib-mermaid
+sphinxcontrib-mermaid
 sphinxcontrib-yt
