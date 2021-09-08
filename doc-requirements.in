@@ -4,7 +4,6 @@ sphinx-prompt
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
-# sphinx-tabs
 sphinxext-remoteliteralinclude
 sphinx-issues
 sphinx_fontawesome

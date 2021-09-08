@@ -53,27 +53,25 @@ Service Authentication using OAuth2
 Propeller (and potentially other non-user facing services) can also authenticate using client_credentials to the Idp and
 be granted an access_token valid to be used with admin and other backend services.
 
-.. tabs::
+.. tabbed:: FlyteAdmin's builtin Authorization Server
 
-    .. tab:: FlyteAdmin's builtin Authorization Server
+    .. mermaid::
+        :alt: Service Authentication Swimlane
 
-        .. mermaid::
-            :alt: Service Authentication Swimlane
+        sequenceDiagram
+            Propeller->>+Admin: /token?client_creds&scope=https://admin/
+            Admin->>-Propeller: access_token
+            Propeller->>+Admin: /list_projects?token=access_token
 
-            sequenceDiagram
-                Propeller->>+Admin: /token?client_creds&scope=https://admin/
-                Admin->>-Propeller: access_token
-                Propeller->>+Admin: /list_projects?token=access_token
+.. tabbed:: External Authorization Server
 
-    .. tab:: External Authorization Server
+    .. mermaid::
+        :alt: Service Authentication Swimlane
 
-        .. mermaid::
-            :alt: Service Authentication Swimlane
-
-            sequenceDiagram
-                Propeller->>+External Authorization Server: /token?client_creds&scope=https://admin/
-                External Authorization Server->>-Propeller: access_token
-                Propeller->>+Admin: /list_projects?token=access_token
+        sequenceDiagram
+            Propeller->>+External Authorization Server: /token?client_creds&scope=https://admin/
+            External Authorization Server->>-Propeller: access_token
+            Propeller->>+Admin: /list_projects?token=access_token
 
 User Authentication in other clients (e.g. Cli) using OAuth2-Pkce
 ==================================================================
@@ -81,52 +79,50 @@ User Authentication in other clients (e.g. Cli) using OAuth2-Pkce
 Users accessing backend services through Cli should be able to use OAuth2-Pkce flow to authenticate (in a browser) to the Idp and be issued
 an access_token valid to communicate with the intended backend service on behalf of the user.
 
-.. tabs::
+.. tabbed:: FlyteAdmin's builtin Authorization Server
 
-    .. tab:: FlyteAdmin's builtin Authorization Server
+    .. mermaid::
+        :alt: CLI Authentication with Admin's own Authorization Server
 
-        .. mermaid::
-            :alt: CLI Authentication with Admin's own Authorization Server
+        sequenceDiagram
+        %%{config: { 'fontFamily': 'Menlo', 'fontSize': 10, 'fontWeight': 100} }%%
+            autonumber
+            User->>+Cli: flytectl list-projects
+            Cli->>+Admin: admin/client-config
+            Admin->>-Cli: Client_id=<abc>, ...
+            Cli->>+Browser: /oauth2/authorize?pkce&code_challenge,client_id,scope
+            Browser->>+Admin: /oauth2/authorize?pkce...
+            Admin->>-Browser: 302 idp.com/login
+            Note over Browser,Admin: The prior OpenID Connect flow
+            Browser->>+Admin: admin/logged_in
+            Note over Browser,Admin: Potentially show custom consent screen
+            Admin->>-Browser: localhost/?authCode=<abc>
+            Browser->>+Cli: localhost/authCode=<abc>
+            Cli->>+Admin: /token?code,code_verifier
+            Admin->>-Cli: access_token
+            Cli->>+Admin: /projects/ + access_token
+            Admin->>-Cli: project1, project2
 
-            sequenceDiagram
-            %%{config: { 'fontFamily': 'Menlo', 'fontSize': 10, 'fontWeight': 100} }%%
-                autonumber
-                User->>+Cli: flytectl list-projects
-                Cli->>+Admin: admin/client-config
-                Admin->>-Cli: Client_id=<abc>, ...
-                Cli->>+Browser: /oauth2/authorize?pkce&code_challenge,client_id,scope
-                Browser->>+Admin: /oauth2/authorize?pkce...
-                Admin->>-Browser: 302 idp.com/login
-                Note over Browser,Admin: The prior OpenID Connect flow
-                Browser->>+Admin: admin/logged_in
-                Note over Browser,Admin: Potentially show custom consent screen
-                Admin->>-Browser: localhost/?authCode=<abc>
-                Browser->>+Cli: localhost/authCode=<abc>
-                Cli->>+Admin: /token?code,code_verifier
-                Admin->>-Cli: access_token
-                Cli->>+Admin: /projects/ + access_token
-                Admin->>-Cli: project1, project2
+.. tabbed:: External Authorization Server
 
-    .. tab:: External Authorization Server
+    .. mermaid::
+        :alt: CLI Authentication with an external Authorization Server
 
-        .. mermaid::
-            :alt: CLI Authentication with an external Authorization Server
-
-            sequenceDiagram
-            %%{config: { 'fontFamily': 'Menlo', 'fontSize': 10, 'fontWeight': 100} }%%
-                autonumber
-                User->>+Cli: flytectl list-projects
-                Cli->>+Admin: admin/client-config
-                Admin->>-Cli: Client_id=<abc>, ...
-                Cli->>+Browser: /oauth2/authorize?pkce&code_challenge,client_id,scope
-                Browser->>+ExternalIdp: /oauth2/authorize?pkce...
-                ExternalIdp->>-Browser: 302 idp.com/login
-                Note over Browser,ExternalIdp: The prior OpenID Connect flow
-                Browser->>+ExternalIdp: /logged_in
-                Note over Browser,ExternalIdp: Potentially show custom consent screen
-                ExternalIdp->>-Browser: localhost/?authCode=<abc>
-                Browser->>+Cli: localhost/authCode=<abc>
-                Cli->>+ExternalIdp: /token?code,code_verifier
-                ExternalIdp->>-Cli: access_token
-                Cli->>+Admin: /projects/ + access_token
-                Admin->>-Cli: project1, project2
+        sequenceDiagram
+        %%{config: { 'fontFamily': 'Menlo', 'fontSize': 10, 'fontWeight': 100} }%%
+            autonumber
+            User->>+Cli: flytectl list-projects
+            Cli->>+Admin: admin/client-config
+            Admin->>-Cli: Client_id=<abc>, ...
+            Cli->>+Browser: /oauth2/authorize?pkce&code_challenge,client_id,scope
+            Browser->>+ExternalIdp: /oauth2/authorize?pkce...
+            ExternalIdp->>-Browser: 302 idp.com/login
+            Note over Browser,ExternalIdp: The prior OpenID Connect flow
+            Browser->>+ExternalIdp: /logged_in
+            Note over Browser,ExternalIdp: Potentially show custom consent screen
+            ExternalIdp->>-Browser: localhost/?authCode=<abc>
+            Browser->>+Cli: localhost/authCode=<abc>
+            Cli->>+ExternalIdp: /token?code,code_verifier
+            ExternalIdp->>-Cli: access_token
+            Cli->>+Admin: /projects/ + access_token
+            Admin->>-Cli: project1, project2

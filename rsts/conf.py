@@ -57,10 +57,8 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx-prompt",
     "sphinx_copybutton",
-    # "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
-    # "sphinx_search.extension",
     "sphinx_panels",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.yt",
@@ -230,8 +228,6 @@ intersphinx_mapping = {
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
 }
 
-# Sphinx-tabs config
-# sphinx_tabs_valid_builders = ["linkcheck"]
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
