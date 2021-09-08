@@ -4,16 +4,16 @@ package validation
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
+
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
@@ -124,7 +124,9 @@ func addResourceEntryToMap(
 	quantity, err := resource.ParseQuantity(entry.Value)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"Invalid quantity %s for resource: %v for task [%+v]", entry.Value, entry.Name, identifier)
+			"Parsing of %v request failed for value %v - reason  %v. "+
+				"Please follow K8s conventions for resources "+
+				"https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/", entry.Name, entry.Value, err)
 	}
 	(*resourceEntries)[entry.Name] = quantity
 	return nil
@@ -196,18 +198,23 @@ func validateTaskResources(
 			if ok && limitQuantity.Value() < defaultQuantity.Value() {
 				// Only assert the requested limit is greater than than the requested default when the limit is actually set
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Type %v for [%+v] cannot set default > limit", resourceName, identifier)
+					"Requested %v default [%v] is greater than the limit [%v]."+
+						" Please fix your configuration", resourceName, defaultQuantity.String(), limitQuantity.String())
 			}
 			platformLimit, platformLimitOk := platformTaskResourceLimits[resourceName]
 			if ok && platformLimitOk && limitQuantity.Value() > platformLimit.Value() {
 				// Also check that the requested limit is less than the platform task limit.
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Type %v for [%+v] cannot set limit > platform limit", resourceName, identifier)
+					"Requested %v limit [%v] is greater than current limit set in the platform configuration"+
+						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					resourceName, limitQuantity.String(), platformLimit.String())
 			}
 			if platformLimitOk && defaultQuantity.Value() > platformTaskResourceLimits[resourceName].Value() {
 				// Also check that the requested limit is less than the platform task limit.
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Type %v for [%+v] cannot set default > platform limit", resourceName, identifier)
+					"Requested %v default [%v] is greater than  current limit set in the platform configuration"+
+						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					resourceName, defaultQuantity.String(), platformTaskResourceLimits[resourceName].String())
 			}
 		case core.Resources_GPU:
 			limitQuantity, ok := requestedResourceLimits[resourceName]
@@ -219,7 +226,9 @@ func validateTaskResources(
 			platformLimit, platformLimitOk := platformTaskResourceLimits[resourceName]
 			if platformLimitOk && defaultQuantity.Value() > platformLimit.Value() {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Type %v for [%+v] cannot set default > platform limit", resourceName, identifier)
+					"Requested %v default [%v] is greater than  current limit set in the platform configuration"+
+						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					resourceName, defaultQuantity.String(), platformLimit.String())
 			}
 		}
 	}

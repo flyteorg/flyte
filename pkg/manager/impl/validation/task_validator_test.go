@@ -210,7 +210,7 @@ func TestAddResourceEntryToMap(t *testing.T) {
 		Name:  core.Resources_MEMORY,
 		Value: "foo",
 	}, &resourceEntries)
-	assert.Contains(t, err.Error(), "Invalid quantity")
+	assert.Contains(t, err.Error(), "Parsing of MEMORY request failed")
 
 	quantity = resourceEntries[core.Resources_CPU]
 	val = quantity.Value()
@@ -289,6 +289,24 @@ func TestValidateTaskResources(t *testing.T) {
 		requestedTaskResourceDefaults, requestedTaskResourceLimits))
 }
 
+func TestValidateTaskResources_ParsingIssue(t *testing.T) {
+	err := validateTaskResources(&core.Identifier{
+		Name: "name",
+	}, runtimeInterfaces.TaskResourceSet{},
+		[]*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: "200Q",
+			},
+		}, []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_CPU,
+				Value: "200Q",
+			},
+		})
+	assert.EqualError(t, err, "Parsing of CPU request failed for value 200Q - reason  quantities must match the regular expression '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'. Please follow K8s conventions for resources https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/")
+}
+
 func TestValidateTaskResources_LimitLessThanRequested(t *testing.T) {
 	err := validateTaskResources(&core.Identifier{
 		Name: "name",
@@ -304,7 +322,7 @@ func TestValidateTaskResources_LimitLessThanRequested(t *testing.T) {
 				Value: "1Gi",
 			},
 		})
-	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set default > limit")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than the limit [1Gi]. Please fix your configuration")
 }
 
 func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
@@ -324,7 +342,7 @@ func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		})
-	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set limit > platform limit")
+	assert.EqualError(t, err, "Requested CPU limit [1536Mi] is greater than current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
@@ -339,7 +357,7 @@ func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than  current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
@@ -378,7 +396,7 @@ func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		})
-	assert.EqualError(t, err, "Type GPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than  current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
@@ -393,7 +411,7 @@ func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Type GPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than  current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestIsWholeNumber(t *testing.T) {
