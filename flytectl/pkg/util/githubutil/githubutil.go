@@ -2,6 +2,7 @@ package githubutil
 
 import (
 	"context"
+	"net/http"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -14,7 +15,6 @@ import (
 	"github.com/flyteorg/flytectl/pkg/util"
 
 	"fmt"
-	"io/ioutil"
 
 	"github.com/google/go-github/v37/github"
 )
@@ -47,9 +47,14 @@ var (
 	arch = platformutil.Arch(runtime.GOARCH)
 )
 
+//GetGHClient will return github client
+func GetGHClient() *github.Client {
+	return github.NewClient(&http.Client{})
+}
+
 // GetLatestVersion returns the latest version of provided repository
 func GetLatestVersion(repository string) (*github.RepositoryRelease, error) {
-	client := github.NewClient(nil)
+	client := GetGHClient()
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repository)
 	if err != nil {
 		return nil, err
@@ -68,12 +73,22 @@ func getFlytectlAssetName() string {
 
 // CheckVersionExist returns the provided version release if version exist in repository
 func CheckVersionExist(version, repository string) (*github.RepositoryRelease, error) {
-	client := github.NewClient(nil)
+	client := GetGHClient()
 	release, _, err := client.Repositories.GetReleaseByTag(context.Background(), owner, repository, version)
 	if err != nil {
 		return nil, err
 	}
 	return release, err
+}
+
+// GetSHAFromVersion returns sha commit hash against a release
+func GetSHAFromVersion(version, repository string) (string, error) {
+	client := GetGHClient()
+	sha, _, err := client.Repositories.GetCommitSHA1(context.Background(), owner, repository, version, "")
+	if err != nil {
+		return "", err
+	}
+	return sha, err
 }
 
 // GetAssetsFromRelease returns the asset from github release
@@ -88,28 +103,6 @@ func GetAssetsFromRelease(version, assets, repository string) (*github.ReleaseAs
 		}
 	}
 	return nil, fmt.Errorf("assest is not found in %s[%s] release", repository, version)
-}
-
-// GetFlyteManifest will write the flyte manifest in a file
-func GetFlyteManifest(version string, target string) error {
-	asset, err := GetAssetsFromRelease(version, sandboxManifest, flyte)
-	if err != nil {
-		return err
-	}
-	response, err := util.SendRequest("GET", asset.GetBrowserDownloadURL(), nil)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-	data, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-	if err := util.WriteIntoFile(data, target); err != nil {
-		return err
-	}
-	return nil
-
 }
 
 // GetUpgradeMessage return the upgrade message

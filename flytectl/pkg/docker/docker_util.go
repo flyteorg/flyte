@@ -24,7 +24,7 @@ import (
 var (
 	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
 	SuccessMessage          = "Deploying Flyte..."
-	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox:dind"
+	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox"
 	FlyteSandboxClusterName = "flyte-sandbox"
 	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
 	Source                  = "/root"
@@ -178,4 +178,9 @@ func InspectExecResp(ctx context.Context, cli Docker, containerID string) error 
 		fmt.Println(s.Text())
 	}
 	return nil
+}
+
+// GetSandboxImage will return the sandbox image with tag
+func GetSandboxImage(tag string) string {
+	return fmt.Sprintf("%s:%s", ImageName, tag)
 }
