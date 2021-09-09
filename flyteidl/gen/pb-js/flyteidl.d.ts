@@ -3725,7 +3725,7 @@ export namespace flyteidl {
         interface IVariableMap {
 
             /** VariableMap variables */
-            variables?: (flyteidl.core.IVariableMapEntry[]|null);
+            variables?: ({ [k: string]: flyteidl.core.IVariable }|null);
         }
 
         /** Represents a VariableMap. */
@@ -3738,7 +3738,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.core.IVariableMap);
 
             /** VariableMap variables. */
-            public variables: flyteidl.core.IVariableMapEntry[];
+            public variables: { [k: string]: flyteidl.core.IVariable };
 
             /**
              * Creates a new VariableMap instance using the specified properties.
@@ -3767,64 +3767,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a VariableMap message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a VariableMapEntry. */
-        interface IVariableMapEntry {
-
-            /** VariableMapEntry name */
-            name?: (string|null);
-
-            /** VariableMapEntry var */
-            "var"?: (flyteidl.core.IVariable|null);
-        }
-
-        /** Represents a VariableMapEntry. */
-        class VariableMapEntry implements IVariableMapEntry {
-
-            /**
-             * Constructs a new VariableMapEntry.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IVariableMapEntry);
-
-            /** VariableMapEntry name. */
-            public name: string;
-
-            /** VariableMapEntry var. */
-            public var?: (flyteidl.core.IVariable|null);
-
-            /**
-             * Creates a new VariableMapEntry instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns VariableMapEntry instance
-             */
-            public static create(properties?: flyteidl.core.IVariableMapEntry): flyteidl.core.VariableMapEntry;
-
-            /**
-             * Encodes the specified VariableMapEntry message. Does not implicitly {@link flyteidl.core.VariableMapEntry.verify|verify} messages.
-             * @param message VariableMapEntry message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IVariableMapEntry, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a VariableMapEntry message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns VariableMapEntry
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.VariableMapEntry;
-
-            /**
-             * Verifies a VariableMapEntry message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -3960,7 +3902,7 @@ export namespace flyteidl {
         interface IParameterMap {
 
             /** ParameterMap parameters */
-            parameters?: (flyteidl.core.IParameterMapEntry[]|null);
+            parameters?: ({ [k: string]: flyteidl.core.IParameter }|null);
         }
 
         /** Represents a ParameterMap. */
@@ -3973,7 +3915,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.core.IParameterMap);
 
             /** ParameterMap parameters. */
-            public parameters: flyteidl.core.IParameterMapEntry[];
+            public parameters: { [k: string]: flyteidl.core.IParameter };
 
             /**
              * Creates a new ParameterMap instance using the specified properties.
@@ -4002,64 +3944,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a ParameterMap message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ParameterMapEntry. */
-        interface IParameterMapEntry {
-
-            /** ParameterMapEntry name */
-            name?: (string|null);
-
-            /** ParameterMapEntry parameter */
-            parameter?: (flyteidl.core.IParameter|null);
-        }
-
-        /** Represents a ParameterMapEntry. */
-        class ParameterMapEntry implements IParameterMapEntry {
-
-            /**
-             * Constructs a new ParameterMapEntry.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IParameterMapEntry);
-
-            /** ParameterMapEntry name. */
-            public name: string;
-
-            /** ParameterMapEntry parameter. */
-            public parameter?: (flyteidl.core.IParameter|null);
-
-            /**
-             * Creates a new ParameterMapEntry instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ParameterMapEntry instance
-             */
-            public static create(properties?: flyteidl.core.IParameterMapEntry): flyteidl.core.ParameterMapEntry;
-
-            /**
-             * Encodes the specified ParameterMapEntry message. Does not implicitly {@link flyteidl.core.ParameterMapEntry.verify|verify} messages.
-             * @param message ParameterMapEntry message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IParameterMapEntry, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ParameterMapEntry message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ParameterMapEntry
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ParameterMapEntry;
-
-            /**
-             * Verifies a ParameterMapEntry message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
