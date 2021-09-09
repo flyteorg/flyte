@@ -1,0 +1,17 @@
+
+html .tabbed-set > label {
+    color: var(--color-foreground-border);
+}
+
+html .tabbed-set > input:checked + label {
+    border-color: var(--color-link);
+    color: var(--color-link);
+}
+
+html .tabbed-set > label:hover {
+    color: var(--color-link);
+}
+
+html .tabbed-content {
+    box-shadow: 0 -.0625rem var(--color-background-border),0 .0625rem var(--color-background-border);
+} 

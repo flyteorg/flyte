@@ -117,25 +117,23 @@ Prerequisites
 * Make sure you have `docker <https://docs.docker.com/get-docker/>`_ and `git <https://git-scm.com/>`_ installed.
 * Install :doc:`flytectl <flytectl:index>`. ``flytectl`` is a commandline interface for flyte.
 
-  .. tabs::
+.. tabbed:: OSX
 
-      .. tab:: OSX
+    .. prompt:: bash
 
-          .. prompt:: bash
+        brew install flyteorg/homebrew-tap/flytectl
 
-              brew install flyteorg/homebrew-tap/flytectl
+    To upgrade, run:
 
-          To upgrade, run:
+    .. prompt:: bash
 
-          .. prompt:: bash
+        brew upgrade flytectl
 
-              brew upgrade flytectl
+.. tabbed:: Most other platforms
 
-      .. tab:: Most other platforms
+    .. prompt:: bash
 
-          .. prompt:: bash
-
-              curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+        curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
 *****
 Steps
