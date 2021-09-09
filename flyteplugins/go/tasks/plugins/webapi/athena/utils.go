@@ -12,7 +12,6 @@ import (
 
 	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	pluginUtils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flytestdlib/logger"
 )
@@ -23,7 +22,12 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 		return err
 	}
 
-	resultsSchema, exists := pluginUtils.GetResultsVariable(taskTemplate)
+	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return nil
+	}
+
+	resultsSchema, exists := taskTemplate.Interface.Outputs.Variables["results"]
 	if !exists {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil

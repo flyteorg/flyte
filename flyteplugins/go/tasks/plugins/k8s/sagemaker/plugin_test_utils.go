@@ -114,28 +114,22 @@ func generateMockHyperparameterTuningJobTaskTemplate(id string, hpoJobCustomObj 
 		Custom: &structObj,
 		Interface: &flyteIdlCore.TypedInterface{
 			Inputs: &flyteIdlCore.VariableMap{
-				Variables: []*flyteIdlCore.VariableMapEntry{
-					{
-						Name: "input",
-						Var: &flyteIdlCore.Variable{
-							Type: &flyteIdlCore.LiteralType{
-								Type: &flyteIdlCore.LiteralType_CollectionType{
-									CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
-								},
+				Variables: map[string]*flyteIdlCore.Variable{
+					"input": {
+						Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_CollectionType{
+								CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
 							},
 						},
 					},
 				},
 			},
 			Outputs: &flyteIdlCore.VariableMap{
-				Variables: []*flyteIdlCore.VariableMapEntry{
-					{
-						Name: "output",
-						Var: &flyteIdlCore.Variable{
-							Type: &flyteIdlCore.LiteralType{
-								Type: &flyteIdlCore.LiteralType_CollectionType{
-									CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
-								},
+				Variables: map[string]*flyteIdlCore.Variable{
+					"output": {
+						Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_CollectionType{
+								CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
 							},
 						},
 					},

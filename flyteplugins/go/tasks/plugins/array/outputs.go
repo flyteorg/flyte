@@ -177,8 +177,8 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 			state.GetOriginalArraySize(), state.GetArrayStatus().Detailed.ItemsCount)
 
 		varNames := make([]string, 0, len(outputVariables.GetVariables()))
-		for _, v := range outputVariables.GetVariables() {
-			varNames = append(varNames, v.Name)
+		for varName := range outputVariables.GetVariables() {
+			varNames = append(varNames, varName)
 		}
 
 		finalPhases := buildFinalPhases(state.GetArrayStatus().Detailed,
