@@ -77,8 +77,8 @@ This document is not:
 - [ ]  Share as WIP with folks you trust to gut-check
 - [ ]  Send pull request when comfortable
 - [ ]  Label accordingly
-- [ ]  Assign reviewers (ask your manager if in doubt)
-- [ ]  Merge yourself with two approved reviews
+- [ ]  Assign reviewers
+- [ ]  Merge PR
 
 **Recommendations**
 
@@ -86,6 +86,4 @@ This document is not:
 - Tag RFC title with [Newbie] if you're trying out something experimental or you're not entirely convinced of what you're proposing.
 - Tag RFC title with [RR] if you'd like to schedule a review request to discuss the RFC.
 - If there are areas that you're not convinced on, tag people who you consider may know about this and ask for their input.
-- If you have doubts, ask your manager for help moving something forward.
-- As the author/s, this is _your decision_. You are empowered to choose to move forward despite dissenting comments. We're not looking for consensus-driven decision-making.
-- The success of the implementation of your proposal depends on how this decision relates to our company's objectives and priorities.
+- If you have doubts, ask on [#feature-discussions](https://slack.com/app_redirect?channel=CPQ3ZFQ84&team=TN89P6GGK) for help moving something forward.
