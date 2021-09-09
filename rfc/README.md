@@ -39,52 +39,47 @@ Some good practices when starting an RFC include:
 - Gathering feedback from team or community members first, to confirm that the changes will indeed be useful.
 - Discussing the topic on [Slack](http://slack.flyte.org/) or [GitHub Discussions](https://github.com/flyteorg/flyte/discussions/categories/) to gauge interest
 - Making sure the changes align with short-term roadmaps (Brigning up the change in the Flyte Sync-Up meeting).
-- Taking the time to produce a well-written, well-thought-of document. A suggested RFC template can be found [here](insert link to RFC template)
+- Taking the time to produce a well-written, well-thought-of document. A suggested RFC template can be found [here](https://github.com/flyteorg/flyte/blob/RFC-Process/rfc/RFC-0000-Template.md).
 
 ## The process
 
-```flow
-st=>start: Start
-e=>end: End
-op=>operation: My Operation
-op2=>operation: lalala
-cond=>condition: Yes or No?
-
-st->op->op2->cond
-cond(yes)->e
-cond(no)->op2
-```
-
-1. Write your RFC
-1. Collect & address feedback
-1. Merge your RFC
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW1N0YXJ0XSAtLT58V3JpdGUgUkZDfCBCKE9wZW4gYSBQUilcbiAgICBCIC0tPiBDe1BSIFJldmlld31cbiAgICBDIC0tPnxBcHByb3ZlZHwgRFtNZXJnZV1cbiAgICBDIC0tPnxGZWVkYmFja3wgQ1xuICAgIEMgLS0-fFJlamVjdGVkfCBGW1BSIENsb3NlZF0iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/edit##eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW1N0YXJ0XSAtLT58V3JpdGUgUkZDfCBCKE9wZW4gYSBQUilcbiAgICBCIC0tPiBDe1BSIFJldmlld31cbiAgICBDIC0tPnxBcHByb3ZlZHwgRFtNZXJnZV1cbiAgICBDIC0tPnxGZWVkYmFja3wgQ1xuICAgIEMgLS0-fFJlamVjdGVkfCBGW1BSIENsb3NlXSIsIm1lcm1haWQiOiJ7XG4gIFwidGhlbWVcIjogXCJkZWZhdWx0XCJcbn0iLCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)
 
 ### The bare-minimum
 
-RFCs must be introduced as a `.md` file in a PR into the flyte repo. Details of the location to store them can be [found below](#Where-to-store-RFCs).
+RFCs must be introduced as a `.md` (Markdown-format) file in a PR into the flyte repo. Details of the location to store them can be [found below](#Where-to-store-RFCs).
 
-At Flyte, we encourage RFCs to be initiated on HackMD (https://hackmd.io/), where they can be iterated on and when ready, pushed to GitHub as a PR, then approved for implementation. Details of the process can be found below.
+### Opening a PullRequest
 
-## Why HackMD?
-[Why HackMD?]: #why-hackmd?
+* Fork the [flyte repository](https://github.com/flyteorg/flyte).
+* Copy `rfc/0000-template.md` to `rfc/<category>/0000-my-feature.md` (where "my-feature" is descriptive). Don't assign an RFC number yet; This is going to be the PR number and we'll rename the file accordingly if the RFC is accepted.
+* Fill in the RFC. Put care into the details.
+* Submit a pull request. As a pull request the RFC will receive design feedback from the larger community, and the author should be prepared to revise it in response.
+* Now that your RFC has an open pull request, use the issue number of the PR to update your 0000- prefix to that number.
+
+### The recommended path
+
+At Flyte, we have been using [HackMD](https://hackmd.io) to author RFCs.
+
+#### Why HackMD?
 
 It is recommended that the initial review of an RFC takes place on HackMD, before pushing to GitHub. Several benefits of this include:
+- PR authors typically have a GitHub account, which is all that's needed to sign in to HackMD. 
 - Ease of commenting, iterating and adjusting on HackMD before pushing to GutHub, as opposed to requesting a PR for every change made to the RFC on GitHub. Visit https://hackmd.io/s/how-to-use-comments for more information on commenting.
-- Ease of document tracking, compared to Google docs, since RFCs will be linked to github making the RFCs indexed, searchable and versioned.
+- Ease of document tracking, compared to Google docs, since RFCs will be stored in github making the RFCs indexed, searchable and versioned.
 
-## The process
-[The process]: #the-process
+#### The HackMD process
 
 The Flyte repo on GitHub contains an RFC folder where RFCs are to be pushed to. 
 
 For those new to HackMD, here is how to begin:
 - Visit https://hackmd.io/
-- Enter your email (preferably one associated with GitHub) and sign up
-- On the top left, locate "My Workspace". Use the drop-down arrow to select "Flyte"
-- Click on "+ New Team Note"
+- Click `Sign in` and use Github to login
+- Click on `+ New Note`
 - Fire away your RFC! 
+- Make sure the link to the hackmd document is included within the body of the document.
 
-Note: HackMD documents are written in Markdown. RFC templates can be found here (insert link to the GitHub template). 
+Note: HackMD documents are written in Markdown. RFC templates can be found [here](https://github.com/flyteorg/flyte/blob/RFC-Process/rfc/RFC-0000-Template.md). 
 
 After completing your RFC on HackMD, it is time to push to GitHub:
 - On the top right, locate the ellipsis (...) next to your avatar
@@ -93,46 +88,47 @@ After completing your RFC on HackMD, it is time to push to GitHub:
 - A new pop-out menu will appear. Make the following selections:
     |         Option             | Value                                  |
     | -------------------------- | -------------------------------------- |
-    | Select Repo:               | flyteorg/flyte                         |
+    | Select Repo:               | <your fork>                         |
     | Select branch:             | <Insert a new or existing branch name> |
     | Select file:               | rfcs/<category>/awesomefeature.md      |
     | Choose version(s) to push: | Fill in a descriptive name and a self-link to the hackmd note.  |
-
 - Go ahead and Push to GitHub
 
 ## Where to store RFCs
 
 The Flyte repo on GitHub has an RFC folder with 3 directories:
 - Core language: Changes to FlyteIdl that change the wire-format in any way are considered significant changes that require revision and approval.
-
-  Lead reviewers: At least one of [flyte core maintainers](https://github.com/orgs/flyteorg/teams/flyte-core-maintainers) and one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
-- General System: Changes to other repos that introduce signficant change of behavior or user-impacting features.
-
-  Lead reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
-- CI-CD: Significant changes to CI-CD System that have impact across different repositories.
-
-  Lead reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
   
- Go to GitHub. You should be abe to push your PR from the branch created.
-
+  Reviewers: At least one of [flyte core maintainers](https://github.com/orgs/flyteorg/teams/flyte-core-maintainers) and one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
+- General System: Changes to other repos that introduce signficant change of behavior or user-impacting features.
+  
+  Reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
+- CI-CD: Significant changes to CI-CD System that have impact across different repositories.
+  
+  Reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
+  
 ## Reviewing RFCs
-[Reviewing RFCs]: #reviewing-rfcs
 
-Once the RFC is created in a PR, reviewers can take up to 3 weeks to review, test, and either approve or recommend adjustments. They may call for meetings, demos, or other measures deemed necessary. 
+Once the RFC is created in a PR, reviewers can take up to 3 weeks to review, test, and either approve or recommend adjustments. They may call for meetings, demos, or other measures deemed necessary.
+
+### Instructions for Reviewers
+
+1. If you are set as a reviewer for a PR, you must submit a review within 3 weeks of the PR open date.
+1. We are not looking for consensus-based decision making. Strong objections to proposals must be considered and a decision one way or another should be taken.
+1. Being curtious and responsive to comments and responses help contributors stay engaged and smoothen out the overall process.
+1. If there is a link to HackMD in the PR, please use that to leave comments and have discussions on the RFC. If there isn't one, feel free to request one or submit your comments in the github PR directly.
 
 Once approved, the RFC will be pushed to GitHub to be implemented.
 
 RFC PRs whose authors become unresponsive to reviewers' comments within 5 business days will be closed.
 
 ## Implementing RFCs
-[Implementing RFCs]: #implementing-rfcs
 
 RFCs for vital features may need to be implemented immediately, whereas other RFCs may need to wait for the right developer to be available. 
 
 The author of an RFC may not always be the one to implement it, but if they do, they are welcome to submit an implementation for review after the RFc has been accepted. 
 
 ## RFC Postponement
-[RFC Postponement]: #rfc-postponement
 
 Rejected RFCs may be labelled as "postponed". This means the PR has been closed without implementation, because either:
 - the proposed change will need to wait for prerequisite features, 
@@ -147,7 +143,6 @@ Alternatively, if an RFC is not likely to be implemented, it should be labelled 
 [Contributions]: #contributions
 
 Any contribution to FlyteOrg repos will be licensed with [Apache-2.0](https://github.com/flyteorg/flyte/blob/master/LICENSE) license without any additional terms or conditions.
-
 
 Adapted from: 
 [Rust RFCs - Active RFC List](https://github.com/rust-lang/rfcs/blob/master/README.md) 
