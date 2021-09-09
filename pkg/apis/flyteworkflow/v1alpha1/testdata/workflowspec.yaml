@@ -205,16 +205,14 @@ tasks:
     interface:
       inputs:
         variables:
-          - name: value_to_print
-            var:
-              type:
-                simple: INTEGER
+          value_to_print:
+            type:
+              simple: INTEGER
       outputs:
         variables:
-          - name: out
-            var:
-              type:
-                simple: INTEGER
+          out:
+            type:
+              simple: INTEGER
     metadata:
       runtime:
         version: 1.19.0b7

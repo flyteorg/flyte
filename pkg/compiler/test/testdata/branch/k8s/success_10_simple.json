@@ -143,17 +143,14 @@
       }
     },
     "outputs": {
-      "variables": [
-        {
-          "name": "o0",
-          "var": {
-            "type": {
-              "simple": "INTEGER"
-            },
-            "description": "o0"
-          }
+      "variables": {
+        "o0": {
+          "type": {
+            "simple": "INTEGER"
+          },
+          "description": "o0"
         }
-      ]
+      }
     },
     "outputBindings": [
       {
@@ -191,17 +188,14 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "BOOLEAN"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "BOOLEAN"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -256,30 +250,24 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "n",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -335,17 +323,14 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "INTEGER"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -400,30 +385,24 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "n",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -479,17 +458,14 @@
       "interface": {
         "inputs": {},
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "INTEGER"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -544,48 +520,36 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "a",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+          "variables": {
+            "a": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             },
-            {
-              "name": "b",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+            "b": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             },
-            {
-              "name": "o1",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o1"
-              }
+            "o1": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o1"
             }
-          ]
+          }
         }
       },
       "container": {

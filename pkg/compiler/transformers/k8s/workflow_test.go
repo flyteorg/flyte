@@ -136,30 +136,18 @@ func TestBuildFlyteWorkflow_withInputs(t *testing.T) {
 
 	w.Template.Interface = &core.TypedInterface{
 		Inputs: &core.VariableMap{
-			Variables: []*core.VariableMapEntry{
-				{
-					Name: "x",
-					Var:  vars[0],
-				},
-				{
-					Name: "y",
-					Var:  vars[1],
-				},
+			Variables: map[string]*core.Variable{
+				"x": vars[0],
+				"y": vars[1],
 			},
 		},
 	}
 
 	startNode.iface = &core.TypedInterface{
 		Outputs: &core.VariableMap{
-			Variables: []*core.VariableMapEntry{
-				{
-					Name: "x",
-					Var:  vars[0],
-				},
-				{
-					Name: "y",
-					Var:  vars[1],
-				},
+			Variables: map[string]*core.Variable{
+				"x": vars[0],
+				"y": vars[1],
 			},
 		},
 	}

@@ -52,14 +52,11 @@ var sampleParameters = &core.LiteralMap{Literals: map[string]*core.Literal{
 }}
 
 var variableMap = &core.VariableMap{
-	Variables: []*core.VariableMapEntry{
-		{
-			Name: "test",
-			Var: &core.Variable{
-				Type: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_STRING,
-					},
+	Variables: map[string]*core.Variable{
+		"test": {
+			Type: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRING,
 				},
 			},
 		},

@@ -187,17 +187,14 @@
       }
     },
     "outputs": {
-      "variables": [
-        {
-          "name": "o0",
-          "var": {
-            "type": {
-              "simple": "FLOAT"
-            },
-            "description": "o0"
-          }
+      "variables": {
+        "o0": {
+          "type": {
+            "simple": "FLOAT"
+          },
+          "description": "o0"
         }
-      ]
+      }
     },
     "outputBindings": [
       {
@@ -243,32 +240,26 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "lst",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "lst"
-              }
+          "variables": {
+            "lst": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "lst"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -331,34 +322,28 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "cereals",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "cereals": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "cereals"
-              }
+                }
+              },
+              "description": "cereals"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -421,34 +406,28 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "lst",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "lst": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "lst"
-              }
+                }
+              },
+              "description": "lst"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "BOOLEAN"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "BOOLEAN"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -511,34 +490,28 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "filepath",
-              "var": {
-                "type": {
-                  "simple": "STRING"
-                },
-                "description": "filepath"
-              }
+          "variables": {
+            "filepath": {
+              "type": {
+                "simple": "STRING"
+              },
+              "description": "filepath"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "o0"
-              }
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -601,32 +574,26 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "cereal",
-              "var": {
-                "type": {
-                  "mapValueType": {
-                    "simple": "STRING"
-                  }
-                },
-                "description": "cereal"
-              }
+          "variables": {
+            "cereal": {
+              "type": {
+                "mapValueType": {
+                  "simple": "STRING"
+                }
+              },
+              "description": "cereal"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "INTEGER"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {

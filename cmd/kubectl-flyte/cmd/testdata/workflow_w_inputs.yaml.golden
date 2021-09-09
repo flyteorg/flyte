@@ -16,12 +16,10 @@ tasks:
   interface:
     inputs:
       variables:
-      - key: x
-        value:
+        x:
           type:
             simple: INTEGER
-      - key: "y"
-        value:
+        "y":
           type:
             collectionType:
               simple: STRING
@@ -34,19 +32,18 @@ tasks:
   id:
     name: task-2
   interface:
-    inputs: {}
+    inputs:
+      variables: {}
 workflow:
   id:
     name: workflow-with-inputs
   interface:
     inputs:
       variables:
-      - key: x
-        value:
+        x:
           type:
             simple: INTEGER
-      - key: "y"
-        value:
+        "y":
           type:
             collectionType:
               simple: STRING

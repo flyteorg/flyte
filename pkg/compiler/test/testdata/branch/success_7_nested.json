@@ -7,33 +7,28 @@
       "name": "core.control_flow.run_conditions.so_nested",
       "version": "abc"
     },
-    "metadata": {},
+    "metadata": {
+    },
     "interface": {
       "inputs": {
-        "variables": [
-          {
-            "name":"my_input",
-            "var": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "my_input"
-            }
+        "variables": {
+          "my_input": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "my_input"
           }
-        ]
+        }
       },
       "outputs": {
-        "variables": [
-          {
-            "name": "o0",
-            "var": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
-            }
+        "variables": {
+          "o0": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "o0"
           }
-        ]
+        }
       }
     },
     "nodes": [
@@ -41,7 +36,8 @@
         "id": "branchnode-2",
         "metadata": {
           "name": "fractions",
-          "retries": {},
+          "retries": {
+          },
           "interruptible": false
         },
         "inputs": [
@@ -91,7 +87,8 @@
                 "id": "branchbranchnode-1",
                 "metadata": {
                   "name": "inner_fractions",
-                  "retries": {},
+                  "retries": {
+                  },
                   "interruptible": false
                 },
                 "inputs": [
@@ -124,7 +121,8 @@
                         "id": "branchbranchn0",
                         "metadata": {
                           "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
-                          "retries": {},
+                          "retries": {
+                          },
                           "interruptible": false
                         },
                         "inputs": [
@@ -192,7 +190,8 @@
                   "id": "branchn1",
                   "metadata": {
                     "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
-                    "retries": {},
+                    "retries": {
+                    },
                     "interruptible": false
                   },
                   "inputs": [
@@ -236,7 +235,8 @@
         }
       }
     ],
-    "metadataDefaults": {}
+    "metadataDefaults": {
+    }
   },
   "tasks": [
     {
@@ -254,35 +254,30 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {},
+        "retries": {
+        },
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "n",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -300,7 +295,8 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {}
+        "resources": {
+        }
       }
     },
     {
@@ -318,35 +314,30 @@
           "version": "0.16.0",
           "flavor": "python"
         },
-        "retries": {},
+        "retries": {
+        },
         "interruptible": false
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name": "n",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "n"
-              }
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -364,7 +355,8 @@
           "--raw-output-data-prefix",
           "{{.rawOutputDataPrefix}}"
         ],
-        "resources": {}
+        "resources": {
+        }
       }
     }
   ]

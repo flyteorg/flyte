@@ -8,7 +8,8 @@ tasks:
   id:
     name: task-1
   interface:
-    inputs: {}
+    inputs:
+      variables: {}
 - container:
     args:
     - testArg
@@ -18,12 +19,14 @@ tasks:
   id:
     name: task-2
   interface:
-    inputs: {}
+    inputs:
+      variables: {}
 workflow:
   id:
     name: workflow-id-123
   interface:
-    inputs: {}
+    inputs:
+      variables: {}
   nodes:
   - id: node-1
     taskNode:

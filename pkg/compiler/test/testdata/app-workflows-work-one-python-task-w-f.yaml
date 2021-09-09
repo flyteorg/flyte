@@ -18,6 +18,24 @@ tasks:
       value: testValue2
     - key: testKey3
       value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
     image: myflytecontainer:abc123
     resources: {}
   id:
@@ -25,15 +43,13 @@ tasks:
   interface:
     inputs:
       variables:
-      - name: list_of_nums
-        var:
+        list_of_nums:
           type:
             collectionType:
               simple: INTEGER
     outputs:
       variables:
-      - name: are_num_odd
-        var:
+        are_num_odd:
           type:
             collectionType:
               simple: BOOLEAN
