@@ -1,8 +1,8 @@
 .. flytectl doc
 
-##########################################
+######################
 ``Flytectl`` Reference
-##########################################
+######################
 
 Overview
 =========
@@ -16,26 +16,23 @@ Install
 Flytectl is a Golang binary and can be installed on any platform supported by
 golang
 
+.. tabbed:: OSX
 
-.. tabs::
+  .. prompt:: bash $
 
-  .. tab:: OSX
+      brew install flyteorg/homebrew-tap/flytectl
 
-    .. prompt:: bash $
+  *Upgrade* existing installation using the following command:
 
-       brew install flyteorg/homebrew-tap/flytectl
+  .. prompt:: bash $
 
-    *Upgrade* existing installation using the following command:
+      brew update && brew upgrade flytectl
 
-    .. prompt:: bash $
+.. tabbed:: Other Operating systems
 
-       brew update && brew upgrade flytectl
+  .. prompt:: bash $
 
-  .. tab:: Other Operating systems
-
-    .. prompt:: bash $
-
-        curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+      curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
 **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
 
@@ -51,79 +48,79 @@ on command-line. The following configuration is useful to setup.
 Basic Configuration
 --------------------
 
-.. tabs:: Flytectl configuration
+Flytectl configuration
 
-   .. tab:: Local Flyte Sandbox
+.. tabbed:: Local Flyte Sandbox
 
-       Automatically configured for you by ``flytectl sandbox`` command.
+    Automatically configured for you by ``flytectl sandbox`` command.
 
-       .. code-block:: yaml
+    .. code-block:: yaml
 
-           admin:
-             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-             endpoint: dns:///localhost:30081
-             insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
-             authType: Pkce # authType: Pkce # if using authentication or just drop this.
-           storage:
-             connection:
-               access-key: minio
-               auth-type: accesskey
-               disable-ssl: true
-               endpoint: http://localhost:30084
-               region: my-region-here
-               secret-key: miniostorage
-             container: my-s3-bucket
-             type: minio
+        admin:
+          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+          endpoint: dns:///localhost:30081
+          insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+          authType: Pkce # authType: Pkce # if using authentication or just drop this.
+        storage:
+          connection:
+            access-key: minio
+            auth-type: accesskey
+            disable-ssl: true
+            endpoint: http://localhost:30084
+            region: my-region-here
+            secret-key: miniostorage
+          container: my-s3-bucket
+          type: minio
 
-   .. tab:: AWS Configuration
+.. tabbed:: AWS Configuration
 
-       .. code-block:: yaml
+    .. code-block:: yaml
 
-           admin:
-             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-             endpoint: dns:///<replace-me>
-             authType: Pkce # authType: Pkce # if using authentication or just drop this.
-             insecure: true # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
-           storage:
-             type: stow
-             stow:
-                kind: s3
-                config:
-                    auth_type: iam
-                    region: <REGION> # Example: us-east-2
-             container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
+        admin:
+          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+          endpoint: dns:///<replace-me>
+          authType: Pkce # authType: Pkce # if using authentication or just drop this.
+          insecure: true # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+        storage:
+          type: stow
+          stow:
+            kind: s3
+            config:
+                auth_type: iam
+                region: <REGION> # Example: us-east-2
+          container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
 
-   .. tab:: GCS Configuration
+.. tabbed:: GCS Configuration
 
-       .. code-block:: yaml
+    .. code-block:: yaml
 
-           admin:
-             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-             endpoint: dns:///<replace-me>
-             authType: Pkce # authType: Pkce # if using authentication or just drop this.
-             insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
-           storage:
-             type: stow
-             stow:
-                kind: google
-                config:
-                    json: ""
-                    project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
-                    scopes: https://www.googleapis.com/auth/devstorage.read_write
-             container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
+        admin:
+          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+          endpoint: dns:///<replace-me>
+          authType: Pkce # authType: Pkce # if using authentication or just drop this.
+          insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+        storage:
+          type: stow
+          stow:
+            kind: google
+            config:
+                json: ""
+                project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
+                scopes: https://www.googleapis.com/auth/devstorage.read_write
+          container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
 
-   .. tab:: Others
+.. tabbed:: Others
 
-           For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
+    For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
 
+    Place the config file in ``$HOME/.flyte`` directory with the name config.yaml.
+    This file is typically searched in:
 
-    Place this in $HOME/.flyte directory with name config.yaml.
-    This file is searched in
-
-    * $HOME/.flyte
+    * ``$HOME/.flyte``
     * currDir from where you run flytectl
-    * /etc/flyte/config
-        You can pass it commandline using --config <config-file-path> aswell
+    * ``/etc/flyte/config``
+    
+    You can pass the file name in the commandline using ``--config <config-file-path>`` as well!
 
 
 .. toctree::
