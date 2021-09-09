@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+
 	"github.com/flyteorg/flytectl/pkg/k8s"
 
 	"github.com/docker/docker/api/types"
@@ -85,10 +87,11 @@ func TestStartSandboxFunc(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
 		errCh := make(chan error)
+		sandboxConfig.DefaultConfig.Version = ""
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -118,7 +121,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -155,6 +158,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.Version = ""
 		volumes := docker.Volumes
 		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
@@ -163,7 +167,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -192,6 +196,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = "../"
+		sandboxConfig.DefaultConfig.Version = ""
 		absPath, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
 		assert.Nil(t, err)
 		volumes := docker.Volumes
@@ -202,7 +207,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -232,15 +237,14 @@ func TestStartSandboxFunc(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Version = "v0.15.0"
 		sandboxConfig.DefaultConfig.Source = ""
+
+		sha, err := githubutil.GetSHAFromVersion(sandboxConfig.DefaultConfig.Version, "flyte")
+		assert.Nil(t, err)
+
 		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: flyteManifest,
-			Target: generatedManifest,
-		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(fmt.Sprintf("%s-%s", dind, sha)),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -260,7 +264,7 @@ func TestStartSandboxFunc(t *testing.T) {
 			Follow:     true,
 		}).Return(nil, nil)
 		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err := startSandbox(ctx, mockDocker, os.Stdin)
+		_, err = startSandbox(ctx, mockDocker, os.Stdin)
 		assert.Nil(t, err)
 	})
 	t.Run("Failed run sandbox cluster with wrong version", func(t *testing.T) {
@@ -271,14 +275,9 @@ func TestStartSandboxFunc(t *testing.T) {
 		sandboxConfig.DefaultConfig.Version = "v0.1444.0"
 		sandboxConfig.DefaultConfig.Source = ""
 		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: flyteManifest,
-			Target: generatedManifest,
-		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -316,7 +315,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -353,7 +352,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -393,7 +392,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		sandboxConfig.DefaultConfig.Version = ""
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -430,7 +429,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -459,6 +458,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.Version = ""
 		volumes := docker.Volumes
 		volumes = append(volumes, mount.Mount{
 			Type:   mount.TypeBind,
@@ -467,7 +467,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -510,7 +510,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -534,6 +534,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
 		docker.Client = mockDocker
 		sandboxConfig.DefaultConfig.Source = ""
+		sandboxConfig.DefaultConfig.Version = ""
 		err = startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})
@@ -546,7 +547,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
-			Image:        docker.ImageName,
+			Image:        docker.GetSandboxImage(dind),
 			Tty:          false,
 			ExposedPorts: p1,
 		}, &container.HostConfig{
@@ -672,5 +673,31 @@ func TestGetNodeTaintStatus(t *testing.T) {
 		c, err := isNodeTainted(ctx, client.CoreV1())
 		assert.Nil(t, err)
 		assert.Equal(t, true, c)
+	})
+}
+
+func TestGetSandboxImage(t *testing.T) {
+	t.Run("Get Latest sandbox", func(t *testing.T) {
+		image, err := getSandboxImage("")
+		assert.Nil(t, err)
+		assert.Equal(t, docker.GetSandboxImage(dind), image)
+	})
+
+	t.Run("Get sandbox image with version ", func(t *testing.T) {
+		image, err := getSandboxImage("v0.14.0")
+		assert.Nil(t, err)
+		assert.Equal(t, true, strings.HasPrefix(image, docker.ImageName))
+	})
+	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
+		_, err := getSandboxImage("v100.1.0")
+		assert.NotNil(t, err)
+	})
+	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
+		_, err := getSandboxImage("aaaaaa")
+		assert.NotNil(t, err)
+	})
+	t.Run("Get sandbox image with version that is not supported", func(t *testing.T) {
+		_, err := getSandboxImage("v0.10.0")
+		assert.NotNil(t, err)
 	})
 }

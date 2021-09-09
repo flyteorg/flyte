@@ -9,17 +9,15 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+
 	"github.com/avast/retry-go"
 	"github.com/olekukonko/tablewriter"
 	corev1api "k8s.io/api/core/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/docker/docker/api/types/mount"
-	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/pkg/configutil"
 	"github.com/flyteorg/flytectl/pkg/k8s"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +26,6 @@ import (
 	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/docker"
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flytectl/pkg/util"
 )
 
@@ -47,23 +44,22 @@ Mount your source code repository inside sandbox
 
  bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
-Run specific version of flyte, Only available after v0.13.0+
+Run specific version of flyte. flytectl sandbox only support flyte version available in Github release https://github.com/flyteorg/flyte/tags
 ::
 
  bin/flytectl sandbox start  --version=v0.14.0
 
+Note: Flytectl sandbox will only work for v0.10.0+
+	
 Usage
 	`
-	k8sEndpoint                  = "https://127.0.0.1:30086"
-	flyteMinimumVersionSupported = "v0.13.0"
-	generatedManifest            = "/flyteorg/share/flyte_generated.yaml"
-	flyteNamespace               = "flyte"
-	diskPressureTaint            = "node.kubernetes.io/disk-pressure"
-	taintEffect                  = "NoSchedule"
-)
-
-var (
-	flyteManifest = f.FilePathJoin(f.UserHomeDir(), ".flyte", "flyte_generated.yaml")
+	k8sEndpoint             = "https://127.0.0.1:30086"
+	flyteNamespace          = "flyte"
+	flyteRepository         = "flyte"
+	dind                    = "dind"
+	sandboxSupportedVersion = "v0.10.0"
+	diskPressureTaint       = "node.kubernetes.io/disk-pressure"
+	taintEffect             = "NoSchedule"
 )
 
 type ExecResult struct {
@@ -86,23 +82,23 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 		docker.WaitForSandbox(reader, docker.SuccessMessage)
 	}
 
-	var k8sClient k8s.K8s
-	err = retry.Do(
-		func() error {
-			k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, k8sEndpoint)
+	if reader != nil {
+		var k8sClient k8s.K8s
+		err = retry.Do(
+			func() error {
+				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, k8sEndpoint)
+				return err
+			},
+			retry.Attempts(10),
+		)
+		if err != nil {
 			return err
-		},
-		retry.Attempts(10),
-	)
-	if err != nil {
-		return err
+		}
+		if err := watchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
+			return err
+		}
+		util.PrintSandboxMessage()
 	}
-
-	if err := watchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
-		return err
-	}
-
-	util.PrintSandboxMessage()
 	return nil
 }
 
@@ -113,7 +109,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		if err.Error() != clierrors.ErrSandboxExists {
 			return nil, err
 		}
-		fmt.Printf("Existing details of your sandbox:")
+		fmt.Printf("Existing details of your sandbox")
 		util.PrintSandboxMessage()
 		return nil, nil
 	}
@@ -137,35 +133,18 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		volumes = append(volumes, *vol)
 	}
 
-	if len(sandboxConfig.DefaultConfig.Version) > 0 {
-		isGreater, err := util.IsVersionGreaterThan(sandboxConfig.DefaultConfig.Version, flyteMinimumVersionSupported)
-		if err != nil {
-			return nil, err
-		}
-		if !isGreater {
-			logger.Infof(ctx, "version flag only supported after with flyte %s+ release", flyteMinimumVersionSupported)
-			return nil, fmt.Errorf("version flag only supported after with flyte %s+ release", flyteMinimumVersionSupported)
-		}
-		if err := githubutil.GetFlyteManifest(sandboxConfig.DefaultConfig.Version, flyteManifest); err != nil {
-			return nil, err
-		}
-
-		if vol, err := mountVolume(flyteManifest, generatedManifest); err != nil {
-			return nil, err
-		} else if vol != nil {
-			volumes = append(volumes, *vol)
-		}
-
+	image, err := getSandboxImage(sandboxConfig.DefaultConfig.Version)
+	if err != nil {
+		return nil, err
 	}
-
-	fmt.Printf("%v pulling docker image %s\n", emoji.Whale, docker.ImageName)
-	if err := docker.PullDockerImage(ctx, cli, docker.ImageName); err != nil {
+	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, image)
+	if err := docker.PullDockerImage(ctx, cli, image); err != nil {
 		return nil, err
 	}
 
 	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
 	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
-	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, docker.ImageName)
+	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, image)
 	if err != nil {
 		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
 		return nil, err
@@ -177,6 +156,29 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	}
 
 	return logReader, nil
+}
+
+func getSandboxImage(version string) (string, error) {
+	// Latest release will use image cr.flyte.org/flyteorg/flyte-sandbox:dind
+	// In case of version flytectl will use cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}
+
+	var tag = dind
+	if len(version) > 0 {
+		isGreater, err := util.IsVersionGreaterThan(version, sandboxSupportedVersion)
+		if err != nil {
+			return "", err
+		}
+		if !isGreater {
+			return "", fmt.Errorf("version flag only supported with flyte %s+ release", sandboxSupportedVersion)
+		}
+		sha, err := githubutil.GetSHAFromVersion(version, flyteRepository)
+		if err != nil {
+			return "", err
+		}
+		tag = fmt.Sprintf("%s-%s", dind, sha)
+	}
+
+	return docker.GetSandboxImage(tag), nil
 }
 
 func mountVolume(file, destination string) (*mount.Mount, error) {

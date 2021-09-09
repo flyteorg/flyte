@@ -42,6 +42,18 @@ func TestCheckVersionExist(t *testing.T) {
 	})
 }
 
+func TestGetSHAFromVersion(t *testing.T) {
+	t.Run("Invalid Tag", func(t *testing.T) {
+		_, err := GetSHAFromVersion("v100.0.0", "flyte")
+		assert.NotNil(t, err)
+	})
+	t.Run("Valid Tag", func(t *testing.T) {
+		release, err := GetSHAFromVersion("v0.15.0", "flyte")
+		assert.Nil(t, err)
+		assert.Greater(t, len(release), 0)
+	})
+}
+
 func TestGetAssetsFromRelease(t *testing.T) {
 	t.Run("Successful get assets", func(t *testing.T) {
 		assets, err := GetAssetsFromRelease("v0.15.0", sandboxManifest, flyte)
@@ -59,21 +71,6 @@ func TestGetAssetsFromRelease(t *testing.T) {
 		assets, err := GetAssetsFromRelease("v100.15.0", "test", flyte)
 		assert.NotNil(t, err)
 		assert.Nil(t, assets)
-	})
-}
-
-func TestGetFlyteManifest(t *testing.T) {
-	t.Run("Successful get manifest", func(t *testing.T) {
-		err := GetFlyteManifest("v0.15.0", "test.yaml")
-		assert.Nil(t, err)
-	})
-	t.Run("Failed get manifest with wrong name", func(t *testing.T) {
-		err := GetFlyteManifest("v100.15.0", "test.yaml")
-		assert.NotNil(t, err)
-	})
-	t.Run("Failed get manifest with wrong name", func(t *testing.T) {
-		err := GetFlyteManifest("v0.12.0", "test.yaml")
-		assert.NotNil(t, err)
 	})
 }
 
