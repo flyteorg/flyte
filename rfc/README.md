@@ -8,11 +8,6 @@ Not all changes will require an RFC. Bug fixes and documentation improvements ca
 
 Other more extensive changes need to be carefully tracked and reviewed, which is where RFCs come in.
 
-
-## Table of Contents
-[Table of Contents]: #table-of-contents
-[toc]
-
 ## When you need to follow this process
 [When you need to follow this process]: #when-you-need-to-follow-this-process
 
@@ -66,7 +61,7 @@ At Flyte, we have been using [HackMD](https://hackmd.io) to author RFCs.
 It is recommended that the initial review of an RFC takes place on HackMD, before pushing to GitHub. Several benefits of this include:
 - PR authors typically have a GitHub account, which is all that's needed to sign in to HackMD. 
 - Ease of commenting, iterating and adjusting on HackMD before pushing to GutHub, as opposed to requesting a PR for every change made to the RFC on GitHub. Visit https://hackmd.io/s/how-to-use-comments for more information on commenting.
-- Ease of document tracking, compared to Google docs, since RFCs will be stored in github making the RFCs indexed, searchable and versioned.
+- Ease of document tracking, compared to Google docs, since RFCs will be stored in GitHub making the RFCs indexed, searchable and versioned.
 
 #### The HackMD process
 
@@ -74,7 +69,7 @@ The Flyte repo on GitHub contains an RFC folder where RFCs are to be pushed to.
 
 For those new to HackMD, here is how to begin:
 - Visit https://hackmd.io/
-- Click `Sign in` and use Github to login
+- Click `Sign in` and use GitHub to login
 - Click on `+ New Note`
 - Fire away your RFC! 
 - Make sure the link to the hackmd document is included within the body of the document.
@@ -116,7 +111,7 @@ Once the RFC is created in a PR, reviewers can take up to 3 weeks to review, tes
 1. If you are set as a reviewer for a PR, you must submit a review within 3 weeks of the PR open date.
 1. We are not looking for consensus-based decision making. Strong objections to proposals must be considered and a decision one way or another should be taken.
 1. Being curtious and responsive to comments and responses help contributors stay engaged and smoothen out the overall process.
-1. If there is a link to HackMD in the PR, please use that to leave comments and have discussions on the RFC. If there isn't one, feel free to request one or submit your comments in the github PR directly.
+1. If there is a link to HackMD in the PR, please use that to leave comments and have discussions on the RFC. If there isn't one, feel free to request one or submit your comments in the GitHub PR directly.
 
 Once approved, the RFC will be pushed to GitHub to be implemented.
 
