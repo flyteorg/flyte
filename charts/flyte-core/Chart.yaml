@@ -1,0 +1,5 @@
+apiVersion: v2
+name: flyte-core
+description: A Helm chart for Flyte
+type: application
+version: v0.1.10 # VERSION

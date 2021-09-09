@@ -34,7 +34,9 @@ echo "Done."
 
 # Deploy flyte
 echo "Deploying Flyte..."
-k3s kubectl apply -f /flyteorg/share/flyte_generated.yaml
+helm dep update /flyteorg/share/flyte/
+helm install -n flyte -f /flyteorg/share/flyte/values-sandbox.yaml --create-namespace flyte /flyteorg/share/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml
+
 wait-for-flyte.sh
 
 # Monitor running processes. Exit when the first process exits.

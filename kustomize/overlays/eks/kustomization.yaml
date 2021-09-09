@@ -21,21 +21,21 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.6.10 # FLYTEADMIN_TAG override the tag
+    newTag: v0.6.22 # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.20.1 # FLYTECONSOLE_TAG  the tag
+    newTag: v0.25.0 # FLYTECONSOLE_TAG  the tag
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
-    newTag: v0.3.5 # DATACATALOG_TAG override the tag
+    newTag: v0.3.9 # DATACATALOG_TAG override the tag
     newName: cr.flyte.org/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.12.9 # FLYTEPROPELLER_TAG override the tag
+    newTag: v0.13.20 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name
   # Webhook
   - name: webhook # match images with this name
-    newTag: v0.12.9 # FLYTEPROPELLER_TAG override the tag
+    newTag: v0.13.20 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name

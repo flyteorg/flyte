@@ -8407,6 +8407,13 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
   name: flyte-propeller-auth
   namespace: flyte
 stringData:
@@ -8654,7 +8661,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.5
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -8677,7 +8684,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.5
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8734,7 +8741,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -8744,6 +8751,29 @@ spec:
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
+      initContainers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
@@ -8782,7 +8812,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8829,7 +8859,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8846,7 +8876,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8860,7 +8890,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8880,7 +8910,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -8926,7 +8956,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: cr.flyte.org/flyteorg/flyteconsole:v0.20.1
+        image: cr.flyte.org/flyteorg/flyteconsole:v0.25.0
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -8970,7 +9000,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.20
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -9162,7 +9192,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: cr.flyte.org/flyteorg/flyteadmin:v0.6.10
+            image: cr.flyte.org/flyteorg/flyteadmin:v0.6.22
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -9185,46 +9215,6 @@ spec:
             secret:
               secretName: db-pass-bthd2588cc
   schedule: '*/1 * * * *'
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: flyte-pod-webhook-secret
-  namespace: flyte
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - args:
-        - webhook
-        - init-certs
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.12.9
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      restartPolicy: Never
-      serviceAccountName: flyte-pod-webhook
-      volumes:
-      - configMap:
-          name: flyte-propeller-config-dtk4mh9k2d
-        name: config-volume
-  ttlSecondsAfterFinished: 0
 ---
 apiVersion: batch/v1
 kind: Job

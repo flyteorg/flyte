@@ -1,0 +1,5 @@
+resources:
+  - deployment.yaml
+  - rbac.yaml
+  - secret.yaml
+  - service.yaml

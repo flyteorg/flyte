@@ -48,7 +48,7 @@ Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__
 
 .. prompt:: bash (venv)$
 
-    pip3 install flytekit
+    pip3 install flytekit --upgrade
     git clone https://github.com/flyteorg/flytekit-python-template.git myflyteapp
     cd myflyteapp
 

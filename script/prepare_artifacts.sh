@@ -3,10 +3,10 @@
 set -e
 
 # Create dir structure
-mkdir -p release .cr-index .cr-release-packages
+mkdir -p release
 
 # Copy all deployment manifest in release directory
-for file in ./deployment/**/flyte_generated.yaml; do 
+for file in ./deployment/**/flyte_generated.yaml; do
     if [ -f "$file" ]; then
         result=${file/#"./deployment/"}
         result=${result/%"/flyte_generated.yaml"}
@@ -14,17 +14,10 @@ for file in ./deployment/**/flyte_generated.yaml; do
     fi
 done
 
-grep -rlZ "version:[^P]*# VERSION" ./helm/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+sed "s/v0.1.10/${VERSION}/g" ./charts/flyte/README.md  > temp.txt && mv temp.txt ./charts/flyte/README.md
 
-# Download helm chart releaser
-wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz 
-mkdir -p bin
-tar -xf /tmp/chart-releaser.tar.gz -C bin
-chmod +x bin/cr
-rm /tmp/chart-releaser.tar.gz 
+grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-core/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-core/README.md  > temp.txt && mv temp.txt ./charts/flyte-core/README.md
 
-# Package helm chart
-bin/cr package helm
-
-# Clean git history
-git stash
+helm dep update ./charts/flyte

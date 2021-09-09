@@ -53,11 +53,18 @@ modules:
       postgres:
         enabled: false
       db:
-        database:
-          port: 5432
-          username: "${{module.postgres.db_user}}"
-          host: "${{module.postgres.db_host}}"
-          dbname: "${{module.postgres.db_name}}"
+        datacatalog:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
+        admin:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
       common:
         ingress:
           albSSLRedirect: false
