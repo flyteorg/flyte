@@ -7,33 +7,28 @@
       "name": "myapp.workflows.cereal.mycereal",
       "version": "{{ registration.version }}"
     },
-    "metadata": {},
+    "metadata": {
+    },
     "interface": {
       "inputs": {
-        "variables": [
-          {
-            "name":"cereal_path",
-            "var": {
-              "type": {
-                "simple": "STRING"
-              },
-              "description": "cereal_path"
-            }
+        "variables": {
+          "cereal_path": {
+            "type": {
+              "simple": "STRING"
+            },
+            "description": "cereal_path"
           }
-        ]
+        }
       },
       "outputs": {
-        "variables": [
-          {
-            "name": "o0",
-            "var": {
-              "type": {
-                "simple": "FLOAT"
-              },
-              "description": "o0"
-            }
+        "variables": {
+          "o0": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "o0"
           }
-        ]
+        }
       }
     },
     "nodes": [
@@ -41,7 +36,8 @@
         "id": "n0",
         "metadata": {
           "name": "flytekit.core.python_function_task.myapp.workflows.cereal.load_cereal",
-          "retries": {}
+          "retries": {
+          }
         },
         "inputs": [
           {
@@ -61,14 +57,16 @@
             "name": "myapp.workflows.cereal.load_cereal",
             "version": "{{ registration.version }}"
           },
-          "overrides": {}
+          "overrides": {
+          }
         }
       },
       {
         "id": "n1",
         "metadata": {
           "name": "flytekit.core.python_function_task.myapp.workflows.cereal.is_list_empty",
-          "retries": {}
+          "retries": {
+          }
         },
         "inputs": [
           {
@@ -92,14 +90,16 @@
             "name": "myapp.workflows.cereal.is_list_empty",
             "version": "{{ registration.version }}"
           },
-          "overrides": {}
+          "overrides": {
+          }
         }
       },
       {
         "id": "n2",
         "metadata": {
           "name": "is_lst_empty",
-          "retries": {}
+          "retries": {
+          }
         },
         "inputs": [
           {
@@ -134,7 +134,8 @@
                 "id": "n0",
                 "metadata": {
                   "name": "flytekit.core.python_function_task.myapp.workflows.cereal.cereal_name_avg",
-                  "retries": {}
+                  "retries": {
+                  }
                 },
                 "inputs": [
                   {
@@ -158,7 +159,8 @@
                     "name": "myapp.workflows.cereal.cereal_name_avg",
                     "version": "{{ registration.version }}"
                   },
-                  "overrides": {}
+                  "overrides": {
+                  }
                 }
               }
             },
@@ -181,7 +183,8 @@
         }
       }
     ],
-    "metadataDefaults": {}
+    "metadataDefaults": {
+    }
   },
   "tasks": [
     {
@@ -199,38 +202,33 @@
           "version": "0.0.0+develop",
           "flavor": "python"
         },
-        "retries": {}
+        "retries": {
+        }
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"filepath",
-              "var": {
-                "type": {
-                  "simple": "STRING"
-                },
-                "description": "filepath"
-              }
+          "variables": {
+            "filepath": {
+              "type": {
+                "simple": "STRING"
+              },
+              "description": "filepath"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "o0"
-              }
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -251,7 +249,8 @@
           "task-name",
           "load_cereal"
         ],
-        "resources": {},
+        "resources": {
+        },
         "env": [
           {
             "key": "FLYTE_INTERNAL_IMAGE",
@@ -275,38 +274,33 @@
           "version": "0.0.0+develop",
           "flavor": "python"
         },
-        "retries": {}
+        "retries": {
+        }
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"lst",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "lst": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "lst"
-              }
+                }
+              },
+              "description": "lst"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "BOOLEAN"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "BOOLEAN"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -327,7 +321,8 @@
           "task-name",
           "is_list_empty"
         ],
-        "resources": {},
+        "resources": {
+        },
         "env": [
           {
             "key": "FLYTE_INTERNAL_IMAGE",
@@ -351,36 +346,31 @@
           "version": "0.0.0+develop",
           "flavor": "python"
         },
-        "retries": {}
+        "retries": {
+        }
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"cereal",
-              "var": {
-                "type": {
-                  "mapValueType": {
-                    "simple": "STRING"
-                  }
-                },
-                "description": "cereal"
-              }
+          "variables": {
+            "cereal": {
+              "type": {
+                "mapValueType": {
+                  "simple": "STRING"
+                }
+              },
+              "description": "cereal"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "INTEGER"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -401,7 +391,8 @@
           "task-name",
           "name_length"
         ],
-        "resources": {},
+        "resources": {
+        },
         "env": [
           {
             "key": "FLYTE_INTERNAL_IMAGE",
@@ -425,36 +416,31 @@
           "version": "0.0.0+develop",
           "flavor": "python"
         },
-        "retries": {}
+        "retries": {
+        }
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"lst",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "lst"
-              }
+          "variables": {
+            "lst": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "lst"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -475,7 +461,8 @@
           "task-name",
           "average"
         ],
-        "resources": {},
+        "resources": {
+        },
         "env": [
           {
             "key": "FLYTE_INTERNAL_IMAGE",
@@ -499,38 +486,33 @@
           "version": "0.0.0+develop",
           "flavor": "python"
         },
-        "retries": {}
+        "retries": {
+        }
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"cereals",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "mapValueType": {
-                      "simple": "STRING"
-                    }
+          "variables": {
+            "cereals": {
+              "type": {
+                "collectionType": {
+                  "mapValueType": {
+                    "simple": "STRING"
                   }
-                },
-                "description": "cereals"
-              }
+                }
+              },
+              "description": "cereals"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "simple": "FLOAT"
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -551,7 +533,8 @@
           "task-name",
           "cereal_name_avg"
         ],
-        "resources": {},
+        "resources": {
+        },
         "env": [
           {
             "key": "FLYTE_INTERNAL_IMAGE",

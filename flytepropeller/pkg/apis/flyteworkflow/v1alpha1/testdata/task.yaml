@@ -3,20 +3,15 @@ id:
 type: "demo"
 interface:
   inputs:
-    variables: # not backwards compatible
-      -
-        name: value_to_print
-        var:
-          type:
-            simple: INTEGER
+    variables:
+      value_to_print:
+        type:
+          simple: INTEGER
   outputs:
     variables:
-      -
-        name: out
-        var:
-          type:
-            simple: INTEGER
-
+      out:
+        type:
+          simple: INTEGER
 metadata:
   runtime:
     version: 1.19.0b7

@@ -323,54 +323,42 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"input",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "input"
-              }
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name":"o1",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o1"
-              }
-            },
-            {
-              "name":"o2",
-              "var": {
-                "type": {
+          "variables": {
+            "o1": {
+              "type": {
+                "collectionType": {
                   "simple": "INTEGER"
-                },
-                "description": "o2"
-              }
+                }
+              },
+              "description": "o1"
             },
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o0"
-              }
+            "o2": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o2"
+            },
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -421,45 +409,36 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"x",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "x"
-              }
+          "variables": {
+            "x": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "x"
             },
-            {
-              "name":"y",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "y"
-              }
+            "y": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "y"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -510,34 +489,28 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"input",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "input"
-              }
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -588,34 +561,28 @@
       },
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"input",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "input"
-              }
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "container": {
@@ -659,43 +626,34 @@
       "metadata": {},
       "interface": {
         "inputs": {
-          "variables": [
-            {
-              "name":"count",
-              "var": {
-                "type": {
-                  "simple": "INTEGER"
-                },
-                "description": "count"
-              }
+          "variables": {
+            "count": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "count"
             },
-            {
-              "name":"input",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "input"
-              }
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
             }
-          ]
+          }
         },
         "outputs": {
-          "variables": [
-            {
-              "name": "o0",
-              "var": {
-                "type": {
-                  "collectionType": {
-                    "simple": "INTEGER"
-                  }
-                },
-                "description": "o0"
-              }
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
             }
-          ]
+          }
         }
       },
       "nodes": [

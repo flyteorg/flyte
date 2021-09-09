@@ -27,12 +27,12 @@ func init() {
 
 func createEmptyVariableMap() *core.VariableMap {
 	res := &core.VariableMap{
-		Variables: []*core.VariableMapEntry{},
+		Variables: map[string]*core.Variable{},
 	}
 	return res
 }
 
-func createVariableMap(variableMap []*core.VariableMapEntry) *core.VariableMap {
+func createVariableMap(variableMap map[string]*core.Variable) *core.VariableMap {
 	res := &core.VariableMap{
 		Variables: variableMap,
 	}
@@ -138,24 +138,18 @@ func generateWorkflowWithInputs(t *testing.T) {
 		Workflow: &core.WorkflowTemplate{
 			Id: &core.Identifier{Name: "workflow-with-inputs"},
 			Interface: &core.TypedInterface{
-				Inputs: createVariableMap([]*core.VariableMapEntry{
-					{
-						Name: "x",
-						Var: &core.Variable{
-							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Inputs: createVariableMap(map[string]*core.Variable{
+					"x": {
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 					},
-					{
-						Name: "y",
-						Var: &core.Variable{
-							Type: &core.LiteralType{
-								Type: &core.LiteralType_CollectionType{
-									CollectionType: &core.LiteralType{
-										Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
-									},
+					"y": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_CollectionType{
+								CollectionType: &core.LiteralType{
+									Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
 								},
 							},
-						},
-					},
+						}},
 				}),
 			},
 			Nodes: []*core.Node{
@@ -189,25 +183,18 @@ func generateWorkflowWithInputs(t *testing.T) {
 			{
 				Id: &core.Identifier{Name: "task-1"},
 				Interface: &core.TypedInterface{
-					Inputs: createVariableMap([]*core.VariableMapEntry{
-						{
-							Name: "x",
-							Var: &core.Variable{
-								Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
-							},
+					Inputs: createVariableMap(map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 						},
-						{
-							Name: "y",
-							Var: &core.Variable{
-								Type: &core.LiteralType{
-									Type: &core.LiteralType_CollectionType{
-										CollectionType: &core.LiteralType{
-											Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
-										},
+						"y": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_CollectionType{
+									CollectionType: &core.LiteralType{
+										Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
 									},
 								},
-							},
-						},
+							}},
 					}),
 				},
 				Target: &core.TaskTemplate_Container{

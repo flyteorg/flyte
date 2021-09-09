@@ -77,7 +77,7 @@ func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs error
 		// Clear out the Inputs. We do not care if the inputs of each of the underlying nodes
 		// match. We will pull the inputs needed for the underlying branch node at runtime.
 		iface2 = &flyte.TypedInterface{
-			Inputs:  &flyte.VariableMap{Variables: []*flyte.VariableMapEntry{}},
+			Inputs:  &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
 			Outputs: iface2.Outputs,
 		}
 
@@ -92,7 +92,7 @@ func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs error
 	// Discover inputs from bindings... these should include all the variables used in the conditional statements.
 	// When we come to validate the conditions themselves, we will look up these variables and fail if a variable is used
 	// in a condition but doesn't have a node input binding.
-	inputVarsFromBindings, _ := ValidateBindings(w, node, node.GetInputs(), &flyte.VariableMap{Variables: []*flyte.VariableMapEntry{}},
+	inputVarsFromBindings, _ := ValidateBindings(w, node, node.GetInputs(), &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
 		false, c.EdgeDirectionUpstream, errs.NewScope())
 
 	if !errs.HasErrors() && iface != nil {
