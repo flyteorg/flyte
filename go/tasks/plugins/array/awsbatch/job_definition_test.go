@@ -44,14 +44,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
 		Interface: &core.TypedInterface{
 			Outputs: &core.VariableMap{
-				Variables: []*core.VariableMapEntry{
-					{
-						Name: "var1",
-						Var: &core.Variable{
-							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
-						},
-					},
-				},
+				Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 			},
 		},
 		Target: &core.TaskTemplate_Container{
@@ -116,14 +109,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
 		Interface: &core.TypedInterface{
 			Outputs: &core.VariableMap{
-				Variables: []*core.VariableMapEntry{
-					{
-						Name: "var1",
-						Var: &core.Variable{
-							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
-						},
-					},
-				},
+				Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 			},
 		},
 		Target: &core.TaskTemplate_Container{

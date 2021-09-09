@@ -163,8 +163,8 @@ func TestDetermineDiscoverability(t *testing.T) {
 			Version:      "1",
 		},
 		Interface: &core.TypedInterface{
-			Inputs:  &core.VariableMap{Variables: []*core.VariableMapEntry{}},
-			Outputs: &core.VariableMap{Variables: []*core.VariableMapEntry{}},
+			Inputs:  &core.VariableMap{Variables: map[string]*core.Variable{}},
+			Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
 		},
 		Target: &core.TaskTemplate_Container{
 			Container: &core.Container{
@@ -261,15 +261,12 @@ func TestDiscoverabilityTaskType1(t *testing.T) {
 				Version:      "1",
 			},
 			Interface: &core.TypedInterface{
-				Inputs: &core.VariableMap{Variables: []*core.VariableMapEntry{
-					{
-						Name: "foo",
-						Var: &core.Variable{
-							Description: "foo",
-						},
+				Inputs: &core.VariableMap{Variables: map[string]*core.Variable{
+					"foo": {
+						Description: "foo",
 					},
 				}},
-				Outputs: &core.VariableMap{Variables: []*core.VariableMapEntry{}},
+				Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
 			},
 			Target: &core.TaskTemplate_Container{
 				Container: &core.Container{
