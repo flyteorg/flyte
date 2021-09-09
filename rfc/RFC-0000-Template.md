@@ -83,8 +83,8 @@ This document is not:
 **Recommendations**
 
 - Tag RFC title with [WIP] if you're still ironing out details.
-- Tag RFC title with [newbie] if you're trying out something experimental or you're not entirely convinced of what you're proposing.
-- Tag RFC title with [SWARCH] if you'd like to schedule a SWARCH review to discuss the RFC.
+- Tag RFC title with [Newbie] if you're trying out something experimental or you're not entirely convinced of what you're proposing.
+- Tag RFC title with [RR] if you'd like to schedule a review request to discuss the RFC.
 - If there are areas that you're not convinced on, tag people who you consider may know about this and ask for their input.
 - If you have doubts, ask your manager for help moving something forward.
 - As the author/s, this is _your decision_. You are empowered to choose to move forward despite dissenting comments. We're not looking for consensus-driven decision-making.
