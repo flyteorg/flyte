@@ -9,8 +9,8 @@
 
 package flyteadmin
 
-// A map of Parameters in the form of repeated map entries.
+// A map of Parameters.
 type CoreParameterMap struct {
 	// Defines a map of parameter names to parameters.
-	Parameters []CoreParameterMapEntry `json:"parameters,omitempty"`
+	Parameters map[string]CoreParameter `json:"parameters,omitempty"`
 }
