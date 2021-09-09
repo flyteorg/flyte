@@ -5,10 +5,14 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
+<<<<<<< HEAD
 {{- with .Values.configmap.admin }}
   admin.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- with .Values.db }}
+=======
+{{- with .Values.db.admin }}
+>>>>>>> af51fa93d7f7c1077668689c86f14580c9c28ad2
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.domain }}
