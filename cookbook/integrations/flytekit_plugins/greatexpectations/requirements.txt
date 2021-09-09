@@ -46,7 +46,7 @@ decorator==5.0.9
     #   retry
 defusedxml==0.7.1
     # via nbconvert
-deprecated==1.2.12
+deprecated==1.2.13
     # via flytekit
 dirhash==0.2.1
     # via flytekit
@@ -61,17 +61,17 @@ entrypoints==0.3
     #   altair
     #   jupyter-client
     #   nbconvert
-flyteidl==0.20.1
+flyteidl==0.20.2
     # via flytekit
-flytekit==0.22.0
+flytekit==0.22.1
     # via
     #   -r ../../../common/requirements-common.in
     #   flytekitplugins-great-expectations
-flytekitplugins-great-expectations==0.22.0
+flytekitplugins-great-expectations==0.22.1
     # via -r requirements.in
-great-expectations==0.13.31
+great-expectations==0.13.32
     # via flytekitplugins-great-expectations
-grpcio==1.39.0
+grpcio==1.40.0
     # via flytekit
 idna==3.2
     # via requests
@@ -79,7 +79,7 @@ importlib-metadata==4.8.1
     # via
     #   great-expectations
     #   keyring
-ipykernel==6.3.1
+ipykernel==6.4.0
     # via
     #   ipywidgets
     #   notebook
@@ -144,7 +144,7 @@ marshmallow-jsonschema==0.12.0
     # via flytekit
 matplotlib==3.4.3
     # via -r ../../../common/requirements-common.in
-matplotlib-inline==0.1.2
+matplotlib-inline==0.1.3
     # via
     #   ipykernel
     #   ipython
@@ -197,7 +197,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.3.1
+pillow==8.3.2
     # via matplotlib
 prometheus-client==0.11.0
     # via notebook
@@ -288,7 +288,7 @@ statsd==3.3.0
     # via flytekit
 termcolor==1.1.0
     # via great-expectations
-terminado==0.11.1
+terminado==0.12.1
     # via notebook
 testpath==0.5.0
     # via nbconvert
