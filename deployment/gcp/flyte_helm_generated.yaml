@@ -186,6 +186,12 @@ data:
       capacity: 1000
       rate: 500
       type: admin
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: postgres
+      port: 5432
+      username: postgres
   domain.yaml: | 
     domains:
     - id: development
@@ -326,6 +332,12 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  db.yaml: | 
+    database:
+      dbname: datacatalog
+      host: postgres
+      port: 5432
+      username: postgres
   logger.yaml: | 
     logger:
       level: 4
@@ -1239,7 +1251,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d0b9a9b56fd2cff0e21226d21bb4de5cf6d54954a7f681428fd1709efd2c995"
+        configChecksum: "efa0151bd1e8ecb9b0ab943471523d22eca7bb4d7f4bc9273dd871455e05dd8"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1394,7 +1406,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d0b9a9b56fd2cff0e21226d21bb4de5cf6d54954a7f681428fd1709efd2c995"
+        configChecksum: "efa0151bd1e8ecb9b0ab943471523d22eca7bb4d7f4bc9273dd871455e05dd8"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1402,19 +1414,38 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
-      - command: ["/bin/sleep","60"]
-        image: "alpine:3.3"
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
         imagePullPolicy: "IfNotPresent"
-        name: sleep
+        name: flytescheduler-check
+        volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
       containers:
       - command:
         - flytescheduler
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:latest"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
+        resources: 
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
         volumeMounts:
           
           - mountPath: /etc/flyte/config
@@ -1503,7 +1534,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "99ed056bbf83ade7a9780f9ada575f3fd98e3dba0924f2380fd21bd7a85537c"
+        configChecksum: "c20fead6cb4c5d998252e322321f8b618558f4698555778400c64361c90c0f8"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte

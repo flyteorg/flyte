@@ -3635,19 +3635,38 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
-      - command: ["/bin/sleep","60"]
-        image: "alpine:3.3"
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
         imagePullPolicy: "IfNotPresent"
-        name: sleep
+        name: flytescheduler-check
+        volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
       containers:
       - command:
         - flytescheduler
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:latest"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
+        resources: 
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
         volumeMounts:
           
           - mountPath: /etc/flyte/config

@@ -130,21 +130,6 @@ spec:
           limits:
             cpu: "0.1"
             memory: 200Mi
-      {{- if .Values.flyteadmin.flytescheduler.enabled }}
-      - command:
-          - flytescheduler
-          - run
-          - --config
-          - {{ .Values.flyteadmin.configPath }}
-        image: "{{ .Values.flyteadmin.flytescheduler.image.repository }}:{{ .Values.flyteadmin.flytescheduler.image.tag }}"
-        imagePullPolicy: "{{ .Values.flyteadmin.flytescheduler.image.pullPolicy }}"
-        name: flytescheduler
-        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      {{- end }}
       serviceAccountName: {{ template "flyteadmin.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}

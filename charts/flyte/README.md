@@ -130,12 +130,19 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
 | datacatalog.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
-| db.database.host | string | `"postgres"` |  username: postgres |
+| db.admin.database.dbname | string | `"flyteadmin"` |  |
+| db.admin.database.host | string | `"postgres"` |  |
+| db.admin.database.port | int | `5432` |  |
+| db.admin.database.username | string | `"postgres"` |  |
+| db.datacatalog.database.dbname | string | `"datacatalog"` |  |
+| db.datacatalog.database.host | string | `"postgres"` |  |
+| db.datacatalog.database.port | int | `5432` |  |
+| db.datacatalog.database.username | string | `"postgres"` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.22"` |  |
+| flyteadmin.image.tag | string | `"v0.6.22"` | Docker image tag |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -174,12 +181,12 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
-| flytescheduler | object | `{"affinity":{},"configPath":"/etc/flyte/config/*.yaml","enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"latest"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"secrets":{},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTESCHEDULER SETTINGS |
+| flytescheduler | object | `{"affinity":{},"configPath":"/etc/flyte/config/*.yaml","enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"v0.6.22"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"secrets":{},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTESCHEDULER SETTINGS |
 | flytescheduler.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flyteadmin deployment |
-| flytescheduler.image.tag | string | `"latest"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v0.6.22"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flytescheduler.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |

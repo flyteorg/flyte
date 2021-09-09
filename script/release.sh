@@ -16,6 +16,8 @@ grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -0 sed
 # bump latest release of flyte component in helm
 sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./charts/flyte-core/values.yaml
+sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${FLYTEADMIN_TAG} # FLYTESCHEDULER_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${FLYTEADMIN_TAG} # FLYTESCHEDULER_TAG," ./charts/flyte-core/values.yaml
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./charts/flyte-core/values.yaml
 sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," ./charts/flyte/values.yaml

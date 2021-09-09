@@ -12,6 +12,13 @@
 flyteadmin: {} # use default config
 
 #
+# FLYTESCHEDULER
+#
+
+flytescheduler: {} # use default config
+
+
+#
 # DATACATALOG
 #
 
