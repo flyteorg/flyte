@@ -18,7 +18,7 @@ In general, a Flyte task is characterized by:
 
    In order for tasks to exchange data with each other, a task can define a signature (much like a function/method
    signature in programming languages). A task interface defines the input and output variables —
-   :std:ref:`variable map entry <flyteidl:protos/docs/core/core:variablemapentry>`
+   :std:ref:`variablesentry <flyteidl:protos/docs/core/core:variablemap.variablesentry>`
    and their types, :std:ref:`literaltype <flyteidl:protos/docs/core/core:literaltype>`.
 
 Can "X" Be a Flyte Task?
