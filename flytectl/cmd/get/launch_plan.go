@@ -104,8 +104,8 @@ var launchplanColumns = []printer.Column{
 	{Header: "Type", JSONPath: "$.closure.compiledTask.template.type"},
 	{Header: "State", JSONPath: "$.spec.state"},
 	{Header: "Schedule", JSONPath: "$.spec.entityMetadata.schedule"},
-	{Header: "Inputs", JSONPath: "$.closure.expectedInputs.parameters[0].parameter.var.description"},
-	{Header: "Outputs", JSONPath: "$.closure.expectedOutputs.variables[0].var.description"},
+	{Header: "Inputs", JSONPath: "$.closure.expectedInputs.parameters." + printer.DefaultFormattedDescriptionsKey + ".var.description"},
+	{Header: "Outputs", JSONPath: "$.closure.expectedOutputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
 }
 
 // Column structure for get all launchplans

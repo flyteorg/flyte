@@ -32,14 +32,9 @@ func createExecutionSetup() {
 			},
 		},
 	}
-	variableMap := []*core.VariableMapEntry{
-		{
-			Name: "sorted_list1",
-			Var:  &sortedListLiteralType,
-		}, {
-			Name: "sorted_list2",
-			Var:  &sortedListLiteralType,
-		},
+	variableMap := map[string]*core.Variable{
+		"sorted_list1": &sortedListLiteralType,
+		"sorted_list2": &sortedListLiteralType,
 	}
 
 	task1 := &admin.Task{
@@ -61,10 +56,9 @@ func createExecutionSetup() {
 		},
 	}
 	mockClient.OnGetTaskMatch(ctx, mock.Anything).Return(task1, nil)
-	parameterMap := []*core.ParameterMapEntry{
-		{
-			Name: "numbers",
-			Parameter: &core.Parameter{Var: &core.Variable{
+	parameterMap := map[string]*core.Parameter{
+		"numbers": {
+			Var: &core.Variable{
 				Type: &core.LiteralType{
 					Type: &core.LiteralType_CollectionType{
 						CollectionType: &core.LiteralType{
@@ -74,42 +68,40 @@ func createExecutionSetup() {
 						},
 					},
 				},
-			}},
+			},
 		},
-		{
-			Name: "numbers_count",
-			Parameter: &core.Parameter{Var: &core.Variable{
-				Type: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_INTEGER,
-					},
-				},
-			}},
-		},
-		{
-			Name: "run_local_at_count",
-			Parameter: &core.Parameter{Var: &core.Variable{
+		"numbers_count": {
+			Var: &core.Variable{
 				Type: &core.LiteralType{
 					Type: &core.LiteralType_Simple{
 						Simple: core.SimpleType_INTEGER,
 					},
 				},
 			},
-				Behavior: &core.Parameter_Default{
-					Default: &core.Literal{
-						Value: &core.Literal_Scalar{
-							Scalar: &core.Scalar{
-								Value: &core.Scalar_Primitive{
-									Primitive: &core.Primitive{
-										Value: &core.Primitive_Integer{
-											Integer: 10,
-										},
+		},
+		"run_local_at_count": {
+			Var: &core.Variable{
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_INTEGER,
+					},
+				},
+			},
+			Behavior: &core.Parameter_Default{
+				Default: &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 10,
 									},
 								},
 							},
 						},
 					},
-				}},
+				},
+			},
 		},
 	}
 	launchPlan1 := &admin.LaunchPlan{

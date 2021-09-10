@@ -11,7 +11,7 @@ import (
 )
 
 func TestTaskInputs(t *testing.T) {
-	taskInputs := []*core.VariableMapEntry{}
+	taskInputs := map[string]*core.Variable{}
 	t.Run("nil task", func(t *testing.T) {
 		retValue := TaskInputs(nil)
 		assert.Equal(t, taskInputs, retValue)
@@ -60,14 +60,9 @@ func createTask() *admin.Task {
 		},
 	}
 
-	variableMap := []*core.VariableMapEntry{
-		{
-			Name: "sorted_list1",
-			Var:  &sortedListLiteralType,
-		}, {
-			Name: "sorted_list2",
-			Var:  &sortedListLiteralType,
-		},
+	variableMap := map[string]*core.Variable{
+		"sorted_list1": &sortedListLiteralType,
+		"sorted_list2": &sortedListLiteralType,
 	}
 
 	inputs := &core.VariableMap{

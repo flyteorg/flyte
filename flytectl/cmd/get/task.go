@@ -3,8 +3,6 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flytectl/cmd/config"
 	taskConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -99,8 +97,8 @@ var taskColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
 	{Header: "Name", JSONPath: "$.id.name"},
 	{Header: "Type", JSONPath: "$.closure.compiledTask.template.type"},
-	{Header: "Inputs", JSONPath: "$.closure.compiledTask.template.interface.inputs.variables[0].var.description"},
-	{Header: "Outputs", JSONPath: "$.closure.compiledTask.template.interface.outputs.variables[0].var.description"},
+	{Header: "Inputs", JSONPath: "$.closure.compiledTask.template.interface.inputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
+	{Header: "Outputs", JSONPath: "$.closure.compiledTask.template.interface.outputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
 	{Header: "Discoverable", JSONPath: "$.closure.compiledTask.template.metadata.discoverable"},
 	{Header: "Discovery Version", JSONPath: "$.closure.compiledTask.template.metadata.discoveryVersion"},
 	{Header: "Created At", JSONPath: "$.closure.createdAt"},
@@ -133,14 +131,6 @@ func TaskToTableProtoMessages(l []*admin.Task) []proto.Message {
 		messages = append(messages, m)
 	}
 	return messages
-}
-
-func VariableMapEntriesToMap(mapFieldEntries []*core.VariableMapEntry) (variableMap map[string]*core.Variable) {
-	variableMap = map[string]*core.Variable{}
-	for _, e := range mapFieldEntries {
-		variableMap[e.Name] = e.Var
-	}
-	return
 }
 
 func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
