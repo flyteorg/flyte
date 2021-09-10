@@ -241,6 +241,20 @@ func TestLaunchPlan_ValidationError(t *testing.T) {
 	assert.Nil(t, response)
 }
 
+func TestLaunchPlanManager_CreateLaunchPlanErrorDueToBadLabels(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
+	request := testutils.GetLaunchPlanRequest()
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"foo": "#badlabel",
+			"bar": "baz",
+		}}
+	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
+	assert.EqualError(t, err, "invalid label value [#badlabel]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
+	assert.Nil(t, response)
+}
+
 func TestLaunchPlan_DatabaseError(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(

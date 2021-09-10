@@ -30,6 +30,9 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := ValidateIdentifier(request.Spec.WorkflowId, common.Workflow); err != nil {
 		return err
 	}
+	if err := validateLabels(request.Spec.Labels); err != nil {
+		return err
+	}
 
 	if err := validateLiteralMap(request.Spec.FixedInputs, shared.FixedInputs); err != nil {
 		return err
