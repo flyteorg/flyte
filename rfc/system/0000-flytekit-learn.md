@@ -9,23 +9,23 @@ As a data scientist/machine learning engineer, I want an easy way of training a 
 
 ## Motivation
 
-Currently, training an ML model in flytekit requires building out custom tasks/workflows to manage everything from data partitioning to model optimization and evaluation. We do have several guides in `flytesnacks`, but there's an opportunity to reduce the boilerplate needed to write a model-training pipeline.
+Currently, training an ML model in Flytekit requires building out custom tasks/workflows to manage everything from data partitioning to model optimization and evaluation. We do have several guides in `flytesnacks`, but there's an opportunity to reduce the boilerplate needed to write a model-training pipeline.
 
-Additionally, although many hyperparameter optimization (auto-ml) frameworks exist out there, there's an opportunity for `flyte` to provide a native solution that takes advantage of flyte propeller to distribute the tasks needed for hyperparameter optimization (and therefore enjoy the inspectability and reproducibility benefits of Flyte) instead of delegating the task to an external service like AWS Sagemaker or using an existing AutoML tool like [hyperopt](http://hyperopt.github.io/hyperopt/).
+Additionally, although many hyperparameter optimization (auto-ml) frameworks exist out there, there's an opportunity for `flyte` to provide a native solution that takes advantage of Flyte propeller to distribute the tasks needed for hyperparameter optimization (and therefore enjoy the inspectability and reproducibility benefits of Flyte) instead of delegating the task to an external service like AWS Sagemaker or using an existing AutoML tool like [hyperopt](http://hyperopt.github.io/hyperopt/).
 
 ## MVP Proposal
 
-Introduce a new flytekit plugin `flytekit-learn`, which provides an interface for training and evaluating models using flyte.
+Introduce a new Flytekit plugin `flytekit-learn`, which provides an interface for training and evaluating models using Flyte.
 
 The central object of `flytekit-learn` is a `ModelTrainer` class that optimizes the parameters of an ML model and returns those parameters in addition to some training and test set metrics. The core offerings of the `flytekit-learn` plugin is to:
 
-1. train a single model with `ModelTrainer`
-2. tune a model based on a space of hyperparameters with `ModelTuner`
-3. deploy a model for generating predictions (offline at first, but support online later)
+1. Train a single model with `ModelTrainer`
+2. Tune a model based on a space of hyperparameters with `ModelTuner`
+3. Deploy a model for generating predictions (offline at first, but support online later)
 
 ### `ModelTrainer`
 
-Under the hood, `ModelTrainer` is a class that converts native python code into a set of flytekit tasks and workflows for training and evaluating a single model on some specified dataset.
+Under the hood, `ModelTrainer` is a class that converts native Python code into a set of Flytekit tasks and workflows for training and evaluating a single model on some specified dataset.
 
 ### `ModelTuner`
 
@@ -33,19 +33,19 @@ Under the hood, `ModelTrainer` is a class that converts native python code into 
 
 ### `Predictor`
 
-The `Predictor` class handles the deployment of a trained/tuned model to some production environment so that users can generate predictions. The MVP will support batch (offline) predictions in the form of a flyte workflow, but future versions will look to integrate with external systems (e.g. Sagemaker, Seldon, etc) to allow for on-demand (online) predictions. The batch-style predictors might also support event-based or reactive triggering once flyte's event-based/reactive scheduling is built out.
+The `Predictor` class handles the deployment of a trained/tuned model to some production environment so that users can generate predictions. The MVP will support batch (offline) predictions in the form of a Flyte workflow, but future versions will look to integrate with external systems (e.g. Sagemaker, Seldon, etc) to allow for on-demand (online) predictions. The batch-style predictors might also support event-based or reactive triggering once Flyte's event-based/reactive scheduling is built out.
 
 ### Requirements
 
 - The training API must be flexible enough to support the common ML frameworks, e.g. `sklearn`, `pytorch`, `tensorflow`, `xgboost`, etc.
 - The user only needs to think about four things:
-  1. how to get the dataset
-  2. how to train a model on that dataset
-  3. how to generate a prediction
-  4. how to evaluate a trained model on some partition of the data.
+  1. How to get the dataset
+  2. How to train a model on that dataset
+  3. How to generate a prediction
+  4. How to evaluate a trained model on some partition of the data.
 - For the tuning API, the user needs to think about:
-  1. the hyperparameter space
-  2. the type of cross-validation to use
+  1. The hyperparameter space
+  2. The type of cross-validation to use
 - Enable the user to express compute and run-time budgets, since most AutoML algorithms are "any-time" algorithms that can just keep running to find better hyperparameters (saturation dynamics are dataset- and model- dependent).
 
 ## Model Training API
@@ -106,11 +106,11 @@ training_results: TrainingResults = trainer(**hyperparameters)
 
 
 You can see that `ModelTrainer` takes a few parameters:
-- `dataset`: this is a `flytekit-learn` object, which compiles down to a flytekit task that encapsulates feature and target data parsing, train/test data partitioning, and shuffling.
+- `dataset`: this is a `flytekit-learn` object, which compiles down to a Flytekit task that encapsulates feature and target data parsing, train/test data partitioning, and shuffling.
 - `train`: a function that takes two arguments: `hyperparameters` and `partition`. The `Partition` type contains data for `features` and `targets`, where the `Dataset` handles the train and test set partitioning. `train` returns a `Model`, which is a higher-level type for ML models that abstract away the reading/writing of the model to/from disk. The `validation_partition` argument is optional and only passed in if the `Dataset` is configured explicitely with a `validation_url`.
 - `evaluate`: a function that takes a partition and produces an `Evaluation`, which contains the evaluation `score` of interest to optimize for, as well as other `metrics` for reporting purposes.
 - `hyperparameters`: a dictionary mapping hyperparameter names to values. The values can be overridden when a `ModelTrainer` instance is called.
-- `requests/limits`: similar to regular flytekit tasks
+- `requests/limits`: similar to regular Flytekit tasks.
 
 `ModelTrainer` tasks return a `TrainingResults` object that contains the final model and evaluation metrics gathered during the training process.
 
@@ -118,12 +118,12 @@ Under the hood, the `ModelTrainer` class handles the conversion of the user-prov
 
 #### Training API Architecture Overview
 
-In terms of flytekit tasks and workflows, the `ModelTrainer` compiles the user-provided functions/configuration into the following:
+In terms of Flytekit tasks and workflows, the `ModelTrainer` compiles the user-provided functions/configuration into the following:
 
-- `Dataset`: flytekit task that copies data from remote source, partitions it into train/validation/test sets, and parses the features and targets
-- `train`: function is converted into a flyte task that takes hyperparameter settings and train/validation partitions as input, outputting a `Model` type.
-- `evaluate`: function is converted into a flyte `task` that takes `Model` and `partition` as input, and is called in the training and test set partitions.
-- `ModelTrainer` itself maps onto a flyte `workflow`, which orchestrates the flow of data in roughly the following way:
+- `Dataset`: Flytekit task that copies data from remote source, partitions it into train/validation/test sets, and parses the features and targets
+- `train`: function is converted into a Flyte task that takes hyperparameter settings and train/validation partitions as input, outputting a `Model` type.
+- `evaluate`: function is converted into a Flyte `task` that takes `Model` and `partition` as input, and is called in the training and test set partitions.
+- `ModelTrainer` itself maps onto a Flyte `workflow`, which orchestrates the flow of data in roughly the following way:
 
 ```python
 Partitions = NamedTuple("Partitions", train=Partition, validation=Optional[Partition], test=Partition)
@@ -251,7 +251,7 @@ trainer = ModelTrainer(
 
 ## Model Tuning API
 
-The `ModelTuner` provides flyte-native hyperparameter optimization capabilities, taking advantage of all of Flyte's features such as caching, recoverability, etc. It builds on top of the `ModelTrainer`, and should be ML-framework-agnostic:
+The `ModelTuner` provides Flyte-native hyperparameter optimization capabilities, taking advantage of all of Flyte's features such as caching, recoverability, etc. It builds on top of the `ModelTrainer`, and should be ML-framework-agnostic:
 
 ```python
 from flytekit_learn import ModelTuner, GridSearch
@@ -317,16 +317,16 @@ RandomSearch(
 As a general guideline, the underlying logic for cross validation and search algorithms will wrap the sklearn API that offers the same functionality, since these functions/methods are widely used and well-tested. Where appropriate, future offerings might need to implement certain functionality from scratch.
 
 :::info
-**NOTE:** Of course, the user can always use the `ModelTrainer` API to do hyperparameter tuning on their own using their hyperopt/automl framework of choice. However, this means that all of the separate training jobs occur within the scope of a single flytekit task, as opposed to being orchestrated by flyte propellor on a K8s cluster. Therefore, the `ModelTrainer` resources need to be properly configured to run however many training runs the user wants for doing e.g. grid search, random search, bayesian optimization, etc.
+**NOTE:** Of course, the user can always use the `ModelTrainer` API to do hyperparameter tuning on their own using their hyperopt/automl framework of choice. However, this means that all of the separate training jobs occur within the scope of a single Flytekit task, as opposed to being orchestrated by Flyte propellor on a K8s cluster. Therefore, the `ModelTrainer` resources need to be properly configured to run however many training runs the user wants for doing e.g. grid search, random search, bayesian optimization, etc.
 :::
 
 #### Tuner API Architecture Overview
 
-In terms of flytekit tasks and workflows, the `ModelTuner` compiles the user-provided functions/configuration:
+In terms of Flytekit tasks and workflows, the `ModelTuner` compiles the user-provided functions/configuration:
 
 - `ModelTuner`: this class takes the `model_trainer`, `hyperparameter_space`, `cross_validation`, and other arguments to compose a workflow that orchestrates the running of individual model training and evaluation tasks, and selects the best model based on the `evaluate` function in the `ModelTrainer` object and the `minimize` argument.
-   - for random search, grid search, and other embarrassingly parallel hyperparameter optimization algorithms, the hyperparameters are all sampled up-front and a map task is created from the user-provided functions in the `ModelTrainer`
-   - for sequential algorithms that rely on the evaluation of some number of model training runs to inform how the hyperparameter space is sampled in subsequent runs (e.g. Bayesian optimization), the model tuner creates a `dynamic` workflow.
+   - For random search, grid search, and other embarrassingly parallel hyperparameter optimization algorithms, the hyperparameters are all sampled up-front and a map task is created from the user-provided functions in the `ModelTrainer`
+   - For sequential algorithms that rely on the evaluation of some number of model training runs to inform how the hyperparameter space is sampled in subsequent runs (e.g. Bayesian optimization), the model tuner creates a `dynamic` workflow.
 - `CrossValidation`: cross validation is handled in one of two ways:
   - If the user provides a static validation set with the `validation_url` argument, a single validation performance metric will be used to determine the best model.
   - If the user specifies a `CrossValidation` object, the underlying tasks/workflows in `ModelTuner`, will handle the training/validation partitions with a `PartitionIndex`, i.e. the training task will receive an object that specifies the index of the training and validation sets for a particular training run. The mean validation performance over the `k` validation sets will be used to determine the best model.
@@ -337,11 +337,11 @@ In terms of flytekit tasks and workflows, the `ModelTuner` compiles the user-pro
 
 **`GridSearch` example**
 
-Below is an example of the underlying flyte tasks/workflows that would make up a grid search model tuning routine.
+Below is an example of the underlying Flyte tasks/workflows that would make up a grid search model tuning routine.
 
 ```python
 import itertools
-from flytekit import task, map_task, workflow
+from Flytekit import task, map_task, workflow
 
 MapInput = NamedTuple(
     "MapInput",
@@ -491,7 +491,7 @@ my_predictor = Predictor(
 
 The reason we need to specify `my_trainer` or `my_tuner` instead of, say, the output of calling the trainer/tuner, is that `Predictor` doesn't have access to those outputs when it's defined at compile time. Therefore, the user needs to specify a `ModelTrainer` or `ModelTuner` instance, which points to particular trainer/tuner workflow.
 
-Under the hood, `predictor` compiles into a flytekit workflow that will be available to execute locally or on a remote backend.
+Under the hood, `predictor` compiles into a Flytekit workflow that will be available to execute locally or on a remote backend.
 
 **Usage**:
 
@@ -508,14 +508,14 @@ def prediction_wf():
 ```
 
 
-3. Called locally
+2. Called locally
 
 ```python
 # purely for local debugging
 predictions = my_predictor(features=[*features])
 ```
 
-5. Executed with the `FlyteRemote` API
+3. Executed with the `FlyteRemote` API
 
 ```python
 # also mainly for debugging
@@ -764,17 +764,17 @@ don't have to implement everything from scratch.
 
 ### Event-based and Online Predictors
 
-The MVP will support batch prediction as a flyte workflow, but there are many cases in which we want to (i) trigger a prediction based on some event or (ii) call an API endpoint with a request to generate a prediction. (i) can be fulfilled by [reactive event workflows](https://docs.google.com/document/d/1AfegI-3-IzNVnbqTiVmQXcQ-3rJC0ugiz9BdGuGAmIA/edit#heading=h.16z861596wrr), which is on the flyte roadmap, and (ii) will require integrating with external services like `Sagemaker` and `Seldon`.
+The MVP will support batch prediction as a Flyte workflow, but there are many cases in which we want to (i) trigger a prediction based on some event or (ii) call an API endpoint with a request to generate a prediction. (i) can be fulfilled by [reactive event workflows](https://docs.google.com/document/d/1AfegI-3-IzNVnbqTiVmQXcQ-3rJC0ugiz9BdGuGAmIA/edit#heading=h.16z861596wrr), which is on the Flyte roadmap, and (ii) will require integrating with external services like `Sagemaker` and `Seldon`.
 
 
 ### Task-based AutoML
 
 There are two types of auto-ml solutions out there:
 
-1. given a dataset, optimize hyperparameters of a single model type, where the use needs to specify the model type and hyperparameter space, e.g. [hyperopt](https://github.com/hyperopt/hyperopt)
-2. given a dataset, find the best model based on task type, e.g. [ludwig](https://github.com/ludwig-ai/ludwig).
+1. Given a dataset, optimize hyperparameters of a single model type, where the use needs to specify the model type and hyperparameter space, e.g. [hyperopt](https://github.com/hyperopt/hyperopt)
+2. Given a dataset, find the best model based on task type, e.g. [ludwig](https://github.com/ludwig-ai/ludwig).
 
-The `ModelTuning` API described in this RFC is of type (1). In theory, it would be possible to offer a flytekit-native type (2) solution, where the user only has to specify the dataset and the task type (ludwig one-ups other such libraries by inferring task type based on the data type of the target variable(s)). For example:
+The `ModelTuning` API described in this RFC is of type (1). In theory, it would be possible to offer a Flytekit-native type (2) solution, where the user only has to specify the dataset and the task type (ludwig one-ups other such libraries by inferring task type based on the data type of the target variable(s)). For example:
 
 ```python
 automl_trainer = AutoMLTrainer(
@@ -796,6 +796,6 @@ automl_trainer = AutoMLTrainer(
 ```
 
 However, there are many open questions underlying the design of such a system, like:
-1. use a single ML framework, e.g. tensorflow? (ludwig does this), or use multiple different frameworks?
-2. how to effectively search the model **and** hyperparameter space?
-3. how to encode non-primitive data types like images, unstructured text, etc?
+1. Use a single ML framework, e.g. tensorflow? (ludwig does this), or use multiple different frameworks?
+2. How to effectively search the model **and** hyperparameter space?
+3. How to encode non-primitive data types like images, unstructured text, etc?
