@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
@@ -36,6 +38,17 @@ func TestValidateLpEmptyName(t *testing.T) {
 	request.Id.Name = ""
 	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultProject(), lpApplicationConfig, getWorkflowInterface())
 	assert.EqualError(t, err, "missing name")
+}
+
+func TestValidateLpLabels(t *testing.T) {
+	request := testutils.GetLaunchPlanRequest()
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"foo": "#badlabel",
+			"bar": "baz",
+		}}
+	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultProject(), lpApplicationConfig, getWorkflowInterface())
+	assert.EqualError(t, err, "invalid label value [#badlabel]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
 }
 
 func TestValidateLpEmptyVersion(t *testing.T) {

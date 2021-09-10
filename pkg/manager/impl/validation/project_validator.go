@@ -16,7 +16,6 @@ import (
 const projectID = "project_id"
 const projectName = "project_name"
 const projectDescription = "project_description"
-const labels = "labels"
 const maxNameLength = 64
 const maxDescriptionLength = 300
 const maxLabelArrayLength = 16
@@ -36,7 +35,7 @@ func ValidateProject(project admin.Project) error {
 	if err := ValidateEmptyStringField(project.Id, projectID); err != nil {
 		return err
 	}
-	if err := validateProjectLabels(project); err != nil {
+	if err := validateLabels(project.Labels); err != nil {
 		return err
 	}
 	if errs := validation.IsDNS1123Label(project.Id); len(errs) > 0 {
@@ -51,19 +50,6 @@ func ValidateProject(project admin.Project) error {
 	if project.Domains != nil {
 		return errors.NewFlyteAdminError(codes.InvalidArgument,
 			"Domains are currently only set system wide. Please retry without domains included in your request.")
-	}
-	return nil
-}
-
-func validateProjectLabels(project admin.Project) error {
-	if project.Labels == nil || len(project.Labels.Values) == 0 {
-		return nil
-	}
-	if err := ValidateMaxMapLengthField(project.Labels.Values, labels, maxLabelArrayLength); err != nil {
-		return err
-	}
-	if err := validateProjectLabelsAlphanumeric(project.Labels); err != nil {
-		return err
 	}
 	return nil
 }
@@ -91,20 +77,6 @@ func ValidateProjectAndDomain(
 	}
 	if !validDomain {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", domainID)
-	}
-	return nil
-}
-
-// Given an admin.Project, checks if the project has labels and if it does, checks if the labels are K8s compliant,
-// i.e. alphanumeric + - and _
-func validateProjectLabelsAlphanumeric(labels *admin.Labels) error {
-	for key, value := range labels.Values {
-		if errs := validation.IsDNS1123Label(key); len(errs) > 0 {
-			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label key [%s]: %v", key, errs)
-		}
-		if errs := validation.IsDNS1123Label(value); len(errs) > 0 {
-			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label value [%s]: %v", value, errs)
-		}
 	}
 	return nil
 }
