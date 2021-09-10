@@ -69,6 +69,9 @@ def run_query(
         conn.commit()
 
 
+local_pg_server = f"postgresql://localhost/flights"
+
+
 # %%
 # We define a helper function to call the required functions.
 def pg_server() -> str:
@@ -106,7 +109,7 @@ def pg_server() -> str:
     cursor.close()
     connection.close()
 
-    return f"postgresql://localhost/flights"
+    return local_pg_server
 
 
 # %%
@@ -128,7 +131,7 @@ sql_task = SQLAlchemyTask(
             and duration <= {{ .inputs.upper_duration_cap }}
         """,
     inputs=kwtypes(lower_duration_cap=int, upper_duration_cap=int),
-    task_config=SQLAlchemyConfig(uri=pg_server()),
+    task_config=SQLAlchemyConfig(uri=local_pg_server),
 )
 
 
@@ -142,5 +145,6 @@ def my_wf(lower_duration_cap: int, upper_duration_cap: int) -> int:
 
 
 if __name__ == "__main__":
+    print(f"Starting pg server at {pg_server()}")
     print(f"Running {__file__} main...")
     print(my_wf(lower_duration_cap=600, upper_duration_cap=800))

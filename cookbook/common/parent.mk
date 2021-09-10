@@ -14,8 +14,9 @@ fast_serialize:
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 		trimmed=$${dir%/}; \
-		test -f $$dir/Makefile && \
-		PREFIX=$$trimmed $(MAKE) fast_serialize; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		PREFIX=$$trimmed $(MAKE) fast_serialize || exit; \
+		fi; \
 	done
 
 .PHONY: fast_register
@@ -23,24 +24,30 @@ fast_register: ## Registers new code changes using the last built image (assumes
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 		trimmed=$${dir%/}; \
-		test -f $$dir/Makefile && \
-		PREFIX=$$trimmed $(MAKE) fast_register; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		PREFIX=$$trimmed $(MAKE) fast_register || exit; \
+		fi; \
 	done
 
 .PHONY: register
 register: ## Builds, pushes and registers all docker images, workflows and tasks in all sub directories.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir register; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		$(MAKE) -C $$dir register || exit; \
+		fi; \
 	done
 
 .PHONY: serialize
 serialize: ## Builds and serializes all docker images, workflows and tasks in all sub directories.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir serialize; \
+		echo "$$dir"; \
+	    if [[ -f $$dir/Makefile ]]; then \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+	            $(MAKE) -C $$dir serialize || exit; \
+	        fi; \
+		fi; \
 	done
 
 .PHONY: docker_push
@@ -48,30 +55,34 @@ docker_push: ## Builds and pushes all docker images.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 		test -f $$dir/Dockerfile && \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir docker_push; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		$(MAKE) -C $$dir docker_push || exit; \
+		fi; \
 	done
 
 .PHONY: requirements
 requirements: ## Makes all requirement files in sub directories.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir requirements; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		$(MAKE) -C $$dir requirements || exit; \
+		fi; \
 	done
 
 .PHONY: k3d_load_image
 k3d_load_image:
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir k3d_load_image; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		$(MAKE) -C $$dir k3d_load_image || exit; \
+		fi; \
 	done
 
 .PHONY: clean
 clean: ## Deletes build directories (e.g. _pb_output/)
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
-		test -f $$dir/Makefile && \
-		$(MAKE) -C $$dir clean; \
+	    if [[ -f $$dir/Makefile ]]; then \
+    		$(MAKE) -C $$dir clean || exit; \
+		fi; \
 	done

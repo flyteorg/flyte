@@ -1,3 +1,3 @@
 PREFIX=house_price_prediction
-include ../../../common/Makefile
+include ../../../common/common.mk
 include ../../../common/leaf.mk

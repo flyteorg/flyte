@@ -29,6 +29,9 @@ RUN ${VENV}/bin/pip install wheel
 COPY eda/requirements.txt /root
 RUN ${VENV}/bin/pip install -r /root/requirements.txt
 
+# Copy the makefile targets to expose on the container. This makes it easier to register.
+COPY in_container.mk /root/Makefile
+
 # Copy the actual code
 COPY eda/ /root/eda/
 

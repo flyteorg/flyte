@@ -1,3 +1,3 @@
 PREFIX=pandera_examples
-include ../../../common/Makefile
+include ../../../common/common.mk
 include ../../../common/leaf.mk

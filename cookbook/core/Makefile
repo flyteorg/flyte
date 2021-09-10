@@ -1,4 +1,4 @@
 PREFIX=core
 PWD=$(shell pwd)
-include ../common/Makefile
+include ../common/common.mk
 include ../common/leaf.mk

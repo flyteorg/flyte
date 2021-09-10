@@ -1,6 +1,6 @@
 .SILENT:
 
-include common/Makefile
+include common/common.mk
 include common/parent.mk
 
 define PIP_COMPILE
