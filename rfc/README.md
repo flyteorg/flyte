@@ -83,9 +83,9 @@ After completing your RFC on HackMD, it is time to push to GitHub:
 - A new pop-out menu will appear. Make the following selections:
     |         Option             | Value                                  |
     | -------------------------- | -------------------------------------- |
-    | Select Repo:               | <your fork>                         |
-    | Select branch:             | <Insert a new or existing branch name> |
-    | Select file:               | rfcs/<category>/awesomefeature.md      |
+    | Select Repo:               | `<your fork>`                        |
+    | Select branch:             | `<insert a new or existing branch name>` |
+    | Select file:               | `rfcs/<category>/awesomefeature.md`      |
     | Choose version(s) to push: | Fill in a descriptive name and a self-link to the hackmd note.  |
 - Go ahead and Push to GitHub
 
