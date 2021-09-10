@@ -87,8 +87,8 @@ Usage
 var workflowColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
 	{Header: "Name", JSONPath: "$.id.name"},
-	{Header: "Inputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.inputs.variables[0].var.description"},
-	{Header: "Outputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.outputs.variables[0].var.description"},
+	{Header: "Inputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.inputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
+	{Header: "Outputs", JSONPath: "$.closure.compiledWorkflow.primary.template.interface.outputs.variables." + printer.DefaultFormattedDescriptionsKey + ".description"},
 	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 

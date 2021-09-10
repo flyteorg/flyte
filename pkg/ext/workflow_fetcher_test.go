@@ -38,14 +38,9 @@ func getWorkflowFetcherSetup() {
 			},
 		},
 	}
-	variableMap := []*core.VariableMapEntry{
-		{
-			Name: "sorted_list1",
-			Var:  &sortedListLiteralType,
-		}, {
-			Name: "sorted_list2",
-			Var:  &sortedListLiteralType,
-		},
+	variableMap := map[string]*core.Variable{
+		"sorted_list1": &sortedListLiteralType,
+		"sorted_list2": &sortedListLiteralType,
 	}
 
 	var compiledTasks []*core.CompiledTask

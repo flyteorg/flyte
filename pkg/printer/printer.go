@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -169,37 +170,50 @@ func printJSONYaml(format OutputFormat, v interface{}) error {
 	return nil
 }
 
-func FormatVariableDescriptions(variableMap []*core.VariableMapEntry) {
+func FormatVariableDescriptions(variableMap map[string]*core.Variable) {
+	keys := make([]string, 0, len(variableMap))
+	// sort the keys for testing and consistency with other output formats
+	for k := range variableMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	var descriptions []string
-	for _, e := range variableMap {
-		if e.Var == nil {
-			continue
-		}
+	for _, k := range keys {
+		v := variableMap[k]
 		// a: a isn't very helpful
-		if e.Name != e.Var.Description {
-			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", e.Name, e.Var.Description)))
+		if k != v.Description {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Description)))
 		} else {
-			descriptions = append(descriptions, getTruncatedLine(e.Name))
+			descriptions = append(descriptions, getTruncatedLine(k))
 		}
 
 	}
-	variableMap[0] = &core.VariableMapEntry{Var: &core.Variable{Description: strings.Join(descriptions, "\n")}}
+	variableMap[DefaultFormattedDescriptionsKey] = &core.Variable{Description: strings.Join(descriptions, "\n")}
 }
 
-func FormatParameterDescriptions(parameterMap []*core.ParameterMapEntry) {
+func FormatParameterDescriptions(parameterMap map[string]*core.Parameter) {
+	keys := make([]string, 0, len(parameterMap))
+	// sort the keys for testing and consistency with other output formats
+	for k := range parameterMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	var descriptions []string
-	for _, e := range parameterMap {
-		if e.Parameter == nil || e.Parameter.Var == nil {
+	for _, k := range keys {
+		v := parameterMap[k]
+		if v.Var == nil {
 			continue
 		}
 		// a: a isn't very helpful
-		if e.Name != e.Parameter.Var.Description {
-			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", e.Name, e.Parameter.Var.Description)))
+		if k != v.Var.Description {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Var.Description)))
 		} else {
-			descriptions = append(descriptions, getTruncatedLine(e.Name))
+			descriptions = append(descriptions, getTruncatedLine(k))
 		}
 	}
-	parameterMap[0] = &core.ParameterMapEntry{Parameter: &core.Parameter{Var: &core.Variable{Description: strings.Join(descriptions, "\n")}}}
+	parameterMap[DefaultFormattedDescriptionsKey] = &core.Parameter{Var: &core.Variable{Description: strings.Join(descriptions, "\n")}}
 }
 
 func getTruncatedLine(line string) string {
