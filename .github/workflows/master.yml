@@ -122,7 +122,7 @@ jobs:
         with:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-          image_name: flytescheduler
+          image_name: flyteorg/flytescheduler
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
           dockerfile: Dockerfile.scheduler
