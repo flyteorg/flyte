@@ -37,13 +37,44 @@ func TestValidateBranchNode(t *testing.T) {
 }
 
 func TestValidateNode(t *testing.T) {
-	n := &mocks.NodeBuilder{}
-	n.OnGetId().Return(common.StartNodeID)
+	t.Run("Start-node", func(t *testing.T) {
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return(common.StartNodeID)
 
-	wf := &mocks.WorkflowBuilder{}
-	errs := errors.NewCompileErrors()
-	ValidateNode(wf, n, true, errs)
-	if errs.HasErrors() {
-		assert.NoError(t, errs)
-	}
+		wf := &mocks.WorkflowBuilder{}
+		errs := errors.NewCompileErrors()
+		ValidateNode(wf, n, true, errs)
+		if !assert.False(t, errs.HasErrors()) {
+			assert.NoError(t, errs)
+		}
+	})
+
+	t.Run("Sort upstream node ids", func(t *testing.T) {
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("my-node")
+		n.OnGetInterface().Return(&core.TypedInterface{
+			Outputs: &core.VariableMap{},
+			Inputs:  &core.VariableMap{},
+		})
+		n.OnGetOutputAliases().Return(nil)
+		n.OnGetBranchNode().Return(nil)
+		n.OnGetWorkflowNode().Return(nil)
+		n.OnGetTaskNode().Return(nil)
+
+		coreN := &core.Node{}
+		coreN.UpstreamNodeIds = []string{"n1", "n0"}
+		n.OnGetCoreNode().Return(coreN)
+		n.On("GetUpstreamNodeIds").Return(func() []string {
+			return coreN.UpstreamNodeIds
+		})
+
+		wf := &mocks.WorkflowBuilder{}
+		errs := errors.NewCompileErrors()
+		ValidateNode(wf, n, true, errs)
+		if !assert.False(t, errs.HasErrors()) {
+			assert.NoError(t, errs)
+		}
+
+		assert.Equal(t, []string{"n0", "n1"}, n.GetUpstreamNodeIds())
+	})
 }

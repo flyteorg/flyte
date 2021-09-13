@@ -3,6 +3,7 @@ package validators
 
 import (
 	"fmt"
+	"sort"
 
 	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
@@ -119,6 +120,13 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 		// Validate node output aliases
 		validateEffectiveOutputParameters(n, errs.NewScope())
 	}
+
+	if n.GetCoreNode().UpstreamNodeIds == nil {
+		n.GetCoreNode().UpstreamNodeIds = make([]string, 0)
+	}
+
+	// Order upstream node ids to ensure consistent output of the compiler even if client ordering changes.
+	sort.Strings(n.GetCoreNode().UpstreamNodeIds)
 
 	// Validate branch node conditions and inner nodes.
 	if n.GetBranchNode() != nil {
