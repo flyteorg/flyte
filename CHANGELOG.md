@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](http://github.com/lyft/flyteconsole/compare/v0.25.0...v0.25.1) (2021-09-13)
+
+
+### Bug Fixes
+
+* show field types on json launch form ([#199](http://github.com/lyft/flyteconsole/issues/199)) ([a42b9f8](http://github.com/lyft/flyteconsole/commit/a42b9f8520fcd24dee752111e606ad9ae9bd88f5))
+* this is rfc, do not deploy until resolved; details in comments ([#172](http://github.com/lyft/flyteconsole/issues/172)) ([67dd183](http://github.com/lyft/flyteconsole/commit/67dd18397caf40e350da40e0672e500eaa9f338a))
+
 # [0.25.0](http://github.com/lyft/flyteconsole/compare/v0.24.0...v0.25.0) (2021-08-31)
 
 
