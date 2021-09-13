@@ -169,8 +169,13 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 		}
 	}
 
-	logger.Infof(ctx, "The resource requirement for creating Pod [%v/%v] is [%v]\n",
-		pod.Namespace, pod.Name, podRequestedResources)
+	formattedResources := make([]string, 0, len(podRequestedResources))
+	for resourceName, quantity := range podRequestedResources {
+		formattedResources = append(formattedResources, fmt.Sprintf("{[%v]: [%v]}", resourceName, quantity.String()))
+	}
+
+	logger.Infof(ctx, "The resource requirement for creating Pod [%v/%v] is [%+v]\n",
+		pod.Namespace, pod.Name, formattedResources)
 
 	return podRequestedResources
 }
