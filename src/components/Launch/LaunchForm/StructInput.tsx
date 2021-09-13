@@ -21,6 +21,25 @@ muiTheme.typography.h5 = {
     fontWeight: 400
 };
 
+const formatJson = data => {
+    const keys = Object.keys(data);
+
+    if (keys.includes('title')) {
+        const { title, type, format } = data;
+        data['title'] = `${title} (${format ?? type})`;
+        if (!keys.includes('additionalProperties')) return data;
+    }
+
+    keys.forEach(key => {
+        const item = data[`${key}`];
+        if (typeof item === 'object') {
+            data = { ...data, [key]: formatJson(item) };
+        }
+    });
+
+    return data;
+};
+
 /** Handles rendering of the input component for a Struct */
 export const StructInput: React.FC<InputProps> = props => {
     const {
@@ -55,7 +74,10 @@ export const StructInput: React.FC<InputProps> = props => {
                 ]
             );
 
-            if (parsedJson) jsonFormRenderable = true;
+            if (parsedJson) {
+                parsedJson = formatJson(parsedJson);
+                jsonFormRenderable = true;
+            }
         }
     }
 
