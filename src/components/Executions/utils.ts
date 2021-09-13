@@ -112,8 +112,9 @@ export const taskExecutionIsTerminal = (taskExecution: TaskExecution) =>
     taskExecution.closure &&
     terminalTaskExecutionStates.includes(taskExecution.closure.phase);
 
+/** Returns a NodeId from a given NodeExecution  */
 export function getNodeExecutionSpecId(nodeExecution: NodeExecution): string {
-    return nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
+    return nodeExecution.id.nodeId;
 }
 
 interface GetExecutionDurationMSArgs {
