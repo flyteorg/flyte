@@ -67,8 +67,6 @@ flyteadmin:
 
 flytescheduler:
   enabled: true
-  # -- Replicas count for Flyteadmin deployment
-  replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
     repository:  cr.flyte.org/flyteorg/flytescheduler

@@ -6,7 +6,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flytescheduler.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.flytescheduler.replicaCount }}
+  replicas: 1
   selector:
     matchLabels: {{ include "flytescheduler.selectorLabels" . | nindent 6 }}
   template:
