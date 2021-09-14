@@ -2,6 +2,7 @@ package errors
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -29,6 +30,24 @@ type EventError struct {
 
 func (r EventError) Error() string {
 	return fmt.Sprintf("%s: %s, caused by [%s]", r.Code, r.Message, r.Cause.Error())
+}
+
+func (r *EventError) Is(target error) bool {
+	t, ok := target.(*EventError)
+	if !ok {
+		return false
+	}
+	if r == nil && t == nil {
+		return true
+	}
+	if r == nil || t == nil {
+		return false
+	}
+	return r.Code == t.Code && (r.Cause == t.Cause || t.Cause == nil) && (r.Message == t.Message || t.Message == "")
+}
+
+func (r *EventError) Unwrap() error {
+	return r.Cause
 }
 
 func WrapError(err error) error {
@@ -78,46 +97,25 @@ func wrapf(code ErrorCode, cause error, msg string) error {
 
 // Checks if the error is of type EventError and the ErrorCode is of type AlreadyExists
 func IsAlreadyExists(err error) bool {
-	e, ok := err.(*EventError)
-	if ok {
-		return e.Code == AlreadyExists
-	}
-	return false
+	return errors.Is(err, &EventError{Code: AlreadyExists})
 }
 
 // Checks if the error is of type EventError and the ErrorCode is of type InvalidArgument
 func IsInvalidArguments(err error) bool {
-	e, ok := err.(*EventError)
-	if ok {
-		return e.Code == InvalidArgument
-	}
-	return false
+	return errors.Is(err, &EventError{Code: InvalidArgument})
 }
 
 // Checks if the error is of type EventError and the ErrorCode is of type ExecutionNotFound
 func IsNotFound(err error) bool {
-	e, ok := err.(*EventError)
-	if ok {
-		return e.Code == ExecutionNotFound
-	}
-	return false
+	return errors.Is(err, &EventError{Code: ExecutionNotFound})
 }
 
 // Checks if the error is of type EventError and the ErrorCode is of type ResourceExhausted
 func IsResourceExhausted(err error) bool {
-	e, ok := err.(*EventError)
-	if ok {
-		return e.Code == ResourceExhausted
-	}
-	return false
+	return errors.Is(err, &EventError{Code: ResourceExhausted})
 }
 
 // Checks if the error is of type EventError and the ErrorCode is of type EventAlreadyInTerminalStateError
 func IsEventAlreadyInTerminalStateError(err error) bool {
-	// TODO: don't rely on the specific type here as it could be wrapped in another object.
-	e, ok := err.(*EventError)
-	if ok {
-		return e.Code == EventAlreadyInTerminalStateError
-	}
-	return false
+	return errors.Is(err, &EventError{Code: EventAlreadyInTerminalStateError})
 }
