@@ -371,6 +371,21 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
+  scheduler.yaml: | 
+    scheduler:
+      eventScheduler:
+        region: '<AWS_REGION>'
+        scheduleNamePrefix: flyte
+        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
+        scheme: aws
+        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
+      workflowExecutor:
+        accountId: '<ACCOUNT_NUMBER>'
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
+        region: '<AWS_REGION>'
+        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
+        scheme: aws
 ---
 # Source: flyte/templates/console/configmap.yaml
 apiVersion: v1
@@ -1335,7 +1350,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "63ff496cc99ae8c3652496ff5e4d0ba60a3125ff579642b3f05b84de6126317"
+        configChecksum: "3143c77cb6775cd06b4c32fe3788c5570abb3e5bf628b5cee63adaedfaa5174"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1481,95 +1496,6 @@ spec:
           - labelSelector:
               matchLabels:
                 app.kubernetes.io/name: flyteadmin
-            topologyKey: kubernetes.io/hostname
----
-# Source: flyte/templates/admin/flytescheduler.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flytescheduler
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app.kubernetes.io/name: flytescheduler
-      app.kubernetes.io/instance: flyte
-  template:
-    metadata:
-      annotations:
-        configChecksum: "63ff496cc99ae8c3652496ff5e4d0ba60a3125ff579642b3f05b84de6126317"
-      labels: 
-        app.kubernetes.io/name: flytescheduler
-        app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
-        app.kubernetes.io/managed-by: Helm
-    spec:
-      initContainers:
-      - command:
-        - flytescheduler
-        - precheck
-        - --config
-        - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
-        imagePullPolicy: "IfNotPresent"
-        name: flytescheduler-check
-        volumeMounts:
-          - mountPath: /etc/db
-            name: db-pass
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      containers:
-      - command:
-        - flytescheduler
-        - run
-        - --config
-        - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.22"
-        imagePullPolicy: "IfNotPresent"
-        name: flytescheduler
-        resources: 
-          limits:
-            cpu: 250m
-            ephemeral-storage: 200Mi
-            memory: 500Mi
-          requests:
-            cpu: 50m
-            ephemeral-storage: 200Mi
-            memory: 200Mi
-        volumeMounts:
-          - mountPath: /etc/db
-            name: db-pass
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      serviceAccountName: flyteadmin
-      volumes:
-        - name: db-pass
-          secret:
-            secretName: db-pass
-        - emptyDir: {}
-          name: shared-data
-        - configMap:
-            name: flyte-admin-config
-          name: config-volume
-        - name: auth
-          secret:
-            secretName: flyte-admin-secrets
-      affinity: 
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: flytescheduler
             topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/console/deployment.yaml

@@ -52,31 +52,7 @@ flyteadmin:
 #
 
 flytescheduler:
-  replicaCount: 1
-  # -- IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-  serviceAccount:
-    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
-    # you can change the name of this role
-    create: true
-    annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
-
-  resources:
-    limits:
-      ephemeral-storage: 200Mi
-    requests:
-      cpu: 50m
-      ephemeral-storage: 200Mi
-      memory: 200Mi
-
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchLabels:
-              app.kubernetes.io/name: flytescheduler
-          topologyKey: kubernetes.io/hostname
-
+  enabled: false
 
 #
 # DATACATALOG
@@ -371,7 +347,7 @@ configmap:
 # -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
-  enabled: false
+  enabled: true
   config:
     scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
