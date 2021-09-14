@@ -340,10 +340,40 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 
 	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 
-	err = e.kubeClient.GetClient().Delete(ctx, o)
+	deleteResource := true
+	abortOverride, hasAbortOverride := e.plugin.(k8s.PluginAbortOverride)
+
+	resourceToFinalize := o
+	var behavior k8s.AbortBehavior
+
+	if hasAbortOverride {
+		behavior, err = abortOverride.OnAbort(ctx, tCtx, o)
+		deleteResource = err == nil && behavior.DeleteResource
+		if err == nil && behavior.Resource != nil {
+			resourceToFinalize = behavior.Resource
+		}
+	}
+
+	if err != nil {
+	} else if deleteResource {
+		err = e.kubeClient.GetClient().Delete(ctx, resourceToFinalize)
+	} else {
+		if behavior.Patch != nil && behavior.Update == nil {
+			err = e.kubeClient.GetClient().Patch(ctx, resourceToFinalize, behavior.Patch.Patch, behavior.Patch.Options...)
+		} else if behavior.Patch == nil && behavior.Update != nil {
+			err = e.kubeClient.GetClient().Update(ctx, resourceToFinalize, behavior.Update.Options...)
+		} else {
+			err = errors.Errorf(errors.RuntimeFailure, "AbortBehavior for resource %v must specify either a Patch and an Update operation if Delete is set to false. Only one can be supplied.", resourceToFinalize.GetName())
+		}
+		if behavior.DeleteOnErr && err != nil {
+			logger.Warningf(ctx, "Failed to apply AbortBehavior for resource %v with error %v. Will attempt to delete resource.", resourceToFinalize.GetName(), err)
+			err = e.kubeClient.GetClient().Delete(ctx, resourceToFinalize)
+		}
+	}
+
 	if err != nil && !IsK8sObjectNotExists(err) {
 		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
-			o.GetNamespace(), o.GetName(), err)
+			resourceToFinalize.GetNamespace(), resourceToFinalize.GetName(), err)
 		return err
 	}
 
