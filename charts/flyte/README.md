@@ -135,7 +135,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.22"` | Docker image tag |
+| flyteadmin.image.tag | string | `"v0.6.28"` | Docker image tag |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -148,23 +148,23 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
-| flyteconsole | object | `{"affinity":{},"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flyteconsole","tag":"v0.25.0"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  FLYTECONSOLE SETTINGS |
+| flyteconsole | object | `{"affinity":{},"image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flyteconsole","tag":"v0.25.1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  FLYTECONSOLE SETTINGS |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
-| flyteconsole.image.tag | string | `"v0.25.0"` | Docker image tag |
+| flyteconsole.image.tag | string | `"v0.25.1"` | Docker image tag |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
-| flytepropeller | object | `{"affinity":{},"cacheSizeMbs":0,"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytepropeller","tag":"v0.13.20"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTEPROPELLER SETTINGS |
+| flytepropeller | object | `{"affinity":{},"cacheSizeMbs":0,"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytepropeller","tag":"v0.14.3"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTEPROPELLER SETTINGS |
 | flytepropeller.affinity | object | `{}` | affinity for Flytepropeller deployment |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v0.13.20"` | Docker image tag |
+| flytepropeller.image.tag | string | `"v0.14.3"` | Docker image tag |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
