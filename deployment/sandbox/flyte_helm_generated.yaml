@@ -3478,7 +3478,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3494,7 +3494,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3507,7 +3507,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -3517,7 +3517,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3538,7 +3538,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -3624,7 +3624,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.25.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.25.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -3878,7 +3878,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.20"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.3"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -3924,14 +3924,14 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.13.20
+        app.kubernetes.io/version: v0.14.3
       annotations:
         configChecksum: "23649f70ef6d41dc508d570df33d78103effffb3d876ea7fc84bcef4693bfd3"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.20"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.3"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -3954,7 +3954,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.20"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.3"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -4010,7 +4010,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.22"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.28"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
