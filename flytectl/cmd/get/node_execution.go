@@ -5,7 +5,6 @@ import (
 	"context"
 	"sort"
 	"strconv"
-	"strings"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/printer"
@@ -149,10 +148,6 @@ func getNodeExecDetailsInt(ctx context.Context, project, domain, execName, nodeN
 				return nil, err
 			}
 		} else {
-			// Bug in admin https://github.com/flyteorg/flyte/issues/1221
-			if strings.HasSuffix(nodeExec.Id.NodeId, "start-node") {
-				continue
-			}
 			taskExecList, err := cmdCtx.AdminFetcherExt().FetchTaskExecutionsOnNode(ctx,
 				nodeExec.Id.NodeId, execName, project, domain)
 			if err != nil {
@@ -260,6 +255,9 @@ func createNodeDetailsTreeView(rootView gotree.Tree, nodeExecutionClosures []*No
 
 func extractLiteralMap(literalMap *core.LiteralMap) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
+	if literalMap == nil || literalMap.Literals == nil {
+		return m, nil
+	}
 	for key, literalVal := range literalMap.Literals {
 		extractedLiteralVal, err := coreutils.ExtractFromLiteral(literalVal)
 		if err != nil {
