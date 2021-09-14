@@ -312,3 +312,13 @@ func TestGetExecutionDetails(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("unable to fetch task exec details"), err)
 	})
 }
+
+func TestExtractLiteralMapError(t *testing.T) {
+	literalMap, err := extractLiteralMap(nil)
+	assert.Nil(t, err)
+	assert.Equal(t, len(literalMap), 0)
+
+	literalMap, err = extractLiteralMap(&core.LiteralMap{})
+	assert.Nil(t, err)
+	assert.Equal(t, len(literalMap), 0)
+}
