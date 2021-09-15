@@ -94,11 +94,26 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		phase = core.NodeExecution_RUNNING
 	}
 
-	nev := &event.NodeExecutionEvent{
-		Id:         nodeExecID,
-		Phase:      phase,
-		InputUri:   inputPath,
-		OccurredAt: occurredTime,
+	var nev *event.NodeExecutionEvent
+	// Start node is special case where the Inputs and Outputs are the same and hence here we copy the Output file
+	// into the OutputResult and in admin we copy it over into input aswell.
+	if nodeExecID.NodeId == v1alpha1.StartNodeID {
+		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
+		nev = &event.NodeExecutionEvent{
+			Id:    nodeExecID,
+			Phase: phase,
+			OutputResult: ToNodeExecOutput(&handler.OutputInfo{
+				OutputURI: outputsFile,
+			}),
+			OccurredAt: occurredTime,
+		}
+	} else {
+		nev = &event.NodeExecutionEvent{
+			Id:         nodeExecID,
+			Phase:      phase,
+			InputUri:   inputPath,
+			OccurredAt: occurredTime,
+		}
 	}
 
 	if eventVersion == v1alpha1.EventVersion0 && status.GetParentTaskID() != nil {
