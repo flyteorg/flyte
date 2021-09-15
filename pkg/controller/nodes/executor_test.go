@@ -1641,6 +1641,48 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
 }
+func TestNodeExecutionEventStartNode(t *testing.T) {
+	execID := &core.WorkflowExecutionIdentifier{
+		Name:    "e1",
+		Domain:  "d1",
+		Project: "p1",
+	}
+	nID := &core.NodeExecutionIdentifier{
+		NodeId:      "start-node",
+		ExecutionId: execID,
+	}
+	tID := &core.TaskExecutionIdentifier{
+		NodeExecutionId: nID,
+	}
+	p := handler.PhaseInfoQueued("r")
+	inputReader := &mocks3.InputReader{}
+	inputReader.OnGetInputPath().Return("reference")
+	parentInfo := &mocks4.ImmutableParentInfo{}
+	parentInfo.OnGetUniqueID().Return("np1")
+	parentInfo.OnCurrentAttempt().Return(uint32(2))
+
+	id := "id"
+	n := &mocks.ExecutableNode{}
+	n.OnGetID().Return(id)
+	n.OnGetName().Return("name")
+	nl := &mocks4.NodeLookup{}
+	ns := &mocks.ExecutableNodeStatus{}
+	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+	ns.OnGetParentTaskID().Return(tID)
+	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
+	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n)
+	assert.NoError(t, err)
+	assert.Equal(t, "start-node", ev.Id.NodeId)
+	assert.Equal(t, execID, ev.Id.ExecutionId)
+	assert.Empty(t, ev.SpecNodeId)
+	assert.Nil(t, ev.ParentNodeMetadata)
+	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
+	assert.Empty(t, ev.NodeName)
+	assert.Empty(t, ev.RetryGroup)
+	assert.Equal(t, "dummy://dummyOutUrl/outputs.pb",
+		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
+}
 
 func TestNodeExecutionEventV0(t *testing.T) {
 	execID := &core.WorkflowExecutionIdentifier{
