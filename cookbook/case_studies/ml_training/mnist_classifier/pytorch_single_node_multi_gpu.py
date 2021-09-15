@@ -23,22 +23,20 @@ information on distributed training, check out the
 import json
 import os
 import typing
-from dataclasses import dataclass
 
 import torch
 import torch.nn.functional as F
 import wandb
 from flytekit import Resources, task, workflow
 from flytekit.types.file import PythonPickledFile
-from torch import distributed as dist
-from torch import nn, multiprocessing as mp, optim
-from torchvision import datasets, transforms
-
 # %%
 # We'll re-use certain classes and functions from the
 # :ref:`single node and gpu tutorial <sphx_glr_auto_case_studies_ml_training_mnist_classifier_pytorch_single_node.py>`
 # such as the ``Net`` model architecture, ``Hyperparameters``, and ``log_test_predictions``.
 from mnist_classifier.pytorch_single_node_and_gpu import Net, Hyperparameters, log_test_predictions
+from torch import distributed as dist
+from torch import nn, multiprocessing as mp, optim
+from torchvision import datasets, transforms
 
 # %%
 # Let's define some variables to be used later.
@@ -56,6 +54,7 @@ DATA_DIR = "./data"
 NUM_BATCHES_TO_LOG = 10
 LOG_IMAGES_PER_BATCH = 32
 
+
 # %%
 # If running remotely, copy your ``wandb`` API key to the Dockerfile under the environment variable ``WANDB_API_KEY``.
 # This function logs into ``wandb`` and initializes the project. If you built your Docker image with the
@@ -65,6 +64,7 @@ LOG_IMAGES_PER_BATCH = 32
 def wandb_setup():
     wandb.login()
     wandb.init(project="mnist-single-node-multi-gpu", entity=os.environ.get("WANDB_USERNAME", "my-user-name"))
+
 
 # %%
 # Re-using the Network from the Single GPU Example
@@ -83,6 +83,7 @@ def wandb_setup():
 def download_mnist(data_dir):
     for train in [True, False]:
         datasets.MNIST(data_dir, train=train, download=True)
+
 
 # %%
 # The Data Loader
@@ -157,7 +158,6 @@ def train(model, rank, train_loader, optimizer, epoch, log_interval):
 # ``wandb`` `table <https://docs.wandb.ai/guides/data-vis/log-tables>`__, which helps us visualize the model's
 # performance in a structured format.
 def test(model, rank, test_loader):
-
     model.eval()
 
     # define ``wandb`` tabular columns and hooks into the model to collect gradients and the topology
@@ -230,6 +230,7 @@ def dist_setup(rank, world_size, backend):
 MODEL_FILE = "./mnist_cnn.pt"
 ACCURACIES_FILE = "./mnist_cnn_accuracies.json"
 
+
 # %%
 # Then we define the ``train_mnist`` function. Note the conditionals that check for ``rank == 0``. These parts of the
 # functions are only called in the main process, which is the ``0``th rank. The reason for this is that we only want the
@@ -240,7 +241,6 @@ ACCURACIES_FILE = "./mnist_cnn_accuracies.json"
 # - keep track of validation metrics
 
 def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
-
     # store the hyperparameters' config in ``wandb``
     if rank == 0:
         wandb_setup()
@@ -327,12 +327,27 @@ def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
 # See `here <https://pytorch.org/tutorials/beginner/dist_overview.html>`_ to read more about pytorch distributed
 # training.
 
+
+# %%
+# Set memory, gpu and storage depending on whether we are trying to register against sandbox or not...
+if os.getenv("SANDBOX") != "":
+    mem = "100Mi"
+    gpu = "0"
+    storage = "500Mi"
+    ephemeral_storage = "500Mi"
+else:
+    mem = "30Gi"
+    gpu = str(WORLD_SIZE)
+    ephemeral_storage = "500Mi"
+    storage = "20Gi"
+
+
 @task(
     retries=2,
     cache=True,
     cache_version="1.2",
-    requests=Resources(gpu=str(WORLD_SIZE), mem="30Gi", storage="20Gi", ephemeral_storage="500Mi"),
-    limits=Resources(gpu=str(WORLD_SIZE), mem="30Gi", storage="20Gi", ephemeral_storage="500Mi"),
+    requests=Resources(gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage),
+    limits=Resources(gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage),
 )
 def pytorch_mnist_task(hp: Hyperparameters) -> TrainingOutputs:
     print("Start MNIST training:")
@@ -352,7 +367,6 @@ def pytorch_mnist_task(hp: Hyperparameters) -> TrainingOutputs:
     return TrainingOutputs(
         epoch_accuracies=accuracies, model_state=PythonPickledFile(MODEL_FILE)
     )
-
 
 
 # %%

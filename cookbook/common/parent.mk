@@ -15,7 +15,9 @@ fast_serialize:
 		echo "processing ${PWD}/$$dir"; \
 		trimmed=$${dir%/}; \
 	    if [[ -f $$dir/Makefile ]]; then \
-    		PREFIX=$$trimmed $(MAKE) fast_serialize || exit; \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+        		PREFIX=$$trimmed $(MAKE) fast_serialize || exit; \
+	        fi; \
 		fi; \
 	done
 
@@ -25,7 +27,9 @@ fast_register: ## Registers new code changes using the last built image (assumes
 		echo "processing ${PWD}/$$dir"; \
 		trimmed=$${dir%/}; \
 	    if [[ -f $$dir/Makefile ]]; then \
-    		PREFIX=$$trimmed $(MAKE) fast_register || exit; \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+        		PREFIX=$$trimmed $(MAKE) fast_register || exit; \
+	        fi; \
 		fi; \
 	done
 
@@ -34,7 +38,9 @@ register: ## Builds, pushes and registers all docker images, workflows and tasks
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 	    if [[ -f $$dir/Makefile ]]; then \
-    		$(MAKE) -C $$dir register || exit; \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+        		$(MAKE) -C $$dir register || exit; \
+	        fi; \
 		fi; \
 	done
 
@@ -65,7 +71,9 @@ requirements: ## Makes all requirement files in sub directories.
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 	    if [[ -f $$dir/Makefile ]]; then \
-    		$(MAKE) -C $$dir requirements || exit; \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+        		$(MAKE) -C $$dir requirements || exit; \
+	        fi; \
 		fi; \
 	done
 
@@ -74,7 +82,9 @@ k3d_load_image:
 	@for dir in $(SUBDIRS) ; do \
 		echo "processing ${PWD}/$$dir"; \
 	    if [[ -f $$dir/Makefile ]]; then \
-    		$(MAKE) -C $$dir k3d_load_image || exit; \
+	        if [[ "$$dir" != 'docs/' ]]; then \
+        		$(MAKE) -C $$dir k3d_load_image || exit; \
+	        fi; \
 		fi; \
 	done
 

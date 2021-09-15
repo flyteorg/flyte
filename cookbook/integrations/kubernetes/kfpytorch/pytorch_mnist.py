@@ -25,6 +25,21 @@ from torchvision import datasets, transforms
 
 WORLD_SIZE = int(os.environ.get("WORLD_SIZE", 1))
 
+# %%
+# Set memory, gpu and storage depending on whether we are trying to register against sandbox or not...
+if os.getenv("SANDBOX") != "":
+    cpu_request = "500m"
+    mem_request = "500Mi"
+    gpu_request = "0"
+    mem_limit = "500Mi"
+    gpu_limit = "0"
+else:
+    cpu_request = "500m"
+    mem_request = "4Gi"
+    gpu_request = "1"
+    mem_limit = "8Gi"
+    gpu_limit = "1"
+
 
 # %%
 # Actual model
@@ -165,8 +180,8 @@ TrainingOutputs = typing.NamedTuple(
 @task(
     task_config=PyTorch(
         num_workers=2,
-        per_replica_requests=Resources(cpu="500m", mem="4Gi", gpu="1"),
-        per_replica_limits=Resources(mem="8Gi", gpu="1"),
+        per_replica_requests=Resources(cpu=cpu_request, mem=mem_request, gpu=gpu_request),
+        per_replica_limits=Resources(mem=mem_limit, gpu=gpu_limit),
     ),
     retries=2,
     cache=True,

@@ -71,6 +71,7 @@ requirements: requirements.txt
 fast_serialize: clean _pb_output
 	echo ${CURDIR}
 	docker run -it --rm \
+		-e SANDBOX=${SANDBOX} \
 		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
 		-e FLYTE_HOST=${FLYTE_HOST} \
@@ -88,12 +89,13 @@ fast_serialize: clean _pb_output
 		${TAGGED_IMAGE} make fast_serialize
 
 .PHONY: fast_register
-fast_register: clean _pb_output ## Packages code and registers without building docker images.
+fast_register: fast_serialize ## Packages code and registers without building docker images.
 	@echo "Tagged Image: "
 	@echo ${TAGGED_IMAGE}
 	@echo ${CURDIR}
 	docker run -it --rm \
 		--network host \
+		-e SANDBOX=${SANDBOX} \
 		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
 		-e FLYTE_HOST=${FLYTE_HOST} \
@@ -121,6 +123,7 @@ serialize: clean _pb_output docker_build
 	@echo ${VERSION}
 	@echo ${CURDIR}
 	docker run -i --rm \
+		-e SANDBOX=${SANDBOX} \
 		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
 		-e FLYTE_HOST=${FLYTE_HOST} \
@@ -138,11 +141,12 @@ serialize: clean _pb_output docker_build
 
 
 .PHONY: register
-register: clean _pb_output docker_push
+register: serialize docker_push
 	@echo ${VERSION}
 	@echo ${CURDIR}
 	docker run -i --rm \
 		--network host \
+		-e SANDBOX=${SANDBOX} \
 		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
 		-e FLYTE_HOST=${FLYTE_HOST} \

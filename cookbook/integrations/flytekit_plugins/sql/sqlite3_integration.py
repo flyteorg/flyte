@@ -61,7 +61,7 @@ if __name__ == "__main__":
 @workflow
 def query_wf() -> int:
     df = SQLite3Task(
-        name="cookbook.sqlite3.sample",
+        name="cookbook.sqlite3.sample_inline",
         query_template="select TrackId, Name from tracks limit {{.inputs.limit}}",
         inputs=kwtypes(limit=int),
         output_schema_type=FlyteSchema[kwtypes(TrackId=int, Name=str)],

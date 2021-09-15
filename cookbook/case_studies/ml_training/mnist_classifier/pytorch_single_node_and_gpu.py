@@ -38,6 +38,7 @@ from torchvision import datasets, transforms
 NUM_BATCHES_TO_LOG = 10
 LOG_IMAGES_PER_BATCH = 32
 
+
 # %%
 # If running remotely, copy your ``wandb`` API key to the Dockerfile under the environment variable ``WANDB_API_KEY``.
 # This function logs into ``wandb`` and initializes the project. If you built your Docker image with the
@@ -47,6 +48,7 @@ LOG_IMAGES_PER_BATCH = 32
 def wandb_setup():
     wandb.login()
     wandb.init(project="mnist-single-node-single-gpu", entity=os.environ.get("WANDB_USERNAME", "my-user-name"))
+
 
 # %%
 # Creating the Network
@@ -159,7 +161,6 @@ def log_test_predictions(images, labels, outputs, predicted, my_table, log_count
 # We log ``accuracy``, ``test_loss``, and a ``wandb`` `table <https://docs.wandb.ai/guides/data-vis/log-tables>`__.
 # The ``wandb`` table can help in depicting the model's performance in a structured format.
 def test(model, device, test_loader):
-
     # ``wandb`` tabular columns
     columns = ["id", "image", "guess", "truth"]
     for digit in range(10):
@@ -253,13 +254,28 @@ TrainingOutputs = typing.NamedTuple(
     model_state=PythonPickledFile,
 )
 
+# %%
+# Set memory, gpu and storage depending on whether we are trying to register against sandbox or not...
+if os.getenv("SANDBOX") != "":
+    print(f"SANDBOX ENV: '{os.getenv('SANDBOX')}'")
+
+    mem = "100Mi"
+    gpu = "0"
+    storage = "500Mi"
+else:
+    print(f"SANDBOX ENV: '{os.getenv('SANDBOX')}'")
+
+    mem = "3Gi"
+    gpu = "1"
+    storage = "1Gi"
+
 
 @task(
     retries=2,
     cache=True,
     cache_version="1.0",
-    requests=Resources(gpu="1", mem="3Gi", storage="1Gi"),
-    limits=Resources(gpu="1", mem="3Gi", storage="1Gi"),
+    requests=Resources(gpu=gpu, mem=mem, storage=storage),
+    limits=Resources(gpu=gpu, mem=mem, storage=storage),
 )
 def pytorch_mnist_task(hp: Hyperparameters) -> TrainingOutputs:
     wandb_setup()
