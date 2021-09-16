@@ -58,6 +58,8 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
+  additionalVolumes: {}
+  additionalVolumeMounts: {}
 
 #
 # DATACATALOG SETTINGS
