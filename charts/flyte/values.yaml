@@ -15,9 +15,9 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: cr.flyte.org/flyteorg/flyteadmin
+    repository: ghcr.io/flyteorg/flyteadmin
     # -- Docker image tag
-    tag: v0.6.22 # FLYTEADMIN_TAG
+    tag: v0.6.27 # FLYTEADMIN_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
@@ -69,9 +69,9 @@ flytescheduler:
   enabled: true
   image:
     # -- Docker image for Flyteadmin deployment
-    repository:  cr.flyte.org/flyteorg/flytescheduler
+    repository:  ghcr.io/flyteorg/flytescheduler
     # -- Docker image tag
-    tag: v0.6.22 # FLYTESCHEDULER_TAG
+    tag: v0.6.27 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment

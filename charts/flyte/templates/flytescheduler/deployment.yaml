@@ -1,0 +1,62 @@
+{{- if .Values.flytescheduler.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flytescheduler.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytescheduler.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "flytescheduler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/admin/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flytescheduler.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flytescheduler.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - {{ .Values.flytescheduler.configPath }}
+        image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
+        imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
+        name: flytescheduler-check
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - {{ .Values.flytescheduler.configPath }}
+        image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
+        imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
+        name: flytescheduler
+        resources: {{ toYaml .Values.flytescheduler.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      serviceAccountName: {{ template "flyteadmin.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: flytescheduler-admin-config
+          name: config-volume
+      {{- with .Values.flytescheduler.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytescheduler.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytescheduler.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end }}

@@ -30,8 +30,6 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
       containers:
       - command:
         - flytescheduler
@@ -45,18 +43,13 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
       serviceAccountName: {{ template "flyteadmin.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
           name: shared-data
         - configMap:
-            name: flyte-admin-config
+            name: flytescheduler-admin-config
           name: config-volume
-        - name: auth
-          secret:
-            secretName: flyte-admin-secrets
       {{- with .Values.flytescheduler.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
