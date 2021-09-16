@@ -14,6 +14,7 @@ import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
+import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TerminateExecutionButton } from '../TerminateExecution/TerminateExecutionButton';
@@ -123,24 +124,36 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         await recoverExecution();
     }, [recoverExecution]);
 
+    const isRecoverVisible = React.useMemo(
+        () =>
+            [
+                WorkflowExecutionPhase.FAILED,
+                WorkflowExecutionPhase.ABORTED,
+                WorkflowExecutionPhase.TIMED_OUT
+            ].includes(phase),
+        [phase]
+    );
+
     const actionContent = isRunning ? (
         <TerminateExecutionButton className={styles.actionButton} />
     ) : isTerminal ? (
         <>
-            <Button
-                variant="outlined"
-                color="primary"
-                disabled={recovering}
-                className={classnames(
-                    styles.actionButton,
-                    commonStyles.buttonWhiteOutlined
-                )}
-                onClick={onClickRecover}
-                size="small"
-            >
-                Recover
-                {recovering && <ButtonCircularProgress />}
-            </Button>
+            {isRecoverVisible && (
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    disabled={recovering}
+                    className={classnames(
+                        styles.actionButton,
+                        commonStyles.buttonWhiteOutlined
+                    )}
+                    onClick={onClickRecover}
+                    size="small"
+                >
+                    Recover
+                    {recovering && <ButtonCircularProgress />}
+                </Button>
+            )}
             <Button
                 variant="outlined"
                 color="primary"
