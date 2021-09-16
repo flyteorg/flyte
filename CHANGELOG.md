@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.3](http://github.com/lyft/flyteconsole/compare/v0.25.2...v0.25.3) (2021-09-16)
+
+
+### Bug Fixes
+
+* hide recover button for successful executions ([#203](http://github.com/lyft/flyteconsole/issues/203)) ([81dd608](http://github.com/lyft/flyteconsole/commit/81dd608d8605522a2c08725dc2986c933ee1deb5))
+
 ## [0.25.2](http://github.com/lyft/flyteconsole/compare/v0.25.1...v0.25.2) (2021-09-16)
 
 
