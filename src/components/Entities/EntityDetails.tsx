@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     versionsContainer: {
         display: 'flex',
         flexDirection: 'column',
-        height: theme.spacing(45)
+        height: theme.spacing(53)
     },
     versionView: {
         flex: '1 1 auto'

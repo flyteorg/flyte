@@ -110,8 +110,8 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
         marginRight: theme.spacing(1),
         minWidth: 0,
-        paddingBottom: theme.spacing(2),
-        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(1),
+        paddingTop: theme.spacing(1),
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
     },
@@ -195,9 +195,13 @@ export const useWorkflowExecutionsColumnStyles = makeStyles((theme: Theme) => ({
 
 /** Style overrides specific to columns in `WorkflowVersionsTable`. */
 export const useWorkflowVersionsColumnStyles = makeStyles((theme: Theme) => ({
+    columnRadioButton: {
+        width: workflowVersionsTableColumnWidths.radio
+    },
     columnName: {
         flexBasis: workflowVersionsTableColumnWidths.name,
-        whiteSpace: 'normal'
+        whiteSpace: 'normal',
+        flexGrow: 1
     },
     columnRelease: {
         flexBasis: workflowVersionsTableColumnWidths.release

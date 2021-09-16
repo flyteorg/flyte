@@ -23,6 +23,7 @@ export const titleStrings = {
 };
 
 export const workflowVersionsTableColumnWidths = {
+    radio: 40,
     name: 380,
     release: 150,
     lastRun: 175,
