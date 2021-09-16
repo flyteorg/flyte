@@ -1,4 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core';
+import Radio from '@material-ui/core/Radio';
 import classnames from 'classnames';
 import * as React from 'react';
 import { ListRowProps } from 'react-virtualized';
@@ -11,7 +12,8 @@ import {
 
 const useStyles = makeStyles((theme: Theme) => ({
     row: {
-        paddingLeft: theme.spacing(2)
+        paddingLeft: theme.spacing(2),
+        cursor: 'pointer'
     }
 }));
 
@@ -19,6 +21,9 @@ export interface WorkflowVersionRowProps extends Partial<ListRowProps> {
     columns: WorkflowVersionColumnDefinition[];
     workflow: Workflow;
     state: WorkflowExecutionsTableState;
+    onClick: (() => void) | undefined;
+    versionView?: boolean;
+    isChecked?: boolean;
 }
 
 /**
@@ -34,7 +39,10 @@ export const WorkflowVersionRow: React.FC<WorkflowVersionRowProps> = ({
     columns,
     workflow,
     state,
-    style
+    style,
+    onClick,
+    versionView = false,
+    isChecked = false
 }) => {
     const tableStyles = useExecutionTableStyles();
     const styles = useStyles();
@@ -47,8 +55,10 @@ export const WorkflowVersionRow: React.FC<WorkflowVersionRowProps> = ({
                 tableStyles.borderBottom
             )}
             style={style}
+            onClick={onClick}
         >
             <div className={tableStyles.rowColumns}>
+                {versionView && <Radio checked={isChecked} />}
                 {columns.map(({ className, key: columnKey, cellRenderer }) => (
                     <div
                         key={columnKey}

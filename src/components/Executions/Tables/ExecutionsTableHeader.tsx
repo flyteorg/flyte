@@ -9,7 +9,8 @@ import { ColumnDefinition } from './types';
 export const ExecutionsTableHeader: React.FC<{
     columns: ColumnDefinition<any>[];
     scrollbarPadding?: number;
-}> = ({ columns, scrollbarPadding = 0 }) => {
+    versionView?: boolean;
+}> = ({ columns, scrollbarPadding = 0, versionView = false }) => {
     const tableStyles = useExecutionTableStyles();
     const scrollbarSpacer =
         scrollbarPadding > 0 ? (
@@ -17,6 +18,16 @@ export const ExecutionsTableHeader: React.FC<{
         ) : null;
     return (
         <div className={tableStyles.headerRow}>
+            {versionView && (
+                <div
+                    className={classnames(
+                        tableStyles.headerColumn,
+                        tableStyles.headerColumnVersion
+                    )}
+                >
+                    &nbsp;
+                </div>
+            )}
             {columns.map(({ key, label, className }) => {
                 const labelContent = isFunction(label) ? (
                     React.createElement(label)

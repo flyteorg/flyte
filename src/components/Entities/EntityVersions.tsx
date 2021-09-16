@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData } from 'components/common/WaitForData';
@@ -10,6 +10,8 @@ import { interactiveTextColor } from 'components/Theme/constants';
 import { SortDirection } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
 import { executionSortFields } from 'models/Execution/constants';
+import { Routes } from 'routes/routes';
+import { history } from 'routes/history';
 import * as React from 'react';
 import { executionFilterGenerator } from './generators';
 import { WorkflowVersionsTablePageSize } from './constants';
@@ -32,14 +34,19 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface EntityVersionsProps {
     id: ResourceIdentifier;
+    versionView?: boolean;
 }
 
 /**
  * The tab/page content for viewing a workflow's versions.
  * @param id
+ * @param versionView
  */
-export const EntityVersions: React.FC<EntityVersionsProps> = ({ id }) => {
-    const { domain, project, resourceType } = id;
+export const EntityVersions: React.FC<EntityVersionsProps> = ({
+    id,
+    versionView = false
+}) => {
+    const { domain, project, resourceType, name } = id;
     const styles = useStyles();
     const filtersState = useWorkflowExecutionFiltersState();
     const sort = {
@@ -57,9 +64,20 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id }) => {
         {
             sort,
             filter: [...baseFilters, ...filtersState.appliedFilters],
-            limit: WorkflowVersionsTablePageSize
+            limit: versionView ? 100 : WorkflowVersionsTablePageSize
         }
     );
+
+    const handleViewAll = React.useCallback(() => {
+        history.push(
+            Routes.WorkflowVersionDetails.makeUrl(
+                project,
+                domain,
+                name,
+                versions.value[0].id.version ?? ''
+            )
+        );
+    }, [project, domain, name, versions]);
 
     /** Don't render component until finish fetching user profile */
     if (filtersState.filters[4].status !== 'LOADED') {
@@ -68,18 +86,25 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id }) => {
 
     return (
         <>
-            <div className={styles.headerContainer}>
-                <Typography className={styles.header} variant="h6">
-                    Recent Workflow Versions
-                </Typography>
-                <Typography className={styles.viewAll} variant="body1">
-                    View All
-                </Typography>
-            </div>
+            {!versionView && (
+                <div className={styles.headerContainer}>
+                    <Typography className={styles.header} variant="h6">
+                        Recent Workflow Versions
+                    </Typography>
+                    <Typography
+                        className={styles.viewAll}
+                        variant="body1"
+                        onClick={handleViewAll}
+                    >
+                        View All
+                    </Typography>
+                </div>
+            )}
             <WaitForData {...versions}>
                 <WorkflowVersionsTable
                     {...versions}
                     isFetching={isLoadingState(versions.state)}
+                    versionView={versionView}
                 />
             </WaitForData>
         </>

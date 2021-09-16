@@ -57,6 +57,9 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
             marginLeft: theme.spacing(2)
         }
     },
+    headerColumnVersion: {
+        width: theme.spacing(4)
+    },
     headerColumnName: {
         fontSize: smallFontSize,
         fontWeight: 'bold',

@@ -44,8 +44,15 @@ export const ApplicationRouter: React.FC = () => (
                 component={withSideNavigation(components.taskDetails)}
             />
             <Route
+                exact
                 path={Routes.WorkflowDetails.path}
                 component={withSideNavigation(components.workflowDetails)}
+            />
+            <Route
+                path={Routes.WorkflowVersionDetails.path}
+                component={withSideNavigation(
+                    components.workflowVersionDetails
+                )}
             />
             <Route
                 path={Routes.ProjectDetails.path}

@@ -86,6 +86,22 @@ export class Routes {
         path: `${projectDomainBasePath}/workflows/:workflowName`
     };
 
+    // Workflow Version Details
+    static WorkflowVersionDetails = {
+        makeUrl: (
+            project: string,
+            domain: string,
+            workflowName: string,
+            version: string
+        ) =>
+            makeProjectDomainBoundPath(
+                project,
+                domain,
+                `/workflows/${workflowName}/version/${version}`
+            ),
+        path: `${projectDomainBasePath}/workflows/:workflowName/version/:workflowVersion`
+    };
+
     // Tasks
     static TaskDetails = {
         makeUrl: (project: string, domain: string, taskName: string) =>
