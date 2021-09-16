@@ -53,12 +53,6 @@ export const StructInput: React.FC<InputProps> = props => {
     const hasError = !!error;
     const helperText = hasError ? error : props.helperText;
 
-    const [paramData, setParamData] = useState({});
-    const onFormChange = ({ formData }, e) => {
-        onChange(JSON.stringify(formData));
-        setParamData(formData);
-    };
-
     let jsonFormRenderable = false;
     let parsedJson: PrimitiveType = {};
 
@@ -80,6 +74,15 @@ export const StructInput: React.FC<InputProps> = props => {
             }
         }
     }
+
+    const [paramData, setParamData] = useState(
+        jsonFormRenderable ? JSON.parse(value as string) : {}
+    );
+
+    const onFormChange = ({ formData }, e) => {
+        onChange(JSON.stringify(formData));
+        setParamData(formData);
+    };
 
     return jsonFormRenderable ? (
         <MuiThemeProvider theme={muiTheme}>
