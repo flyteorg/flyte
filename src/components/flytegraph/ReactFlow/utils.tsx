@@ -13,7 +13,7 @@ export const COLOR_GRAPH_BACKGROUND = '#666666';
 
 export const DISPLAY_NAME_START = 'start';
 export const DISPLAY_NAME_END = 'end';
-export const MAX_RENDER_DEPTH = 1;
+export const MAX_NESTED_DEPTH = 1;
 export const HANDLE_ICON = require('assets/SmallArrow.svg') as string;
 
 export const ReactFlowGraphConfig = {
@@ -79,6 +79,16 @@ export const getGraphHandleStyle = (
     }
 };
 
+export const nodePhaseColorMapping = {
+    [NodeExecutionPhase.FAILED]: { color: '#e90000', text: 'Failed' },
+    [NodeExecutionPhase.FAILING]: { color: '#f2a4ad', text: 'Failing' },
+    [NodeExecutionPhase.SUCCEEDED]: { color: '#37b789', text: 'Succeded' },
+    [NodeExecutionPhase.ABORTED]: { color: '#be25d7', text: 'Aborted' },
+    [NodeExecutionPhase.RUNNING]: { color: '#2892f4', text: 'Running' },
+    [NodeExecutionPhase.QUEUED]: { color: '#dfd71b', text: 'Queued' },
+    [NodeExecutionPhase.UNDEFINED]: { color: '#4a2839', text: 'Undefined' }
+};
+
 /**
  * Maps node execution phases to UX colors
  * @param nodeExecutionStatus
@@ -87,33 +97,45 @@ export const getGraphHandleStyle = (
 export const getStatusColor = (
     nodeExecutionStatus: NodeExecutionPhase
 ): string => {
-    let nodePrimaryColor = '';
-    switch (nodeExecutionStatus) {
-        case NodeExecutionPhase.FAILED:
-            nodePrimaryColor = '#f2a4ad';
-            break;
-        case NodeExecutionPhase.FAILING:
-            nodePrimaryColor = '#f2a4ad';
-            break;
-        case NodeExecutionPhase.SUCCEEDED:
-            nodePrimaryColor = '#37b789';
-            break;
-        case NodeExecutionPhase.ABORTED:
-            nodePrimaryColor = '#be25d7';
-            break;
-        case NodeExecutionPhase.RUNNING:
-            nodePrimaryColor = '#2892f4';
-            break;
-        case NodeExecutionPhase.QUEUED:
-            nodePrimaryColor = '#dfd71b';
-            break;
-        case NodeExecutionPhase.UNDEFINED:
-            nodePrimaryColor = '#4a2839';
-            break;
-        default:
-            nodePrimaryColor = '#c6c6c6';
+    if (nodePhaseColorMapping[nodeExecutionStatus]) {
+        return nodePhaseColorMapping[nodeExecutionStatus].color;
+    } else {
+        /** @TODO decide what we want default color to be */
+        return '#c6c6c6';
     }
-    return nodePrimaryColor;
+};
+
+export const getNestedGraphContainerStyle = overwrite => {
+    let width = overwrite.width;
+    let height = overwrite.height;
+
+    const maxHeight = 500;
+    const minHeight = 200;
+    const maxWidth = 700;
+    const minWidth = 300;
+
+    if (overwrite) {
+        width = width > maxWidth ? maxWidth : width;
+        width = width < minWidth ? minWidth : width;
+        height = height > maxHeight ? maxHeight : height;
+        height = height < minHeight ? minHeight : height;
+    }
+
+    const output: React.CSSProperties = {
+        width: `${width}px`,
+        height: `${height}px`
+    };
+
+    return output;
+};
+
+export const getNestedContainerStyle = nodeExecutionStatus => {
+    const style = {
+        border: `1px dashed ${getStatusColor(nodeExecutionStatus)}`,
+        borderRadius: '8px',
+        background: 'rgba(255,255,255,.9)'
+    } as React.CSSProperties;
+    return style;
 };
 
 export const getGraphNodeStyle = (
@@ -199,7 +221,7 @@ export const getGraphNodeStyle = (
     return output;
 };
 
-export const getRFBackground = (nodeExecutionStatus: NodeExecutionPhase) => {
+export const getRFBackground = () => {
     return {
         main: {
             background: {
@@ -210,13 +232,6 @@ export const getRFBackground = (nodeExecutionStatus: NodeExecutionPhase) => {
             gridSpacing: 20
         } as RFBackgroundProps,
         nested: {
-            background: {
-                border: `1px dashed ${getStatusColor(nodeExecutionStatus)}`,
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,1)',
-                padding: 0,
-                margin: 0
-            },
             gridColor: 'none',
             gridSpacing: 1
         } as RFBackgroundProps
@@ -232,16 +247,20 @@ export const getRFBackground = (nodeExecutionStatus: NodeExecutionPhase) => {
  */
 export const setReactFlowGraphLayout = (
     elements: Elements,
-    direction: string
+    direction: string,
+    estimate = false
 ) => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
     const isHorizontal = direction === 'LR';
 
+    const ESTIMATE_HEIGHT = 25;
+    const ESTIMATE_WIDTH_FACTOR = 6;
+
     dagreGraph.setGraph({
         rankdir: direction,
-        edgesep: 20,
-        nodesep: 40,
+        edgesep: 60,
+        nodesep: 30,
         ranker: 'longest-path',
         acyclicer: 'greedy'
     });
@@ -251,8 +270,10 @@ export const setReactFlowGraphLayout = (
      */
     elements.forEach(el => {
         if (isNode(el)) {
-            const nodeWidth = el.__rf.width;
-            const nodeHeight = el.__rf.height;
+            const nodeWidth = estimate
+                ? el.data.text.length * ESTIMATE_WIDTH_FACTOR
+                : el.__rf.width;
+            const nodeHeight = estimate ? ESTIMATE_HEIGHT : el.__rf.height;
             dagreGraph.setNode(el.id, { width: nodeWidth, height: nodeHeight });
         } else {
             dagreGraph.setEdge(el.source, el.target);
@@ -260,29 +281,53 @@ export const setReactFlowGraphLayout = (
     });
 
     dagre.layout(dagreGraph);
+    const graphWidth = dagreGraph.graph().width;
+    const graphHeight = dagreGraph.graph().height;
+    if (estimate) {
+        return {
+            estimatedDimensions: {
+                width: graphWidth,
+                height: graphHeight
+            }
+        };
+    } else {
+        return {
+            graph: elements.map(el => {
+                if (isNode(el)) {
+                    el.targetPosition = isHorizontal
+                        ? Position.Left
+                        : Position.Top;
+                    el.sourcePosition = isHorizontal
+                        ? Position.Right
+                        : Position.Bottom;
+                    const nodeWidth = estimate
+                        ? el.data.text.length * ESTIMATE_WIDTH_FACTOR
+                        : el.__rf.width;
+                    const nodeHeight = estimate
+                        ? ESTIMATE_HEIGHT
+                        : el.__rf.height;
+                    const nodeWithPosition = dagreGraph.node(el.id);
 
-    return elements.map(el => {
-        if (isNode(el)) {
-            el.targetPosition = isHorizontal ? Position.Left : Position.Top;
-            el.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
-            const nodeWidth = el.__rf.width;
-            const nodeHeight = el.__rf.height;
-            const nodeWithPosition = dagreGraph.node(el.id);
-
-            /** Keep both position and .__rf.position in sync */
-            const x = nodeWithPosition.x - nodeWidth / 2;
-            const y = nodeWithPosition.y - nodeHeight / 2;
-            el.position = {
-                x: x,
-                y: y
-            };
-            el.__rf.position = {
-                x: x,
-                y: y
-            };
-        }
-        return el;
-    });
+                    /** Keep both position and .__rf.position in sync */
+                    const x = nodeWithPosition.x - nodeWidth / 2;
+                    const y = nodeWithPosition.y - nodeHeight / 2;
+                    el.position = {
+                        x: x,
+                        y: y
+                    };
+                    el.__rf.position = {
+                        x: x,
+                        y: y
+                    };
+                }
+                return el;
+            }),
+            dimensions: {
+                width: graphWidth,
+                height: graphHeight
+            }
+        };
+    }
 };
 
 export default setReactFlowGraphLayout;

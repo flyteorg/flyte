@@ -89,6 +89,7 @@ export interface NodeExecution extends Admin.INodeExecution {
     inputUri: string;
     closure: NodeExecutionClosure;
     metadata?: NodeExecutionMetadata;
+    scopedId?: string;
 }
 
 export interface NodeExecutionsById {

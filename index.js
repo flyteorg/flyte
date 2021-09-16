@@ -14,7 +14,6 @@ const app = express();
 // Enable logging for HTTP access
 app.use(morgan('combined'));
 app.use(express.json());
-
 app.get(`${env.BASE_URL}/healthz`, (_req, res) => res.status(200).send());
 app.use(corsProxy(`${env.BASE_URL}${env.CORS_PROXY_PREFIX}`));
 

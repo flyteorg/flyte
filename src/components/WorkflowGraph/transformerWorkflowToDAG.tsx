@@ -14,7 +14,6 @@ import {
 import {
     isEndNode,
     isStartNode,
-    getThenNodeFromBranch,
     getDisplayName,
     getSubWorkflowFromId,
     getNodeTypeFromCompiledNode,
@@ -115,6 +114,19 @@ export const buildBranchStartEndNodes = (root: dNode) => {
     };
 };
 
+export const buildBranchNodeWidthType = (node, root, workflow) => {
+    const taskNode = node.taskNode as TaskNode;
+    let taskType: CompiledTask | null = null;
+    if (taskNode) {
+        taskType = getTaskTypeFromCompiledNode(
+            taskNode,
+            workflow.tasks
+        ) as CompiledTask;
+    }
+    const dNode = createDNode(node as CompiledNode, root, taskType);
+    root.nodes.push(dNode);
+};
+
 /**
  * Will parse values when dealing with a Branch and recursively find and build
  * any other node types.
@@ -127,53 +139,46 @@ export const parseBranch = (
     parentCompiledNode: CompiledNode,
     workflow: CompiledWorkflowClosure
 ) => {
-    const thenNodeCompiledNode = getThenNodeFromBranch(parentCompiledNode);
-    const thenNodeDNode = createDNode(thenNodeCompiledNode, root);
-    const { startNode, endNode } = buildBranchStartEndNodes(root);
+    const otherNode = parentCompiledNode.branchNode?.ifElse?.other;
+    const thenNode = parentCompiledNode.branchNode?.ifElse?.case
+        ?.thenNode as CompiledNode;
+    const elseNode = parentCompiledNode.branchNode?.ifElse
+        ?.elseNode as CompiledNode;
 
-    /* We must push container node regardless */
-    root.nodes.push(thenNodeDNode);
-
-    if (thenNodeCompiledNode.branchNode) {
-        buildDAG(thenNodeDNode, thenNodeCompiledNode, dTypes.branch, workflow);
+    /* Check: if thenNode has branch : else add theNode */
+    if (thenNode.branchNode) {
+        const thenNodeDNode = createDNode(thenNode, root);
+        buildDAG(thenNodeDNode, thenNode, dTypes.branch, workflow);
+        root.nodes.push(thenNodeDNode);
     } else {
-        /* Find any 'other' (other means 'else', 'else if') nodes */
-        const otherArr = parentCompiledNode.branchNode?.ifElse?.other;
-
-        if (otherArr) {
-            otherArr.map(otherItem => {
-                const otherCompiledNode: CompiledNode = otherItem.thenNode as CompiledNode;
-                if (otherCompiledNode.branchNode) {
-                    const otherDNodeBranch = createDNode(
-                        otherCompiledNode,
-                        root
-                    );
-                    buildDAG(
-                        otherDNodeBranch,
-                        otherCompiledNode,
-                        dTypes.branch,
-                        workflow
-                    );
-                } else {
-                    const taskNode = otherCompiledNode.taskNode as TaskNode;
-                    let taskType: CompiledTask | null = null;
-                    if (taskNode) {
-                        taskType = getTaskTypeFromCompiledNode(
-                            taskNode,
-                            workflow.tasks
-                        ) as CompiledTask;
-                    }
-                    const otherDNode = createDNode(
-                        otherCompiledNode,
-                        root,
-                        taskType
-                    );
-                    root.nodes.push(otherDNode);
-                }
-            });
-        }
+        buildBranchNodeWidthType(thenNode, root, workflow);
     }
 
+    /* Check: else case */
+    if (elseNode) {
+        buildBranchNodeWidthType(elseNode, root, workflow);
+    }
+
+    /* Check: other case */
+    if (otherNode) {
+        otherNode.map(otherItem => {
+            const otherCompiledNode: CompiledNode = otherItem.thenNode as CompiledNode;
+            if (otherCompiledNode.branchNode) {
+                const otherDNodeBranch = createDNode(otherCompiledNode, root);
+                buildDAG(
+                    otherDNodeBranch,
+                    otherCompiledNode,
+                    dTypes.branch,
+                    workflow
+                );
+            } else {
+                buildBranchNodeWidthType(otherCompiledNode, root, workflow);
+            }
+        });
+    }
+
+    /* Add edges and add start/end nodes */
+    const { startNode, endNode } = buildBranchStartEndNodes(root);
     for (let i = 0; i < root.nodes.length; i++) {
         const startEdge: dEdge = {
             sourceId: startNode.id,
@@ -186,8 +191,6 @@ export const parseBranch = (
         root.edges.push(startEdge);
         root.edges.push(endEdge);
     }
-
-    /* Add back to root */
     root.nodes.push(startNode);
     root.nodes.push(endNode);
 };

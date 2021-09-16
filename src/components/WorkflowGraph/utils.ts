@@ -67,10 +67,6 @@ export const getDisplayName = (context: any): string => {
     }
 };
 
-export const getThenNodeFromBranch = (node: CompiledNode) => {
-    return node.branchNode?.ifElse?.case?.thenNode as CompiledNode;
-};
-
 /**
  * Returns the id for CompiledWorkflow
  * @param context   will find id for this entity

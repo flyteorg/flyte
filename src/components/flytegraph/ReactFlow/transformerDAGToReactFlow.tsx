@@ -1,9 +1,5 @@
 import { dEdge, dNode, dTypes } from 'models/Graph/types';
-import {
-    DISPLAY_NAME_START,
-    DISPLAY_NAME_END
-} from 'components/WorkflowGraph/utils';
-import { MAX_RENDER_DEPTH, ReactFlowGraphConfig } from './utils';
+import { MAX_NESTED_DEPTH, ReactFlowGraphConfig } from './utils';
 import { Edge, Elements, Node, Position } from 'react-flow-renderer';
 import { NodeExecutionsById } from 'models/Execution/types';
 import { NodeExecutionPhase } from 'models/Execution/enums';
@@ -34,12 +30,14 @@ export const buildReactFlowNode = (
     const taskType = dNode?.value?.template ? dNode.value.template.type : null;
 
     /**
-     * @TODO decide which to display after demo
+     * @TODO Implement a toggle that will allow users to view either the display
+     * name or the nodeId.
      */
-    const displayName =
-        dNode.name == DISPLAY_NAME_START || dNode.name == DISPLAY_NAME_END
-            ? dNode.name
-            : dNode.scopedId;
+    // const displayName =
+    //     dNode.name == DISPLAY_NAME_START || dNode.name == DISPLAY_NAME_END
+    //         ? dNode.name
+    //         : dNode.scopedId;
+    const displayName = dNode.name;
 
     const mapNodeExecutionStatus = () => {
         if (nodeExecutionsById[dNode.scopedId]) {
@@ -83,16 +81,16 @@ export const nodeMapToArr = map => {
 export const dagToReactFlow = (
     dag: dNode,
     nodeExecutionsById: NodeExecutionsById,
-    currentDepth = 0,
+    nestedDepth = 0,
     onNodeSelectionChanged
 ) => {
     const nodes: any = {};
     const edges: any = {};
 
     dag.nodes?.map(dNode => {
-        if (dNode.nodes?.length > 0 && currentDepth <= MAX_RENDER_DEPTH) {
+        if (dNode.nodes?.length > 0 && nestedDepth <= MAX_NESTED_DEPTH) {
             /* Note: currentDepth will be replaced once nested toggle */
-            if (currentDepth == MAX_RENDER_DEPTH) {
+            if (nestedDepth == MAX_NESTED_DEPTH) {
                 nodes[dNode.id] = buildReactFlowNode(
                     dNode,
                     [],
@@ -106,7 +104,7 @@ export const dagToReactFlow = (
                     dagToReactFlow(
                         dNode,
                         nodeExecutionsById,
-                        currentDepth + 1,
+                        nestedDepth + 1,
                         onNodeSelectionChanged
                     ),
                     nodeExecutionsById,

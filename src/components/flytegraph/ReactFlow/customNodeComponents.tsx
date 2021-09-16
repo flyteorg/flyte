@@ -8,12 +8,14 @@ import {
 } from 'react-flow-renderer';
 import { dTypes } from 'models/Graph/types';
 import { ReactFlowWrapper } from './ReactFlowWrapper';
-import {
+import setReactFlowGraphLayout, {
     COLOR_TASK_TYPE,
     COLOR_GRAPH_BACKGROUND,
     getGraphHandleStyle,
     getGraphNodeStyle,
-    getRFBackground
+    getRFBackground,
+    getNestedContainerStyle,
+    getNestedGraphContainerStyle
 } from './utils';
 import { RFGraphTypes, RFHandleProps } from './types';
 
@@ -244,13 +246,10 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
  */
 export const ReactFlowCustomSubworkflowNode = ({ data }: any) => {
     const { dag } = data;
-    const backgroundStyle = getRFBackground(data.nodeExecutionStatus).nested;
-
-    const rfContainerStyle: React.CSSProperties = {
-        width: `300px`,
-        height: `200px`
-    };
-
+    const backgroundStyle = getRFBackground().nested;
+    const borderStyle = getNestedContainerStyle(data.nodeExecutionStatus);
+    const { estimatedDimensions } = setReactFlowGraphLayout(dag, 'LR', true);
+    const graphContainer = getNestedGraphContainerStyle(estimatedDimensions);
     return (
         <>
             {renderDefaultHandles(
@@ -258,12 +257,14 @@ export const ReactFlowCustomSubworkflowNode = ({ data }: any) => {
                 getGraphHandleStyle('source'),
                 getGraphHandleStyle('target')
             )}
-            <div style={rfContainerStyle}>
-                <ReactFlowWrapper
-                    rfGraphJson={dag}
-                    backgroundStyle={backgroundStyle}
-                    type={RFGraphTypes.nested}
-                />
+            <div style={borderStyle}>
+                <div style={graphContainer}>
+                    <ReactFlowWrapper
+                        rfGraphJson={dag}
+                        backgroundStyle={backgroundStyle}
+                        type={RFGraphTypes.nested}
+                    />
+                </div>
             </div>
         </>
     );
@@ -276,12 +277,11 @@ export const ReactFlowCustomSubworkflowNode = ({ data }: any) => {
  */
 export const ReactFlowCustomBranchNode = ({ data }: any) => {
     const { dag } = data;
-    const backgroundStyle = getRFBackground(data.nodeExecutionStatus).nested;
-
-    const rfContainerStyle: React.CSSProperties = {
-        width: `300px`,
-        height: `200px`
-    };
+    console.log('@ReactFlowCustomBranchNode: data');
+    const backgroundStyle = getRFBackground().nested;
+    const borderStyle = getNestedContainerStyle(data.nodeExecutionStatus);
+    const { estimatedDimensions } = setReactFlowGraphLayout(dag, 'LR', true);
+    const graphContainer = getNestedGraphContainerStyle(estimatedDimensions);
 
     return (
         <>
@@ -290,12 +290,14 @@ export const ReactFlowCustomBranchNode = ({ data }: any) => {
                 getGraphHandleStyle('source'),
                 getGraphHandleStyle('target')
             )}
-            <div style={rfContainerStyle}>
-                <ReactFlowWrapper
-                    rfGraphJson={dag}
-                    backgroundStyle={backgroundStyle}
-                    type={RFGraphTypes.nested}
-                />
+            <div style={borderStyle}>
+                <div style={graphContainer}>
+                    <ReactFlowWrapper
+                        rfGraphJson={dag}
+                        backgroundStyle={backgroundStyle}
+                        type={RFGraphTypes.nested}
+                    />
+                </div>
             </div>
         </>
     );

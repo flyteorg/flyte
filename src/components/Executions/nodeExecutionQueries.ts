@@ -78,6 +78,13 @@ export function makeNodeExecutionListQuery(
             const nodeExecutions = removeSystemNodes(
                 (await listNodeExecutions(id, config)).entities
             );
+            nodeExecutions.map(exe => {
+                if (exe.metadata) {
+                    return (exe.scopedId = exe.metadata.specNodeId);
+                } else {
+                    return (exe.scopedId = exe.id.nodeId);
+                }
+            });
             cacheNodeExecutions(queryClient, nodeExecutions);
             return nodeExecutions;
         }
@@ -226,6 +233,11 @@ async function fetchGroupsForParentNodeExecution(
         }
     };
 
+    /** @TODO there is likely a better way to do this; eg, in a previous call */
+    if (!nodeExecution.scopedId) {
+        nodeExecution.scopedId = nodeExecution.metadata?.specNodeId;
+    }
+
     const children = await fetchNodeExecutionList(
         queryClient,
         nodeExecution.id.executionId,
@@ -238,6 +250,19 @@ async function fetchGroupsForParentNodeExecution(
             if (!group) {
                 group = { name: retryAttempt, nodeExecutions: [] };
                 out.set(retryAttempt, group);
+            }
+            /**
+             * GraphUX uses workflowClosure which uses scopedId
+             * This builds a scopedId via parent nodeExecution
+             * to enable mapping between graph and other components
+             */
+            let scopedId: string | undefined =
+                nodeExecution.metadata?.specNodeId;
+            if (scopedId != undefined) {
+                scopedId += `-${child.metadata?.retryGroup}-${child.metadata?.specNodeId}`;
+                child['scopedId'] = scopedId;
+            } else {
+                child['scopedId'] = child.metadata?.specNodeId;
             }
             group.nodeExecutions.push(child);
             return out;
@@ -295,7 +320,6 @@ async function fetchAllChildNodeExecutions(
     );
     return executions;
 }
-
 /**
  *
  * @param nodeExecutions list of parent node executionId's

@@ -26,7 +26,7 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
         makeWorkflowQuery(useQueryClient(), workflowId)
     );
     const nodeExecutionsById = React.useMemo(
-        () => keyBy(nodeExecutions, 'id.nodeId'),
+        () => keyBy(nodeExecutions, 'scopedId'),
         [nodeExecutions]
     );
 
