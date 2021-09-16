@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.2](http://github.com/lyft/flyteconsole/compare/v0.25.1...v0.25.2) (2021-09-16)
+
+
+### Bug Fixes
+
+* repopulate struct input fields on relaunch form ([#201](http://github.com/lyft/flyteconsole/issues/201)) ([950e080](http://github.com/lyft/flyteconsole/commit/950e080a2c52c6294630f0ffd1410b0e45b50a8d))
+
 ## [0.25.1](http://github.com/lyft/flyteconsole/compare/v0.25.0...v0.25.1) (2021-09-13)
 
 
