@@ -7,6 +7,7 @@ export interface WorkflowVersionDetailsRouteParams {
     projectId: string;
     domainId: string;
     workflowName: string;
+    workflowVersion: string;
 }
 export type WorkflowDetailsProps = WorkflowVersionDetailsRouteParams;
 
@@ -19,18 +20,20 @@ export type WorkflowDetailsProps = WorkflowVersionDetailsRouteParams;
 export const WorkflowVersionDetailsContainer: React.FC<WorkflowVersionDetailsRouteParams> = ({
     projectId,
     domainId,
-    workflowName
+    workflowName,
+    workflowVersion
 }) => {
     const id = React.useMemo<ResourceIdentifier>(
         () => ({
             resourceType: ResourceType.WORKFLOW,
             project: projectId,
             domain: domainId,
-            name: workflowName
+            name: workflowName,
+            version: workflowVersion
         }),
-        [projectId, domainId, workflowName]
+        [projectId, domainId, workflowName, workflowVersion]
     );
-    return <EntityDetails id={id} versionView />;
+    return <EntityDetails id={id} versionView showStaticGraph />;
 };
 
 export const WorkflowVersionDetails = withRouteParams<

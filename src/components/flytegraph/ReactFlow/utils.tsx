@@ -211,6 +211,15 @@ export const getGraphNodeStyle = (
         },
         task: {
             borderColor: nodePrimaryColor
+        },
+        staticNode: {
+            backgroundColor: '#fff',
+            borderColor: '#bfbfbf',
+            borderWidth: '.05rem'
+        },
+        staticNestedNode: {
+            backgroundColor: '#dfdfdf',
+            border: 'none'
         }
     };
     const key = String(dTypes[type]);
@@ -234,6 +243,14 @@ export const getRFBackground = () => {
         nested: {
             gridColor: 'none',
             gridSpacing: 1
+        } as RFBackgroundProps,
+        static: {
+            background: {
+                border: 'none',
+                backgroundColor: 'rgb(255,255,255)'
+            },
+            gridColor: 'none',
+            gridSpacing: 20
         } as RFBackgroundProps
     };
 };

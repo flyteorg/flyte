@@ -13,6 +13,8 @@ import { EntityExecutions } from './EntityExecutions';
 import { EntitySchedules } from './EntitySchedules';
 import { EntityVersions } from './EntityVersions';
 import classNames from 'classnames';
+import { StaticGraphContainer } from 'components/Workflow/StaticGraphContainer';
+import { WorkflowId } from 'models/Workflow/types';
 
 const useStyles = makeStyles((theme: Theme) => ({
     metadataContainer: {
@@ -48,6 +50,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface EntityDetailsProps {
     id: ResourceIdentifier;
     versionView?: boolean;
+    showStaticGraph?: boolean;
 }
 
 function getLaunchProps(id: ResourceIdentifier) {
@@ -67,9 +70,11 @@ function getLaunchProps(id: ResourceIdentifier) {
  */
 export const EntityDetails: React.FC<EntityDetailsProps> = ({
     id,
-    versionView = false
+    versionView = false,
+    showStaticGraph = false
 }) => {
     const sections = entitySections[id.resourceType];
+    const workflowId = id as WorkflowId;
     const project = useProject(id.project);
     const styles = useStyles();
     const [showLaunchForm, setShowLaunchForm] = React.useState(false);
@@ -99,13 +104,18 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
                 </div>
             )}
             {sections.versions ? (
-                <div
-                    className={classNames(styles.versionsContainer, {
-                        [styles.versionView]: versionView
-                    })}
-                >
-                    <EntityVersions id={id} versionView={versionView} />
-                </div>
+                <>
+                    {showStaticGraph ? (
+                        <StaticGraphContainer workflowId={workflowId} />
+                    ) : null}
+                    <div
+                        className={classNames(styles.versionsContainer, {
+                            [styles.versionView]: versionView
+                        })}
+                    >
+                        <EntityVersions id={id} versionView={versionView} />
+                    </div>
+                </>
             ) : null}
             {sections.executions && !versionView ? (
                 <div className={styles.executionsContainer}>

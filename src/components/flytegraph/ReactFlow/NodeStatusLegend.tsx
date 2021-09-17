@@ -39,7 +39,7 @@ export const Legend = () => {
     const positionStyle: CSSProperties = {
         bottom: '1rem',
         right: '1rem',
-        zIndex: 10000,
+        zIndex: 10,
         position: 'absolute',
         width: '150px'
     };

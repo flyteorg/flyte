@@ -171,6 +171,80 @@ export const ReactFlowCustomMaxNested = ({ data }: any) => {
     );
 };
 
+export const ReactFlowStaticNested = ({ data }: any) => {
+    const styles = getGraphNodeStyle(dTypes.staticNestedNode);
+    const containerStyle = {};
+    const taskContainerStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '-.55rem',
+        zIndex: 0,
+        right: '.15rem'
+    };
+    const taskTypeStyle: React.CSSProperties = {
+        backgroundColor: COLOR_GRAPH_BACKGROUND,
+        color: 'white',
+        padding: '.1rem .2rem',
+        fontSize: '.3rem'
+    };
+
+    const renderTaskType = () => {
+        return (
+            <div style={taskContainerStyle}>
+                <div style={taskTypeStyle}>{data.taskType}</div>
+            </div>
+        );
+    };
+
+    return (
+        <div style={containerStyle}>
+            {data.taskType ? renderTaskType() : null}
+            <div style={styles}>{data.text}</div>
+            {renderDefaultHandles(
+                data.scopedId,
+                getGraphHandleStyle('source'),
+                getGraphHandleStyle('target')
+            )}
+        </div>
+    );
+};
+
+export const ReactFlowStaticNode = ({ data }: any) => {
+    const styles = getGraphNodeStyle(dTypes.staticNode);
+    const containerStyle = {};
+    const taskContainerStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '-.55rem',
+        zIndex: 0,
+        right: '.15rem'
+    };
+    const taskTypeStyle: React.CSSProperties = {
+        backgroundColor: COLOR_GRAPH_BACKGROUND,
+        color: 'white',
+        padding: '.1rem .2rem',
+        fontSize: '.3rem'
+    };
+
+    const renderTaskType = () => {
+        return (
+            <div style={taskContainerStyle}>
+                <div style={taskTypeStyle}>{data.taskType}</div>
+            </div>
+        );
+    };
+
+    return (
+        <div style={containerStyle}>
+            {data.taskType ? renderTaskType() : null}
+            <div style={styles}>{data.text}</div>
+            {renderDefaultHandles(
+                data.scopedId,
+                getGraphHandleStyle('source'),
+                getGraphHandleStyle('target')
+            )}
+        </div>
+    );
+};
+
 /**
  * Custom component used by ReactFlow.  Renders a label (text)
  * and any edge handles.
@@ -178,6 +252,9 @@ export const ReactFlowCustomMaxNested = ({ data }: any) => {
  */
 
 export const ReactFlowCustomTaskNode = ({ data }: any) => {
+    // console.log(`\n\n@ReactFlowCustomTaskNode: ${data.text}`);
+    // console.log('\t data.nodeType:', dTypes[data.nodeType]);
+    // console.log('\t data.nodeExecutionStatus:', data.nodeExecutionStatus);
     const styles = getGraphNodeStyle(data.nodeType, data.nodeExecutionStatus);
     const onNodeSelectionChanged = data.onNodeSelectionChanged;
     const [selectedNode, setSelectedNode] = useState(false);
@@ -277,7 +354,7 @@ export const ReactFlowCustomSubworkflowNode = ({ data }: any) => {
  */
 export const ReactFlowCustomBranchNode = ({ data }: any) => {
     const { dag } = data;
-    console.log('@ReactFlowCustomBranchNode: data');
+    console.log('@ReactFlowCustomBranchNode: data', data);
     const backgroundStyle = getRFBackground().nested;
     const borderStyle = getNestedContainerStyle(data.nodeExecutionStatus);
     const { estimatedDimensions } = setReactFlowGraphLayout(dag, 'LR', true);

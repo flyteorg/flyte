@@ -1,8 +1,8 @@
-import { dEdge, dNode, dTypes } from 'models/Graph/types';
-import { MAX_NESTED_DEPTH, ReactFlowGraphConfig } from './utils';
+import { dEdge, dTypes } from 'models/Graph/types';
+import { ReactFlowGraphConfig } from './utils';
 import { Edge, Elements, Node, Position } from 'react-flow-renderer';
-import { NodeExecutionsById } from 'models/Execution/types';
 import { NodeExecutionPhase } from 'models/Execution/enums';
+import { BuildRFNodeProps, ConvertDagProps, DagToFRProps } from './types';
 
 export const buildCustomNodeName = (type: dTypes) => {
     return `${ReactFlowGraphConfig.customNodePrefix}_${dTypes[type]}`;
@@ -19,51 +19,52 @@ export const buildReactFlowEdge = (edge: dEdge): Edge => {
     } as Edge;
 };
 
-export const buildReactFlowNode = (
-    dNode: dNode,
-    dag: any = [],
-    nodeExecutionsById: NodeExecutionsById,
-    typeOverride?: dTypes | null,
-    onNodeSelectionChanged?: any | null
-): Node => {
+export const buildReactFlowNode = (props: BuildRFNodeProps): Node => {
+    const {
+        dNode,
+        dag,
+        nodeExecutionsById,
+        typeOverride,
+        onNodeSelectionChanged
+    } = props;
+
     const type = typeOverride ? typeOverride : dNode.type;
     const taskType = dNode?.value?.template ? dNode.value.template.type : null;
-
-    /**
-     * @TODO Implement a toggle that will allow users to view either the display
-     * name or the nodeId.
-     */
-    // const displayName =
-    //     dNode.name == DISPLAY_NAME_START || dNode.name == DISPLAY_NAME_END
-    //         ? dNode.name
-    //         : dNode.scopedId;
     const displayName = dNode.name;
 
     const mapNodeExecutionStatus = () => {
-        if (nodeExecutionsById[dNode.scopedId]) {
-            return nodeExecutionsById[dNode.scopedId].closure
-                .phase as NodeExecutionPhase;
+        if (nodeExecutionsById) {
+            if (nodeExecutionsById[dNode.scopedId]) {
+                return nodeExecutionsById[dNode.scopedId].closure
+                    .phase as NodeExecutionPhase;
+            } else {
+                return NodeExecutionPhase.SKIPPED;
+            }
         } else {
-            return NodeExecutionPhase.SKIPPED;
+            return NodeExecutionPhase.UNDEFINED;
         }
     };
     const nodeExecutionStatus = mapNodeExecutionStatus();
 
+    const dataProps = {
+        nodeExecutionStatus: nodeExecutionStatus,
+        text: displayName,
+        handles: [],
+        nodeType: type,
+        scopedId: dNode.scopedId,
+        dag: dag,
+        taskType: taskType,
+        onNodeSelectionChanged: () => {
+            if (onNodeSelectionChanged) {
+                onNodeSelectionChanged([dNode.scopedId]);
+            }
+        }
+    };
+
     return {
         id: dNode.scopedId,
         type: buildCustomNodeName(type),
-        data: {
-            nodeExecutionStatus: nodeExecutionStatus,
-            text: displayName,
-            handles: [],
-            nodeType: type,
-            scopedId: dNode.scopedId,
-            dag: dag,
-            taskType: taskType,
-            onNodeSelectionChanged: () => {
-                onNodeSelectionChanged([dNode.scopedId]);
-            }
-        },
+        data: dataProps,
         position: { x: 0, y: 0 },
         sourcePosition: Position.Right,
         targetPosition: Position.Left
@@ -78,51 +79,58 @@ export const nodeMapToArr = map => {
     return output;
 };
 
-export const dagToReactFlow = (
-    dag: dNode,
-    nodeExecutionsById: NodeExecutionsById,
-    nestedDepth = 0,
-    onNodeSelectionChanged
-) => {
+export const dagToReactFlow = (props: DagToFRProps) => {
+    const {
+        root,
+        nodeExecutionsById,
+        currentDepth,
+        onNodeSelectionChanged,
+        maxRenderDepth,
+        isStaticGraph
+    } = props;
+
     const nodes: any = {};
     const edges: any = {};
 
-    dag.nodes?.map(dNode => {
-        if (dNode.nodes?.length > 0 && nestedDepth <= MAX_NESTED_DEPTH) {
+    root.nodes?.map(dNode => {
+        /* Base props to build RF Node */
+        const buildNodeProps = {
+            dNode: dNode,
+            dag: [],
+            nodeExecutionsById: nodeExecutionsById,
+            typeOverride: null,
+            onNodeSelectionChanged: onNodeSelectionChanged,
+            isStaticGraph: isStaticGraph
+        } as BuildRFNodeProps;
+        if (dNode.nodes?.length > 0 && currentDepth <= maxRenderDepth) {
             /* Note: currentDepth will be replaced once nested toggle */
-            if (nestedDepth == MAX_NESTED_DEPTH) {
-                nodes[dNode.id] = buildReactFlowNode(
-                    dNode,
-                    [],
-                    nodeExecutionsById,
-                    dTypes.nestedMaxDepth,
-                    onNodeSelectionChanged
-                );
+            if (currentDepth == maxRenderDepth) {
+                buildNodeProps.typeOverride = isStaticGraph
+                    ? dTypes.staticNestedNode
+                    : dTypes.nestedMaxDepth;
             } else {
-                nodes[dNode.id] = buildReactFlowNode(
-                    dNode,
-                    dagToReactFlow(
-                        dNode,
-                        nodeExecutionsById,
-                        nestedDepth + 1,
-                        onNodeSelectionChanged
-                    ),
-                    nodeExecutionsById,
-                    null,
-                    onNodeSelectionChanged
-                );
+                const nestedDagProps: DagToFRProps = {
+                    root: dNode,
+                    nodeExecutionsById: nodeExecutionsById,
+                    currentDepth: currentDepth + 1,
+                    onNodeSelectionChanged: onNodeSelectionChanged,
+                    maxRenderDepth: maxRenderDepth,
+                    isStaticGraph: isStaticGraph
+                };
+                buildNodeProps.dag = dagToReactFlow(nestedDagProps);
+                buildNodeProps.typeOverride = isStaticGraph
+                    ? dTypes.staticNode
+                    : null;
             }
         } else {
-            nodes[dNode.id] = buildReactFlowNode(
-                dNode,
-                [],
-                nodeExecutionsById,
-                null,
-                onNodeSelectionChanged
-            );
+            buildNodeProps.typeOverride = isStaticGraph
+                ? dTypes.staticNode
+                : null;
         }
+        /* Build and add node to map */
+        nodes[dNode.id] = buildReactFlowNode(buildNodeProps);
     });
-    dag.edges?.map(edge => {
+    root.edges?.map(edge => {
         const rfEdge = buildReactFlowEdge(edge);
         edges[rfEdge.id] = rfEdge;
     });
@@ -131,16 +139,9 @@ export const dagToReactFlow = (
 };
 
 export const ConvertFlyteDagToReactFlows = (
-    root: dNode,
-    nodeExecutionsById: NodeExecutionsById,
-    onNodeSelectionChanged
+    props: ConvertDagProps
 ): Elements => {
-    const rfJson = dagToReactFlow(
-        root,
-        nodeExecutionsById,
-        0,
-        onNodeSelectionChanged
-    );
-
+    const dagProps = { ...props, currentDepth: 0 } as DagToFRProps;
+    const rfJson = dagToReactFlow(dagProps);
     return rfJson;
 };
