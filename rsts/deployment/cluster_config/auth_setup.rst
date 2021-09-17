@@ -156,7 +156,8 @@ Apply Configuration
         authorizedUris:
           # 4. Update with public domain name (for non-sandbox deployments)
           # - https://example.foobar.com:443
-          - https://localhost:30081
+          # Or uncomment this line for sandbox deployment
+          # - https://localhost:30081
           - http://flyteadmin:80
           - http://flyteadmin.flyte.svc.cluster.local:80
 
