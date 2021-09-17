@@ -21,16 +21,36 @@ func (w *WorkflowError) Error() string {
 	return fmt.Sprintf("Workflow[%s] failed. %v: %v", w.Workflow, w.Code, w.Message)
 }
 
+func (w *WorkflowError) Is(target error) bool {
+	t, ok := target.(*WorkflowError)
+	if !ok {
+		return false
+	}
+	return w.Code == t.Code
+}
+
 type WorkflowErrorWithCause struct {
 	*WorkflowError
 	cause error
+}
+
+func (w *WorkflowErrorWithCause) Cause() error {
+	return w.cause
 }
 
 func (w *WorkflowErrorWithCause) Error() string {
 	return fmt.Sprintf("%v, caused by: %v", w.WorkflowError.Error(), w.cause)
 }
 
-func (w *WorkflowErrorWithCause) Cause() error {
+func (w *WorkflowErrorWithCause) Is(target error) bool {
+	t, ok := target.(*WorkflowErrorWithCause)
+	if !ok {
+		return false
+	}
+	return w.Code == t.Code && (w.cause == t.cause || t.cause == nil) && (w.Message == t.Message || t.Message == "") && (w.Workflow == t.Workflow || t.Workflow == "")
+}
+
+func (w *WorkflowErrorWithCause) Unwrap() error {
 	return w.cause
 }
 
