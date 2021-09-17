@@ -59,6 +59,7 @@ The following is required for non-sandbox deployments:
       Flyte Console or Flyte Admin based on the url path
 
    .. prompt:: bash
+
       # determine Flyte Ingress IP
       kubectl get ingress -n flyte flyte
 
