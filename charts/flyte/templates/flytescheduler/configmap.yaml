@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flytescheduler-admin-config
+  name: flyte-scheduler-admin-config
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flytescheduler.labels" . | nindent 4 }}
 data:

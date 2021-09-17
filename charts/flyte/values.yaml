@@ -69,7 +69,7 @@ flytescheduler:
   enabled: true
   image:
     # -- Docker image for Flyteadmin deployment
-    repository:  cr.flyte.org/flyteorg/flytescheduler
+    repository:  ghcr.io/flyteorg/flytescheduler
     # -- Docker image tag
     tag: v0.6.28 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
@@ -612,8 +612,6 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
-      clientSecret: foobar
-
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
   catalog:

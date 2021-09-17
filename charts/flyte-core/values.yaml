@@ -248,43 +248,6 @@ webhook:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
 
-#
-# POSTGRES SETTINGS
-#
-
-postgres:
-  # --- enable or disable Postgres deployment installation
-  enabled: true
-  # -- Replicas count for Postgres deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Postgres deployment
-    repository: postgres
-    # -- Docker image tag
-    tag: "10.16"
-    # -- Docker image pull policy
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Postgres deployment
-  resources:
-    requests:
-      cpu: 10m
-      memory: 128Mi
-    limits:
-      cpu: 1000m
-      memory: 512Mi
-  # -- Service settings for Postgres
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for Postgres pods
-  podAnnotations: {}
-  # -- nodeSelector for Postgres deployment
-  nodeSelector: {}
-  # -- tolerations for Postgres deployment
-  tolerations: []
-  # -- affinity for Postgres deployment
-  affinity: {}
-
 # ------------------------------------------------
 #
 # COMMON SETTINGS
@@ -471,7 +434,6 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
-      clientSecret: foobar
 
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)

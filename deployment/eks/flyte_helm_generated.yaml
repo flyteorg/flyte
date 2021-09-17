@@ -101,16 +101,6 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte/templates/common/secret-auth.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-common-auth
-  namespace: flyte
-type: Opaque
-stringData:
-  client_secret: foobar
----
 # Source: flyte/templates/common/secret.yaml
 apiVersion: v1
 kind: Secret
@@ -119,6 +109,16 @@ metadata:
 stringData:
   pass.txt: '<DB_PASSWORD>'
 type: Opaque
+---
+# Source: flyte/templates/propeller/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-propeller-auth
+  namespace: flyte
+type: Opaque
+stringData:
+  client_secret: foobar
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
@@ -250,7 +250,6 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientSecret: foobar
       endpoint: flyteadmin:81
       insecure: true
     event:
@@ -459,7 +458,6 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientSecret: foobar
       endpoint: flyteadmin:81
       insecure: true
     event:
@@ -1350,7 +1348,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "3143c77cb6775cd06b4c32fe3788c5570abb3e5bf628b5cee63adaedfaa5174"
+        configChecksum: "1e835d36ff62ef26701c9386a8264d96938fd75a0a9ff8dab1251397eea9c89"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1481,9 +1479,6 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
-        - name: common-auth
-          secret:
-            secretName: flyte-common-auth
         - configMap:
             name: clusterresource-template
           name: resource-templates
@@ -1661,7 +1656,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b90c49df4d61c35810f64e63324db2fd9def5c6821efa52ffcc2b0dc677dc78"
+        configChecksum: "c4e609e9c12a562aa214413a77bc6b9d13c4dce45d375f3e95a68e4d81998b8"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1733,7 +1728,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.3
       annotations:
-        configChecksum: "b90c49df4d61c35810f64e63324db2fd9def5c6821efa52ffcc2b0dc677dc78"
+        configChecksum: "c4e609e9c12a562aa214413a77bc6b9d13c4dce45d375f3e95a68e4d81998b8"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

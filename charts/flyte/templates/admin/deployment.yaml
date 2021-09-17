@@ -137,9 +137,6 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
-        - name: common-auth
-          secret:
-            secretName: flyte-common-auth
         {{- if .Values.cluster_resource_manager.enabled }}
         - configMap:
             name: clusterresource-template
