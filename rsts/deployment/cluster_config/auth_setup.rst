@@ -272,27 +272,6 @@ Apply Configuration
 
       kubectl rollout restart deployment/flytepropeller -n flyte
 
-#. Add `/oauth2` path routing to Ingress
-
-   .. prompt:: bash
-
-      kubectl edit ingress -n flyte flyte
-
-   Under `spec.rules.http.paths` add the following if not already present
-
-   .. code-block:: yaml
-
-      - path: /oauth2
-        pathType: ImplementationSpecific
-        backend:
-          serviceName: flyteadmin
-          servicePort: 80
-      - path: /oauth2/*
-        pathType: ImplementationSpecific
-        backend:
-          serviceName: flyteadmin
-          servicePort: 80
-
 Continuous Integration - CI
 ---------------------------
 
