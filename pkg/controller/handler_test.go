@@ -10,10 +10,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
+	eventErrors "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	workflowErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -459,6 +461,37 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
 		assert.Equal(t, 0, len(r.Finalizers))
 		assert.True(t, HasCompletedLabel(r))
+	})
+
+	t.Run("failOnExecutionNotFoundError", func(t *testing.T) {
+		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+			Status: v1alpha1.WorkflowStatus{
+				Phase:          v1alpha1.WorkflowPhaseRunning,
+				FailedAttempts: 0,
+			},
+		}))
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			return workflowErrors.Wrapf(workflowErrors.EventRecordingError, "",
+				&eventErrors.EventError{
+					Code:    eventErrors.ExecutionNotFound,
+					Cause:   nil,
+					Message: "The execution that the event belongs to does not exist",
+				}, "failed to transition phase")
+		}
+		assert.NoError(t, p.Handle(ctx, namespace, name))
+
+		r, err := s.Get(ctx, namespace, name)
+		assert.NoError(t, err)
+		assert.Equal(t, v1alpha1.WorkflowPhaseFailing, r.GetExecutionStatus().GetPhase())
+		assert.Equal(t, 0, len(r.Finalizers))
+		assert.False(t, HasCompletedLabel(r))
 	})
 }
 

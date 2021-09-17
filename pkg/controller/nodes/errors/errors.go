@@ -23,9 +23,27 @@ func (n *NodeError) Error() string {
 	return fmt.Sprintf("failed at Node[%s]. %v: %v", n.Node, n.ErrCode, n.Message)
 }
 
+func (n *NodeError) Is(target error) bool {
+	t, ok := target.(*NodeError)
+	if !ok {
+		return false
+	}
+	if n == nil && t == nil {
+		return true
+	}
+	if n == nil || t == nil {
+		return false
+	}
+	return n.ErrCode == t.ErrCode && (n.Message == t.Message || t.Message == "") && (n.Node == t.Node || t.Node == "")
+}
+
 type NodeErrorWithCause struct {
 	NodeError error
 	cause     error
+}
+
+func (n *NodeErrorWithCause) Cause() error {
+	return n.cause
 }
 
 func (n *NodeErrorWithCause) Code() ErrorCode {
@@ -50,7 +68,21 @@ func (n *NodeErrorWithCause) Error() string {
 	return fmt.Sprintf("%v, caused by: %v", nodeError, cause)
 }
 
-func (n *NodeErrorWithCause) Cause() error {
+func (n *NodeErrorWithCause) Is(target error) bool {
+	t, ok := target.(*NodeErrorWithCause)
+	if !ok {
+		return false
+	}
+	if n == nil && t == nil {
+		return true
+	}
+	if n == nil || t == nil {
+		return false
+	}
+	return n.Is(target) && (n.cause == t.cause || t.cause == nil)
+}
+
+func (n *NodeErrorWithCause) Unwrap() error {
 	return n.cause
 }
 
