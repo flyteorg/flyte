@@ -35,7 +35,7 @@ spec:
           image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
           imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
           name: run-migrations
-          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 12 }}
             - mountPath: /etc/datacatalog/config
               name: config-volume
       containers:
@@ -43,22 +43,22 @@ spec:
             - datacatalog
             - --config
             - {{ .Values.datacatalog.configPath }}
-          {{- with .Values.datacatalog.extraArgs }}
-          {{- toYaml . | nindent 8 }}
-          {{- end }}
-          - serve
+            {{- with .Values.datacatalog.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - serve
           image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
           imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
           name: datacatalog
           ports:
             - containerPort: 8088
             - containerPort: 8089
-          resources: {{ toYaml .Values.datacatalog.resources | nindent 10 }}
-          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+          resources: {{ toYaml .Values.datacatalog.resources | nindent 12 }}
+          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 12 }}
             - mountPath: /etc/datacatalog/config
               name: config-volume
       serviceAccountName: {{ template "datacatalog.name" . }}
-      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
           name: shared-data
         - configMap:
