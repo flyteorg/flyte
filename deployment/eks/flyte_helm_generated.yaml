@@ -1557,56 +1557,56 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - migrate
-        - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
-        imagePullPolicy: "IfNotPresent"
-        name: run-migrations
-        volumeMounts:
-        - mountPath: /etc/db
-          name: db-pass
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - migrate
+            - run
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: run-migrations
+          volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       containers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
-        imagePullPolicy: "IfNotPresent"
-        name: datacatalog
-        ports:
-        - containerPort: 8088
-        - containerPort: 8089
-        resources: 
-          limits:
-            cpu: 500m
-            ephemeral-storage: 200Mi
-            memory: 500Mi
-          requests:
-            cpu: 50m
-            ephemeral-storage: 200Mi
-            memory: 200Mi
-        volumeMounts:
-        - mountPath: /etc/db
-          name: db-pass
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - serve
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: datacatalog
+          ports:
+            - containerPort: 8088
+            - containerPort: 8089
+          resources: 
+            limits:
+              cpu: 500m
+              ephemeral-storage: 200Mi
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 200Mi
+              memory: 200Mi
+          volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       serviceAccountName: datacatalog
       volumes:
-      - name: db-pass
-        secret:
-          secretName: db-pass
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: datacatalog-config
-        name: config-volume
+        - name: db-pass
+          secret:
+            secretName: db-pass
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: datacatalog-config
+          name: config-volume
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
