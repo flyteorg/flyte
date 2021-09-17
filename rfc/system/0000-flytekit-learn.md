@@ -672,7 +672,6 @@ from flytekit import task
 from flytekit.types.directory import FlyteDirectory
 
 
-@task
 def my_dataset_task(partition: str) -> FlyteDirectory:
     """Writes a dataset to a directory with the following structure
     
@@ -689,6 +688,7 @@ def my_dataset_task(partition: str) -> FlyteDirectory:
 dataset = Dataset(
     dataset_task=my_dataset_task,
     training_task_inputs={"partition": "train"},
+    validation_task_inputs={"partition": "validation"},
     test_task_inputs={"partition": "test"},
     data_format="directory",
     targets=["y"],
@@ -697,7 +697,8 @@ dataset = Dataset(
 )
 ```
 
-`training_task_inputs` and `test_task_inputs` are applied to the task to create the training and test sets respectively.
+Under the hood, `flytekit-learn` converts `my_dataset_task` into a flyte task, and
+`training_task_inputs` and `test_task_inputs` are applied to the task for creating the training and test sets respectively.
 
 ### User-handled Data Preprocessing and Transforming with `Dataset(..., lazy=True)`
 
