@@ -1699,7 +1699,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-common-auth
+          secretName: flyte-propeller-auth
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
