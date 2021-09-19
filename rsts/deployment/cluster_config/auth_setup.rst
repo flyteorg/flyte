@@ -46,6 +46,23 @@ your IdP.
 Authentication Setup
 ********************
 
+Prerequisites
+=============
+
+The following is required for non-sandbox deployments:
+* A public domain name (e.g. example.foobar.com)
+* Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
+
+   .. note::
+
+      Flyte's Ingress routes traffic to either
+      Flyte Console or Flyte Admin based on the url path
+
+   .. prompt:: bash
+
+      # determine Flyte Ingress IP
+      kubectl get ingress -n flyte flyte
+
 IdP Configuration
 =================
 Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
@@ -136,6 +153,13 @@ Apply Configuration
               # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
             # 3. Replace with the client ID created for Flyte.
             clientId: 0oakkheteNjCMERst5d6
+        authorizedUris:
+          # 4. Update with public domain name (for non-sandbox deployments)
+          # - https://example.foobar.com:443
+          # Or uncomment this line for sandbox deployment
+          # - https://localhost:30081
+          - http://flyteadmin:80
+          - http://flyteadmin.flyte.svc.cluster.local:80
 
    Save and exit your editor.
 
@@ -193,6 +217,7 @@ Apply Configuration
                     # 3. Replace with a new Native Client ID provisioned in the custom authorization server
                     clientId: flytectl
 
+                    # This should not change
                     redirectUri: https://localhost:53593/callback
 
                     # 4. "all" is a required scope and must be configured in the custom authorization server
@@ -263,8 +288,9 @@ If your organization does any automated registration, then you'll need to authen
    .. code-block:: yaml
 
        admin:
-           # Update with the flyteAdmin's endpoint. You must keep the 3 forward-slashes after dns:
-           endpoint: dns:///<flyteAdmin's url>
+           # Update with the Flyte's ingress endpoint (e.g. flyteIngressIP for sandbox or example.foobar.com)
+           # You must keep the 3 forward-slashes after dns:
+           endpoint: dns:///<Flyte ingress url>
 
            # Update auth type to `Pkce` or `ClientSecret`
            authType: Pkce
