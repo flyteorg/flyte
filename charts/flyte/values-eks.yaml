@@ -369,7 +369,6 @@ workflow_scheduler:
 # various events in their workflows
 workflow_notifications:
   enabled: false
-  type: native
   config:
     notifications:
       type: aws

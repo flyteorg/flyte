@@ -363,6 +363,92 @@ data:
       limits:
         maxDownloadMBs: 10
 ---
+# Source: flyte/templates/flytescheduler/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-scheduler-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  admin.yaml: | 
+    admin:
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: postgres
+      port: 5432
+      username: postgres
+  logger.yaml: | 
+    logger:
+      level: 4
+      show-source: true
+  server.yaml: | 
+    auth:
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: http://localhost:53593/callback
+            scopes:
+            - offline
+            - all
+      authorizedUris:
+      - https://localhost:30081
+      - http://flyteadmin:80
+      - http://flyteadmin.flyte.svc.cluster.local:80
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+          scopes:
+          - profile
+          - openid
+    flyteadmin:
+      eventVersion: 1
+      metadataStoragePrefix:
+      - metadata
+      - admin
+      metricsScope: 'flyte:'
+      profilerPort: 10254
+      roleNameKey: iam.amazonaws.com/role
+      testing:
+        host: http://flyteadmin
+    server:
+      grpcPort: 8089
+      httpPort: 8088
+      security:
+        allowCors: true
+        allowedHeaders:
+        - Content-Type
+        - flyte-authorization
+        allowedOrigins:
+        - '*'
+        secure: false
+        useAuth: false
+  storage.yaml: | 
+    storage:
+      type: stow
+      stow:
+        kind: google
+        config:
+          json: ""
+          project_id: <GOOGLE_PROJECT_ID>
+          scopes: https://www.googleapis.com/auth/devstorage.read_write
+      container: "<BUCKET_NAME>"
+      limits:
+        maxDownloadMBs: 10
+---
 # Source: flyte/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -1505,6 +1591,77 @@ spec:
       - configMap:
           name: datacatalog-config
         name: config-volume
+---
+# Source: flyte/templates/flytescheduler/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flytescheduler
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "b82f80234a60e51e11c35cd37594272dd9bbb99bd767ef748b6beea9deee192"
+      labels: 
+        app.kubernetes.io/name: flytescheduler
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      initContainers:
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.28"
+        imagePullPolicy: "IfNotPresent"
+        name: flytescheduler-check
+        volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.28"
+        imagePullPolicy: "IfNotPresent"
+        name: flytescheduler
+        resources: 
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+          
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      serviceAccountName: flyteadmin
+      volumes:
+        
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: flyte-scheduler-config
+          name: config-volume
 ---
 # Source: flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1

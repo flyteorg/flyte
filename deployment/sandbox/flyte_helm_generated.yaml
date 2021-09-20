@@ -3888,7 +3888,7 @@ spec:
         - emptyDir: {}
           name: shared-data
         - configMap:
-            name: flytescheduler-admin-config
+            name: flyte-scheduler-config
           name: config-volume
 ---
 # Source: flyte/templates/minio/deployment.yaml

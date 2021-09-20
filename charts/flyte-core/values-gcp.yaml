@@ -43,3 +43,6 @@ configmap:
         sidecar: sidecar
         container_array: k8s-array
 
+workflow_scheduler:
+  enabled: true
+  type: native

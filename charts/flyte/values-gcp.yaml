@@ -62,3 +62,7 @@ minio:
 
 contour:
   enabled: false
+
+workflow_scheduler:
+  enabled: true
+  type: native
