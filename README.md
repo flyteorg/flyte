@@ -103,7 +103,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 - [Freenome](https://www.freenome.com/)
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
-- [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
+- [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
 - [RunX.dev](https://runx.dev/)
 - [Spotify](https://www.spotify.com/)
 - [Striveworks](https://striveworks.us/)
