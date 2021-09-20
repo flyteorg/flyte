@@ -44,7 +44,8 @@ modules:
       - s3: [ "write" ]
   - type: helm-chart
     repository: https://flyteorg.github.io/flyte
-    chart: flyte-core
+    chart: flyte
+    chart_version: "0.17.3-b2"
     namespace: flyte
     timeout: 600
     create_namespace: true
