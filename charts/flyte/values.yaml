@@ -670,7 +670,7 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type: noop
+        type: redis
         resourceMaxQuota: 10000
         redis:
           hostPath: redis-resource-manager:6379
