@@ -51,6 +51,15 @@ func TestGetTask(t *testing.T) {
 	task := getMockTaskResponseFromDb(version, []byte{1, 2})
 	tasks = append(tasks, task)
 
+	output, err := taskRepo.Get(context.Background(), interfaces.Identifier{
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+		Version: version,
+	})
+	assert.Empty(t, output)
+	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" ")
+
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
@@ -58,7 +67,7 @@ func TestGetTask(t *testing.T) {
 		`SELECT * FROM "tasks"  WHERE "tasks"."deleted_at" IS NULL AND (("tasks"."project" = project) ` +
 			`AND ("tasks"."domain" = domain) AND ("tasks"."name" = name) AND ("tasks"."version" = XYZ)) LIMIT 1`).
 		WithReply(tasks)
-	output, err := taskRepo.Get(context.Background(), interfaces.Identifier{
+	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

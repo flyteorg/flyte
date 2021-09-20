@@ -42,9 +42,6 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 		},
 	}).Take(&task)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.Task{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
 	if tx.RecordNotFound() {
 		return models.Task{}, errors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
 			Project: input.Project,
@@ -52,6 +49,9 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 			Name:    input.Name,
 			Version: input.Version,
 		})
+	}
+	if tx.Error != nil {
+		return models.Task{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return task, nil
 }

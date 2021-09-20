@@ -6,6 +6,9 @@ import (
 	"strconv"
 	"testing"
 
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -288,4 +291,15 @@ func TestValidateProjectAndDomainError(t *testing.T) {
 		"flyte-project-id", "domain")
 	assert.EqualError(t, err,
 		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")
+}
+
+func TestValidateProjectAndDomainNotFound(t *testing.T) {
+	mockRepo := repositoryMocks.NewMockRepository()
+	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
+	}
+	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
+		"flyte-project", "domain")
+	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] are registered, err: [project [flyte-project] not found]")
 }
