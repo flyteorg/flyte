@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.4](http://github.com/lyft/flyteconsole/compare/v0.25.3...v0.25.4) (2021-09-20)
+
+
+### Bug Fixes
+
+* ensure no leading or trailing whitespace on the string input ([#206](http://github.com/lyft/flyteconsole/issues/206)) ([a9a1e9b](http://github.com/lyft/flyteconsole/commit/a9a1e9bc2163360a7942e8feeb4c8a9ff85db707))
+
 ## [0.25.3](http://github.com/lyft/flyteconsole/compare/v0.25.2...v0.25.3) (2021-09-16)
 
 
