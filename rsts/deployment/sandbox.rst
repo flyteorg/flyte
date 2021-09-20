@@ -187,6 +187,6 @@ Flyte configuration on your remote cluster.
 
 #. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows::
 
-    kubectl port-forward svc/envoy 30081:80 -n projectcontour
+    kubectl port-forward --address 0.0.0.0 svc/envoy 30081:80 -n projectcontour
 
 #. Open console http://localhost:30081/console.
