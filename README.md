@@ -99,14 +99,15 @@ Here's a quick visual tour of the console.
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
-## ⭐️ Current Deployments
+## ⭐️ Current Deployments & Contributors
 
 - [Freenome](https://www.freenome.com/)
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
 - [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
 - [Spotify](https://www.spotify.com/)
-- [USU Group](https://www.usu.com/)
 - [Striveworks](https://striveworks.us/)
+- [Union.ai](https://union.ai/)
+- [USU Group](https://www.usu.com/)
 
 <html>
 <h2 id="features"> 
