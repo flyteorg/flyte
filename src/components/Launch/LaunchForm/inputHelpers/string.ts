@@ -20,6 +20,12 @@ function validate({ value }: InputValidatorParams) {
     if (typeof value !== 'string') {
         throw new Error('Value is not a string');
     }
+    if (value && value[0] === ' ') {
+        throw new Error('Value should not have a leading space');
+    }
+    if (value && value[value.length - 1] === ' ') {
+        throw new Error('Value should not have a trailing space');
+    }
 }
 
 export const stringHelper: InputHelper = {
