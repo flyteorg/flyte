@@ -56,6 +56,8 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			}
 		case *core.Scalar_Blob:
 			return scalarValue.Blob.Uri, nil
+		case *core.Scalar_Schema:
+			return scalarValue.Schema.Uri, nil
 		case *core.Scalar_Generic:
 			return scalarValue.Generic, nil
 		default:
