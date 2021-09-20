@@ -553,6 +553,38 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.Equal(t, expectedVal, actualVal)
 	})
 
+	t.Run("Schema", func(t *testing.T) {
+		var schemaColumns []*core.SchemaType_SchemaColumn
+		schemaColumns = append(schemaColumns, &core.SchemaType_SchemaColumn{
+			Name: "Price",
+			Type: core.SchemaType_SchemaColumn_FLOAT,
+		})
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Schema{Schema: &core.SchemaType{
+			Columns: schemaColumns,
+		}}}
+
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Schema{
+				Schema: &core.Schema{
+					Uri: "s3://blah/blah/blah",
+					Type: &core.SchemaType{
+						Columns: schemaColumns,
+					},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, "s3://blah/blah/blah")
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedLV, lv)
+
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
 	t.Run("Blob", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{
 			Dimensionality: core.BlobType_SINGLE,
@@ -607,16 +639,6 @@ func TestMakeLiteralForType(t *testing.T) {
 		actualVal, err := ExtractFromLiteral(lv)
 		assert.NoError(t, err)
 		assert.Equal(t, expectedVal, actualVal)
-	})
-
-	t.Run("UnsupportedType", func(t *testing.T) {
-		var literalType = &core.LiteralType{Type: &core.LiteralType_Schema{
-			Schema: &core.SchemaType{}}}
-		var schema interface{}
-		_, err := MakeLiteralForType(literalType, schema)
-		expectedErrorf := fmt.Errorf("unsupported type schema:<> ")
-		assert.Equal(t, expectedErrorf, err)
-
 	})
 
 	t.Run("enumtype-nil", func(t *testing.T) {
