@@ -4,17 +4,13 @@ SQLAlchemy
 
 SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL.
 
-That being said, Flyte provides an easy-to-use interface to utilize SQLAlchemy to connect to various SQL Databases.
+Flyte provides an easy-to-use interface to utilize SQLAlchemy to connect to various SQL Databases. In this example, we use a Postgres DB to understand how SQLAlchemy can be used within Flyte.
 
-In this example, we'll use a Postgres DB to understand how you can use SQLAlchemy with Flyte.
 This task will run with a pre-built container, and thus users needn't build one.
 You can simply implement the task, then register and execute it immediately.
 
-Install the following packages before running this example (works locally only):
-
-* `Postgres <https://www.postgresql.org/download/>`__
-* ``pip install flytekitplugins-sqlalchemy``
-* ``pip install psycopg2``
+.. note::
+    This example works locally only. For remote, you need to input a valid URI.
 """
 
 # %%
@@ -52,7 +48,7 @@ def create_db(
 
 
 # %%
-# We define a ``run_query`` function to create a table and insert data entries into the table.
+# We define a ``run_query`` function to create a table and insert data entries into it.
 def run_query(
     sql_query: str,
     conn: psycopg2.extensions.connection,
@@ -73,7 +69,7 @@ local_pg_server = f"postgresql://localhost/flights"
 
 
 # %%
-# We define a helper function to call the required functions.
+# We define a helper function.
 def pg_server() -> str:
     conn_info = {"database": "flights", "user": "postgres", "password": "postgres"}
 
@@ -131,7 +127,7 @@ sql_task = SQLAlchemyTask(
             and duration <= {{ .inputs.upper_duration_cap }}
         """,
     inputs=kwtypes(lower_duration_cap=int, upper_duration_cap=int),
-    task_config=SQLAlchemyConfig(uri=local_pg_server),
+    task_config=SQLAlchemyConfig(uri="postgresql://localhost/flights"),
 )
 
 
@@ -147,4 +143,5 @@ def my_wf(lower_duration_cap: int, upper_duration_cap: int) -> int:
 if __name__ == "__main__":
     print(f"Starting pg server at {pg_server()}")
     print(f"Running {__file__} main...")
-    print(my_wf(lower_duration_cap=600, upper_duration_cap=800))
+    print(f"Starting Postgres DB at {pg_server()}")
+    print(my_wf(lower_duration_cap=300, upper_duration_cap=800))
