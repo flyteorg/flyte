@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -39,12 +39,14 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project
 		Identifier: projectID,
 	}).Take(&project)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.Project{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
 	if tx.RecordNotFound() {
 		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
 	}
+
+	if tx.Error != nil {
+		return models.Project{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+
 	return project, nil
 }
 

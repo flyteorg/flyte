@@ -48,6 +48,10 @@ func TestGetProject(t *testing.T) {
 	response["description"] = "project_description"
 	response["state"] = admin.Project_ACTIVE
 
+	output, err := projectRepo.Get(context.Background(), "project_id")
+	assert.Empty(t, output)
+	assert.EqualError(t, err, "project [project_id] not found")
+
 	query := GlobalMock.NewMock()
 	query.WithQuery(`SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ` +
 		`(("projects"."identifier" = project_id)) LIMIT 1`).WithReply(
@@ -55,7 +59,7 @@ func TestGetProject(t *testing.T) {
 			response,
 		})
 
-	output, err := projectRepo.Get(context.Background(), "project_id")
+	output, err = projectRepo.Get(context.Background(), "project_id")
 	assert.Nil(t, err)
 	assert.Equal(t, "project_id", output.Identifier)
 	assert.Equal(t, "project_name", output.Name)

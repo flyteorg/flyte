@@ -14,6 +14,14 @@ type CreateProjectModelInput struct {
 
 func CreateProjectModel(project *admin.Project) models.Project {
 	stateInt := int32(project.State)
+	if project.Labels == nil {
+		return models.Project{
+			Identifier:  project.Id,
+			Name:        project.Name,
+			Description: project.Description,
+			State:       &stateInt,
+		}
+	}
 	projectBytes, err := proto.Marshal(project)
 	if err != nil {
 		return models.Project{}

@@ -11,25 +11,30 @@ import (
 )
 
 func TestCreateProjectModel(t *testing.T) {
-
-	projectModel := CreateProjectModel(&admin.Project{
+	labels := admin.Labels{
+		Values: map[string]string{
+			"foo": "#badlabel",
+			"bar": "baz",
+		},
+	}
+	project := admin.Project{
 		Id:          "project_id",
 		Name:        "project_name",
 		Description: "project_description",
+		Labels:      &labels,
 		State:       admin.Project_ACTIVE,
-	})
+	}
+
+	projectBytes, _ := proto.Marshal(&project)
+	projectModel := CreateProjectModel(&project)
 
 	activeState := int32(admin.Project_ACTIVE)
 	assert.Equal(t, models.Project{
 		Identifier:  "project_id",
 		Name:        "project_name",
 		Description: "project_description",
-		Labels: []uint8{
-			0xa, 0xa, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x69, 0x64, 0x12, 0xc, 0x70, 0x72, 0x6f,
-			0x6a, 0x65, 0x63, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x13, 0x70, 0x72, 0x6f, 0x6a, 0x65,
-			0x63, 0x74, 0x5f, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-		},
-		State: &activeState,
+		Labels:      projectBytes,
+		State:       &activeState,
 	}, projectModel)
 }
 
