@@ -108,6 +108,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Striveworks](https://striveworks.us/)
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
+- [RunX.dev](https://runx.dev)
 
 <html>
 <h2 id="features"> 
