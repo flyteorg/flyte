@@ -131,8 +131,8 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
 | db.database.host | string | `"postgres"` |  username: postgres |
-| flyteadmin.additionalVolumeMounts | object | `{}` |  |
-| flyteadmin.additionalVolumes | object | `{}` |  |
+| flyteadmin.additionalVolumeMounts | list | `[]` |  |
+| flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
