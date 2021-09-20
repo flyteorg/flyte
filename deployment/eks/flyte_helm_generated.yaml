@@ -370,21 +370,6 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
-  scheduler.yaml: | 
-    scheduler:
-      eventScheduler:
-        region: '<AWS_REGION>'
-        scheduleNamePrefix: flyte
-        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
-        scheme: aws
-        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
-      workflowExecutor:
-        accountId: '<ACCOUNT_NUMBER>'
-        reconnectAttempts: 10
-        reconnectDelaySeconds: 30
-        region: '<AWS_REGION>'
-        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
-        scheme: aws
 ---
 # Source: flyte/templates/console/configmap.yaml
 apiVersion: v1
@@ -1348,7 +1333,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1e835d36ff62ef26701c9386a8264d96938fd75a0a9ff8dab1251397eea9c89"
+        configChecksum: "dec12d3ac1285f51fd4cc5d079339a26633fc8984313de9cdaef3b0d2f4f8b9"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte

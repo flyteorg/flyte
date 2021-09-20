@@ -68,10 +68,9 @@ flyteadmin:
 #
 
 flytescheduler:
-  enabled: true
   image:
     # -- Docker image for Flyteadmin deployment
-    repository:  ghcr.io/flyteorg/flytescheduler
+    repository: cr.flyte.org/flyteorg/flytescheduler
     # -- Docker image tag
     tag: v0.6.28 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy

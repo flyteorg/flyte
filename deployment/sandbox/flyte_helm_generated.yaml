@@ -491,7 +491,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-scheduler-admin-config
+  name: flyte-scheduler-config
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
@@ -3853,7 +3853,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "ghcr.io/flyteorg/flytescheduler:v0.6.28"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.28"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -3866,7 +3866,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "ghcr.io/flyteorg/flytescheduler:v0.6.28"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.28"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         resources: 

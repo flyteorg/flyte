@@ -215,6 +215,7 @@ configmap:
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
   enabled: true
+  type: native
 
 # --
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of

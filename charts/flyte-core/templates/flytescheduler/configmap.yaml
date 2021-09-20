@@ -1,4 +1,5 @@
-{{- if .Values.flytescheduler.enabled }}
+{{- if .Values.workflow_scheduler.enabled}}
+{{- if eq .Values.workflow_scheduler.type "native" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -51,8 +51,7 @@ flyteadmin:
 # FLYTESCHEDULER
 #
 
-flytescheduler:
-  enabled: false
+flytescheduler: {}
 
 #
 # DATACATALOG
@@ -347,7 +346,7 @@ configmap:
 # -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
-  enabled: true
+  enabled: false
   config:
     scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
@@ -370,6 +369,7 @@ workflow_scheduler:
 # various events in their workflows
 workflow_notifications:
   enabled: false
+  type: native
   config:
     notifications:
       type: aws

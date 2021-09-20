@@ -1,8 +1,9 @@
-{{- if .Values.flytescheduler.enabled }}
+{{- if .Values.workflow_scheduler.enabled}}
+{{- if eq .Values.workflow_scheduler.type "native" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-scheduler-admin-config
+  name: flyte-scheduler-config
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flytescheduler.labels" . | nindent 4 }}
 data:
@@ -22,6 +23,7 @@ data:
 {{- if .Values.workflow_scheduler.enabled }}
 {{- with .Values.workflow_scheduler.config }}
   scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
