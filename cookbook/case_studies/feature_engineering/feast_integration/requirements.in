@@ -1,0 +1,4 @@
+flytekit>=0.23.0b1
+scikit-learn
+numpy
+feast[aws]
