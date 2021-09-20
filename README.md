@@ -104,11 +104,11 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Freenome](https://www.freenome.com/)
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
 - [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
+- [RunX.dev](https://runx.dev)
 - [Spotify](https://www.spotify.com/)
 - [Striveworks](https://striveworks.us/)
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
-- [RunX.dev](https://runx.dev)
 
 <html>
 <h2 id="features"> 
