@@ -1,11 +1,14 @@
 """
 Scheduling Workflows
 --------------------
-
 For background on launch plans, refer to :any:`launch_plans`.
-
-Launch plans can be set to run automatically on a schedule if the Flyte platform is properly configured.
+Launch plans can be set to run automatically on a schedule using the flyte native scheduler.
 For workflows that depend on knowing the kick-off time, Flyte also supports passing in the scheduled time (not the actual time, which may be a few seconds off) as an argument to the workflow. 
+
+.. note::
+
+  Native scheduler doesn't support `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`_.
+
 """
 
 # %%
@@ -32,8 +35,8 @@ def date_formatter_wf(kickoff_time: datetime):
 # Cron Schedules
 # ##############
 #
-# Cron expression strings use the `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`_.
-# These are validated at launch plan registration time.
+# Cron expression strings use the following `syntax <https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format>`_.
+# An incorrect cron schedule expression would lead to failure in triggering the schedule
 from flytekit import CronSchedule, LaunchPlan
 
 # creates a launch plan that runs at 10am UTC every day.
@@ -42,7 +45,8 @@ cron_lp = LaunchPlan.get_or_create(
     workflow=date_formatter_wf,
     schedule=CronSchedule(
         # Note that kickoff_time_input_arg matches the workflow input we defined above: kickoff_time
-        cron_expression="0 10 * * ? *",
+        # But in case you are using the AWS scheme of schedules and not using the native scheduler then switch over the schedule parameter with cron_expression
+        schedule="*/1 * * * *", # Following schedule runs every min 
         kickoff_time_input_arg="kickoff_time",
     ),
 )
@@ -55,7 +59,7 @@ cron_lp = LaunchPlan.get_or_create(
 # ####################
 #     
 # If you prefer to use an interval rather than a cron scheduler to schedule your workflows, you can use the fixed-rate scheduler. 
-# A fixed-rate scheduler runs at the specified interval and is currently supported for Flyte deployments hosted on AWS.
+# A fixed-rate scheduler runs at the specified interval.
 #
 # Here's an example:
 
@@ -143,10 +147,10 @@ fixed_rate_lp = LaunchPlan.get_or_create(
 #       flytectl get launchplan -p flytesnacks -d development``
 
 # %%        
-# Platform Configuration Changes
-# ##############################
+# Platform Configuration Changes For AWS Scheduler
+# ################################################
 # 
-# Scheduling features require additional infrastructure to run, so these will have to be created and configured.
+# Scheduling feature can be run using the flyte native scheduler which comes with flyte but if you intend to use the AWS scheduler then it require additional infrastructure to run, so these will have to be created and configured.The following sections are only required if you use AWS scheme for the scheduler. You can even run the flyte native scheduler on AWS though
 # 
 # Setting up Scheduled Workflows
 # ==============================
@@ -207,7 +211,7 @@ fixed_rate_lp = LaunchPlan.get_or_create(
 #        accountId: "{{ YOUR ACCOUNT ID }}"
 
 # %%            
-# * **scheme**: in this case because AWS is the only cloud back-end supported for executing scheduled workflows, only ``"aws"`` is a valid value. By default, the no-op executor is used.
+# * **scheme**: in this case because AWS is the only cloud back-end supported for executing scheduled workflows, only ``"aws"`` is a valid value. By default, the no-op executor is used and in case of sandbox we use ``"local"`` scheme which uses the flyte native scheduler.
 # * **region**: this specifies which region AWS clients should will use when creating an SQS subscriber client
 # * **scheduleQueueName**: this is the name of the SQS Queue you've allocated to scheduling workflows
 # * **accountId**: Your AWS `account id <https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId>`_

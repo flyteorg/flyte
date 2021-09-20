@@ -50,6 +50,15 @@ Table of Contents
 
    ---
 
+   .. link-button:: auto/core/scheduled_workflows/index
+      :type: ref
+      :text: ⏱ Scheduled Workflows
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   Learn about scheduled workflows.
+
+   ---
+
    .. link-button:: auto/testing/index
       :type: ref
       :text: ⚗️ Testing

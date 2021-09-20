@@ -56,6 +56,7 @@ class CustomSorter(FileNameSortKey):
         "typed_schema.py",
         "custom_objects.py",
         "enums.py",
+        "lp_schedules.py",
         # Testing
         "mocking.py",
         # Containerization
@@ -74,7 +75,6 @@ class CustomSorter(FileNameSortKey):
         # Deployment
         ## Workflow
         "deploying_workflows.py",
-        "lp_schedules.py",
         "customizing_resources.py",
         "lp_notifications.py",
         "fast_registration.py",
@@ -241,6 +241,7 @@ html_logo = "_static/flyte_circle_gradient_1_4x4.png"
 examples_dirs = [
     "../core/flyte_basics",
     "../core/control_flow",
+    "../core/scheduled_workflows",
     "../core/type_system",
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
@@ -270,6 +271,7 @@ examples_dirs = [
 gallery_dirs = [
     "auto/core/flyte_basics",
     "auto/core/control_flow",
+    "auto/core/scheduled_workflows",
     "auto/core/type_system",
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
