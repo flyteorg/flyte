@@ -54,7 +54,7 @@ func TestUpgrade(t *testing.T) {
 	t.Run("Successful upgrade", func(t *testing.T) {
 		message, err := upgrade(githubutil.FlytectlReleaseConfig)
 		assert.Nil(t, err)
-		assert.Equal(t, 39, len(message))
+		assert.Contains(t, message, "Successfully updated to version")
 	})
 }
 
