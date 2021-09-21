@@ -2,6 +2,7 @@ package container
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -196,4 +197,46 @@ func TestContainerTaskExecutor_GetProperties(t *testing.T) {
 	plugin := Plugin{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, plugin.GetProperties())
+}
+
+func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
+	ctx := context.TODO()
+	c := Plugin{}
+	reason := "InvalidImageName"
+	message := "Failed to apply default image tag \"TEST/flyteorg/myapp:latest\": couldn't parse image reference" +
+		" \"TEST/flyteorg/myapp:latest\": invalid reference format: repository name must be lowercase"
+
+	pendingPod := &v1.Pod{
+		Status: v1.PodStatus{
+			Phase: v1.PodPending,
+			Conditions: []v1.PodCondition{
+				{
+					Type:   v1.PodReady,
+					Status: v1.ConditionFalse,
+				},
+			},
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					ContainerID: "ContainerID",
+					Ready:       false,
+					State: v1.ContainerState{
+						Waiting: &v1.ContainerStateWaiting{
+							Reason:  reason,
+							Message: message,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	t.Run("failInvalidImageName", func(t *testing.T) {
+		pendingPod.Status.Phase = v1.PodPending
+		phaseInfo, err := c.GetTaskPhase(ctx, nil, pendingPod)
+		finalReason := fmt.Sprintf("|%s", reason)
+		finalMessage := fmt.Sprintf("|%s", message)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+		assert.Equal(t, &core.ExecutionError{Code: finalReason, Message: finalMessage, Kind: core.ExecutionError_USER}, phaseInfo.Err())
+	})
 }

@@ -613,7 +613,7 @@ func TestDemystifyPending(t *testing.T) {
 		}
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 	})
 
 	t.Run("RegistryUnavailable", func(t *testing.T) {

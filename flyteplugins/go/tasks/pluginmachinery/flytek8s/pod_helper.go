@@ -253,7 +253,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 									&pluginsCore.TaskInfo{OccurredAt: &t},
 								), nil
 
-							case "CreateContainerConfigError":
+							case "CreateContainerConfigError", "InvalidImageName":
 								t := c.LastTransitionTime.Time
 								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
