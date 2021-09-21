@@ -22,11 +22,13 @@ Mount your source code repository inside sandbox
 
  bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
-Run specific version of flyte, Only available after v0.13.0+
+Run specific version of flyte. flytectl sandbox only support flyte version available in Github release https://github.com/flyteorg/flyte/tags
 ::
 
  bin/flytectl sandbox start  --version=v0.14.0
 
+Note: Flytectl sandbox will only work for v0.10.0+
+	
 Usage
 	
 
@@ -40,8 +42,8 @@ Options
 ::
 
   -h, --help             help for start
-      --source string     Path of your source code
-      --version string   Version of flyte
+      --source string    Path of your source code
+      --version string   Version of flyte. Only support v0.10.0+ flyte release
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

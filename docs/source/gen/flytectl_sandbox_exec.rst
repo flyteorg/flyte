@@ -26,9 +26,7 @@ Options
 
 ::
 
-  -h, --help             help for exec
-      --source string     Path of your source code
-      --version string   Version of flyte
+  -h, --help   help for exec
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
