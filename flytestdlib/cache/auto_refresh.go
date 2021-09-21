@@ -40,6 +40,10 @@ type AutoRefresh interface {
 
 	// Get object if exists else create it.
 	GetOrCreate(id ItemID, item Item) (Item, error)
+
+	// DeleteDelayed queues an item for deletion. It Will get deleted as part of the next Sync cycle. Until the next sync
+	// cycle runs, Get and GetOrCreate will continue to return the Item in its previous state.
+	DeleteDelayed(id ItemID) error
 }
 
 type metrics struct {
@@ -113,6 +117,7 @@ type autoRefresh struct {
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
 	lruMap          *lru.Cache
+	toDelete        *syncSet
 	syncPeriod      time.Duration
 	workqueue       workqueue.RateLimitingInterface
 	parallelizm     int
@@ -190,6 +195,13 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	return item, nil
 }
 
+// DeleteDelayed queues an item for deletion. It Will get deleted as part of the next Sync cycle. Until the next sync
+// cycle runs, Get and GetOrCreate will continue to return the Item in its previous state.
+func (w *autoRefresh) DeleteDelayed(id ItemID) error {
+	w.toDelete.Insert(id)
+	return nil
+}
+
 // This function is called internally by its own timer. Roughly, it will,
 //  - List keys
 //  - Create batches of keys based on createBatchesCb
@@ -202,7 +214,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	for _, k := range keys {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
-		if value, ok := w.lruMap.Peek(k); ok {
+		if value, ok := w.lruMap.Peek(k); ok && !w.toDelete.Contains(k) {
 			snapshot = append(snapshot, itemWrapper{
 				id:   k.(ItemID),
 				item: value.(Item),
@@ -282,6 +294,12 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				}
 			}
 
+			w.toDelete.Range(func(key interface{}) bool {
+				w.lruMap.Remove(key)
+				w.toDelete.Remove(key)
+				return true
+			})
+
 			t.Stop()
 		}
 	}
@@ -304,6 +322,7 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
+		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),
 	}
