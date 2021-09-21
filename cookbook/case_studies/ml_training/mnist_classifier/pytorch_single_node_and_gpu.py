@@ -10,7 +10,9 @@ Currently, Flyte does not provide any specific task type for PyTorch (though it 
 that supports *PyTorch-Ignite* or *PyTorch Lightening* support, but this is not critical). One can request for a GPU, simply
 by setting GPU="1" resource request and then at runtime, the GPU will be provisioned.
 
-In this example, we'll see how we can create any PyTorch model, train it using Flyte and a specialized container. 
+In this example, we'll see how we can create any PyTorch model, train it using Flyte and a specialized container. The following video will outline the basics of this process.
+
+..  youtube:: sJrERMVtxL4
 """
 
 # %%
