@@ -16,6 +16,10 @@ For training on a single node and gpu see
 :ref:`this tutorial <sphx_glr_auto_case_studies_ml_training_mnist_classifier_pytorch_single_node.py>`, and for more
 information on distributed training, check out the
 `pytorch documentation <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`__.
+
+The following video has further explanation:
+
+..  youtube:: nTMFb7TmArI
 """
 
 # %%
