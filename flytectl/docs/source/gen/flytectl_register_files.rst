@@ -97,7 +97,8 @@ Options
       --continueOnError               continue on error when registering files.
       --dryRun                        execute command without making any modifications.
   -h, --help                          help for files
-      --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
+      --k8ServiceAccount string        deprecated. Please use --K8sServiceAccount
+      --k8sServiceAccount string       custom kubernetes service account auth role to register launch plans with.
       --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
       --sourceUploadPath string        Location for source code in storage.
       --version string                version of the entity to be registered with flyte. (default "v1")
