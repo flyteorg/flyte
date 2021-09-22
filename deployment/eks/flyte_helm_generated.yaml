@@ -248,14 +248,6 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  admin.yaml: | 
-    admin:
-      endpoint: flyteadmin:81
-      insecure: true
-    event:
-      capacity: 1000
-      rate: 500
-      type: admin
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -443,6 +435,8 @@ metadata:
 data:
   admin.yaml: | 
     admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
     event:
@@ -1333,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "dec12d3ac1285f51fd4cc5d079339a26633fc8984313de9cdaef3b0d2f4f8b9"
+        configChecksum: "f69f77a814f4fa2371ee9d84500b74ec85a8001cd0db86005a2368a13f87dca"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1641,7 +1635,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c4e609e9c12a562aa214413a77bc6b9d13c4dce45d375f3e95a68e4d81998b8"
+        configChecksum: "08ecba3dfce27eb9ba518185f130dd04e1133f60fa432e53e7ec2ddf9abc8de"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1713,7 +1707,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.3
       annotations:
-        configChecksum: "c4e609e9c12a562aa214413a77bc6b9d13c4dce45d375f3e95a68e4d81998b8"
+        configChecksum: "08ecba3dfce27eb9ba518185f130dd04e1133f60fa432e53e7ec2ddf9abc8de"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

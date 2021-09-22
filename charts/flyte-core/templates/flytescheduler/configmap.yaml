@@ -16,14 +16,5 @@ data:
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-{{- with .Values.configmap.adminServer }}
-  server.yaml: | {{ toYaml . | nindent 4 }}
-{{- end }}
-  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
-{{- if .Values.workflow_scheduler.enabled }}
-{{- with .Values.workflow_scheduler.config }}
-  scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
-{{- end }}
   {{- end }}
 {{- end }}

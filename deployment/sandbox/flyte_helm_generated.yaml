@@ -305,14 +305,6 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  admin.yaml: | 
-    admin:
-      endpoint: flyteadmin:81
-      insecure: true
-    event:
-      capacity: 1000
-      rate: 500
-      type: admin
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -499,80 +491,26 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  admin.yaml: | 
+admin.yaml: | 
     admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
     event:
       capacity: 1000
       rate: 500
       type: admin
-  db.yaml: | 
+db.yaml: | 
     database:
       dbname: flyteadmin
       host: postgres
       port: 5432
       username: postgres
-  logger.yaml: | 
+logger.yaml: | 
     logger:
       level: 4
       show-source: true
-  server.yaml: | 
-    auth:
-      appAuth:
-        thirdPartyConfig:
-          flyteClient:
-            clientId: flytectl
-            redirectUri: http://localhost:53593/callback
-            scopes:
-            - offline
-            - all
-      authorizedUris:
-      - https://localhost:30081
-      - http://flyteadmin:80
-      - http://flyteadmin.flyte.svc.cluster.local:80
-      userAuth:
-        openId:
-          baseUrl: https://accounts.google.com
-          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-          scopes:
-          - profile
-          - openid
-    flyteadmin:
-      eventVersion: 1
-      metadataStoragePrefix:
-      - metadata
-      - admin
-      metricsScope: 'flyte:'
-      profilerPort: 10254
-      roleNameKey: iam.amazonaws.com/role
-      testing:
-        host: http://flyteadmin
-    server:
-      grpcPort: 8089
-      httpPort: 8088
-      security:
-        allowCors: true
-        allowedHeaders:
-        - Content-Type
-        - flyte-authorization
-        allowedOrigins:
-        - '*'
-        secure: false
-        useAuth: false
-  storage.yaml: | 
-    storage:
-      type: minio
-      container: "my-s3-bucket"
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-      limits:
-        maxDownloadMBs: 10
 ---
 # Source: flyte/templates/propeller/configmap.yaml
 apiVersion: v1
@@ -588,6 +526,8 @@ metadata:
 data:
   admin.yaml: | 
     admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
     event:
@@ -3551,7 +3491,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "30e00d6d1329b0ade7f3a28f493fae3c0a7b2eb17c766ce3df63ef9251c2671"
+        configChecksum: "5586369315bb36bb445d651321bb90a11e8d8635e44dde1432295c1ed18b71a"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3840,7 +3780,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "30e00d6d1329b0ade7f3a28f493fae3c0a7b2eb17c766ce3df63ef9251c2671"
+        configChecksum: "5586369315bb36bb445d651321bb90a11e8d8635e44dde1432295c1ed18b71a"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4025,7 +3965,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6954b6a774b1acb404098efd3dc39c22478aef7e8c6417c95b4d4459e0d6630"
+        configChecksum: "23649f70ef6d41dc508d570df33d78103effffb3d876ea7fc84bcef4693bfd3"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -4090,7 +4030,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.3
       annotations:
-        configChecksum: "6954b6a774b1acb404098efd3dc39c22478aef7e8c6417c95b4d4459e0d6630"
+        configChecksum: "23649f70ef6d41dc508d570df33d78103effffb3d876ea7fc84bcef4693bfd3"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
