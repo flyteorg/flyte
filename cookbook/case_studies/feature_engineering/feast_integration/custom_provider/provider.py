@@ -1,15 +1,18 @@
+"""
+Feast Custom Provider
+---------------------
+
+Custom provider helps in handling remote Feast manifests within Flyte. It helps Flyte tasks communicate seamlessly.
+"""
+
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Callable, List, Union
 
 import pandas
-from feast.entity import Entity
-from feast.feature_table import FeatureTable
 from feast.feature_view import FeatureView
 from feast.infra.local import LocalProvider
 from feast.infra.offline_stores.file_source import FileSource
 from feast.infra.offline_stores.offline_store import RetrievalJob
-from feast.protos.feast.types.EntityKey_pb2 import EntityKey as EntityKeyProto
-from feast.protos.feast.types.Value_pb2 import Value as ValueProto
 from feast.registry import Registry
 from feast.repo_config import RepoConfig
 from flytekit.core.context_manager import FlyteContext
@@ -72,6 +75,7 @@ class FlyteCustomProvider(LocalProvider):
         """
         if not isinstance(feature_view.batch_source, FileSource):
             return
+
         # Copy parquet file to a local file
         file_source: FileSource = feature_view.batch_source
         random_local_path = FlyteContext.current_context().file_access.get_random_local_path(file_source.path)

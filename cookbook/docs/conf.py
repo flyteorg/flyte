@@ -130,12 +130,15 @@ class CustomSorter(FileNameSortKey):
         "diabetes.py",
         "house_price_predictor.py",
         "multiregion_house_price_predictor.py",
-        "datacleaning_tasks.py",
-        "datacleaning_workflow.py",
-        "single_node.py",
+        ## Feature Engineering
+        "pytorch_single_node_and_gpu.py",
+        "pytorch_single_node_multi_gpu.py",
         "notebook.py",
         "notebook_and_task.py",
         "notebook_as_tasks.py",
+        "feature_eng_tasks.py",
+        "feast_dataobjects.py",
+        "feast_workflow.py",
     ]
     """
     Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
@@ -246,8 +249,8 @@ examples_dirs = [
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
     "../case_studies/ml_training/mnist_classifier",
-    "../case_studies/feature_engineering/sqlite_datacleaning",
     "../case_studies/feature_engineering/eda",
+    "../case_studies/feature_engineering/feast_integration",
     "../testing",
     "../core/containerization",
     "../deployment",
@@ -276,8 +279,8 @@ gallery_dirs = [
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
     "auto/case_studies/ml_training/mnist_classifier",
-    "auto/case_studies/feature_engineering/sqlite_datacleaning",
     "auto/case_studies/feature_engineering/eda",
+    "auto/case_studies/feature_engineering/feast_integration",
     "auto/testing",
     "auto/core/containerization",
     "auto/deployment",

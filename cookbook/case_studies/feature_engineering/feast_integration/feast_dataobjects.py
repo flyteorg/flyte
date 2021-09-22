@@ -1,26 +1,26 @@
-from flytekit.configuration import aws
-from datetime import datetime
-import pandas as pd
+"""
+Feature Store Dataclass
+-----------------------
+
+This dataclass provides a unified interface to access Feast methods from within a feature store. 
+"""
+
 import os
-from typing import Type
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+import pandas as pd
 from dataclasses_json import dataclass_json
-from feast import repo_config
-from feast.feature_store import FeatureStore
-from feast.repo_config import RepoConfig
-from flytekit import FlyteContext
-from flytekit.core.type_engine import TypeEngine, TypeTransformer
-from flytekit.models.literals import Literal, Scalar
-from flytekit.models.types import LiteralType, SimpleType
+from feast import FeatureStore as FeastFeatureStore
+from feast.entity import Entity
+from feast.feature_service import FeatureService
+from feast.feature_view import FeatureView
 from feast.infra.offline_stores.file import FileOfflineStoreConfig
 from feast.infra.online_stores.sqlite import SqliteOnlineStoreConfig
-from feast import FeatureStore as FeastFeatureStore
-from google.protobuf.struct_pb2 import Struct
-from google.protobuf.json_format import MessageToDict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-from feast.entity import Entity
-from feast.feature_view import FeatureView
-from feast.feature_service import FeatureService
+from feast.repo_config import RepoConfig
+from flytekit import FlyteContext
+from flytekit.configuration import aws
 
 
 @dataclass_json
@@ -30,7 +30,6 @@ class FeatureStoreConfig:
     project: str
     s3_bucket: str
     online_store_path: str = 'online.db'
-
 
 @dataclass_json
 @dataclass

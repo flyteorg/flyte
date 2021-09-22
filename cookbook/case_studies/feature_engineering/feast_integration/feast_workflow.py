@@ -1,40 +1,49 @@
-import os
+"""
+Flyte Pipeline with Feast
+-------------------------
+
+This workflow makes use of the feature engineering tasks defined in the other file. We'll build an end-to-end Flyte pipeline utilizing "Feast". 
+Here is the step-by-step process:
+
+* Fetch the SQLite3 data as a Pandas DataFrame
+* Perform mean-median-imputation
+* Build a feature store
+* Store the updated features in an offline store
+* Retrieve the features from an offline store
+* Perform univariate-feature-selection
+* Train a Naive Bayes model
+* Load features into an online store
+* Fetch one feature vector for inference
+* Generate prediction
+"""
+
+import logging
+import random
+import typing
+
+# %%
+# Let's import the libraries.
 from datetime import datetime, timedelta
 
-from flytekit.core.context_manager import FlyteContext
-
-import random
 import joblib
-import logging
-import typing
 import pandas as pd
-from feast import (
-    Entity,
-    Feature,
-    FeatureStore,
-    FeatureView,
-    FileSource,
-    RepoConfig,
-    ValueType,
-    online_response,
-    registry,
-)
+from feast import Entity, Feature, FeatureStore, FeatureView, FileSource, ValueType
+from feast_dataobjects import FeatureStore, FeatureStoreConfig
+from feature_eng_tasks import mean_median_imputer, univariate_selection
+from flytekit import task, workflow
 from flytekit.core.node_creation import create_node
-from feast.infra.offline_stores.file import FileOfflineStoreConfig
-from feast.infra.online_stores.sqlite import SqliteOnlineStoreConfig
-from flytekit import reference_task, task, workflow, Workflow
 from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 from flytekit.types.file import JoblibSerializedFile
-from flytekit.types.file.file import FlyteFile
 from flytekit.types.schema import FlyteSchema
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from flytekit.configuration import aws
-from feature_eng_tasks import mean_median_imputer, univariate_selection
-from feast_dataobjects import FeatureStore, FeatureStoreConfig
-
 
 logger = logging.getLogger(__file__)
+
+
+# %%
+# We define the necessary data holders.
+
 # TODO: find a better way to define these features.
 FEAST_FEATURES = [
     "horse_colic_stats:rectal temperature",
@@ -61,7 +70,24 @@ sql_task = SQLite3Task(
     ),
 )
 
-
+# %%
+# We define two tasks, namely ``store_offline`` and ``load_historical_features`` to store and retrieve the historial features.
+#
+# .. list-table:: Decoding the ``Feast`` Jargon
+#    :widths: 25 25
+#
+#    * - ``FeatureStore``
+#      - A FeatureStore object is used to define, create, and retrieve features.
+#    * - ``Entity``
+#      - Represents a collection of entities and associated metadata. It's usually the primary key of your data.
+#    * - ``FeatureView``
+#      - A FeatureView defines a logical grouping of serveable features.
+#    * - ``FileSource``
+#      - File data sources allow for the retrieval of historical feature values from files on disk for building training datasets, as well as for materializing features into an online store.
+#    * - ``apply()``
+#      - Register objects to metadata store and update related infrastructure.
+#    * - ``get_historical_features()``
+#      - Enrich an entity dataframe with historical feature values for either training or batch scoring.
 @task
 def store_offline(feature_store: FeatureStore, dataframe: FlyteSchema):
     horse_colic_entity = Entity(name="Hospital Number", value_type=ValueType.STRING)
@@ -127,7 +153,7 @@ def load_historical_features(feature_store: FeatureStore) -> FlyteSchema:
 
 
 # %%
-# Next, we train the Naive Bayes model using the data that's been fetched from the feature store.
+# Next, we train a naive bayes model using the data from the feature store.
 @task
 def train_model(dataset: pd.DataFrame, data_class: str) -> JoblibSerializedFile:
     X_train, _, y_train, _ = train_test_split(
@@ -143,6 +169,22 @@ def train_model(dataset: pd.DataFrame, data_class: str) -> JoblibSerializedFile:
     joblib.dump(model, fname)
     return fname
 
+# %%
+# To perform inferencing, we define two tasks: ``store_online`` and ``retrieve_online``.
+#
+# .. list-table:: Decoding the ``Feast`` Jargon
+#    :widths: 25 25
+#
+#    * - ``materialize()``
+#      - Materialize data from the offline store into the online store.
+#    * - ``get_online_features()``
+#      - Retrieves the latest online feature data.
+#
+# .. note::
+#   One key difference between an online and offline store is that only the latest feature values are stored per entity key in an 
+#   online store, unlike an offline store where all feature values are stored.
+#   Our dataset has two such entries with the same ``Hospital Number`` but different time stamps. 
+#   Only data point with the latest timestamp will be stored in the online store.
 @task
 def store_online(feature_store: FeatureStore):
     feature_store.materialize(
@@ -162,7 +204,7 @@ def retrieve_online(
 
 
 # %%
-# We define a task to test the model using the inference point fetched earlier.
+# We define a task to test our model using the inference point fetched earlier.
 @task
 def test_model(
     model_ser: JoblibSerializedFile,
@@ -179,7 +221,8 @@ def test_model(
     prediction = model.predict([test_list])
     return prediction
 
-
+# %%
+# Next, we need to convert timestamp column in the underlying dataframe, otherwise its type is written as string.
 @task
 def convert_timestamp_column(
     dataframe: FlyteSchema, timestamp_column: str
@@ -188,12 +231,15 @@ def convert_timestamp_column(
     df[timestamp_column] = pd.to_datetime(df[timestamp_column])
     return df
 
+# %%
+# The ``build_feature_store`` task is a medium to access Feast methods by building a feature store.
 @task
 def build_feature_store(s3_bucket: str, registry_path: str, online_store_path: str) -> FeatureStore:
     feature_store_config = FeatureStoreConfig(project="horsecolic", s3_bucket=s3_bucket, registry_path=registry_path, online_store_path=online_store_path)
     return FeatureStore(config=feature_store_config)
 
-
+# %%
+# Finally, we define a workflow that streamlines the whole pipeline building and feature serving process.
 @workflow
 def feast_workflow(
     imputation_method: str = "mean",
@@ -202,15 +248,19 @@ def feast_workflow(
     registry_path: str = "registry.db",
     online_store_path: str = "online.db",
 ) -> typing.List[str]:
+
     # Load parquet file from sqlite task
     df = sql_task()
+
+    # Perfrom mean median imputation
     dataframe = mean_median_imputer(dataframe=df, imputation_method=imputation_method)
-    # Need to convert timestamp column in the underlying dataframe, otherwise its type is written as
-    # string. There is probably a better way of doing this conversion.
+
+    # Convert timestamp column from string to datetime.
     converted_df = convert_timestamp_column(
         dataframe=dataframe, timestamp_column="timestamp"
     )
 
+    # Build feature store
     feature_store = build_feature_store(s3_bucket=s3_bucket, registry_path=registry_path, online_store_path=online_store_path)
 
     # Ingest data into offline store
@@ -230,16 +280,20 @@ def feast_workflow(
     load_historical_features_node >> store_online_node
     store_online_node >> retrieve_online_node
 
-    # Use a feature retrieved from the online store for inference on a trained model
+    # Perform univariate feature selection
     selected_features = univariate_selection(
         dataframe=load_historical_features_node.o0,
         num_features=num_features_univariate,
         data_class=DATA_CLASS,
     )
+
+    # Train the Naive Bayes model
     trained_model = train_model(
         dataset=selected_features,
         data_class=DATA_CLASS,
     )
+
+    # Use a feature retrieved from the online store for inference
     prediction = test_model(
         model_ser=trained_model,
         inference_point=retrieve_online_node.o0,
@@ -247,6 +301,8 @@ def feast_workflow(
 
     return prediction
 
-
 if __name__ == "__main__":
     print(f"{feast_workflow()}")
+
+# %%
+# You should see prediction against the test input as the workflow output.

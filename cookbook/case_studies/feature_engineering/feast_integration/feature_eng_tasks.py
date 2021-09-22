@@ -1,7 +1,7 @@
 """
 Feature Engineering Tasks
 -------------------------
-We'll define the relevant feature engineering tasks to clean up the SQLite3 data.
+We'll define the relevant feature engineering tasks to clean up the SQLite data.
 """
 
 # %%
@@ -27,7 +27,8 @@ NO_IMPUTATION_COLS = [
 
 
 # %%
-# Next, we define a ``mean_median_imputer`` task to fill in the missing values of the dataset, for which we use `SimpleImputer <https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html>`__ class from the ``scikit-learn`` library.
+# We define a ``mean_median_imputer`` task to fill in the missing values of the dataset, for which we use the 
+# `SimpleImputer <https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html>`__ class from the ``scikit-learn`` library.
 @task
 def mean_median_imputer(
     dataframe: pd.DataFrame,
@@ -52,7 +53,8 @@ def mean_median_imputer(
 
 # %%
 # Let's define the other task called ``univariate_selection`` that does feature selection.
-# The `SelectKBest <https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest>`__ method removes all but the highest scoring features (data frame columns).
+# The `SelectKBest <https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest>`__ method removes all 
+# but the highest scoring features (DataFrame columns).
 @task
 def univariate_selection(
     dataframe: pd.DataFrame, num_features: int, data_class: str
@@ -74,7 +76,3 @@ def univariate_selection(
     column_names.extend([data_class])
     features = fit.transform(X)
     return pd.DataFrame(np.c_[features, y.to_numpy()], columns=column_names)
-
-
-# %%
-# The aforementioned feature engineering tasks are used as ``reference tasks`` while building the Flyte pipeline with Feast.

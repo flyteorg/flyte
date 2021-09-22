@@ -111,9 +111,9 @@
       "exit_message": ""    
   }
  },{ 
-    "name": "case-studies-sqlite-datacleaning",
+    "name": "case-studies-feast-integration",
     "priority": "P2",
-    "path": "case_studies/feature_engineering/sqlite_datacleaning",
+    "path": "case_studies/feature_engineering/feast_integration",
     "exitCondition": {
       "exit_success": true,
       "exit_message": ""    

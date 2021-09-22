@@ -27,8 +27,6 @@ jobs:
             path: integrations/kubernetes
           - name: kfpytorch
             path: integrations/kubernetes
-          - name: sqlite_datacleaning
-            path: case_studies/feature_engineering
           - name: sagemaker_training
             path: integrations/aws
           - name: sagemaker_pytorch

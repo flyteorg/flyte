@@ -24,8 +24,3 @@ feature engineering, model training, and batch predictions.
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Engineer the data features to improve your model accuracy.
-
-    ---
-    :body: d-flex center-card-content
-
-    *More tutorials coming soon...*
