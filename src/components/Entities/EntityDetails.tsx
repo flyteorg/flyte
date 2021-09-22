@@ -118,7 +118,7 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
                     </div>
                 </>
             ) : null}
-            <EntityExecutionsBarChart id={id} />
+            {!versionView && <EntityExecutionsBarChart id={id} />}
             {sections.executions && !versionView ? (
                 <div className={styles.executionsContainer}>
                     <EntityExecutions id={id} />
