@@ -169,14 +169,24 @@ URL of your target FlyteAdmin API instance. These instructions will use
 `https://different.admin.service.com` as an example.
 
 
-#. Export value for `ADMIN_API_URL`
+#. Set `ADMIN_API_URL` and `ADMIN_API_USE_SSL`
    
    .. code:: bash
 
       export ADMIN_API_URL=https://different.admin.service.com
+      export ADMIN_API_USE_SSL="https"
 
-      .. note:: Hint
-         Add this to your local profile (eg, `./profile`) to prevent having to do this step each time
+   .. note:: Hint
+      Add these to your local profile (eg, `./profile`) to prevent having to do this step each time
+
+#. Generate SSL certificate
+
+   Run the following command from your `flyteconsole` directory
+
+   .. code:: bash
+
+      make generate_ssl
+
 
 #. Add new record to hosts file
 
@@ -194,20 +204,6 @@ URL of your target FlyteAdmin API instance. These instructions will use
 
       .. note:: Activate plugin (toggle to "on")
 
-#. Install Chrome plugin: `ModHeader <https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj?hl=en>`_
-
-      .. note:: Configure ModHead by adding record
-      
-         - Header: `Host`
-         - Value: `different.admin.service.com`
-
-#. Set Schemeful Same-Site to disabled
-
-   - Enter `chrome://flags` in url bar
-   - Find 'Schemeful Same-Site' and set to `disabled`
-
-#. Restart Chrome
-
 #. Start `flyteconsole`
 
    .. code:: bash
@@ -219,20 +215,3 @@ URL of your target FlyteAdmin API instance. These instructions will use
 .. note:: Hint
 
    Ensure you don't have `ADMIN_API_URL` or `DISABLE_AUTH` set (eg, in your `/.profile`.)
-
-=================================
-CORS Proxying: Node configuration
-=================================
-
-For any requests which do not share the same ``origin`` value, the client application will route
-requests through a special endpoint on the NodeJS server. This is done to
-minimize the amount of extra configuration required for ingress to the Admin API
-and data storage, as well as to simplify local development of the console without
-the need to grant CORS access to ``localhost``. To proxy requests for local
-development, set ``ADMIN_API_URL`` to
-``http://localhost:3000/cors_proxy/http://<admin-host>:<admin-port>``.
-
-The requests and responses are piped through the NodeJS server with minimal
-overhead. However, it is still recommended to host the Admin API and console on
-the same domain to prevent unnecessary load on the NodeJS server and extra
-latency on API requests due to the additional hop.

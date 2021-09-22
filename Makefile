@@ -38,3 +38,7 @@ clean:
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	yarn run test-coverage
+
+.PHONY: generate_ssl
+generate_ssl:
+	./script/generate_ssl.sh

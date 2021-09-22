@@ -50,3 +50,10 @@ jest
 jest_0
 yarn-error.log
 .coverage/
+
+# Certs
+.srl
+script/rootCA.*
+script/server.crt
+script/server.csr
+script/server.key

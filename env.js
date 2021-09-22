@@ -8,6 +8,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // If this is unset, API calls will default to the same host used to serve this app
 const ADMIN_API_URL = process.env.ADMIN_API_URL;
+// Use this to create SSL server 
+const ADMIN_API_USE_SSL = process.env.ADMIN_API_USE_SSL || 'http';
 
 const BASE_URL = process.env.BASE_URL || '';
 const CORS_PROXY_PREFIX = process.env.CORS_PROXY_PREFIX || '/cors_proxy';
@@ -27,6 +29,7 @@ const DISABLE_AUTH = process.env.DISABLE_AUTH;
 
 module.exports = {
     ADMIN_API_URL,
+    ADMIN_API_USE_SSL,
     BASE_URL,
     CORS_PROXY_PREFIX,
     DISABLE_AUTH,
