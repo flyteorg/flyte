@@ -8,7 +8,7 @@ import (
 
 func ShouldFetchData(config *interfaces.RemoteDataConfig, urlBlob admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
-		urlBlob.Bytes < config.MaxSizeInBytes
+		(len(urlBlob.Url) > 0 && urlBlob.Bytes < config.MaxSizeInBytes)
 }
 
 func ShouldFetchOutputData(config *interfaces.RemoteDataConfig, urlBlob admin.UrlBlob, outputURI string) bool {
