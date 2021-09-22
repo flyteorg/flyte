@@ -487,7 +487,7 @@ data:
           hostKey: mypassword
           hostPath: redis-resource-manager:6379
         resourceMaxQuota: 10000
-        type: noop
+        type: redis
   spark.yaml: | 
     plugins:
       spark:
@@ -1486,52 +1486,52 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - migrate
-        - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
-        imagePullPolicy: "IfNotPresent"
-        name: run-migrations
-        volumeMounts:
-        
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - migrate
+            - run
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: run-migrations
+          volumeMounts:
+            
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       containers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
-        imagePullPolicy: "IfNotPresent"
-        name: datacatalog
-        ports:
-        - containerPort: 8088
-        - containerPort: 8089
-        resources: 
-          limits:
-            cpu: 500m
-            ephemeral-storage: 100Mi
-            memory: 500Mi
-          requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
-        volumeMounts:
-        
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - serve
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: datacatalog
+          ports:
+            - containerPort: 8088
+            - containerPort: 8089
+          resources: 
+            limits:
+              cpu: 500m
+              ephemeral-storage: 100Mi
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              ephemeral-storage: 50Mi
+              memory: 50Mi
+          volumeMounts:
+            
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       serviceAccountName: datacatalog
       volumes:
-      
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: datacatalog-config
-        name: config-volume
+        
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: datacatalog-config
+          name: config-volume
 ---
 # Source: flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
@@ -1624,7 +1624,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "3413b76dbd585dbaafc0f91cc55e2a8e4fa98e65074c0ca510782c961cfa62f"
+        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1689,7 +1689,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.3
       annotations:
-        configChecksum: "3413b76dbd585dbaafc0f91cc55e2a8e4fa98e65074c0ca510782c961cfa62f"
+        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

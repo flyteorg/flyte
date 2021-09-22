@@ -88,8 +88,8 @@ helm install gateway bitnami/contour -n flyte
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
 | configmap.remoteData.remoteData.signedUrls.durationMinutes | int | `3` |  |
-| configmap.resource_manager | object | `{"propeller":{"resourcemanager":{"redis":{"hostKey":"mypassword","hostPath":"redis-resource-manager:6379"},"resourceMaxQuota":10000,"type":"noop"}}}` | Resource manager configuration |
-| configmap.resource_manager.propeller | object | `{"resourcemanager":{"redis":{"hostKey":"mypassword","hostPath":"redis-resource-manager:6379"},"resourceMaxQuota":10000,"type":"noop"}}` | resource manager configuration |
+| configmap.resource_manager | object | `{"propeller":{"resourcemanager":{"type":"noop"}}}` | Resource manager configuration |
+| configmap.resource_manager.propeller | object | `{"resourcemanager":{"type":"noop"}}` | resource manager configuration |
 | configmap.task_logs | object | `{"plugins":{"logs":{"cloudwatch-enabled":false,"kubernetes-enabled":false}}}` | Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider. Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various logging engines |
 | configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `false` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"1Gi","storage":"20Mi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
@@ -118,8 +118,8 @@ helm install gateway bitnami/contour -n flyte
 | db.datacatalog.database.host | string | `"postgres"` |  |
 | db.datacatalog.database.port | int | `5432` |  |
 | db.datacatalog.database.username | string | `"postgres"` |  |
-| flyteadmin.additionalVolumeMounts | object | `{}` |  |
-| flyteadmin.additionalVolumes | object | `{}` |  |
+| flyteadmin.additionalVolumeMounts | list | `[]` |  |
+| flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |

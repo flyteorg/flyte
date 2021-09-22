@@ -8254,7 +8254,7 @@ data:
           start-timeout: "30s"
   core.yaml: |
     propeller:
-      rawoutput-prefix: s3://my-s3-bucket/
+      rawoutput-prefix: gs://my-s3-bucket/
       metadata-prefix: metadata/propeller
       workers: 40
       gc-interval: 12h
@@ -8385,7 +8385,7 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dtk4mh9k2d
+  name: flyte-propeller-config-bc2dd7kh26
   namespace: flyte
 ---
 apiVersion: v1
@@ -8777,7 +8777,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtk4mh9k2d
+          name: flyte-propeller-config-bc2dd7kh26
         name: config-volume
       - name: webhook-certs
         secret:
@@ -9018,7 +9018,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtk4mh9k2d
+          name: flyte-propeller-config-bc2dd7kh26
         name: config-volume
       - name: auth
         secret:

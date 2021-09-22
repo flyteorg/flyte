@@ -1,6 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # The installer.yaml was a direct copy from the v1.1 release of SageMaker operator's installer.yaml (https://raw.githubusercontent.com/aws/amazon-sagemaker-operator-for-k8s/24853d92a8b2c282d62aafac06b8a0df5f138039/release/rolebased/installer.yaml)  
-  # When Kustomizer release the "load file from Https" (https://github.com/kubernetes-sigs/kustomize/pull/2167) feature in the future, we can simply replace this following line with the remote URL of the installer.yaml
-  - installer.yaml
+  - https://raw.githubusercontent.com/aws/amazon-sagemaker-operator-for-k8s/v1.2.1/release/rolebased/installer.yaml

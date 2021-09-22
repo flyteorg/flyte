@@ -1,5 +1,5 @@
 propeller:
-  rawoutput-prefix: s3://my-s3-bucket/
+  rawoutput-prefix: gs://my-s3-bucket/
   metadata-prefix: metadata/propeller
   workers: 40
   gc-interval: 12h

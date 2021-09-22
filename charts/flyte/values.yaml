@@ -60,8 +60,8 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
-  additionalVolumes: {}
-  additionalVolumeMounts: {}
+  additionalVolumes: []
+  additionalVolumeMounts: []
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -719,7 +719,7 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type: noop
+        type: redis
         resourceMaxQuota: 10000
         redis:
           hostPath: redis-resource-manager:6379
