@@ -437,9 +437,12 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		logger.Debugf(ctx, "failed to transform node execution model [%+v] when fetching data: %v", request.Id, err)
 		return nil, err
 	}
-	signedInputsURLBlob, err := m.urlData.Get(ctx, nodeExecution.InputUri)
-	if err != nil {
-		return nil, err
+	signedInputsURLBlob := admin.UrlBlob{}
+	if nodeExecution.InputUri != "" {
+		signedInputsURLBlob, err = m.urlData.Get(ctx, nodeExecution.InputUri)
+		if err != nil {
+			return nil, err
+		}
 	}
 	signedOutputsURLBlob := admin.UrlBlob{}
 	if nodeExecution.Closure.GetOutputUri() != "" {

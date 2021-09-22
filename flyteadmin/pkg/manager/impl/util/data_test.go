@@ -15,6 +15,7 @@ func TestShouldFetchData(t *testing.T) {
 			Scheme:         common.Local,
 			MaxSizeInBytes: 100,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}))
 	})
@@ -23,6 +24,7 @@ func TestShouldFetchData(t *testing.T) {
 			Scheme:         common.None,
 			MaxSizeInBytes: 100,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}))
 	})
@@ -30,6 +32,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.True(t, ShouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme: common.None,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}))
 	})
@@ -38,10 +41,20 @@ func TestShouldFetchData(t *testing.T) {
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}))
 	})
 	t.Run("max size over limit", func(t *testing.T) {
+		assert.False(t, ShouldFetchData(&interfaces.RemoteDataConfig{
+			Scheme:         common.AWS,
+			MaxSizeInBytes: 100,
+		}, admin.UrlBlob{
+			Url:   "s3://data",
+			Bytes: 200,
+		}))
+	})
+	t.Run("empty url config", func(t *testing.T) {
 		assert.False(t, ShouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 100,
@@ -57,6 +70,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 			Scheme:         common.Local,
 			MaxSizeInBytes: 100,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}, "s3://foo/bar.txt"))
 	})
@@ -65,6 +79,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}, "s3://foo/bar.txt"))
 	})
@@ -73,6 +88,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
 		}, admin.UrlBlob{
+			Url:   "s3://data",
 			Bytes: 200,
 		}, ""))
 	})
