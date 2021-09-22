@@ -15,6 +15,7 @@ import { EntityVersions } from './EntityVersions';
 import classNames from 'classnames';
 import { StaticGraphContainer } from 'components/Workflow/StaticGraphContainer';
 import { WorkflowId } from 'models/Workflow/types';
+import { EntityExecutionsBarChart } from './EntityExecutionsBarChart';
 
 const useStyles = makeStyles((theme: Theme) => ({
     metadataContainer: {
@@ -117,6 +118,7 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
                     </div>
                 </>
             ) : null}
+            <EntityExecutionsBarChart id={id} />
             {sections.executions && !versionView ? (
                 <div className={styles.executionsContainer}>
                     <EntityExecutions id={id} />

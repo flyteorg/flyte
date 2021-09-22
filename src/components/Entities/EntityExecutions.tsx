@@ -58,7 +58,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
     return (
         <>
             <Typography className={styles.header} variant="h6">
-                Executions
+                All Executions in the Workflow
             </Typography>
             <div className={styles.filtersContainer}>
                 <ExecutionFilters {...filtersState} />

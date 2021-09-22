@@ -12,3 +12,9 @@ export const labels = {
 export const defaultStateMachineConfig: Partial<InterpreterOptions> = {
     devTools: env.NODE_ENV === 'development'
 };
+
+export const barChartColors = {
+    default: '#e5e5e5',
+    success: '#78dfb1',
+    failure: '#f2a4ad'
+};
