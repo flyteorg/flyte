@@ -491,7 +491,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-admin.yaml: | 
+  admin.yaml: | 
     admin:
       clientId: flytepropeller
       clientSecretLocation: /etc/secrets/client_secret
@@ -501,13 +501,13 @@ admin.yaml: |
       capacity: 1000
       rate: 500
       type: admin
-db.yaml: | 
+  db.yaml: | 
     database:
       dbname: flyteadmin
       host: postgres
       port: 5432
       username: postgres
-logger.yaml: | 
+  logger.yaml: | 
     logger:
       level: 4
       show-source: true
