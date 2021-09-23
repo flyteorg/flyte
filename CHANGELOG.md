@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](http://github.com/lyft/flyteconsole/compare/v0.25.4...v0.26.0) (2021-09-23)
+
+
+### Features
+
+* add min height for all executions list ([#214](http://github.com/lyft/flyteconsole/issues/214)) ([2cd9888](http://github.com/lyft/flyteconsole/commit/2cd9888b3679d5b980d19149b988d1202ffed63a))
+
 ## [0.25.4](http://github.com/lyft/flyteconsole/compare/v0.25.3...v0.25.4) (2021-09-20)
 
 
