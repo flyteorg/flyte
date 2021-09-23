@@ -1,6 +1,6 @@
 database:
   port: 5432
-  username: flyte
+  username: flyte-user
   host: cloudsqlproxy
-  dbname: flyte
+  dbname: flytedb
   passwordPath: /etc/db/pass.txt

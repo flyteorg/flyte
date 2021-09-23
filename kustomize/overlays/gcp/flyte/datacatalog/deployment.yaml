@@ -7,6 +7,15 @@ spec:
   template:
     spec:
       containers:
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.16
+        imagePullPolicy: IfNotPresent
+        # TODO: replace <project-id> with the GCP project ID and <region> with the region where
+        # Cloud SQL runs
+        command: ["/cloud_sql_proxy", "-instances=data-infra-flyte:us-central1:flyte-instance=tcp:0.0.0.0:5432"]
+        ports:
+          - containerPort: 5432
+
       - name: datacatalog
         resources:
           limits:

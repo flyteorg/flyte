@@ -57,4 +57,4 @@ secretGenerator:
 - name: db-pass
   behavior: merge
   literals:
-  - pass.txt="yourpassword"
+  - pass.txt="be1J4IG5EAUkkmI6A6BhUEW22g9PvhAN"

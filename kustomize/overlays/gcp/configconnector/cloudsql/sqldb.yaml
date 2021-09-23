@@ -1,0 +1,25 @@
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLDatabase
+metadata:
+  name: flytedb
+  labels:
+    app.kubernetes.io/name: flytedb
+    app.kubernetes.io/component: postgresql
+spec:
+  charset: utf8mb4
+  collation: utf8mb4_bin
+  instanceRef:
+    name: flyte-instance
+---
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLDatabase
+metadata:
+  name: datacatalog
+  labels:
+    app.kubernetes.io/name: flytedb
+    app.kubernetes.io/component: postgresql
+spec:
+  charset: utf8mb4
+  collation: utf8mb4_bin
+  instanceRef:
+    name: flyte-instance

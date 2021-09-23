@@ -1,7 +1,7 @@
 database:
   port: 5432
-  username: flyte
-  host: cloudsqlproxy
+  username: flyte-user
+  host: localhost
   dbname: datacatalog
   options: "sslmode=disable"
   passwordPath: /etc/db/pass.txt

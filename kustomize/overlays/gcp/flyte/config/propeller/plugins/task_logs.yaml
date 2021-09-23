@@ -6,5 +6,5 @@ plugins:
     # #2 GCP stackdriver
     stackdriver-enabled: true
     # TODO: replace <project-id> with the GCP project ID
-    gcp-project: <project-id>
+    gcp-project: data-infra-flyte
     stackdriver-logresourcename: k8s_container

@@ -1,0 +1,15 @@
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLUser
+metadata:
+  name: flyte-user
+  labels:
+    app.kubernetes.io/name: flytedb
+    app.kubernetes.io/component: postgresql
+spec:
+  instanceRef:
+    name: flyte-instance
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: db-user-pass
+        key: password

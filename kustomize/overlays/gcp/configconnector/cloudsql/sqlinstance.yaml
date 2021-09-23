@@ -1,0 +1,12 @@
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLInstance
+metadata:
+  name: flyte-instance
+  labels:
+    app.kubernetes.io/name: flytedb
+    app.kubernetes.io/component: postgresql
+spec:
+  region: us-central1
+  databaseVersion: POSTGRES_13
+  settings:
+    tier: db-custom-4-13312

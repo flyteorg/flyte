@@ -5,10 +5,10 @@ storage:
     config:
       json: ""
       # TODO: replace <project-id> with the GCP project ID
-      project_id: <project-id>
+      project_id: data-infra-flyte
       scopes: https://www.googleapis.com/auth/devstorage.read_write
   # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-  container: "flyte"
+  container: "data-infra-flyte-test-bucket"
   # NOTE this cache configuration is purely for propeller. But since we are having a common storage
   # config, we are configuring this value. In production create a separate storage config for
   # propeller and increase the cache size
