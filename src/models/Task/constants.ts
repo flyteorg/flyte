@@ -10,7 +10,8 @@ export enum TaskType {
     SIDECAR = 'sidecar',
     SPARK = 'spark',
     UNKNOWN = 'unknown',
-    WAITABLE = 'waitable'
+    WAITABLE = 'waitable',
+    MPI = 'mpi'
 }
 
 export const taskSortFields = {

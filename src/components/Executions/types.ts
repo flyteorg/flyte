@@ -30,7 +30,8 @@ export enum NodeExecutionDisplayType {
     Workflow = 'Sub-Workflow',
     Unknown = 'Unknown',
     UnknownTask = 'Unknown Task',
-    WaitableTask = 'Waitable Task'
+    WaitableTask = 'Waitable Task',
+    MpiTask = 'MPI Task'
 }
 
 export interface CompiledTaskNode extends CompiledNode {

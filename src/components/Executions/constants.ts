@@ -185,7 +185,8 @@ export const taskTypeToNodeExecutionDisplayType: {
     [TaskType.SIDECAR]: NodeExecutionDisplayType.SidecarTask,
     [TaskType.SPARK]: NodeExecutionDisplayType.SparkTask,
     [TaskType.UNKNOWN]: NodeExecutionDisplayType.UnknownTask,
-    [TaskType.WAITABLE]: NodeExecutionDisplayType.WaitableTask
+    [TaskType.WAITABLE]: NodeExecutionDisplayType.WaitableTask,
+    [TaskType.MPI]: NodeExecutionDisplayType.MpiTask
 };
 
 export const cacheStatusMessages: { [k in Core.CatalogCacheStatus]: string } = {

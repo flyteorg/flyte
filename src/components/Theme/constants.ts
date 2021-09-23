@@ -64,7 +64,8 @@ export const taskColors: TaskColorMap = {
     [TaskType.ARRAY]: '#E1E8ED',
     [TaskType.SIDECAR]: '#E1E8ED',
     [TaskType.UNKNOWN]: '#E1E8ED',
-    [TaskType.WAITABLE]: '#E1E8ED'
+    [TaskType.WAITABLE]: '#E1E8ED',
+    [TaskType.MPI]: '#00B3A4'
 };
 
 export const bodyFontSize = '0.875rem';
