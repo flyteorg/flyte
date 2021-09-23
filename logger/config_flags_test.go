@@ -84,7 +84,7 @@ func testDecodeJson_Config(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_Config(val, result))
 }
 
-func testDecodeSlice_Config(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_Config(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_show-source", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("show-source"); err == nil {
-				assert.Equal(t, bool(defaultConfig.IncludeSourceCode), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_mute", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("mute"); err == nil {
-				assert.Equal(t, bool(defaultConfig.Mute), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_level", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("level"); err == nil {
-				assert.Equal(t, int(defaultConfig.Level), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_formatter.type", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("formatter.type"); err == nil {
-				assert.Equal(t, string(defaultConfig.Formatter.Type), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
