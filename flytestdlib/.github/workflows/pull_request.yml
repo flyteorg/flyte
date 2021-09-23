@@ -35,3 +35,17 @@ jobs:
           GO111MODULE: "on"
         with:
           args: make install && make test_benchmark
+  test-generate-integrity:
+    name: Ensure go generate has run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: GoGenerate and Diff
+        uses: cedrickring/golang-action@1.6.0
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make gen-config && git diff --quiet || { echo "run go gonerate ./..."; exit 1; }

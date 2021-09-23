@@ -15,6 +15,38 @@ type AutoRefresh struct {
 	mock.Mock
 }
 
+type AutoRefresh_DeleteDelayed struct {
+	*mock.Call
+}
+
+func (_m AutoRefresh_DeleteDelayed) Return(_a0 error) *AutoRefresh_DeleteDelayed {
+	return &AutoRefresh_DeleteDelayed{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *AutoRefresh) OnDeleteDelayed(id string) *AutoRefresh_DeleteDelayed {
+	c := _m.On("DeleteDelayed", id)
+	return &AutoRefresh_DeleteDelayed{Call: c}
+}
+
+func (_m *AutoRefresh) OnDeleteDelayedMatch(matchers ...interface{}) *AutoRefresh_DeleteDelayed {
+	c := _m.On("DeleteDelayed", matchers...)
+	return &AutoRefresh_DeleteDelayed{Call: c}
+}
+
+// DeleteDelayed provides a mock function with given fields: id
+func (_m *AutoRefresh) DeleteDelayed(id string) error {
+	ret := _m.Called(id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type AutoRefresh_Get struct {
 	*mock.Call
 }
