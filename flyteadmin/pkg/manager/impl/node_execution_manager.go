@@ -438,7 +438,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 	signedInputsURLBlob := admin.UrlBlob{}
-	if nodeExecution.InputUri != "" {
+	if len(nodeExecution.InputUri) != 0 {
 		signedInputsURLBlob, err = m.urlData.Get(ctx, nodeExecution.InputUri)
 		if err != nil {
 			return nil, err

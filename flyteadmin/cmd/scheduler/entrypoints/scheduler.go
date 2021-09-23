@@ -8,11 +8,12 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	repositoryCommonConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	scheduler "github.com/flyteorg/flyteadmin/scheduler"
+	"github.com/flyteorg/flyteadmin/scheduler"
 	schdulerRepoConfig "github.com/flyteorg/flyteadmin/scheduler/repositories"
 	"github.com/flyteorg/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
@@ -27,6 +28,7 @@ var schedulerRunCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
+		schedulerConfiguration := configuration.ApplicationConfiguration().GetSchedulerConfig()
 
 		// Define the schedulerScope for prometheus metrics
 		schedulerScope := promutils.NewScope(applicationConfiguration.MetricsScope).NewSubScope("flytescheduler")
@@ -54,7 +56,16 @@ var schedulerRunCmd = &cobra.Command{
 		scheduleExecutor := scheduler.NewScheduledExecutor(db,
 			configuration.ApplicationConfiguration().GetSchedulerConfig().GetWorkflowExecutorConfig(), schedulerScope, adminServiceClient)
 
-		logger.Info(context.Background(), "Successfully initialized a native flyte scheduler")
+		logger.Info(ctx, "Successfully initialized a native flyte scheduler")
+
+		// Serve profiling endpoints.
+		go func() {
+			err := profutils.StartProfilingServerWithDefaultHandlers(
+				ctx, schedulerConfiguration.ProfilerPort.Port, nil)
+			if err != nil {
+				logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
+			}
+		}()
 
 		err = scheduleExecutor.Run(ctx)
 		if err != nil {
