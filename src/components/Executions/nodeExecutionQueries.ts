@@ -1,16 +1,21 @@
 import { QueryInput, QueryType } from 'components/data/types';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { isEqual } from 'lodash';
-import { RequestConfig } from 'models/AdminEntity/types';
+import {
+    PaginatedEntityResponse,
+    RequestConfig
+} from 'models/AdminEntity/types';
 import {
     getNodeExecution,
     listNodeExecutions,
-    listTaskExecutionChildren
+    listTaskExecutionChildren,
+    listTaskExecutions
 } from 'models/Execution/api';
 import { nodeExecutionQueryParams } from 'models/Execution/constants';
 import {
     NodeExecution,
     NodeExecutionIdentifier,
+    TaskExecution,
     TaskExecutionIdentifier,
     WorkflowExecutionIdentifier
 } from 'models/Execution/types';
@@ -42,6 +47,15 @@ export function makeNodeExecutionQuery(
     return {
         queryKey: [QueryType.NodeExecution, id],
         queryFn: () => getNodeExecution(id)
+    };
+}
+
+export function makeListTaskExecutionsQuery(
+    id: NodeExecutionIdentifier
+): QueryInput<PaginatedEntityResponse<TaskExecution>> {
+    return {
+        queryKey: [QueryType.TaskExecutionList, id],
+        queryFn: () => listTaskExecutions(id)
     };
 }
 
