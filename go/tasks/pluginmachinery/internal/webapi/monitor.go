@@ -16,8 +16,8 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 		State: *state,
 	}
 
-	item, err := cache.GetOrCreate(
-		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), newCacheItem)
+	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	item, err := cache.GetOrCreate(cacheItemID, newCacheItem)
 	if err != nil {
 		return nil, core.PhaseInfo{}, err
 	}
@@ -49,6 +49,15 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 	}
 
 	cacheItem.Phase = newPluginPhase
+
+	if newPluginPhase.IsTerminal() {
+		// Queue item for deletion in the cache.
+		err = cache.DeleteDelayed(cacheItemID)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to queue item for deletion in the cache with Item Id: [%v]. Error: %v",
+				cacheItemID, err)
+		}
+	}
 
 	// If there were updates made to the state, we'll have picked them up automatically. Nothing more to do.
 	return &cacheItem.State, newPhase, nil
