@@ -17,7 +17,9 @@ Here is the step-by-step process:
 * Generate prediction
 """
 
+import boto3
 import logging
+import os
 import random
 import typing
 
@@ -31,6 +33,7 @@ from feast import Entity, Feature, FeatureStore, FeatureView, FileSource, ValueT
 from feast_dataobjects import FeatureStore, FeatureStoreConfig
 from feature_eng_tasks import mean_median_imputer, univariate_selection
 from flytekit import task, workflow
+from flytekit.configuration import aws
 from flytekit.core.node_creation import create_node
 from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 from flytekit.types.file import JoblibSerializedFile
@@ -58,6 +61,23 @@ FEAST_FEATURES = [
 ]
 DATABASE_URI = "https://cdn.discordapp.com/attachments/545481172399030272/861575373783040030/horse_colic.db.zip"
 DATA_CLASS = "surgical lesion"
+
+
+@task
+def create_bucket(bucket_name: str):
+    client = boto3.client(
+        's3',
+        aws_access_key_id=aws.S3_ACCESS_KEY_ID.get(),
+        aws_secret_access_key=aws.S3_SECRET_ACCESS_KEY.get(),
+        use_ssl=False,
+        endpoint_url=aws.S3_ENDPOINT.get(),
+    )
+
+    try:
+        client.create_bucket(Bucket=bucket_name)
+    except client.exceptions.BucketAlreadyOwnedByYou:
+        logger.info(f"Bucket {bucket_name} has already been created by you.")
+        pass
 
 
 sql_task = SQLite3Task(
@@ -248,6 +268,8 @@ def feast_workflow(
     registry_path: str = "registry.db",
     online_store_path: str = "online.db",
 ) -> typing.List[str]:
+    # Create bucket if it does not already exist
+    create_bucket(bucket_name=s3_bucket)
 
     # Load parquet file from sqlite task
     df = sql_task()
