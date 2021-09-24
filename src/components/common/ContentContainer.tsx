@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => {
         root: {
             display: 'flex',
             flexDirection: 'column',
-            height: '100vh',
+            minHeight: '100vh',
             padding: `${spacerHeight} ${contentMargin} 0 ${contentMargin}`,
             [`&.${ContainerClasses.NoMargin}`]: {
                 margin: 0,

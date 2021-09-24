@@ -130,12 +130,22 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
      *  - Append that to the rf nodes {data} object.
      */
 
+    /**
+     * React Flow's min height to make it render
+     */
+    const reactFlowStyle: React.CSSProperties = {
+        display: 'flex',
+        flex: `1 1 100%`,
+        flexDirection: 'column'
+    };
+
     return (
         <ReactFlowProvider>
             <ReactFlow
                 elements={elements}
                 onLoad={onLoad}
                 nodeTypes={CustomNodeTypes}
+                style={reactFlowStyle}
             >
                 <Background
                     style={backgroundStyle.background}

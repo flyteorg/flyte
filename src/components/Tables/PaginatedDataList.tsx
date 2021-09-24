@@ -36,6 +36,7 @@ interface PaginatedDataListProps<T> {
     data: T[];
     rowRenderer: (row: T) => void;
     noDataString: string;
+    fillEmptyRows?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -164,6 +165,7 @@ const PaginatedDataList = <T,>({
     rowRenderer,
     totalRows,
     showRadioButton,
+    fillEmptyRows = true,
     noDataString
 }: PropsWithChildren<PaginatedDataListProps<T>>) => {
     const classes = useStyles();
@@ -211,13 +213,17 @@ const PaginatedDataList = <T,>({
                             {data.map((row, index) => {
                                 return rowRenderer(row);
                             })}
-                            {!showRadioButton && emptyRows > 0 && (
-                                <TableRow
-                                    style={{ height: `${4 * emptyRows}rem` }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
+                            {fillEmptyRows &&
+                                !showRadioButton &&
+                                emptyRows > 0 && (
+                                    <TableRow
+                                        style={{
+                                            height: `${4 * emptyRows}rem`
+                                        }}
+                                    >
+                                        <TableCell colSpan={6} />
+                                    </TableRow>
+                                )}
                         </TableBody>
                     </Table>
                 </TableContainer>

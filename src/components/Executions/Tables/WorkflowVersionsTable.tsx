@@ -60,6 +60,7 @@ export const WorkflowVersionsTable: React.FC<WorkflowVersionsTableProps> = props
             versionView={versionView}
             onClick={versionView ? handleClickRow(row.id) : undefined}
             isChecked={workflowVersion === row.id.version}
+            key={`workflow-version-row-${row.id.version}`}
         />
     );
 
@@ -77,6 +78,7 @@ export const WorkflowVersionsTable: React.FC<WorkflowVersionsTableProps> = props
                 totalRows={workflows.length}
                 showRadioButton={versionView}
                 noDataString={noWorkflowVersionsFoundString}
+                fillEmptyRows={false}
             />
         </div>
     );

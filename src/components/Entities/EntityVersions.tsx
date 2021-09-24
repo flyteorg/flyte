@@ -1,6 +1,5 @@
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { WorkflowVersionsTable } from 'components/Executions/Tables/WorkflowVersionsTable';
@@ -20,8 +19,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     headerContainer: {
         display: 'flex',
         justifyContent: 'space-between',
-        marginLeft: theme.spacing(contentMarginGridUnits),
-        marginRight: theme.spacing(contentMarginGridUnits)
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1)
     },
     header: {
         marginBottom: theme.spacing(1)

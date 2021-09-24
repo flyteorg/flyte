@@ -33,12 +33,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         flex: '1 1 auto',
         flexDirection: 'column',
         margin: `0 -${theme.spacing(contentMarginGridUnits)}px`,
-        minHeight: theme.spacing(55)
+        flexBasis: theme.spacing(80)
     },
     versionsContainer: {
         display: 'flex',
-        flexDirection: 'column',
-        height: theme.spacing(53)
+        flexDirection: 'column'
     },
     versionView: {
         flex: '1 1 auto'

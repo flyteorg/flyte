@@ -25,11 +25,20 @@ const ReactFlowGraphComponent = props => {
         rfGraphJson: rfGraphJson,
         type: RFGraphTypes.main
     };
+
+    const containerStyle: React.CSSProperties = {
+        display: 'flex',
+        flex: `1 1 100%`,
+        flexDirection: 'column',
+        minHeight: '100px',
+        minWidth: '200px'
+    };
+
     return (
-        <>
+        <div style={containerStyle}>
             <Legend />
             <ReactFlowWrapper {...ReactFlowProps} />
-        </>
+        </div>
     );
 };
 
