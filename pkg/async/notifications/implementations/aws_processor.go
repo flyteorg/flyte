@@ -2,34 +2,18 @@ package implementations
 
 import (
 	"context"
-	"time"
-
-	"github.com/flyteorg/flyteadmin/pkg/async"
-
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-
 	"encoding/base64"
 	"encoding/json"
+	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/prometheus/client_golang/prometheus"
 )
-
-type processorSystemMetrics struct {
-	Scope                 promutils.Scope
-	MessageTotal          prometheus.Counter
-	MessageDoneError      prometheus.Counter
-	MessageDecodingError  prometheus.Counter
-	MessageDataError      prometheus.Counter
-	MessageProcessorError prometheus.Counter
-	MessageSuccess        prometheus.Counter
-	ChannelClosedError    prometheus.Counter
-	StopError             prometheus.Counter
-}
 
 // TODO: Add a counter that encompasses the publisher stats grouped by project and domain.
 type Processor struct {
@@ -54,11 +38,10 @@ func (p *Processor) run() error {
 	var emailMessage admin.EmailMessage
 	var err error
 	for msg := range p.sub.Start() {
-
 		p.systemMetrics.MessageTotal.Inc()
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
-		var stringMsg = string(msg.Message())
-		// Amazon doesn't provide a struct that can be used to unmarshall into. A generic JSON struct is used in its place.
+		stringMsg := string(msg.Message())
+
 		var snsJSONFormat map[string]interface{}
 
 		// At Lyft, SNS populates SQS. This results in the message body of SQS having the SNS message format.
@@ -144,23 +127,6 @@ func (p *Processor) StopProcessing() error {
 		logger.Errorf(context.Background(), "Failed to stop the subscriber channel gracefully with err: %v", err)
 	}
 	return err
-}
-
-func newProcessorSystemMetrics(scope promutils.Scope) processorSystemMetrics {
-	return processorSystemMetrics{
-		Scope:                scope,
-		MessageTotal:         scope.MustNewCounter("message_total", "overall count of messages processed"),
-		MessageDecodingError: scope.MustNewCounter("message_decoding_error", "count of messages with decoding errors"),
-		MessageDataError:     scope.MustNewCounter("message_data_error", "count of message data processing errors experience when preparing the message to be notified."),
-		MessageDoneError: scope.MustNewCounter("message_done_error",
-			"count of message errors when marking it as done with underlying processor"),
-		MessageProcessorError: scope.MustNewCounter("message_processing_error",
-			"count of errors when interacting with notification processor"),
-		MessageSuccess: scope.MustNewCounter("message_ok",
-			"count of messages successfully processed by underlying notification mechanism"),
-		ChannelClosedError: scope.MustNewCounter("channel_closed_error", "count of channel closing errors"),
-		StopError:          scope.MustNewCounter("stop_error", "count of errors in Stop() method"),
-	}
 }
 
 func NewProcessor(sub pubsub.Subscriber, emailer interfaces.Emailer, scope promutils.Scope) interfaces.Processor {
