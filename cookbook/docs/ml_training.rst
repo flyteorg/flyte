@@ -30,6 +30,15 @@ ML Training
     ^^^^^^^^^^^^
     Train a neural network on MNIST with PyTorch and W&B
 
+    ---
+
+    .. link-button:: auto/case_studies/ml_training/spark_horovod/index
+       :type: ref
+       :text: Distributed training using Horovod
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Distributed training using Horovod on Spark using the Rossman stores price estimator
+
 
 .. toctree::
     :maxdepth: -1
@@ -39,6 +48,7 @@ ML Training
     auto/case_studies/ml_training/pima_diabetes/index
     auto/case_studies/ml_training/house_price_prediction/index
     auto/case_studies/ml_training/mnist_classifier/index
+    auto/case_studies/ml_training/spark_horovod/index
 
 
 .. TODO: write tutorials for data parallel training, distributed training, and single node training

@@ -1,3 +1,8 @@
+"""
+Distributed training using Horovod on Spark
+-------------------------------------------
+"""
+
 import datetime
 import os
 import pathlib

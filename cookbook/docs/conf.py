@@ -130,6 +130,7 @@ class CustomSorter(FileNameSortKey):
         "diabetes.py",
         "house_price_predictor.py",
         "multiregion_house_price_predictor.py",
+        "keras_spark_rossmann_estimator.py",
         ## Feature Engineering
         "pytorch_single_node_and_gpu.py",
         "pytorch_single_node_multi_gpu.py",
@@ -176,7 +177,6 @@ extensions = [
     "sphinx_copybutton",
     "sphinxext.remoteliteralinclude",
     "sphinx_panels",
-    "sphinx_tabs.tabs",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.yt",
 ]
@@ -249,6 +249,7 @@ examples_dirs = [
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
     "../case_studies/ml_training/mnist_classifier",
+    "../case_studies/ml_training/spark_horovod",
     "../case_studies/feature_engineering/eda",
     "../case_studies/feature_engineering/feast_integration",
     "../testing",
@@ -279,6 +280,7 @@ gallery_dirs = [
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
     "auto/case_studies/ml_training/mnist_classifier",
+    "auto/case_studies/ml_training/spark_horovod",
     "auto/case_studies/feature_engineering/eda",
     "auto/case_studies/feature_engineering/feast_integration",
     "auto/testing",
@@ -441,7 +443,7 @@ intersphinx_mapping = {
 }
 
 # Sphinx-tabs config
-sphinx_tabs_valid_builders = ["linkcheck"]
+# sphinx_tabs_valid_builders = ["linkcheck"]
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
