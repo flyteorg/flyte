@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.1](http://github.com/lyft/flyteconsole/compare/v0.27.0...v0.27.1) (2021-09-24)
+
+
+### Bug Fixes
+
+* tooltip scrolling and bar chart ordering issue ([#218](http://github.com/lyft/flyteconsole/issues/218)) ([900312d](http://github.com/lyft/flyteconsole/commit/900312df7c5dd4a3fb509808bdd96c3c322a98d2))
+
 # [0.27.0](http://github.com/lyft/flyteconsole/compare/v0.26.0...v0.27.0) (2021-09-24)
 
 
