@@ -87,7 +87,9 @@ const BarChartItem: React.FC<BarChartItemProps> = ({
                 <Tooltip
                     title={tooltip}
                     TransitionComponent={Zoom}
-                    onMouseMove={e => setPosition({ x: e.pageX, y: e.pageY })}
+                    onMouseMove={e =>
+                        setPosition({ x: e.pageX, y: e.pageY - window.scrollY })
+                    }
                     PopperProps={{
                         anchorEl: {
                             clientHeight: 0,

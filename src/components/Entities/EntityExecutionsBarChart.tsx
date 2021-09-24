@@ -35,7 +35,7 @@ export interface EntityExecutionsBarChartProps {
 }
 
 const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
-    const newExecutions = exectuions.map(execution => {
+    const newExecutions = exectuions.reverse().map(execution => {
         const duration = getWorkflowExecutionTimingMS(execution)?.duration || 1;
         return {
             value: duration,
@@ -71,10 +71,14 @@ const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
 };
 
 const getStartExecutionTime = (executions: Execution[]) => {
-    if (executions.length === 0 || !executions[0].closure.startedAt) {
+    if (executions.length === 0) {
         return '';
     }
-    return formatDateUTC(timestampToDate(executions[0].closure.startedAt));
+    const lastExecution = executions[executions.length - 1];
+    if (!lastExecution.closure.startedAt) {
+        return '';
+    }
+    return formatDateUTC(timestampToDate(lastExecution.closure.startedAt));
 };
 
 /**
@@ -90,7 +94,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
     const filtersState = useWorkflowExecutionFiltersState();
     const sort = {
         key: executionSortFields.createdAt,
-        direction: SortDirection.ASCENDING
+        direction: SortDirection.DESCENDING
     };
 
     const baseFilters = React.useMemo(
@@ -102,7 +106,8 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
         { domain, project },
         {
             sort,
-            filter: [...baseFilters, ...filtersState.appliedFilters]
+            filter: [...baseFilters, ...filtersState.appliedFilters],
+            limit: 100
         }
     );
 
