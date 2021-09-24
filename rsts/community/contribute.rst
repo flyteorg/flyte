@@ -260,8 +260,7 @@ For example:
 The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location. 
 
 Here are a couple of examples that you can refer to:
-
-1. 
+ 
 .. code-block:: text
 
     Task: :std:doc:`generated/flytekit.task`
@@ -270,7 +269,6 @@ Output:
 
 Task: :std:doc:`generated/flytekit.task`
 
-2.
 .. code-block:: text
 
     :std:doc:`Using custom words <generated/flytekit.task>`
