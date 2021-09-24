@@ -1,21 +1,23 @@
+import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { formatDateUTC, millisecondsToHMS } from 'common/formatters';
+import { timestampToDate } from 'common/utils';
+import { BarChart } from 'components/common/BarChart';
 import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
 import { SortDirection } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
-import { Execution } from 'models/Execution/types';
+import { Execution, WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { executionSortFields } from 'models/Execution/constants';
-import * as React from 'react';
+import { Routes } from 'routes/routes';
+import { history } from 'routes/history';
 import { executionFilterGenerator } from './generators';
-import { BarChart } from 'components/common/BarChart';
 import {
     getWorkflowExecutionPhaseConstants,
     getWorkflowExecutionTimingMS
 } from '../Executions/utils';
-import { formatDateUTC } from 'common/formatters';
-import { timestampToDate } from 'common/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
     header: {
@@ -34,10 +36,26 @@ export interface EntityExecutionsBarChartProps {
 
 const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
     const newExecutions = exectuions.map(execution => {
+        const duration = getWorkflowExecutionTimingMS(execution)?.duration || 1;
         return {
-            value: getWorkflowExecutionTimingMS(execution)?.duration || 1,
+            value: duration,
             color: getWorkflowExecutionPhaseConstants(execution.closure.phase)
-                .badgeColor
+                .badgeColor,
+            metadata: execution.id,
+            tooltip: (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>
+                        Execution Id: <strong>{execution.id.name}</strong>
+                    </span>
+                    <span>Running time: {millisecondsToHMS(duration)}</span>
+                    <span>
+                        Started at:{' '}
+                        {formatDateUTC(
+                            timestampToDate(execution.closure.startedAt!)
+                        )}
+                    </span>
+                </div>
+            )
         };
     });
     if (newExecutions.length >= fillSize) {
@@ -88,6 +106,13 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
         }
     );
 
+    const handleClickItem = React.useCallback(item => {
+        if (item.metadata) {
+            // const executionId = item.metadata as WorkflowExecutionIdentifier;
+            // history.push(Routes.ExecutionDetails.makeUrl(executionId));
+        }
+    }, []);
+
     /** Don't render component until finish fetching user profile */
     if (filtersState.filters[4].status !== 'LOADED') {
         return null;
@@ -102,6 +127,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
                 <BarChart
                     data={getExecutionTimeData(executions.value)}
                     startDate={getStartExecutionTime(executions.value)}
+                    onClickItem={handleClickItem}
                 />
             </div>
         </WaitForData>
