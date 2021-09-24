@@ -69,13 +69,13 @@ flyteadmin:
 
 flytescheduler:
   image:
-    # -- Docker image for Flyteadmin deployment
+    # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler
     # -- Docker image tag
     tag: v0.6.28 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Flyteadmin deployment
+  # -- Default resources requests and limits for Flytescheduler deployment
   resources:
     limits:
       cpu: 250m
@@ -88,21 +88,21 @@ flytescheduler:
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
-  # -- Configuration for service accounts for FlyteAdmin
+  # -- Configuration for service accounts for Flytescheduler
   serviceAccount:
-    # -- Should a service account be created for flyteadmin
+    # -- Should a service account be created for Flytescheduler
     create: true
-    # -- Annotations for ServiceAccount attached to Flyteadmin pods
+    # -- Annotations for ServiceAccount attached to Flytescheduler pods
     annotations: {}
     # -- ImapgePullSecrets to automatically assign to the service account
     imagePullSecrets: {}
-  # -- Annotations for Flyteadmin pods
+  # -- Annotations for Flytescheduler pods
   podAnnotations: {}
-  # -- nodeSelector for Flyteadmin deployment
+  # -- nodeSelector for Flytescheduler deployment
   nodeSelector: {}
-  # -- tolerations for Flyteadmin deployment
+  # -- tolerations for Flytescheduler deployment
   tolerations: []
-  # -- affinity for Flyteadmin deployment
+  # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
 
