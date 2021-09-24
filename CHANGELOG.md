@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](http://github.com/lyft/flyteconsole/compare/v0.26.0...v0.27.0) (2021-09-24)
+
+
+### Bug Fixes
+
+* polish workflow details page ([#215](http://github.com/lyft/flyteconsole/issues/215)) ([dba3df1](http://github.com/lyft/flyteconsole/commit/dba3df1c5509b9a1aef7c903810551f329308631))
+
+
+### Features
+
+* add popover for bar chart item hover state ([#217](http://github.com/lyft/flyteconsole/issues/217)) ([46a7823](http://github.com/lyft/flyteconsole/commit/46a7823f785fd917f48d61e9b5dc1b81c3e3e33a))
+
 # [0.26.0](http://github.com/lyft/flyteconsole/compare/v0.25.4...v0.26.0) (2021-09-23)
 
 
