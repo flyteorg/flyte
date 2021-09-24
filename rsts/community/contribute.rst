@@ -9,7 +9,7 @@ Thank you for taking the time to contribute to Flyte! Here are some guidelines f
 
 Code
 ====
-An issue tagged with ``good first issue`` is the best place to start for first-time contributors. Look into them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__.
+An issue tagged with ``good first issue`` is the best place to start for first-time contributors. You can find them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__.
 
 To take a step ahead, check out the repositories available under `flyteorg <https://github.com/flyteorg>`__.
 
@@ -24,9 +24,11 @@ Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flyteprop
 
 #. To get through DCO, sign off on every commit. (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__) 
 #. To improve code coverage, write unit tests to test your code.
+#. Make sure all the tests pass. If you face any issues, please let us know.
 
 .. note::
-    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). Refer to `Effective Go <https://golang.org/doc/effective_go>`_ and `Black <https://github.com/psf/black>`_ for full coding standards.
+    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
+    Refer to `Effective Go <https://golang.org/doc/effective_go>`_ and `Black <https://github.com/psf/black>`_ for full coding standards.
 
 Component Reference
 ===================
@@ -66,7 +68,7 @@ Component Reference
     * - `Repo <https://github.com/lyft/flytepropeller>`__ | `Code Reference <https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller>`__
     * - **Purpose**: Deployment, Documentation, and Issues 
     * - **Languages**: Kustomize & RST
-    * - **Setup**
+    * - **Setup:**
 
         * Check for the Makefile in the root repo
         * Run the following commands:
@@ -159,13 +161,7 @@ Component Reference
     * - `Repo <https://github.com/lyft/flytesnacks>`__
     * - **Purpose**: Examples, Tips, and Tricks to use Flytekit SDKs
     * - **Language**: Python (In future, Java shall be added)
-    * - **Setup**:
-
-        * If the Python code has to be tested, run it locally
-        * If the Python code has to be tested in a cluster:
-            * Run the ``make start`` command in the root directory of the flytesnacks repo
-            * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in ``flytesnacks/cookbook/core`` directory
-            * To fetch the new dependencies and rebuild the image, run ``make register``
+    * - **Setup**: Refer to the `README <https://github.com/flyteorg/flytesnacks#----------contribution-guide---->`__
 
 ``flytectl``
 ************
@@ -232,9 +228,9 @@ You can then view the HTML pages in the ``docs/_build`` directory.
 
         make -C rsts html
 
-For minor edits that don’t require a local setup, you can edit the GitHub page in the documentation to propose the improvements.
+For minor edits that don’t require a local setup, you can edit GitHub page in the documentation to propose improvements.
 
-The edit option is found at the bottom of a page, as shown below.
+The edit option can be found at the bottom of a page, as shown below.
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/docs_edit.png
     :alt: GitHub edit option for Documentation
@@ -265,6 +261,7 @@ The key refers to the name used to refer to the file (while referencing the docu
 
 Here are a couple of examples that you can refer to:
 
+1. 
 .. code-block:: text
 
     Task: :std:doc:`generated/flytekit.task`
@@ -273,6 +270,7 @@ Output:
 
 Task: :std:doc:`generated/flytekit.task`
 
+2.
 .. code-block:: text
 
     :std:doc:`Using custom words <generated/flytekit.task>`
@@ -283,7 +281,7 @@ Output:
 
 |
 
-Linking to Python elements changes based on what you're linking to. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
+Linking to Python elements can change based on what you are linking to. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
 
 |
 
