@@ -11,7 +11,6 @@ FlyteAdmin serves the main Flyte API. It processes all client requests to the sy
 
 Below, we'll dive into each component defined in admin in more detail.
 
-
 RPC
 ---
 
