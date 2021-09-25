@@ -48,6 +48,12 @@ flyteadmin:
           topologyKey: kubernetes.io/hostname
 
 #
+# FLYTESCHEDULER
+#
+
+flytescheduler: {}
+
+#
 # DATACATALOG
 #
 
