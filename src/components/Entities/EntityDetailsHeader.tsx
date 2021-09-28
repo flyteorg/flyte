@@ -8,6 +8,7 @@ import { Project } from 'models/Project/types';
 import { getProjectDomain } from 'models/Project/utils';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { Routes } from 'routes/routes';
 import { launchStrings } from './constants';
 import { backUrlGenerator } from './generators';
 
@@ -34,14 +35,24 @@ interface EntityDetailsHeaderProps {
     project: Project;
     id: ResourceIdentifier;
     launchable?: boolean;
+    versionView: boolean;
     onClickLaunch?(): void;
 }
 
-/** Renders the entity name and any applicable actions.  */
+/**
+ * Renders the entity name and any applicable actions.
+ * @param id
+ * @param onClickLaunch
+ * @param launchable
+ * @param versionView
+ * @param project
+ * @constructor
+ */
 export const EntityDetailsHeader: React.FC<EntityDetailsHeaderProps> = ({
     id,
     onClickLaunch,
     launchable = false,
+    versionView,
     project
 }) => {
     const styles = useStyles();
@@ -58,7 +69,15 @@ export const EntityDetailsHeader: React.FC<EntityDetailsHeaderProps> = ({
             >
                 <Link
                     className={commonStyles.linkUnstyled}
-                    to={backUrlGenerator[id.resourceType](id)}
+                    to={
+                        versionView
+                            ? Routes.WorkflowDetails.makeUrl(
+                                  id.project,
+                                  id.domain,
+                                  id.name
+                              )
+                            : backUrlGenerator[id.resourceType](id)
+                    }
                 >
                     <ArrowBack color="inherit" />
                 </Link>

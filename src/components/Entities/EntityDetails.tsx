@@ -68,6 +68,7 @@ function getLaunchProps(id: ResourceIdentifier) {
  * for use with all entities (not all entities have schedules, for example).
  * @param id
  * @param versionView
+ * @param showStaticGraph
  */
 export const EntityDetails: React.FC<EntityDetailsProps> = ({
     id,
@@ -88,6 +89,7 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
                 project={project.value}
                 id={id}
                 launchable={!!sections.launch}
+                versionView={versionView}
                 onClickLaunch={onLaunch}
             />
             {!versionView && (
