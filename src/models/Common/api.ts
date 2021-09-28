@@ -13,13 +13,14 @@ import {
     PaginatedEntityResponse,
     RequestConfig
 } from 'models/AdminEntity/types';
-import { getProfileUrl } from 'models/AdminEntity/utils';
+import { adminApiUrl, getProfileUrl } from 'models/AdminEntity/utils';
 import {
     defaultAxiosConfig,
     defaultSystemStatus,
     identifierPrefixes
 } from './constants';
 import {
+    GetVersionResponse,
     IdentifierScope,
     LiteralMap,
     NamedEntity,
@@ -130,6 +131,23 @@ export const getUserProfile = async () => {
     } catch (e) {
         const { message } = transformRequestError(e, path);
         log.error(`Failed to fetch user profile: ${message}`);
+        return null;
+    }
+};
+
+/** Fetches the current admin version.
+ */
+export const getVersion = async () => {
+    const path = adminApiUrl('/version');
+    try {
+        const { data } = await axios.get<GetVersionResponse>(
+            path,
+            defaultAxiosConfig
+        );
+        return data;
+    } catch (e) {
+        const { message } = transformRequestError(e, path);
+        log.error(`Failed to fetch version: ${message}`);
         return null;
     }
 };
