@@ -75,8 +75,8 @@ Here are the setup instructions to start contributing to `flytesnacks` repo:
         * Install flytectl by running `brew install flyteorg/homebrew-tap/flytectl`. Learn more about install and configuration of [flytectl](https://docs.flyte.org/projects/flytectl/en/latest/index.html) 
         * Run the `make start` command in the root directory of the flytesnacks repo
         * Visit https://localhost:30081/console to view the Flyte console consisting of the examples present in flytesnacks/cookbook/core directory
-        * To fetch new dependencies and rebuild the image, run `make register`
-        * If examples from a different directory (other than `core`) have to registered, enter the sandbox first: `make shell` and then run `make -C <directory> register`.
+        * To fetch new dependencies and rebuild the image, run `make serialize`
+        * If examples from a different directory (other than `core`) have to registered then run `make -C <directory> register`.
 
 ### 📝 Contribute to documentation
 
