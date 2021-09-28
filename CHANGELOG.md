@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.2](http://github.com/lyft/flyteconsole/compare/v0.27.1...v0.27.2) (2021-09-28)
+
+
+### Bug Fixes
+
+* back navigation from version details view ([#219](http://github.com/lyft/flyteconsole/issues/219)) ([003d6ca](http://github.com/lyft/flyteconsole/commit/003d6ca9bae1326a7bac7d210844c24301efa947))
+
 ## [0.27.1](http://github.com/lyft/flyteconsole/compare/v0.27.0...v0.27.1) (2021-09-24)
 
 
