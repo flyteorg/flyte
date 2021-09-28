@@ -79,8 +79,6 @@ class Hyperparameters:
     epochs: int = 100
     local_checkpoint_file: str = "checkpoint.h5"
     local_submission_csv: str = "submission.csv"
-    # temporary working directory to write intermediate files (prefix with hdfs:// to use HDFS)
-    work_dir: FlyteFile = "s3://flyte-demo/horovod-tmp/"
 
 @task(
     task_config=Spark(
@@ -96,11 +94,11 @@ class Hyperparameters:
         }
     ),
     cache=True,
-    cache_version="0.1",
+    cache_version="0.2",
     requests=Resources(mem="2Gi"),
     limits=Resources(mem="2Gi"),
 )
-def estimate(data_dir: FlyteDirectory, hp: Hyperparameters, work_dir: FlyteDirectory) -> (FlyteFile, CSVFile):
+def estimate(data_dir: FlyteDirectory, hp: Hyperparameters, work_dir: FlyteDirectory) -> FlyteDirectory:
     # ================ #
     # DATA PREPARATION #
     # ================ #
@@ -424,9 +422,11 @@ def estimate(data_dir: FlyteDirectory, hp: Hyperparameters, work_dir: FlyteDirec
     best_val_rmspe = min(history['val_exp_rmspe'])
     print('Best RMSPE: %f' % best_val_rmspe)
 
+    working_dir = flytekit.current_context().working_directory
+
     # Save the trained model.
-    keras_model.save(hp.local_checkpoint_file)
-    print('Written checkpoint to %s' % hp.local_checkpoint_file)
+    keras_model.save(os.path.join(working_dir, hp.local_checkpoint_file))
+    print('Written checkpoint to %s' % os.path.join(working_dir, hp.local_checkpoint_file))
 
     # ================ #
     # FINAL PREDICTION #
@@ -444,17 +444,17 @@ def estimate(data_dir: FlyteDirectory, hp: Hyperparameters, work_dir: FlyteDirec
     pred_df=pred_df.withColumn('Sales_pred', F.exp(pred_df.Sales_output))
 
     submission_df = pred_df.select(pred_df.Id.cast(T.IntegerType()), pred_df.Sales_pred).toPandas()
-    submission_df.sort_values(by=['Id']).to_csv(hp.local_submission_csv, index=False)
+    submission_df.sort_values(by=['Id']).to_csv(os.path.join(working_dir, hp.local_submission_csv), index=False)
     print('Saved predictions to %s' % hp.local_submission_csv)
 
-    return hp.local_checkpoint_file, hp.local_submission_csv
+    return working_dir
 
 
 @workflow
 def horovod_training_wf(
     hp: Hyperparameters = Hyperparameters(),
     work_dir: FlyteDirectory = "s3://flyte-demo/horovod-tmp/",
-) -> (FlyteFile, CSVFile):
+) -> FlyteDirectory:
     data_dir = download_data()
 
     return estimate(data_dir=data_dir, hp=hp, work_dir=work_dir)
