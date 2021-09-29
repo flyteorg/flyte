@@ -48,7 +48,10 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
-    Plugin Setup
+    .. link-button:: deployment-plugin-setup
+       :type: ref
+       :text: Plugin Setup
+       :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Plugin Setup guides with detailed instructions.
 

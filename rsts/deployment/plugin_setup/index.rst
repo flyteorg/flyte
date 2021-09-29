@@ -1,7 +1,7 @@
-.. _deployment-cluster-config:
+.. _deployment-plugin-setup:
 
 ##############
-Cluster Config
+Plugin Setup
 ##############
 
 
@@ -14,15 +14,6 @@ Cluster Config
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Guide to setting up MPI Plugin
-
-    ---
-
-    .. link-button:: deployment-plugin-setup-spark-plugin
-       :type: ref
-       :text: Spark Plugin
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up Spark Plugin
 
 
 .. toctree::

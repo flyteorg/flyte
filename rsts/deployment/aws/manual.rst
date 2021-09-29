@@ -407,11 +407,11 @@ Time for Helm
 
 Installing Flyte
 -----------------
-#. Add helm registry for flyte
+#. Clone the Flyte repo
 
 .. code-block:: bash
 
-   helm repo add flyteorg https://flyteorg.github.io/flyte
+   git clone https://github.com/flyteorg/flyte
 
 #. Update values
 
@@ -445,19 +445,20 @@ Search and replace the following
    * - ``<CERTIFICATE_ARN>``
      - ARN of the self-signed (or official) certificate
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
-   * - ``<REDIS_HOST_URL>``
-     - DNS entry for your redis instance
-     - ``redis-resource-manager:6379``
-   * - ``<REDIS_HOST_KEY>``
-     - The password in plaintext for your Redis instance
-     - ``mypassword``
+
+#. Update helm dependencies
+
+.. code-block:: bash
+
+   helm dep update
+
 
 #. Install Flyte
 
 .. code-block:: bash
 
    cd helm
-   helm install -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
+   helm install -n flyte -f values-eks.yaml --create-namespace flyte .
 
 
 #. Verify all the pods have come up correctly
@@ -478,7 +479,7 @@ Upgrading Flyte
 
 .. code-block:: bash
 
-   helm upgrade -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
+   helm upgrade -n flyte -f values-eks.yaml --create-namespace flyte .
 
 Connecting to Flyte
 ===================
@@ -500,13 +501,7 @@ Flyte can be accessed using the UI console or your terminal
 
 * Connecting to flytectl CLI
 
-Generate flytectl config for your flyte cluster. Use `--insecure` flag for self-signed cert;
-
-.. code-block:: bash
-   # Generate config for production cluster
-   flytectl config init --host=<FLYTE-ENDPOINT> --storage
-
-Manually update the `insecureSkipVerify: true` config in `~/.flyte/config.yaml` (only required if using a self-signed cert. Caution: not to be used in production)
+Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
 
 .. code-block::
 

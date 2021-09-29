@@ -5,15 +5,16 @@ MPI Operator Setup
 
 .. _mpi-operator:
 
-##############
+####################################
 Install MPI Operator
-##############
+####################################
+
 
 Start the sandbox for testing
 
 .. code-block:: bash
 
-   flytectl sandbox start
+   flytectl sandbox start --source=${PATH_TO_FLYTESNACKS}
 
 Clone MPI Operator
 
