@@ -9,24 +9,29 @@ MPI Operator Setup
 Install MPI Operator
 ####################################
 
+Clone Flytesnacks
+
+.. code-block:: bash
+
+   git clone https://github.com/flyteorg/flytesnacks.git
 
 Start the sandbox for testing
 
 .. code-block:: bash
 
-   flytectl sandbox start --source=${PATH_TO_FLYTESNACKS}
+   flytectl sandbox start --source=./flytesnacks
 
 Clone MPI Operator
 
 .. code-block:: bash
 
-   git clone https://github.com/kubeflow/mpi-operator.git && cd mpi-operator/manifests
+   git clone https://github.com/kubeflow/mpi-operator.git
 
 Install MPI Operator
 
 .. code-block:: bash
 
-   kustomize build overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
+   kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
 
 Create a file values-mpi.yaml and add the below values
 
@@ -56,3 +61,16 @@ Upgrade flyte helm release
 .. code-block:: bash
 
    helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+
+Build & Serialize MPI plugin example
+
+.. code-block:: bash
+
+   cd flytesnacks
+   flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfmpi serialize
+
+Register MPI plugin example
+
+.. code-block:: bash
+
+   make -C cookbook/integrations/kubernetes/kfmpi register
