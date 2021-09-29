@@ -53,10 +53,7 @@ setup:
 	flytectl config init
 
 .PHONY: start
-start: setup
-	$(call LOG,Registering examples from commit: latest)
-	REGISTRY=cr.flyte.org/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
-
+start: setup fast_register
 	echo "Flyte is ready! Flyte UI is available at http://localhost:$(FLYTE_PROXY_PORT)/console."
 
 .PHONY: teardown
