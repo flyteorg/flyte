@@ -7,7 +7,7 @@ Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduc
 
 Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
 
-TL;DR: Find the repo-wise contribution guidelines in the `Component Reference <#component-reference>`__ section.
+TL;DR: Find the repo-specific contribution guidelines in the `Component Reference <#component-reference>`__ section.
 
 💻 Code
 =======
@@ -30,7 +30,7 @@ On a side note, format your Go code with ``golangci-lint`` followed by ``goimpor
 If make targets are not available, you can manually format the code.
 Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
-A piece of good news -- you can be added as a committer to any ``flyteorg`` repo as you become more involved with the project ✨.
+Good news -- you can be added as a committer to any ``flyteorg`` repo as you become more involved with the project ✨.
 
 📃 Documentation
 ================
@@ -42,7 +42,7 @@ For API- and code-related content, it extracts docstrings from the code files.
 
 To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__. 
 
-For minor edits that don’t require a local setup, you can edit GitHub page in the documentation to propose improvements.
+For minor edits that don’t require a local setup, you can edit the GitHub page in the documentation to propose improvements.
 
 The edit option can be found at the bottom of a page, as shown below.
 
@@ -56,9 +56,9 @@ Intersphinx
 
 `Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`__ can generate automatic links to the documentation of objects in other projects.
 
-To establish a reference to any other documentation from Flyte or within it, use intersphinx. 
+To establish a reference to any other documentation from Flyte or within it, use Intersphinx. 
 
-To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file which should be present in the concerning ``docs`` repository. 
+To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file which should be present in the respective ``docs`` repository. 
 For example, ``rsts`` is the docs repository for the ``flyte`` repo.
 
 For example:
@@ -94,7 +94,7 @@ Output:
 
 |
 
-You can cross-reference to multiple Python objects. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
+You can cross-reference multiple Python objects. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
 
 |
 
@@ -140,7 +140,7 @@ Output:
     :align: center
     :figclass: align-center
 
-    The dependency graph between various flyteorg repos
+    The dependency graph between various flyte.org repos
 
 
 ``flyte``
@@ -285,7 +285,7 @@ Output:
 🐞 File an Issue
 ================
 
-`GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ is used for issue tracking. Following are the issue types available that you could use while filing an issue.
+`GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ is used for issue tracking. The following are available issue types that you could use for filing an issue.
 
 * `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`__
 * `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`__
@@ -295,7 +295,7 @@ Output:
 * `Housekeeping <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=housekeeping&template=housekeeping_template.md&title=%5BHousekeeping%5D+>`__
 * `UI Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+ui&template=ui_feature_request.md&title=%5BUI+Feature%5D>`__
 
-If none of the above fits your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
+If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 
 |
 
