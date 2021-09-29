@@ -143,4 +143,4 @@ Flytectl configuration
    Install and Configure <self>
    verbs
    nouns
-   Contribute <https://github.com/flyteorg/flytectl/blob/master/docs/CONTRIBUTING.md>
+   contribute

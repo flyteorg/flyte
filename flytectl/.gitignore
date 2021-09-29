@@ -7,3 +7,4 @@ _test
 ./config.yaml
 docs/build/*
 cmd/upgrade/flyte.ext
+.vscode
