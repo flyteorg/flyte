@@ -61,11 +61,18 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 // Updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
 func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	resourceRequirements []v1.ResourceRequirements, podSpec *v1.PodSpec) {
+	UpdatePodWithInterruptibleFlag(taskExecutionMetadata, resourceRequirements, podSpec, false)
+}
+
+// Updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
+func UpdatePodWithInterruptibleFlag(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
+	resourceRequirements []v1.ResourceRequirements, podSpec *v1.PodSpec, omitInterruptible bool) {
+	isInterruptible := !omitInterruptible && taskExecutionMetadata.IsInterruptible()
 	if len(podSpec.RestartPolicy) == 0 {
 		podSpec.RestartPolicy = v1.RestartPolicyNever
 	}
 	podSpec.Tolerations = append(
-		GetPodTolerations(taskExecutionMetadata.IsInterruptible(), resourceRequirements...), podSpec.Tolerations...)
+		GetPodTolerations(isInterruptible, resourceRequirements...), podSpec.Tolerations...)
 	if len(podSpec.ServiceAccountName) == 0 {
 		podSpec.ServiceAccountName = taskExecutionMetadata.GetK8sServiceAccount()
 	}
@@ -73,16 +80,19 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 		podSpec.SchedulerName = config.GetK8sPluginConfig().SchedulerName
 	}
 	podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().DefaultNodeSelector)
-	if taskExecutionMetadata.IsInterruptible() {
+	if isInterruptible {
 		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().InterruptibleNodeSelector)
 	}
 	if podSpec.Affinity == nil && config.GetK8sPluginConfig().DefaultAffinity != nil {
 		podSpec.Affinity = config.GetK8sPluginConfig().DefaultAffinity.DeepCopy()
 	}
-	ApplyInterruptibleNodeAffinity(taskExecutionMetadata.IsInterruptible(), podSpec)
+	ApplyInterruptibleNodeAffinity(isInterruptible, podSpec)
 }
 
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error) {
+	return ToK8sPodSpecWithInterruptible(ctx, tCtx, false)
+}
+func ToK8sPodSpecWithInterruptible(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, omitInterruptible bool) (*v1.PodSpec, error) {
 	task, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
@@ -113,7 +123,7 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	pod := &v1.PodSpec{
 		Containers: containers,
 	}
-	UpdatePod(tCtx.TaskExecutionMetadata(), []v1.ResourceRequirements{c.Resources}, pod)
+	UpdatePodWithInterruptibleFlag(tCtx.TaskExecutionMetadata(), []v1.ResourceRequirements{c.Resources}, pod, omitInterruptible)
 
 	if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, pod, task.GetInterface(), tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), task.GetContainer().GetDataConfig()); err != nil {
 		return nil, err
