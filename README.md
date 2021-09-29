@@ -1,4 +1,19 @@
-# flytectl
+<html>
+    <p align="center"> 
+        <img src="https://github.com/flyteorg/flyte/blob/master/rsts/images/flyte_circle_gradient_1_4x4.png" alt="Flyte Logo" width="100">
+    </p>
+    <h1 align="center">
+        FlyteCTL
+    </h1>
+    <p align="center">
+        The official Flyte command-line interface
+    </p>
+    <h3 align="center">
+        <a href="https://flytectl.rtfd.io">Documentation</a>
+        <span> · </span>
+        <a href="https://docs.flyte.org/projects/flytectl/en/stable/contribute.html">Contribution Guide</a>
+    </h3>
+</html>
 
 [![Docs](https://readthedocs.org/projects/flytectl/badge/?version=latest&style=plastic)](https://flytectl.rtfd.io)
 [![Current Release](https://img.shields.io/github/release/flyteorg/flytectl.svg)](https://github.com/flyteorg/flytectl/releases/latest)
@@ -10,42 +25,45 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytectl.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytectl/latest.svg?style=plastic)
 
-Flytectl is designed to be a portable, lightweight, CLI for working with Flyte.  It is written in Golang and can access FlyteAdmin
+FlyteCTL is designed to be a portable and lightweight CLI to work with Flyte. It is written in Golang and can access [FlyteAdmin](https://github.com/flyteorg/flyteadmin/)—the control plane of Flyte.
 
-## Docs
+## 🚀 Quick Start
 
-Docs are generated using Sphinx and are available at [flytectl.rtfd.io](https://flytectl.rtfd.io)
-Generating docs locally can be accomplished by running make gendocs from within the docs folder
+1. Install FlyteCTL with bash or shell script
 
+    * Bash
+        ```bash
+        $ brew install flyteorg/homebrew-tap/flytectl
+        ```
+    * Shell script
+        ```bash
+        $ curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+        ```
+2. (Optional) `flytectl upgrade` provides a general interface to upgrade FlyteCTL; run the command shown in the output
 
-## Installation
+3. Start sandbox using FlyteCTL 
+    ```bash
+    $ flytectl sandbox start 
+    ```
 
-Install flytectl with homebrew tap
-```bash
-$ brew install flyteorg/homebrew-tap/flytectl
+4. Register examples
+    ```bash
+    # Register core workflows 
+    $ flytectl register examples -d development -p flytesnacks
+    ```
 
-# Upgrade flytectl 
-$ brew upgrade flytectl
-```
+<html>
+    <h2 id="contribution-guide"> 
+        📖 How to Contribute to FlyteCTL
+    </h2>
+</html>
 
-Install flytectl with shell script
-```bash
-$ curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
-```
+You can find the detailed contribution guide [here](docs/source/contribute.rst). 
 
-## Get Started 
+<html>
+    <h2 id="file-an-issue"> 
+        🐞 File an Issue
+    </h2>
+</html>
 
-### Create a sandbox cluster 
-```bash
-$ flytectl sandbox start 
-```
-
-### Register flytesnacks example
-```bash
-# Run Core workflows 
-$ flytectl register examples -d development -p flytesnacks
-```
-
-## Contributing
-
-[Contribution guidelines for this project](docs/CONTRIBUTING.md)
+Refer to the [issues](https://docs.flyte.org/en/latest/community/contribute.html#issues) section in the contribution guide if you'd like to file an issue.
