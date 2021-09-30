@@ -102,6 +102,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 ## ⭐️ Current Deployments & Contributors
 
 - [Freenome](https://www.freenome.com/)
+- [Gojek](https://www.gojek.io/)
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
 - [RunX.dev](https://runx.dev/)
