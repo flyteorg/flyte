@@ -50,7 +50,7 @@ const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
                     <span>Running time: {millisecondsToHMS(duration)}</span>
                     <span>
                         Started at:{' '}
-                        {formatDateUTC(
+                        {execution.closure.startedAt != null && formatDateUTC(
                             timestampToDate(execution.closure.startedAt!)
                         )}
                     </span>
