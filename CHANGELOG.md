@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.1](http://github.com/lyft/flyteconsole/compare/v0.28.0...v0.28.1) (2021-09-30)
+
+
+### Bug Fixes
+
+* **ui:** avoid empty startedAt to crash console ([#221](http://github.com/lyft/flyteconsole/issues/221)) ([42fa5ce](http://github.com/lyft/flyteconsole/commit/42fa5ce34fdc4672bf394326e56b898bdaf9abc1))
+
 # [0.28.0](http://github.com/lyft/flyteconsole/compare/v0.27.2...v0.28.0) (2021-09-28)
 
 
