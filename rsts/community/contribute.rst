@@ -75,22 +75,24 @@ The key refers to the name used to refer to the file (while referencing the docu
 Here is an example using ``:std:doc``:
  
 * Direct reference
-.. code-block:: text
 
-    Task: :std:doc:`generated/flytekit.task`
+  .. code-block:: text
 
-Output:
+      Task: :std:doc:`generated/flytekit.task`
 
-Task: :std:doc:`generated/flytekit.task`
+  Output:
+
+  Task: :std:doc:`generated/flytekit.task`
 
 * Custom name
-.. code-block:: text
 
-    :std:doc:`Using custom words <generated/flytekit.task>`
+  .. code-block:: text
 
-Output:
+      :std:doc:`Using custom words <generated/flytekit.task>`
 
-:std:doc:`Using custom words <generated/flytekit.task>`
+  Output:
+
+  :std:doc:`Using custom words <generated/flytekit.task>`
 
 |
 
