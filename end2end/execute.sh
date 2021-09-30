@@ -39,13 +39,15 @@ function wait_for_flyte_deploys() {
     echo "Flyte deployed in $SECONDS seconds."
 }
 
+function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+
 function run_flyte_examples()
 {
     echo $DIR
     # Launch test
     kubectl -n flyte create -f $DIR/tests/endtoend.yaml
     # Wait at most 20 minutes for things to pass
-    /usr/bin/timeout 1200 $DIR/test_monitor.sh
+    timeout 1200 $DIR/test_monitor.sh
     return $?
 }
 

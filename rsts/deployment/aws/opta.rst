@@ -26,7 +26,7 @@ Deploying Opta Environment and Service for Flyte
 To begin using Opta, please first `download the latest version <https://docs.opta.dev/installation/>`_ and all the listed
 prerequisites and make sure that you have
 `admin/fullwrite AWS credentials setup on your terminal <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html>`_.
-With that prepared, go to the Opta subdirectory in the Flyte repo, and open up env.yaml in your editor. Please find and
+With that prepared, go to the `Opta subdirectory <https://github.com/flyteorg/flyte/tree/master/opta>`_ in the Flyte repo, and open up env.yaml in your editor. Please find and
 replace the following values with your desired ones:
 
 * <account_id>: your AWS account ID

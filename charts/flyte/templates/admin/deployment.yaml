@@ -24,7 +24,7 @@ spec:
           command:
           - sh
           - -c
-          - until pg_isready -h {{ tpl .Values.db.database.host $ }} -p {{ .Values.db.database.port }}; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h {{ tpl .Values.db.admin.database.host $ }} -p {{ .Values.db.admin.database.port }}; do echo waiting for database; sleep 2; done;
         {{- end }}
         - command:
           - flyteadmin
@@ -110,6 +110,9 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
+        {{- with .Values.flyteadmin.additionalVolumeMounts -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
       - command:
         - sh
         - -c
@@ -145,6 +148,9 @@ spec:
         - name: auth
           secret:
             secretName: flyte-admin-secrets
+        {{- with .Values.flyteadmin.additionalVolumes -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.flyteadmin.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -18,6 +18,14 @@ spec:
       labels: {{ include "datacatalog.labels" . | nindent 8 }}
     spec:
       initContainers:
+      {{- if .Values.postgres.enabled }}
+      - name: check-db-ready
+        image: postgres:10.16-alpine
+        command:
+          - sh
+          - -c
+          - until pg_isready -h {{ tpl .Values.db.datacatalog.database.host $ }} -p {{ .Values.db.datacatalog.database.port }}; do echo waiting for database; sleep 2; done;
+      {{- end }}
       - command:
         - datacatalog
         - --config
@@ -29,7 +37,7 @@ spec:
         name: run-migrations
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config
-          name: config-volume 
+          name: config-volume
       containers:
       - command:
         - datacatalog

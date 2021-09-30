@@ -37,12 +37,32 @@ configmap:
       enabled-plugins:
         - container
         - sidecar
-        - spark
         - k8s-array
-        - pytorch
       default-for-task-types:
         container: container
-        sidecar: sidecar
-        spark: spark
         container_array: k8s-array
-        pytorch: pytorch
+
+#
+# POSTGRES
+#
+
+postgres:
+  enabled: false
+
+#
+# MINIO
+#
+
+minio:
+  enabled: false
+
+#
+# CONTOUR
+#
+
+contour:
+  enabled: false
+
+workflow_scheduler:
+  enabled: true
+  type: native
