@@ -537,7 +537,8 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 
 // Produces execution-time attributes for workflow execution.
 // Defaults to overridable execution values set in the execution create request, then looks at the launch plan values
-// (if any) before defaulting to values set in the matchable resource db.
+// (if any) before defaulting to values set in the matchable resource db and further if matchable resources don't
+// exist then defaults to one set in application configuration
 func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admin.ExecutionCreateRequest,
 	launchPlan *admin.LaunchPlan) (*admin.WorkflowExecutionConfig, error) {
 	if request.Spec.MaxParallelism > 0 {
@@ -565,7 +566,10 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	if resource != nil && resource.Attributes.GetWorkflowExecutionConfig() != nil {
 		return resource.Attributes.GetWorkflowExecutionConfig(), nil
 	}
-	return nil, nil
+	// Defaults to one from the application config
+	return &admin.WorkflowExecutionConfig{
+		MaxParallelism: m.config.ApplicationConfiguration().GetTopLevelConfig().GetMaxParallelism(),
+	}, nil
 }
 
 func (m *ExecutionManager) launchSingleTaskExecution(

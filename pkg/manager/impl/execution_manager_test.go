@@ -9,6 +9,7 @@ import (
 
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/runtime"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
@@ -3300,9 +3301,10 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 		t.Errorf("When a user specifies max parallelism in a spec, the db should not be queried")
 		return nil, nil
 	}
-
+	applicationConfig := runtime.NewConfigurationProvider()
 	executionManager := ExecutionManager{
 		resourceManager: &resourceManager,
+		config:          applicationConfig,
 	}
 	execConfig, err := executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
 		Project: workflowIdentifier.Project,
@@ -3329,6 +3331,26 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, execConfig.MaxParallelism, int32(50))
+
+	resourceManager = managerMocks.MockResourceManager{}
+	resourceManager.GetResourceFunc = func(ctx context.Context,
+		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		return nil, nil
+	}
+	executionManager = ExecutionManager{
+		resourceManager: &resourceManager,
+		config:          applicationConfig,
+	}
+
+	execConfig, err = executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
+		Project: workflowIdentifier.Project,
+		Domain:  workflowIdentifier.Domain,
+		Spec:    &admin.ExecutionSpec{},
+	}, &admin.LaunchPlan{
+		Spec: &admin.LaunchPlanSpec{},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, execConfig.MaxParallelism, int32(25))
 }
 
 func TestResolvePermissions(t *testing.T) {

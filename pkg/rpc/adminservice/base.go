@@ -60,7 +60,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	configuration := runtime.NewConfigurationProvider()
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
-	adminScope := promutils.NewScope(applicationConfiguration.MetricsScope).NewSubScope("admin")
+	adminScope := promutils.NewScope(applicationConfiguration.GetMetricsScope()).NewSubScope("admin")
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -92,10 +92,10 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		configuration,
 		db)
 	workflowExecutor := workflowengine.NewFlytePropeller(
-		applicationConfiguration.RoleNameKey,
+		applicationConfiguration.GetRoleNameKey(),
 		execCluster,
 		adminScope.NewSubScope("executor").NewSubScope("flytepropeller"),
-		configuration.NamespaceMappingConfiguration(), applicationConfiguration.EventVersion)
+		configuration.NamespaceMappingConfiguration(), applicationConfiguration.GetEventVersion())
 	logger.Info(context.Background(), "Successfully created a workflow executor engine")
 	dataStorageClient, err := storage.NewDataStore(storeConfig, adminScope.NewSubScope("storage"))
 	if err != nil {
@@ -135,11 +135,11 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	}).GetRemoteURLInterface()
 
 	workflowManager := manager.NewWorkflowManager(
-		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
+		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
 		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
 
-	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(db, applicationConfiguration.AsyncEventsBufferSize)
+	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(db, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {
 		executionEventWriter.Run()
 	}()
@@ -159,13 +159,13 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	// Serve profiling endpoints.
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(
-			context.Background(), applicationConfiguration.ProfilerPort, nil)
+			context.Background(), applicationConfiguration.GetProfilerPort(), nil)
 		if err != nil {
 			logger.Panicf(context.Background(), "Failed to Start profiling and Metrics server. Error, %v", err)
 		}
 	}()
 
-	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(db, applicationConfiguration.AsyncEventsBufferSize)
+	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(db, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {
 		nodeExecutionEventWriter.Run()
 	}()
@@ -179,7 +179,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		ExecutionManager:   executionManager,
 		NamedEntityManager: namedEntityManager,
 		VersionManager:     versionManager,
-		NodeExecutionManager: manager.NewNodeExecutionManager(db, configuration, applicationConfiguration.MetadataStoragePrefix, dataStorageClient,
+		NodeExecutionManager: manager.NewNodeExecutionManager(db, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
 			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, nodeExecutionEventWriter),
 		TaskExecutionManager: manager.NewTaskExecutionManager(db, configuration, dataStorageClient,
 			adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher),
