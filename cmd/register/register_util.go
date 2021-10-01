@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/utils"
 
 	"github.com/google/go-github/github"
 
@@ -34,6 +35,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	v1 "k8s.io/api/core/v1"
 )
 
 // Variable define in serialized proto that needs to be replace in registration time
@@ -221,6 +223,33 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
 				}
 				task.Template.GetContainer().Args[k] = string(remotePath)
 			}
+		}
+	} else if task.Template.GetK8SPod() != nil && task.Template.GetK8SPod().PodSpec != nil {
+		var podSpec = v1.PodSpec{}
+		err := utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &podSpec)
+		if err != nil {
+			return err
+		}
+		for containerIdx, container := range podSpec.Containers {
+			for argIdx, arg := range container.Args {
+				if arg == registrationRemotePackagePattern {
+					remotePath, err := getRemoteStoragePath(context.Background(), Client, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCode, rconfig.DefaultFilesConfig.Version)
+					if err != nil {
+						return err
+					}
+					podSpec.Containers[containerIdx].Args[argIdx] = string(remotePath)
+				}
+			}
+		}
+		podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+		if err != nil {
+			return err
+		}
+		task.Template.Target = &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				Metadata: task.Template.GetK8SPod().Metadata,
+				PodSpec:  podSpecStruct,
+			},
 		}
 	}
 	return nil

@@ -9,6 +9,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flytestdlib/utils"
+
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -396,4 +400,56 @@ func TestHydrateNode(t *testing.T) {
 		err := hydrateSpec(task, "")
 		assert.NotNil(t, err)
 	})
+}
+
+func TestHydrateTaskSpec(t *testing.T) {
+	testScope := promutils.NewTestScope()
+	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+	s, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, testScope.NewSubScope("flytectl"))
+	assert.Nil(t, err)
+	Client = s
+
+	metadata := &core.K8SObjectMetadata{
+		Labels: map[string]string{
+			"l": "a",
+		},
+		Annotations: map[string]string{
+			"a": "b",
+		},
+	}
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Args: []string{"foo", "bar"},
+			},
+			{
+				Args: []string{"baz", registrationRemotePackagePattern},
+			},
+		},
+	}
+	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	task := &admin.TaskSpec{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_K8SPod{
+				K8SPod: &core.K8SPod{
+					Metadata: metadata,
+					PodSpec:  podSpecStruct,
+				},
+			},
+		},
+	}
+	err = hydrateTaskSpec(task, "sourcey")
+	assert.NoError(t, err)
+	var hydratedPodSpec = v1.PodSpec{}
+	err = utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &hydratedPodSpec)
+	assert.NoError(t, err)
+	assert.Len(t, hydratedPodSpec.Containers[1].Args, 2)
+	assert.True(t, strings.HasSuffix(hydratedPodSpec.Containers[1].Args[1], "sourcey"))
 }
