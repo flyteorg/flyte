@@ -37,7 +37,9 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	MetadataStoragePrefix: []string{"metadata", "admin"},
 	EventVersion:          1,
 	AsyncEventsBufferSize: 100,
+	MaxParallelism:        25,
 })
+
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{
 	ProfilerPort: config.Port{Port: 10253},
 	EventSchedulerConfig: interfaces.EventSchedulerConfig{
