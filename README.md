@@ -110,6 +110,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Striveworks](https://striveworks.us/)
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
+- [Wolt](https://www.wolt.com)
 
 <html>
 <h2 id="features"> 
