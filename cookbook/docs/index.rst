@@ -268,6 +268,7 @@ Steps
    Configuring Production Features <auto/deployment/index>
    integrations
    Extending flyte <auto/core/extend_flyte/index>
+   contribute
 
 .. toctree::
    :maxdepth: -1
