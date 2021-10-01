@@ -4,7 +4,9 @@
 Flyte Console
 #############
 
-This is the web UI for the Flyte platform.
+This is the web UI for the Flyte platform. The results of running Flyte Console are displayed in this graph, explained below:
+
+.. youtube:: 7YSc-QHk_Ec
 
 *********************
 Running flyteconsole
@@ -18,7 +20,7 @@ Running flyteconsole locally requires `NodeJS <https://nodejs.org>`_ and
 can be installed by running ``yarn`` in the project directory.
 
 ======================
-Environment variables
+Environment Variables
 ======================
 Before we can run the server, we need to set up an environment variable or two.
 
@@ -55,7 +57,7 @@ usually not needed, so the default behavior is to run without a prefix.
 Sets the local endpoint for `CORS request proxying <cors-proxy_>`_.
 
 ===============
-Run the server
+Run the Server
 ===============
 
 To start the local development server, run ``yarn start``. This will spin up a
