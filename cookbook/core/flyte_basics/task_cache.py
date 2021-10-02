@@ -10,7 +10,10 @@ Task caching is useful when a user knows that many executions with the same inpu
 - Running the code multiple times when debugging workflows
 - Running the commonly shared tasks amongst different workflows, which receive the same inputs
 
-Let's see how task caching can be enabled.
+Let's watch a brief explanation of caching and a demo in this video, followed by how task caching can be enabled .
+
+.. youtube:: WNkThCp-gqo
+
 """
 
 # %%
