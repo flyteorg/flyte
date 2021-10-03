@@ -1,7 +1,7 @@
 
 Steps:
-- Make sure kubectl and aws-cli are installed and working
-- Make sure terraform is installed and working and references aws-cli permissions
+- You need to make sure kubectl and aws-cli are installed and working
+- Aws-cli permissions must be referenced and terraform must be installed and running
 - Run Terraform files. (There seems to be a race condition in one of the IAM role creation steps - you may need to run it twice.)
 - Copy or update the kubectl config file and switch to that context.
 - Create the webhook

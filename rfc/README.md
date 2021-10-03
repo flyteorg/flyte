@@ -2,16 +2,16 @@
 
 [![hackmd-github-sync-badge](https://hackmd.io/0F2E71vhTk-zPE5qAmBFZA/badge)](https://hackmd.io/0F2E71vhTk-zPE5qAmBFZA)
 
-An RFC - Request For Change - is a document issued mainly to recommend new features to the language and standard libraries. It provides the opportunity for all stakeholders to review and approve the changes before they are implemented. 
+RFCs - Request For Change - are typically issued to recommend new features for a language or standard library. All stakeholders can review and approve the changes before they are implemented. 
 
-Not all changes will require an RFC. Bug fixes and documentation improvements can be carried out using GitHub pull requests (PRs).
+RFCs are not required for all changes. GitHub pull requests (PRs) can be used to fix bugs and improve documentation.
 
-Other more extensive changes need to be carefully tracked and reviewed, which is where RFCs come in.
+Some changes need to be tracked and reviewed more carefully, which is where RFCs come into play.
 
 ## When you need to follow this process
 [When you need to follow this process]: #when-you-need-to-follow-this-process
 
-Significant changes to the system or changes to the user experience would require an RFC. Examples of changes can be:
+Changes to the system or to the user experience would require an RFC. Examples of changes can be:
 
   - Semantics or syntax changes, other than bugfixes (e.g. introducing a new Flytekit language feature)
   - Core-Language updates (e.g. FlyteIdl changes that introuce new wire-format)

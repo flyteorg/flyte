@@ -61,8 +61,7 @@
 
 ## 💥 Introduction
 
-Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
-a history of all executions and provides an intuitive UI, CLI and REST/gRPC API to interact with the computation.
+Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, allowing time to be rolled back. Additionally, it stores the execution history and provides an intuitive UI, CLI, and REST/gRPC API to interact with the computation.
 
 Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top level concept. Multiple tasks arranged in a data
 producer-consumer order create a workflow.
@@ -89,11 +88,11 @@ With [Docker installed](https://docs.docker.com/get-docker/) and [Flytectl insta
   flytectl sandbox start
 ```
 
-This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.
+A local Flyte sandbox is created. When the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.
 
 Visit http://localhost:30081/console to view the Flyte dashboard.
 
-Here's a quick visual tour of the console.
+Here is a quick look at the console.
 
 ![Flyte console Example](https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif)
 

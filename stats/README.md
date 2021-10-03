@@ -1,7 +1,6 @@
 ## Developing stats
 
-These scripts generate dashboards by running the following make target in the
-flyteorg/flyte root folder.
+By running the following make target in the flyteorg/flyte root folder, the scripts generate dashboards.
 
 ```bash
 make stats
