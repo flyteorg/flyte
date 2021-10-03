@@ -114,7 +114,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 <html>
 <h2 id="features"> 
-  🔥 Features
+  🔥 Features included are:
 </h2>
 </html>
 
@@ -209,6 +209,8 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 | [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Incubating       |
 | [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
 | [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
+| [flytectl](https://kanishkvijaywargiya.github.io/uicolorpicker.github.io/)   | Html5 Css3 JavaScript  | A UI color picker for developers and designers.
+        | Production-grade |
 
 ## 🔩 Production K8s Operators
 
