@@ -19,6 +19,19 @@ Flyte directly has no unique understanding of PyTorch. As per Flyte, PyTorch is 
 However, when merged with Flyte, the combo helps utilize and bootstrap the infrastructure for PyTorch and ensures that things work well!
 Additionally, it also offers other benefits of using tasks and workflows -- checkpointing, separation of concerns, and auto-memoization.
 
+Model Development
+=================
+
+Some basics of model development are outlined in the following video, in addition to:
+
+- Bias Variance trade-off
+- Model families
+- Data parallelism
+- Model parallelism, and 
+- PyTorch parallelism
+
+..  youtube:: FuMtJOMh5uQ
+
 Specify GPU Requirement
 =======================
 
