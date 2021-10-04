@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     dialog: {
         maxWidth: `calc(100% - ${theme.spacing(12)}px)`,
         maxHeight: `calc(100% - ${theme.spacing(12)}px)`,
-        height: theme.spacing(36),
-        width: theme.spacing(38)
+        height: theme.spacing(34),
+        width: theme.spacing(36)
     },
     versionWrapper: {
         minWidth: theme.spacing(20),
@@ -47,6 +47,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         lineHeight: '17px',
         color: '#636379',
         margin: '17px 0 2px 0'
+    },
+    version: {
+        color: '#1982E3',
+        fontSize: '14px'
     }
 }));
 
@@ -59,6 +63,14 @@ export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({
 }) => {
     const styles = useStyles();
     const version = useVersion();
+
+    const adminVersion =
+        version && version.value && version.value.controlPlaneVersion
+            ? version.value.controlPlaneVersion.Version?.slice(
+                  1,
+                  version.value.controlPlaneVersion.Version?.indexOf('-')
+              )
+            : null;
 
     return (
         <Dialog
@@ -78,29 +90,32 @@ export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({
                 <div className={styles.title}>Flyte Console</div>
                 <div className={styles.versionWrapper}>
                     <span>UI Version</span>
-                    <span>0.1.1</span>
-                </div>
-                <div className={styles.versionWrapper}>
-                    <span>Platform Version</span>
-                    <span>{platformVersion}</span>
+                    <Link
+                        href={`https://github.com/flyteorg/flyteconsole/releases/tag/v${platformVersion}`}
+                        className={styles.version}
+                        target="_blank"
+                    >
+                        {platformVersion}
+                    </Link>
                 </div>
                 <div className={styles.versionWrapper}>
                     <span>Admin Version</span>
-                    <span>
-                        {version &&
-                        version.value &&
-                        version.value.controlPlaneVersion
-                            ? version.value.controlPlaneVersion.Version
-                            : null}
-                    </span>
+                    <Link
+                        href={`https://github.com/flyteorg/flyteadmin/releases/tag/v${adminVersion}`}
+                        className={styles.version}
+                        target="_blank"
+                    >
+                        {adminVersion}
+                    </Link>
                 </div>
                 <div className={styles.link}>Documentation Link:</div>
                 <Link
                     href="https://docs.flyte.org/en/latest/"
                     style={{
                         color: '#1982E3',
-                        fontSize: '12px'
+                        fontSize: '13px'
                     }}
+                    target="_blank"
                 >
                     https://docs.flyte.org/en/latest/
                 </Link>
