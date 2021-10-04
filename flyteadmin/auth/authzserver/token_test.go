@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
+	jwtgo "github.com/golang-jwt/jwt/v4"
 
 	"github.com/flyteorg/flyteadmin/auth/config"
 
@@ -67,9 +67,6 @@ func Test_tokenEndpoint(t *testing.T) {
 		mockAuthCtx.OnOAuth2Provider().Return(oauth2Provider)
 		mockAuthCtx.OnOptions().Return(&config.Config{})
 
-		expectedAccessTokenExpiry := time.Now().Add(config.DefaultConfig.AppAuth.SelfAuthServer.AccessTokenLifespan.Duration).Unix()
-		expectedRefreshTokenExpiry := time.Now().Add(config.DefaultConfig.AppAuth.SelfAuthServer.RefreshTokenLifespan.Duration).Unix()
-
 		rw := httptest.NewRecorder()
 		tokenEndpoint(mockAuthCtx, rw, req)
 		if !assert.Equal(t, http.StatusOK, rw.Code) {
@@ -90,6 +87,9 @@ func Test_tokenEndpoint(t *testing.T) {
 		})
 
 		assert.NoError(t, err)
+
+		expectedAccessTokenExpiry := time.Now().Add(config.DefaultConfig.AppAuth.SelfAuthServer.AccessTokenLifespan.Duration - time.Second).Unix()
+		expectedRefreshTokenExpiry := time.Now().Add(config.DefaultConfig.AppAuth.SelfAuthServer.RefreshTokenLifespan.Duration - time.Second).Unix()
 
 		claims := parsedToken.Claims.(jwtgo.MapClaims)
 		assert.True(t, claims.VerifyExpiresAt(expectedAccessTokenExpiry, true))

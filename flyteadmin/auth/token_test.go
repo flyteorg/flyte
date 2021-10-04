@@ -27,5 +27,6 @@ func TestExpiredToken(t *testing.T) {
 	x, err := verifier.Verify(context.Background(), expiredToken)
 	assert.Nil(t, x)
 	assert.Error(t, err)
+	t.Log(err.Error())
 	assert.True(t, strings.Contains(err.Error(), "token is expired"))
 }
