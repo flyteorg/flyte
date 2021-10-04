@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
 
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
@@ -32,7 +34,7 @@ var arrayJobEnvVars = []corev1.EnvVar{
 }
 
 func formatSubTaskName(_ context.Context, parentName, suffix string) (subTaskName string) {
-	return fmt.Sprintf("%v-%v", parentName, suffix)
+	return utils.ConvertToDNS1123SubdomainCompatibleString(fmt.Sprintf("%v-%v", parentName, suffix))
 }
 
 func ApplyPodPolicies(_ context.Context, cfg *Config, pod *corev1.Pod) *corev1.Pod {
