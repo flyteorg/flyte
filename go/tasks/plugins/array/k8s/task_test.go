@@ -25,6 +25,7 @@ func TestFinalize(t *testing.T) {
 	podTemplate, _, _ := FlyteArrayJobToK8sPodTemplate(ctx, tCtx, "")
 	pod := addPodFinalizer(&podTemplate)
 	pod.Name = formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "1")
+	assert.Equal(t, "notfound-1", pod.Name)
 	assert.NoError(t, kubeClient.GetClient().Create(ctx, pod))
 
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
