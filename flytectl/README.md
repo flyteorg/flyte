@@ -6,7 +6,7 @@
         FlyteCTL
     </h1>
     <p align="center">
-        The official Flyte command-line interface
+       Flyte's official command-line interface
     </p>
     <h3 align="center">
         <a href="https://flytectl.rtfd.io">Documentation</a>
@@ -25,7 +25,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytectl.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytectl/latest.svg?style=plastic)
 
-FlyteCTL is designed to be a portable and lightweight CLI to work with Flyte. It is written in Golang and can access [FlyteAdmin](https://github.com/flyteorg/flyteadmin/)—the control plane of Flyte.
+FlyteCTL was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
 
 ## 🚀 Quick Start
 
@@ -39,7 +39,7 @@ FlyteCTL is designed to be a portable and lightweight CLI to work with Flyte. It
         ```bash
         $ curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
         ```
-2. (Optional) `flytectl upgrade` provides a general interface to upgrade FlyteCTL; run the command shown in the output
+2. (Optional) `flytectl upgrade` provides a general interface to upgrading FlyteCTL; run the command in the output
 
 3. Start sandbox using FlyteCTL 
     ```bash
