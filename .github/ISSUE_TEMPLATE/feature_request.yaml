@@ -1,0 +1,54 @@
+name: Core Feature request
+about: Suggest an idea for this project
+title: "[Core Feature]"
+labels: enhancement, untriaged
+assignees: ''
+body:
+  - type: textarea
+    id: Motivation
+    validations:
+      required: true
+    attributes:
+      label: " Motivation: Why do you think this is important?"
+      description: " A clear and concise description of what the problem is.”
+      placeholder: " Ex. I'm always frustrated when [...] OR why this would be a cool addition OR which usecases could this unblock."
+  - type: textarea
+    id: Goal
+    validations:
+      required: true
+    attributes:
+      label: " Goal: What should the final outcome look like, ideally?"
+      description: " A clear and concise description of what you want to happen or achieve."
+      placeholder: "It would.."
+  - type: textarea
+    id: Alternatives
+    validations:
+      required: false
+    attributes:
+      label: " Describe alternatives you've considered"
+      description: " A clear and concise description of any alternative solutions or features you've considered."
+      placeholder: "Some alternatives might be..."
+  
+  - type: textarea
+    id: operating-system
+    attributes:
+      label: " Propose: Link/Inline OR Additional context"
+      description: " If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document."
+      placeholder: "links/inline ..."
+
+    validations:
+      required: false
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "Have you spent some time to check if this issue has been raised before?"
+      description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
+      options:
+        - label: "I checked and didn't find similar issue"
+  - type: checkboxes
+    id: read-code-of-conduct
+    attributes:
+      label: "Have you read the Code of Conduct?"
+      options:
+        - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
+          required: true
