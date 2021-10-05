@@ -1,15 +1,15 @@
 name: "Bug Report"
 description: "Submit a bug report to help us improve"
 title: "Bug Report: "
-labels: [bug]
+labels: [bug,untriaged]
 body:
   - type: textarea
     id: steps-to-reproduce
     validations:
       required: true
     attributes:
-      label: "Reproduction steps"
-      description: "How do you trigger this bug? Please walk us through it step by step."
+      label: "Describe the bug"
+      description: "A clear and concise description of what the bug is."
       placeholder: "..."
   - type: textarea
     id: expected-behavior
@@ -17,49 +17,33 @@ body:
       required: true
     attributes:
       label: "Expected behavior"
-      description: "What did you think would happen?"
-      placeholder: "It should have.."
+      description: "A clear and concise description of what you expected to happen."
+      placeholder: "..."
   - type: textarea
-    id: actual-behavior
-    validations:
-      required: true
-    attributes:
-      label: "Actual Behavior"
-      description: "What actually happened? Add screenshots, if applicable."
-      placeholder: "It actually did..."
-  
-  - type: dropdown
-    id: operating-system
-    attributes:
-      label: "Operating system"
-      description: "What OS is your server or device running on?"
-      options:
-        - Linux
-        - MacOS
-        - Windows
-        - Something else
-    validations:
-      required: true
-  - type: textarea
-    id: enviromnemt
+    id: additional-context
     validations:
       required: false
     attributes:
-      label: "Your Environment"
-      description: "Is your environment customized in any way?"
-      placeholder: "I used ..."
+      label: "Additional context To Reproduce"
+      description: "Steps to reproduce the behavior"
+      placeholder: "1.2."
+  - type: textarea
+    id: screenshots
+    validations:
+      required: false
+    attributes:
+      label: "Screenshots"
+      description: "If applicable, add screenshots to help explain your problem."
+      placeholder: "..."
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
-      label: "Have you spent some time to check if this issue has been raised before?"
-      description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
       options:
-        - label: "I checked and didn't find similar issue"
+        - label: "Are you sure this issue hasn't been raised already?"
           required: true
   - type: checkboxes
     id: read-code-of-conduct
     attributes:
-      label: "Have you read the Code of Conduct?"
       options:
-        - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
+        - label: "Have you read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
           required: true
