@@ -40,7 +40,9 @@ This will behave similarly to the default container plugin behavior. Platform-su
 
 ## 5 Drawbacks
 
-The current system for resource allocation has proven buggy and confusing. Refactoring to eliminate spaghetti code and properly delegate responsibilities should address this.
+As the control plane, admin represents the centralized authority responsible for task resource defaults and limits. Resolving individual task resources in admin provides a centralized implementation whereas the move to handle this in plugins disperses resource assignment. This is necessary to support the rich variety of container-less task types but does complicate debugging where and how resource allocation happens.
+
+Introducing this change as always, has the potential for leading to bugs and conflicts. Migrating resource resolution from different components requires maintaining duplicate code in flyteadmin and flyteplugins across a period of several releases until the flyteadmin code can be safely removed.
 
 ## 6 Alternatives
 
