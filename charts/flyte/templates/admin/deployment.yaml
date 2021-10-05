@@ -113,7 +113,7 @@ spec:
         {{- with .Values.flyteadmin.additionalVolumeMounts -}}
         {{ toYaml . | nindent 8 }}
         {{- end }}
-      {{- if .Values.flyteadmin.deployRedoc -}}
+      {{- if .Values.flyteadmin.deployRedoc }}
       - command:
         - sh
         - -c

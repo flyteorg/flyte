@@ -61,6 +61,8 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
+  # -- Deploys a Redoc container in Flyteadmin's pod
+  deployRedoc: true
 
 #
 # DATACATALOG SETTINGS
