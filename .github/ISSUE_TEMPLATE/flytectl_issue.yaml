@@ -1,0 +1,37 @@
+name: Flytectl Feature request
+about: Suggest a feature for flytectl
+title: "[Flytectl Feature]"
+labels: enhancement, untriaged, flytectl
+assignees: 
+body:
+  - type: textarea
+    id: feature-description
+    validations:
+      required: true
+    attributes:
+      label: "Feature description"
+      description: "Describe the feature/command for flytectl"
+      placeholder: "A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] OR why this would be a cool addition OR which usecases could this unblock."
+  - type: textarea
+    id: example
+    validations:
+      required: true
+    attributes:
+      label: "Provide a possible output or ux example"
+      description: " A clear and concise description of what you want to happen or achieve."
+      placeholder: "It would.."
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "Have you spent some time to check if this issue has been raised before?"
+      description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
+      options:
+        - label: "I checked and didn't find similar issue"
+          required: true
+  - type: checkboxes
+    id: read-code-of-conduct
+    attributes:
+      label: "Have you read the Code of Conduct?"
+      options:
+        - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
+          required: true
