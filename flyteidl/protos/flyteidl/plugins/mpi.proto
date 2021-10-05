@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// MPI operator proposal https://github.com/kubeflow/community/blob/master/proposals/mpi-operator-proposal.md
+// Custom proto for plugin that enables distributed training using https://github.com/kubeflow/mpi-operator
+message DistributedMPITrainingTask {
+  // number of worker spawned in the cluster for this job
+  int32 num_workers = 1;
+
+  // number of launcher replicas spawned in the cluster for this job
+  // The launcher pod invokes mpirun and communicates with worker pods through MPI.
+  int32 num_launcher_replicas = 2;
+
+  // number of slots per worker used in hostfile.
+  // The available slots (GPUs) in each pod.
+  int32 slots = 3;
+}

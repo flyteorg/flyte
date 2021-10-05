@@ -48,6 +48,48 @@ will be executed concurrently.
 
 
 
+.. _ref_flyteidl/plugins/mpi.proto:
+
+flyteidl/plugins/mpi.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.plugins.DistributedMPITrainingTask:
+
+DistributedMPITrainingTask
+------------------------------------------------------------------
+
+MPI operator proposal https://github.com/kubeflow/community/blob/master/proposals/mpi-operator-proposal.md
+Custom proto for plugin that enables distributed training using https://github.com/kubeflow/mpi-operator
+
+
+
+.. csv-table:: DistributedMPITrainingTask type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "num_workers", ":ref:`ref_int32`", "", "number of worker spawned in the cluster for this job"
+   "num_launcher_replicas", ":ref:`ref_int32`", "", "number of launcher replicas spawned in the cluster for this job The launcher pod invokes mpirun and communicates with worker pods through MPI."
+   "slots", ":ref:`ref_int32`", "", "number of slots per worker used in hostfile. The available slots (GPUs) in each pod."
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+
 .. _ref_flyteidl/plugins/presto.proto:
 
 flyteidl/plugins/presto.proto
