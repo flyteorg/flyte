@@ -5,7 +5,7 @@ labels: [documentation,untriaged]
 body:
  - type: textarea
    id: issue-description
-    validations:
+   validations:
       required: true
     attributes:
       label: "Description"
