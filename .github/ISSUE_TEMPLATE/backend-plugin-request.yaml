@@ -1,0 +1,51 @@
+name: Plugin request
+description: This issue is used to request for and track addition of new plugins in Flyte
+title: "[Plugin]"
+labels: untriaged,plugins
+body:
+  - type: textarea
+    id: motivation
+    validations:
+      required: true
+    attributes:
+      label: "Why would this plugin be helpful to the Flyte community"
+      description: " Explain the usecases for the plugin."
+      placeholder: " Ex. I'm always frustrated when [...] OR why this would be a cool addition.."
+  - type: dropdown
+    id: type
+    validations:
+      required: true
+    attributes:
+      label: " Type"
+      description: "What is the type of this plugin"
+      options:
+        - Python/Java interface only plugin
+        -  Web Service (e.g. AWS Sagemaker, GCP DataFlow, Qubole etc...)
+        - Kubernetes Operator (e.g. TfOperator, SparkOperator, FlinkK8sOperator, etc...)
+        - Customized Plugin using native kubernetes constructs
+        - Other
+  - type: dropdown
+    id: help
+    validations:
+      required: true
+    attributes:
+      label: "Implementation"
+      description: "Can you help with the implementation?"
+      options:
+        - Yes
+        - No
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "Have you spent some time to check if this issue has been raised before?"
+      description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
+      options:
+        - label: "I checked and didn't find similar issue"
+          required: true
+  - type: checkboxes
+    id: read-code-of-conduct
+    attributes:
+      label: "Have you read the Code of Conduct?"
+      options:
+        - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
+          required: true
