@@ -1,19 +1,18 @@
-name: "Core Feature request"
-about: "Suggest an idea for this project"
-title: "Core Feature"
-labels: [enhancement, untriaged]
-assignees: ''
+name: "Core features"
+description: "Suggest an idea for the project"
+title: "[Core feature] "
+labels: [enhancement,untriaged]
 body:
   - type: textarea
-    id: Motivation
+    id: motivation
     validations:
       required: true
     attributes:
       label: " Motivation: Why do you think this is important?"
-      description: " A clear and concise description of what the problem is.”
+      description: " A clear and concise description of what the problem is."
       placeholder: " Ex. I'm always frustrated when [...] OR why this would be a cool addition OR which usecases could this unblock."
   - type: textarea
-    id: Goal
+    id: goal
     validations:
       required: true
     attributes:
@@ -21,21 +20,21 @@ body:
       description: " A clear and concise description of what you want to happen or achieve."
       placeholder: "It would.."
   - type: textarea
-    id: Alternatives
+    id: alternatives
     validations:
-      required: false
+      required: true
     attributes:
-      label: " Describe alternatives you've considered"
-      description: " A clear and concise description of any alternative solutions or features you've considered."
-      placeholder: "Some alternatives might be..."
+      label: " Describe alternatives you've considered "
+      description: " Some alternatives might be..."
+      placeholder: "For example..."
   - type: textarea
-    id: Additional-context
-    attributes:
-      label: " Propose: Link/Inline OR Additional context"
-      description: " If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document."
-      placeholder: "links/inline ..."
+    id: context
     validations:
       required: false
+    attributes:
+      label: " Propose: Link/Inline OR Additional context "
+      description: "" If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document.
+      placeholder: "links/inline.."
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
@@ -43,6 +42,7 @@ body:
       description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
       options:
         - label: "I checked and didn't find similar issue"
+          required: true
   - type: checkboxes
     id: read-code-of-conduct
     attributes:
@@ -50,3 +50,4 @@ body:
       options:
         - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
           required: true
+
