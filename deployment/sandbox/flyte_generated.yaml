@@ -2972,7 +2972,7 @@ spec:
         - sh
         - -c
         - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.16-alpine
+        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: check-db-ready
       - command:
         - flyteadmin
@@ -3162,7 +3162,7 @@ spec:
           value: minio
         - name: MINIO_SECRET_KEY
           value: miniostorage
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+        image: ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1
         name: minio
         ports:
         - containerPort: 9000
@@ -3174,7 +3174,7 @@ spec:
       - command:
         - mkdir
         - /data/my-s3-bucket
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+        image: ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1
         name: create-bucket
         volumeMounts:
         - mountPath: /data
@@ -3201,7 +3201,7 @@ spec:
       - env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
-        image: postgres:10.16-alpine
+        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: postgres
         ports:
         - containerPort: 5432

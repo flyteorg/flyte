@@ -1846,7 +1846,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "docker.io/bitnami/redis:4.0.2-r1"
+      - image: "ecr.flyte.org/bitnami/redis:6.2.5-debian-10-r59"
         imagePullPolicy: "IfNotPresent"
         name: redis
         env:

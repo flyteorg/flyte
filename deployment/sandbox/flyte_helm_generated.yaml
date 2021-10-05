@@ -3467,7 +3467,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: postgres:10.16-alpine
+          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
           command:
           - sh
           - -c
@@ -3675,7 +3675,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: postgres:10.16-alpine
+          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
           command:
             - sh
             - -c
@@ -3753,7 +3753,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "minio/minio:RELEASE.2020-12-16T05-05-17Z"
+      - image: "ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1"
         imagePullPolicy: "IfNotPresent"
         name: minio
         args:
@@ -3781,7 +3781,7 @@ spec:
       - command:
           - mkdir
           - /var/lib/minioql/data/my-s3-bucket
-        image: "minio/minio:RELEASE.2020-12-16T05-05-17Z"
+        image: "ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1"
         name: create-bucket
         volumeMounts:
         - name: minio-storage
@@ -3816,7 +3816,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "postgres:10.16-alpine"
+      - image: "public.ecr.aws/ubuntu/postgres:10.16-alpine"
         imagePullPolicy: "IfNotPresent"
         name: postgres
         env:
