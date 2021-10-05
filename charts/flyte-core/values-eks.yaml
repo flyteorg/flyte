@@ -51,6 +51,12 @@ flyteadmin:
   deployRedoc: false
 
 #
+# FLYTESCHEDULER
+#
+
+flytescheduler: {}
+
+#
 # DATACATALOG
 #
 
@@ -138,37 +144,6 @@ flyteconsole:
             matchLabels:
               app.kubernetes.io/name: flyteconsole
           topologyKey: kubernetes.io/hostname
-
-#
-# REDIS
-#
-
-redis:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 250Mi
-
-#
-# POSTGRES
-#
-
-postgres:
-  enabled: false
-
-#
-# MINIO
-#
-
-minio:
-  enabled: false
-
-#
-# CONTOUR
-#
-
-contour:
-  enabled: false
 
 #
 # COMMON
@@ -298,6 +273,7 @@ configmap:
         redis:
           hostPath: "{{ .Values.userSettings.redisHostUrl }}"
           hostKey: "{{ .Values.userSettings.redisHostKey }}"
+
 
   enabled_plugins:
     # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
@@ -453,23 +429,11 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
+
+
 #
 # SPARKOPERATOR
 #
 
 sparkoperator:
   enabled: false
-
-# -----------------
-# -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
-# Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
-sagemaker:
-  enabled: false
-#  plugin_config:
-#    plugins:
-#      sagemaker:
-#        roleArn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/<ROLE_FOR_SAGEMAKER>
-#        region: {{ .Values.userSettings.accountRegion }}
-# ---------------------------
-# Flink jobs using the Flink Operator
-#

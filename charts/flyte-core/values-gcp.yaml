@@ -44,12 +44,12 @@ configmap:
       enabled-plugins:
         - container
         - sidecar
-        - spark
         - k8s-array
-        - pytorch
       default-for-task-types:
         container: container
         sidecar: sidecar
-        spark: spark
         container_array: k8s-array
-        pytorch: pytorch
+
+workflow_scheduler:
+  enabled: true
+  type: native

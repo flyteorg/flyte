@@ -49,6 +49,12 @@ flyteadmin:
   deployRedoc: false
 
 #
+# FLYTESCHEDULER
+#
+
+flytescheduler: {}
+
+#
 # DATACATALOG
 #
 

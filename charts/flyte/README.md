@@ -130,7 +130,14 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
 | datacatalog.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
-| db.database.host | string | `"postgres"` |  username: postgres |
+| db.admin.database.dbname | string | `"flyteadmin"` |  |
+| db.admin.database.host | string | `"postgres"` |  |
+| db.admin.database.port | int | `5432` |  |
+| db.admin.database.username | string | `"postgres"` |  |
+| db.datacatalog.database.dbname | string | `"datacatalog"` |  |
+| db.datacatalog.database.host | string | `"postgres"` |  |
+| db.datacatalog.database.port | int | `5432` |  |
+| db.datacatalog.database.username | string | `"postgres"` |  |
 | flyteadmin.additionalVolumeMounts | list | `[]` |  |
 | flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
@@ -177,6 +184,20 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
+| flytescheduler | object | `{"affinity":{},"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"v0.6.28"},"nodeSelector":{},"podAnnotations":{},"resources":{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"secrets":{},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTESCHEDULER SETTINGS |
+| flytescheduler.affinity | object | `{}` | affinity for Flytescheduler deployment |
+| flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
+| flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
+| flytescheduler.image.tag | string | `"v0.6.28"` | Docker image tag |
+| flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
+| flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
+| flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
+| flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for Flytescheduler |
+| flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
+| flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
+| flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | kubernetes-dashboard | object | `{"enabled":false}` |  KUBERNETES DASHBOARD |
 | minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/bitnami/minio","tag":"2021.9.18-debian-10-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
 | minio.affinity | object | `{}` | affinity for Minio deployment |

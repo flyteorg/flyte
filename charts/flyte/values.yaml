@@ -1,3 +1,4 @@
+
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -63,6 +64,49 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
+
+#
+# FLYTESCHEDULER SETTINGS
+#
+
+flytescheduler:
+  image:
+    # -- Docker image for Flytescheduler deployment
+    repository: cr.flyte.org/flyteorg/flytescheduler
+    # -- Docker image tag
+    tag: v0.6.28 # FLYTESCHEDULER_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flytescheduler deployment
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyte/config/*.yaml
+
+  # -- Configuration for service accounts for Flytescheduler
+  serviceAccount:
+    # -- Should a service account be created for Flytescheduler
+    create: true
+    # -- Annotations for ServiceAccount attached to Flytescheduler pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Flytescheduler pods
+  podAnnotations: {}
+  # -- nodeSelector for Flytescheduler deployment
+  nodeSelector: {}
+  # -- tolerations for Flytescheduler deployment
+  tolerations: []
+  # -- affinity for Flytescheduler deployment
+  affinity: {}
+  secrets: {}
 
 #
 # DATACATALOG SETTINGS
@@ -392,6 +436,7 @@ common:
   databaseSecret:
     # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
     name: ""
+
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
@@ -434,20 +479,25 @@ storage:
     region: us-east-1
   # -- settings for storage type gcs
   gcs:
-    # -- GCP project ID. Required for storage type gcs.
-    # projectId:
+  # -- GCP project ID. Required for storage type gcs.
+  # projectId:
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
 
 # Database configuration
 db:
-  database:
-    # port: 5432
-    # username: postgres
-    host: postgres
-    # dbname: flyte
-    # passwordPath: /etc/db/pass.txt
-    # options:
+  datacatalog:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "datacatalog"
+  admin:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "flyteadmin"
 
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
@@ -567,7 +617,6 @@ configmap:
       insecure: true
       clientId: flytepropeller
       clientSecretLocation: /etc/secrets/client_secret
-
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
   catalog:
