@@ -33,7 +33,7 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v0.21.2
+	github.com/flyteorg/flyteidl v0.21.3
 	github.com/flyteorg/flyteplugins v0.6.0
 	github.com/flyteorg/flytepropeller v0.14.2
 	github.com/flyteorg/flytestdlib v0.3.34
