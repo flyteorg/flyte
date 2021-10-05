@@ -8,7 +8,7 @@ body:
     validations:
       required: true
     attributes:
-      label: "Featur description"
+      label: "Feature description"
       description: "A clear and concise description of what the housekeeping item is."
       placeholder: "..."
   - type: textarea
