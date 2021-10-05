@@ -1,6 +1,6 @@
 name: Core Feature request
 about: Suggest an idea for this project
-title: "[Core Feature]"
+title: Core Feature
 labels: enhancement, untriaged
 assignees: ''
 body:
@@ -28,14 +28,12 @@ body:
       label: " Describe alternatives you've considered"
       description: " A clear and concise description of any alternative solutions or features you've considered."
       placeholder: "Some alternatives might be..."
-  
   - type: textarea
-    id: operating-system
+    id: Additional-context
     attributes:
       label: " Propose: Link/Inline OR Additional context"
       description: " If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document."
       placeholder: "links/inline ..."
-
     validations:
       required: false
   - type: checkboxes
