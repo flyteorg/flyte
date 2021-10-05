@@ -1,5 +1,5 @@
 name: Housekeeping
-about: Maintenance and cleanup tasks, that need to be performed. This may include tech-debt, library upgrades, CI/CD improvements etc
+description: Maintenance and cleanup tasks, that need to be performed. This may include tech-debt, library upgrades, CI/CD improvements etc
 title: "[Housekeeping] "
 labels: housekeeping
 body:
