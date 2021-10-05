@@ -3,8 +3,7 @@ description: "Report an issue or suggest an improvement for Flyte docs"
 title: "[Documentation]"
 labels: [documentation,untriaged]
 body:
-  
-  - type: textarea
+- type: textarea
     id: issue-description
     validations:
       required: true
