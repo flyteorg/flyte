@@ -26,7 +26,7 @@ body:
     attributes:
       label: "Propose: Link/Inline OR Additional context "
       description: "If you have ideas about the implementation, please propose the change. If inline, keep it short; if more prominent, then you can link to an external document."
- - type: checkboxes
+  - type: checkboxes
     id: no-duplicate-issues
     attributes:
       options:
