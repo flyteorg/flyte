@@ -1,5 +1,5 @@
 name: "Documentation"
-description: "Report an issue related to documentation"
+description: "Report an issue or suggest an improvement for Flyte docs"
 title: "Documentation: "
 labels: [documentation]
 body:
