@@ -32,8 +32,8 @@ body:
       label: "Implementation"
       description: "Can you help with the implementation?"
       options:
-        - Yes
-        - No
+        - 'Yes'
+        - 'No'
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
