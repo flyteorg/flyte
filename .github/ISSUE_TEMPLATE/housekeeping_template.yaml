@@ -1,0 +1,44 @@
+name: Housekeeping
+about: Maintenance and cleanup tasks, that need to be performed. This may include tech-debt, library upgrades, CI/CD improvements etc
+title: "[Housekeeping] "
+labels: housekeeping
+body:
+  - type: textarea
+    id: feature-description
+    validations:
+      required: true
+    attributes:
+      label: "Featur description"
+      description: "A clear and concise description of what the housekeeping item is."
+      placeholder: "..."
+  - type: textarea
+    id: consequences
+    validations:
+      required: true
+    attributes:
+      label: "What if we do not do this?"
+      description: "Short description of potential consequences"
+      placeholder: "...."
+  - type: textarea
+    id: related-component
+    validations:
+      required: false
+    attributes:
+      label: "Related component"
+      description: "Either specific or all"
+      placeholder: "...."
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "Have you spent some time to check if this issue has been raised before?"
+      description: "Have you Googled for a similar issue or checked our older issues for a similar bug?"
+      options:
+        - label: "I checked and didn't find similar issue"
+          required: true
+  - type: checkboxes
+    id: read-code-of-conduct
+    attributes:
+      label: "Have you read the Code of Conduct?"
+      options:
+        - label: "I have read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
+          required: true
