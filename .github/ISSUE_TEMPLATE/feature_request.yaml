@@ -33,7 +33,7 @@ body:
       required: false
     attributes:
       label: " Propose: Link/Inline OR Additional context "
-      description: "" If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document.
+      description: "If you have ideas about the implementation please propose the change. If inline keep it short, if larger then you link to an external document."
       placeholder: "links/inline.."
   - type: checkboxes
     id: no-duplicate-issues
