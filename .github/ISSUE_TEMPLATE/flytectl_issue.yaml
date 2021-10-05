@@ -2,7 +2,7 @@ name: Flytectl Feature request
 about: Suggest a feature for flytectl
 title: "[Flytectl Feature]"
 labels: enhancement, untriaged, flytectl
-assignees: 
+assignees: ""
 body:
   - type: textarea
     id: feature-description
