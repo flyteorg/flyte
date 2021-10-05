@@ -1,4 +1,3 @@
-
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -60,6 +59,8 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
+  # -- Deploys a Redoc container in Flyteadmin's pod
+  deployRedoc: true
 
 #
 # DATACATALOG SETTINGS
@@ -203,7 +204,6 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
-
 
 common:
   databaseSecret:
@@ -522,8 +522,6 @@ workflow_notifications:
   enabled: false
   config: {}
 
-
-
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
@@ -616,7 +614,6 @@ sparkoperator:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
 # Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
@@ -627,5 +624,3 @@ sagemaker:
       sagemaker:
         roleArn: <arn>
         region: <region>
-
-

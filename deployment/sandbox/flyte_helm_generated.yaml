@@ -3467,7 +3467,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
+          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
           - sh
           - -c
@@ -3561,26 +3561,6 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
       serviceAccountName: flyteadmin
       volumes:
         
@@ -3675,7 +3655,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
+          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
             - sh
             - -c
@@ -3816,7 +3796,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "public.ecr.aws/ubuntu/postgres:10.16-alpine"
+      - image: "ecr.flyte.org/ubuntu/postgres:10.16-alpine"
         imagePullPolicy: "IfNotPresent"
         name: postgres
         env:

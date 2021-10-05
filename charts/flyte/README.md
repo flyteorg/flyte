@@ -191,12 +191,12 @@ helm install gateway bitnami/contour -n flyte
 | minio.resources.requests | object | `{"cpu":"10m","memory":"128Mi"}` | Requests are the minimum set of resources needed for this pod |
 | minio.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Minio |
 | minio.tolerations | list | `[]` | tolerations for Minio deployment |
-| postgres | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"public.ecr.aws/ubuntu/postgres","tag":"3-21.04_beta"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  POSTGRES SETTINGS |
+| postgres | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/ubuntu/postgres","tag":"13-21.04_beta"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  POSTGRES SETTINGS |
 | postgres.affinity | object | `{}` | affinity for Postgres deployment |
 | postgres.enabled | bool | `true` | - enable or disable Postgres deployment installation |
 | postgres.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| postgres.image.repository | string | `"public.ecr.aws/ubuntu/postgres"` | Docker image for Postgres deployment |
-| postgres.image.tag | string | `"3-21.04_beta"` | Docker image tag |
+| postgres.image.repository | string | `"ecr.flyte.org/ubuntu/postgres"` | Docker image for Postgres deployment |
+| postgres.image.tag | string | `"13-21.04_beta"` | Docker image tag |
 | postgres.nodeSelector | object | `{}` | nodeSelector for Postgres deployment |
 | postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
 | postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |

@@ -20,7 +20,7 @@ spec:
       initContainers:
         {{- if .Values.postgres.enabled }}
         - name: check-db-ready
-          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
+          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
           - sh
           - -c
@@ -113,6 +113,7 @@ spec:
         {{- with .Values.flyteadmin.additionalVolumeMounts -}}
         {{ toYaml . | nindent 8 }}
         {{- end }}
+      {{- if .Values.flyteadmin.deployRedoc -}}
       - command:
         - sh
         - -c
@@ -133,6 +134,7 @@ spec:
           limits:
             cpu: "0.1"
             memory: 200Mi
+      {{- end }}
       serviceAccountName: {{ template "flyteadmin.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}

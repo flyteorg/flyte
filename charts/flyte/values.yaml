@@ -267,9 +267,9 @@ postgres:
   replicaCount: 1
   image:
     # -- Docker image for Postgres deployment
-    repository: public.ecr.aws/ubuntu/postgres
+    repository: ecr.flyte.org/ubuntu/postgres
     # -- Docker image tag
-    tag: 3-21.04_beta
+    tag: 13-21.04_beta
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Postgres deployment
