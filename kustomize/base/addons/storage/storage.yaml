@@ -17,7 +17,7 @@ spec:
         - name: minio-storage
           emptyDir: {}
       initContainers:
-        - image: minio/minio
+        - image: minio
           name: create-bucket
           command:
             - mkdir
@@ -26,7 +26,7 @@ spec:
             - name: minio-storage
               mountPath: /data
       containers:
-        - image: minio/minio
+        - image: minio
           name: minio
           env:
             - name: MINIO_ACCESS_KEY

@@ -20,7 +20,7 @@ spec:
       initContainers:
         {{- if .Values.postgres.enabled }}
         - name: check-db-ready
-          image: postgres:10.16-alpine
+          image: public.ecr.aws/ubuntu/postgres:13-21.04_beta
           command:
           - sh
           - -c

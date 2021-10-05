@@ -228,9 +228,9 @@ redis:
   replicaCount: 1
   image:
     # -- Docker image for Redis Statefulset
-    repository: docker.io/bitnami/redis
+    repository: ecr.flyte.org/bitnami/redis
     # -- Docker image tag
-    tag: 4.0.2-r1
+    tag: 6.2.5-debian-10-r59
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Redis Statefulset
@@ -267,9 +267,9 @@ postgres:
   replicaCount: 1
   image:
     # -- Docker image for Postgres deployment
-    repository: postgres
+    repository: public.ecr.aws/ubuntu/postgres
     # -- Docker image tag
-    tag: "10.16"
+    tag: 3-21.04_beta
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Postgres deployment
@@ -304,9 +304,9 @@ minio:
   replicaCount: 1
   image:
     # -- Docker image for Minio deployment
-    repository: minio/minio
+    repository: ecr.flyte.org/bitnami/minio
     # -- Docker image tag
-    tag: RELEASE.2020-12-16T05-05-17Z
+    tag: 2021.9.18-debian-10-r1
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Minio deployment
