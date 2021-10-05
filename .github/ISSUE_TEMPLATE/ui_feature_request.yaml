@@ -19,7 +19,7 @@ body:
       label: "Goal: What should the final outcome look like, ideally?"
       description: "A clear and concise description of what you want to happen or achieve."
       placeholder: "This feature can help implement or resolve [...]"
- - type: textarea
+  - type: textarea
     id: context
     validations:
       required: false
