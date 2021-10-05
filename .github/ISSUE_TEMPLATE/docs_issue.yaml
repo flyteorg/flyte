@@ -10,7 +10,6 @@ body:
     attributes:
       label: "Description"
       description: "Describe the documentation update"
-      placeholder: "The issues/changes ..."
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
