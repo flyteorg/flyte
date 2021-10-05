@@ -3,16 +3,16 @@ description: "Report an issue or suggest an improvement for Flyte docs"
 title: "[Documentation]"
 labels: [documentation,untriaged]
 body:
- - type: textarea
-   id: issue-description
-   validations:
+  - type: textarea
+    id: issue-description
+    validations:
       required: true
     attributes:
       label: "Description"
       description: "Describe the documentation update"
       placeholder: "The issues/changes ..."
- - type: checkboxes
-   id: no-duplicate-issues
+  - type: checkboxes
+    id: no-duplicate-issues
     attributes:
       options:
         - label: "Are you sure this issue hasn't been raised already?"
@@ -23,4 +23,3 @@ body:
       options:
         - label: "Have you read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
           required: true
-
