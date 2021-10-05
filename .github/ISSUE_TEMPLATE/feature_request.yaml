@@ -10,7 +10,7 @@ body:
     attributes:
       label: "Motivation: Why do you think this is important?"
       description: "A clear and concise description of the use case."
-      placeholder: "Ex. I'm always frustrated when [...] OR this feature can be a cool addition because [...] OR this feature can simplify [...] use case."
+      placeholder: "I'm frustrated when [...] OR this feature can be a cool addition because [...] OR this feature can simplify [...] use case."
   - type: textarea
     id: goal
     validations:
