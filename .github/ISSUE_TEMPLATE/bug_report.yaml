@@ -10,7 +10,6 @@ body:
     attributes:
       label: "Describe the bug"
       description: "A clear and concise description of what the bug is."
-      placeholder: "..."
   - type: textarea
     id: expected-behavior
     validations:
@@ -18,7 +17,6 @@ body:
     attributes:
       label: "Expected behavior"
       description: "A clear and concise description of what you expected to happen."
-      placeholder: "..."
   - type: textarea
     id: additional-context
     validations:
@@ -26,7 +24,6 @@ body:
     attributes:
       label: "Additional context To Reproduce"
       description: "Steps to reproduce the behavior"
-      placeholder: "1.2."
   - type: textarea
     id: screenshots
     validations:
@@ -34,7 +31,6 @@ body:
     attributes:
       label: "Screenshots"
       description: "If applicable, add screenshots to help explain your problem."
-      placeholder: "..."
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
