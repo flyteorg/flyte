@@ -32,6 +32,8 @@ const (
 	AuthTypeClientSecret AuthType = iota
 	// Chooses Proof Key Code Exchange OAuth2 extension protocol (ref: https://tools.ietf.org/html/rfc7636)
 	AuthTypePkce
+	// Chooses an external authentication process
+	AuthTypeExternalCommand
 )
 
 type Config struct {
@@ -62,6 +64,8 @@ type Config struct {
 	DeprecatedAuthorizationHeader string `json:"authorizationHeader" pflag:",Custom metadata header to pass JWT"`
 
 	PkceConfig pkce.Config `json:"pkceConfig" pflag:",Config for Pkce authentication flow."`
+
+	Command []string `json:"command" pflag:",Command for external authentication token generation"`
 }
 
 var (
