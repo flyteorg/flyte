@@ -62,12 +62,12 @@ Cluster Config
 
     ---
 
-    .. link-button:: deployment-cluster-config-performance
+    .. link-button:: deployment-cluster-config-swagger
        :type: ref
-       :text: Performance
+       :text: Swagger
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Tweaks to improve performance of the core Flyte engine
+    Swagger Open API Schema UI
 
 
 .. toctree::
