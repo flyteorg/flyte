@@ -78,11 +78,11 @@ Please check out and subscribe to the `calendar <https://www.addevent.com/calend
     :text: Zoom Link
     :classes: btn-outline-secondary
     
-If you would like to suggest an alternative meeting time due to time zone differences, please let us know.
+If you'd like to give a 3-5 minute :zap: Lightning Talk :zap: during our Open Source Community Sync, or even suggest a topic for someone else to talk about, let us know!
 
-.. link-button:: https://docs.google.com/forms/d/e/1FAIpQLSeMMAT9g7G0fNVwNX4KdNOoK--0Gf-OOsooccFQ8uIOqDgv-g/viewform?usp=sf_link
+.. link-button:: https://docs.google.com/forms/d/e/1FAIpQLSekwk2fieIVxmRuuNelbIp8DdXKe_SanlRguBtETbcSNHD11w/viewform
     :type: url
-    :text: OSS Meeting Time Feedback Form
+    :text: Lightning Talk Sign Up Sheet
     :classes: btn-outline-secondary
 
 .. toctree::
