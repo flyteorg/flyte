@@ -24,7 +24,7 @@ body:
     attributes:
       label: "Additional context to reproduce"
       description: "Steps to reproduce the behavior."
-      placeholder: "1."\n"2."
+      placeholder: "1. </br> 2."
   - type: textarea
     id: screenshots
     validations:
