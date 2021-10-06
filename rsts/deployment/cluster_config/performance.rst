@@ -12,13 +12,13 @@ The video below contains an overview of the Flyte architecture, what is meant by
 
 Scaling up FlytePropeller
 ==========================
-`FlytePropeller <https://pkg.go.dev/github.com/flyteorg/flytepropeller>`_ is the core engine of Flyte that executes the workflows for Flyte. It is implemented as a `controller <https://kubernetes.io/docs/concepts/architecture/controller/>`__ in Kubernetes.
+`FlytePropeller <https://pkg.go.dev/github.com/flyteorg/flytepropeller>`_ is the core engine of Flyte that executes the workflows for Flyte.
 It is designed as a `Kubernetes Controller <https://kubernetes.io/docs/concepts/architecture/controller/>`_, where the desired state is specified as a FlyteWorkflow `Custom Resource <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`_.
 
-One of the base assumptions of FlytePropeller is that every workflow is independent and can be executed by a completely distinct process, without a need for communication with other processes. On the flip-side, one workflow is tracks the dependencies using a DAG structure and hence constantly needs synchronization.
-Currently each workflow is executed by exactly one process and one thread at a given time. Each workflow is constantly evaluated in an event-loop and uses the specification to cause an effect on the K8s cluster or remote services. The actual effect is actually caused by FlytePropeller plugins.
+One of the base assumptions of FlytePropeller is that every workflow is independent and can be executed by a completely distinct process, without a need for communication with other processes. Meanwhile, one workflow tracks the dependencies between tasks using a DAG structure and hence constantly needs synchronization.
+Currently, FlytePropeller executes Workflows by using an event loop to periodically track and amend the execution status. Within each iteration, a single thread requests the state of Workflow nodes and performs operations (i.e., scheduling node executions, handling failures, etc) to gracefully transition a Workflow from the observed state to the desired state (i.e., Success). Consequently, actual node executions are performed by various FlytePlugins, a diverse collection of operations spanning k8s and other remote services, and FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
-FlytePropeller has a lot of knobs that can be tweaked for performance. The default configuration is good enough for small to medium sized installations of Flyte, that are running about 500 workflows concurrently with no noticeable overhead. In the case when the number of workflows increases,
+FlytePropeller has a lot of knobs that can be tweaked for performance. The default configuration is usually adequate for small to medium sized installations of Flyte, that are running about 500 workflows concurrently with no noticeable overhead. In the case when the number of workflows increases,
 FlytePropeller will automatically slow down, without losing correctness.
 
 Signs of slowdown
@@ -46,7 +46,7 @@ Signs of slowdown
      - The processing queue depth is long and is taking long to drain
 
 For each of the metrics above you can dig deeper into the cause for this spike in latency. All of them are mostly related to one latency and should be correlated - ``The Round latency!``.
-The round-latency is the time it takes for FlytePropeller to traverse through one workflow. To understand this, you have to understand the :ref:`divedeep-execution-timeline`. Once you understand this, continue reading on.
+The round-latency is the time it takes for FlytePropeller to to perform a single iteration of workflow evaluation. To understand this, you have to understand the :ref:`divedeep-execution-timeline`. Once you understand this, continue reading on.
 
 Optimizing round latency
 -------------------------
@@ -83,7 +83,7 @@ Let us first look at various config properties that can be set and would impact 
      - number of consecutive rounds to try with one workflow - prioritize a hot workflow over others.
    * - kube-client-config
      - propeller
-     - This is how you can control the number of requests cieling that Flytepropeller can initiate to KubeAPI. This is usual the #1 bottle neck
+     - This is how you can control the number of requests ceiling that Flytepropeller can initiate to KubeAPI. This is usual the #1 bottle neck
      - this configures the kubernetes client used by flytepropeller
    * - workflowStore.policy
      - propeller
@@ -108,7 +108,7 @@ Let us first look at various config properties that can be set and would impact 
 
 
 In the above table the 2 most important configs are ``workers`` and ``kube-client-config``.
-Kubeclient config is usually configured poorly and leads to bad performance. This is especially noticeable, if your workload involves spawning a lot of pods or other CRDs. For case in which your workload is a good mix of K8s local resources and external resources, the default for this configuration should suffice.
+Kubeclient config is usually configured poorly and leads to bad performance. This is especially noticeable if your workload involves spawning a lot of pods or other CRDs. When the workload is a good mix of K8s local resources and external resources, the default for this configuration should suffice.
 Flytepropeller configures a default version, which is better than the actual default. This configuration is critical, as this improves the number of requests that Flyte can send to KubeAPI, which is critical. An example kube-client-config is as follows
 
 

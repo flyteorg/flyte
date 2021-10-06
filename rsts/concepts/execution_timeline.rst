@@ -17,23 +17,23 @@ The illustration above refers to a simple workflow, with 2 nodes N1 & N2. This c
          N2 --> End;
 
 
-Acceptance
-===========
-Every Workflow starts in the ``Acceptance`` phase. Acceptance refers to the time it takes for the workflow to start execution in FlytePropeller from the time the FlyteAdmin service receives a request.
-Usually in this section the K8s queuing latency is the highest component. But overall Acceptance latency of <5s is desirable.
+Acceptance Latency
+====================
+Every Workflow starts in the ``Acceptance`` phase. Acceptance refers to the time between FlyteAdmin receiving an execution request and FlytePropeller's first round of Workflow evaluation.
+Usually within this phase the K8s queuing latency is the largest contributor to latency. But overall Acceptance latency of <5s is desirable.
 
 **This is one of the latencies that the core team is working on optimizing**
 
-Transition
-===========
-Transition latency refers to the time between success node executions, i.e between N1 & N2. For the first node this latency encapsulate executing the ``Start node`` as well. For the last node to End node, this encapsulates executing ``End node`` as well.
+Transition Latency
+===================
+Transition latency refers to the time between successive node executions, i.e between N1 & N2. For the first node (N1) this latency also encapsulates executing the Start node. Similarly, the last node also encapsulates executing End node as well. ``Start Node`` and ``End Node`` are capstones inserted to mark the begining and end of the DAG.
 the latency involves, time it takes to,
 #. Gather outputs for a node after the node completes
-#. Send an observation event to FlyteAdmin. Failing to do so is regarded as an error and will be tried untill successful or we exhaust system max retries.
+#. Send an observation event to FlyteAdmin. Failing to do so is regarded as an error and will be tried until successful or we exhaust system max retries. (as a default the the max system retries is configured to be 30 and can be altered per deployment)
 #. Persist data to Kubernetes
 #. Receive the persisted object back from Kubernetes (as this process is eventually consistent using informer caches)
 #. Gather inputs for a node before the node starts
-#. Send a queued event for the next node to Flyteadmin for observability
+#. Send a queued event for the next node to FlyteAdmin (this is what is persisted and drives the UI/CLI and historical information)
 
 **This is one of the latencies that the core team is working on optimizing**
 
@@ -48,7 +48,7 @@ Time it takes to mark the workflow as complete and accumulate outputs of a workf
 
 **This is one of the latencies that the core team is working on optimizing**
 
-Overview of various latencies in flytepropeller
+Overview of various latencies in FlytePropeller
 =================================================
 
 ===================================  ==================================================================================================================================
