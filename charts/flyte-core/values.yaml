@@ -369,7 +369,7 @@ configmap:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
-      eventVersion: 1
+      eventVersion: 2
       testing:
         host: http://flyteadmin
     # -- Authentication configuration
