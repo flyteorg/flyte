@@ -1,6 +1,6 @@
 name: Plugin request
 description: This issue is used to request for and track addition of new plugins in Flyte
-title: "[Plugin]"
+title: "[Plugin] "
 labels: untriaged,plugins
 body:
   - type: textarea
