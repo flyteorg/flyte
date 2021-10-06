@@ -678,26 +678,33 @@ func TestGetNodeTaintStatus(t *testing.T) {
 
 func TestGetSandboxImage(t *testing.T) {
 	t.Run("Get Latest sandbox", func(t *testing.T) {
-		image, err := getSandboxImage("")
+		image, err := getSandboxImage("", "")
 		assert.Nil(t, err)
 		assert.Equal(t, docker.GetSandboxImage(dind), image)
 	})
 
 	t.Run("Get sandbox image with version ", func(t *testing.T) {
-		image, err := getSandboxImage("v0.14.0")
+		image, err := getSandboxImage("v0.14.0", "")
 		assert.Nil(t, err)
 		assert.Equal(t, true, strings.HasPrefix(image, docker.ImageName))
 	})
 	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
-		_, err := getSandboxImage("v100.1.0")
+		_, err := getSandboxImage("v100.1.0", "")
 		assert.NotNil(t, err)
 	})
 	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
-		_, err := getSandboxImage("aaaaaa")
+		_, err := getSandboxImage("aaaaaa", "")
 		assert.NotNil(t, err)
 	})
 	t.Run("Get sandbox image with version that is not supported", func(t *testing.T) {
-		_, err := getSandboxImage("v0.10.0")
+		_, err := getSandboxImage("v0.10.0", "")
 		assert.NotNil(t, err)
+	})
+
+	t.Run("Get sandbox image with version that is not supported", func(t *testing.T) {
+		img := "docker.io/my-override:latest"
+		i, err := getSandboxImage("v0.11.0", img)
+		assert.Nil(t, err)
+		assert.Equal(t, i, img)
 	})
 }

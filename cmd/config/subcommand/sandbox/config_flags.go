@@ -51,6 +51,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.StringVar(&DefaultConfig.Source, fmt.Sprintf("%v%v", prefix, "source"), DefaultConfig.Source, "Path of your source code")
-	cmdFlags.StringVar(&DefaultConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), DefaultConfig.Version, "Version of flyte. Only support v0.10.0+ flyte release")
+	cmdFlags.StringVar(&DefaultConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), DefaultConfig.Version, "Version of flyte. Only supports flyte releases greater than v0.10.0")
+	cmdFlags.StringVar(&DefaultConfig.Image, fmt.Sprintf("%v%v", prefix, "image"), DefaultConfig.Image, "Optional. Provide a fully qualified path to a Flyte compliant docker image.")
 	return cmdFlags
 }

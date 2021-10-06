@@ -37,22 +37,27 @@ The Flyte Sandbox is a fully standalone minimal environment for running Flyte. p
 Start sandbox cluster without any source code
 ::
 
- bin/flytectl sandbox start
+ flytectl sandbox start
 	
 Mount your source code repository inside sandbox 
 ::
 
- bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
+ flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
 Run specific version of flyte. flytectl sandbox only support flyte version available in Github release https://github.com/flyteorg/flyte/tags
 ::
 
- bin/flytectl sandbox start  --version=v0.14.0
+ flytectl sandbox start  --version=v0.14.0
 
-Note: Flytectl sandbox will only work for v0.10.0+
-	
+Note: Flytectl sandbox is only supported for Flyte versions > v0.10.0
+
+Specify a Flyte Sandbox compliant image with the registry. This is useful, in case you want to use an image from your registry.
+::
+
+  flytectl sandbox start --image docker.io/my-override:latest
+
 Usage
-	`
+`
 	k8sEndpoint             = "https://127.0.0.1:30086"
 	flyteNamespace          = "flyte"
 	flyteRepository         = "flyte"
@@ -133,7 +138,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		volumes = append(volumes, *vol)
 	}
 
-	image, err := getSandboxImage(sandboxConfig.DefaultConfig.Version)
+	image, err := getSandboxImage(sandboxConfig.DefaultConfig.Version, sandboxConfig.DefaultConfig.Image)
 	if err != nil {
 		return nil, err
 	}
@@ -158,9 +163,14 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	return logReader, nil
 }
 
-func getSandboxImage(version string) (string, error) {
-	// Latest release will use image cr.flyte.org/flyteorg/flyte-sandbox:dind
-	// In case of version flytectl will use cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}
+// Returns the alternate image if specified, else
+// if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind is used
+// else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
+func getSandboxImage(version string, alternateImage string) (string, error) {
+
+	if len(alternateImage) > 0 {
+		return alternateImage, nil
+	}
 
 	var tag = dind
 	if len(version) > 0 {
