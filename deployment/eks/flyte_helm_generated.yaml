@@ -289,7 +289,7 @@ data:
           - profile
           - openid
     flyteadmin:
-      eventVersion: 1
+      eventVersion: 2
       metadataStoragePrefix:
       - metadata
       - admin
@@ -1327,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f69f77a814f4fa2371ee9d84500b74ec85a8001cd0db86005a2368a13f87dca"
+        configChecksum: "faf2bd6b71f061de4716e29b46b929f85becc0030b93428c9f452b22dc19e04"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
