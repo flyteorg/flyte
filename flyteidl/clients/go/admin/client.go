@@ -3,9 +3,8 @@ package admin
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
-	"io/ioutil"
-	"strings"
 	"sync"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -16,8 +15,6 @@ import (
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -84,17 +81,10 @@ func GetAdditionalAdminClientConfigOptions(cfg *Config) []grpc.DialOption {
 
 // This retrieves a DialOption that contains a source for generating JWTs for authentication with Flyte Admin. If
 // the token endpoint is set in the config, that will be used, otherwise it'll attempt to make a metadata call.
-func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenCache pkce.TokenCache,
+func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourceProvider TokenSourceProvider,
 	authClient service.AuthMetadataServiceClient) (grpc.DialOption, error) {
-
-	tokenURL := cfg.TokenURL
-	if len(tokenURL) == 0 {
-		metadata, err := authClient.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch auth metadata. Error: %v", err)
-		}
-
-		tokenURL = metadata.TokenEndpoint
+	if tokenSourceProvider == nil {
+		return nil, errors.New("can't create authenticated channel without a TokenSourceProvider")
 	}
 
 	clientMetadata, err := authClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
@@ -102,75 +92,13 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenCache pk
 		return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
 	}
 
-	var tSource oauth2.TokenSource
-	if cfg.AuthType == AuthTypeClientSecret {
-		tSource, err = getClientCredentialsTokenSource(ctx, cfg, clientMetadata, tokenURL)
-		if err != nil {
-			return nil, err
-		}
-	} else if cfg.AuthType == AuthTypePkce {
-		tokenOrchestrator, err := pkce.NewTokenOrchestrator(ctx, cfg.PkceConfig, tokenCache, authClient)
-		if err != nil {
-			return nil, err
-		}
-
-		tSource, err = getPkceAuthTokenSource(ctx, tokenOrchestrator)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported type %v", cfg.AuthType)
+	tSource, err := tokenSourceProvider.GetTokenSource(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	oauthTokenSource := NewCustomHeaderTokenSource(tSource, cfg.UseInsecureConnection, clientMetadata.AuthorizationMetadataKey)
 	return grpc.WithPerRPCCredentials(oauthTokenSource), nil
-}
-
-// Returns the client credentials token source to be used eg by flytepropeller to communicate with admin/ by CI
-func getClientCredentialsTokenSource(ctx context.Context, cfg *Config,
-	clientMetadata *service.PublicClientAuthConfigResponse, tokenURL string) (oauth2.TokenSource, error) {
-
-	secretBytes, err := ioutil.ReadFile(cfg.ClientSecretLocation)
-	if err != nil {
-		logger.Errorf(ctx, "Error reading secret from location %s", cfg.ClientSecretLocation)
-		return nil, err
-	}
-
-	secret := strings.TrimSpace(string(secretBytes))
-	scopes := cfg.Scopes
-	if len(scopes) == 0 {
-		scopes = clientMetadata.Scopes
-	}
-
-	ccConfig := clientcredentials.Config{
-		ClientID:     cfg.ClientID,
-		ClientSecret: secret,
-		TokenURL:     tokenURL,
-		Scopes:       scopes,
-	}
-
-	return ccConfig.TokenSource(ctx), nil
-}
-
-// Returns the token source which would be used for three legged oauth. eg : for admin to authorize access to flytectl
-func getPkceAuthTokenSource(ctx context.Context, tokenOrchestrator pkce.TokenOrchestrator) (oauth2.TokenSource, error) {
-	// explicitly ignore error while fetching token from cache.
-	authToken, err := tokenOrchestrator.FetchTokenFromCacheOrRefreshIt(ctx)
-	if err != nil {
-		logger.Warnf(ctx, "Failed fetching from cache. Will restart the flow. Error: %v", err)
-	}
-
-	if authToken == nil {
-		// Fetch using auth flow
-		if authToken, err = tokenOrchestrator.FetchTokenFromAuthFlow(ctx); err != nil {
-			logger.Errorf(ctx, "Error fetching token using auth flow due to %v", err)
-			return nil, err
-		}
-	}
-
-	return &pkce.SimpleTokenSource{
-		CachedToken: authToken,
-	}, nil
 }
 
 // InitializeAuthMetadataClient creates a new anonymously Auth Metadata Service client.
@@ -237,9 +165,12 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 			logger.Panicf(ctx, "failed to initialize Auth Metadata Client. Error: %v", err)
 		}
 
-		// If auth is enabled, this call will return the required information to use to authenticate, otherwise,
-		// start the client without authentication.
-		opt, err := getAuthenticationDialOption(ctx, cfg, tokenCache, authMetadataClient)
+		tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
+		if err != nil {
+			logger.Errorf(ctx, "failed to initialize token source provider. Err: %s", err.Error())
+		}
+
+		opt, err := getAuthenticationDialOption(ctx, cfg, tokenSourceProvider, authMetadataClient)
 		if err != nil {
 			logger.Warnf(ctx, "Starting an unauthenticated client because: %v", err)
 		}
