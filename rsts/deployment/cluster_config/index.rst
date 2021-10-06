@@ -60,6 +60,15 @@ Cluster Config
     ^^^^^^^^^^^^
     Tweaks to improve performance of the core Flyte engine
 
+    ---
+
+    .. link-button:: deployment-cluster-config-performance
+       :type: ref
+       :text: Performance
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Tweaks to improve performance of the core Flyte engine
+
 
 .. toctree::
     :maxdepth: 1
