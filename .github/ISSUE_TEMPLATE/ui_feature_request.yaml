@@ -1,6 +1,6 @@
-name: UI Feature request
+name: UI feature request
 description: Suggest a feature in the UI
-title: "[UI Feature]"
+title: "[UI Feature] "
 labels: enhancement, untriaged, ui
 body:
   - type: textarea
@@ -36,5 +36,5 @@ body:
     id: read-code-of-conduct
     attributes:
       options:
-        - label: "Have you read the [Code of Conduct]( https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
+        - label: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
           required: true
