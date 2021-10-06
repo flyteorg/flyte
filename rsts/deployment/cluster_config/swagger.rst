@@ -13,10 +13,12 @@ For convenience, flyte deployments also ship with a `redocly/redoc <https://gith
 
 .. prompt:: bash $
 
-flytectl sandbox start
+   flytectl sandbox start
 
 Once it's ready, you will get this message:
 
-👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30081/console 🚀 🚀 🎉 
+.. prompt:: bash $
+
+   👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30081/console 🚀 🚀 🎉 
 
 You can now visit http://localhost:30081/openapi to view the swagger UI for the service, documentation for the payload fields and send sample queries.
