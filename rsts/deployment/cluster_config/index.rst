@@ -82,3 +82,4 @@ Cluster Config
     monitoring
     notifications
     performance
+    swagger
