@@ -67,7 +67,7 @@ a history of all executions and provides an intuitive UI, CLI and REST/gRPC API 
 Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top level concept. Multiple tasks arranged in a data
 producer-consumer order create a workflow.
 
-`Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
+`Workflows` and `Tasks` can be written in any language, without the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
 
 ## ⏳ Five Reasons to Use Flyte
@@ -153,12 +153,12 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - **Multi cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
 - No single point of failure and is resilient by design
-- Automated notifications to Slack, Email, and Pagerduty
+- Automated notifications to Slack, Email and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
 - Snappy Console
 - Python CLI and Golang CLI (flytectl)
-- Written in **Golang** and optimized for large running jobs' performance
+- Written in **Golang** and optimized for large running job's performance
 - [Grafana templates](https://grafana.com/orgs/flyte) (user/system observability)
 
 ### In Progress
@@ -235,7 +235,7 @@ Here are some resources to help you learn more about Flyte.
 
 ### Biweekly Community Sync
 
-- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Checkout the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting times. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Checkout the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting timings. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Upcoming meeting agenda, previous meeting notes and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
 - If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
