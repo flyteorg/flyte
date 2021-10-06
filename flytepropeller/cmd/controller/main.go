@@ -10,6 +10,7 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sidecar"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/athena"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/snowflake"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
