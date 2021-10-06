@@ -1,14 +1,14 @@
-name: Flytectl Feature request
-description: Suggest a feature for flytectl
-title: "[Flytectl Feature]"
-labels: enhancement, untriaged, flytectl
+name: FlyteCTL Feature request
+description: Suggest a feature for FlyteCTL
+title: "[FlyteCTL Feature] "
+labels: enhancement, untriaged, FlyteCTL
 body:
   - type: textarea
     id: feature-description
     validations:
       required: true
     attributes:
-      label: "Describe the feature/command for flytectl"
+      label: "Describe the feature/command for FlyteCTL"
       description: "A clear and concise description of what the problem is. "
       placeholder: "I'm frustrated when [...] OR this feature can be a cool addition because [...] OR this feature can simplify [...] use case."
   - type: textarea
