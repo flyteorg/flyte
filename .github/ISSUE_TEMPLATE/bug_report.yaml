@@ -1,7 +1,7 @@
 name: "Bug Report"
 description: "Submit a bug report to help us improve"
-title: "Bug Report: "
-labels: [bug,untriaged]
+title: [BUG]
+labels: bug,untriaged
 body:
   - type: textarea
     id: steps-to-reproduce
@@ -22,8 +22,10 @@ body:
     validations:
       required: false
     attributes:
-      label: "Additional context To Reproduce"
-      description: "Steps to reproduce the behavior"
+      label: "Additional context to reproduce"
+      description: "Steps to reproduce the behavior."
+      placeholder: "1.[...]"
+                   "2.[...]"
   - type: textarea
     id: screenshots
     validations:
