@@ -1,6 +1,6 @@
 name: "Bug Report"
 description: "Submit a bug report to help us improve"
-title: [BUG]
+title: "[BUG]"
 labels: bug,untriaged
 body:
   - type: textarea
