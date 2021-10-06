@@ -345,7 +345,7 @@ data:
           - profile
           - openid
     flyteadmin:
-      eventVersion: 1
+      eventVersion: 2
       metadataStoragePrefix:
       - metadata
       - admin
@@ -3491,7 +3491,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5586369315bb36bb445d651321bb90a11e8d8635e44dde1432295c1ed18b71a"
+        configChecksum: "884efea0e0b5b70bfef4f7c5ac0d15946222a1bb6d37cf2c8d7c83acf28cc43"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3780,7 +3780,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5586369315bb36bb445d651321bb90a11e8d8635e44dde1432295c1ed18b71a"
+        configChecksum: "884efea0e0b5b70bfef4f7c5ac0d15946222a1bb6d37cf2c8d7c83acf28cc43"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
