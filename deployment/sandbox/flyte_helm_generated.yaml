@@ -2939,6 +2939,10 @@ spec:
     port: 9000
     protocol: TCP
     targetPort: minio
+  - name: minio
+    port: 9001
+    protocol: TCP
+    targetPort: minio
   selector: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
@@ -3860,17 +3864,18 @@ spec:
       - image: "ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1"
         imagePullPolicy: "IfNotPresent"
         name: minio
-        args:
-        - server
-        - /var/lib/minioql/data
         env:
-        - name: MINIO_ACCESS_KEY
-          value: minio
-        - name: MINIO_SECRET_KEY
-          value: miniostorage
+          - name: MINIO_ACCESS_KEY
+            value: minio
+          - name: MINIO_SECRET_KEY
+            value: miniostorage
+          - name: MINIO_DEFAULT_BUCKETS
+            value: my-s3-bucket
         ports:
         - containerPort: 9000
           name: minio
+        - containerPort: 9001
+          name: minio-console
         resources: 
           limits:
             cpu: 200m
@@ -3880,16 +3885,7 @@ spec:
             memory: 128Mi
         volumeMounts:
         - name: minio-storage
-          mountPath: /var/lib/minioql/data
-      initContainers:
-      - command:
-          - mkdir
-          - /var/lib/minioql/data/my-s3-bucket
-        image: "ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1"
-        name: create-bucket
-        volumeMounts:
-        - name: minio-storage
-          mountPath: /var/lib/minioql/data
+          mountPath: /data
       volumes:
       - name: minio-storage
         emptyDir: {}
