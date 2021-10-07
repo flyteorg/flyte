@@ -96,7 +96,7 @@ func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Co
 }
 
 func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	var _err error
+	var regErr error
 	var dataRefs []string
 
 	// Deprecated checks for --k8Service
@@ -131,17 +131,18 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 
 	var registerResults []Result
 	fastFail := rconfig.DefaultFilesConfig.ContinueOnError
-	for i := 0; i < len(validProto) && !(fastFail && _err != nil); i++ {
-		registerResults, _err = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx)
+	for i := 0; i < len(validProto) && !(fastFail && regErr != nil); i++ {
+		registerResults, regErr = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx)
 	}
 
 	payload, _ := json.Marshal(registerResults)
 	registerPrinter := printer.Printer{}
 	_ = registerPrinter.JSONToTable(payload, projectColumns)
 	if tmpDir != "" {
-		if _err = os.RemoveAll(tmpDir); _err != nil {
+		if _err := os.RemoveAll(tmpDir); _err != nil {
 			logger.Errorf(ctx, "unable to delete temp dir %v due to %v", tmpDir, _err)
+			return _err
 		}
 	}
-	return _err
+	return regErr
 }
