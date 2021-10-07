@@ -107,7 +107,7 @@ func appendVolumeMountIfNotExists(volumes []corev1.VolumeMount, vol corev1.Volum
 func AppendVolume(volumes []corev1.Volume, volume corev1.Volume) []corev1.Volume {
 	for _, v := range volumes {
 		// append secret items to existing volume for secret within same secret group
-		if v.Secret.SecretName == volume.Secret.SecretName {
+		if v.Secret != nil && v.Secret.SecretName == volume.Secret.SecretName {
 			v.Secret.Items = append(v.Secret.Items, volume.Secret.Items...)
 			return volumes
 		}
