@@ -139,16 +139,35 @@ To prevent this duplication and redundancy, FlytePropeller employs a trick. For 
 
 If `max-streaks` are enabled then instead of waiting for the informer cache to be refreshed, FlytePropeller uses its own inmemory copy to run multiple rounds as long as mutations occur or the max-streak-length configuration is met. This reduces the latency of cache propagation, which can be order of seconds.
 
-
 Worst case workflows: Poison Pills & max-parallelism
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The worst case for FlytePropeller is workflows that have an extremely large fan-out. This is because FlytePropeller implements a greedy traversal algorithm, that tries to evaluate the entire unblocked nodes within a workflow in every round.
 A solution for this is to limit the maximum number of nodes that can be evaluated. This can be done by setting max-parallelism for an execution.
 This can done in multiple ways
 
-#. Platform default
-#. Default for a specific launch plan
-#. Specify for an execution
+#. Platform default: This allows to set platform-wide defaults for maximum concurrency within a Workflow execution. This can be overriden per Launch plan or per execution.
+   The default `maxParallelism is configured to be 25 <https://github.com/flyteorg/flyteadmin/blob/master/pkg/runtime/application_config_provider.go#L40>`_.
+   It can be overriden with this config block in flyteadmin
+
+   .. code-block:: yaml
+
+       flyteadmin:
+          maxParallelism: 25
+
+#. Default for a specific launch plan. For any launch plan, the maxParallelism value can be changed or altered. This can be done using :py:meth:`flytekit.LaunchPlan.get_or_create` or the :std:ref:`protos/docs/admin/admin:launchplancreaterequest`
+   **Flytekit Example**
+
+   .. code-block:: python
+
+       LaunchPlan.get_or_create(
+         name="my_cron_scheduled_lp",
+         workflow=date_formatter_wf,
+         max_parallelism=30,
+       )
+
+#. Specify for an execution. For any specific execution the max-parallelism can be overriden. This can be done using flytectl (and soon flyteconsole). Refer to :std:doc:`gen/flytectl_create_execution`
+
+
 
 
 Manual Scale out FlytePropeller
@@ -157,7 +176,6 @@ FlytePropeller can be run manually per namespace. This is not a recommended solu
 
 Automatic scale-out: coming soon
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 TODO link to RFC
 
 Scaling out FlyteAdmin
