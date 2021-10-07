@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/go-test/deep"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -172,6 +174,41 @@ func TestUpdateEnvVars(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := AppendEnvVars(tt.args.containers, tt.args.envVar); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AppendEnvVars() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAppendVolume(t *testing.T) {
+	type args struct {
+		volumes []corev1.Volume
+		volume  corev1.Volume
+	}
+	tests := []struct {
+		name string
+		args args
+		want []corev1.Volume
+	}{
+		{name: "append secret", args: args{volumes: []corev1.Volume{}, volume: corev1.Volume{Name: "new_secret"}}, want: []corev1.Volume{{Name: "new_secret"}}},
+		{name: "existing other volumes", args: args{volumes: []corev1.Volume{{Name: "existing"}}, volume: corev1.Volume{Name: "new_secret"}}, want: []corev1.Volume{{Name: "existing"}, {Name: "new_secret"}}},
+		{name: "existing secret volume",
+			args: args{
+				volumes: []corev1.Volume{{
+					Name: "existing", VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{SecretName: "foo", Items: []corev1.KeyToPath{{Key: "existingKey"}}}},
+				}},
+				volume: corev1.Volume{Name: "new_secret", VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{SecretName: "foo", Items: []corev1.KeyToPath{{Key: "newKey"}}}}}},
+			want: []corev1.Volume{{
+				Name: "existing", VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{SecretName: "foo", Items: []corev1.KeyToPath{{Key: "existingKey"}, {Key: "newKey"}}}},
+			}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := AppendVolume(tt.args.volumes, tt.args.volume)
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Errorf("AppendVolume() = %v, want %v", got, tt.want)
+				t.Errorf("Diff: %v", diff)
 			}
 		})
 	}
