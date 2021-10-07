@@ -35,13 +35,11 @@ body:
         - 'Yes'
         - 'No'
   - type: checkboxes
-    id: no-duplicate-issues
     attributes:
       options:
         - label: "Are you sure this issue hasn't been raised already?"
           required: true
   - type: checkboxes
-    id: read-code-of-conduct
     attributes:
       options:
         - label: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
