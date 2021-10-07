@@ -1,6 +1,7 @@
 package register
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -71,7 +72,7 @@ func TestRegisterFromFiles(t *testing.T) {
 		err = Register(ctx, args, cmdCtx)
 		assert.Nil(t, err)
 	})
-	t.Run("Failed registeration because of invalid files", func(t *testing.T) {
+	t.Run("Failed registration because of invalid files", func(t *testing.T) {
 		setup()
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
@@ -90,7 +91,28 @@ func TestRegisterFromFiles(t *testing.T) {
 		err = registerFromFilesFunc(ctx, args, cmdCtx)
 		assert.NotNil(t, err)
 	})
+	t.Run("Failure registration of fast serialize", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		rconfig.DefaultFilesConfig.Archive = true
 
+		rconfig.DefaultFilesConfig.OutputLocationPrefix = s3Output
+		rconfig.DefaultFilesConfig.SourceUploadPath = s3Output
+		s, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		Client = s
+		assert.Nil(t, err)
+		args = []string{"testdata/flytesnacks-core.tgz"}
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		mockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		mockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		err = registerFromFilesFunc(ctx, args, cmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("failed"), err)
+	})
 	t.Run("Valid registration of fast serialize", func(t *testing.T) {
 		setup()
 		registerFilesSetup()
