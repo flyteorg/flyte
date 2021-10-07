@@ -35,6 +35,7 @@ body:
         - 'Yes'
         - 'No'
   - type: checkboxes
+    label: null
     attributes:
       options:
         - label: "Are you sure this issue hasn't been raised already?"
