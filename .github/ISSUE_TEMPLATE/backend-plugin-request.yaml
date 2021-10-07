@@ -34,7 +34,7 @@ body:
       options:
         - 'Yes'
         - 'No'
- - type: checkboxes
+  - type: checkboxes
     id: no-duplicate-issues
     attributes:
      label: "Are you sure this issue hasn't been raised already?"
