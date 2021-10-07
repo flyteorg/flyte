@@ -40,6 +40,5 @@ body:
         - label: "Are you sure this issue hasn't been raised already?"
           required: true
   - type: checkboxes
-    attributes:
-      label: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
+     label: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
           required: true
