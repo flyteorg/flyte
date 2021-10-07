@@ -33,16 +33,17 @@ body:
       label: "Screenshots"
       description: "If applicable, add screenshots to help explain your problem."
   - type: checkboxes
-    id: duplicate_issue
+    id: no-duplicate-issues
     attributes:
-      label: "Are you sure this issue hasn't been raised already?"
-      options:
+     label: "Are you sure this issue hasn't been raised already?"
+     options:
         - label: "Yes"
           required: true
   - type: checkboxes
-    id: code-of-conduct
+    id: read-code-of-conduct
     attributes:
-      label: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
+      label: "Have you read the Code of Conduct?"
+      description: "[Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
       options:
-        - label: "yes"
+        - label: "Yes"
           required: true
