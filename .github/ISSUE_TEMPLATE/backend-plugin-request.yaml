@@ -39,7 +39,7 @@ body:
     attributes:
      label: "Are you sure this issue hasn't been raised already?"
      options:
-        - label: "Yes"
+       - label: "Yes"
           required: true
   - type: checkboxes
     id: read-code-of-conduct
