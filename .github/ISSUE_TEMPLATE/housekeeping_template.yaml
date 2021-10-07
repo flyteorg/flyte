@@ -29,21 +29,18 @@ body:
       placeholder: "flyteidl, [...]"
   - type: checkboxes
     id: no-duplicate-issues
-    validations:
-      required: true
     attributes:
      label: "Are you sure this issue hasn't been raised already?"
      options:
         - label: "Yes"
-        - label: "No"
+          required: true
   - type: checkboxes
     id: read-code-of-conduct
-    validations:
-      required: true
     attributes:
       label: "Have you read the Code of Conduct?"
       description: "[Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
       options:
         - label: "Yes"
-        - label: "No"
+          required: true
+       
           
