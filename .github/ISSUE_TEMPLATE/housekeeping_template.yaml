@@ -36,7 +36,8 @@ body:
   - type: checkboxes
     id: read-code-of-conduct
     attributes:
-      description: "Have you read the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
+      label: "Have you read the Code of Conduct(https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)?"
+      description: "[Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md)"
       options:
         - label: "Yes"
         - label: "No"
