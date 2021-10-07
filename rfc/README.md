@@ -54,13 +54,20 @@ RFCs must be introduced as a `.md` (Markdown-format) file in a PR into the flyte
 
 ### The recommended path
 
-At Flyte, we have been using [HackMD](https://hackmd.io) to author RFCs.
+At Flyte, we have been using [HackMD](https://hackmd.io) to author RFCs, which is the preferred method. 
+RFCs may also be submitted directly to GitHub as a PR, or drafted as a Google Doc, which is reveiwed and then submitted as a PR. 
 
 #### Why HackMD?
 
 It is recommended that the initial review of an RFC takes place on HackMD, before pushing to GitHub. Several benefits of this include:
 - PR authors typically have a GitHub account, which is all that's needed to sign in to HackMD. 
-- Ease of commenting, iterating and adjusting on HackMD before pushing to GutHub, as opposed to requesting a PR for every change made to the RFC on GitHub. Visit https://hackmd.io/s/how-to-use-comments for more information on commenting.
+- Ease of commenting, iterating and adjusting on HackMD before pushing to GitHub, during the initial phase of issuing RFCs. 
+- Please note that:
+  - comments made on HackMD after pushing a PR will not be reflected
+  - changes made to the PR on GitHub will not be reflected back to HackMD
+  - comments in code do not show the actual parts highlighted and will duplicate themselves  
+  - Visit https://hackmd.io/s/how-to-use-comments for more information on commenting.
+- RFCs submitted directly on GitHub would need a PR issued for every subsequent change made, lengthening the review phase. 
 - Ease of document tracking, compared to Google docs, since RFCs will be stored in GitHub making the RFCs indexed, searchable and versioned.
 
 #### The HackMD process
@@ -83,11 +90,12 @@ After completing your RFC on HackMD, it is time to push to GitHub:
 - A new pop-out menu will appear. Make the following selections:
     |         Option             | Value                                  |
     | -------------------------- | -------------------------------------- |
-    | Select Repo:               | `<your fork>`                        |
+    | Select Repo:               | `<GitHub username/flyte>`                        |
     | Select branch:             | `<insert a new or existing branch name>` |
     | Select file:               | `rfcs/<category>/awesomefeature.md`      |
     | Choose version(s) to push: | Fill in a descriptive name and a self-link to the hackmd note.  |
 - Go ahead and Push to GitHub
+- Please check DCO every time a commit is pushed on GitHub.  
 
 ## Where to store RFCs
 
