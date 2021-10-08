@@ -1,8 +1,8 @@
--r ./docs-requirements.in
 -r ./integrations/aws/sagemaker_training/requirements.in
 -r ./integrations/aws/sagemaker_pytorch/requirements.in
 -r ./integrations/external_services/hive/requirements.in
 -r ./integrations/flytekit_plugins/dolt/requirements.in
+-r ./integrations/flytekit_plugins/pandera_examples/requirements.in
 -r ./integrations/kubernetes/pod/requirements.in
 -r ./integrations/kubernetes/k8s_spark/requirements.in
 -r ./integrations/kubernetes/kfpytorch/requirements.in

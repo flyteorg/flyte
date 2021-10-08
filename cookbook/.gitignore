@@ -11,3 +11,4 @@ release-snacks/*.tgz
 auto_*/
 docs/auto/*
 docs/_rsts/
+.hypothesis
