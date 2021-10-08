@@ -17,3 +17,7 @@ dependencies:
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/
     condition: kubernetes-dashboard.enabled
+  - name: flyte-core
+    version: 4.1.2
+    repository: ../flyte-core
+    condition: flyte.enabled
