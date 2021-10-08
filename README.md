@@ -1,76 +1,76 @@
 <html>
 <p align="center"> 
-  <img src="rsts/images/flyte-and-lf.png" alt="Flyte and LF AI & Data Logo" width="300">
+  <img src="rsts/images/flyte-and-lf.png" alt="Flyte and LF AI & Data Logo" width="300">
 </p>
 
 <h1 align="center">
-  Flyte
+  Flyte
 </h1>
 
 <p align="center">
-  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b> and <b>ML processes</b> at scale 
+  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b> and <b>ML processes</b> at scale 
 </p>
 
 <p align="center">
-  <a href="https://github.com/flyteorg/flyte/releases/latest">
-    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg" alt="Current Release" />
-  </a>
-  <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
-    <img src="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg" alt="Sandbox Build" />
-  </a>
-  <a href="https://github.com/flyteorg/flyte/actions/workflows/tests.yml">
-    <img src="https://github.com/flyteorg/flyte/actions/workflows/tests.yml/badge.svg" alt="End-to-End Tests" />
-  </a>
-  <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
-    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg" alt="License" />
-  </a>
-  <img src="https://img.shields.io/github/commit-activity/w/flyteorg/flyte.svg?style=plastic" alt="Commit Activity" />
-  <img src="https://img.shields.io/github/commits-since/flyteorg/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
-  <img src="https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=plastic" alt="GitHub Milestones Completed" />
-  <img src="https://img.shields.io/github/milestones/progress-percent/flyteorg/flyte/18?style=plastic" alt="GitHub Next Milestone Percentage" />
-  <a href="https://flyte.rtfd.io">
-    <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
-  </a>
-  <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a> 
-  <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" />
-  <a href="https://artifacthub.io/packages/search?repo=flyte">
-    <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
-  </a> 
-  <a href="https://forms.gle/UVuek9WfBoweiqcJA">
-    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
-  </a>
+  <a href="https://github.com/flyteorg/flyte/releases/latest">
+    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg" alt="Current Release" />
+  </a>
+  <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
+    <img src="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg" alt="Sandbox Build" />
+  </a>
+  <a href="https://github.com/flyteorg/flyte/actions/workflows/tests.yml">
+    <img src="https://github.com/flyteorg/flyte/actions/workflows/tests.yml/badge.svg" alt="End-to-End Tests" />
+  </a>
+  <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
+    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg" alt="License" />
+  </a>
+  <img src="https://img.shields.io/github/commit-activity/w/flyteorg/flyte.svg?style=plastic" alt="Commit Activity" />
+  <img src="https://img.shields.io/github/commits-since/flyteorg/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
+  <img src="https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=plastic" alt="GitHub Milestones Completed" />
+  <img src="https://img.shields.io/github/milestones/progress-percent/flyteorg/flyte/18?style=plastic" alt="GitHub Next Milestone Percentage" />
+  <a href="https://flyte.rtfd.io">
+    <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
+  </a>
+  <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a> 
+  <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" />
+  <a href="https://artifacthub.io/packages/search?repo=flyte">
+    <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
+  </a> 
+  <a href="https://forms.gle/UVuek9WfBoweiqcJA">
+    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
+  </a>
 </p>
 
 <h3 align="center">
-  <a href="https://flyte.org">Home Page</a>
-  <span> · </span>
-  <a href="#quickstart">Quick Start</a>
-  <span> · </span>
-  <a href="https://docs.flyte.org/">Documentation</a>
-  <span> · </span>
-  <a href="#features">Features</a>
-  <span> · </span>
-  <a href="#community--resources">Community & Resources</a>
-  <span> · </span>
-  <a href="CHANGELOG/">Changelogs</a>
-  <span> · </span>  
-  <a href="#component-repos">Components</a>
+  <a href="https://flyte.org">Home Page</a>
+  <span> · </span>
+  <a href="#quickstart">Quick Start</a>
+  <span> · </span>
+  <a href="https://docs.flyte.org/">Documentation</a>
+  <span> · </span>
+  <a href="#features">Features</a>
+  <span> · </span>
+  <a href="#community--resources">Community & Resources</a>
+  <span> · </span>
+  <a href="CHANGELOG/">Changelogs</a>
+  <span> · </span>  
+  <a href="#component-repos">Components</a>
 </h3>
 
 </html>
 
-## 💥 Introduction
+## Introduction
 
-Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
-a history of all executions and provides an intuitive UI, CLI and REST/gRPC API to interact with the computation.
+Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable, and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type-safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
+a history of all executions and provides an intuitive UI, CLI, and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top level concept. Multiple tasks arranged in a data
-producer-consumer order create a workflow.
+Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
+producer-consumer order creates a workflow.
 
-`Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
+`Workflows` and `Tasks` can be written in any language, with out-of-the-box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
 
-## ⏳ Five Reasons to Use Flyte
+## Five Reasons to Use Flyte
 - Kubernetes-Native Workflow Automation Platform
 - Ergonomic SDK's in Python, Java & Scala
 - Versioned & Auditable
@@ -79,14 +79,14 @@ producer-consumer order create a workflow.
 
 <html>
 <h2 id="quickstart"> 
-  🚀 Quick Start
+  Quick Start
 </h2>
 </html>
 
 With [Docker installed](https://docs.docker.com/get-docker/) and [Flytectl installed](https://docs.flyte.org/projects/flytectl/en/stable/index.html), run the following command:
 
 ```bash
-  flytectl sandbox start
+  flytectl sandbox start
 ```
 
 This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.
@@ -99,7 +99,7 @@ Here's a quick visual tour of the console.
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
-## ⭐️ Current Deployments & Contributors
+## ️ Current Deployments & Contributors
 
 - [Freenome](https://www.freenome.com/)
 - [Gojek](https://www.gojek.io/)
@@ -114,43 +114,43 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 <html>
 <h2 id="features"> 
-  🔥 Features
+  Features
 </h2>
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
-- A data aware platform
+- A data-aware platform
 - Enables **collaboration across your organization** by:
-  - Executing distributed data pipelines/workflows
-  - Reusing tasks across projects, users, and workflows
-  - Making it easy to stitch together workflows from different teams and domain experts
-  - Backtracing to a specified workflow
-  - Comparing results of training workflows over time and across pipelines
-  - Sharing workflows and tasks across your teams
-  - Simplifying the complexity of multi-step, multi-owner workflows
+  - Executing distributed data pipelines/workflows
+  - Reusing tasks across projects, users, and workflows
+  - Making it easy to stitch together workflows from different teams and domain experts
+  - Backtracing to a specified workflow
+  - Comparing results of training workflows over time and across pipelines
+  - Sharing workflows and tasks across your teams
+  - Simplifying the complexity of multi-step, multi-owner workflows
 - **[Quick registration](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
-- **Centralized Inventory** constituting Tasks, Workflows and Executions
+- **Centralized Inventory** constituting Tasks, Workflows, and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
-- **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output, so illegal construction of pipelines fails during declaration rather than at runtime
+- **Type safe** construction of pipelines -- each task has an interface that is characterized by its input and output, so illegal construction of pipelines fails during declaration rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.
 - Memoization and Lineage tracking
 - Provides logging and observability
 - Workflow features:
-  - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
-  - Parallel step execution
-  - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
-  - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
-  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embeded within one node of the top level workflow)
-  - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
-  - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
-  - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
-  - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first class support in Python
-  - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
+  - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
+  - Parallel step execution
+  - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
+  - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
+  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embedded within one node of the top-level workflow)
+  - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
+  - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
+  - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
+  - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
+  - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
 - Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
-  - Versioned data, code and models
-  - Automatically tracked executions
-  - Declarative pipelines
-- **Multi cloud support** (AWS, GCP and others)
+  - Versioned data, code, and models
+  - Automatically tracked executions
+  - Declarative pipelines
+- **Multi-cloud support** (AWS, GCP, and others)
 - Extensible core, modularized, and deep observability
 - No single point of failure and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
@@ -169,7 +169,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - Relaunch execution in recover mode
 - Documentation as code
 
-## 🔌 Available Plugins
+## Available Plugins
 
 - Containers
 - [K8s Pods](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
@@ -191,35 +191,35 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 <html>
 <h2 id="component-repos"> 
-  📦 Component Repos 
+  Component Repos 
 </h2>
 </html>
 
-| Repo                                                         | Language      | Purpose                                        | Status           |
+| Repo                                                         | Language      | Purpose                                        | Status           |
 | ------------------------------------------------------------ | ------------- | ---------------------------------------------- | ---------------- |
-| [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
-| [flyteidl](https://github.com/flyteorg/flyteidl)             | Protobuf      | interface definitions                          | Production-grade |
-| [flytepropeller](https://github.com/flyteorg/flytepropeller) | Go            | execution engine                               | Production-grade |
-| [flyteadmin](https://github.com/flyteorg/flyteadmin)         | Go            | control plane                                  | Production-grade |
-| [flytekit](https://github.com/flyteorg/flytekit)             | Python        | python SDK and tools                           | Production-grade |
-| [flyteconsole](https://github.com/flyteorg/flyteconsole)     | Typescript    | admin console                                  | Production-grade |
-| [datacatalog](https://github.com/flyteorg/datacatalog)       | Go            | manage input & output artifacts                | Production-grade |
-| [flyteplugins](https://github.com/flyteorg/flyteplugins)     | Go            | flyte plugins                                  | Production-grade |
-| [flytestdlib](https://github.com/flyteorg/flytestdlib)       | Go            | standard library                               | Production-grade |
-| [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Incubating       |
-| [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
-| [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
+| [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
+| [flyteidl](https://github.com/flyteorg/flyteidl)             | Protobuf      | interface definitions                          | Production-grade |
+| [flytepropeller](https://github.com/flyteorg/flytepropeller) | Go            | execution engine                               | Production-grade |
+| [flyteadmin](https://github.com/flyteorg/flyteadmin)         | Go            | control plane                                  | Production-grade |
+| [flytekit](https://github.com/flyteorg/flytekit)             | Python        | python SDK and tools                           | Production-grade |
+| [flyteconsole](https://github.com/flyteorg/flyteconsole)     | Typescript    | admin console                                  | Production-grade |
+| [datacatalog](https://github.com/flyteorg/datacatalog)       | Go            | manage input & output artifacts                | Production-grade |
+| [flyteplugins](https://github.com/flyteorg/flyteplugins)     | Go            | flyte plugins                                  | Production-grade |
+| [flytestdlib](https://github.com/flyteorg/flytestdlib)       | Go            | standard library                               | Production-grade |
+| [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Incubating       |
+| [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
+| [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
 
-## 🔩 Production K8s Operators
+## Production K8s Operators
 
-| Repo                                                                  | Language | Purpose                |
+| Repo                                                                  | Language | Purpose                |
 | --------------------------------------------------------------------- | -------- | ---------------------- |
-| [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
-| [Flink](https://github.com/lyft/flinkk8soperator)                 | Go       | Apache Flink streaming |
+| [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
+| [Flink](https://github.com/lyft/flinkk8soperator)                 | Go       | Apache Flink streaming |
 
 <html>
 <h2 id="community--resources"> 
-  🤝 Community & Resources
+  Community & Resources
 </h2>
 </html>
 
@@ -235,8 +235,8 @@ Here are some resources to help you learn more about Flyte.
 
 ### Biweekly Community Sync
 
-- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Checkout the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting times. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
-- Upcoming meeting agenda, previous meeting notes and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
+-  **Flyte OSS Community Sync** Every other Tuesday, 9 am-10 am PDT. Check out the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting times. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- Upcoming meeting agenda, previous meeting notes, and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
 - If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
 ### Conference Talks
@@ -261,7 +261,7 @@ Here are some resources to help you learn more about Flyte.
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
-## 💖 Top Contributors
+## Top Contributors
 
 A big thank you to the community for making Flyte possible!
 
