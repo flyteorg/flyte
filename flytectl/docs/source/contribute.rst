@@ -13,7 +13,7 @@ Docs are generated using Sphinx and are available at [flytectl.rtfd.io](https://
 To update the documentation, follow these steps:
 
 1. Install the requirements by running ``pip install -r doc-requirements.txt`` in the root folder
-2. Make modifications in the `docs/source/gen <https://github.com/flyteorg/flytectl/tree/master/docs/source/gen>`__ folder
+2. Make modifications in the `cmd <https://github.com/flyteorg/flytectl/tree/master/cmd>`__ folder
 3. Run ``make gendocs`` from within the `docs <https://github.com/flyteorg/flytectl/tree/master/docs>`__ folder
 4. Open html files produced by Sphinx in your browser to verify if the changes look as expected (html files can be found in the ``docs/build/html`` folder)
 
@@ -25,11 +25,11 @@ To update the documentation, follow these steps:
 3. Run ``flytectl get project`` to see if things are working
 4. Run the command you want to test in the terminal
 5. If you want to update the command (add additional options, change existing options, etc.):
-   
+
    * Navigate to `cmd <https://github.com/flyteorg/flytectl/tree/master/cmd>`__ directory
    * Each sub-directory points to a command, for example, ``create`` points to ``flytectl create ...``
    * Here are the directories you can navigate to:
-  
+
      .. list-table:: FlyteCTL cmd directories
         :widths: 25 25 50
         :header-rows: 1
@@ -67,7 +67,7 @@ To update the documentation, follow these steps:
         * - ``version``
           - ``flytectl version ...``
           - Command to fetch FlyteCTL version
-     
+
      Find all FlyteCTL commands on the `Nouns <https://docs.flyte.org/projects/flytectl/en/stable/nouns.html>`__ page.
    * Run appropriate tests to test the changes by running ``go test ./... -race -coverprofile=coverage.txt -covermode=atomic  -v`` 
      in the root directory
