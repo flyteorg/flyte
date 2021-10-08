@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -51,6 +50,7 @@ func validateAndFinalizePod(
 		if err != nil {
 			return nil, err
 		}
+		resReqs = append(resReqs, container.Resources)
 	}
 	if !hasPrimaryContainer {
 		return nil, errors.Errorf(errors.BadTaskSpecification,
