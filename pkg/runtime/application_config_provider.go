@@ -35,7 +35,7 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	ProfilerPort:          10254,
 	MetricsScope:          "flyte:",
 	MetadataStoragePrefix: []string{"metadata", "admin"},
-	EventVersion:          1,
+	EventVersion:          2,
 	AsyncEventsBufferSize: 100,
 	MaxParallelism:        25,
 })
