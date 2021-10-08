@@ -73,6 +73,7 @@ func UpdatePodWithInterruptibleFlag(taskExecutionMetadata pluginsCore.TaskExecut
 	}
 	podSpec.Tolerations = append(
 		GetPodTolerations(isInterruptible, resourceRequirements...), podSpec.Tolerations...)
+
 	if len(podSpec.ServiceAccountName) == 0 {
 		podSpec.ServiceAccountName = taskExecutionMetadata.GetK8sServiceAccount()
 	}
