@@ -61,13 +61,13 @@
 
 ## 💥 Introduction
 
-Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
+Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and, maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type-safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top level concept. Multiple tasks arranged in a data
-producer-consumer order create a workflow.
+Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
+producer-consumer order creates a workflow.
 
-`Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
+`Workflows` and `Tasks` can be written in any language, with out-of-the-box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
 
 ## ⏳ Five Reasons to Use Flyte
@@ -119,7 +119,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
-- A data aware platform
+- A data-aware platform
 - Enables **collaboration across your organization** by:
   - Executing distributed data pipelines/workflows
   - Reusing tasks across projects, users, and workflows
@@ -140,17 +140,17 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
   - Parallel step execution
   - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
   - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
-  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embeded within one node of the top level workflow)
+  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embedded within one node of the top-level workflow)
   - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
   - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
   - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
-  - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first class support in Python
+  - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
   - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
 - Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
   - Versioned data, code and models
   - Automatically tracked executions
   - Declarative pipelines
-- **Multi cloud support** (AWS, GCP and others)
+- **Multi-cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
 - No single point of failure and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
