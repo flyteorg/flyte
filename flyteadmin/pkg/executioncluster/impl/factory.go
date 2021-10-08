@@ -8,15 +8,18 @@ import (
 )
 
 func GetExecutionCluster(scope promutils.Scope, kubeConfig, master string, config interfaces.Configuration, db repositories.RepositoryInterface) executioncluster_interface.ClusterInterface {
+	initializationErrorCounter := scope.MustNewCounter(
+		"flyteclient_initialization_error",
+		"count of errors encountered initializing a flyte client from kube config")
 	switch len(config.ClusterConfiguration().GetClusterConfigs()) {
 	case 0:
-		cluster, err := NewInCluster(scope, kubeConfig, master)
+		cluster, err := NewInCluster(initializationErrorCounter, kubeConfig, master)
 		if err != nil {
 			panic(err)
 		}
 		return cluster
 	default:
-		cluster, err := NewRandomClusterSelector(scope, config, &clusterExecutionTargetProvider{}, db)
+		cluster, err := NewRandomClusterSelector(initializationErrorCounter, config, &clusterExecutionTargetProvider{}, db)
 		if err != nil {
 			panic(err)
 		}

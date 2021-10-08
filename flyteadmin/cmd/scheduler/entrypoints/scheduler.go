@@ -32,11 +32,12 @@ var schedulerRunCmd = &cobra.Command{
 
 		// Define the schedulerScope for prometheus metrics
 		schedulerScope := promutils.NewScope(applicationConfiguration.MetricsScope).NewSubScope("flytescheduler")
+		schedulerPanics := schedulerScope.MustNewCounter("initialization_panic",
+			"panics encountered initializing the flyte native scheduler")
 
 		defer func() {
 			if err := recover(); err != nil {
-				schedulerScope.MustNewCounter("initialization_panic",
-					"panics encountered initializing the flyte native scheduler").Inc()
+				schedulerPanics.Inc()
 				logger.Fatalf(ctx, fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
 			}
 		}()

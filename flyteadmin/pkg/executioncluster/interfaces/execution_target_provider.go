@@ -3,9 +3,9 @@ package interfaces
 import (
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type ExecutionTargetProvider interface {
-	GetExecutionTarget(scope promutils.Scope, k8sCluster interfaces.ClusterConfig) (*executioncluster.ExecutionTarget, error)
+	GetExecutionTarget(initializationErrorCounter prometheus.Counter, k8sCluster interfaces.ClusterConfig) (*executioncluster.ExecutionTarget, error)
 }

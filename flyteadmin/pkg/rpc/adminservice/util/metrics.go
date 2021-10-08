@@ -1,13 +1,18 @@
 package util
 
 import (
+	"context"
 	"fmt"
 	"time"
+
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 )
+
+const maxGRPCStatusCode = 17 // From _maxCode in "google.golang.org/grpc/codes"
 
 type responseCodeMetrics struct {
 	scope                promutils.Scope
@@ -36,9 +41,8 @@ func (m *RequestMetrics) Record(code codes.Code) {
 	}
 	counter, ok := m.responseCodes.responseCodeCounters[code]
 	if !ok {
-		m.responseCodes.responseCodeCounters[code] = m.responseCodes.scope.MustNewCounter(code.String(),
-			fmt.Sprintf("count of responses returning: %s", code.String()))
-		counter = m.responseCodes.responseCodeCounters[code]
+		logger.Warnf(context.TODO(), "encountered unexpected error code [%s]", code.String())
+		return
 	}
 	counter.Inc()
 }
@@ -47,13 +51,22 @@ func (m *RequestMetrics) Success() {
 	m.Record(codes.OK)
 }
 
+func newResponseCodeMetrics(scope promutils.Scope) responseCodeMetrics {
+	responseCodeCounters := make(map[codes.Code]prometheus.Counter)
+	for i := 0; i < maxGRPCStatusCode; i++ {
+		code := codes.Code(i)
+		responseCodeCounters[code] = scope.MustNewCounter(code.String(),
+			fmt.Sprintf("count of responses returning: %s", code.String()))
+	}
+	return responseCodeMetrics{
+		scope:                scope,
+		responseCodeCounters: responseCodeCounters,
+	}
+}
+
 func NewRequestMetrics(scope promutils.Scope, method string) RequestMetrics {
 	methodScope := scope.NewSubScope(method)
-
-	responseCodeMetrics := responseCodeMetrics{
-		scope:                methodScope.NewSubScope("codes"),
-		responseCodeCounters: make(map[codes.Code]prometheus.Counter),
-	}
+	responseCodeMetrics := newResponseCodeMetrics(methodScope.NewSubScope("codes"))
 
 	return RequestMetrics{
 		scope: methodScope,
