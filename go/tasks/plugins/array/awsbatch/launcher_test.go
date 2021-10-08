@@ -75,6 +75,7 @@ func TestLaunchSubTasks(t *testing.T) {
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
 	tMeta.OnGetOverrides().Return(overrides)
+	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	ow := &mocks3.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")

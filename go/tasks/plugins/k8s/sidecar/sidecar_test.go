@@ -73,6 +73,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
+	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
 	tID.On("GetID").Return(core.TaskExecutionIdentifier{
@@ -128,10 +129,12 @@ func getPodSpec() v1.PodSpec {
 					Limits: v1.ResourceList{
 						"cpu":    resource.MustParse("2"),
 						"memory": resource.MustParse("200Mi"),
+						"gpu":    resource.MustParse("1"),
 					},
 					Requests: v1.ResourceList{
 						"cpu":    resource.MustParse("1"),
 						"memory": resource.MustParse("100Mi"),
+						"gpu":    resource.MustParse("1"),
 					},
 				},
 				VolumeMounts: []v1.VolumeMount{
@@ -142,6 +145,14 @@ func getPodSpec() v1.PodSpec {
 			},
 			{
 				Name: "secondary container",
+				Resources: v1.ResourceRequirements{
+					Limits: v1.ResourceList{
+						"gpu": resource.MustParse("2"),
+					},
+					Requests: v1.ResourceList{
+						"gpu": resource.MustParse("2"),
+					},
+				},
 			},
 		},
 		Volumes: []v1.Volume{
@@ -223,8 +234,9 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
-		DefaultCPURequest:    "1024m",
-		DefaultMemoryRequest: "1024Mi",
+		DefaultCPURequest:    resource.MustParse("1024m"),
+		DefaultMemoryRequest: resource.MustParse("1024Mi"),
+		GpuResourceName:      ResourceNvidiaGPU,
 	}))
 	handler := &sidecarResourceHandler{}
 	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
@@ -258,6 +270,13 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 	assert.Equal(t, expectedMemLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.Memory().Value())
 	expectedEphemeralStorageLimit := resource.MustParse("100M")
 	assert.Equal(t, expectedEphemeralStorageLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.StorageEphemeral().Value())
+
+	expectedGPURes := resource.MustParse("1")
+	assert.Equal(t, expectedGPURes, res.(*v1.Pod).Spec.Containers[0].Resources.Requests[ResourceNvidiaGPU])
+	assert.Equal(t, expectedGPURes, res.(*v1.Pod).Spec.Containers[0].Resources.Limits[ResourceNvidiaGPU])
+	expectedGPURes = resource.MustParse("2")
+	assert.Equal(t, expectedGPURes, res.(*v1.Pod).Spec.Containers[1].Resources.Requests[ResourceNvidiaGPU])
+	assert.Equal(t, expectedGPURes, res.(*v1.Pod).Spec.Containers[1].Resources.Limits[ResourceNvidiaGPU])
 }
 
 func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
@@ -325,8 +344,8 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
-		DefaultCPURequest:    "1024m",
-		DefaultMemoryRequest: "1024Mi",
+		DefaultCPURequest:    resource.MustParse("1024m"),
+		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
 	handler := &sidecarResourceHandler{}
 	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
@@ -390,8 +409,8 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 			v1.ResourceStorage: {},
 			ResourceNvidiaGPU:  {},
 		},
-		DefaultCPURequest:    "1024m",
-		DefaultMemoryRequest: "1024Mi",
+		DefaultCPURequest:    resource.MustParse("1024m"),
+		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
 	handler := &sidecarResourceHandler{}
 	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
@@ -442,8 +461,8 @@ func TestBuildSidecarResource(t *testing.T) {
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
-		DefaultCPURequest:    "1024m",
-		DefaultMemoryRequest: "1024Mi",
+		DefaultCPURequest:    resource.MustParse("1024m"),
+		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
 	handler := &sidecarResourceHandler{}
 	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)

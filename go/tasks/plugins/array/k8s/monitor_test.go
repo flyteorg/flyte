@@ -79,6 +79,7 @@ func getMockTaskExecutionContext(ctx context.Context) *mocks.TaskExecutionContex
 	tMeta.OnGetLabels().Return(nil)
 	tMeta.OnGetAnnotations().Return(nil)
 	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
+	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	ow := &mocks2.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")

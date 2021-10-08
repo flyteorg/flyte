@@ -3,8 +3,10 @@
 package mocks
 
 import (
-	flyteidlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	core "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	corev1 "k8s.io/api/core/v1"
+
+	flyteidlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -275,6 +277,40 @@ func (_m *TaskExecutionMetadata) GetOwnerReference() v1.OwnerReference {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1.OwnerReference)
+	}
+
+	return r0
+}
+
+type TaskExecutionMetadata_GetPlatformResources struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetPlatformResources) Return(_a0 *corev1.ResourceRequirements) *TaskExecutionMetadata_GetPlatformResources {
+	return &TaskExecutionMetadata_GetPlatformResources{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetPlatformResources() *TaskExecutionMetadata_GetPlatformResources {
+	c := _m.On("GetPlatformResources")
+	return &TaskExecutionMetadata_GetPlatformResources{Call: c}
+}
+
+func (_m *TaskExecutionMetadata) OnGetPlatformResourcesMatch(matchers ...interface{}) *TaskExecutionMetadata_GetPlatformResources {
+	c := _m.On("GetPlatformResources", matchers...)
+	return &TaskExecutionMetadata_GetPlatformResources{Call: c}
+}
+
+// GetPlatformResources provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetPlatformResources() *corev1.ResourceRequirements {
+	ret := _m.Called()
+
+	var r0 *corev1.ResourceRequirements
+	if rf, ok := ret.Get(0).(func() *corev1.ResourceRequirements); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*corev1.ResourceRequirements)
+		}
 	}
 
 	return r0

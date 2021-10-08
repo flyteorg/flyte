@@ -164,6 +164,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	tMetadata.OnGetOwnerReference().Return(v1.OwnerReference{Name: "x"})
 	tMetadata.OnGetTaskExecutionID().Return(id)
 	tMetadata.OnGetOverrides().Return(to)
+	tMetadata.OnGetPlatformResources().Return(&v12.ResourceRequirements{})
 
 	ir := &mocks2.InputReader{}
 	ir.OnGetInputPath().Return("inputs.pb")

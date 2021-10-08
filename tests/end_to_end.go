@@ -171,6 +171,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		Namespace: "fake-development",
 		Name:      execID,
 	})
+	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}

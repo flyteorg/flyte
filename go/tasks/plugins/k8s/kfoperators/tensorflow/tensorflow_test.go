@@ -146,6 +146,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
 	taskExecutionMetadata.OnGetOverrides().Return(resources)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

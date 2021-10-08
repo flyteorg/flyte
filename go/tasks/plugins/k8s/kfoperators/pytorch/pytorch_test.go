@@ -130,7 +130,18 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	resources := &mocks.TaskOverrides{}
-	resources.OnGetResources().Return(resourceRequirements)
+	resources.OnGetResources().Return(&corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:         resource.MustParse("1000m"),
+			corev1.ResourceMemory:      resource.MustParse("1Gi"),
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:         resource.MustParse("100m"),
+			corev1.ResourceMemory:      resource.MustParse("512Mi"),
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	})
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -144,6 +155,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
 	taskExecutionMetadata.OnGetOverrides().Return(resources)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }
@@ -292,8 +304,8 @@ func TestBuildResourcePytorch(t *testing.T) {
 				hasContainerWithDefaultPytorchName = true
 			}
 
-			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
-			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
+			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests, fmt.Sprintf(" container.Resources.Requests [%+v]", container.Resources.Requests.Cpu().String()))
+			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits, fmt.Sprintf(" container.Resources.Limits [%+v]", container.Resources.Limits.Cpu().String()))
 		}
 
 		assert.True(t, hasContainerWithDefaultPytorchName)

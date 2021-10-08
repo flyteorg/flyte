@@ -25,6 +25,8 @@ const (
 	arrayJobIDFormatter = "%v:%v"
 )
 
+const assignResources = true
+
 // Note that Name is not set on the result object.
 // It's up to the caller to set the Name before creating the object in K8s.
 func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionContext, jobDefinition string, cfg *config2.Config) (
@@ -77,14 +79,18 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 
 	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
 	res := tCtx.TaskExecutionMetadata().GetOverrides().GetResources()
-	res = flytek8s.ApplyResourceOverrides(ctx, *res)
+	platformResources := tCtx.TaskExecutionMetadata().GetPlatformResources()
+	if platformResources == nil {
+		platformResources = &v1.ResourceRequirements{}
+	}
+	resources := flytek8s.ApplyResourceOverrides(*res, *platformResources, assignResources)
 
 	return &batch.SubmitJobInput{
 		JobName:            refStr(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()),
 		JobDefinition:      refStr(jobDefinition),
 		JobQueue:           refStr(jobConfig.DynamicTaskQueue),
 		RetryStrategy:      toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries),
-		ContainerOverrides: toContainerOverrides(ctx, append(cmd, args...), res, envVars),
+		ContainerOverrides: toContainerOverrides(ctx, append(cmd, args...), &resources, envVars),
 		Timeout:            toTimeout(taskTemplate.Metadata.GetTimeout(), cfg.DefaultTimeOut.Duration),
 	}, nil
 }

@@ -35,10 +35,10 @@ func validateAndFinalizePod(
 
 	resReqs := make([]k8sv1.ResourceRequirements, 0, len(pod.Spec.Containers))
 	for index, container := range pod.Spec.Containers {
-		var resourceMode = flytek8s.LeaveResourcesUnmodified
+		var resourceMode = flytek8s.ResourceCustomizationModeEnsureExistingResourcesInRange
 		if container.Name == primaryContainerName {
 			hasPrimaryContainer = true
-			resourceMode = flytek8s.MergeExistingResources
+			resourceMode = flytek8s.ResourceCustomizationModeMergeExistingResources
 		}
 		templateParameters := template.Parameters{
 			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
