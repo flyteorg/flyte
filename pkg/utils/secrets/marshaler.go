@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
 
 	"github.com/golang/protobuf/proto"
 
@@ -23,12 +23,12 @@ const (
 const totalAnnotationSizeLimitB int = 256 * (1 << 10) // 256 kB
 
 func encodeSecret(secretAsString string) string {
-	res := utils.Base32Encoder.EncodeToString([]byte(secretAsString))
+	res := encoding.Base32Encoder.EncodeToString([]byte(secretAsString))
 	return strings.TrimSuffix(res, "=")
 }
 
 func decodeSecret(encoded string) (string, error) {
-	decodedRaw, err := utils.Base32Encoder.DecodeString(encoded)
+	decodedRaw, err := encoding.Base32Encoder.DecodeString(encoded)
 	if err != nil {
 		return encoded, err
 	}

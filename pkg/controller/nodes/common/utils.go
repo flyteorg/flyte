@@ -3,9 +3,10 @@ package common
 import (
 	"strconv"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
+
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 const maxUniqueIDLength = 20
@@ -23,7 +24,7 @@ func GenerateUniqueID(parentInfo executors.ImmutableParentInfo, nodeID string) (
 		parentRetryAttempt = strconv.Itoa(int(parentInfo.CurrentAttempt()))
 	}
 
-	return utils.FixedLengthUniqueIDForParts(maxUniqueIDLength, parentUniqueID, parentRetryAttempt, nodeID)
+	return encoding.FixedLengthUniqueIDForParts(maxUniqueIDLength, parentUniqueID, parentRetryAttempt, nodeID)
 }
 
 // When creating parentInfo, the unique id of parent is dependent on the unique id and the current attempt of the grand parent to track the lineage.

@@ -7,9 +7,9 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 // Constructs the expected interface of a given node.
@@ -28,7 +28,7 @@ func underlyingInterface(ctx context.Context, taskReader handler.TaskReader) (*c
 }
 
 func hierarchicalNodeID(parentNodeID, retryAttempt, nodeID string) (string, error) {
-	return utils.FixedLengthUniqueIDForParts(20, parentNodeID, retryAttempt, nodeID)
+	return encoding.FixedLengthUniqueIDForParts(20, parentNodeID, retryAttempt, nodeID)
 }
 
 func updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt string, binding *core.BindingData) (err error) {
