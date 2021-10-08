@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -38,7 +38,7 @@ func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
 	return corev1.Volume{
 		// we don't want to create different volume for the same secret group
-		Name: utils.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.GroupVersion)),
+		Name: encoding.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.GroupVersion)),
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName: secret.Group,
