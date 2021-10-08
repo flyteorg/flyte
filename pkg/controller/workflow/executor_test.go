@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/rand"
+
 	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
@@ -396,27 +398,46 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	if err != nil {
 		assert.FailNow(b, "Got error reading the testdata")
 	}
+
 	w := &v1alpha1.FlyteWorkflow{}
 	err = json.Unmarshal(wJSON, w)
 	if err != nil {
 		assert.FailNow(b, "Got error unmarshalling the testdata")
 	}
 
-	// Current benchmark 2ms/op
-	for i := 0; i < b.N; i++ {
-		deepW := w.DeepCopy()
-		// For benchmark workflow, we know how many rounds it needs
-		// Number of rounds = 7 + 1
-		for i := 0; i < 8; i++ {
-			err := executor.HandleFlyteWorkflow(ctx, deepW)
-			if err != nil {
-				assert.FailNow(b, "Run the unit test first. Benchmark should not fail")
+	b.Run("Test", func(b *testing.B) {
+		// Current benchmark 15,675,695ms/op
+		for i := 0; i < b.N; i++ {
+			b.StopTimer()
+			deepW := w.DeepCopy()
+			deepW.Name = rand.String(5)
+			deepW.ID = deepW.Name
+			b.StartTimer()
+
+			// For benchmark workflow, we know how many rounds it needs
+			// Number of rounds = 28
+			for i := 0; i < 28; i++ {
+				b.StopTimer()
+				raw, err := json.Marshal(deepW)
+				assert.NoError(b, err)
+				deepW = &v1alpha1.FlyteWorkflow{}
+				err = json.Unmarshal(raw, deepW)
+				if !assert.NoError(b, err) {
+					assert.FailNow(b, "Got error unmarshalling the testdata")
+				}
+				b.StartTimer()
+
+				err = executor.HandleFlyteWorkflow(ctx, deepW)
+				if !assert.NoError(b, err) {
+					assert.FailNow(b, "Run the unit test first. Benchmark should not fail")
+				}
+			}
+
+			if !assert.Equal(b, v1alpha1.WorkflowPhaseSuccess.String(), deepW.Status.Phase.String()) {
+				assert.FailNow(b, "Workflow did not end in the expected state")
 			}
 		}
-		if deepW.Status.Phase != v1alpha1.WorkflowPhaseSuccess {
-			assert.FailNow(b, "Workflow did not end in the expected state")
-		}
-	}
+	})
 }
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {

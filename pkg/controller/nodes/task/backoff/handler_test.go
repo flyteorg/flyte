@@ -68,7 +68,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 					MaxBackOffDuration: 10 * time.Second,
 				},
 				ComputeResourceCeilings: &ComputeResourceCeilings{
-					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")}),
 				},
 			},
 			args: args{
@@ -93,7 +93,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 					MaxBackOffDuration: 10 * time.Second,
 				},
 				ComputeResourceCeilings: &ComputeResourceCeilings{
-					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")}),
 				},
 			},
 			args: args{
@@ -120,7 +120,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 					MaxBackOffDuration: 10 * time.Second,
 				},
 				ComputeResourceCeilings: &ComputeResourceCeilings{
-					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1Ei"), v1.ResourceMemory: resource.MustParse("1Ei")},
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceCPU: resource.MustParse("1Ei"), v1.ResourceMemory: resource.MustParse("1Ei")}),
 				},
 			},
 			args: args{
@@ -157,8 +157,8 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 			if tt.wantNextEligibleTime != h.NextEligibleTime.Load() {
 				t.Errorf("post-Handle() NextEligibleTime = %v, wantNextEligibleTime %v", h.NextEligibleTime, tt.wantNextEligibleTime)
 			}
-			if !reflect.DeepEqual(h.computeResourceCeilings, tt.wantCeilings) {
-				t.Errorf("ResourceCeilings = %v, want %v", h.computeResourceCeilings, tt.wantCeilings)
+			if !reflect.DeepEqual(h.computeResourceCeilings.AsResourceList(), tt.wantCeilings) {
+				t.Errorf("ResourceCeilings = %v, want %v", h.computeResourceCeilings.AsResourceList(), tt.wantCeilings)
 			}
 			if tt.wantCallCount != callCount {
 				t.Errorf("Operation call count = %v, want %v", callCount, tt.wantCallCount)
@@ -169,19 +169,19 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 
 func TestComputeResourceCeilings_inf(t *testing.T) {
 	type fields struct {
-		computeResourceCeilings v1.ResourceList
+		v1.ResourceList
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		want   resource.Quantity
 	}{
-		{name: "inf is set properly", fields: fields{computeResourceCeilings: v1.ResourceList{}}, want: resource.MustParse("1Ei")},
+		{name: "inf is set properly", fields: fields{ResourceList: v1.ResourceList{}}, want: resource.MustParse("1Ei")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &ComputeResourceCeilings{
-				computeResourceCeilings: tt.fields.computeResourceCeilings,
+				computeResourceCeilings: SyncResourceListFromResourceList(tt.fields.ResourceList),
 			}
 			if got := r.inf(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("inf() = %v, want %v", got, tt.want)
@@ -227,7 +227,7 @@ func TestComputeResourceCeilings_isEligible(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &ComputeResourceCeilings{
-				computeResourceCeilings: tt.fields.computeResourceCeilings,
+				computeResourceCeilings: SyncResourceListFromResourceList(tt.fields.computeResourceCeilings),
 			}
 			if got := r.isEligible(tt.args.requestedResourceList); got != tt.want {
 				t.Errorf("isEligible() = %v, want %v", got, tt.want)
@@ -275,17 +275,17 @@ func TestComputeResourceCeilings_update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &ComputeResourceCeilings{
-				computeResourceCeilings: tt.fields.computeResourceCeilings,
+				computeResourceCeilings: SyncResourceListFromResourceList(tt.fields.computeResourceCeilings),
 			}
 			r.update(tt.args.reqResource, tt.args.reqQuantity)
 			for _, rsrcTuple := range tt.wants {
-				if rsrcTuple.reqQuantity != r.computeResourceCeilings[rsrcTuple.reqResource] {
+				if quantity, found := r.computeResourceCeilings.Load(rsrcTuple.reqResource); !found || rsrcTuple.reqQuantity != quantity {
 					t.Errorf("Resource ceiling: (%v, %v), want (%v, %v)",
-						rsrcTuple.reqResource, r.computeResourceCeilings[rsrcTuple.reqResource], rsrcTuple.reqResource, rsrcTuple.reqQuantity)
+						rsrcTuple.reqResource, quantity, rsrcTuple.reqResource, rsrcTuple.reqQuantity)
 				}
 			}
 			for _, ne := range tt.shouldNotExist {
-				if _, ok := r.computeResourceCeilings[ne]; ok {
+				if _, ok := r.computeResourceCeilings.Load(ne); ok {
 					t.Errorf("Resource should not exist in ceiling: %v", ne)
 				}
 			}
@@ -324,17 +324,17 @@ func TestComputeResourceCeilings_updateAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &ComputeResourceCeilings{
-				computeResourceCeilings: tt.fields.computeResourceCeilings,
+				computeResourceCeilings: SyncResourceListFromResourceList(tt.fields.computeResourceCeilings),
 			}
 			r.updateAll(tt.args.resources)
 			for rs, qs := range tt.wants.resources {
-				if qs != r.computeResourceCeilings[rs] {
+				if quantity, found := r.computeResourceCeilings.Load(rs); !found || quantity != qs {
 					t.Errorf("Resource ceiling: (%v, %v), want (%v, %v)",
-						rs, r.computeResourceCeilings[rs], rs, qs)
+						rs, quantity, rs, qs)
 				}
 			}
 			for _, ne := range tt.shouldNotExist {
-				if _, ok := r.computeResourceCeilings[ne]; ok {
+				if _, ok := r.computeResourceCeilings.Load(ne); ok {
 					t.Errorf("Resource should not exist in ceiling: %v", ne)
 				}
 			}

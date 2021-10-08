@@ -11,7 +11,6 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 )
 
@@ -31,7 +30,7 @@ func (m *Controller) GetOrCreateHandler(ctx context.Context, key string, backOff
 			NextEligibleTime:   NewAtomicTime(m.Clock.Now()),
 			MaxBackOffDuration: maxBackOffDuration,
 		}, ComputeResourceCeilings: &ComputeResourceCeilings{
-			computeResourceCeilings: v1.ResourceList{},
+			computeResourceCeilings: NewSyncResourceList(),
 		},
 	})
 
