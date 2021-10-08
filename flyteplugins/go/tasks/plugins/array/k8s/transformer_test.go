@@ -179,6 +179,7 @@ func TestFlyteArrayJobToK8sPodTemplate(t *testing.T) {
 		},
 	})
 	tMeta.OnGetOverrides().Return(&mockResourceOverrides)
+	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{

@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	sagemakerConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 
 	"github.com/flyteorg/flytestdlib/config"
@@ -68,8 +70,10 @@ func TestLoadConfig(t *testing.T) {
 
 		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations[v1.ResourceName("nvidia.com/gpu")])
 		assert.Equal(t, []v1.Toleration{tolStorage}, k8sConfig.ResourceTolerations[v1.ResourceStorage])
-		assert.Equal(t, "1000m", k8sConfig.DefaultCPURequest)
-		assert.Equal(t, "1024Mi", k8sConfig.DefaultMemoryRequest)
+		expectedCPU := resource.MustParse("1000m")
+		assert.True(t, expectedCPU.Equal(k8sConfig.DefaultCPURequest))
+		expectedMemory := resource.MustParse("1024Mi")
+		assert.True(t, expectedMemory.Equal(k8sConfig.DefaultMemoryRequest))
 		assert.Equal(t, map[string]string{"x/interruptible": "true"}, k8sConfig.InterruptibleNodeSelector)
 		assert.Equal(t, "x/flyte", k8sConfig.InterruptibleTolerations[0].Key)
 		assert.Equal(t, "interruptible", k8sConfig.InterruptibleTolerations[0].Value)

@@ -51,8 +51,6 @@ func (K8sPluginConfig) mustMarshalJSON(v json.Marshaler) string {
 func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("K8sPluginConfig", pflag.ExitOnError)
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "inject-finalizer"), defaultK8sConfig.InjectFinalizer, "Instructs the plugin to inject a finalizer on startTask and remove it on task termination.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-cpus"), defaultK8sConfig.DefaultCPURequest, "Defines a default value for cpu for containers if not specified.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-memory"), defaultK8sConfig.DefaultMemoryRequest, "Defines a default value for memory for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "scheduler-name"), defaultK8sConfig.SchedulerName, "Defines scheduler name.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.name"), defaultK8sConfig.CoPilot.NamePrefix, "Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.image"), defaultK8sConfig.CoPilot.Image, "Flyte co-pilot Docker Image FQN")

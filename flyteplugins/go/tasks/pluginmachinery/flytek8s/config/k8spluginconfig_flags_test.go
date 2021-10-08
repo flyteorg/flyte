@@ -113,34 +113,6 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_default-cpus", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("default-cpus", testValue)
-			if vString, err := cmdFlags.GetString("default-cpus"); err == nil {
-				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultCPURequest)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_default-memory", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("default-memory", testValue)
-			if vString, err := cmdFlags.GetString("default-memory"); err == nil {
-				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultMemoryRequest)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_scheduler-name", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -3,11 +3,12 @@ package flytek8s
 import (
 	"context"
 
+	"github.com/flyteorg/flytestdlib/logger"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/rand"
@@ -21,6 +22,10 @@ const resourceGPU = "gpu"
 // ResourceNvidiaGPU is the name of the Nvidia GPU resource.
 // Copied from: k8s.io/autoscaler/cluster-autoscaler/utils/gpu/gpu.go
 const ResourceNvidiaGPU = "nvidia.com/gpu"
+
+// Specifies whether resource resolution should assign unset resource requests or limits from platform defaults
+// or existing container values.
+const assignIfUnset = true
 
 func MergeResources(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
 	if out.Limits == nil {
@@ -39,8 +44,99 @@ func MergeResources(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
 	}
 }
 
-func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequirements) *v1.ResourceRequirements {
-	// set memory and cpu to default if not provided by user.
+type ResourceRequirement struct {
+	Request resource.Quantity
+	Limit   resource.Quantity
+}
+
+func resolvePlatformDefaults(platformResources v1.ResourceRequirements, configCPU, configMemory resource.Quantity) v1.ResourceRequirements {
+	if len(platformResources.Requests) == 0 {
+		platformResources.Requests = make(v1.ResourceList)
+	}
+
+	if _, ok := platformResources.Requests[v1.ResourceCPU]; !ok {
+		platformResources.Requests[v1.ResourceCPU] = configCPU
+	}
+
+	if _, ok := platformResources.Requests[v1.ResourceMemory]; !ok {
+		platformResources.Requests[v1.ResourceMemory] = configMemory
+	}
+
+	if len(platformResources.Limits) == 0 {
+		platformResources.Limits = make(v1.ResourceList)
+	}
+
+	return platformResources
+}
+
+// AdjustOrDefaultResource validates resources conform to platform limits and assigns defaults for Request and Limit values by
+// using the Request when the Limit is unset, and vice versa.
+func AdjustOrDefaultResource(request, limit, platformDefault, platformLimit resource.Quantity) ResourceRequirement {
+	if request.IsZero() {
+		if !limit.IsZero() {
+			request = limit
+		} else {
+			request = platformDefault
+		}
+	}
+
+	if limit.IsZero() {
+		limit = request
+	}
+
+	return ensureResourceRange(request, limit, platformLimit)
+}
+
+func ensureResourceLimit(value, limit resource.Quantity) resource.Quantity {
+	if value.IsZero() || limit.IsZero() {
+		return value
+	}
+
+	if value.Cmp(limit) == 1 {
+		return limit
+	}
+
+	return value
+}
+
+// ensureResourceRange doesn't assign resources unless they need to be adjusted downwards
+func ensureResourceRange(request, limit, platformLimit resource.Quantity) ResourceRequirement {
+	// Ensure request is < platformLimit
+	request = ensureResourceLimit(request, platformLimit)
+	// Ensure limit is < platformLimit
+	limit = ensureResourceLimit(limit, platformLimit)
+	// Ensure request is < limit
+	request = ensureResourceLimit(request, limit)
+
+	return ResourceRequirement{
+		Request: request,
+		Limit:   limit,
+	}
+}
+
+func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirements,
+	platformResources v1.ResourceRequirements, assignIfUnset bool) {
+
+	var resourceValue ResourceRequirement
+	if assignIfUnset {
+		resourceValue = AdjustOrDefaultResource(resourceRequirements.Requests[resourceName],
+			resourceRequirements.Limits[resourceName], platformResources.Requests[resourceName],
+			platformResources.Limits[resourceName])
+	} else {
+		resourceValue = ensureResourceRange(resourceRequirements.Requests[resourceName],
+			resourceRequirements.Limits[resourceName], platformResources.Limits[resourceName])
+	}
+
+	resourceRequirements.Requests[resourceName] = resourceValue.Request
+	resourceRequirements.Limits[resourceName] = resourceValue.Limit
+}
+
+// ApplyResourceOverrides handles resource resolution, allocation and validation. Primarily, it ensures that container
+// resources do not exceed defined platformResource limits and in the case of assignIfUnset, ensures that limits and
+// requests are sensibly set for resources of all types.
+// Furthermore, this function handles some clean-up such as converting GPU resources to the recognized Nvidia gpu
+// resource name and deleting unsupported Storage-type resources.
+func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements, assignIfUnset bool) v1.ResourceRequirements {
 	if len(resources.Requests) == 0 {
 		resources.Requests = make(v1.ResourceList)
 	}
@@ -49,42 +145,19 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 		resources.Limits = make(v1.ResourceList)
 	}
 
-	if _, found := resources.Requests[v1.ResourceCPU]; !found {
-		// use cpu limit if set else default to config
-		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
-			resources.Requests[v1.ResourceCPU] = resources.Limits[v1.ResourceCPU]
-		} else {
-			resources.Requests[v1.ResourceCPU] = resource.MustParse(config.GetK8sPluginConfig().DefaultCPURequest)
-		}
-	}
+	// As a fallback, in the case the Flyte workflow object does not have platformResource defaults set, the defaults
+	// come from the plugin config.
+	platformResources = resolvePlatformDefaults(platformResources, config.GetK8sPluginConfig().DefaultCPURequest,
+		config.GetK8sPluginConfig().DefaultMemoryRequest)
 
-	if _, found := resources.Requests[v1.ResourceMemory]; !found {
-		// use memory limit if set else default to config
-		if _, limitSet := resources.Limits[v1.ResourceMemory]; limitSet {
-			resources.Requests[v1.ResourceMemory] = resources.Limits[v1.ResourceMemory]
-		} else {
-			resources.Requests[v1.ResourceMemory] = resource.MustParse(config.GetK8sPluginConfig().DefaultMemoryRequest)
-		}
-	}
+	adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset)
+	adjustResourceRequirement(v1.ResourceMemory, resources, platformResources, assignIfUnset)
 
-	if _, found := resources.Limits[v1.ResourceCPU]; !found {
-		logger.Infof(ctx, "found cpu limit missing, setting limit to the requested value %v", resources.Requests[v1.ResourceCPU])
-		resources.Limits[v1.ResourceCPU] = resources.Requests[v1.ResourceCPU]
-	}
+	_, ephemeralStorageRequested := resources.Requests[v1.ResourceEphemeralStorage]
+	_, ephemeralStorageLimited := resources.Limits[v1.ResourceEphemeralStorage]
 
-	if _, found := resources.Limits[v1.ResourceMemory]; !found {
-		logger.Infof(ctx, "found memory limit missing, setting limit to the requested value %v", resources.Requests[v1.ResourceMemory])
-		resources.Limits[v1.ResourceMemory] = resources.Requests[v1.ResourceMemory]
-	}
-
-	// Ephemeral storage resources aren't required but if one of requests or limits is set and the other isn't, we'll
-	// just use the same values.
-	if _, requested := resources.Requests[v1.ResourceEphemeralStorage]; !requested {
-		if _, limitSet := resources.Limits[v1.ResourceEphemeralStorage]; limitSet {
-			resources.Requests[v1.ResourceEphemeralStorage] = resources.Limits[v1.ResourceEphemeralStorage]
-		}
-	} else if _, limitSet := resources.Limits[v1.ResourceEphemeralStorage]; !limitSet {
-		resources.Limits[v1.ResourceEphemeralStorage] = resources.Requests[v1.ResourceEphemeralStorage]
+	if ephemeralStorageRequested || ephemeralStorageLimited {
+		adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset)
 	}
 
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
@@ -92,21 +165,36 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 	delete(resources.Requests, v1.ResourceStorage)
 	delete(resources.Limits, v1.ResourceStorage)
 
+	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+	shouldAdjustGPU := false
+	_, gpuRequested := resources.Requests[gpuResourceName]
+	_, gpuLimited := resources.Limits[gpuResourceName]
+	if gpuRequested || gpuLimited {
+		shouldAdjustGPU = true
+	}
+
 	// Override GPU
 	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[ResourceNvidiaGPU] = res
+		resources.Requests[gpuResourceName] = res
 		delete(resources.Requests, resourceGPU)
-	}
-	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[ResourceNvidiaGPU] = res
-		delete(resources.Requests, resourceGPU)
+		shouldAdjustGPU = true
 	}
 
-	return &resources
+	if res, found := resources.Limits[resourceGPU]; found {
+		resources.Limits[gpuResourceName] = res
+		delete(resources.Limits, resourceGPU)
+		shouldAdjustGPU = true
+	}
+
+	if shouldAdjustGPU {
+		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
+	}
+
+	return resources
 }
 
-// Transforms a task template target of type core.Container into a bare-bones kubernetes container, which can be further
-// modified with flyte-specific customizations specified by various static and run-time attributes.
+// ToK8sContainer transforms a task template target of type core.Container into a bare-bones kubernetes container, which
+// can be further modified with flyte-specific customizations specified by various static and run-time attributes.
 func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *core.TypedInterface, parameters template.Parameters) (*v1.Container, error) {
 	// Perform preliminary validations
 	if parameters.TaskExecMetadata.GetOverrides() == nil {
@@ -135,16 +223,24 @@ func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *c
 	return container, nil
 }
 
+//go:generate enumer -type=ResourceCustomizationMode -trimprefix=ResourceCustomizationMode
+
 type ResourceCustomizationMode int
 
 const (
-	AssignResources ResourceCustomizationMode = iota
-	MergeExistingResources
-	LeaveResourcesUnmodified
+	// ResourceCustomizationModeAssignResources is used for container tasks where resources are validated and assigned if necessary.
+	ResourceCustomizationModeAssignResources ResourceCustomizationMode = iota
+	// ResourceCustomizationModeMergeExistingResources is used for primary containers in pod tasks where container requests and limits are
+	// merged, validated and assigned if necessary.
+	ResourceCustomizationModeMergeExistingResources
+	// ResourceCustomizationModeEnsureExistingResourcesInRange is used for secondary containers in pod tasks where requests and limits are only
+	// adjusted if needed (downwards).
+	ResourceCustomizationModeEnsureExistingResourcesInRange
 )
 
-// Takes a container definition which specifies how to run a Flyte task and fills in templated command and argument
-// values, updates resources and decorates environment variables with platform and task-specific customizations.
+// AddFlyteCustomizationsToContainer takes a container definition which specifies how to run a Flyte task and fills in
+// templated command and argument values, updates resources and decorates environment variables with platform and
+// task-specific customizations.
 func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.Parameters,
 	mode ResourceCustomizationMode, container *v1.Container) error {
 	modifiedCommand, err := template.Render(ctx, container.Command, parameters)
@@ -163,16 +259,25 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 
 	if parameters.TaskExecMetadata.GetOverrides() != nil && parameters.TaskExecMetadata.GetOverrides().GetResources() != nil {
 		res := parameters.TaskExecMetadata.GetOverrides().GetResources()
-		switch mode {
-		case AssignResources:
-			if res = ApplyResourceOverrides(ctx, *res); res != nil {
-				container.Resources = *res
-			}
-		case MergeExistingResources:
-			MergeResources(*res, &container.Resources)
-			container.Resources = *ApplyResourceOverrides(ctx, container.Resources)
-		case LeaveResourcesUnmodified:
+		platformResources := parameters.TaskExecMetadata.GetPlatformResources()
+		if platformResources == nil {
+			platformResources = &v1.ResourceRequirements{}
 		}
+
+		logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
+			" Resources [%v] with mode [%v]", res, platformResources, container.Resources, mode)
+
+		switch mode {
+		case ResourceCustomizationModeAssignResources:
+			container.Resources = ApplyResourceOverrides(*res, *platformResources, assignIfUnset)
+		case ResourceCustomizationModeMergeExistingResources:
+			MergeResources(*res, &container.Resources)
+			container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, assignIfUnset)
+		case ResourceCustomizationModeEnsureExistingResourcesInRange:
+			container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
+		}
+
+		logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)
 	}
 	return nil
 }

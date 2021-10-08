@@ -48,6 +48,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
+	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
 	tID.On("GetID").Return(core.TaskExecutionIdentifier{

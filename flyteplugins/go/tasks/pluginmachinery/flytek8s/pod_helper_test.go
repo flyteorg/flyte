@@ -55,6 +55,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements) pluginsCore.
 	to.On("GetResources").Return(resources)
 	taskExecutionMetadata.On("GetOverrides").Return(to)
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
+	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	return taskExecutionMetadata
 }
 
@@ -404,8 +405,8 @@ func TestToK8sPod(t *testing.T) {
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
-		DefaultCPURequest:    "1024m",
-		DefaultMemoryRequest: "1024Mi",
+		DefaultCPURequest:    resource.MustParse("1024m"),
+		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
 
 	op := &pluginsIOMock.OutputFilePaths{}
@@ -471,8 +472,8 @@ func TestToK8sPod(t *testing.T) {
 				"nodeId": "123",
 			},
 			SchedulerName:        "myScheduler",
-			DefaultCPURequest:    "1024m",
-			DefaultMemoryRequest: "1024Mi",
+			DefaultCPURequest:    resource.MustParse("1024m"),
+			DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		}))
 
 		p, err := ToK8sPodSpec(ctx, x)

@@ -17,104 +17,198 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
+var zeroQuantity = resource.MustParse("0")
+
+func TestAssignResource(t *testing.T) {
+	t.Run("Leave valid requests and limits unchanged", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			resource.MustParse("1"), resource.MustParse("2"),
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.True(t, res.Request.Equal(resource.MustParse("1")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("2")))
+	})
+	t.Run("Assign unset Request from Limit", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			zeroQuantity, resource.MustParse("2"),
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.True(t, res.Request.Equal(resource.MustParse("2")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("2")))
+	})
+	t.Run("Assign unset Limit from Request", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			resource.MustParse("2"), zeroQuantity,
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.Equal(t, resource.MustParse("2"), res.Request)
+		assert.Equal(t, resource.MustParse("2"), res.Limit)
+	})
+	t.Run("Assign from platform defaults", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			zeroQuantity, zeroQuantity,
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.Equal(t, resource.MustParse("10"), res.Request)
+		assert.Equal(t, resource.MustParse("10"), res.Limit)
+	})
+	t.Run("Adjust Limit when Request > Limit", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			resource.MustParse("10"), resource.MustParse("2"),
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.Equal(t, resource.MustParse("2"), res.Request)
+		assert.Equal(t, resource.MustParse("2"), res.Limit)
+	})
+	t.Run("Adjust Limit > platformLimit", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			resource.MustParse("1"), resource.MustParse("40"),
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.True(t, res.Request.Equal(resource.MustParse("1")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("20")))
+	})
+	t.Run("Adjust Request, Limit > platformLimit", func(t *testing.T) {
+		res := AdjustOrDefaultResource(
+			resource.MustParse("40"), resource.MustParse("50"),
+			resource.MustParse("10"), resource.MustParse("20"))
+		assert.True(t, res.Request.Equal(resource.MustParse("20")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("20")))
+	})
+}
+
+func TestValidateResource(t *testing.T) {
+	platformLimit := resource.MustParse("5")
+	t.Run("adjust when Request > Limit", func(t *testing.T) {
+		res := ensureResourceRange(resource.MustParse("4"), resource.MustParse("3"), platformLimit)
+		assert.True(t, res.Request.Equal(resource.MustParse("3")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("3")))
+	})
+	t.Run("adjust when Request > platformLimit", func(t *testing.T) {
+		res := ensureResourceRange(resource.MustParse("6"), platformLimit, platformLimit)
+		assert.True(t, res.Request.Equal(platformLimit))
+		assert.True(t, res.Limit.Equal(platformLimit))
+	})
+	t.Run("adjust when Limit > platformLimit", func(t *testing.T) {
+		res := ensureResourceRange(resource.MustParse("4"), resource.MustParse("6"), platformLimit)
+		assert.True(t, res.Request.Equal(resource.MustParse("4")))
+		assert.True(t, res.Limit.Equal(platformLimit))
+	})
+	t.Run("nothing to do", func(t *testing.T) {
+		res := ensureResourceRange(resource.MustParse("1"), resource.MustParse("2"), platformLimit)
+		assert.True(t, res.Request.Equal(resource.MustParse("1")))
+		assert.True(t, res.Limit.Equal(resource.MustParse("2")))
+	})
+}
+
 func TestApplyResourceOverrides_OverrideCpu(t *testing.T) {
+	platformRequirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("3"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("10"),
+		},
+	}
 	cpuRequest := resource.MustParse("1")
-	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU: cpuRequest,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, cpuRequest, overrides.Requests[v1.ResourceCPU])
 	assert.EqualValues(t, cpuRequest, overrides.Limits[v1.ResourceCPU])
 
 	cpuLimit := resource.MustParse("2")
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU: cpuRequest,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceCPU: cpuLimit,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, cpuRequest, overrides.Requests[v1.ResourceCPU])
 	assert.EqualValues(t, cpuLimit, overrides.Limits[v1.ResourceCPU])
 
-	// request equals limit if not set
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	// Request equals Limit if not set
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			v1.ResourceCPU: cpuLimit,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, cpuLimit, overrides.Requests[v1.ResourceCPU])
 	assert.EqualValues(t, cpuLimit, overrides.Limits[v1.ResourceCPU])
 }
 
 func TestApplyResourceOverrides_OverrideMemory(t *testing.T) {
 	memoryRequest := resource.MustParse("1")
-	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	platformRequirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceMemory: resource.MustParse("3"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceMemory: resource.MustParse("10"),
+		},
+	}
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceMemory: memoryRequest,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, memoryRequest, overrides.Requests[v1.ResourceMemory])
 	assert.EqualValues(t, memoryRequest, overrides.Limits[v1.ResourceMemory])
 
 	memoryLimit := resource.MustParse("2")
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceMemory: memoryRequest,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceMemory: memoryLimit,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, memoryRequest, overrides.Requests[v1.ResourceMemory])
 	assert.EqualValues(t, memoryLimit, overrides.Limits[v1.ResourceMemory])
 
-	// request equals limit if not set
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	// Request equals Limit if not set
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			v1.ResourceMemory: memoryLimit,
 		},
-	})
+	}, platformRequirements, assignIfUnset)
 	assert.EqualValues(t, memoryLimit, overrides.Requests[v1.ResourceMemory])
 	assert.EqualValues(t, memoryLimit, overrides.Limits[v1.ResourceMemory])
 }
 
 func TestApplyResourceOverrides_OverrideEphemeralStorage(t *testing.T) {
 	ephemeralStorageRequest := resource.MustParse("1")
-	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceEphemeralStorage: ephemeralStorageRequest,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, ephemeralStorageRequest, overrides.Requests[v1.ResourceEphemeralStorage])
 	assert.EqualValues(t, ephemeralStorageRequest, overrides.Limits[v1.ResourceEphemeralStorage])
 
 	ephemeralStorageLimit := resource.MustParse("2")
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceEphemeralStorage: ephemeralStorageRequest,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: ephemeralStorageLimit,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, ephemeralStorageRequest, overrides.Requests[v1.ResourceEphemeralStorage])
 	assert.EqualValues(t, ephemeralStorageLimit, overrides.Limits[v1.ResourceEphemeralStorage])
 
-	// request equals limit if not set
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	// Request equals Limit if not set
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: ephemeralStorageLimit,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, ephemeralStorageLimit, overrides.Requests[v1.ResourceEphemeralStorage])
 }
 
 func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 	requestedResourceQuantity := resource.MustParse("1")
-	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
@@ -126,7 +220,7 @@ func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, v1.ResourceList{
 		v1.ResourceMemory:           requestedResourceQuantity,
 		v1.ResourceCPU:              requestedResourceQuantity,
@@ -142,18 +236,18 @@ func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 
 func TestApplyResourceOverrides_OverrideGpu(t *testing.T) {
 	gpuRequest := resource.MustParse("1")
-	overrides := ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			resourceGPU: gpuRequest,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Requests[ResourceNvidiaGPU])
 
-	overrides = ApplyResourceOverrides(context.Background(), v1.ResourceRequirements{
+	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			resourceGPU: gpuRequest,
 		},
-	})
+	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Limits[ResourceNvidiaGPU])
 }
 
@@ -298,7 +392,7 @@ func TestToK8sContainer(t *testing.T) {
 	assert.Nil(t, errs)
 }
 
-func TestAddFlyteCustomizationsToContainer(t *testing.T) {
+func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements) template.Parameters {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskExecutionID := mocks.TaskExecutionID{}
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
@@ -323,15 +417,9 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
 
 	mockOverrides := mocks.TaskOverrides{}
-	mockOverrides.OnGetResources().Return(&v1.ResourceRequirements{
-		Requests: v1.ResourceList{
-			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
-		},
-		Limits: v1.ResourceList{
-			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
-		},
-	})
+	mockOverrides.OnGetResources().Return(resourceRequirements)
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
+	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
@@ -344,11 +432,22 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	mockOutputPath.OnGetRawOutputPrefix().Return(mockOutputPathPrefix)
 	mockOutputPath.OnGetOutputPrefixPath().Return(mockOutputPathPrefix)
 
-	templateParameters := template.Parameters{
+	return template.Parameters{
 		TaskExecMetadata: &mockTaskExecMetadata,
 		Inputs:           &mockInputReader,
 		OutputPath:       &mockOutputPath,
 	}
+}
+
+func TestAddFlyteCustomizationsToContainer(t *testing.T) {
+	templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
+		},
+	}, nil)
 	container := &v1.Container{
 		Command: []string{
 			"{{ .Input }}",
@@ -357,11 +456,143 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 			"{{ .OutputPrefix }}",
 		},
 	}
-	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, AssignResources, container)
+	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
 	assert.NoError(t, err)
 	assert.EqualValues(t, container.Args, []string{"s3://output/path"})
 	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
 	assert.Len(t, container.Resources.Limits, 3)
 	assert.Len(t, container.Resources.Requests, 3)
 	assert.Len(t, container.Env, 12)
+}
+
+func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
+	container := &v1.Container{
+		Command: []string{
+			"{{ .Input }}",
+		},
+		Args: []string{
+			"{{ .OutputPrefix }}",
+		},
+		Resources: v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("10"),
+			},
+		},
+	}
+
+	t.Run("merge requests/limits for pod tasks - primary container", func(t *testing.T) {
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("2"),
+			},
+		}, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("2"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("20"),
+			},
+		})
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		assert.NoError(t, err)
+		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
+		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
+		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("2")))
+		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("2")))
+	})
+	t.Run("enforce merge requests/limits for pod tasks - values from task overrides", func(t *testing.T) {
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("2"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("200"),
+			},
+		}, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("2"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("20"),
+			},
+		})
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		assert.NoError(t, err)
+		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
+		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
+		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("2")))
+		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("20")))
+	})
+	t.Run("enforce requests/limits for pod tasks - values from container", func(t *testing.T) {
+		container := &v1.Container{
+			Command: []string{
+				"{{ .Input }}",
+			},
+			Args: []string{
+				"{{ .OutputPrefix }}",
+			},
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU: resource.MustParse("100"),
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU: resource.MustParse("100"),
+				},
+			},
+		}
+
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("1"),
+				v1.ResourceMemory: resource.MustParse("2"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("10"),
+				v1.ResourceMemory: resource.MustParse("20"),
+			},
+		})
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		assert.NoError(t, err)
+		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
+		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
+		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("2")))
+		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("2")))
+	})
+}
+
+func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.T) {
+	container := &v1.Container{
+		Command: []string{
+			"{{ .Input }}",
+		},
+		Args: []string{
+			"{{ .OutputPrefix }}",
+		},
+		Resources: v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("100"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("200"),
+			},
+		},
+	}
+	templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: resource.MustParse("2"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("10"),
+			v1.ResourceMemory: resource.MustParse("20"),
+		},
+	})
+	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	assert.NoError(t, err)
+
+	assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
+	assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
 }

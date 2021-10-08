@@ -35,4 +35,5 @@ type TaskExecutionMetadata interface {
 	GetK8sServiceAccount() string
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
+	GetPlatformResources() *v1.ResourceRequirements
 }
