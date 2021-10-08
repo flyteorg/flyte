@@ -63,21 +63,23 @@ func (b *SimpleBackOffBlocker) backOff(ctx context.Context) time.Duration {
 }
 
 type ComputeResourceCeilings struct {
-	computeResourceCeilings v1.ResourceList
+	computeResourceCeilings *SyncResourceList
 }
 
-func (r *ComputeResourceCeilings) isEligible(requestedResourceList v1.ResourceList) bool {
-	eligibility := true
+func (r *ComputeResourceCeilings) isEligible(requestedResourceList v1.ResourceList) (eligibility bool) {
 	for reqResource, reqQuantity := range requestedResourceList {
-		eligibility = eligibility && (reqQuantity.Cmp(r.computeResourceCeilings[reqResource]) < 0)
+		val, found := r.computeResourceCeilings.Load(reqResource)
+		if found && reqQuantity.Cmp(val) >= 0 {
+			return false
+		}
 	}
-	return eligibility
+
+	return true
 }
 
 func (r *ComputeResourceCeilings) update(reqResource v1.ResourceName, reqQuantity resource.Quantity) {
-
-	if currentCeiling, ok := r.computeResourceCeilings[reqResource]; !ok || reqQuantity.Value() < currentCeiling.Value() {
-		r.computeResourceCeilings[reqResource] = reqQuantity.DeepCopy()
+	if currentCeiling, ok := r.computeResourceCeilings.Load(reqResource); !ok || reqQuantity.Value() < currentCeiling.Value() {
+		r.computeResourceCeilings.Store(reqResource, reqQuantity.DeepCopy())
 	}
 }
 
@@ -88,13 +90,14 @@ func (r *ComputeResourceCeilings) updateAll(resources *v1.ResourceList) {
 }
 
 func (r *ComputeResourceCeilings) reset(resource v1.ResourceName) {
-	r.computeResourceCeilings[resource] = r.inf()
+	r.computeResourceCeilings.Store(resource, r.inf())
 }
 
 func (r *ComputeResourceCeilings) resetAll() {
-	for compResource := range r.computeResourceCeilings {
-		r.reset(compResource)
-	}
+	r.computeResourceCeilings.Range(func(key v1.ResourceName, value resource.Quantity) bool {
+		r.reset(key)
+		return true
+	})
 }
 
 func (r *ComputeResourceCeilings) inf() resource.Quantity {
@@ -162,7 +165,7 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
 					"but failed due to %s (the next eligible time "+
 					"remains unchanged [%v]). The requests are [%v]. The ceilings are [%v]\n",
-					err, h.SimpleBackOffBlocker.NextEligibleTime, requestedResourceList, h.computeResourceCeilings)
+					err, h.SimpleBackOffBlocker.NextEligibleTime, requestedResourceList, h.computeResourceCeilings.String())
 			}
 			if IsResourceQuotaExceeded(err) {
 				// It is necessary to parse the error message to get the actual constraints
