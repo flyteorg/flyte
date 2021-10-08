@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/flytek8s"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/dynamic"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,12 +31,12 @@ func (i InCluster) GetAllValidTargets() []executioncluster.ExecutionTarget {
 	}
 }
 
-func NewInCluster(scope promutils.Scope, kubeConfig, master string) (interfaces.ClusterInterface, error) {
+func NewInCluster(initializationErrorCounter prometheus.Counter, kubeConfig, master string) (interfaces.ClusterInterface, error) {
 	clientConfig, err := flytek8s.GetRestClientConfig(kubeConfig, master, nil)
 	if err != nil {
 		return nil, err
 	}
-	flyteClient, err := getRestClientFromKubeConfig(scope, clientConfig)
+	flyteClient, err := getRestClientFromKubeConfig(initializationErrorCounter, clientConfig)
 	if err != nil {
 		return nil, err
 	}

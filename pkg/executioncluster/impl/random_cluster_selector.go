@@ -6,6 +6,8 @@ import (
 	"hash/fnv"
 	"math/rand"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -22,7 +24,6 @@ import (
 	"github.com/flyteorg/flytestdlib/random"
 
 	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 // Implementation of Random cluster selector
@@ -44,7 +45,7 @@ func getRandSource(seed string) (rand.Source, error) {
 	return rand.NewSource(hashedSeed), nil
 }
 
-func getExecutionTargets(ctx context.Context, scope promutils.Scope, executionTargetProvider interfaces.ExecutionTargetProvider,
+func getExecutionTargets(ctx context.Context, initializationErrorCounter prometheus.Counter, executionTargetProvider interfaces.ExecutionTargetProvider,
 	clusterConfig runtime.ClusterConfiguration) (random.WeightedRandomList, map[string]executioncluster.ExecutionTarget, error) {
 	executionTargetMap := make(map[string]executioncluster.ExecutionTarget)
 	entries := make([]random.Entry, 0)
@@ -52,7 +53,7 @@ func getExecutionTargets(ctx context.Context, scope promutils.Scope, executionTa
 		if _, ok := executionTargetMap[cluster.Name]; ok {
 			return nil, nil, fmt.Errorf("duplicate clusters for name %s", cluster.Name)
 		}
-		executionTarget, err := executionTargetProvider.GetExecutionTarget(scope, cluster)
+		executionTarget, err := executionTargetProvider.GetExecutionTarget(initializationErrorCounter, cluster)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -166,8 +167,8 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 	return &execTarget, nil
 }
 
-func NewRandomClusterSelector(scope promutils.Scope, config runtime.Configuration, executionTargetProvider interfaces.ExecutionTargetProvider, db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
-	equalWeightedAllClusters, executionTargetMap, err := getExecutionTargets(context.Background(), scope, executionTargetProvider, config.ClusterConfiguration())
+func NewRandomClusterSelector(initializationErrorCounter prometheus.Counter, config runtime.Configuration, executionTargetProvider interfaces.ExecutionTargetProvider, db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
+	equalWeightedAllClusters, executionTargetMap, err := getExecutionTargets(context.Background(), initializationErrorCounter, executionTargetProvider, config.ClusterConfiguration())
 	if err != nil {
 		return nil, err
 	}

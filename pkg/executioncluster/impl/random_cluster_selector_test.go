@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	repo_interface "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repo_mock "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
@@ -20,8 +22,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/config/viper"
-	"github.com/flyteorg/flytestdlib/promutils"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +43,6 @@ func initTestConfig(fileName string) error {
 }
 
 func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface {
-	var clusterScope promutils.Scope
 	err := initTestConfig("clusters_config.yaml")
 	assert.NoError(t, err)
 
@@ -85,7 +84,8 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 		return response, nil
 	}
 	configProvider := runtime.NewConfigurationProvider()
-	randomCluster, err := NewRandomClusterSelector(clusterScope, configProvider, &mocks.MockExecutionTargetProvider{}, db)
+	var initializationErrorCounter prometheus.Counter
+	randomCluster, err := NewRandomClusterSelector(initializationErrorCounter, configProvider, &mocks.MockExecutionTargetProvider{}, db)
 	assert.NoError(t, err)
 	return randomCluster
 }

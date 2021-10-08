@@ -96,7 +96,10 @@ func persistSecrets(ctx context.Context, _ *pflag.FlagSet) error {
 	serverCfg := config.GetConfig()
 	configuration := runtime.NewConfigurationProvider()
 	scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope)
-	clusterClient, err := impl.NewInCluster(scope.NewSubScope("secrets"), serverCfg.KubeConfig, serverCfg.Master)
+	initializationErrorCounter := scope.NewSubScope("secrets").MustNewCounter(
+		"flyteclient_initialization_error",
+		"count of errors encountered initializing a flyte client from kube config")
+	clusterClient, err := impl.NewInCluster(initializationErrorCounter, serverCfg.KubeConfig, serverCfg.Master)
 	if err != nil {
 		return err
 	}

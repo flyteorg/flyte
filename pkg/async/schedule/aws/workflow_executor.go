@@ -46,6 +46,7 @@ type workflowExecutorMetrics struct {
 	ScheduledEventProcessingDelay       labeled.StopWatch
 	CreateExecutionDuration             labeled.StopWatch
 	ChannelClosedError                  prometheus.Counter
+	StopSubscriberFailed                prometheus.Counter
 }
 
 type workflowExecutor struct {
@@ -267,8 +268,7 @@ func (e *workflowExecutor) Stop() error {
 	err := e.subscriber.Stop()
 	if err != nil {
 		logger.Warningf(context.Background(), "failed to stop workflow executor with err %v", err)
-		e.metrics.Scope.MustNewCounter("stop_subscriber_failed",
-			"failures stopping the event subscriber").Inc()
+		e.metrics.StopSubscriberFailed.Inc()
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to stop workflow executor with err %v", err)
 	}
 	return nil
@@ -303,7 +303,8 @@ func newWorkflowExecutorMetrics(scope promutils.Scope) workflowExecutorMetrics {
 		CreateExecutionDuration: labeled.NewStopWatch("create_execution_duration",
 			"time spent waiting on the call to CreateExecution to return",
 			time.Second, scope, labeled.EmitUnlabeledMetric),
-		ChannelClosedError: scope.MustNewCounter("channel_closed_error", "count of channel closing errors"),
+		ChannelClosedError:   scope.MustNewCounter("channel_closed_error", "count of channel closing errors"),
+		StopSubscriberFailed: scope.MustNewCounter("stop_subscriber_failed", "failures stopping the event subscriber"),
 	}
 }
 
