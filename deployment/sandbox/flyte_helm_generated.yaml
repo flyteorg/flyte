@@ -3916,7 +3916,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "ecr.flyte.org/ubuntu/postgres:10.16-alpine"
+      - image: "ecr.flyte.org/ubuntu/postgres:13-21.04_beta"
         imagePullPolicy: "IfNotPresent"
         name: postgres
         env:

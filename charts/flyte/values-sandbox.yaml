@@ -17,7 +17,6 @@ flyteadmin: {} # use default config
 
 flytescheduler: {} # use default config
 
-
 #
 # DATACATALOG
 #
@@ -56,7 +55,7 @@ redis:
 postgres:
   image:
     # Override postgres image to use alpine based (rather smaller) docker image
-    tag: "10.16-alpine"
+    tag: "13-21.04_beta"
 
 #
 # MINIO
@@ -64,7 +63,7 @@ postgres:
 
 minio:
   service:
-    annotations: { }
+    annotations: {}
     type: NodePort
 
 #
@@ -202,7 +201,7 @@ configmap:
     plugins:
       logs:
         kubernetes-enabled: true
-        kubernetes-template-uri: "http://localhost:30082/#/log/{{ \"{{\" }} .namespace {{ \"}}\" }}/{{ \"{{\" }} .podName {{ \"}}\" }}/pod?namespace={{ \"{{\" }} .namespace {{ \"}}\" }}"
+        kubernetes-template-uri: 'http://localhost:30082/#/log/{{ "{{" }} .namespace {{ "}}" }}/{{ "{{" }} .podName {{ "}}" }}/pod?namespace={{ "{{" }} .namespace {{ "}}" }}'
 
 # ----------------------------------------------------------------
 # Optional Modules
