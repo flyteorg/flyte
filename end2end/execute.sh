@@ -13,14 +13,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 # This is the naive solution, think of a better one in the future.
 trap $DIR/print_logs.sh ERR
 
-# launch flyte end2end
-kubectl apply -f "$DIR/../deployment/test/flyte_generated.yaml"
-
-# in debug mode, run bash instead of running the tests
-if [ -n "$DOCKERNETES_DEBUG" ]; then
-  bash
-fi
-
 # This is a separate function so that we can potentially reuse in the future when we have more than one test
 function wait_for_flyte_deploys() {
     SECONDS=0
