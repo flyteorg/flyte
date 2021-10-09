@@ -18,9 +18,9 @@ spec:
     port: 9000
     protocol: TCP
     targetPort: minio
-  - name: minio
+  - name: minio-console
     port: 9001
     protocol: TCP
-    targetPort: minio
+    targetPort: minio-console
   selector: {{ include "minio.selectorLabels" . | nindent 4 }}
 {{- end }}
