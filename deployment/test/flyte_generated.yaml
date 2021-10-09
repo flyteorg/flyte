@@ -577,8 +577,10 @@ metadata:
 spec:
   externalName: minio
   ports:
-  - port: 9000
-  - port: 9001
+  - name: minio-api
+    port: 9000
+  - name: minio-console
+    port: 9001
   selector:
     app: minio
 ---
