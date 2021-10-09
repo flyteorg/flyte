@@ -2939,10 +2939,10 @@ spec:
     port: 9000
     protocol: TCP
     targetPort: minio
-  - name: minio
+  - name: minio-console
     port: 9001
     protocol: TCP
-    targetPort: minio
+    targetPort: minio-console
   selector: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
@@ -3504,7 +3504,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
+          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
           - sh
           - -c
@@ -3712,7 +3712,7 @@ spec:
     spec:
       initContainers:
         - name: check-db-ready
-          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
+          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
             - sh
             - -c

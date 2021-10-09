@@ -20,7 +20,7 @@ spec:
       initContainers:
         {{- if .Values.postgres.enabled }}
         - name: check-db-ready
-          image: cr.flyte.org/ubuntu/postgres:13-21.04_beta
+          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
             - sh
             - -c
