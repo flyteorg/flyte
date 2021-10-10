@@ -20,30 +20,22 @@ spec:
       - image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"
         imagePullPolicy: "{{ .Values.minio.image.pullPolicy }}"
         name: minio
-        args:
-        - server
-        - /var/lib/minioql/data
         env:
-        - name: MINIO_ACCESS_KEY
-          value: minio
-        - name: MINIO_SECRET_KEY
-          value: miniostorage
+          - name: MINIO_ACCESS_KEY
+            value: minio
+          - name: MINIO_SECRET_KEY
+            value: miniostorage
+          - name: MINIO_DEFAULT_BUCKETS
+            value: my-s3-bucket
         ports:
         - containerPort: 9000
           name: minio
+        - containerPort: 9001
+          name: minio-console
         resources: {{ toYaml .Values.minio.resources | nindent 10 }}
         volumeMounts:
         - name: minio-storage
-          mountPath: /var/lib/minioql/data
-      initContainers:
-      - command:
-          - mkdir
-          - /var/lib/minioql/data/my-s3-bucket
-        image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"
-        name: create-bucket
-        volumeMounts:
-        - name: minio-storage
-          mountPath: /var/lib/minioql/data
+          mountPath: /data
       volumes:
       - name: minio-storage
         emptyDir: {}

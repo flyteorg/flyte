@@ -13,32 +13,28 @@ spec:
       labels:
         app: minio
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       volumes:
         - name: minio-storage
           emptyDir: {}
-      initContainers:
-        - image: minio/minio
-          name: create-bucket
-          command:
-            - mkdir
-            - /data/my-s3-bucket
-          volumeMounts:
-            - name: minio-storage
-              mountPath: /data
       containers:
-        - image: minio/minio
+        - image: minio
           name: minio
           env:
             - name: MINIO_ACCESS_KEY
               value: minio
             - name: MINIO_SECRET_KEY
               value: miniostorage
-          args:
-            - server
-            - /data
+            - name: MINIO_DEFAULT_BUCKETS
+              value: my-s3-bucket
           ports:
             - containerPort: 9000
               name: minio
+            - containerPort: 9001
+              name: minio-console
           volumeMounts:
             - name: minio-storage
               mountPath: /data
@@ -51,7 +47,10 @@ metadata:
 spec:
   externalName: minio
   ports:
-    - port: 9000
+    - name: minio-api
+      port: 9000
+    - name: minio-console
+      port: 9001
   selector:
     app: minio
 ---
@@ -72,4 +71,4 @@ spec:
               service:
                 name: minio
                 port:
-                  number: 9000
+                  number: 9001

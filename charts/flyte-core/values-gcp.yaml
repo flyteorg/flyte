@@ -1,4 +1,11 @@
 #
+# FlyteAdmin
+#
+
+flyteadmin:
+  deployRedoc: false
+
+#
 # COMMON
 #
 

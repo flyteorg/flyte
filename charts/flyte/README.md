@@ -142,6 +142,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
 | flyteadmin.image.tag | string | `"v0.6.28"` | Docker image tag |
@@ -198,12 +199,12 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | kubernetes-dashboard | object | `{"enabled":false}` |  KUBERNETES DASHBOARD |
-| minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"minio/minio","tag":"RELEASE.2020-12-16T05-05-17Z"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
+| minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/bitnami/minio","tag":"2021.9.18-debian-10-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
 | minio.affinity | object | `{}` | affinity for Minio deployment |
 | minio.enabled | bool | `true` | - enable or disable Minio deployment installation |
 | minio.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| minio.image.repository | string | `"minio/minio"` | Docker image for Minio deployment |
-| minio.image.tag | string | `"RELEASE.2020-12-16T05-05-17Z"` | Docker image tag |
+| minio.image.repository | string | `"ecr.flyte.org/bitnami/minio"` | Docker image for Minio deployment |
+| minio.image.tag | string | `"2021.9.18-debian-10-r1"` | Docker image tag |
 | minio.nodeSelector | object | `{}` | nodeSelector for Minio deployment |
 | minio.podAnnotations | object | `{}` | Annotations for Minio pods |
 | minio.replicaCount | int | `1` | Replicas count for Minio deployment |
@@ -212,12 +213,12 @@ helm install gateway bitnami/contour -n flyte
 | minio.resources.requests | object | `{"cpu":"10m","memory":"128Mi"}` | Requests are the minimum set of resources needed for this pod |
 | minio.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Minio |
 | minio.tolerations | list | `[]` | tolerations for Minio deployment |
-| postgres | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"postgres","tag":"10.16"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  POSTGRES SETTINGS |
+| postgres | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/ubuntu/postgres","tag":"13-21.04_beta"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  POSTGRES SETTINGS |
 | postgres.affinity | object | `{}` | affinity for Postgres deployment |
 | postgres.enabled | bool | `true` | - enable or disable Postgres deployment installation |
 | postgres.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| postgres.image.repository | string | `"postgres"` | Docker image for Postgres deployment |
-| postgres.image.tag | string | `"10.16"` | Docker image tag |
+| postgres.image.repository | string | `"ecr.flyte.org/ubuntu/postgres"` | Docker image for Postgres deployment |
+| postgres.image.tag | string | `"13-21.04_beta"` | Docker image tag |
 | postgres.nodeSelector | object | `{}` | nodeSelector for Postgres deployment |
 | postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
 | postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |
@@ -237,12 +238,12 @@ helm install gateway bitnami/contour -n flyte
 | pytorchoperator.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Pytorchoperator |
 | pytorchoperator.serviceAccountAnnotations | object | `{}` | Annotations for ServiceAccount attached to Pytorchoperator pods |
 | pytorchoperator.tolerations | list | `[]` | tolerations for Pytorchoperator deployment |
-| redis | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"docker.io/bitnami/redis","tag":"4.0.2-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` | -------------------------------------------- Sandbox Configuration Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop. This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal for a high performance setup, but are great to try out flyte ----------------------------------------------- REDIS SETTINGS |
+| redis | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/bitnami/redis","tag":"6.2.5-debian-10-r59"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"10m","memory":"50Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` | -------------------------------------------- Sandbox Configuration Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop. This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal for a high performance setup, but are great to try out flyte ----------------------------------------------- REDIS SETTINGS |
 | redis.affinity | object | `{}` | affinity for Redis Statefulset |
 | redis.enabled | bool | `true` | - enable or disable Redis Statefulset installation |
 | redis.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| redis.image.repository | string | `"docker.io/bitnami/redis"` | Docker image for Redis Statefulset |
-| redis.image.tag | string | `"4.0.2-r1"` | Docker image tag |
+| redis.image.repository | string | `"ecr.flyte.org/bitnami/redis"` | Docker image for Redis Statefulset |
+| redis.image.tag | string | `"6.2.5-debian-10-r59"` | Docker image tag |
 | redis.nodeSelector | object | `{}` | nodeSelector for Redis Statefulset |
 | redis.podAnnotations | object | `{}` | Annotations for Redis pods |
 | redis.replicaCount | int | `1` | Replicas count for Redis Statefulset |

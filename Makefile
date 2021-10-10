@@ -57,14 +57,17 @@ stats:
 prepare_artifacts:
 	bash script/prepare_artifacts.sh
 
+.PHONE: helm_update
+helm_update:
+	helm dep update ./charts/flyte/
+
 .PHONY: helm_install
 helm_install:
-	helm install flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace --namespace=flyte
+	helm install flyte --debug ./charts/flyte -f ./charts/flyte/values-sandbox.yaml --create-namespace --namespace=flyte
 
 .PHONY: helm_upgrade
 helm_upgrade:
-	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace --namespace=flyte
-	bash script/prepare_artifacts.sh
+	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values-sandbox.yaml --create-namespace --namespace=flyte
 
 .PHONY: docs
 docs:
