@@ -1373,26 +1373,6 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
       serviceAccountName: flyteadmin
       volumes:
         
@@ -1828,7 +1808,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "docker.io/bitnami/redis:4.0.2-r1"
+      - image: "ecr.flyte.org/bitnami/redis:6.2.5-debian-10-r59"
         imagePullPolicy: "IfNotPresent"
         name: redis
         env:
@@ -1972,7 +1952,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               serviceName: flyteadmin
-              servicePort: 80
+              servicePort: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:

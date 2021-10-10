@@ -9093,7 +9093,7 @@ spec:
       - env:
         - name: REDIS_PASSWORD
           value: mypassword
-        image: docker.io/bitnami/redis:4.0.2-r1
+        image: ecr.flyte.org/bitnami/redis:6.2.5-debian-10-r59
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -9267,7 +9267,7 @@ spec:
           service:
             name: flyteadmin
             port:
-              number: 80
+              number: 87
         path: /openapi/*
         pathType: ImplementationSpecific
       - backend:

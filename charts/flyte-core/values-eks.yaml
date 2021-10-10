@@ -9,7 +9,6 @@ userSettings:
   redisHostUrl: <REDIS_HOST_URL>
   redisHostKey: <REDIS_HOST_KEY>
 
-
 #
 # FLYTEADMIN
 #
@@ -49,6 +48,7 @@ flyteadmin:
             matchLabels:
               app.kubernetes.io/name: flyteadmin
           topologyKey: kubernetes.io/hostname
+  deployRedoc: false
 
 #
 # FLYTESCHEDULER

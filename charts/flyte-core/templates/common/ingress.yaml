@@ -101,7 +101,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               serviceName: flyteadmin
-              servicePort: 80
+              servicePort: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
