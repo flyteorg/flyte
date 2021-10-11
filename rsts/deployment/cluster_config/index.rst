@@ -35,6 +35,15 @@ Cluster Config
 
     ---
 
+    .. link-button:: deployment-cluster-config-specification
+       :type: ref
+       :text: Flyte Configuration Specification
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    All configuration specification are covered here.
+
+    ---
+
     .. link-button:: deployment-cluster-config-notifications
        :type: ref
        :text: Notifications
@@ -79,6 +88,7 @@ Cluster Config
     auth_migration
     auth_appendix
     general
+    config
     monitoring
     notifications
     performance

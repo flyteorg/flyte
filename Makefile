@@ -1,4 +1,5 @@
 export REPOSITORY=flyte
+ROOT_DIR := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -65,6 +66,8 @@ helm_upgrade: ## Upgrade helm charts
 
 .PHONY: docs
 docs:
+	cd script/generate_config && go run generate_config.go > ${ROOT_DIR}/rsts/deployment/cluster_config/config.rst
+	cd ${ROOT_DIR}
 	make -C rsts clean html SPHINXOPTS=-W
 
 .PHONY: help
