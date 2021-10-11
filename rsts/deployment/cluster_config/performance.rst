@@ -176,7 +176,7 @@ FlytePropeller can be run manually per namespace. This is not a recommended solu
 
 Automatic scale-out: coming soon
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TODO link to RFC
+An automatic horizontal scaling FlytePropeller deployment is being explored as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_. In brief, the solution introduces an additional component, namely FlytePropeller Manager, which acts as a home-grown k8s ReplicaSet. The Manager is responsible for a collection of FlytePropeller instances, ensuring liveness and proper distributed configuration. Each FlyteWorkflow is deterministically processed by a single FlytePropeller instance to ensure correctness. Currently, we are beginning with a simple consistent hashing implementation, where FlyteWorkflow processing responsibilities are distributed over FlytePropeller instances by assigned key ranges -- enabling use of the k8s label selector paradigm. For more in depth explanation, these approaches are explored more thoroughly in the aforementioned document.
 
 Scaling out FlyteAdmin
 =======================
