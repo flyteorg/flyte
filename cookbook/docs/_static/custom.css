@@ -14,4 +14,18 @@ html .tabbed-set > label:hover {
 
 html .tabbed-content {
     box-shadow: 0 -.0625rem var(--color-background-border),0 .0625rem var(--color-background-border);
-} 
+}
+
+details.dropdown summary span.fa {
+    padding-right: 3px;
+}
+
+details.dropdown summary {
+    background: var(--color-background-secondary);
+    color: var(--color-sidebar-link-text);
+    border-radius: 4px !important;
+}
+
+details.dropdown[open] summary {
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0 !important;
+}

@@ -1,6 +1,6 @@
-######
-Athena
-######
+##########
+AWS Athena
+##########
 
 Executing Athena Queries
 =======================

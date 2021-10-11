@@ -1,5 +1,5 @@
-Pytorch with Sagemaker
-======================
+AWS Sagemaker Pytorch
+=====================
 
 This plugin shows an example of using Sagemaker custom training, with Pytorch distributed training.
 
