@@ -30,5 +30,7 @@ then
 fi
 
 make kustomize
+# launch flyte end2end
+kubectl apply -f "${OUT}/deployment/test/flyte_generated.yaml"
 make end2end_execute
 popd

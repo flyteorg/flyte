@@ -5,6 +5,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
@@ -304,76 +306,37 @@ func TestAssignResource(t *testing.T) {
 	}
 }
 
-func TestDetermineResourceRequirements(t *testing.T) {
-	node := &flyteMocks.ExecutableNode{}
-	node.OnGetResources().Return(&corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("1"),
-			corev1.ResourceMemory: resource.MustParse("10"),
-		},
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:              resource.MustParse("1"),
-			corev1.ResourceMemory:           resource.MustParse("100"),
-			corev1.ResourceEphemeralStorage: resource.MustParse("10"),
-			corev1.ResourceStorage:          resource.MustParse("20"),
-		},
-	})
-	nodeExecutionContext := &nodeMocks.NodeExecutionContext{}
-	nodeExecutionContext.OnNode().Return(node)
-
-	taskResources := v1alpha1.TaskResources{
+func TestConvertTaskResourcesToRequirements(t *testing.T) {
+	resourceRequirements := convertTaskResourcesToRequirements(v1alpha1.TaskResources{
 		Requests: v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("1"),
-			Memory:           resource.MustParse("20"),
-			EphemeralStorage: resource.MustParse("50"),
+			Memory:           resource.MustParse("2"),
+			EphemeralStorage: resource.MustParse("3"),
+			Storage:          resource.MustParse("4"),
+			GPU:              resource.MustParse("5"),
 		},
 		Limits: v1alpha1.TaskResourceSpec{
-			CPU:              resource.MustParse("2"),
-			Memory:           resource.MustParse("50"),
-			EphemeralStorage: resource.MustParse("100"),
-			Storage:          resource.MustParse("15"),
+			CPU:              resource.MustParse("10"),
+			Memory:           resource.MustParse("20"),
+			EphemeralStorage: resource.MustParse("30"),
+			Storage:          resource.MustParse("40"),
+			GPU:              resource.MustParse("50"),
 		},
-	}
-	resources := determineResourceRequirements(nodeExecutionContext, taskResources)
-	assert.EqualValues(t, resources.Requests, corev1.ResourceList{
-		corev1.ResourceCPU:              resource.MustParse("1"),
-		corev1.ResourceMemory:           resource.MustParse("10"),
-		corev1.ResourceEphemeralStorage: resource.MustParse("10"),
 	})
-	assert.EqualValues(t, resources.Limits, corev1.ResourceList{
-		corev1.ResourceCPU:              resource.MustParse("1"),
-		corev1.ResourceMemory:           resource.MustParse("50"),
-		corev1.ResourceEphemeralStorage: resource.MustParse("10"),
-		corev1.ResourceStorage:          resource.MustParse("15"),
-	})
-}
-
-func TestGetResources(t *testing.T) {
-	node := &flyteMocks.ExecutableNode{}
-	node.OnGetResources().Return(&corev1.ResourceRequirements{
+	assert.EqualValues(t, &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("1"),
-			corev1.ResourceMemory: resource.MustParse("10"),
-		},
-		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:              resource.MustParse("1"),
-			corev1.ResourceMemory:           resource.MustParse("100"),
-			corev1.ResourceEphemeralStorage: resource.MustParse("10"),
-		},
-	})
-
-	computedRequirements := &corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("2"),
-			corev1.ResourceMemory: resource.MustParse("20"),
+			corev1.ResourceMemory:           resource.MustParse("2"),
+			corev1.ResourceEphemeralStorage: resource.MustParse("3"),
+			corev1.ResourceStorage:          resource.MustParse("4"),
+			utils.ResourceNvidiaGPU:         resource.MustParse("5"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:              resource.MustParse("2"),
-			corev1.ResourceMemory:           resource.MustParse("200"),
-			corev1.ResourceEphemeralStorage: resource.MustParse("20"),
+			corev1.ResourceCPU:              resource.MustParse("10"),
+			corev1.ResourceMemory:           resource.MustParse("20"),
+			corev1.ResourceEphemeralStorage: resource.MustParse("30"),
+			corev1.ResourceStorage:          resource.MustParse("40"),
+			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
 		},
-	}
-
-	overrides := newTaskOverrides(node, computedRequirements)
-	assert.EqualValues(t, overrides.GetResources(), computedRequirements)
+	}, resourceRequirements)
 }

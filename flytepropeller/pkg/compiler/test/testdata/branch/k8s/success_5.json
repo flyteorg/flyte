@@ -531,13 +531,15 @@
         "CPU": "0",
         "Memory": "0",
         "EphemeralStorage": "0",
-        "Storage": "0"
+        "Storage": "0",
+        "GPU": "0"
       },
       "Limits": {
         "CPU": "0",
         "Memory": "0",
         "EphemeralStorage": "0",
-        "Storage": "0"
+        "Storage": "0",
+        "GPU": "0"
       }
     }
   }
