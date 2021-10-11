@@ -118,6 +118,9 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		if !taskResources.Defaults.Storage.IsZero() {
 			requests.Storage = taskResources.Defaults.Storage
 		}
+		if !taskResources.Defaults.GPU.IsZero() {
+			requests.GPU = taskResources.Defaults.GPU
+		}
 
 		var limits = v1alpha1.TaskResourceSpec{}
 		if !taskResources.Limits.CPU.IsZero() {
@@ -131,6 +134,9 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 		if !taskResources.Limits.Storage.IsZero() {
 			limits.Storage = taskResources.Limits.Storage
+		}
+		if !taskResources.Limits.GPU.IsZero() {
+			limits.GPU = taskResources.Limits.GPU
 		}
 		executionConfig.TaskResources = v1alpha1.TaskResources{
 			Requests: requests,

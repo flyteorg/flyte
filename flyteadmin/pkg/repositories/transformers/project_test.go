@@ -14,7 +14,6 @@ func TestCreateProjectModel(t *testing.T) {
 	labels := admin.Labels{
 		Values: map[string]string{
 			"foo": "#badlabel",
-			"bar": "baz",
 		},
 	}
 	project := admin.Project{
