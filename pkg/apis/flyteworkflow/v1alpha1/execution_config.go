@@ -41,6 +41,7 @@ type TaskResourceSpec struct {
 	Memory           resource.Quantity
 	EphemeralStorage resource.Quantity
 	Storage          resource.Quantity
+	GPU              resource.Quantity
 }
 
 // Defines the complete closure of compute resources a task can request and apply as limits.
