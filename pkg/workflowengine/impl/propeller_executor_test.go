@@ -526,6 +526,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Memory:           resource.MustParse("200Gi"),
 			Storage:          resource.MustParse("5Gi"),
 			EphemeralStorage: resource.MustParse("1Gi"),
+			GPU:              resource.MustParse("1"),
 		}, workflow.ExecutionConfig.TaskResources.Limits)
 	})
 }
