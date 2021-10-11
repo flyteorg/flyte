@@ -9,6 +9,10 @@ For workflows that depend on knowing the kick-off time, Flyte also supports pass
 
   Native scheduler doesn't support `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`_.
 
+Check out a demo of how Native Scheduler works below:
+
+.. youtube:: sQoCp2qSQK4
+
 """
 
 # %%
