@@ -27,3 +27,5 @@ cookbook/release-snacks
 .kube/
 .docker/
 .cache/
+download-artifact/
+typescript
