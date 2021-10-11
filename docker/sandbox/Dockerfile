@@ -90,4 +90,4 @@ VOLUME /var/log
 # Expose Flyte ports
 EXPOSE 30081 30082 30084
 
-ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
+# ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
