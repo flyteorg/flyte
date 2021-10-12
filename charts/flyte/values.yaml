@@ -750,6 +750,7 @@ configmap:
 workflow_scheduler:
   enabled: false
   config: {}
+  type: ""
 
 # -- **Optional Component**
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
