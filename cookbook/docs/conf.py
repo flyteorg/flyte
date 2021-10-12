@@ -121,6 +121,7 @@ class CustomSorter(FileNameSortKey):
         # TODO
         ## External Services
         "hive.py"
+        "snowflake.py"
         # Extending Flyte
         "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
         "run_custom_types.py",
@@ -270,6 +271,7 @@ examples_dirs = [
     "../integrations/aws/sagemaker_pytorch",
     "../integrations/gcp",
     "../integrations/external_services/hive",
+    "../integrations/external_services/snowflake",
     "../core/extend_flyte",
 ]
 gallery_dirs = [
@@ -301,6 +303,7 @@ gallery_dirs = [
     "auto/integrations/aws/sagemaker_pytorch",
     "auto/integrations/gcp",
     "auto/integrations/external_services/hive",
+    "auto/integrations/external_services/snowflake",
     "auto/core/extend_flyte",
 ]
 

@@ -113,8 +113,8 @@ External Service Backend Plugins
 ********************************
 
 As the term suggests, external service backend plugins relies on external services like
-`AWS Sagemaker <https://aws.amazon.com/sagemaker/>`__ or
-`Hive <https://docs.qubole.com/en/latest/user-guide/engines/hive/index.html>`__ for handling the workload defined in
+`AWS Sagemaker <https://aws.amazon.com/sagemaker/>`__,
+`Hive <https://docs.qubole.com/en/latest/user-guide/engines/hive/index.html>`__ or `Snowflake <https://www.snowflake.com/>`__ for handling the workload defined in
 the Flyte task that use the respective plugin.
 
 .. panels::
@@ -153,6 +153,15 @@ the Flyte task that use the respective plugin.
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Run Hive jobs in your workflows.
+
+    ---
+
+    .. link-button:: auto/integrations/external_services/snowflake/index
+       :type: ref
+       :text: Snowflake
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Run Snowflake jobs in your workflows.
 
 
 .. _enable-backend-plugins:
@@ -238,3 +247,4 @@ The :ref:`community <community>` would love to help you with your own ideas of b
     auto/integrations/aws/sagemaker_pytorch/index
     auto/integrations/aws/athena/index
     auto/integrations/external_services/hive/index
+    auto/integrations/external_services/snowflake/index
