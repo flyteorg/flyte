@@ -29,3 +29,5 @@ cookbook/release-snacks
 .cache/
 download-artifact/
 typescript
+.bash_history
+
