@@ -1,21 +1,11 @@
+Release:
+  Name: <RELEASE-NAME>
+
 userSettings:
-  googleProjectId: lunar-prism-326111
-  dbHost: 10.35.208.3
-  dbPassword: kharghar
-  bucketName: flytebucket2
-  serviceAcct: |
-           {
-              "type": "service_account",
-              "project_id": "lunar-prism-326111",
-              "private_key_id": "ef7b0e904492f2155c8cb3728325e1dd74d24156",
-              "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDdRC1stcm6sW3+\nTb9y5S/sp2x0Vs59DJ/apfUqx+Xw5O5PrBxpC5LKDrOBH0dVYtlQPsYuMnllmSAF\nqP9z3EFel2ge9G4t5KLU3Wz8p/mwd6dUz8r0N6tB+0OFXEDwzcMcev9+GoBWUuxr\nrp9hYKJlmp727DSS7Ue7PiN3tXQernqDB+4WjXKIlTqz/HENKIO+t9fFERi1/pUG\nI5RW4lBVliQgKkiNN/PTWStK0EDlajSCP/Pr47ZBh8q/E8EGSGxP9ogI+Erjrq0r\nCE2HvAWEEOuINb75/GZ/VSM0HmruJU19ul9RnYNHk8e06RhOdX/VZpmgHjxKblku\n6evBsYFfAgMBAAECggEAAkYN1yxdkkUcJJrtlbr1Xot48kLUF6BlSIQxUYKneZhS\nOvrjiqW5Ox7EjYC/z94JuyjttQE4GyCXYiVfc/Qpncxh5FnwDAh6t3cLrxavuHIx\nyAU5ZiqSiwm6TYaudNFm3BdLVYmggpOj5SeBtSjA4WGIQ8XjyeC3k/I3SDfsetdH\nUHBEVZ5TVicxvxctLn/MpKzRrvjwwDLjX2/20x+Mlra0uLtCu+o7Zoaayq3Zhpmg\njAZe1435S1g7USNIFyywJaJfBxp0az7Bxfr22RfSktO6HxvpTsjzfjy6AjG16E1f\nRSte9NMvFStraDt2uUv9UuTQfXeM+EcKax419zSBFQKBgQD2/zLRabdjVmD32j7S\nN8/2k5EXZF35B3Y7rDmp6SBRupt1GTs6Cad7GArMkwW4cj8Eb8Fek4FOyAvpEf4x\n3aNBimnugnriJo9tBtwEqApRMS4Ce9KGwHrd3npv5UF/eR1JwoXigZtYn+dt9o8E\nGTzb7eD5HoyFnGRYbPsWdNSkMwKBgQDlVOElvaDYDvDMgWzTWlOeaU5gwz+nPO53\nQjeEXZLdeJ3Qel08HWUq6EmfzemM+t8t+W++vu2K8olT65R9iW/24vPcUC/dTYjL\n0QWQE+/RzcxwLM0YaH6TsePLMsnfwbAzHn67aSb2H9kJ6CP2pdokUpFnoZ/+L7oJ\nD3IDez0iJQKBgQCsZZ1ju0UMKetOs98rPVeDRKZ9zEknG0U0C1bIOHaddQEyr2S+\ncqSab0KCXZAdmGhRwWsXhx83DLv7dtqUlZ1wjpq3pgz9Mmrjb2k8OsnQt+HkS+a6\ntThNCg8tcLfRsIh3xjVKzqnOJvYSs4hJFRB8dUGUv/TXATys14w9tVgCLwKBgDz9\nHsdfr+flyUpJ3Tw0GGrXjJ2VL1d1j+GtfYA5NnapviaUdDkphB8uGW5jX4o7qaDb\nZklvE1NRfw4PZ7UfGOSqpLnhpWkQVqIFm5oegzfjqEvozj6Ag7EZrP/8KM3V/9sI\ncCG9LDxmad0FnJLatrHUN5E83YTHAo2oSuT8IFz1AoGBAK+gWuH/WC/BaE7Izmyt\n46RTN6K2bYGv1ToT0CACS+FEe8VcBfkNwIq+/PsxV6cAh7Iq8kQEplHRwS0XV/g7\nBWIlmhQUFaP6E902f0wkzqwxXkqTPIAg204C352sovAMYLoyiGjZGgiBvM5KaDkv\nGTfgglUa+RiCVMJXwOFc6YKd\n-----END PRIVATE KEY-----\n",
-              "client_email": "flyte-datacatalog@lunar-prism-326111.iam.gserviceaccount.com",
-              "client_id": "107183682474063272119",
-              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-              "token_uri": "https://oauth2.googleapis.com/token",
-              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-              "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/flyte-datacatalog%40lunar-prism-326111.iam.gserviceaccount.com"
-            }
+  googleProjectId: <PROJECT-ID>
+  dbHost: <CLOUD-SQL-IP>
+  dbPassword: <DBPASSWORD>
+  bucketName: <BUCKETNAME>
 
 #
 # FLYTEADMIN
@@ -24,19 +14,19 @@ userSettings:
 flyteadmin:
   replicaCount: 1
   serviceAccount:
-    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # -- If the service account is created by you, make this false, else a new service account will be created and the flyteadmin role will be added
     # you can change the name of this role
     create: true
     annotations:
       # Needed for gcp workload identity to function
       # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-      iam.gke.io/gcp-service-account: flyteadmin@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: gsa-flyteadmin@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
   resources:
     limits:
-      ephemeral-storage: 1Gi
+      ephemeral-storage: 2Gi
     requests:
       cpu: 50m
-      ephemeral-storage: 1Gi
+      ephemeral-storage: 2Gi
       memory: 200Mi
   service:
     annotations:
@@ -63,14 +53,14 @@ datacatalog:
     annotations:
       # Needed for gcp workload identity to function
       # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-      iam.gke.io/gcp-service-account: flyte-datacatalog@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: gsa-datacatalog@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
   resources:
     limits:
       cpu: 500m
-      ephemeral-storage: 200Mi
+      ephemeral-storage: 2Gi
     requests:
       cpu: 50m
-      ephemeral-storage: 200Mi
+      ephemeral-storage: 2Gi
       memory: 200Mi
   service:
     annotations:
@@ -97,15 +87,15 @@ flytepropeller:
     annotations:
       # Needed for gcp workload identity to function
       # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-      iam.gke.io/gcp-service-account: flytepropeller@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: gsa-flytepropeller@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
   resources:
     limits:
       cpu: 500m
-      ephemeral-storage: 1Gi
+      ephemeral-storage: 2Gi
       memory: 1Gi
     requests:
       cpu: 50m
-      ephemeral-storage: 1Gi
+      ephemeral-storage: 2Gi
       memory: 1Gi
   cacheSizeMbs: 1024
   affinity:
@@ -177,11 +167,9 @@ flyteadmin:
 
 common:
   ingress:  
-    spec:
-      tls:
-      - hosts:
-        - dev.gcp.union.ai
-        secretName: dev-gcp-union-ai-tls
+    host: dev.gcp.union.ai
+    tls:
+      enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -225,8 +213,6 @@ storage:
   gcs:
     # -- GCP project ID. Required for storage type gcs.
     projectId: "{{ .Values.userSettings.googleProjectId }}"
-    # -- GCP service account key for GSA with bucket access. Leave empty if you use workload identity.
-    serviceAccountKey: "{{ .Values.userSettings.serviceAcct }}"
 
 db:
 
@@ -353,21 +339,21 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "4000Mi"
             - defaultIamRole:
-                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+                value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+                value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
         - development:
             - projectQuotaCpu:
-                value: "4"
+                value: "0.7"
             - projectQuotaMemory:
-                value: "3000Mi"
+                value: "150Mi"
             - defaultIamRole:
-                value: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+                value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
 
   templates:
     # -- Template for namespaces resources

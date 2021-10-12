@@ -192,9 +192,9 @@ storage:
   stow:
     kind: google
     config:
-      json: {{ .Values.storage.gcs.serviceAccountKey }}
+      json: ""
       project_id: {{ .Values.storage.gcs.projectId }}
-      scopes: https://www.googleapis.com/auth/devstorage.read_write
+      scopes: https://www.googleapis.com/auth/devstorage.full_control
   container: {{ .Values.storage.bucketName | quote }}
 {{- else if eq .Values.storage.type "sandbox" }}
   type: minio
