@@ -266,5 +266,5 @@ Here are some resources to help you learn more about Flyte.
 
 A big thank you to the community for making Flyte possible!
 
-<!-- readme: contributors -start -->
-<!-- readme: contributors -end -->
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
