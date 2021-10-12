@@ -264,12 +264,7 @@ Here are some resources to help you learn more about Flyte.
 
 ## Contributors
 
-<!-- readme: collaborators,contributors -start -->
-<!-- readme: collaborators,contributors -end -->
 
 ## 💖 Top Contributors
 
 A big thank you to the community for making Flyte possible!
-
-<!-- readme: collaborators,contributors -start -->
-<!-- readme: collaborators,contributors -end -->

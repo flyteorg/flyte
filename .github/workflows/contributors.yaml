@@ -2,14 +2,17 @@ name: autogenerate-contributors-list
 on: [push, pull_request]
 
 jobs:
-  contrib-readme-job:
+  add-contributors:
     runs-on: ubuntu-latest
-    name: A job to automate contrib in readme
     steps:
-      - name: Contribute List
-        uses: akhilmhdh/contributors-readme-action@v2.2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          readme_path: README.md
-          collaborators: all
+    - uses: actions/checkout@v2
+    - uses: BobAnkh/add-contributors@master
+      with:
+        CONTRIBUTOR: '### Contributors'
+        COLUMN_PER_ROW: '6'
+        ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        IMG_WIDTH: '100'
+        FONT_SIZE: '14'
+        PATH: '/README.md'
+        COMMIT_MESSAGE: 'docs(README): update contributors'
+        AVATAR_SHAPE: 'round'
