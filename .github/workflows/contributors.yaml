@@ -11,5 +11,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
         with:
-          readme: README.md
+          readme_path: README.md
           collaborators: all
