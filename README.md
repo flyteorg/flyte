@@ -8,6 +8,11 @@
     <p align="center">
         Flytesnacks encompasses code examples showcasing Flytekit Python
     </p>
+    <p align="center">
+        <a href="https://forms.gle/UVuek9WfBoweiqcJA">
+            <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack" />
+        </a>
+    </p>
     <h3 align="center">
         <a href="https://docs.flyte.org/projects/cookbook/en/latest/index.html">User Guide</a>
         <span> · </span>
