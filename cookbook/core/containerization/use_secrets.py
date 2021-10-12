@@ -22,16 +22,41 @@ Where:
 2. Flyte will apply labels and annotations that are referenced to all secrets the task is requesting access to.
 3. Flyte will send a POST request to ApiServer to create the object.
 4. Before persisting the Pod, ApiServer will invoke all registered Pod Webhooks. Flyte's Pod Webhook will be called.
-5. Flyte Pod Webhook will then lookup globally mounted secrets for each of the requested secrets. 
-6. If found, Pod Webhook will mount them directly in the Pod. If not found, it will inject the appropriate annotations to load the secrets for K8s (or Vault or Confidant or any other secret management system plugin configured) into the Pod.
+5. Flyte Pod Webhook will then, using the labels and annotiations attached in step 2, lookup globally mounted secrets for each of the requested secrets. 
+6. If found, Pod Webhook will mount them directly in the Pod. If not found, it will inject the appropriate annotations to load the secrets for K8s (or Vault or Confidant or any other secret management system plugin configured) into the task pod.
+
+Once the secret is injected into the task pod, Flytekit can read it using the secret manager (see examples below). 
 
 The webhook is included in all overlays in the Flytekit repo. The deployment file creates (mainly) two things; a Job and a Deployment.
 
 1) flyte-pod-webhook-secrets Job: This job runs ``flytepropeller webhook init-certs`` command that issues self-signed CA Certificate as well as a derived TLS certificate and its private key. It stores them into a new secret ``flyte-pod-webhook-secret``.
 2) flyte-pod-webhook Deployment: This deployment creates the Webhook pod which creates a MutatingWebhookConfiguration on startup. This serves as the registration contract with the ApiServer to know about the Webhook before it starts serving traffic.
 
-How to Enable Secrets Injection
-###############################
+Preparations for Using Secrets
+##############################
+
+Configuring a secret management system plugin into use
+------------------------------------------------------
+
+When a task requests a secret Flyte will, by default, look for global secrets (secrets mounted as files or environment variables on the Pod Weebhook pod) and for K8s secrets. You can, however, configure another secret manager into use by adding `secretManagerType: K8s` to 
+the [core config](https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/propeller/core.yaml#L34) of the Flyte propeller. Ath the time opf writing the two available secret manager types are `K8s` and `AWS`.
+
+
+Making secrets discoverable
+---------------------------
+// Paths and names
+Global secrets need to be made available to the Pod Webhook pod either by mounting them as volumes or as environment variables. This is a good way to make secrets discoverable by tasks in all projects and domains, but as names of the secrets need 
+to be unique it can get a convoluted if you have a large number of secrets. Note that global secrets can only be injected into the task pod as environemnt variables (see examples below). Volumes should be mounted into the path `/etc/secrets/<secret group>/<secret name>`. 
+Environment variables should be named `FLYTE_SECRET_<secret group>_<secret_name>`.  
+
+When using the K8s secret manager plugin (enabled by default), the secrets need to be available in the same namespace as the task (for example `flytesnacks-development`). K8s secrets can be mounted as both files and injected as environment variables into the task pod, so if you need to make larger files available to the task, then this might be the better option. Furthermore, this method also allows you to have separate credentials for different domains but still using the same name for the secret. The `group` of the secret request corresponds to the K8s secret name, while the `name` of the request corresponds to the key of the specific entry in the secret.    
+
+Note that the global secrets take precedence over any secret discoverable by the secret manager plugins. 
+
+
+
+How to Use Secrets Injection in a Task
+######################################
 
 This feature is available in Flytekit v0.17.0+. This example explains how a secret can be accessed in a Flyte Task. Flyte provides different types of Secrets, as part of
 SecurityContext. But, for users writing python tasks, you can only access ``secure secrets`` either as environment variable
@@ -61,9 +86,10 @@ SECRET_GROUP = "user-info"
 
 
 # %%
-# Now declare the secret in the requests. The secret can be accessed using the :py:class:`flytekit.ExecutionParameters`,
-# through the global flytekit context as shown below
-#
+# Now declare the secret in the requests. The request tells Flyte to make the secret available to the task. The secret can 
+# then be accessed inside the task using the :py:class:`flytekit.ExecutionParameters`, through the global flytekit 
+# context as shown below. At runtime, flytekit looks inside the task pod for an environment variable or a mounted file with 
+# a predefined name/path and loads the value. 
 @task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME)])
 def secret_task() -> str:
     secret_val = flytekit.current_context().secrets.get(SECRET_GROUP, SECRET_NAME)
