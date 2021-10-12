@@ -22,8 +22,11 @@ Here's an example configuration:
 .. code-block:: yaml
 
     plugins:
-        k8s:
-            resource-tolerations:
-                gpu:
-
+      k8s:
+        resource-tolerations:
+          - nvidia.com/gpu:
+            - key: "key1"
+              operator: "Equal"
+              value: "value1"
+              effect: "NoSchedule"
 """
