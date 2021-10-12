@@ -9,7 +9,7 @@ jobs:
       - name: Contribute List
         uses: akhilmhdh/contributors-readme-action@v2.2.1
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           readme_path: README.md
           collaborators: all
