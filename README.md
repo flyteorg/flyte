@@ -1,5 +1,6 @@
 Flyte Propeller
 ===============
+
 [![Current Release](https://img.shields.io/github/release/flyteorg/flytepropeller.svg)](https://github.com/flyteorg/flytepropeller/releases/latest)
 ![Master](https://github.com/flyteorg/flytepropeller/workflows/Master/badge.svg)
 [![GoDoc](https://godoc.org/github.com/flyteorg/flytepropeller?status.svg)](https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller)
@@ -8,6 +9,7 @@ Flyte Propeller
 [![Go Report Card](https://goreportcard.com/badge/github.com/flyteorg/flytepropeller)](https://goreportcard.com/report/github.com/flyteorg/flytepropeller)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/flyteorg/flytepropeller.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/flyteorg/flytepropeller/latest.svg?style=plastic)
+[![Slack](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://forms.gle/UVuek9WfBoweiqcJA)
 
 Kubernetes operator to executes Flyte graphs natively on kubernetes
 
