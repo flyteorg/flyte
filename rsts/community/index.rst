@@ -78,7 +78,7 @@ Please check out and subscribe to the `calendar <https://www.addevent.com/calend
     :text: Zoom Link
     :classes: btn-outline-secondary
     
-If you'd like to give a 3-5 minute :zap: Lightning Talk :zap: during our Open Source Community Sync, or even suggest a topic for someone else to talk about, let us know!
+If you'd like to give a 3-5 minute ⚡ Lightning Talk ⚡ during our Open Source Community Sync, or even suggest a topic for someone else to talk about, let us know!
 
 .. link-button:: https://docs.google.com/forms/d/e/1FAIpQLSekwk2fieIVxmRuuNelbIp8DdXKe_SanlRguBtETbcSNHD11w/viewform
     :type: url
