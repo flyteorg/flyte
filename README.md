@@ -103,6 +103,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 
 - [Freenome](https://www.freenome.com/)
 - [Gojek](https://www.gojek.io/)
+- [Intel](https://www.intel.com/)
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
 - [RunX.dev](https://runx.dev/)
