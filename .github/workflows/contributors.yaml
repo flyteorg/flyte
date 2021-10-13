@@ -22,6 +22,6 @@ jobs:
         IMG_WIDTH: '100'
         FONT_SIZE: '14'
         PATH: '/README.md'
-        BRANCH: 'all-contributors'
+        BRANCH: $GITHUB_REF
         COMMIT_MESSAGE: 'update contributors'
         AVATAR_SHAPE: 'round'
