@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](http://github.com/lyft/flyteconsole/compare/v0.28.3...v0.29.0) (2021-10-13)
+
+
+### Bug Fixes
+
+* bar chart order changes whenever click on launch workflow button ([#227](http://github.com/lyft/flyteconsole/issues/227)) ([f2961d0](http://github.com/lyft/flyteconsole/commit/f2961d015271169d8b996093d8488358d2700f78))
+
+
+### Features
+
+* add advanced options to launch workflow form ([#226](http://github.com/lyft/flyteconsole/issues/226)) ([82a9271](http://github.com/lyft/flyteconsole/commit/82a9271eba73e2bc4742baf299661c35e347e283))
+
 ## [0.28.3](http://github.com/lyft/flyteconsole/compare/v0.28.2...v0.28.3) (2021-10-13)
 
 
