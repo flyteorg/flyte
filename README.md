@@ -9,7 +9,7 @@
         Flytesnacks encompasses code examples showcasing Flytekit Python
     </p>
     <p align="center">
-        <a href="https://forms.gle/UVuek9WfBoweiqcJA">
+        <a href="https://slack.flyte.org">
             <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack" />
         </a>
     </p>
