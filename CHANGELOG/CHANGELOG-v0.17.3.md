@@ -1,11 +1,11 @@
 # Flyte v0.17.3
 
 ## Platform
-1.  Native scheduler
-2.  Support for Snowflake including backend plugin and flytekit tasks
-3.  Expose default MaxParallelism in flyteadmin conter
-4.  Support custom resource cleanup policy in backend plugins
-5.  Improved error message in the case of images with invalid names
+1.  [Flyte Native scheduler](https://www.youtube.com/watch?v=YljIIJx1_q8)
+2.  [Support for Snowflake](https://github.com/flyteorg/flytesnacks/blob/master/cookbook/integrations/external_services/snowflake/README.rst) including backend plugin and flytekit tasks
+3.  Expose default MaxParallelism in flyteadmin [configuration](https://github.com/flyteorg/flyteadmin/pull/262)
+4.  Support [custom resource cleanup policy](https://github.com/flyteorg/flyte/issues/1345) in backend plugins
+5.  Improved error message in the case of [images with invalid names](https://github.com/flyteorg/flyte/issues/306)
 
 
 ## flytekit
