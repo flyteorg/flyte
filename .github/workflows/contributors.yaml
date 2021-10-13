@@ -1,0 +1,44 @@
+name: Contributors
+
+schedule:
+  - cron: '0 12 * * 1' # At 12 noon on Monday.
+
+on:
+  push:
+    branches: auto-add-contributors
+
+jobs:
+  contributors:
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith( github.event.head_commit.message , '[auto-update-contributors]' ) }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wow-actions/contributors-list@v1
+        with:
+          repo: flyteorg/flyte
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          svgPath: contributors/flyte.svg
+          noCommit: true
+      - uses: wow-actions/contributors-list@v1
+        with:
+          repo: flyteorg/flytekit
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          svgPath: contributors/flytekit.svg
+          noCommit: true
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.FLYTE_BOT_PAT }}
+          commit-message: '[auto-update-contributors] update contributors svg'
+          committer: Flyte-Bot <admin@flyte.org>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: true
+          branch: flyte-bot-update-releases
+          delete-branch: true
+          title: 'auto-update contributors'
+          labels: contibutors
+          team-reviewers: |
+            owners
+            maintainers
+          draft: false
