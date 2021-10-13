@@ -1,23 +1,5 @@
 name: Contributors
 on: push
-# jobs:
-#   add-contributors:
-#     runs-on: ubuntu-latest
-#     # only run if the commit wasn't created by the auto-contrib-bot
-#     if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]' ) }}
-#     steps:
-#     - uses: actions/checkout@v2
-#     - uses: BobAnkh/add-contributors@v0.2.2
-#       with:
-#         ACCESS_TOKEN: ${{secrets.FLYTE_BOT_PAT}}
-#         CONTRIBUTOR: '<!-- Flyte Contributors -->'
-#         COLUMN_PER_ROW: '8'
-#         IMG_WIDTH: '90'
-#         FONT_SIZE: '10'
-#         PATH: '/README.md'
-#         BRANCH: ${{ github.ref }}
-#         COMMIT_MESSAGE: '[auto-contrib-bot] update contributors'
-#         AVATAR_SHAPE: round
 
 jobs:
   contributors:
@@ -26,8 +8,15 @@ jobs:
       - uses: actions/checkout@v2
       - uses: wow-actions/contributors-list@v1
         with:
+          repo: flyteorg/flyte
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-          svgPath: ./CONTRIBUTORS.svg
+          svgPath: contributors/flyte.svg
+          noCommit: true
+      - uses: wow-actions/contributors-list@v1
+        with:
+          repo: flyteorg/flytekit
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          svgPath: contributors/flytekit.svg
           noCommit: true
       - name: Create Pull Request
         id: cpr
