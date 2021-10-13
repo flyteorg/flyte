@@ -13,27 +13,15 @@ jobs:
     if: ${{ !startsWith( github.event.head_commit.message , '[auto-update-contributors]' ) }}
     steps:
       - uses: actions/checkout@v2
-      # - uses: wow-actions/contributors-list@v1
-      #   with:
-      #     repo: flyteorg/flyte
-      #     GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-      #     svgPath: contributors/flyte.svg
-      #     noCommit: true
-      # - uses: wow-actions/contributors-list@v1
-      #   with:
-      #     repo: flyteorg/flytekit
-      #     GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-      #     svgPath: contributors/flytekit.svg
-      #     noCommit: true
       - name: GitHub Contributors Action
         uses: hyperledger-tooling/github-contributors-action@v0.0.1
         env:
           GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          SOURCE_GITHUB_REPOSITORY: flyteorg/flyte
+          SOURCE_GITHUB_REPOSITORY: flyteorg
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
           CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->
           INPUT_TEMPLATE_FILE: ./assets/contributor-template.md
-          FILE_WITH_PATTERN: ./CONTRIBUTORS.md
+          FILE_WITH_PATTERN: ./README.md
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
