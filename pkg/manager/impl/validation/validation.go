@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -254,4 +255,16 @@ func ValidateLimit(limit uint32) error {
 		return shared.GetInvalidArgumentError(shared.Limit)
 	}
 	return nil
+}
+
+func ValidateOutputData(outputData *core.LiteralMap, maxSizeInBytes int64) error {
+	if outputData == nil {
+		return nil
+	}
+
+	outputSizeInBytes := int64(proto.Size(outputData))
+	if outputSizeInBytes <= maxSizeInBytes {
+		return nil
+	}
+	return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Output data size exceeds platform configured threshold (%+v > %v)", outputSizeInBytes, maxSizeInBytes)
 }

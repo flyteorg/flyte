@@ -24,10 +24,6 @@ func (m *AdminService) CreateTaskEvent(
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
 
-	if err := validation.ValidateTaskExecutionRequest(*request); err != nil {
-		return nil, err
-	}
-
 	var response *admin.TaskExecutionEventResponse
 	var err error
 	m.Metrics.taskExecutionEndpointMetrics.createEvent.Time(func() {

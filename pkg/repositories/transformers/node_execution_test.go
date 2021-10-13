@@ -84,6 +84,47 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
 }
 
+func TestAddTerminalState_OutputData(t *testing.T) {
+	outputData := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 4,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Phase: core.NodeExecution_SUCCEEDED,
+			OutputResult: &event.NodeExecutionEvent_OutputData{
+				OutputData: outputData,
+			},
+			OccurredAt: occurredAtProto,
+		},
+	}
+	startedAt := occurredAt.Add(-time.Minute)
+	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	nodeExecutionModel := models.NodeExecution{
+		StartedAt: &startedAt,
+	}
+	closure := admin.NodeExecutionClosure{
+		StartedAt: startedAtProto,
+	}
+	err := addTerminalState(&request, &nodeExecutionModel, &closure)
+	assert.Nil(t, err)
+	assert.EqualValues(t, outputData, closure.GetOutputData())
+	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+}
+
 func TestAddTerminalState_Error(t *testing.T) {
 	error := &core.ExecutionError{
 		Code: "foo",

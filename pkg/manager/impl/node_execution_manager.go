@@ -222,7 +222,7 @@ func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 
 func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error) {
-	if err := validation.ValidateNodeExecutionEventRequest(&request); err != nil {
+	if err := validation.ValidateNodeExecutionEventRequest(&request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
 		logger.Debugf(ctx, "CreateNodeEvent called with invalid identifier [%+v]: %v", request.Event.Id, err)
 	}
 	ctx = getNodeExecutionContext(ctx, request.Event.Id)
@@ -274,6 +274,9 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	} else if common.IsNodeExecutionTerminal(request.Event.Phase) {
 		m.metrics.ActiveNodeExecutions.Dec()
 		m.metrics.NodeExecutionsTerminated.Inc()
+		if request.Event.GetOutputData() != nil {
+			m.metrics.NodeExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		}
 	}
 	m.metrics.NodeExecutionEventsCreated.Inc()
 
@@ -437,41 +440,22 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		logger.Debugf(ctx, "failed to transform node execution model [%+v] when fetching data: %v", request.Id, err)
 		return nil, err
 	}
-	signedInputsURLBlob := admin.UrlBlob{}
-	if len(nodeExecution.InputUri) != 0 {
-		signedInputsURLBlob, err = m.urlData.Get(ctx, nodeExecution.InputUri)
-		if err != nil {
-			return nil, err
-		}
+
+	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, nodeExecution.InputUri)
+	if err != nil {
+		return nil, err
 	}
-	signedOutputsURLBlob := admin.UrlBlob{}
-	if nodeExecution.Closure.GetOutputUri() != "" {
-		signedOutputsURLBlob, err = m.urlData.Get(ctx, nodeExecution.Closure.GetOutputUri())
-		if err != nil {
-			return nil, err
-		}
+	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, nodeExecution.Closure)
+	if err != nil {
+		return nil, err
 	}
 	response := &admin.NodeExecutionGetDataResponse{
-		Inputs:  &signedInputsURLBlob,
-		Outputs: &signedOutputsURLBlob,
-	}
-	if util.ShouldFetchData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedInputsURLBlob) {
-		var fullInputs core.LiteralMap
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.InputUri), &fullInputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", nodeExecution.InputUri, err)
-		}
-		response.FullInputs = &fullInputs
-	}
-	if util.ShouldFetchOutputData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedOutputsURLBlob,
-		nodeExecution.Closure.GetOutputUri()) {
-		var fullOutputs core.LiteralMap
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.Closure.GetOutputUri()), &fullOutputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v",
-				nodeExecution.Closure.GetOutputUri(), err)
-		}
-		response.FullOutputs = &fullOutputs
+		Inputs:      inputURLBlob,
+		Outputs:     outputURLBlob,
+		FullInputs:  inputs,
+		FullOutputs: outputs,
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
@@ -488,7 +472,11 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	m.metrics.NodeExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	if response.Outputs.Bytes > 0 {
+		m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	} else if response.FullOutputs != nil {
+		m.metrics.NodeExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
+	}
 
 	return response, nil
 }

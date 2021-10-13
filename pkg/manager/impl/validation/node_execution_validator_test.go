@@ -54,7 +54,7 @@ func TestValidateNodeExecutionEventRequest(t *testing.T) {
 			},
 		},
 	}
-	assert.NoError(t, ValidateNodeExecutionEventRequest(&request))
+	assert.NoError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes))
 
 	request = admin.NodeExecutionEventRequest{
 		Event: &event.NodeExecutionEvent{
@@ -78,7 +78,7 @@ func TestValidateNodeExecutionEventRequest(t *testing.T) {
 			},
 		},
 	}
-	assert.NoError(t, ValidateNodeExecutionEventRequest(&request))
+	assert.NoError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes))
 }
 
 func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
@@ -96,7 +96,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing id")
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes), "missing id")
 	})
 
 	t.Run("missing dynamic compiled workflow", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing compiled dynamic workflow")
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes), "missing compiled dynamic workflow")
 	})
 
 	t.Run("missing dynamic compiled workflow primary", func(t *testing.T) {
@@ -135,7 +135,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing primary dynamic workflow")
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes), "missing primary dynamic workflow")
 	})
 
 	t.Run("missing dynamic compiled primary template", func(t *testing.T) {
@@ -157,7 +157,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing primary dynamic workflow template")
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes), "missing primary dynamic workflow template")
 	})
 
 	t.Run("missing dynamic compiled workflow primary identifier", func(t *testing.T) {
@@ -183,7 +183,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "unexpected resource type unspecified for identifier [], expected workflow instead")
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request, maxOutputSizeInBytes), "unexpected resource type unspecified for identifier [], expected workflow instead")
 	})
 }
 

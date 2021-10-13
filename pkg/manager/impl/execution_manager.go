@@ -666,8 +666,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 			workflowExecutionID, err)
 		return nil, nil, err
 	}
+	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.Inputs)))
 	return ctx, executionModel, nil
-
 }
 
 func resolvePermissions(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
@@ -1148,7 +1148,7 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 
 func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
 	*admin.WorkflowExecutionEventResponse, error) {
-	err := validation.ValidateCreateWorkflowEventRequest(request)
+	err := validation.ValidateCreateWorkflowEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes)
 	if err != nil {
 		logger.Debugf(ctx, "received invalid CreateWorkflowEventRequest [%s]: %v", request.RequestId, err)
 		return nil, err
@@ -1202,6 +1202,9 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		m.systemMetrics.ActiveExecutions.Dec()
 		m.systemMetrics.ExecutionsTerminated.Inc()
 		go m.emitOverallWorkflowExecutionTime(executionModel, request.Event.OccurredAt)
+		if request.Event.GetOutputData() != nil {
+			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		}
 
 		err = m.publishNotifications(ctx, request, *executionModel)
 		if err != nil {
@@ -1256,13 +1259,6 @@ func (m *ExecutionManager) GetExecutionData(
 		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id, err)
 		return nil, err
 	}
-	signedOutputsURLBlob := admin.UrlBlob{}
-	if execution.Closure.GetOutputs() != nil && execution.Closure.GetOutputs().GetUri() != "" {
-		signedOutputsURLBlob, err = m.urlData.Get(ctx, execution.Closure.GetOutputs().GetUri())
-		if err != nil {
-			return nil, err
-		}
-	}
 	// Prior to flyteidl v0.15.0, Inputs were held in ExecutionClosure and were not offloaded. Ensure we can return the inputs as expected.
 	if len(executionModel.InputsURI) == 0 {
 		closure := &admin.ExecutionClosure{}
@@ -1280,36 +1276,29 @@ func (m *ExecutionManager) GetExecutionData(
 			return nil, err
 		}
 	}
-	inputsURLBlob, err := m.urlData.Get(ctx, executionModel.InputsURI.String())
+	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, executionModel.InputsURI.String())
+	if err != nil {
+		return nil, err
+	}
+	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
 	if err != nil {
 		return nil, err
 	}
 	response := &admin.WorkflowExecutionGetDataResponse{
-		Outputs: &signedOutputsURLBlob,
-		Inputs:  &inputsURLBlob,
-	}
-	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
-	remoteDataScheme := m.config.ApplicationConfiguration().GetRemoteDataConfig().Scheme
-	if util.ShouldFetchData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), inputsURLBlob) {
-		var fullInputs core.LiteralMap
-		err := m.storageClient.ReadProtobuf(ctx, executionModel.InputsURI, &fullInputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", executionModel.InputsURI, err)
-		}
-		response.FullInputs = &fullInputs
-	}
-	if remoteDataScheme == common.Local || remoteDataScheme == common.None || (signedOutputsURLBlob.Bytes < maxDataSize && execution.Closure.GetOutputs() != nil) {
-		var fullOutputs core.LiteralMap
-		outputsURI := execution.Closure.GetOutputs().GetUri()
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(outputsURI), &fullOutputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputsURI, err)
-		}
-		response.FullOutputs = &fullOutputs
+		Inputs:      inputURLBlob,
+		Outputs:     outputURLBlob,
+		FullInputs:  inputs,
+		FullOutputs: outputs,
 	}
 
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	if response.Outputs.Bytes > 0 {
+		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	} else if response.FullOutputs != nil {
+		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
+	}
 	return response, nil
 }
 

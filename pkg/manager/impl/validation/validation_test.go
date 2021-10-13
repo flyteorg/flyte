@@ -304,3 +304,33 @@ func TestValidateActiveLaunchPlanListRequest(t *testing.T) {
 	)
 	assert.Error(t, err)
 }
+
+func TestValidateOutputData(t *testing.T) {
+	t.Run("no output data", func(t *testing.T) {
+		assert.NoError(t, ValidateOutputData(nil, 100))
+	})
+	outputData := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 4,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	t.Run("output data within threshold", func(t *testing.T) {
+		assert.NoError(t, ValidateOutputData(outputData, int64(10000000)))
+	})
+	t.Run("output data greater than threshold", func(t *testing.T) {
+		err := ValidateOutputData(outputData, int64(1))
+		assert.Equal(t, codes.ResourceExhausted, err.(errors.FlyteAdminError).Code())
+	})
+}

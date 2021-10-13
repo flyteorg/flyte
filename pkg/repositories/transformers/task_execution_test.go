@@ -141,6 +141,51 @@ func TestAddTaskTerminalState_OutputURI(t *testing.T) {
 	assert.Equal(t, time.Minute, taskExecutionModel.Duration)
 }
 
+func TestAddTaskTerminalState_OutputData(t *testing.T) {
+	outputData := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 4,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	request := admin.TaskExecutionEventRequest{
+		Event: &event.TaskExecutionEvent{
+			Phase: core.TaskExecution_SUCCEEDED,
+			OutputResult: &event.TaskExecutionEvent_OutputData{
+				OutputData: outputData,
+			},
+			OccurredAt: taskEventOccurredAtProto,
+		},
+	}
+	startedAt := taskEventOccurredAt.Add(-time.Minute)
+	taskExecutionModel := models.TaskExecution{
+		StartedAt: &startedAt,
+	}
+
+	closure := &admin.TaskExecutionClosure{}
+	err := addTaskTerminalState(&request, &taskExecutionModel, closure)
+	assert.Nil(t, err)
+
+	duration, err := ptypes.Duration(closure.GetDuration())
+	assert.Nil(t, err)
+	assert.EqualValues(t, request.Event.OutputResult, closure.OutputResult)
+	assert.True(t, proto.Equal(outputData, closure.GetOutputData()))
+	assert.EqualValues(t, time.Minute, duration)
+
+	assert.Equal(t, time.Minute, taskExecutionModel.Duration)
+}
+
 func TestCreateTaskExecutionModelQueued(t *testing.T) {
 	taskExecutionModel, err := CreateTaskExecutionModel(CreateTaskExecutionModelInput{
 		Request: &admin.TaskExecutionEventRequest{
