@@ -270,3 +270,4 @@ helm install gateway bitnami/contour -n flyte
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler.config | object | `{}` |  |
 | workflow_scheduler.enabled | bool | `false` |  |
+| workflow_scheduler.type | string | `""` |  |
