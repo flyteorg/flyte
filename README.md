@@ -268,11 +268,7 @@ A big thank you to the community for making Flyte possible!
 
 ### Flyte
 
-
-<object type="image/svg+xml" data="contributors/flyte.svg"></object>
-
-<iframe src="contributors/flyte.svg" width="500" height="500" sandbox>
-</iframe>
+<iframe src="contributors/flyte.svg" width="500" height="500" sandbox></iframe>
 
 ### Flytekit
 
