@@ -270,8 +270,6 @@ A big thank you to the community for making Flyte possible!
 
 <img src="./contributors/flyte.svg" alt="flyte contributors">
 
-![flytekit contributors](./contributors/flyte.svg)
-
 ### Flytekit
 
 <img src="./contributors/flytekit.svg" alt="flytekit contributors">
