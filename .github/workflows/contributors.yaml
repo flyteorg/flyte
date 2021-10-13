@@ -1,10 +1,27 @@
 name: Contributors
 on: push
+# jobs:
+#   contributors:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: wow-actions/contributors-list@v1
+#         with:
+#           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+#           svgPath: CONTRIBUTORS.svg
+
 jobs:
-  contributors:
+  add-contributors:
     runs-on: ubuntu-latest
     steps:
-      - uses: wow-actions/contributors-list@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-          svgPath: CONTRIBUTORS.svg
+    - uses: actions/checkout@v2
+    - uses: BobAnkh/add-contributors@master
+      with:
+        CONTRIBUTOR: '### Contributors'
+        COLUMN_PER_ROW: '6'
+        ACCESS_TOKEN: ${{secrets.FLYTE_BOT_PAT}}
+        IMG_WIDTH: '100'
+        FONT_SIZE: '14'
+        PATH: '/README.md'
+        BRANCH: 'all-contributors'
+        COMMIT_MESSAGE: 'update contributors'
+        AVATAR_SHAPE: 'round'
