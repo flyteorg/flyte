@@ -268,8 +268,8 @@ A big thank you to the community for making Flyte possible!
 
 ### Flyte
 
-<object type="image/svg+xml" data="./contributors/flyte.svg"></object>
+<object type="image/svg+xml" data="contributors/flyte.svg"></object>
 
 ### Flytekit
 
-<object type="image/svg+xml" data="./contributors/flytekit.svg"></object>
+<object type="image/svg+xml" data="contributors/flytekit.svg"></object>
