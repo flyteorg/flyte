@@ -243,17 +243,56 @@ Then apply it to your cluster:
 
   kubectl apply -f flyte-certificate.yaml
 
+Alternative is to use certificate manager
+
+* Install the cert manager
+
+.. code-block::
+
+  helm install cert-manager --namespace flyte --version v0.12.0 jetstack/cert-manager
+
+* Create cert issuer
+
+.. code-block:: 
+
+   apiVersion: cert-manager.io/v1alpha2
+   kind: Issuer
+   metadata:
+     name: letsencrypt-production
+   spec:
+     acme:
+       server: https://acme-v02.api.letsencrypt.org/directory
+       email: pmahindrakar@union.ai
+       privateKeySecretRef:
+         name: letsencrypt-production
+       solvers:
+       - selector: {}
+         http01:
+           ingress:
+             class: nginx
+
 Ingress
 =======
 
-Create a static IP address.
+* Add the ingress repo
 
 .. code-block:: bash
 
-  gcloud compute addresses create flyte-example --global
-  gcloud compute addresses describe flyte-example --global
+  helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
-TODO
+
+* Install the nginx-ingress
+
+.. code-block:: bash
+
+  helm install nginx-ingress ingress-nginx/ingress-nginx
+
+
+* Get the ingress IP to be used for updating the zone and getting the name server records for DNS
+
+.. code-block:: bash
+
+  kubectl get ingress -n flyte
 
 Create GCS Bucket
 =================
