@@ -1,7 +1,7 @@
 name: Contributors
 on: push
 jobs:
-  add-contributors-flyte:
+  add-contributors:
     runs-on: ubuntu-latest
     # only run if the commit wasn't created by the auto-contrib-bot
     if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]' ) }}
@@ -10,26 +10,7 @@ jobs:
     - uses: BobAnkh/add-contributors@master
       with:
         ACCESS_TOKEN: ${{secrets.FLYTE_BOT_PAT}}
-        CONTRIBUTOR: '#### Flyte Contributors'
-        COLUMN_PER_ROW: '10'
-        IMG_WIDTH: '70'
-        FONT_SIZE: '10'
-        PATH: '/README.md'
-        BRANCH: ${{ github.ref }}
-        COMMIT_MESSAGE: '[auto-contrib-bot] update contributors'
-        AVATAR_SHAPE: round
-
-  add-contributors-flytekit:
-    runs-on: ubuntu-latest
-    # only run if the commit wasn't created by the auto-contrib-bot
-    if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]' ) }}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: BobAnkh/add-contributors@master
-      with:
-        REPO_NAME: 'flyteorg/flytekit'
-        ACCESS_TOKEN: ${{secrets.FLYTE_BOT_PAT}}
-        CONTRIBUTOR: '#### Flytekit Contributors'
+        CONTRIBUTOR: '<!-- Flyte Contributors -->'
         COLUMN_PER_ROW: '10'
         IMG_WIDTH: '70'
         FONT_SIZE: '10'
