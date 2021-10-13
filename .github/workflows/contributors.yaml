@@ -29,7 +29,7 @@ jobs:
         uses: hyperledger-tooling/github-contributors-action@v0.0.1
         env:
           GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          SOURCE_GITHUB_REPOSITORY: flyteorg
+          SOURCE_GITHUB_REPOSITORY: flyteorg/flyte
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
           CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->
           FILE_WITH_PATTERN: CONTRIBUTORS.md
