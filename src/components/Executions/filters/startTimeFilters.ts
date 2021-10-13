@@ -37,7 +37,7 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
             ]
         },
         today: {
-            label: 'Today',
+            label: 'Last 24 hours',
             value: 'today',
             data: [
                 {
@@ -45,13 +45,13 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
                     operation: FilterOperationName.GTE,
                     value: () =>
                         moment()
-                            .startOf('day')
+                            .subtract(24, 'hour')
                             .toISOString()
                 }
             ]
         },
         yesterday: {
-            label: 'Yesterday',
+            label: 'Last 48 hours',
             value: 'yesterday',
             data: [
                 {
@@ -59,8 +59,7 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
                     operation: FilterOperationName.GTE,
                     value: () =>
                         moment()
-                            .startOf('day')
-                            .subtract(1, 'day')
+                            .subtract(48, 'hour')
                             .toISOString()
                 },
                 {
