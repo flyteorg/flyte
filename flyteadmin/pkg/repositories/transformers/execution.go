@@ -142,9 +142,11 @@ func UpdateExecutionModelState(
 				},
 			},
 		}
-	}
-
-	if request.Event.GetError() != nil {
+	} else if request.Event.GetOutputData() != nil {
+		executionClosure.OutputResult = &admin.ExecutionClosure_OutputData{
+			OutputData: request.Event.GetOutputData(),
+		}
+	} else if request.Event.GetError() != nil {
 		executionClosure.OutputResult = &admin.ExecutionClosure_Error{
 			Error: request.Event.GetError(),
 		}

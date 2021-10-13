@@ -254,40 +254,10 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
 	duration := time.Minute
+	durationProto := ptypes.DurationProto(duration)
 	occurredAt := startedAt.Add(duration).UTC()
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
 
-	err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
-		Event: &event.WorkflowExecutionEvent{
-			Phase:      core.WorkflowExecution_SUCCEEDED,
-			OccurredAt: occurredAtProto,
-			OutputResult: &event.WorkflowExecutionEvent_OutputUri{
-				OutputUri: "output.pb",
-			},
-		},
-	})
-	assert.Nil(t, err)
-
-	durationProto := ptypes.DurationProto(duration)
-	expectedClosure := admin.ExecutionClosure{
-		ComputedInputs: &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": {},
-			},
-		},
-		Phase:     core.WorkflowExecution_SUCCEEDED,
-		StartedAt: startedAtProto,
-		UpdatedAt: occurredAtProto,
-		Duration:  durationProto,
-		OutputResult: &admin.ExecutionClosure_Outputs{
-			Outputs: &admin.LiteralMapBlob{
-				Data: &admin.LiteralMapBlob_Uri{
-					Uri: "output.pb",
-				},
-			},
-		},
-	}
-	expectedClosureBytes, _ := proto.Marshal(&expectedClosure)
 	expectedModel := models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: "project",
@@ -296,7 +266,6 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		},
 		Spec:               specBytes,
 		Phase:              core.WorkflowExecution_SUCCEEDED.String(),
-		Closure:            expectedClosureBytes,
 		LaunchPlanID:       uint(1),
 		WorkflowID:         uint(2),
 		StartedAt:          &startedAt,
@@ -304,7 +273,88 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		ExecutionCreatedAt: executionModel.ExecutionCreatedAt,
 		ExecutionUpdatedAt: &occurredAt,
 	}
-	assert.EqualValues(t, expectedModel, executionModel)
+
+	t.Run("output URI set", func(t *testing.T) {
+		err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_SUCCEEDED,
+				OccurredAt: occurredAtProto,
+				OutputResult: &event.WorkflowExecutionEvent_OutputUri{
+					OutputUri: "output.pb",
+				},
+			},
+		})
+		assert.Nil(t, err)
+
+		expectedClosure := admin.ExecutionClosure{
+			ComputedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {},
+				},
+			},
+			Phase:     core.WorkflowExecution_SUCCEEDED,
+			StartedAt: startedAtProto,
+			UpdatedAt: occurredAtProto,
+			Duration:  durationProto,
+			OutputResult: &admin.ExecutionClosure_Outputs{
+				Outputs: &admin.LiteralMapBlob{
+					Data: &admin.LiteralMapBlob_Uri{
+						Uri: "output.pb",
+					},
+				},
+			},
+		}
+		closureBytes, _ := proto.Marshal(&expectedClosure)
+		expectedModel.Closure = closureBytes
+		assert.EqualValues(t, expectedModel, executionModel)
+	})
+	t.Run("output data set", func(t *testing.T) {
+		outputData := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 4,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_SUCCEEDED,
+				OccurredAt: occurredAtProto,
+				OutputResult: &event.WorkflowExecutionEvent_OutputData{
+					OutputData: outputData,
+				},
+			},
+		})
+		assert.Nil(t, err)
+
+		expectedClosure := admin.ExecutionClosure{
+			ComputedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {},
+				},
+			},
+			Phase:     core.WorkflowExecution_SUCCEEDED,
+			StartedAt: startedAtProto,
+			UpdatedAt: occurredAtProto,
+			Duration:  durationProto,
+			OutputResult: &admin.ExecutionClosure_OutputData{
+				OutputData: outputData,
+			},
+		}
+		closureBytes, _ := proto.Marshal(&expectedClosure)
+		expectedModel.Closure = closureBytes
+		assert.EqualValues(t, expectedModel, executionModel)
+	})
 }
 
 func TestSetExecutionAborted(t *testing.T) {

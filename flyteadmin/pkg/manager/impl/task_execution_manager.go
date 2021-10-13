@@ -122,6 +122,10 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 
 func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	*admin.TaskExecutionEventResponse, error) {
+	if err := validation.ValidateTaskExecutionRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
+		return nil, err
+	}
+
 	// Get the parent node execution, if none found a MissingEntityError will be returned
 	nodeExecutionID := request.Event.ParentNodeExecutionId
 	taskExecutionID := core.TaskExecutionIdentifier{
@@ -182,6 +186,9 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()
 		m.metrics.TaskExecutionsTerminated.Inc()
+		if request.Event.GetOutputData() != nil {
+			m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		}
 	}
 
 	if err = m.notificationClient.Publish(ctx, proto.MessageName(&request), &request); err != nil {
@@ -287,42 +294,31 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 			request.Id, err)
 		return nil, err
 	}
-	signedInputsURLBlob, err := m.urlData.Get(ctx, taskExecution.InputUri)
+
+	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, taskExecution.InputUri)
 	if err != nil {
 		return nil, err
 	}
-	signedOutputsURLBlob := admin.UrlBlob{}
-	if taskExecution.Closure.GetOutputUri() != "" {
-		signedOutputsURLBlob, err = m.urlData.Get(ctx, taskExecution.Closure.GetOutputUri())
-		if err != nil {
-			return nil, err
-		}
+	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, taskExecution.Closure)
+	if err != nil {
+		return nil, err
 	}
+
 	response := &admin.TaskExecutionGetDataResponse{
-		Inputs:  &signedInputsURLBlob,
-		Outputs: &signedOutputsURLBlob,
-	}
-	if util.ShouldFetchData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedInputsURLBlob) {
-		var fullInputs core.LiteralMap
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.InputUri), &fullInputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", taskExecution.InputUri, err)
-		}
-		response.FullInputs = &fullInputs
-	}
-	if util.ShouldFetchOutputData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedOutputsURLBlob,
-		taskExecution.Closure.GetOutputUri()) {
-		var fullOutputs core.LiteralMap
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.Closure.GetOutputUri()), &fullOutputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v",
-				taskExecution.Closure.GetOutputUri(), err)
-		}
-		response.FullOutputs = &fullOutputs
+		Inputs:      inputURLBlob,
+		Outputs:     outputURLBlob,
+		FullInputs:  inputs,
+		FullOutputs: outputs,
 	}
 
 	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	if response.Outputs.Bytes > 0 {
+		m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	} else if response.FullOutputs != nil {
+		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
+	}
 	return response, nil
 }
 

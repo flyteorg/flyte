@@ -13,6 +13,7 @@ import (
 
 var taskEventOccurredAt = time.Now()
 var taskEventOccurredAtProto, _ = ptypes.TimestampProto(taskEventOccurredAt)
+var maxOutputSizeInBytes = int64(1000000)
 
 func TestValidateTaskExecutionRequest(t *testing.T) {
 	assert.Nil(t, ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
@@ -35,7 +36,7 @@ func TestValidateTaskExecutionRequest(t *testing.T) {
 			},
 			RetryAttempt: 0,
 		},
-	}))
+	}, maxOutputSizeInBytes))
 }
 
 func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
@@ -58,7 +59,7 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 			},
 			RetryAttempt: 0,
 		},
-	})
+	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing occurred_at")
 
 	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
@@ -80,7 +81,7 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 			},
 			RetryAttempt: 0,
 		},
-	})
+	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing version")
 
 	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
@@ -102,10 +103,10 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 			},
 			RetryAttempt: 0,
 		},
-	})
+	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing node_id")
 
-	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{})
+	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing event")
 }
 

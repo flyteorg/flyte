@@ -180,7 +180,7 @@ func TestValidateCreateWorkflowEventRequest(t *testing.T) {
 	request := admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 	}
-	err := ValidateCreateWorkflowEventRequest(request)
+	err := ValidateCreateWorkflowEventRequest(request, maxOutputSizeInBytes)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Workflow event handler was called without event")
 
@@ -191,7 +191,7 @@ func TestValidateCreateWorkflowEventRequest(t *testing.T) {
 			OutputResult: &event.WorkflowExecutionEvent_Error{},
 		},
 	}
-	err = ValidateCreateWorkflowEventRequest(request)
+	err = ValidateCreateWorkflowEventRequest(request, maxOutputSizeInBytes)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "Workflow event handler request event doesn't have an execution id")
 }

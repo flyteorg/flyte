@@ -131,13 +131,16 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	return nil
 }
 
-func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest) error {
+func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
 	if request.Event == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler was called without event")
 	} else if request.Event.ExecutionId == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler request event doesn't have an execution id - %v", request.Event)
+	}
+	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+		return err
 	}
 	return nil
 }

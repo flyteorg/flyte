@@ -61,6 +61,10 @@ func addTaskTerminalState(
 		closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
 			OutputUri: request.Event.GetOutputUri(),
 		}
+	} else if request.Event.GetOutputData() != nil {
+		closure.OutputResult = &admin.TaskExecutionClosure_OutputData{
+			OutputData: request.Event.GetOutputData(),
+		}
 	} else if request.Event.GetError() != nil {
 		closure.OutputResult = &admin.TaskExecutionClosure_Error{
 			Error: request.Event.GetError(),

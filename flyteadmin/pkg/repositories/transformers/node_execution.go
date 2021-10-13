@@ -63,6 +63,10 @@ func addTerminalState(
 		closure.OutputResult = &admin.NodeExecutionClosure_OutputUri{
 			OutputUri: request.Event.GetOutputUri(),
 		}
+	} else if request.Event.GetOutputData() != nil {
+		closure.OutputResult = &admin.NodeExecutionClosure_OutputData{
+			OutputData: request.Event.GetOutputData(),
+		}
 	} else if request.Event.GetError() != nil {
 		closure.OutputResult = &admin.NodeExecutionClosure_Error{
 			Error: request.Event.GetError(),
