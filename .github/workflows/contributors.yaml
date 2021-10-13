@@ -3,9 +3,9 @@ name: Contributors
 on:
   schedule:
     - cron: '0 12 * * 1' # At 12 noon on Monday.
-  push:
-    branches: 
-      - auto-add-contributors
+  # push:
+  #   branches:
+  #     - auto-add-contributors
 
 jobs:
   contributors:
@@ -34,9 +34,9 @@ jobs:
           committer: Flyte Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
-          branch: flyte-bot-update-releases
+          branch: auto-add-contributors-bot
           delete-branch: true
-          title: 'auto-update contributors'
+          title: '[auto-update-contributors] auto-update contributors'
           labels: contibutors
           team-reviewers: |
             owners
