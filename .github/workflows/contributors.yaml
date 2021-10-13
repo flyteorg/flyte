@@ -1,11 +1,11 @@
 name: Contributors
 
-schedule:
-  - cron: '0 12 * * 1' # At 12 noon on Monday.
-
 on:
+  schedule:
+    - cron: '0 12 * * 1' # At 12 noon on Monday.
   push:
-    branches: auto-add-contributors
+    branches: 
+      - auto-add-contributors
 
 jobs:
   contributors:
