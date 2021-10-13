@@ -15,7 +15,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
-    tag: v0.6.28 # FLYTEADMIN_TAG
+    tag: v0.6.41 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -71,7 +71,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler
     # -- Docker image tag
-    tag: v0.6.28 # FLYTESCHEDULER_TAG
+    tag: v0.6.41 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -163,7 +163,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller
-    tag: v0.14.3 # FLYTEPROPELLER_TAG
+    tag: v0.14.12 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -206,7 +206,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole
-    tag: v0.25.1 # FLYTECONSOLE_TAG
+    tag: v0.28.2 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
