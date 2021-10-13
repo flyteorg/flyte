@@ -23,7 +23,7 @@ helm install -n flyte -f values-eks.yaml --create-namespace flyte flyte/flyte-co
 ```
 
 Customize your installation by changing settings in `values-eks.yaml`.
-You can use the helm diff plugin to review any value changes you've made to your values:
+You can use the helm diff plugin to review any changes you've made to your values:
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
@@ -51,7 +51,7 @@ helm install gateway bitnami/contour -n flyte
 ### CONFIGURATION NOTES:
 - The docker images, their tags and other default parameters are configured in `values.yaml` file.
 - Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
-- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
+- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, IAM roles, secrets, etc., need to be modified.
 
 ## Values
 
@@ -276,4 +276,4 @@ helm install gateway bitnami/contour -n flyte
 | webhook.serviceAccount.create | bool | `true` | Should a service account be created for the webhook |
 | webhook.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
-| workflow_scheduler | object | `{"config":{},"enabled":false,"type":""}` | -------------------------------------------------------------- Optional Modules Flyte built extensions that enable various additional features in Flyte. All these features are optional, but are critical to run certain features ------------------------------------------------------------------------ -- **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |
+| workflow_scheduler | object | `{"config":{},"enabled":false,"type":""}` | -------------------------------------------------------------- Optional Modules Flyte built extensions that enable various additional features in Flyte. All these features are optional, but certain features are critical to run------------------------------------------------------------------------ -- **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |
