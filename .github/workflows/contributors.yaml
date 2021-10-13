@@ -4,7 +4,7 @@ jobs:
   auto-add-contributors:
     runs-on: ubuntu-latest
     # only run if the commit wasn't created by the auto-contrib-bot
-    if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]'' ) }}
+    if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]' ) }}
     steps:
     - uses: actions/checkout@v2
     - uses: BobAnkh/add-contributors@master
