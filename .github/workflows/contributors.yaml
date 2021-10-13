@@ -32,7 +32,8 @@ jobs:
           SOURCE_GITHUB_REPOSITORY: flyteorg/flyte
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
           CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->
-          FILE_WITH_PATTERN: CONTRIBUTORS.md
+          INPUT_TEMPLATE_FILE: ./assets/contributor-template.md
+          FILE_WITH_PATTERN: ./CONTRIBUTORS.md
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
