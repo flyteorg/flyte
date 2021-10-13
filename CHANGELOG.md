@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.3](http://github.com/lyft/flyteconsole/compare/v0.28.2...v0.28.3) (2021-10-13)
+
+
+### Bug Fixes
+
+* improve start time filter for executions ([#224](http://github.com/lyft/flyteconsole/issues/224)) ([74b8a61](http://github.com/lyft/flyteconsole/commit/74b8a617522c0da9462078e392c04bf4588b4573))
+
 ## [0.28.2](http://github.com/lyft/flyteconsole/compare/v0.28.1...v0.28.2) (2021-10-04)
 
 
