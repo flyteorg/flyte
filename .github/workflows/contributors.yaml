@@ -25,9 +25,14 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
       #     svgPath: contributors/flytekit.svg
       #     noCommit: true
-      - uses: sinchang/all-contributors-action@master
-        env:
-          GITHUB_REPOSITORY: flyteorg/flyte
+      - name: GitHub Contributors Action
+        uses: hyperledger-tooling/github-contributors-action@v0.0.1
+        with:
+          GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          SOURCE_GITHUB_REPOSITORY: flyteorg
+          CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
+          CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->
+          FILE_WITH_PATTERN: CONTRIBUTORS.md
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
