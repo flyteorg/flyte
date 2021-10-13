@@ -34,8 +34,8 @@ export interface EntityExecutionsBarChartProps {
     id: ResourceIdentifier;
 }
 
-const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
-    const newExecutions = exectuions.reverse().map(execution => {
+const getExecutionTimeData = (executions: Execution[], fillSize = 100) => {
+    const newExecutions = [...executions].reverse().map(execution => {
         const duration = getWorkflowExecutionTimingMS(execution)?.duration || 1;
         return {
             value: duration,
@@ -50,9 +50,10 @@ const getExecutionTimeData = (exectuions: Execution[], fillSize = 100) => {
                     <span>Running time: {millisecondsToHMS(duration)}</span>
                     <span>
                         Started at:{' '}
-                        {execution.closure.startedAt != null && formatDateUTC(
-                            timestampToDate(execution.closure.startedAt!)
-                        )}
+                        {execution.closure.startedAt != null &&
+                            formatDateUTC(
+                                timestampToDate(execution.closure.startedAt!)
+                            )}
                     </span>
                 </div>
             )
@@ -110,6 +111,8 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
             limit: 100
         }
     );
+
+    console.log(executions);
 
     const handleClickItem = React.useCallback(item => {
         if (item.metadata) {
