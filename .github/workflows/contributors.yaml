@@ -6,5 +6,5 @@ jobs:
     steps:
       - uses: wow-actions/contributors-list@v1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           svgPath: CONTRIBUTORS.svg
