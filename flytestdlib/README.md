@@ -8,6 +8,7 @@ Common Go Tools
 [![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flytestdlib)](https://goreportcard.com/report/github.com/lyft/flytestdlib)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytestdlib.svg?style=plastic)
 ![Commit since last releast](https://img.shields.io/github/commits-since/lyft/flytestdlib/latest.svg?style=plastic)
+[![Slack](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://slack.flyte.org)
 
 Shared components we found ourselves building time and time again, so we collected them in one place!
 
