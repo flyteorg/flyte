@@ -31,7 +31,7 @@ jobs:
         with:
           token: ${{ secrets.FLYTE_BOT_PAT }}
           commit-message: '[auto-update-contributors] update contributors svg'
-          committer: Flyte-Bot <admin@flyte.org>
+          committer: Flyte Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
           branch: flyte-bot-update-releases
