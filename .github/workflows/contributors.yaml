@@ -1,5 +1,7 @@
 name: Contributors
-on: push
+
+schedule:
+  - cron: '0 12 * * 1' # At 12 noon on Monday.
 
 jobs:
   contributors:
