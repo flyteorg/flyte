@@ -4,6 +4,7 @@ on: push
 jobs:
   contributors:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith( github.event.head_commit.message , '[auto-update-contributors]' ) }}
     steps:
       - uses: actions/checkout@v2
       - uses: wow-actions/contributors-list@v1
@@ -23,13 +24,13 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.FLYTE_BOT_PAT }}
-          commit-message: Update CONTRIBUTORS.svg
+          commit-message: '[auto-update-contributors] update contributors svg'
           committer: Flyte-Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
           branch: flyte-bot-update-releases
           delete-branch: true
-          title: 'Update contributors'
+          title: 'auto-update contributors'
           labels: contibutors
           team-reviewers: |
             owners
