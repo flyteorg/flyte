@@ -26,4 +26,7 @@ COPY --from=builder /app app
 WORKDIR /app
 ENV NODE_ENV=production PORT=8080
 EXPOSE 8080
+
+USER 1000
+
 CMD ["index.js"]
