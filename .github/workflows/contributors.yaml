@@ -27,7 +27,7 @@ jobs:
       #     noCommit: true
       - name: GitHub Contributors Action
         uses: hyperledger-tooling/github-contributors-action@v0.0.1
-        with:
+        env:
           GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           SOURCE_GITHUB_REPOSITORY: flyteorg
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
