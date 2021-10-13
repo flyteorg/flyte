@@ -36,8 +36,8 @@
   <a href="https://artifacthub.io/packages/search?repo=flyte">
     <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
   </a> 
-  <a href="https://forms.gle/UVuek9WfBoweiqcJA">
-    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Slack Status" />
+  <a href="https://slack.flyte.org">
+    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Join Flyte Slack" />
   </a>
 </p>
 
@@ -228,7 +228,7 @@ Here are some resources to help you learn more about Flyte.
 
 ### Communication Channels
 
-- [Slack](https://forms.gle/UVuek9WfBoweiqcJA)
+- [Slack](https://slack.flyte.org)
 - [Email list](https://groups.google.com/u/0/a/flyte.org/g/users)
 - [Twitter](https://twitter.com/flyteorg) 
 - [LinkedIn Discussion Group](https://www.linkedin.com/groups/13962256/)
