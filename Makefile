@@ -13,7 +13,7 @@ kustomize:
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
 .PHONY: helm
-helm: ## Generate helm charts
+helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
 
 .PHONY: release_automation
@@ -56,7 +56,7 @@ prepare_artifacts:
 	bash script/prepare_artifacts.sh
 
 .PHONE: helm_update
-helm_update: ## Update helm charts
+helm_update: ## Update helm charts' dependencies.
 	helm dep update ./charts/flyte/
 
 .PHONY: helm_install
