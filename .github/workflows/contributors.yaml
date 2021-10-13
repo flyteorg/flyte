@@ -27,3 +27,21 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           svgPath: CONTRIBUTORS.svg
+          noCommit: true
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.FLYTE_BOT_PAT }}
+          commit-message: Update CONTRIBUTORS.svg
+          committer: Flyte-Bot <admin@flyte.org>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: true
+          branch: flyte-bot-update-releases
+          delete-branch: true
+          title: 'Update contributors'
+          labels: contibutors
+          team-reviewers: |
+            owners
+            maintainers
+          draft: false
