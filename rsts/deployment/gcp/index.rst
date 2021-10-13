@@ -20,16 +20,50 @@ Before you begin, please ensure that you have the following tools installed.
 * Helm
 * ``kubectl``
 
+Initialize Gcloud
+===================
+Authorize Gcloud sdk to access GCP using your credentials and also additionally setup the config for existing project
+and optionally set the default compute zone. `Init <https://cloud.google.com/sdk/gcloud/reference/init>`__
+
+.. code-block::
+
+   gcloud init
+
+
+Create Organization
+===================
+Use the following docs to understand the organization creation process in google cloud
+`Organization Management <https://cloud.google.com/resource-manager/docs/creating-managing-organization>`__
+
+Get the organization id to be used for creating the project. The billing should be linked with the organization so
+that all projects under the org use the same billing account.
+
+.. code-block::
+
+   gcloud organizations list
+
+Sample output
+.. code-block::
+
+   DISPLAY_NAME                 ID    DIRECTORY_CUSTOMER_ID
+   example-org        123456789999                C02ewszsz
+
+<ORG-ID> = ID column value for the organization
+
+.. code-block::
+
+   export ORG_ID=<id>
+
 Create GCE Project
 ==================
 .. code-block::
 
   export GCP_PROJECT=<my-project>
-  gcloud create project $GCP_PROJECT
+  gcloud projects create $GCP_PROJECT --organization $ORG_ID
 
 Of course you can also use an existing project if your account has appropriate permissions to create the required resources.
 
-Set project <my-project> as default in gcloud:
+Set project <my-project> as default in gcloud or use gcloud init to set this default:
 
 .. code-block::
 
@@ -41,40 +75,142 @@ Permissions
 ===========
 
 Configure `workload identity <https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity>`__ for flyte namespace service accounts.
+This creates the GSA's which would be used as mapped to the KSA(kubernetes service account) through annotations and would be used for authorizing the pods access to the google cloud services.
 
-.. code-block:: bash
+* Create GSA for flyteadmin
 
-  gcloud iam service-accounts create flyteadmin
-  gcloud iam service-accounts create flyte-datacatalog
-  gcloud iam service-accounts create flytepropeller
+.. code-block::
+
+  gcloud iam service-accounts create gsa-flyteadmin
+
+* Create GSA for datacatalog
+
+.. code-block::
+
+  gcloud iam service-accounts create gsa-datacatalog
+
+* Create GSA for flytepropeller
+
+.. code-block::
+
+  gcloud iam service-accounts create gsa-flytepropeller
+
+
+* Create GSA for cluster resource manager
+
+.. code-block::
+
+  gcloud iam service-accounts create flyte-clusterresources
+
+
+* Create a new customized role enveloping `storage.buckets.get` with name StorageBucketGet which will be used while adding roles
+
+* Add IAM policy binding for flyteadmin GSA. It requires permissions to get bucket, create/delete/update objects in the bucket, connecting to cloud sql and also workload identity user role.
+
+.. code-block::
 
   gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
+    --role "roles/iam.workloadIdentityUser" \
+    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "roles/cloudsql.client" \
+    --role "roles/storage.objectAdmin" \
     --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flyteadmin]" \
-    flyteadmin@${GCP_PROJECT}.iam.gserviceaccount.com
+    gsa-flyteadmin@${GCP_PROJECT}.iam.gserviceaccount.com
+
+* Add IAM policy binding for datacatalog GSA.It requires permissions to get bucket, create/delete/update objects in the bucket, connecting to cloud sql and also workload identity user role.
+
+.. code-block::
 
   gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
+    --role "roles/iam.workloadIdentityUser" \
+    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "roles/cloudsql.client" \
+    --role "roles/storage.objectAdmin" \
     --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/datacatalog]" \
-    flyte-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
+    gsa-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
+
+* Add IAM policy binding for flytepropeller GSA.It requires permissions to get bucket, create/delete/update objects in the bucket, create/update/delete kubernetes objects in the cluster and also workload identity user role.
+
+.. code-block::
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
+    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "roles/container.developer" \
+    --role "roles/storage.objectAdmin" \
     --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flytepropeller]" \
-    flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
+    gsa-flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
+
+* Add IAM policy binding for cluster resource manager GSA.It requires permissions to get bucket, create/delete/update objects in the bucket and also workload identity user role.
+
+.. code-block::
+
+  gcloud iam service-accounts add-iam-policy-binding \
+    --role roles/iam.workloadIdentityUser \
+    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "roles/storage.objectAdmin" \
+    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flytepropeller]" \
+    flyte-clusterresources@${GCP_PROJECT}.iam.gserviceaccount.com
+
 
 Create GKE Cluster
 ==================
+Creates GKE cluster with VPC-native networking and workload identity enabled.
+Browse to the gcloud console and Kubernetes Engine tab to start creating the k8s cluster.
+
+Ensure that VPC native traffic routing is enabled and under Security enable Workload identity and use project default pool
+which would be `${GCP_PROJECT}.svc.id.goog`
+
+Recommended way is to create it from the console.
+
 .. code-block::
 
   gcloud container clusters create <my-flyte-cluster> \
     --workload-pool=${GCP_PROJECT}.svc.id.goog
     --region us-west1 \
-    --num-nodes 1
+    --num-nodes 6
+
+Create GKE context
+==================
+Initialize your kubecontext to point to GKE cluster using the following command.
+
+.. code-block::
+
+  gcloud container clusters get-credentials <my-flyte-cluster>
+
+Verify by creating a test namespace
+
+.. code-block::
+
+   kubectl create ns test
 
 Create Cloud SQL Database
 =========================
 Next create a relational `Cloud SQL for PostgreSQL <https://cloud.google.com/sql/docs/postgres/introduction>`__ database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
+Follow this `link <https://console.cloud.google.com/sql/choose-instance-engine>`__ to create the cloud sql instance
+
+* Select PostgreSQL
+* Provide an Instance ID
+* Provide password for the instance <DB_INSTANCE_PASSWD>
+* Use PostgresSQL13 or higher
+* Select the Zone based on your availability requirements.
+* Select customize your instance and enable Private IP in Connections tab. This is required for the private communication between the GKE apps and cloud SQL instance. Follow the steps to create the private connection (default)
+* Create the SQL instance
+* After creation of the instance get the private IP of the database <PRIVATE_IP>
+* Create flyteadmin database and flyteadmin user account on that instance with <DB_PASSWORD>
+* Verify the connectivity to the DB from GKE cluster
+   * Create a testdb namespace
+
+   .. code-block::
+
+      kubectl create ns test
+   * Verify the connectivity using a postgres client
+
+   .. code-block::
+
+      kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' --namespace testdb --image docker.io/bitnami/postgresql:11.7.0-debian-10-r9 --env="PGPASSWORD=<DB_INSTANCE_PASSWD>" --command -- psql testdb --host <PRIVATE_IP> -U postgres -d flyteadmin -p 5432
+
+Recommended way is to create it from the console.
 
 .. code-block:: bash
 
@@ -83,8 +219,7 @@ Next create a relational `Cloud SQL for PostgreSQL <https://cloud.google.com/sql
     --cpu=1 \
     --memory=3840MB \
     --region=us-west1
-    
-TODO get DB password
+
 
 SSL Certificate
 ===============
@@ -122,12 +257,17 @@ TODO
 
 Create GCS Bucket
 =================
+Create <BUCKET-NAME> with uniform access
 
 .. code-block:: bash
 
   gsutil mb -b on -l us-west1 gs://my-flyte-bucket/
 
-TODO bucket permissions
+Add access permission for the following principals
+* gsa-flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
+* gsa-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
+* gsa-flyteadmin@f${GCP_PROJECT}.iam.gserviceaccount.com
+* gsa-flyte-clusterresources@${GCP_PROJECT}.iam.gserviceaccount.com
 
 Time for Helm
 =============
