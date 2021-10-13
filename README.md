@@ -266,34 +266,10 @@ Here are some resources to help you learn more about Flyte.
 
 A big thank you to the community for making Flyte possible!
 
-- [@wild-endeavor](https://github.com/wild-endeavor)
-- [@katrogan](https://github.com/katrogan)
-- [@EngHabu](https://github.com/EngHabu)
-- [@akhurana001](https://github.com/akhurana001)
-- [@anandswaminathan](https://github.com/anandswaminathan)
-- [@kanterov](https://github.com/kanterov)
-- [@honnix](https://github.com/honnix)
-- [@jeevb](https://github.com/jeevb)
-- [@jonathanburns](https://github.com/jonathanburns)
-- [@migueltol22](https://github.com/migueltol22)
-- [@varshaparthay](https://github.com/varshaparthay)
-- [@pingsutw](https://github.com/pingsutw)
-- [@narape](https://github.com/narape)
-- [@lu4nm3](https://github.com/lu4nm3)
-- [@bnsblue](https://github.com/bnsblue)
-- [@RubenBarragan](https://github.com/RubenBarragan)
-- [@schottra](https://github.com/schottra)
-- [@evalsocket](https://github.com/evalsocket)
-- [@matthewphsmith](https://github.com/matthewphsmith)
-- [@slai](https://github.com/slai)
-- [@derwiki](https://github.com/derwiki)
-- [@tnsetting](https://github.com/tnsetting)
-- [@jbrambleDC](https://github.com/jbrambleDC)
-- [@igorvalko](https://github.com/igorvalko)
-- [@chanadian](https://github.com/chanadian)
-- [@surindersinghp](https://github.com/surindersinghp)
-- [@vsbus](https://github.com/vsbus)
-- [@catalinii](https://github.com/catalinii)
-- [@pmahindrakar-oss](https://github.com/pmahindrakar-oss)
-- [@milton0825](https://github.com/milton0825)
-- [@kumare3](https://github.com/kumare3)
+### Flyte
+
+![flytekit contributors](./contributors/flyte.svg)
+
+### Flytekit
+
+![flytekit contributors](./contributors/flytekit.svg)
