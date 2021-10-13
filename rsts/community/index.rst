@@ -14,7 +14,7 @@ so please join us on:
     :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
     :body: text-center
 
-    .. link-button:: http://flyte-org.slack.com
+    .. link-button:: https://slack.flyte.org
        :type: url
        :text: Slack
        :classes: btn-block stretched-link
