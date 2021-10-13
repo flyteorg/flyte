@@ -1,17 +1,10 @@
 name: Contributors
-on: push
-# jobs:
-#   contributors:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: wow-actions/contributors-list@v1
-#         with:
-#           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-#           svgPath: CONTRIBUTORS.svg
-
+on: pull_request
 jobs:
-  add-contributors:
+  auto-add-contributors:
     runs-on: ubuntu-latest
+    # only run if the commit wasn't created by the auto-contrib-bot
+    if: ${{ !startsWith( github.event.head_commit.message , '[auto-contrib-bot]'' ) }}
     steps:
     - uses: actions/checkout@v2
     - uses: BobAnkh/add-contributors@master
@@ -23,5 +16,5 @@ jobs:
         FONT_SIZE: '14'
         PATH: '/README.md'
         BRANCH: ${{ github.ref }}
-        COMMIT_MESSAGE: 'update contributors'
+        COMMIT_MESSAGE: '[auto-contrib-bot] update contributors'
         AVATAR_SHAPE: 'round'
