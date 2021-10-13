@@ -34,7 +34,12 @@ function useRelaunchWorkflowFormState({
             doFetch: async execution => {
                 const {
                     closure: { workflowId },
-                    spec: { launchPlan }
+                    spec: {
+                        launchPlan,
+                        disableAll,
+                        maxParallelism,
+                        qualityOfService
+                    }
                 } = execution;
                 const workflow = await apiContext.getWorkflow(workflowId);
                 const inputDefinitions = getWorkflowInputs(workflow);
@@ -45,7 +50,14 @@ function useRelaunchWorkflowFormState({
                     },
                     apiContext
                 );
-                return { values, launchPlan, workflowId };
+                return {
+                    values,
+                    launchPlan,
+                    workflowId,
+                    disableAll,
+                    maxParallelism,
+                    qualityOfService
+                };
             }
         },
         execution

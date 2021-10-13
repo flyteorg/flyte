@@ -1,4 +1,4 @@
-import { Admin } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import { Identifier, NamedEntityIdentifier } from 'models/Common/types';
 import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { LaunchPlan } from 'models/Launch/types';
@@ -77,6 +77,10 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
     preferredWorkflowId?: Identifier;
     workflowVersion?: WorkflowId;
     workflowVersionOptions?: Workflow[];
+    defaultAuthRole?: Admin.IAuthRole;
+    disableAll?: boolean | null;
+    maxParallelism?: number | null;
+    qualityOfService?: Core.IQualityOfService | null;
 }
 
 export interface TaskLaunchContext extends BaseLaunchContext {

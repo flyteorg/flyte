@@ -94,6 +94,9 @@ export const getExecutionData = (
 export interface CreateWorkflowExecutionArguments {
     authRole?: Admin.IAuthRole;
     domain: string;
+    disableAll?: boolean | null;
+    qualityOfServiceTier?: Core.QualityOfService.Tier | null;
+    maxParallelism?: number | null;
     inputs: Core.ILiteralMap;
     launchPlanId: Identifier;
     project: string;
@@ -106,14 +109,39 @@ export const createWorkflowExecution = (
     {
         authRole,
         domain,
+        disableAll,
+        qualityOfServiceTier,
+        maxParallelism,
         inputs,
         launchPlanId: launchPlan,
         project,
         referenceExecutionId: referenceExecution
     }: CreateWorkflowExecutionArguments,
     config?: RequestConfig
-) =>
-    postAdminEntity<
+) => {
+    const spec: Admin.IExecutionSpec = {
+        inputs,
+        launchPlan,
+        metadata: {
+            referenceExecution,
+            principal: defaultExecutionPrincipal
+        }
+    };
+    if (authRole?.assumableIamRole || authRole?.kubernetesServiceAccount) {
+        spec.authRole = authRole;
+    }
+    if (disableAll) {
+        spec.disableAll = disableAll;
+    }
+    if (qualityOfServiceTier !== undefined) {
+        spec.qualityOfService = {
+            tier: qualityOfServiceTier
+        };
+    }
+    if (maxParallelism !== undefined) {
+        spec.maxParallelism = maxParallelism;
+    }
+    return postAdminEntity<
         Admin.IExecutionCreateRequest,
         Admin.ExecutionCreateResponse
     >(
@@ -121,15 +149,7 @@ export const createWorkflowExecution = (
             data: {
                 project,
                 domain,
-                spec: {
-                    authRole,
-                    inputs,
-                    launchPlan,
-                    metadata: {
-                        referenceExecution,
-                        principal: defaultExecutionPrincipal
-                    }
-                }
+                spec
             },
             path: endpointPrefixes.execution,
             requestMessageType: Admin.ExecutionCreateRequest,
@@ -137,6 +157,7 @@ export const createWorkflowExecution = (
         },
         config
     );
+};
 
 /** Submits a request to terminate a WorkflowExecution by id */
 export const terminateWorkflowExecution = (

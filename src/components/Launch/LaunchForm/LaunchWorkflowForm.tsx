@@ -1,4 +1,9 @@
-import { DialogContent } from '@material-ui/core';
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    DialogContent
+} from '@material-ui/core';
 import { getCacheKey } from 'components/Cache/utils';
 import * as React from 'react';
 import { formStrings } from './constants';
@@ -14,11 +19,16 @@ import {
     LaunchWorkflowFormProps
 } from './types';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
+import { isEnterInputsState } from './utils';
+import { LaunchRoleInput } from './LaunchRoleInput';
+import { LaunchFormAdvancedInputs } from './LaunchFormAdvancedInputs';
 
 /** Renders the form for initiating a Launch request based on a Workflow */
 export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     const {
         formInputsRef,
+        roleInputRef,
+        advancedOptionsRef,
         state,
         service,
         workflowSourceSelectorState
@@ -96,6 +106,33 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     state={baseState}
                     variant="workflow"
                 />
+                <Accordion className={styles.noBorder}>
+                    <AccordionSummary
+                        classes={{
+                            root: styles.summaryWrapper,
+                            content: styles.advancedOptions
+                        }}
+                    >
+                        Advanced options
+                    </AccordionSummary>
+                    <AccordionDetails classes={{ root: styles.detailsWrapper }}>
+                        {isEnterInputsState(baseState) ? (
+                            <LaunchRoleInput
+                                initialValue={state.context.defaultAuthRole}
+                                ref={roleInputRef}
+                                showErrors={state.context.showErrors}
+                            />
+                        ) : null}
+                        <LaunchFormAdvancedInputs
+                            ref={advancedOptionsRef}
+                            spec={{
+                                disableAll: state.context.disableAll,
+                                maxParallelism: state.context.maxParallelism,
+                                qualityOfService: state.context.qualityOfService
+                            }}
+                        />
+                    </AccordionDetails>
+                </Accordion>
             </DialogContent>
             <LaunchFormActions
                 state={baseState}

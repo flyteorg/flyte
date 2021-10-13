@@ -16,15 +16,18 @@ import {
     workflowLaunchMachine,
     WorkflowLaunchTypestate
 } from './launchMachine';
-import { validate } from './services';
+import { validate as baseValidate } from './services';
 import {
     LaunchFormInputsRef,
+    LaunchRoleInputRef,
+    LaunchAdvancedOptionsRef,
     LaunchWorkflowFormProps,
     LaunchWorkflowFormState,
     ParsedInput
 } from './types';
 import { useWorkflowSourceSelectorState } from './useWorkflowSourceSelectorState';
 import { getUnsupportedRequiredInputs } from './utils';
+import { correctInputErrors } from './constants';
 
 async function loadLaunchPlans(
     { listLaunchPlans }: APIContextValue,
@@ -155,6 +158,8 @@ async function loadInputs(
 async function submit(
     { createWorkflowExecution }: APIContextValue,
     formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>,
+    advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>,
     { launchPlan, referenceExecutionId, workflowVersion }: WorkflowLaunchContext
 ) {
     if (!launchPlan) {
@@ -166,11 +171,25 @@ async function submit(
     if (formInputsRef.current === null) {
         throw new Error('Unexpected empty form inputs ref');
     }
+    // if (roleInputRef.current === null) {
+    //     throw new Error('Unexpected empty role input ref');
+    // }
+    // if (advancedOptionsRef.current === null) {
+    //     throw new Error('Unexpected empty advanced options ref');
+    // }
+
+    const authRole = roleInputRef.current?.getValue();
     const literals = formInputsRef.current.getValues();
+    const { disableAll, qualityOfService, maxParallelism } =
+        advancedOptionsRef.current?.getValues() || {};
     const launchPlanId = launchPlan.id;
     const { domain, project } = workflowVersion;
 
     const response = await createWorkflowExecution({
+        authRole,
+        disableAll,
+        qualityOfServiceTier: qualityOfService?.tier,
+        maxParallelism,
         domain,
         launchPlanId,
         project,
@@ -185,16 +204,44 @@ async function submit(
     return newExecutionId;
 }
 
+async function validate(
+    formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>,
+    advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>
+) {
+    if (roleInputRef.current === null) {
+        throw new Error('Unexpected empty role input ref');
+    }
+
+    // if (!roleInputRef.current.validate()) {
+    //     throw new Error(correctInputErrors);
+    // }
+    return baseValidate(formInputsRef);
+}
+
 function getServices(
     apiContext: APIContextValue,
-    formInputsRef: RefObject<LaunchFormInputsRef>
+    formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>,
+    advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>
 ) {
     return {
         loadWorkflowVersions: partial(loadWorkflowVersions, apiContext),
         loadLaunchPlans: partial(loadLaunchPlans, apiContext),
         loadInputs: partial(loadInputs, apiContext),
-        submit: partial(submit, apiContext, formInputsRef),
-        validate: partial(validate, formInputsRef)
+        submit: partial(
+            submit,
+            apiContext,
+            formInputsRef,
+            roleInputRef,
+            advancedOptionsRef
+        ),
+        validate: partial(
+            validate,
+            formInputsRef,
+            roleInputRef,
+            advancedOptionsRef
+        )
     };
 }
 
@@ -209,18 +256,30 @@ export function useLaunchWorkflowFormState({
     // These values will be used to auto-select items from the workflow
     // version/launch plan drop downs.
     const {
+        authRole: defaultAuthRole,
         launchPlan: preferredLaunchPlanId,
         workflowId: preferredWorkflowId,
-        values: defaultInputValues
+        values: defaultInputValues,
+        disableAll,
+        maxParallelism,
+        qualityOfService
     } = initialParameters;
 
     const apiContext = useAPIContext();
     const formInputsRef = useRef<LaunchFormInputsRef>(null);
+    const roleInputRef = useRef<LaunchRoleInputRef>(null);
+    const advancedOptionsRef = useRef<LaunchAdvancedOptionsRef>(null);
 
-    const services = useMemo(() => getServices(apiContext, formInputsRef), [
-        apiContext,
-        formInputsRef
-    ]);
+    const services = useMemo(
+        () =>
+            getServices(
+                apiContext,
+                formInputsRef,
+                roleInputRef,
+                advancedOptionsRef
+            ),
+        [apiContext, formInputsRef, roleInputRef, advancedOptionsRef]
+    );
 
     const [state, sendEvent, service] = useMachine<
         WorkflowLaunchContext,
@@ -230,11 +289,15 @@ export function useLaunchWorkflowFormState({
         ...defaultStateMachineConfig,
         services,
         context: {
+            defaultAuthRole,
             defaultInputValues,
             preferredLaunchPlanId,
             preferredWorkflowId,
             referenceExecutionId,
-            sourceId
+            sourceId,
+            disableAll,
+            maxParallelism,
+            qualityOfService
         }
     });
 
@@ -351,7 +414,9 @@ export function useLaunchWorkflowFormState({
     }, [service, sendEvent]);
 
     return {
+        advancedOptionsRef,
         formInputsRef,
+        roleInputRef,
         state,
         service,
         workflowSourceSelectorState

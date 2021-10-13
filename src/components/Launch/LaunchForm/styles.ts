@@ -1,6 +1,9 @@
 import { Theme } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import { smallFontSize } from 'components/Theme/constants';
+import {
+    interactiveTextColor,
+    smallFontSize
+} from 'components/Theme/constants';
 
 export const useStyles = makeStyles((theme: Theme) => ({
     footer: {
@@ -14,7 +17,8 @@ export const useStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     inputsSection: {
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
+        maxHeight: theme.spacing(90)
     },
     inputLabel: {
         color: theme.palette.text.hint,
@@ -28,5 +32,25 @@ export const useStyles = makeStyles((theme: Theme) => ({
     sectionHeader: {
         marginBottom: theme.spacing(1),
         marginTop: theme.spacing(1)
+    },
+    advancedOptions: {
+        color: interactiveTextColor,
+        justifyContent: 'flex-end'
+    },
+    noBorder: {
+        '&:before': {
+            height: 0
+        }
+    },
+    summaryWrapper: {
+        padding: 0
+    },
+    detailsWrapper: {
+        paddingLeft: 0,
+        paddingRight: 0,
+        flexDirection: 'column',
+        '& section': {
+            flex: 1
+        }
     }
 }));

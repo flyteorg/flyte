@@ -83,3 +83,17 @@ export const blobUriHelperText = '(required) location of the data';
 export const blobFormatHelperText = '(optional) csv, parquet, etc...';
 export const correctInputErrors =
     'Some inputs have errors. Please correct them before submitting.';
+
+export const qualityOfServiceTier = {
+    UNDEFINED: 0,
+    HIGH: 1,
+    MEDIUM: 2,
+    LOW: 3
+};
+
+export const qualityOfServiceTierLabels = {
+    [qualityOfServiceTier.UNDEFINED]: 'Undefined',
+    [qualityOfServiceTier.HIGH]: 'High',
+    [qualityOfServiceTier.MEDIUM]: 'Medium',
+    [qualityOfServiceTier.LOW]: 'Low'
+};

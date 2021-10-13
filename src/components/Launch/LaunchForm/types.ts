@@ -54,6 +54,10 @@ export interface WorkflowInitialLaunchParameters
     extends BaseInitialLaunchParameters {
     launchPlan?: Identifier;
     workflowId?: WorkflowId;
+    authRole?: Admin.IAuthRole;
+    disableAll?: boolean | null;
+    maxParallelism?: number | null;
+    qualityOfService?: Core.IQualityOfService | null;
 }
 export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
     workflowId: NamedEntityIdentifier;
@@ -85,6 +89,10 @@ export interface LaunchRoleInputRef {
     getValue(): Admin.IAuthRole;
     validate(): boolean;
 }
+export interface LaunchAdvancedOptionsRef {
+    getValues(): Admin.IExecutionSpec;
+    validate(): boolean;
+}
 
 export interface WorkflowSourceSelectorState {
     launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
@@ -110,7 +118,9 @@ export interface TaskSourceSelectorState {
 }
 
 export interface LaunchWorkflowFormState {
+    advancedOptionsRef: React.RefObject<LaunchAdvancedOptionsRef>;
     formInputsRef: React.RefObject<LaunchFormInputsRef>;
+    roleInputRef: React.RefObject<LaunchRoleInputRef>;
     state: State<
         WorkflowLaunchContext,
         WorkflowLaunchEvent,
