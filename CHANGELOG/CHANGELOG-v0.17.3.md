@@ -9,12 +9,19 @@
 
 
 ## flytekit
-1.  Tuples are now supported as the return type
-2.  Duplicate tasks names are now caught at serialization time.
-3.  Support flag to specify config file
-4.  Bug fixes:
-    1.  Configuration generated via `flyte-cli setup-config --insecure` no longer raise an error
-    2.  Improved detection of remote files
+
+1.  Continued changes to the FlyteRemote interface, including:
+    - `remote.sync` now operates on the object in-place.
+    - A `sync_nodes` argument has been added to the `remote.sync` call - by default it's True but set it to False if you want to only render inputs/outputs at the top level (rather than at every node within the execution).
+    - The `sync` call on `FlyteWorkflowExecution` objects was removed (it was already deprecated and a noop but if you were calling it, you'll need to remove it.)
+    - gRPC credentials to FlyteRemote
+2.  Improved typing errors when scanning user code. Added better type inference to some of the transformers.
+3.  Plugin tests have been moved into each individual plugin's `test` folder.
+4.  Snowflake task has been added
+5.  Fixes to SQLAlchemy task secrets handling
+6.  Modin schema transformer
+
+Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/tag/v0.23.0) for the full list and more details.
 
 
 ## UI
