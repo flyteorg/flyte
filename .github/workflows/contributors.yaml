@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: GitHub Contributors Action
-        uses: hyperledger-tooling/github-contributors-action@v0.0.1
+        uses: hyperledger-tooling/github-contributors-action@main
         env:
           GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          SOURCE_GITHUB_REPOSITORY: flyteorg/flyte
+          SOURCE_GITHUB_REPOSITORY: flyteorg
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
           CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->
           INPUT_TEMPLATE_FILE: ./assets/contributor-template.md
