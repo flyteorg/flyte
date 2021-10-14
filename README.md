@@ -64,7 +64,7 @@
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable, and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type-safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI, and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
+Flyte is more than a workflow engine -- it uses `workflow` as a core concept and `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
 producer-consumer order creates a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out-of-the-box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
@@ -134,7 +134,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - **gRPC / REST** interface to define and execute tasks and workflows
 - **Type safe** construction of pipelines -- each task has an interface that is characterized by its input and output, so illegal construction of pipelines fails during declaration rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.
-- Memorization and Lineage tracking
+- Memoization and Lineage tracking
 - Provides logging and observability
 - Workflow features:
   - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
@@ -151,7 +151,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
   - Versioned data, code, and models
   - Automatically tracked executions
   - Declarative pipelines
-- **Multi cloud support** (AWS, GCP, and others)
+- **Multi-cloud support** (AWS, GCP, and others)
 - Extensible core, modularized, and deep observability
 - No single point of failure and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
