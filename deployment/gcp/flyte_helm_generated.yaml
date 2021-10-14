@@ -1905,6 +1905,8 @@ kind: Ingress
 metadata:
   name: flyte
   namespace: flyte
+  annotations: 
+    nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
     - http:
