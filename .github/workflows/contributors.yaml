@@ -31,7 +31,7 @@ jobs:
           committer: Flyte-Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
-          branch: flyte-bot-update-releases
+          branch: auto-update-contributors
           delete-branch: true
           title: 'auto-update contributors'
           labels: contibutors
