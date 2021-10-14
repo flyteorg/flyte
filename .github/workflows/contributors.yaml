@@ -1,8 +1,8 @@
 name: Contributors
 
 on:
-  # schedule:
-  #   - cron: '0 12 * * 1' # At 12 noon on Monday.
+  schedule:
+    - cron: '0 12 * * 1' # At 12 noon on Monday.
   push:
     branches: 
       - contributors-action
@@ -28,10 +28,11 @@ jobs:
         with:
           token: ${{ secrets.FLYTE_BOT_PAT }}
           commit-message: '[auto-update-contributors] update all-contributors'
-          committer: Flyte-Bot <admin@flyte.org>
+          committer: Flyte Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
           branch: auto-update-contributors
+          base: contributors-action
           delete-branch: true
           title: 'auto-update contributors'
           labels: contibutors
