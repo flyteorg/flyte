@@ -7,7 +7,6 @@ on:
 jobs:
   contributors:
     runs-on: ubuntu-latest
-    if: ${{ !startsWith( github.event.head_commit.message , '[auto-update-contributors]' ) }}
     steps:
       - uses: actions/checkout@v2
       - name: GitHub Contributors Action
@@ -29,7 +28,7 @@ jobs:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
           branch: auto-update-contributors
-          base: contributors-action
+          base: master
           delete-branch: true
           title: 'auto-update contributors'
           labels: auto-update-contributors
