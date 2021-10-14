@@ -123,6 +123,20 @@ flyteconsole:
               app.kubernetes.io/name: flyteconsole
           topologyKey: kubernetes.io/hostname
 
+# --
+# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+workflow_scheduler:
+  enabled: true
+  type: native
+
+# --
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+  enabled: false
+
+
 #
 # REDIS
 #
@@ -339,6 +353,7 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "4000Mi"
             - defaultIamRole:
+                # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
                 value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
         - staging:
             - projectQuotaCpu:
@@ -346,13 +361,15 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
+                # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
                 value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
         - development:
             - projectQuotaCpu:
-                value: "0.7"
+                value: "2"
             - projectQuotaMemory:
-                value: "150Mi"
+                value: "3000Mi"
             - defaultIamRole:
+                # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
                 value: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
 
   templates:
@@ -378,7 +395,8 @@ cluster_resource_manager:
           annotations:
             # Needed for gcp workload identity to function
             # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-            iam.gke.io/gcp-service-account: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+            # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
+            iam.gke.io/gcp-service-account: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
 
     - key: ab_project_resource_quota
       value: |
@@ -431,7 +449,8 @@ cluster_resource_manager:
           annotations:
             # Needed for gcp workload identity to function
             # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-            iam.gke.io/gcp-service-account: flyte-930@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+            # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
+            iam.gke.io/gcp-service-account: flyte-clusterresourcs@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
 
     # -- Template for spark role binding
     - key: af_spark_role_binding
