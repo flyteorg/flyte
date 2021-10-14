@@ -112,6 +112,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
 - [Wolt](https://www.wolt.com)
+- [Blackshark.ai](https://blackshark.ai/)
 
 <html>
 <h2 id="features"> 
