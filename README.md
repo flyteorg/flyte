@@ -24,6 +24,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/flyteorg/flytectl)](https://goreportcard.com/report/github.com/flyteorg/flytectl)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytectl.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytectl/latest.svg?style=plastic)
+[![Slack](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://slack.flyte.org)
 
 FlyteCTL was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
 
