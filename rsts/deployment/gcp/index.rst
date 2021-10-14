@@ -58,8 +58,8 @@ Create GCE Project
 ==================
 .. code-block::
 
-  export GCP_PROJECT=<my-project>
-  gcloud projects create $GCP_PROJECT --organization $ORG_ID
+  export PROJECT-ID=<my-project>
+  gcloud projects create $PROJECT-ID --organization $ORG_ID
 
 Of course you can also use an existing project if your account has appropriate permissions to create the required resources.
 
@@ -67,7 +67,7 @@ Set project <my-project> as default in gcloud or use gcloud init to set this def
 
 .. code-block::
 
-  gcloud config set project ${GCP_PROJECT}
+  gcloud config set project ${PROJECT-ID}
 
 We assume that for the <my-project> has been set as default for all gcloud commands below.
 
@@ -111,11 +111,11 @@ This creates the GSA's which would be used as mapped to the KSA(kubernetes servi
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role "roles/iam.workloadIdentityUser" \
-    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
     --role "roles/cloudsql.client" \
     --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flyteadmin]" \
-    gsa-flyteadmin@${GCP_PROJECT}.iam.gserviceaccount.com
+    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flyteadmin]" \
+    gsa-flyteadmin@${PROJECT-ID}.iam.gserviceaccount.com
 
 * Add IAM policy binding for datacatalog GSA.It requires permissions to get bucket, create/delete/update objects in the bucket, connecting to cloud sql and also workload identity user role.
 
@@ -123,11 +123,11 @@ This creates the GSA's which would be used as mapped to the KSA(kubernetes servi
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role "roles/iam.workloadIdentityUser" \
-    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
     --role "roles/cloudsql.client" \
     --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/datacatalog]" \
-    gsa-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
+    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/datacatalog]" \
+    gsa-datacatalog@${PROJECT-ID}.iam.gserviceaccount.com
 
 * Add IAM policy binding for flytepropeller GSA.It requires permissions to get bucket, create/delete/update objects in the bucket, create/update/delete kubernetes objects in the cluster and also workload identity user role.
 
@@ -135,11 +135,11 @@ This creates the GSA's which would be used as mapped to the KSA(kubernetes servi
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
-    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
     --role "roles/container.developer" \
     --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flytepropeller]" \
-    gsa-flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
+    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flytepropeller]" \
+    gsa-flytepropeller@${PROJECT-ID}.iam.gserviceaccount.com
 
 * Add IAM policy binding for cluster resource manager GSA.It requires permissions to get bucket, create/delete/update objects in the bucket and also workload identity user role.
 
@@ -147,10 +147,10 @@ This creates the GSA's which would be used as mapped to the KSA(kubernetes servi
 
   gcloud iam service-accounts add-iam-policy-binding \
     --role roles/iam.workloadIdentityUser \
-    --role "projects/${GCP_PROJECT}/roles/StorageBucketGet" \
+    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
     --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${GCP_PROJECT}.svc.id.goog[flyte/flytepropeller]" \
-    flyte-clusterresources@${GCP_PROJECT}.iam.gserviceaccount.com
+    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flytepropeller]" \
+    flyte-clusterresources@${PROJECT-ID}.iam.gserviceaccount.com
 
 
 Create GKE Cluster
@@ -159,14 +159,14 @@ Creates GKE cluster with VPC-native networking and workload identity enabled.
 Browse to the gcloud console and Kubernetes Engine tab to start creating the k8s cluster.
 
 Ensure that VPC native traffic routing is enabled and under Security enable Workload identity and use project default pool
-which would be `${GCP_PROJECT}.svc.id.goog`
+which would be `${PROJECT-ID}.svc.id.goog`
 
 Recommended way is to create it from the console.
 
 .. code-block::
 
   gcloud container clusters create <my-flyte-cluster> \
-    --workload-pool=${GCP_PROJECT}.svc.id.goog
+    --workload-pool=${PROJECT-ID}.svc.id.goog
     --region us-west1 \
     --num-nodes 6
 
@@ -196,19 +196,20 @@ Follow this `link <https://console.cloud.google.com/sql/choose-instance-engine>`
 * Select the Zone based on your availability requirements.
 * Select customize your instance and enable Private IP in Connections tab. This is required for the private communication between the GKE apps and cloud SQL instance. Follow the steps to create the private connection (default)
 * Create the SQL instance
-* After creation of the instance get the private IP of the database <PRIVATE_IP>
-* Create flyteadmin database and flyteadmin user account on that instance with <DB_PASSWORD>
+* After creation of the instance get the private IP of the database <CLOUD-SQL-IP>
+* Create flyteadmin database and flyteadmin user account on that instance with <DBPASSWORD>
 * Verify the connectivity to the DB from GKE cluster
    * Create a testdb namespace
 
    .. code-block::
 
       kubectl create ns test
+
    * Verify the connectivity using a postgres client
 
    .. code-block::
 
-      kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' --namespace testdb --image docker.io/bitnami/postgresql:11.7.0-debian-10-r9 --env="PGPASSWORD=<DB_INSTANCE_PASSWD>" --command -- psql testdb --host <PRIVATE_IP> -U postgres -d flyteadmin -p 5432
+      kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' --namespace testdb --image docker.io/bitnami/postgresql:11.7.0-debian-10-r9 --env="PGPASSWORD=<DBPASSWORD>" --command -- psql testdb --host <CLOUD-SQL-IP> -U flyteadmin -d flyteadmin -p 5432
 
 Recommended way is to create it from the console.
 
@@ -253,7 +254,7 @@ Alternative is to use certificate manager
 
 * Create cert issuer
 
-.. code-block:: 
+.. code-block::
 
    apiVersion: cert-manager.io/v1alpha2
    kind: Issuer
@@ -262,7 +263,7 @@ Alternative is to use certificate manager
    spec:
      acme:
        server: https://acme-v02.api.letsencrypt.org/directory
-       email: pmahindrakar@union.ai
+       email: issue-email-id
        privateKeySecretRef:
          name: letsencrypt-production
        solvers:
@@ -288,25 +289,19 @@ Ingress
   helm install nginx-ingress ingress-nginx/ingress-nginx
 
 
-* Get the ingress IP to be used for updating the zone and getting the name server records for DNS
-
-.. code-block:: bash
-
-  kubectl get ingress -n flyte
-
 Create GCS Bucket
 =================
-Create <BUCKET-NAME> with uniform access
+Create <BUCKETNAME> with uniform access
 
 .. code-block:: bash
 
-  gsutil mb -b on -l us-west1 gs://my-flyte-bucket/
+  gsutil mb -b on -l us-west1 gs://<BUCKETNAME>/
 
 Add access permission for the following principals
-* gsa-flytepropeller@${GCP_PROJECT}.iam.gserviceaccount.com
-* gsa-datacatalog@${GCP_PROJECT}.iam.gserviceaccount.com
-* gsa-flyteadmin@f${GCP_PROJECT}.iam.gserviceaccount.com
-* gsa-flyte-clusterresources@${GCP_PROJECT}.iam.gserviceaccount.com
+* gsa-flytepropeller@${PROJECT-ID}.iam.gserviceaccount.com
+* gsa-datacatalog@${PROJECT-ID}.iam.gserviceaccount.com
+* gsa-flyteadmin@f${PROJECT-ID}.iam.gserviceaccount.com
+* gsa-flyte-clusterresources@${PROJECT-ID}.iam.gserviceaccount.com
 
 Time for Helm
 =============
@@ -320,8 +315,12 @@ Installing Flyte
    git clone https://github.com/flyteorg/flyte
 
 #. Update values
-
-TODO
+   <RELEASE-NAME> to be used as prefix for ssl certificate secretName
+   <PROJECT-ID> of your GCP project
+   <CLOUD-SQL-IP> private IP of cloud sql instance
+   <DBPASSWORD> of the flyteadmin user created for the cloud sql instance
+   <BUCKETNAME> of the GCS bucket created
+   <HOSTNAME> DNS name of the flyte deployment
 
 #. Update helm dependencies
 
@@ -343,6 +342,13 @@ TODO
 .. code-block:: bash
 
    kubectl get pods -n flyte
+
+
+# Get the ingress IP to be used for updating the zone and getting the name server records for DNS
+
+.. code-block:: bash
+
+  kubectl get ingress -n flyte
 
 Uninstalling Flyte
 ------------------
@@ -369,9 +375,9 @@ Flyte can be accessed using the UI console or your terminal
 
    $ kubectl -n flyte get ingress
 
-   NAME         CLASS    HOSTS   ADDRESS                                                       PORTS   AGE
-   flyte        <none>   *       k8s-flyte-8699360f2e-1590325550.us-east-2.elb.amazonaws.com   80      3m50s
-   flyte-grpc   <none>   *       k8s-flyte-8699360f2e-1590325550.us-east-2.elb.amazonaws.com   80      3m49s
+   NAME         CLASS    HOSTS                                                                        ADDRESS                                                       PORTS   AGE
+   flyte        <none>   dev.gcp.example.com       k8s-flyte-8699360f2e-1590325550.us-east-2.elb.amazonaws.com   80      3m50s
+   flyte-grpc   <none>   dev.gcp.example.com       k8s-flyte-8699360f2e-1590325550.us-east-2.elb.amazonaws.com   80      3m49s
 
 <FLYTE-ENDPOINT> = Value in ADDRESS column and both will be the same as the same port is used for both GRPC and HTTP.
 
@@ -431,3 +437,4 @@ eg: to check for run-migrations init container do this.
      show-source: true
      level: 6
 
+* In case you get new ingress IP for your flyte deployment, you would need to flush DNS cache using `this <https://developers.google.com/speed/public-dns/cache>`__
