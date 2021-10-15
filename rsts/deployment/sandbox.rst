@@ -75,7 +75,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. prompt:: bash $
 
-          docker run --rm --privileged -p 30081:30081 -p 30084:30084 cr.flyte.org/flyteorg/flyte-sandbox
+          docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30087:30087 cr.flyte.org/flyteorg/flyte-sandbox
 
 .. tabbed:: k3d
 
