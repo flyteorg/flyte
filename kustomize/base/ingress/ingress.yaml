@@ -5,6 +5,7 @@ metadata:
   namespace: flyte
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
     - http:
