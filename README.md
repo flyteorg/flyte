@@ -103,6 +103,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 **NOTE**
 Please maintain an alphabetical order in the following list
 
+- [appliedAI Initiative](https://appliedai.de)
 - [Blackshark.ai](https://blackshark.ai/)
 - [Freenome](https://www.freenome.com/)
 - [Gojek](https://www.gojek.io/)
