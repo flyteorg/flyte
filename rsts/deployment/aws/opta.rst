@@ -17,8 +17,9 @@ be done independently from the sandbox deployment:
 
 A Flyte user may provision and orchestrate this setup by themselves, but the Flyte team has partnered with the
 `Opta <https://github.com/run-x/opta>`_ team to create a streamlined production deployment strategy for AWS with
-ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta>`_. The following
-documentation specifies how to use and further configure them.
+ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta>`_. The following demo and documentation specifies how to use and further configure them.
+
+.. youtube:: CMp04-mdtQQ
 
 Deploying Opta Environment and Service for Flyte
 ************************************************
