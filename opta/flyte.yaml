@@ -23,12 +23,12 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
+    #      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
     links:
-      - s3: [ "write" ]
+      - s3: ["write"]
       - notifcationsQueue
       - schedulesQueue
       - topic
@@ -36,12 +36,12 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
+    #      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
     links:
-      - s3: [ "write" ]
+      - s3: ["write"]
   - type: helm-chart
     chart: "../helm" # NOTE: relative path to chart
     namespace: flyte
@@ -71,6 +71,7 @@ modules:
           host: "{parent.domain}"
           annotations:
             kubernetes.io/ingress.class: "nginx"
+            nginx.ingress.kubernetes.io/app-root: /console
         databaseSecret:
           secretManifest:
             stringData:
