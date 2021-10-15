@@ -108,6 +108,7 @@ Please maintain an alphabetical order in the following list
 - [Freenome](https://www.freenome.com/)
 - [Gojek](https://www.gojek.io/)
 - [Intel](https://www.intel.com/)
+- [LatchBio](https://www.latch.bio/)
 - [Lyft](https://www.lyft.com/)
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
 - [RunX.dev](https://runx.dev/)
