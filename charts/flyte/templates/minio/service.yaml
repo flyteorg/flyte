@@ -14,11 +14,11 @@ spec:
   {{- end }}
   ports:
   - name: minio
-    nodePort: 30084
     port: 9000
     protocol: TCP
     targetPort: minio
   - name: minio-console
+    nodePort: 30084
     port: 9001
     protocol: TCP
     targetPort: minio-console
