@@ -19,6 +19,7 @@ spec:
     protocol: TCP
     targetPort: minio
   - name: minio-console
+    nodePort: 30087
     port: 9001
     protocol: TCP
     targetPort: minio-console
