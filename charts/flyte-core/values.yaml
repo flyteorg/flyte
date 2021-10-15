@@ -272,7 +272,8 @@ common:
     separateGrpcIngressAnnotations:
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
-    annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/app-root: /console
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname

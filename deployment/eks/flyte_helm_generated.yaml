@@ -1935,6 +1935,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
     - http:
@@ -2071,6 +2072,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/app-root: /console
     alb.ingress.kubernetes.io/backend-protocol-version: HTTP2
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
