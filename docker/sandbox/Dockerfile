@@ -62,7 +62,7 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 30081 30082 30084
+EXPOSE 30081 30082 30084 30087
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
 
@@ -88,6 +88,6 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 30081 30082 30084
+EXPOSE 30081 30082 30084 30087
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
