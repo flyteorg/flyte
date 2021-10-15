@@ -55,7 +55,7 @@ RFCs must be introduced as a `.md` (Markdown-format) file in a PR into the flyte
 ### The recommended path
 
 At Flyte, we have been using [HackMD](https://hackmd.io) to author RFCs, which is the preferred method. 
-RFCs may also be submitted directly to GitHub as a PR, or drafted as a Google Doc, which is reveiwed and then submitted as a PR. 
+RFCs may also be submitted directly to GitHub as a PR, or drafted as a Google Doc, which is reviewed and then submitted as a PR. 
 
 #### Why HackMD?
 
@@ -103,7 +103,7 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
 - Core language: Changes to FlyteIdl that change the wire-format in any way are considered significant changes that require revision and approval.
   
   Reviewers: At least one of [flyte core maintainers](https://github.com/orgs/flyteorg/teams/flyte-core-maintainers) and one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
-- General System: Changes to other repos that introduce signficant change of behavior or user-impacting features.
+- General System: Changes to other repos that introduce significant change of behavior or user-impacting features.
   
   Reviewer: At least one of [flyte maintainers](https://github.com/orgs/flyteorg/teams/flyte-maintainers/members).
 - CI-CD: Significant changes to CI-CD System that have impact across different repositories.

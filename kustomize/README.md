@@ -6,7 +6,7 @@ In brief, Kustomize allows composing a deployment yaml using multiple components
 a composed set of components that can be deployed to a [Single Kubernetes cluster](./base/single_cluster). This deployment configures various components using [Flyte Configuration
 system](todo).
 
-The *Single Cluster* configuration on its own is not deployable. But indiviudal [overlays](./overlays) are deployable. 
+The *Single Cluster* configuration on its own is not deployable. But individuals [overlays](./overlays) are deployable. 
 
 Refer to
 1. [Base Components](./base): If you want to build your own overlay start here
