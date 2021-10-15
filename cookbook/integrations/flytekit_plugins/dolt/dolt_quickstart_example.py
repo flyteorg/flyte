@@ -2,7 +2,10 @@
 Quickstart
 ----------
 
-In this example, we'll learn how to use ``DoltTable`` to annotate DataFrame inputs and outputs in the Flyte tasks.
+In this demo and following example, learn how to use ``DoltTable`` to annotate DataFrame inputs and outputs in the Flyte tasks.
+
+.. youtube:: TfBIuHYkyvU
+
 """
 # %%
 # First, let's import the libraries.
