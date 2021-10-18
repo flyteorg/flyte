@@ -1,5 +1,4 @@
 export REPOSITORY=flyte
-ROOT_DIR := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
