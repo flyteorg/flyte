@@ -11,15 +11,35 @@ import (
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	commonKf "github.com/kubeflow/common/pkg/apis/common/v1"
 	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
 	v1 "k8s.io/api/core/v1"
 )
 
 const (
 	TensorflowTaskType = "tensorflow"
+	MPITaskType        = "mpi"
 	PytorchTaskType    = "pytorch"
 )
 
+// ExtractMPICurrentCondition will return the first job condition for MPI
+func ExtractMPICurrentCondition(jobConditions []commonKf.JobCondition) (commonKf.JobCondition, error) {
+	if jobConditions != nil {
+		sort.Slice(jobConditions, func(i, j int) bool {
+			return jobConditions[i].LastTransitionTime.Time.After(jobConditions[j].LastTransitionTime.Time)
+		})
+
+		for _, jc := range jobConditions {
+			if jc.Status == v1.ConditionTrue {
+				return jc, nil
+			}
+		}
+	}
+
+	return commonKf.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
+}
+
+// ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
 func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
 	if jobConditions != nil {
 		sort.Slice(jobConditions, func(i, j int) bool {
@@ -36,6 +56,7 @@ func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.Jo
 	return commonOp.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
 }
 
+// GetPhaseInfo will return the phase of kubeflow job
 func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	switch currentCondition.Type {
@@ -55,6 +76,27 @@ func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 	return pluginsCore.PhaseInfoUndefined, nil
 }
 
+// GetMPIPhaseInfo will return the phase of MPI job
+func GetMPIPhaseInfo(currentCondition commonKf.JobCondition, occurredAt time.Time,
+	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	switch currentCondition.Type {
+	case commonKf.JobCreated:
+		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator"), nil
+	case commonKf.JobRunning:
+		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
+	case commonKf.JobSucceeded:
+		return pluginsCore.PhaseInfoSuccess(&taskPhaseInfo), nil
+	case commonKf.JobFailed:
+		details := fmt.Sprintf("Job failed:\n\t%v - %v", currentCondition.Reason, currentCondition.Message)
+		return pluginsCore.PhaseInfoRetryableFailure(flyteerr.DownstreamSystemError, details, &taskPhaseInfo), nil
+	case commonKf.JobRestarting:
+		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
+	}
+
+	return pluginsCore.PhaseInfoUndefined, nil
+}
+
+// GetLogs will return the logs for kubeflow job
 func GetLogs(taskType string, name string, namespace string,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
 	taskLogs := make([]*core.TaskLog, 0, 10)
@@ -94,6 +136,11 @@ func GetLogs(taskType string, name string, namespace string,
 		}
 		taskLogs = append(taskLogs, workerLog.TaskLogs...)
 	}
+
+	if taskType == MPITaskType || taskType == PytorchTaskType {
+		return taskLogs, nil
+	}
+
 	// get all parameter servers logs
 	for psReplicaIndex := int32(0); psReplicaIndex < psReplicasCount; psReplicaIndex++ {
 		psReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
