@@ -95,8 +95,8 @@ class Hyperparameters:
     ),
     cache=True,
     cache_version="0.2",
-    requests=Resources(mem="2Gi"),
-    limits=Resources(mem="2Gi"),
+    requests=Resources(mem="1Gi"),
+    limits=Resources(mem="1Gi"),
 )
 def estimate(data_dir: FlyteDirectory, hp: Hyperparameters, work_dir: FlyteDirectory) -> FlyteDirectory:
     # ================ #
