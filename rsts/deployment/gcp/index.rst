@@ -183,14 +183,14 @@ This creates the GSA's which would be mapped to the KSA(kubernetes service accou
     gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
 
    * flyte-clusterresources
-   Do the following for all project-domain combination of namespaces. Following example shows for flytesnacks-development namespace
+      Do the following for all project-domain combination of namespaces. Following example shows for flytesnacks-development namespace
 
-   .. code-block:: bash
+      .. code-block:: bash
 
-    gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:flyte-gcp.svc.id.goog[flytesnacks-development/default]” \
-    flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+       gcloud iam service-accounts add-iam-policy-binding \
+       --role roles/iam.workloadIdentityUser \
+       --member "serviceAccount:flyte-gcp.svc.id.goog[flytesnacks-development/default]” \
+       flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
 
 
 Create GKE Cluster
@@ -460,79 +460,80 @@ Running workflows
 =================
 
 * Docker file changes
-Make sure the Dockerfile contains gcloud-sdk installation steps which is needed by flyte to upload the results
+   Make sure the Dockerfile contains gcloud-sdk installation steps which is needed by flyte to upload the results
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   # Install gcloud for GCP
-   RUN apt-get install curl --assume-yes
+      # Install gcloud for GCP
+      RUN apt-get install curl --assume-yes
 
-   RUN curl -sSL https://sdk.cloud.google.com | bash
-   ENV PATH $PATH:/root/google-cloud-sdk/bin
+      RUN curl -sSL https://sdk.cloud.google.com | bash
+      ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 
 * Serializing workflows
-For running the flytecookbook examples on GCP make sure you have right registry during serialization.
-Following example shows if you are using GCP container registry and us-central zone with project name flyte-gcp and repo name flyterep
+   For running the flytecookbook examples on GCP make sure you have right registry during serialization.
+   Following example shows if you are using GCP container registry and us-central zone with project name flyte-gcp and repo name flyterep
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   REGISTRY=us-central1-docker.pkg.dev/flyte-gcp/flyterepo make serialize
+      REGISTRY=us-central1-docker.pkg.dev/flyte-gcp/flyterepo make serialize
 
 * Uploading the image to registry
-Following example shows uploading cookbook core examples to gcp container registry. This step must be performed before performing registration of the workflows in flyte
+   Following example shows uploading cookbook core examples to gcp container registry. This step must be performed before performing registration of the workflows in flyte
 
-.. code-block:: bash
-   docker push us-central1-docker.pkg.dev/flyte-gcp/flyterepo/flytecookbook:core-2bd81805629e41faeaa25039a6e6abe847446356
+   .. code-block:: bash
+
+      docker push us-central1-docker.pkg.dev/flyte-gcp/flyterepo/flytecookbook:core-2bd81805629e41faeaa25039a6e6abe847446356
 
 * Registering workflows
-Register workflows by pointing to the output folder for the serialization and providing version to use for the workflow through flytectl
+   Register workflows by pointing to the output folder for the serialization and providing version to use for the workflow through flytectl
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   flytectl register file  /Users/<user-name>/flytesnacks/cookbook/core/_pb_output/*   -d development  -p flytesnacks --version v1
+      flytectl register file  /Users/<user-name>/flytesnacks/cookbook/core/_pb_output/*   -d development  -p flytesnacks --version v1
 
 * Generating exec spec file for workflow
-Following example generates exec spec file for the latest version of core.flyte_basics.lp.go_greet workflow part of flytecookbook examples
+   Following example generates exec spec file for the latest version of core.flyte_basics.lp.go_greet workflow part of flytecookbook examples
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   flytectl  get launchplan -p flytesnacks -d development core.flyte_basics.lp.go_greet --latest --execFile lp.yaml
+      flytectl  get launchplan -p flytesnacks -d development core.flyte_basics.lp.go_greet --latest --execFile lp.yaml
 
 * Modify  exec spec file of the  workflow for inputs
-Modify the exec spec file lp.yaml and modify the inputs for the workflow
+   Modify the exec spec file lp.yaml and modify the inputs for the workflow
 
-.. code-block:: yaml
+   .. code-block:: yaml
 
-   iamRoleARN: ""
-   inputs:
-       am: true
-       day_of_week: "Sunday"
-       number: 5
-   kubeServiceAcct: ""
-   targetDomain: ""
-   targetProject: ""
-   version: v1
-   workflow: core.flyte_basics.lp.go_greet
+      iamRoleARN: ""
+      inputs:
+          am: true
+          day_of_week: "Sunday"
+          number: 5
+      kubeServiceAcct: ""
+      targetDomain: ""
+      targetProject: ""
+      version: v1
+      workflow: core.flyte_basics.lp.go_greet
 
 * Create execution using the exec spec file
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   flytectl create execution -p flytesnacks -d development --execFile lp.yaml
+      flytectl create execution -p flytesnacks -d development --execFile lp.yaml
 
-Sample O/P
+   Sample O/P
 
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   execution identifier project:"flytesnacks" domain:"development" name:"f12c787de18304f4cbe7"
+      execution identifier project:"flytesnacks" domain:"development" name:"f12c787de18304f4cbe7"
 
 * Get the execution details
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    flytectl get executions  -p flytesnacks -d development f12c787de18304f4cbe7
+       flytectl get executions  -p flytesnacks -d development f12c787de18304f4cbe7
 
 
 
@@ -541,20 +542,19 @@ Troubleshooting
 
 * If any pod is not coming up, then describe the pod and check which container or init-containers had an error.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   kubectl describe pod/<pod-instance> -n flyte
+      kubectl describe pod/<pod-instance> -n flyte
 
-Then check the logs for the container which failed.
-eg: to check for <init-container> init container do this.
+   Then check the logs for the container which failed.
+   eg: to check for <init-container> init container do this.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   kubectl logs -f <pod-instance> <init-container> -n flyte
+      kubectl logs -f <pod-instance> <init-container> -n flyte
 
 
 * Increasing log level for flytectl
-===================================
 
   Change your logger config to this:
 
