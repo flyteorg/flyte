@@ -42,7 +42,7 @@ help: ## Show help message
 # Helper to determine if a sandbox is up and running
 .PHONY: _requires-sandbox-up
 _requires-sandbox-up:
-ifeq ($(shell docker ps -f name=$(FLYTE_SANDBOX_NAME) --format={.ID}),)
+ifeq ($(shell docker ps -f name=$(FLYTE_SANDBOX_NAME) --format='{{.ID}}'),)
 	$(error Cluster has not been started! Use 'make start' to start a cluster)
 endif
 
