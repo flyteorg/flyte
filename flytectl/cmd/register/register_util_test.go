@@ -163,7 +163,7 @@ func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
-	assert.Equal(t, errors.New("only .tar and .tgz extension archives are supported"), err)
+	assert.Equal(t, errors.New("only .tar, .tar.gz and .tgz extension archives are supported"), err)
 	// Clean up the temp directory.
 	assert.Nil(t, os.RemoveAll(tmpDir), "unable to delete temp dir %v", tmpDir)
 }
