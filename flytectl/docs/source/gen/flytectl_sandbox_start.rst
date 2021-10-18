@@ -15,22 +15,27 @@ The Flyte Sandbox is a fully standalone minimal environment for running Flyte. p
 Start sandbox cluster without any source code
 ::
 
- bin/flytectl sandbox start
+ flytectl sandbox start
 	
 Mount your source code repository inside sandbox 
 ::
 
- bin/flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
+ flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
 Run specific version of flyte. flytectl sandbox only support flyte version available in Github release https://github.com/flyteorg/flyte/tags
 ::
 
- bin/flytectl sandbox start  --version=v0.14.0
+ flytectl sandbox start  --version=v0.14.0
 
-Note: Flytectl sandbox will only work for v0.10.0+
-	
+Note: Flytectl sandbox is only supported for Flyte versions > v0.10.0
+
+Specify a Flyte Sandbox compliant image with the registry. This is useful, in case you want to use an image from your registry.
+::
+
+  flytectl sandbox start --image docker.io/my-override:latest
+
 Usage
-	
+
 
 ::
 
@@ -42,8 +47,9 @@ Options
 ::
 
   -h, --help             help for start
+      --image string     Optional. Provide a fully qualified path to a Flyte compliant docker image.
       --source string    Path of your source code
-      --version string   Version of flyte. Only support v0.10.0+ flyte release
+      --version string   Version of flyte. Only supports flyte releases greater than v0.10.0
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
