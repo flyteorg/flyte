@@ -68,7 +68,8 @@ helm_upgrade: ## Upgrade helm charts
 docs:
 	cd script/generate_config && go run generate_config.go > ${ROOT_DIR}/rsts/deployment/cluster_config/config.rst
 	cd ${ROOT_DIR}
-	make -C rsts clean html SPHINXOPTS=-W
+	script/generate_config_docs.sh
+	make -C rsts clean html
 
 .PHONY: help
 help: SHELL := /bin/sh
