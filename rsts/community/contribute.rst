@@ -228,7 +228,7 @@ Output:
     * - `Repo <https://github.com/flyteorg/flyteconsole>`__
     * - **Purpose**: Admin Console
     * - **Language**: Typescript
-    * - **Guidelines**: Refer to the `Flyte Console Contribution Guide <https://github.com/flyteorg/flyteconsole/CONTRIBUTING.md>`__
+    * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteconsole/blob/master/README.rst>`__
 
 ``datacatalog``
 ***************
