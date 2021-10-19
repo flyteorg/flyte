@@ -155,42 +155,42 @@ This creates the GSA's which would be mapped to the KSA(kubernetes service accou
 
 * Allow the Kubernetes service account to impersonate the Google service account by creating an IAM policy binding between the two. This binding allows the Kubernetes Service account to act as the Google service account
 
-   * flyteadmin
+flyteadmin
 
-   .. code-block:: bash
+.. code-block:: bash
 
-    gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flyteadmin]” \
-    gsa-flyteadmin@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding \
+ --role roles/iam.workloadIdentityUser \
+ --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flyteadmin]” \
+ gsa-flyteadmin@flyte-gcp.iam.gserviceaccount.com
 
-   * flytepropeller
+flytepropeller
 
-   .. code-block:: bash
+.. code-block:: bash
 
-    gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flytepropeller]” \
-    gsa-flytepropeller@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding \
+ --role roles/iam.workloadIdentityUser \
+ --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flytepropeller]” \
+ gsa-flytepropeller@flyte-gcp.iam.gserviceaccount.com
 
-   * datacatalog
+datacatalog
 
-   .. code-block:: bash
+.. code-block:: bash
 
-    gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/datacatalog]” \
-    gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding \
+ --role roles/iam.workloadIdentityUser \
+ --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/datacatalog]” \
+ gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
 
-   * flyte-clusterresources
-      Do the following for all project-domain combination of namespaces. Following example shows for flytesnacks-development namespace
+flyte-clusterresources
+Do the following for all project-domain combination of namespaces. Following example shows for flytesnacks-development namespace
 
-      .. code-block:: bash
+.. code-block:: bash
 
-       gcloud iam service-accounts add-iam-policy-binding \
-       --role roles/iam.workloadIdentityUser \
-       --member "serviceAccount:flyte-gcp.svc.id.goog[flytesnacks-development/default]” \
-       flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding \
+ --role roles/iam.workloadIdentityUser \
+ --member "serviceAccount:flyte-gcp.svc.id.goog[flytesnacks-development/default]” \
+ flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
 
 
 Create GKE Cluster
@@ -351,14 +351,19 @@ Time for Helm
 
 Installing Flyte
 -----------------
-#. Clone the Flyte repo
+#. Add the flyte helm repo
 
 .. code-block:: bash
 
-   git clone https://github.com/flyteorg/flyte
+   helm repo add flyteorg https://flyteorg.github.io/flyte
+
+#. Download the gcp values file
+
+.. code-block:: bash
+
+   curl https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte/values-gcp.yaml >values-gcp.yaml
 
 #. Update values
-
 
 .. code-block::
 
@@ -369,6 +374,33 @@ Installing Flyte
    <BUCKETNAME> of the GCS bucket created
    <HOSTNAME> DNS name of the Flyte deployment
 
+Also update the PROJECT-ID in the cluster_resource_manager section in the values-gcp.yaml file. Following example show flyte-gcp project id being replaced
+
+.. code-block:: yaml
+  config:
+    cluster_resources:
+      customData:
+        - production:
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+            - defaultIamRole:
+                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+        - staging:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+        - development:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+            - defaultIamRole:
+                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
 #. Update helm dependencies
 
 .. code-block:: bash
@@ -380,8 +412,7 @@ Installing Flyte
 
 .. code-block:: bash
 
-   cd helm
-   helm install -n flyte -f values-gcp.yaml --create-namespace flyte .
+   helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte
 
 
 #. Verify all the pods have come up correctly
