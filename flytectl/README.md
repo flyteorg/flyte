@@ -26,7 +26,8 @@
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytectl/latest.svg?style=plastic)
 [![Slack](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://slack.flyte.org)
 
-FlyteCTL was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
+FlyteCTL was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang
+and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
 
 ## 🚀 Quick Start
 
@@ -38,11 +39,11 @@ FlyteCTL was designed as a portable and lightweight command-line interface to wo
         ```
     * Shell script
         ```bash
-        $ curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+        $ curl -sL https://ctl.flyte.org/install | bash
         ```
 2. (Optional) `flytectl upgrade` provides a general interface to upgrading FlyteCTL; run the command in the output
 
-3. Start sandbox using FlyteCTL 
+3. Start sandbox using FlyteCTL
     ```bash
     $ flytectl sandbox start 
     ```
@@ -59,7 +60,7 @@ FlyteCTL was designed as a portable and lightweight command-line interface to wo
     </h2>
 </html>
 
-You can find the detailed contribution guide [here](docs/source/contribute.rst). 
+You can find the detailed contribution guide [here](docs/source/contribute.rst).
 
 <html>
     <h2 id="file-an-issue"> 
@@ -67,4 +68,5 @@ You can find the detailed contribution guide [here](docs/source/contribute.rst).
     </h2>
 </html>
 
-Refer to the [issues](https://docs.flyte.org/en/latest/community/contribute.html#issues) section in the contribution guide if you'd like to file an issue.
+Refer to the [issues](https://docs.flyte.org/en/latest/community/contribute.html#issues) section in the contribution
+guide if you'd like to file an issue.
