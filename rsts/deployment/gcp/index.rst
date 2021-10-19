@@ -377,6 +377,7 @@ Installing Flyte
 Also update the PROJECT-ID in the cluster_resource_manager section in the values-gcp.yaml file. Following example show flyte-gcp project id being replaced
 
 .. code-block:: yaml
+
   config:
     cluster_resources:
       customData:
@@ -401,6 +402,7 @@ Also update the PROJECT-ID in the cluster_resource_manager section in the values
                 value: "3000Mi"
             - defaultIamRole:
                 value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+
 #. Update helm dependencies
 
 .. code-block:: bash
