@@ -351,7 +351,7 @@ minio:
     # -- Docker image for Minio deployment
     repository: ecr.flyte.org/bitnami/minio
     # -- Docker image tag
-    tag: 2021.9.18-debian-10-r1
+    tag: 2021.10.13-debian-10-r0
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Minio deployment
