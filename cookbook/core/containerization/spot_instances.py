@@ -39,9 +39,12 @@ Using Spot/Preemptible Instances
 # Setting Interruptible
 # ^^^^^^^^^^^^^^^^^^^^^
 # To run your workload on a spot/preemptible instance, you can set interruptible to ``True``. For example:
-# @task(cache_version='1', interruptible=True)
-# def add_one_and_print(value_to_print: int) -> int:
-#     return value_to_print + 1
+#
+# .. code-block:: python
+#
+#    @task(cache_version='1', interruptible=True)
+#    def add_one_and_print(value_to_print: int) -> int:
+#        return value_to_print + 1
 
 # %%
 # By setting this value, Flyte will schedule your task on an auto-scaling group (ASG) with only spot instances. 
