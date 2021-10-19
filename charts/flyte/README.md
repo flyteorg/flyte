@@ -199,12 +199,12 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | kubernetes-dashboard | object | `{"enabled":false}` |  KUBERNETES DASHBOARD |
-| minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/bitnami/minio","tag":"2021.9.18-debian-10-r1"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
+| minio | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ecr.flyte.org/bitnami/minio","tag":"2021.10.13-debian-10-r0"},"nodeSelector":{},"podAnnotations":{},"replicaCount":1,"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}},"service":{"annotations":{},"type":"ClusterIP"},"tolerations":[]}` |  MINIO SETTINGS |
 | minio.affinity | object | `{}` | affinity for Minio deployment |
 | minio.enabled | bool | `true` | - enable or disable Minio deployment installation |
 | minio.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | minio.image.repository | string | `"ecr.flyte.org/bitnami/minio"` | Docker image for Minio deployment |
-| minio.image.tag | string | `"2021.9.18-debian-10-r1"` | Docker image tag |
+| minio.image.tag | string | `"2021.10.13-debian-10-r0"` | Docker image tag |
 | minio.nodeSelector | object | `{}` | nodeSelector for Minio deployment |
 | minio.podAnnotations | object | `{}` | Annotations for Minio pods |
 | minio.replicaCount | int | `1` | Replicas count for Minio deployment |
