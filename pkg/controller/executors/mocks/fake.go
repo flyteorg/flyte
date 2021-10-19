@@ -7,7 +7,7 @@ import (
 
 func NewFakeKubeClient() *Client {
 	c := Client{}
-	c.On("GetClient").Return(fake.NewClientBuilder().WithRuntimeObjects().Build())
-	c.On("GetCache").Return(&informertest.FakeInformers{})
+	c.OnGetClient().Return(fake.NewClientBuilder().WithRuntimeObjects().Build())
+	c.OnGetCache().Return(&informertest.FakeInformers{})
 	return &c
 }

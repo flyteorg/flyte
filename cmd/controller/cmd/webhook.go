@@ -112,6 +112,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(safeMetricName(propellerCfg.LimitNamespace))
+	webhookScope := propellerScope.NewSubScope("webhook")
 
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, propellerCfg.ProfilerPort.Port, nil)
@@ -125,7 +126,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		limitNamespace = propellerCfg.LimitNamespace
 	}
 
-	secretsWebhook := webhook.NewPodMutator(cfg, propellerScope.NewSubScope("webhook"))
+	secretsWebhook := webhook.NewPodMutator(cfg, webhookScope)
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
 	err = createMutationConfig(ctx, kubeClient, secretsWebhook)
@@ -138,7 +139,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		CertDir:       cfg.CertDir,
 		Namespace:     limitNamespace,
 		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(),
+		ClientBuilder: executors.NewFallbackClientBuilder(webhookScope),
 	})
 
 	if err != nil {

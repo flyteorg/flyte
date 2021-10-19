@@ -1,4 +1,4 @@
-// Core Nodes Executor implementation
+// Package nodes contains the Core Nodes Executor implementation and a subpackage for every node kind
 // This module implements the core Nodes executor.
 // This executor is the starting point for executing any node in the workflow. Since Nodes in a workflow are composable,
 // i.e., one node may contain other nodes, the Node Handler is recursive in nature.
@@ -9,7 +9,7 @@
 // - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
 //         is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
 //          is purely a meta-workflow and can run other workflows
-// - SubWorkflow: This is one of the most important handlers. It can executes Workflows that are nested inside a workflow
+// - SubWorkflow: This is one of the most important handlers. It can execute Workflows that are nested inside a workflow
 // - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
 //                        file. Every Task is actually executed through the DynamicTaskHandler
 // - Branch Handler: This handler is used to execute branches
@@ -129,7 +129,7 @@ func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *eve
 		return fmt.Errorf("event recording attempt of with nil node Event ID")
 	}
 
-	logger.Infof(ctx, "Recording event p[%+v]", nodeEvent)
+	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.Phase.String())
 	err := c.nodeRecorder.RecordNodeEvent(ctx, nodeEvent, c.eventConfig)
 	if err != nil {
 		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
