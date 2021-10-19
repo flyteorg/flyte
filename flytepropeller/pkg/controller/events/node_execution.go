@@ -19,9 +19,9 @@ import (
 
 //go:generate mockery -all -output=mocks -case=underscore
 
-// Recorder for Node events
+// NodeEventRecorder records Node events
 type NodeEventRecorder interface {
-	// Records node execution events indicating the node has undergone a phase change and additional metadata.
+	// RecordNodeEvent records execution events indicating the node has undergone a phase change and additional metadata.
 	RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error
 }
 

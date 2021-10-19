@@ -197,7 +197,7 @@ func executeRootCmd(cfg *config2.Config) {
 	mgr, err := manager.New(kubecfg, manager.Options{
 		Namespace:     limitNamespace,
 		SyncPeriod:    &cfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(),
+		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
 	})
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to initialize controller run-time manager. Error: %v", err)
