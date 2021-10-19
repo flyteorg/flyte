@@ -49,10 +49,11 @@ def square(n: int) -> int:
 # %%
 # If in a subsequent code update, we update the signature of the task to return the original number along with the result, it'll automatically invalidate the cache (even though the cache version remains the same).
 #
-#   :py:func:`flytekit.task`
-#   @task(cache=True, cache_version="1.0")
-#   def square(n: int) -> (int, int):
-#       ...
+# .. code-block:: python
+#
+#    @task(cache=True, cache_version="1.0")
+#    def square(n: int) -> (int, int):
+#        ...
 
 # %%
 # .. note::
