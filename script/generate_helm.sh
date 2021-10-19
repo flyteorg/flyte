@@ -7,12 +7,18 @@ helm version
 # All the values files to be built
 DEPLOYMENT=${1:-sandbox eks gcp}
 
+# All the values files to be built
+CORE_DEPLOYMENT=${1:-eks gcp}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 helm dep update ${DIR}/../charts/flyte/
 
 for deployment in ${DEPLOYMENT}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+done
+
+for deployment in ${CORE_DEPLOYMENT}; do
+    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_core_generated.yaml
 done
 
 echo "Generating helm docs"
