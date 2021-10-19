@@ -65,17 +65,11 @@ Below you’ll find instructions that will hopefully guide you through how to co
     Refer to any repo in the cookbook directory to understand this better.
 
 2. Explain what the code does  
-3. Following are some documentation configuration-related changes (imagine you have added ``snowflake`` to the ``integrations/external_services`` folder):
-   
-   1. Update `conf.py <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/docs/conf.py>`__
+3. Update `conf.py <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/docs/conf.py>`__ (imagine you have added ``snowflake`` to the ``integrations/external_services`` folder):
    
       * Add the Python file names to the ``CUSTOM_FILE_SORT_ORDER`` list
       * Add ``../integrations/external_services/snowflake`` to ``example_dirs``
       * Add ``auto/integrations/external_services/snowflake`` to ``gallery_dirs``
-   2. Update `external_services.rst <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/docs/external_services.rst>`__ file
-   
-      * Add a new panel
-      * Update the toctree
 4. Verify if the code and documentation look as expected
    
    1. Learn about the documentation tools `here <https://docs.flyte.org/en/latest/community/contribute.html#documentation>`__

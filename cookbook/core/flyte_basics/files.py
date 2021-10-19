@@ -80,7 +80,7 @@ def rotate_one_workflow(in_image: JPEGImageFile) -> JPEGImageFile:
 if __name__ == "__main__":
     default_images = [
         "https://media.sketchfab.com/models/e13940161fb64746a4f6753f76abe886/thumbnails/b7e1ba951ffb46a4ad584ba8ae400d17/e9de09ac9c7941f1924bd384e74a5e2e.jpeg",
-        "https://upload.wikimedia.org/wikipedia/en/7/7e/Julia_0.4_0.6.png",
+        "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg",
     ]
     print(f"Running {__file__} main...")
     for index, each_image in enumerate(default_images):

@@ -29,11 +29,13 @@ Managing Python dependencies is hard. Flyte makes it easy to version and manage 
 The K8s Spark plugin brings all the benefits of containerization to Spark without needing to manage special Spark clusters.
 
 **Pros:**
+
 #. Extremely easy to get started; get complete isolation between workloads
 #. Every job runs in isolation and has its own virtual cluster — no more nightmarish dependency management!
 #. Flyte manages everything for you!
 
 **Cons:**
+
 #. Short running, bursty jobs are not a great fit because of the container overhead
 #. No interactive Spark capabilities are available with Flyte K8s Spark, which is more suited for running adhoc and scheduled jobs
 

@@ -24,10 +24,10 @@ representation format. An example of this is available in FlyteCookbook - :std:d
 
 For types that are not simply representable as JSON documents, Flytekit allows users to extends Flyte's type system and
 implement these types in Python. The user has to essentially implement a :py:class:`flytekit.extend.TypeTransformer`
-class to enable translation of the type from Users type to flyte understood types. As an example, instead of using
-:py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`_ to
-perform validation of an input or output dataframe. an example can be found
-`here <https://github.com/flyteorg/flytekit/blob/master/plugins/tests/pandera/test_wf.py#L9>`_.
+class to enable translation of the type from user type to Flyte-understood type. As an example, instead of using
+:py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`__ to
+perform validation of an input or output dataframe. An example can be found
+`here <https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/pandera_examples/basic_schema_example.html>`__.
 
 To extend the type system in flytekit refer to an illustrative example found at - :std:ref:`advanced_custom_types`.
 

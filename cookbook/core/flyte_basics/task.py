@@ -16,7 +16,7 @@ A task in Flytekit can be of two types:
 #. A task that does not have a Python function, e.g., an SQL query or some other portable task like Sagemaker prebuilt 
    algorithms, or something that just invokes an API 
 
-Flyte has multiple plugins for tasks, either a backend plugin (`Athena <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-athena/flytekitplugins/athena/task.py>`__) or a simple extension available within Flytekit (`Papermill <https://github.com/flyteorg/flytekit/blob/master/plugins/papermill/flytekitplugins/papermill/task.py>`__).
+Flyte has multiple plugins for tasks, either a backend plugin (`Athena <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-aws-athena/flytekitplugins/athena/task.py>`__).
 
 In this example, you will learn how to write and execute a ``Python function task``. Other types of tasks will be covered in the later sections.
 """

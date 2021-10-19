@@ -39,13 +39,16 @@ class CustomSorter(FileNameSortKey):
         "task.py",
         "basic_workflow.py",
         "imperative_wf_style.py",
+        "documented_workflow.py",
         "lp.py",
         "task_cache.py",
+        "reference_task.py",
         "files.py",
         "folders.py",
-        "named_outputs.py"
+        "named_outputs.py",
         # Control Flow
         "run_conditions.py",
+        "chain_tasks.py",
         "subworkflows.py",
         "dynamics.py",
         "map_task.py",
