@@ -32,7 +32,7 @@ golang
 
   .. prompt:: bash $
 
-      curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+      curl -sL https://ctl.flyte.org/install | bash
 
 **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
 
