@@ -18,14 +18,12 @@ spec:
       labels: {{ include "datacatalog.labels" . | nindent 8 }}
     spec:
       initContainers:
-        {{- if .Values.postgres.enabled }}
         - name: check-db-ready
           image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
           command:
             - sh
             - -c
             - until pg_isready -h {{ tpl .Values.db.datacatalog.database.host $ }} -p {{ .Values.db.datacatalog.database.port }}; do echo waiting for database; sleep 2; done;
-        {{- end }}
         - command:
             - datacatalog
             - --config

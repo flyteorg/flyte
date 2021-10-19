@@ -1335,6 +1335,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
+        - name: check-db-ready
+          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          command:
+          - sh
+          - -c
+          - until pg_isready -h <RDS_HOST> -p 5432; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config
@@ -1537,6 +1543,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
+        - name: check-db-ready
+          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          command:
+            - sh
+            - -c
+            - until pg_isready -h <RDS_HOST> -p 5432; do echo waiting for database; sleep 2; done;
         - command:
             - datacatalog
             - --config
