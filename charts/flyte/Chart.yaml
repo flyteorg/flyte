@@ -12,7 +12,7 @@ dependencies:
     alias: sparkoperator
     version: 1.0.6
     repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
-    condition: spark.enabled
+    condition: sparkoperator.enabled
   - name: kubernetes-dashboard
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/
