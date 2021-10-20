@@ -13,7 +13,7 @@ Plugin Setup
        :text: MPI Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up MPI Plugin
+    MPI Plugin
 
 
 .. toctree::

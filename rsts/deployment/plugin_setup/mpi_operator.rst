@@ -69,8 +69,14 @@ Build & Serialize MPI plugin example
    cd flytesnacks
    flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfmpi serialize
 
-Register MPI plugin example
+Register Pytorch plugin example
 
 .. code-block:: bash
+   flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
 
-   make -C cookbook/integrations/kubernetes/kfmpi register
+
+Create executions
+
+.. code-block:: bash
+   flytectl get launchplan --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
+   flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
