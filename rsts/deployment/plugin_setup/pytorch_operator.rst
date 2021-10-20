@@ -1,81 +1,77 @@
 .. _deployment-plugin-setup-pytorch-operator:
 
-PyTorch plugin Setup
-------------------------
+PyTorch Operator Setup
+----------------------
 
-.. _pytorch-operator:
+This guide gives an overview of how to set up the PyTorch operator in your Flyte deployment.
 
-####################################
-Install PyTorch Operator
-####################################
+1. First, clone the Flytesnacks repo. This is where we have the example.
 
-Clone Flytesnacks
+   .. code-block:: bash
 
-.. code-block:: bash
+      git clone https://github.com/flyteorg/flytesnacks.git
 
-   git clone https://github.com/flyteorg/flytesnacks.git
+2. Start the Flyte sandbox for testing.
 
-Start the sandbox for testing
+   .. code-block:: bash
 
-.. code-block:: bash
+      flytectl sandbox start --source=./flytesnacks
 
-   flytectl sandbox start --source=./flytesnacks
+3. Install the PyTorch Operator.
 
-Install Pytorch Operator
+   .. code-block:: bash
 
-.. code-block:: bash
+      helm repo add bitnami https://charts.bitnami.com/bitnami --kubeconfig=~/.flyte/k3s/k3s.yaml
+      helm install my-release bitnami/pytorch
 
-   helm repo add bitnami https://charts.bitnami.com/bitnami --kubeconfig=~/.flyte/k3s/k3s.yaml
-   helm install my-release bitnami/pytorch
+4. Create a file named ``values-pytorch.yaml`` and add the following config to it:
 
+   .. code-block::
 
-Create a file values-pytorch.yaml and add the below values
+       configmap:
+         enabled_plugins:
+           # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+           tasks:
+             # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+             task-plugins:
+               # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+               # plugins
+               enabled-plugins:
+                 - container
+                 - sidecar
+                 - k8s-array
+                 - mpi
+                 - pytorch
+               default-for-task-types:
+                 container: container
+                 sidecar: sidecar
+                 container_array: k8s-array
+                 pytorch: pytorch
 
-.. code-block::
+5. Upgrade the Flyte Helm release.
 
-    configmap:
-      enabled_plugins:
-        # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
-        tasks:
-          # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
-          task-plugins:
-            # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
-            # plugins
-            enabled-plugins:
-              - container
-              - sidecar
-              - k8s-array
-              - mpi
-              - pytorch
-            default-for-task-types:
-              container: container
-              sidecar: sidecar
-              container_array: k8s-array
-              pytorch: pytorch
+   .. code-block:: bash
 
-Upgrade flyte helm release
+      helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-.. code-block:: bash
+6. Build & Serialize the PyTorch plugin example.
 
-   helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+   .. code-block:: bash
 
-Build & Serialize Pytorch plugin example
+      cd flytesnacks
+      flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfpytorch serialize
 
-.. code-block:: bash
+7. Register the PyTorch plugin example.
 
-   cd flytesnacks
-   flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfpytorch serialize
+   .. code-block:: bash
 
-Register Pytorch plugin example
-
-.. code-block:: bash
-
-   flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
+      flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
 
 
-Create executions
+8. Lastly, fetch the launch plan, create and monitor the execution.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   flytectl get launchplan --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
-   flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
+      flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+      flytectl get execution --project flytesnacks --domain development <execname>

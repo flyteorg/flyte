@@ -1,8 +1,8 @@
 .. _deployment-plugin-setup:
 
-##############
+############
 Plugin Setup
-##############
+############
 
 
 .. panels::
@@ -10,10 +10,10 @@ Plugin Setup
 
     .. link-button:: deployment-plugin-setup-pytorch-operator
        :type: ref
-       :text: Pytorch Plugin
+       :text: PyTorch Operator
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Pytorch Plugin
+    Guide to setting up the PyTorch Operator.
 
 
 .. toctree::

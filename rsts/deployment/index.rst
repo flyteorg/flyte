@@ -52,7 +52,7 @@ solution). The following pages will help you effectively deploy and manage an en
        :text: Plugin Setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Plugin Setup Guides
+    How to set up a plugin for your deployment.
 
     ---
     .. link-button:: deployment-cluster-config
