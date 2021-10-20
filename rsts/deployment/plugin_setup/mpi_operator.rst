@@ -14,7 +14,7 @@ This guide gives an overview of how to set up the kubeflow mpi operator in your 
 2. Start the Flyte sandbox for testing.
 
    .. code-block:: bash
-
+      // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
       flytectl sandbox start --source=./flytesnacks
 
 3. Install the MPI Operator.
