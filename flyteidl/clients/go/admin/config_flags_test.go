@@ -309,4 +309,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_command", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config("1,1", ",")
+
+			cmdFlags.Set("command", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("command"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.Command)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

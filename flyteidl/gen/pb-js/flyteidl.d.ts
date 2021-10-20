@@ -4436,6 +4436,9 @@ export namespace flyteidl {
 
             /** Container dataConfig */
             dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
+
+            /** Container architecture */
+            architecture?: (flyteidl.core.Container.Architecture|null);
         }
 
         /** Represents a Container. */
@@ -4471,6 +4474,9 @@ export namespace flyteidl {
             /** Container dataConfig. */
             public dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
 
+            /** Container architecture. */
+            public architecture: flyteidl.core.Container.Architecture;
+
             /**
              * Creates a new Container instance using the specified properties.
              * @param [properties] Properties to set
@@ -4502,6 +4508,18 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Container {
+
+            /** Architecture enum. */
+            enum Architecture {
+                UNKNOWN = 0,
+                AMD64 = 1,
+                ARM64 = 2,
+                ARM_V6 = 3,
+                ARM_V7 = 4
+            }
         }
 
         /** Properties of a IOStrategy. */

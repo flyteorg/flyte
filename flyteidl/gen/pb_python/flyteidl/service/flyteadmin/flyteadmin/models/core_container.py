@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.container_architecture import ContainerArchitecture  # noqa: F401,E501
 from flyteadmin.models.core_container_port import CoreContainerPort  # noqa: F401,E501
 from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig  # noqa: F401,E501
 from flyteadmin.models.core_key_value_pair import CoreKeyValuePair  # noqa: F401,E501
@@ -43,7 +44,8 @@ class CoreContainer(object):
         'env': 'list[CoreKeyValuePair]',
         'config': 'list[CoreKeyValuePair]',
         'ports': 'list[CoreContainerPort]',
-        'data_config': 'CoreDataLoadingConfig'
+        'data_config': 'CoreDataLoadingConfig',
+        'architecture': 'ContainerArchitecture'
     }
 
     attribute_map = {
@@ -54,10 +56,11 @@ class CoreContainer(object):
         'env': 'env',
         'config': 'config',
         'ports': 'ports',
-        'data_config': 'data_config'
+        'data_config': 'data_config',
+        'architecture': 'architecture'
     }
 
-    def __init__(self, image=None, command=None, args=None, resources=None, env=None, config=None, ports=None, data_config=None):  # noqa: E501
+    def __init__(self, image=None, command=None, args=None, resources=None, env=None, config=None, ports=None, data_config=None, architecture=None):  # noqa: E501
         """CoreContainer - a model defined in Swagger"""  # noqa: E501
 
         self._image = None
@@ -68,6 +71,7 @@ class CoreContainer(object):
         self._config = None
         self._ports = None
         self._data_config = None
+        self._architecture = None
         self.discriminator = None
 
         if image is not None:
@@ -86,6 +90,8 @@ class CoreContainer(object):
             self.ports = ports
         if data_config is not None:
             self.data_config = data_config
+        if architecture is not None:
+            self.architecture = architecture
 
     @property
     def image(self):
@@ -264,6 +270,27 @@ class CoreContainer(object):
         """
 
         self._data_config = data_config
+
+    @property
+    def architecture(self):
+        """Gets the architecture of this CoreContainer.  # noqa: E501
+
+
+        :return: The architecture of this CoreContainer.  # noqa: E501
+        :rtype: ContainerArchitecture
+        """
+        return self._architecture
+
+    @architecture.setter
+    def architecture(self, architecture):
+        """Sets the architecture of this CoreContainer.
+
+
+        :param architecture: The architecture of this CoreContainer.  # noqa: E501
+        :type: ContainerArchitecture
+        """
+
+        self._architecture = architecture
 
     def to_dict(self):
         """Returns the model properties as a dict"""
