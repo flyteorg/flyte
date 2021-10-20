@@ -64,7 +64,15 @@ func TestGenericSet(t *testing.T) {
 		assert.True(t, g2.IsSuperset(g1))
 		assert.False(t, g1.IsSuperset(g2))
 	}
+	{
+		g1 := NewGeneric(GenericVal("a"), GenericVal("b"))
+		g2 := g1.UnsortedListKeys()
+		assert.Equal(t, g1.Len(), len(g2))
 
+		for _, key := range g2 {
+			assert.True(t, g1.Has(GenericVal(key)))
+		}
+	}
 	{
 		g1 := NewGeneric(GenericVal("a"), GenericVal("b"))
 		assert.True(t, g1.Has(GenericVal("a")))
