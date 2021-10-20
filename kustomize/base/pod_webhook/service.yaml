@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  annotations:
+    # This tells contour to use a H2 connection for the port associated
+    # with the name 'grpc' under spec/ports.
+    # For more information, refer to
+    # https://github.com/heptio/contour/blob/master/docs/annotations.md#contour-specific-service-annotations
+    # # Following this issue - the annotation was updated https://github.com/projectcontour/contour/issues/2092
+    projectcontour.io/upstream-protocol.h2c: "grpc"
+spec:
+  selector:
+    app: flyte-pod-webhook
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9443

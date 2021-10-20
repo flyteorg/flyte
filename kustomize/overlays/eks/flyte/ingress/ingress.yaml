@@ -70,7 +70,7 @@ spec:
               service:
                 name: flyteadmin
                 port:
-                  number: 80
+                  number: 87
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:

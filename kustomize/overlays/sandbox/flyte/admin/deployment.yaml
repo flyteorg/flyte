@@ -12,7 +12,7 @@ spec:
             name: clusterresource-template
       initContainers:
         - name: check-db-ready
-          image: postgres:10.16-alpine
+          image: postgres:13-21.04_beta
           command: [
               "sh",
               "-c",

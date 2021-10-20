@@ -23,12 +23,12 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
+    #      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
     links:
-      - s3: [ "write" ]
+      - s3: ["write"]
       - notifcationsQueue
       - schedulesQueue
       - topic
@@ -36,34 +36,42 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
+    #      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
     links:
-      - s3: [ "write" ]
+      - s3: ["write"]
   - type: helm-chart
-    chart: "../helm" # NOTE: relative path to chart
+    chart: "../charts/flyte" # NOTE: relative path to chart
     namespace: flyte
     timeout: 600
     create_namespace: true
-    values_file: "../helm/values-eks.yaml" # NOTE: relative path to values yaml
+    values_file: "../charts/flyte/values-eks.yaml" # NOTE: relative path to values yaml
     # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
     values:
       postgres:
         enabled: false
       db:
-        database:
-          port: 5432
-          username: "${{module.postgres.db_user}}"
-          host: "${{module.postgres.db_host}}"
-          dbname: "${{module.postgres.db_name}}"
+        datacatalog:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
+        admin:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
       common:
         ingress:
           albSSLRedirect: false
           host: "{parent.domain}"
           annotations:
             kubernetes.io/ingress.class: "nginx"
+            nginx.ingress.kubernetes.io/app-root: /console
         databaseSecret:
           secretManifest:
             stringData:

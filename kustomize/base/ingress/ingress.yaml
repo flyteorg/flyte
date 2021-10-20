@@ -5,6 +5,7 @@ metadata:
   namespace: flyte
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
     - http:
@@ -98,7 +99,7 @@ spec:
               service:
                 name: flyteadmin
                 port:
-                  number: 80
+                  number: 87
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:

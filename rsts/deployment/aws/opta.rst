@@ -17,8 +17,9 @@ be done independently from the sandbox deployment:
 
 A Flyte user may provision and orchestrate this setup by themselves, but the Flyte team has partnered with the
 `Opta <https://github.com/run-x/opta>`_ team to create a streamlined production deployment strategy for AWS with
-ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta>`_. The following
-documentation specifies how to use and further configure them.
+ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta>`_. The following demo and documentation specifies how to use and further configure them.
+
+.. youtube:: CMp04-mdtQQ
 
 Deploying Opta Environment and Service for Flyte
 ************************************************
@@ -26,7 +27,7 @@ Deploying Opta Environment and Service for Flyte
 To begin using Opta, please first `download the latest version <https://docs.opta.dev/installation/>`_ and all the listed
 prerequisites and make sure that you have
 `admin/fullwrite AWS credentials setup on your terminal <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html>`_.
-With that prepared, go to the Opta subdirectory in the Flyte repo, and open up env.yaml in your editor. Please find and
+With that prepared, go to the `Opta subdirectory <https://github.com/flyteorg/flyte/tree/master/opta>`_ in the Flyte repo, and open up env.yaml in your editor. Please find and
 replace the following values with your desired ones:
 
 * <account_id>: your AWS account ID
@@ -39,7 +40,7 @@ Once complete please run ``opta apply -c env.yaml`` and follow the prompts.
 
 **DNS Delegation**
 Once Opta's apply for the environment is completed, you will need to complete dns delegation to fully setup public
-traffic access. You may find instructions on `how to do so here <https://docs.opta.dev/miscellaneous/ingress/>`__.
+traffic access. You may find instructions on `how to do so here <https://docs.opta.dev/tutorials/ingress/>`__.
 
 **The Flyte Deployment**
 Once dns deployment delegation is complete, you may deploy the Flyte service and affiliated resources. Go to the Opta

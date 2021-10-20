@@ -1,4 +1,3 @@
-
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -16,7 +15,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
-    tag: v0.6.16 # FLYTEADMIN_TAG
+    tag: v0.6.43 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -58,6 +57,53 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
+  additionalVolumes: []
+  additionalVolumeMounts: []
+  # -- Deploys a Redoc container in Flyteadmin's pod
+  deployRedoc: true
+
+#
+# FLYTESCHEDULER SETTINGS
+#
+
+flytescheduler:
+  image:
+    # -- Docker image for Flytescheduler deployment
+    repository: cr.flyte.org/flyteorg/flytescheduler
+    # -- Docker image tag
+    tag: v0.6.43 # FLYTESCHEDULER_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flytescheduler deployment
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyte/config/*.yaml
+
+  # -- Configuration for service accounts for Flytescheduler
+  serviceAccount:
+    # -- Should a service account be created for Flytescheduler
+    create: true
+    # -- Annotations for ServiceAccount attached to Flytescheduler pods
+    annotations: {}
+    # -- ImapgePullSecrets to automatically assign to the service account
+    imagePullSecrets: {}
+  # -- Annotations for Flytescheduler pods
+  podAnnotations: {}
+  # -- nodeSelector for Flytescheduler deployment
+  nodeSelector: {}
+  # -- tolerations for Flytescheduler deployment
+  tolerations: []
+  # -- affinity for Flytescheduler deployment
+  affinity: {}
+  secrets: {}
 
 #
 # DATACATALOG SETTINGS
@@ -69,7 +115,9 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog
-    tag: v0.3.6 # DATACATALOG_TAG
+    # -- Docker image tag
+    tag: v0.3.9 # DATACATALOG_TAG
+    # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -115,7 +163,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller
-    tag: v0.13.4 # FLYTEPROPELLER_TAG
+    tag: v0.14.13 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -158,7 +206,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole
-    tag: v0.20.1 # FLYTECONSOLE_TAG
+    tag: v0.29.0 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -202,11 +250,15 @@ webhook:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
 
+# ------------------------------------------------
+#
+# COMMON SETTINGS
+#
 
 common:
   databaseSecret:
     # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
-    name: "db-pass"
+    name: ""
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
@@ -220,7 +272,8 @@ common:
     separateGrpcIngressAnnotations:
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
-    annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/app-root: /console
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
@@ -256,14 +309,18 @@ storage:
 
 # Database configuration
 db:
-  database:
-    # port: 5432
-    # username: postgres
-    host: postgres
-    # dbname: flyte
-    # passwordPath: /etc/db/pass.txt
-    # options:
-
+  datacatalog:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "datacatalog"
+  admin:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "flyteadmin"
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
 # -------------------------------------------------------------------
@@ -314,7 +371,7 @@ configmap:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
-      eventVersion: 1
+      eventVersion: 2
       testing:
         host: http://flyteadmin
     # -- Authentication configuration
@@ -382,7 +439,6 @@ configmap:
       insecure: true
       clientId: flytepropeller
       clientSecretLocation: /etc/secrets/client_secret
-
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
   catalog:
@@ -487,12 +543,7 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type:
-
-        resourceMaxQuota: 10000
-        redis:
-          hostPath: redis-resource-manager:6379
-          hostKey: mypassword
+        type: noop
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
@@ -517,6 +568,7 @@ configmap:
 workflow_scheduler:
   enabled: false
   config: {}
+  type: ""
 
 # -- **Optional Component**
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
@@ -524,8 +576,6 @@ workflow_scheduler:
 workflow_notifications:
   enabled: false
   config: {}
-
-
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
@@ -575,6 +625,7 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
+
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
@@ -595,6 +646,7 @@ cluster_resource_manager:
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
   enabled: false
+
   # -- Spark plugin configuration
   plugin_config:
     plugins:
@@ -618,17 +670,3 @@ sparkoperator:
           - spark.blacklist.enabled: "true"
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
-
-
-# -----------------
-# -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
-# Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
-sagemaker:
-  enabled: false
-  plugin_config:
-    plugins:
-      sagemaker:
-        roleArn: <arn>
-        region: <region>
-
-

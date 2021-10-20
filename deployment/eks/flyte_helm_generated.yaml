@@ -289,7 +289,7 @@ data:
           - profile
           - openid
     flyteadmin:
-      eventVersion: 1
+      eventVersion: 2
       metadataStoragePrefix:
       - metadata
       - admin
@@ -1327,7 +1327,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f69f77a814f4fa2371ee9d84500b74ec85a8001cd0db86005a2368a13f87dca"
+        configChecksum: "faf2bd6b71f061de4716e29b46b929f85becc0030b93428c9f452b22dc19e04"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1341,7 +1341,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -1358,7 +1358,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -1372,7 +1372,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -1383,7 +1383,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -1404,7 +1404,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1428,26 +1428,6 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -1500,7 +1480,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.20.1"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.29.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -1557,56 +1537,56 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       initContainers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - migrate
-        - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.6"
-        imagePullPolicy: "IfNotPresent"
-        name: run-migrations
-        volumeMounts:
-        - mountPath: /etc/db
-          name: db-pass
-        - mountPath: /etc/datacatalog/config
-          name: config-volume 
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - migrate
+            - run
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: run-migrations
+          volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       containers:
-      - command:
-        - datacatalog
-        - --config
-        - /etc/datacatalog/config/*.yaml
-        - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.6"
-        imagePullPolicy: "IfNotPresent"
-        name: datacatalog
-        ports:
-        - containerPort: 8088
-        - containerPort: 8089
-        resources: 
-          limits:
-            cpu: 500m
-            ephemeral-storage: 200Mi
-            memory: 500Mi
-          requests:
-            cpu: 50m
-            ephemeral-storage: 200Mi
-            memory: 200Mi
-        volumeMounts:
-        - mountPath: /etc/db
-          name: db-pass
-        - mountPath: /etc/datacatalog/config
-          name: config-volume
+        - command:
+            - datacatalog
+            - --config
+            - /etc/datacatalog/config/*.yaml
+            - serve
+          image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+          imagePullPolicy: "IfNotPresent"
+          name: datacatalog
+          ports:
+            - containerPort: 8088
+            - containerPort: 8089
+          resources: 
+            limits:
+              cpu: 500m
+              ephemeral-storage: 200Mi
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 200Mi
+              memory: 200Mi
+          volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
       serviceAccountName: datacatalog
       volumes:
-      - name: db-pass
-        secret:
-          secretName: db-pass
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: datacatalog-config
-        name: config-volume
+        - name: db-pass
+          secret:
+            secretName: db-pass
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: datacatalog-config
+          name: config-volume
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -1652,7 +1632,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.4"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -1705,14 +1685,14 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.13.4
+        app.kubernetes.io/version: v0.14.13
       annotations:
         configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.4"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1735,7 +1715,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.13.4"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1846,7 +1826,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "docker.io/bitnami/redis:4.0.2-r1"
+      - image: "ecr.flyte.org/bitnami/redis:6.2.5-debian-10-r59"
         imagePullPolicy: "IfNotPresent"
         name: redis
         env:
@@ -1917,7 +1897,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.16"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
@@ -1955,6 +1935,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
     - http:
@@ -2007,7 +1988,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               serviceName: flyteadmin
-              servicePort: 80
+              servicePort: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
@@ -2091,6 +2072,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/app-root: /console
     alb.ingress.kubernetes.io/backend-protocol-version: HTTP2
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:

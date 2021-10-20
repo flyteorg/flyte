@@ -55,15 +55,20 @@ Install flytectl
 
      .. prompt:: bash $
 
-        brew upgrade flytectl
+        flytectl upgrade
 
    .. tabbed:: Other Operating systems
 
      .. prompt:: bash $
 
-         curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
-         export PATH=$(pwd)/bin:$PATH
+         curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin # You can change path from /usr/local/bin to any file system path
+         export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
 
+     *Upgrade* existing installation using the following command:
+
+     .. prompt:: bash $
+
+        flytectl upgrade
 
    **Test** if Flytectl is installed correctly (your Flytectl version should be >= 0.1.34.) using the following command:
 
@@ -83,11 +88,11 @@ Install flytectl
 
         flytectl sandbox start --source .
 
-     *NOTE*: Output of the command will contain a recommendation to export an environment variable called FLYTECTL_CONFIG. please export as follows or copy paste
+     Setup flytectl sandbox config
 
      .. prompt:: bash $
 
-        export FLYTECTL_CONFIG=$HOME/.flyte/config-sandbox.yaml
+        flytectl config init
 
      **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
 
@@ -95,7 +100,7 @@ Install flytectl
 
      .. prompt:: bash $
 
-         # COMING SOON! flytectl init
+         flytectl config init --host={FLYTEADMIN_URL} --storage
 
 
 Build & Deploy Your Application to the Cluster

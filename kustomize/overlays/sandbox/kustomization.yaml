@@ -25,26 +25,31 @@ resources:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.6.16 # FLYTEADMIN_TAG override the tag
+    newTag: v0.6.43 # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.20.1 # FLYTECONSOLE_TAG  the tag
+    newTag: v0.29.0 # FLYTECONSOLE_TAG  the tag
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
-    newTag: v0.3.6 # DATACATALOG_TAG override the tag
+    newTag: v0.3.9 # DATACATALOG_TAG override the tag
     newName: cr.flyte.org/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.13.4 # FLYTEPROPELLER_TAG override the tag
+    newTag: v0.14.13 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name
   # Webhook
   - name: webhook # match images with this name
-    newTag: v0.13.4 # FLYTEPROPELLER_TAG override the tag
+    newTag: v0.14.13 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name
   # Override postgres image to use alpine based (rather smaller) docker image
   - name: postgres
-    newTag: 10.16-alpine
-  - name: minio/minio
-    newTag: RELEASE.2021-04-06T23-11-00Z
+    newTag: 13-21.04_beta
+    newName: ecr.flyte.org/ubuntu/postgres
+  - name: minio
+    newTag: 2021.10.13-debian-10-r0
+    newName: ecr.flyte.org/bitnami/minio
+  - name: redis
+    newTag: 6.2.5-debian-10-r59
+    newName: ecr.flyte.org/bitnami/redis

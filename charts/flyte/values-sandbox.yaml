@@ -12,6 +12,12 @@
 flyteadmin: {} # use default config
 
 #
+# FLYTESCHEDULER
+#
+
+flytescheduler: {} # use default config
+
+#
 # DATACATALOG
 #
 
@@ -49,13 +55,16 @@ redis:
 postgres:
   image:
     # Override postgres image to use alpine based (rather smaller) docker image
-    tag: "10.16-alpine"
+    tag: "13-21.04_beta"
 
 #
 # MINIO
 #
 
-minio: {}
+minio:
+  service:
+    annotations: {}
+    type: NodePort
 
 #
 # CONTOUR
@@ -81,9 +90,12 @@ kubernetes-dashboard:
     - --enable-insecure-login
     - --disable-settings-authorizer
   protocolHttp: true
+  rbac:
+    clusterReadOnlyRole: true
   service:
     type: NodePort
     externalPort: 30082
+    nodePort: 30082
 
 # ------------------------------------------------
 #
@@ -115,12 +127,18 @@ storage:
 
 # Database configuration
 db:
-  database:
-    port: 5432
-    username: postgres
-    host: postgres
-    dbname: flyte_development
-
+  datacatalog:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "datacatalog"
+  admin:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "flyteadmin"
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
 # -------------------------------------------------------------------
@@ -183,7 +201,7 @@ configmap:
     plugins:
       logs:
         kubernetes-enabled: true
-        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
+        kubernetes-template-uri: 'http://localhost:30082/#/log/{{ "{{" }} .namespace {{ "}}" }}/{{ "{{" }} .podName {{ "}}" }}/pod?namespace={{ "{{" }} .namespace {{ "}}" }}'
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -195,7 +213,8 @@ configmap:
 # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
-  enabled: false
+  enabled: true
+  type: native
 
 # --
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of

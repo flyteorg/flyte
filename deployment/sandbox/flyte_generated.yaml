@@ -2492,6 +2492,13 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
   name: flyte-propeller-auth
   namespace: flyte
 stringData:
@@ -2610,7 +2617,10 @@ metadata:
 spec:
   externalName: minio
   ports:
-  - port: 9000
+  - name: minio-api
+    port: 9000
+  - name: minio-console
+    port: 9001
   selector:
     app: minio
 ---
@@ -2754,7 +2764,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.6
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -2772,7 +2782,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.6
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.9
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2829,7 +2839,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.14.13
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -2842,6 +2852,29 @@ spec:
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
+      initContainers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.14.13
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
       serviceAccountName: flyte-pod-webhook
       volumes:
       - name: sample-secrets
@@ -2883,7 +2916,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2909,7 +2942,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources-goroutine
         volumeMounts:
@@ -2942,7 +2975,7 @@ spec:
         - sh
         - -c
         - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.16-alpine
+        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: check-db-ready
       - command:
         - flyteadmin
@@ -2950,7 +2983,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2966,7 +2999,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2980,7 +3013,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -3000,7 +3033,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -3046,7 +3079,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: cr.flyte.org/flyteorg/flyteconsole:v0.20.1
+        image: cr.flyte.org/flyteorg/flyteconsole:v0.29.0
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -3090,7 +3123,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.14.13
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -3124,31 +3157,27 @@ spec:
         app: minio
     spec:
       containers:
-      - args:
-        - server
-        - /data
-        env:
+      - env:
         - name: MINIO_ACCESS_KEY
           value: minio
         - name: MINIO_SECRET_KEY
           value: miniostorage
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+        - name: MINIO_DEFAULT_BUCKETS
+          value: my-s3-bucket
+        image: ecr.flyte.org/bitnami/minio:2021.10.13-debian-10-r0
         name: minio
         ports:
         - containerPort: 9000
           name: minio
+        - containerPort: 9001
+          name: minio-console
         volumeMounts:
         - mountPath: /data
           name: minio-storage
-      initContainers:
-      - command:
-        - mkdir
-        - /data/my-s3-bucket
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
-        name: create-bucket
-        volumeMounts:
-        - mountPath: /data
-          name: minio-storage
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 1001
       volumes:
       - emptyDir: {}
         name: minio-storage
@@ -3171,7 +3200,7 @@ spec:
       - env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
-        image: postgres:10.16-alpine
+        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: postgres
         ports:
         - containerPort: 5432
@@ -3409,7 +3438,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: cr.flyte.org/flyteorg/flyteadmin:v0.6.16
+            image: cr.flyte.org/flyteorg/flyteadmin:v0.6.43
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3570,46 +3599,6 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: flyte-pod-webhook-secret
-  namespace: flyte
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - args:
-        - webhook
-        - init-certs
-        - --config
-        - /etc/flyte/config/*.yaml
-        command:
-        - flytepropeller
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.13.4
-        imagePullPolicy: IfNotPresent
-        name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      restartPolicy: Never
-      serviceAccountName: flyte-pod-webhook
-      volumes:
-      - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
-        name: config-volume
-  ttlSecondsAfterFinished: 0
----
-apiVersion: batch/v1
-kind: Job
-metadata:
   name: contour-certgen-v1.13.1
   namespace: projectcontour
 spec:
@@ -3650,6 +3639,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/app-root: /console
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
   name: flytesystem
   namespace: flyte
@@ -3738,7 +3728,7 @@ spec:
           service:
             name: flyteadmin
             port:
-              number: 80
+              number: 87
         path: /openapi/*
         pathType: ImplementationSpecific
       - backend:
@@ -3841,6 +3831,6 @@ spec:
           service:
             name: minio
             port:
-              number: 9000
+              number: 9001
         path: /minio
         pathType: ImplementationSpecific

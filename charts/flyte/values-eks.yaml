@@ -46,6 +46,13 @@ flyteadmin:
             matchLabels:
               app.kubernetes.io/name: flyteadmin
           topologyKey: kubernetes.io/hostname
+  deployRedoc: false
+
+#
+# FLYTESCHEDULER
+#
+
+flytescheduler: {}
 
 #
 # DATACATALOG
@@ -181,7 +188,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      # -- This is the certificate arn of the cert imported in AWS certificate manager. 
+      # -- This is the certificate arn of the cert imported in AWS certificate manager.
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
@@ -223,15 +230,24 @@ storage:
     region: "{{ .Values.userSettings.accountRegion }}"
 
 db:
-  database:
-    port: 5432
-    # -- Create a user called flyteadmin
-    username: flyteadmin
-    host: "{{ .Values.userSettings.rdsHost }}"
-    # -- Create a DB called flyteadmin (OR change the name here)
-    dbname: flyteadmin
-    passwordPath: /etc/db/pass.txt
-
+  datacatalog:
+    database:
+      port: 5432
+      # -- Create a user called flyteadmin
+      username: flyteadmin
+      host: "{{ .Values.userSettings.rdsHost }}"
+      # -- Create a DB called datacatalog (OR change the name here)
+      dbname: flyteadmin
+      passwordPath: /etc/db/pass.txt
+  admin:
+    database:
+      port: 5432
+      # -- Create a user called flyteadmin
+      username: flyteadmin
+      host: "{{ .Values.userSettings.rdsHost }}"
+      # -- Create a DB called flyteadmin (OR change the name here)
+      dbname: flyteadmin
+      passwordPath: /etc/db/pass.txt
 #
 # CONFIGMAPS
 #
