@@ -3,7 +3,7 @@
 Kubeflow MPI Operator Plugin Setup
 ----------------------------------
 
-This guide gives an overview of how to set up the kubeflow mpi operator in your Flyte deployment.
+This guide gives an overview of how to set up the Kubeflow MPI operator in your Flyte deployment.
 
 1. First, clone the Flytesnacks repo. This is where we have the example.
 
@@ -51,20 +51,20 @@ This guide gives an overview of how to set up the kubeflow mpi operator in your 
 
    .. code-block:: bash
 
-      helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+      helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
 6. Build & Serialize the MPI plugin example.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   cd flytesnacks
-   flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfmpi serialize
+      cd flytesnacks
+      flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfmpi serialize
 
-7. Register the PyTorch plugin example.
+7. Register the MPI plugin example.
 
    .. code-block:: bash
 
-      flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
+      flytectl register files cookbook/integrations/kubernetes/kfmpi/_pb_output/* -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 

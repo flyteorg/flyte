@@ -66,7 +66,6 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
       flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
 
-
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
    .. code-block:: bash

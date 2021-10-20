@@ -14,10 +14,10 @@ Plugin Setup
        :text: MPI Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Kubeflow MPI Operator Plugin
-    
+    Guide to setting up the Kubeflow MPI Operator Plugin.
+
     ---
-    
+
     .. link-button:: deployment-plugin-setup-pytorch-operator
        :type: ref
        :text: PyTorch Operator
