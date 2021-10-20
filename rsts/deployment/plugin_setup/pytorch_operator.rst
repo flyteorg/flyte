@@ -1,7 +1,7 @@
 .. _deployment-plugin-setup-pytorch-operator:
 
-PyTorch Operator Setup
-----------------------
+Kubeflow PyTorch Operator Plugin Setup
+--------------------------------------
 
 This guide gives an overview of how to set up the PyTorch operator in your Flyte deployment.
 
@@ -40,7 +40,6 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
                  - container
                  - sidecar
                  - k8s-array
-                 - mpi
                  - pytorch
                default-for-task-types:
                  container: container

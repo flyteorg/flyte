@@ -1,39 +1,30 @@
 .. _deployment-plugin-setup-mpi-operator:
 
-MPI Operator Setup
-------------------------
+Kubeflow MPI Operator Plugin Setup
+----------------------------------
 
-.. _mpi-operator:
+This guide gives an overview of how to set up the kubeflow mpi operator in your Flyte deployment.
 
-####################################
-Install MPI Operator
-####################################
+1. First, clone the Flytesnacks repo. This is where we have the example.
 
-Clone Flytesnacks
+   .. code-block:: bash
 
-.. code-block:: bash
+      git clone https://github.com/flyteorg/flytesnacks.git
 
-   git clone https://github.com/flyteorg/flytesnacks.git
+2. Start the Flyte sandbox for testing.
 
-Start the sandbox for testing
+   .. code-block:: bash
 
-.. code-block:: bash
+      flytectl sandbox start --source=./flytesnacks
 
-   flytectl sandbox start --source=./flytesnacks
+3. Install the MPI Operator.
 
-Clone MPI Operator
+   .. code-block:: bash
 
-.. code-block:: bash
+      git clone https://github.com/kubeflow/mpi-operator.git
+      kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
 
-   git clone https://github.com/kubeflow/mpi-operator.git
-
-Install MPI Operator
-
-.. code-block:: bash
-
-   kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
-
-Create a file values-mpi.yaml and add the below values
+4. Create a file named ``values-mpi.yaml`` and add the following config to it:
 
 .. code-block::
 
@@ -56,29 +47,29 @@ Create a file values-mpi.yaml and add the below values
               container_array: k8s-array
               mpi: mpi
 
-Upgrade flyte helm release
+5. Upgrade the Flyte Helm release.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+      helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-Build & Serialize MPI plugin example
+6. Build & Serialize the MPI plugin example.
 
 .. code-block:: bash
 
    cd flytesnacks
    flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfmpi serialize
 
-Register Pytorch plugin example
+7. Register the PyTorch plugin example.
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
+      flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
 
+8. Lastly, fetch the launch plan, create and monitor the execution.
 
-Create executions
+   .. code-block:: bash
 
-.. code-block:: bash
-
-   flytectl get launchplan --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
-   flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
+      flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+      flytectl get execution --project flytesnacks --domain development <execname>
