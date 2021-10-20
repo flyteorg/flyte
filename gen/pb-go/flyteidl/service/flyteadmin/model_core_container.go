@@ -23,4 +23,5 @@ type CoreContainer struct {
 	Config []CoreKeyValuePair `json:"config,omitempty"`
 	Ports []CoreContainerPort `json:"ports,omitempty"`
 	DataConfig *CoreDataLoadingConfig `json:"data_config,omitempty"`
+	Architecture *ContainerArchitecture `json:"architecture,omitempty"`
 }

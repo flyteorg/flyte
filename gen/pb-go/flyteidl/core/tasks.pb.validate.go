@@ -611,6 +611,8 @@ func (m *Container) Validate() error {
 		}
 	}
 
+	// no validation rules for Architecture
+
 	return nil
 }
 

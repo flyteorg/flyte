@@ -10577,6 +10577,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {Array.<flyteidl.core.IKeyValuePair>|null} [config] Container config
              * @property {Array.<flyteidl.core.IContainerPort>|null} [ports] Container ports
              * @property {flyteidl.core.IDataLoadingConfig|null} [dataConfig] Container dataConfig
+             * @property {flyteidl.core.Container.Architecture|null} [architecture] Container architecture
              */
 
             /**
@@ -10664,6 +10665,14 @@ export const flyteidl = $root.flyteidl = (() => {
             Container.prototype.dataConfig = null;
 
             /**
+             * Container architecture.
+             * @member {flyteidl.core.Container.Architecture} architecture
+             * @memberof flyteidl.core.Container
+             * @instance
+             */
+            Container.prototype.architecture = 0;
+
+            /**
              * Creates a new Container instance using the specified properties.
              * @function create
              * @memberof flyteidl.core.Container
@@ -10708,6 +10717,8 @@ export const flyteidl = $root.flyteidl = (() => {
                         $root.flyteidl.core.ContainerPort.encode(message.ports[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 if (message.dataConfig != null && message.hasOwnProperty("dataConfig"))
                     $root.flyteidl.core.DataLoadingConfig.encode(message.dataConfig, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                if (message.architecture != null && message.hasOwnProperty("architecture"))
+                    writer.uint32(/* id 10, wireType 0 =*/80).int32(message.architecture);
                 return writer;
             };
 
@@ -10762,6 +10773,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 9:
                         message.dataConfig = $root.flyteidl.core.DataLoadingConfig.decode(reader, reader.uint32());
+                        break;
+                    case 10:
+                        message.architecture = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -10836,8 +10850,39 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "dataConfig." + error;
                 }
+                if (message.architecture != null && message.hasOwnProperty("architecture"))
+                    switch (message.architecture) {
+                    default:
+                        return "architecture: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        break;
+                    }
                 return null;
             };
+
+            /**
+             * Architecture enum.
+             * @name flyteidl.core.Container.Architecture
+             * @enum {string}
+             * @property {number} UNKNOWN=0 UNKNOWN value
+             * @property {number} AMD64=1 AMD64 value
+             * @property {number} ARM64=2 ARM64 value
+             * @property {number} ARM_V6=3 ARM_V6 value
+             * @property {number} ARM_V7=4 ARM_V7 value
+             */
+            Container.Architecture = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNKNOWN"] = 0;
+                values[valuesById[1] = "AMD64"] = 1;
+                values[valuesById[2] = "ARM64"] = 2;
+                values[valuesById[3] = "ARM_V6"] = 3;
+                values[valuesById[4] = "ARM_V7"] = 4;
+                return values;
+            })();
 
             return Container;
         })();
