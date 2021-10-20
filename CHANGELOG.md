@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.1](http://github.com/lyft/flyteconsole/compare/v0.29.0...v0.29.1) (2021-10-20)
+
+
+### Bug Fixes
+
+* add pagination for child node expansion ([#232](http://github.com/lyft/flyteconsole/issues/232)) ([9fff398](http://github.com/lyft/flyteconsole/commit/9fff398009c77933928ec79ff74f493e7d113843))
+
 # [0.29.0](http://github.com/lyft/flyteconsole/compare/v0.28.3...v0.29.0) (2021-10-13)
 
 
