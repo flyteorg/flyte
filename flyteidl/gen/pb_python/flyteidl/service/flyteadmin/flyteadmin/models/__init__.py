@@ -125,6 +125,7 @@ from flyteadmin.models.blob_type_blob_dimensionality import BlobTypeBlobDimensio
 from flyteadmin.models.comparison_expression_operator import ComparisonExpressionOperator
 from flyteadmin.models.conjunction_expression_logical_operator import ConjunctionExpressionLogicalOperator
 from flyteadmin.models.connection_set_id_list import ConnectionSetIdList
+from flyteadmin.models.container_architecture import ContainerArchitecture
 from flyteadmin.models.core_alias import CoreAlias
 from flyteadmin.models.core_binary import CoreBinary
 from flyteadmin.models.core_binding import CoreBinding

@@ -175,6 +175,30 @@ inline bool RuntimeMetadata_RuntimeType_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<RuntimeMetadata_RuntimeType>(
     RuntimeMetadata_RuntimeType_descriptor(), name, value);
 }
+enum Container_Architecture {
+  Container_Architecture_UNKNOWN = 0,
+  Container_Architecture_AMD64 = 1,
+  Container_Architecture_ARM64 = 2,
+  Container_Architecture_ARM_V6 = 3,
+  Container_Architecture_ARM_V7 = 4,
+  Container_Architecture_Container_Architecture_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Container_Architecture_Container_Architecture_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Container_Architecture_IsValid(int value);
+const Container_Architecture Container_Architecture_Architecture_MIN = Container_Architecture_UNKNOWN;
+const Container_Architecture Container_Architecture_Architecture_MAX = Container_Architecture_ARM_V7;
+const int Container_Architecture_Architecture_ARRAYSIZE = Container_Architecture_Architecture_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Container_Architecture_descriptor();
+inline const ::std::string& Container_Architecture_Name(Container_Architecture value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Container_Architecture_descriptor(), value);
+}
+inline bool Container_Architecture_Parse(
+    const ::std::string& name, Container_Architecture* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Container_Architecture>(
+    Container_Architecture_descriptor(), name, value);
+}
 enum IOStrategy_DownloadMode {
   IOStrategy_DownloadMode_DOWNLOAD_EAGER = 0,
   IOStrategy_DownloadMode_DOWNLOAD_STREAM = 1,
@@ -1398,6 +1422,38 @@ class Container final :
 
   // nested types ----------------------------------------------------
 
+  typedef Container_Architecture Architecture;
+  static const Architecture UNKNOWN =
+    Container_Architecture_UNKNOWN;
+  static const Architecture AMD64 =
+    Container_Architecture_AMD64;
+  static const Architecture ARM64 =
+    Container_Architecture_ARM64;
+  static const Architecture ARM_V6 =
+    Container_Architecture_ARM_V6;
+  static const Architecture ARM_V7 =
+    Container_Architecture_ARM_V7;
+  static inline bool Architecture_IsValid(int value) {
+    return Container_Architecture_IsValid(value);
+  }
+  static const Architecture Architecture_MIN =
+    Container_Architecture_Architecture_MIN;
+  static const Architecture Architecture_MAX =
+    Container_Architecture_Architecture_MAX;
+  static const int Architecture_ARRAYSIZE =
+    Container_Architecture_Architecture_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Architecture_descriptor() {
+    return Container_Architecture_descriptor();
+  }
+  static inline const ::std::string& Architecture_Name(Architecture value) {
+    return Container_Architecture_Name(value);
+  }
+  static inline bool Architecture_Parse(const ::std::string& name,
+      Architecture* value) {
+    return Container_Architecture_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // repeated string command = 2;
@@ -1512,6 +1568,12 @@ class Container final :
   ::flyteidl::core::DataLoadingConfig* mutable_data_config();
   void set_allocated_data_config(::flyteidl::core::DataLoadingConfig* data_config);
 
+  // .flyteidl.core.Container.Architecture architecture = 10;
+  void clear_architecture();
+  static const int kArchitectureFieldNumber = 10;
+  ::flyteidl::core::Container_Architecture architecture() const;
+  void set_architecture(::flyteidl::core::Container_Architecture value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.Container)
  private:
   class HasBitSetters;
@@ -1525,6 +1587,7 @@ class Container final :
   ::google::protobuf::internal::ArenaStringPtr image_;
   ::flyteidl::core::Resources* resources_;
   ::flyteidl::core::DataLoadingConfig* data_config_;
+  int architecture_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
@@ -3780,6 +3843,20 @@ inline void Container::set_allocated_data_config(::flyteidl::core::DataLoadingCo
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Container.data_config)
 }
 
+// .flyteidl.core.Container.Architecture architecture = 10;
+inline void Container::clear_architecture() {
+  architecture_ = 0;
+}
+inline ::flyteidl::core::Container_Architecture Container::architecture() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Container.architecture)
+  return static_cast< ::flyteidl::core::Container_Architecture >(architecture_);
+}
+inline void Container::set_architecture(::flyteidl::core::Container_Architecture value) {
+  
+  architecture_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.Container.architecture)
+}
+
 // -------------------------------------------------------------------
 
 // IOStrategy
@@ -4266,6 +4343,11 @@ template <> struct is_proto_enum< ::flyteidl::core::RuntimeMetadata_RuntimeType>
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::RuntimeMetadata_RuntimeType>() {
   return ::flyteidl::core::RuntimeMetadata_RuntimeType_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::core::Container_Architecture> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::Container_Architecture>() {
+  return ::flyteidl::core::Container_Architecture_descriptor();
 }
 template <> struct is_proto_enum< ::flyteidl::core::IOStrategy_DownloadMode> : ::std::true_type {};
 template <>

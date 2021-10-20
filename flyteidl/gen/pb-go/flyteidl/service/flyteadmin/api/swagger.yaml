@@ -2579,6 +2579,16 @@ definitions:
       ids:
       - "ids"
       - "ids"
+  ContainerArchitecture:
+    type: "string"
+    description: "Architecture-type the container image supports."
+    enum:
+    - "UNKNOWN"
+    - "AMD64"
+    - "ARM64"
+    - "ARM_V6"
+    - "ARM_V7"
+    default: "UNKNOWN"
   DataLoadingConfigLiteralMapFormat:
     type: "string"
     title: "LiteralMapFormat decides the encoding format in which the input metadata\
@@ -7731,6 +7741,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -7929,6 +7940,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -9616,6 +9628,7 @@ definitions:
               command:
               - "command"
               - "command"
+              architecture: {}
             metadata:
               retries:
                 retries: 0
@@ -9830,6 +9843,7 @@ definitions:
             command:
             - "command"
             - "command"
+            architecture: {}
           metadata:
             retries:
               retries: 0
@@ -10356,6 +10370,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -10563,6 +10578,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -12610,6 +12626,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -12808,6 +12825,7 @@ definitions:
                 command:
                 - "command"
                 - "command"
+                architecture: {}
               metadata:
                 retries:
                   retries: 0
@@ -15779,6 +15797,7 @@ definitions:
               command:
               - "command"
               - "command"
+              architecture: {}
             metadata:
               retries:
                 retries: 0
@@ -15977,6 +15996,7 @@ definitions:
               command:
               - "command"
               - "command"
+              architecture: {}
             metadata:
               retries:
                 retries: 0
@@ -18884,6 +18904,7 @@ definitions:
                   command:
                   - "command"
                   - "command"
+                  architecture: {}
                 metadata:
                   retries:
                     retries: 0
@@ -19082,6 +19103,7 @@ definitions:
                   command:
                   - "command"
                   - "command"
+                  architecture: {}
                 metadata:
                   retries:
                     retries: 0
@@ -21902,6 +21924,7 @@ definitions:
                   command:
                   - "command"
                   - "command"
+                  architecture: {}
                 metadata:
                   retries:
                     retries: 0
@@ -22100,6 +22123,7 @@ definitions:
                   command:
                   - "command"
                   - "command"
+                  architecture: {}
                 metadata:
                   retries:
                     retries: 0
@@ -23639,6 +23663,7 @@ definitions:
           command:
           - "command"
           - "command"
+          architecture: {}
         metadata:
           retries:
             retries: 0
@@ -26488,6 +26513,7 @@ definitions:
             command:
             - "command"
             - "command"
+            architecture: {}
           metadata:
             retries:
               retries: 0
@@ -26686,6 +26712,7 @@ definitions:
             command:
             - "command"
             - "command"
+            architecture: {}
           metadata:
             retries:
               retries: 0
@@ -27807,6 +27834,8 @@ definitions:
           \ outputs will be uploaded from a pre-determined file-system path. Refer\
           \ to the documentation\nto understand the default paths.\nOnly K8s"
         $ref: "#/definitions/coreDataLoadingConfig"
+      architecture:
+        $ref: "#/definitions/ContainerArchitecture"
     example:
       args:
       - "args"
@@ -27847,6 +27876,7 @@ definitions:
       command:
       - "command"
       - "command"
+      architecture: {}
   coreContainerPort:
     type: "object"
     properties:
@@ -29540,6 +29570,7 @@ definitions:
         command:
         - "command"
         - "command"
+        architecture: {}
       metadata:
         retries:
           retries: 0
@@ -32866,6 +32897,7 @@ definitions:
               command:
               - "command"
               - "command"
+              architecture: {}
             metadata:
               retries:
                 retries: 0
@@ -33064,6 +33096,7 @@ definitions:
               command:
               - "command"
               - "command"
+              architecture: {}
             metadata:
               retries:
                 retries: 0

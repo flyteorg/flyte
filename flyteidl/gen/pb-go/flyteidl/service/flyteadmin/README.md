@@ -184,6 +184,7 @@ Class | Method | HTTP request | Description
  - [ComparisonExpressionOperator](docs/ComparisonExpressionOperator.md)
  - [ConjunctionExpressionLogicalOperator](docs/ConjunctionExpressionLogicalOperator.md)
  - [ConnectionSetIdList](docs/ConnectionSetIdList.md)
+ - [ContainerArchitecture](docs/ContainerArchitecture.md)
  - [CoreAlias](docs/CoreAlias.md)
  - [CoreBinary](docs/CoreBinary.md)
  - [CoreBinding](docs/CoreBinding.md)

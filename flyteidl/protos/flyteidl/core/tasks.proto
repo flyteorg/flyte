@@ -182,6 +182,16 @@ message Container {
     // to understand the default paths.
     // Only K8s
     DataLoadingConfig data_config = 9;
+
+    // Architecture-type the container image supports.
+    enum Architecture {
+        UNKNOWN = 0;
+        AMD64  = 1;
+        ARM64  = 2;
+        ARM_V6 = 3;
+        ARM_V7 = 4;
+    }
+    Architecture architecture = 10;
 }
 
 // Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)
