@@ -1,6 +1,6 @@
 .. _deployment-plugin-setup-pytorch-operator:
 
-PyTorch Operator Setup
+PyTorch plugin Setup
 ------------------------
 
 .. _pytorch-operator:
@@ -70,4 +70,12 @@ Register Pytorch plugin example
 
 .. code-block:: bash
 
-   make -C cookbook/integrations/kubernetes/kfpytorch register
+   flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
+
+
+Create executions
+
+.. code-block:: bash
+
+   flytectl get launchplan --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
+   flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml

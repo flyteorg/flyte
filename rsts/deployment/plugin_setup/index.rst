@@ -10,10 +10,10 @@ Plugin Setup
 
     .. link-button:: deployment-plugin-setup-pytorch-operator
        :type: ref
-       :text: PyTorch Plugin
+       :text: Pytorch Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    PyTorch Plugin
+    Pytorch Plugin
 
 
 .. toctree::
