@@ -61,7 +61,7 @@ Install flytectl
 
      .. prompt:: bash $
 
-         curl -s https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | sudo bash -s -- -b /usr/local/bin # You can change path from /usr/local/bin to any file system path
+         curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin # You can change path from /usr/local/bin to any file system path
          export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
 
      *Upgrade* existing installation using the following command:
