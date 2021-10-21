@@ -183,4 +183,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_vaultSecretManager.role", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("vaultSecretManager.role", testValue)
+			if vString, err := cmdFlags.GetString("vaultSecretManager.role"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.VaultSecretManagerConfig.Role)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

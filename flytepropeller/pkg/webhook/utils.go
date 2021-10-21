@@ -1,14 +1,17 @@
 package webhook
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/uuid"
 )
 
 func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
@@ -114,4 +117,32 @@ func AppendVolume(volumes []corev1.Volume, volume corev1.Volume) []corev1.Volume
 	}
 
 	return append(volumes, volume)
+}
+
+func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVersion) (map[string]string, error) {
+	// Creates three grouped annotations "agent-inject-secret", "agent-inject-file" and "agent-inject-template"
+	// for a given secret request and KV engine version. The annotations respectively handle: 1. retrieving the
+	// secret from a vault path specified in secret.Group, 2. storing it in a file named after secret.Group/secret.Key
+	// and 3. creating a template that retrieves only secret.Key from the multiple k:v pairs present in a vault secret.
+	id := string(uuid.NewUUID())
+
+	// Set the consul template language query depending on the KV Secrets Engine version.
+	// Version 1 stores plain k:v pairs under .Data, version 2 supports versioned secrets
+	// and wraps the k:v pairs into an additional subfield.
+	var query string
+	if kvversion == config.KVVersion1 {
+		query = ".Data"
+	} else if kvversion == config.KVVersion2 {
+		query = ".Data.data"
+	} else {
+		err := fmt.Errorf("unsupported KV Version %v, supported versions are 1 and 2", kvversion)
+		return nil, err
+	}
+	template := fmt.Sprintf(`{{- with secret "%s" -}}{{ %s.%s }}{{- end -}}`, secret.Group, query, secret.Key)
+	secretVaultAnnotations := map[string]string{
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", id):   secret.Group,
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):     fmt.Sprintf("%s/%s", secret.Group, secret.Key),
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", id): template,
+	}
+	return secretVaultAnnotations, nil
 }
