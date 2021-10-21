@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/validation"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -114,6 +116,10 @@ func (e *PluginManager) AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 	if cfg.InjectFinalizer && !e.plugin.GetProperties().DisableInjectFinalizer {
 		f := append(o.GetFinalizers(), finalizer)
 		o.SetFinalizers(f)
+	}
+
+	if errs := validation.IsDNS1123Subdomain(o.GetName()); len(errs) > 0 {
+		o.SetName(utils.ConvertToDNS1123SubdomainCompatibleString(o.GetName()))
 	}
 }
 

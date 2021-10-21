@@ -739,7 +739,7 @@ func TestPluginManager_CustomKubeClient(t *testing.T) {
 }
 
 func TestPluginManager_AddObjectMetadata(t *testing.T) {
-	genName := "genName"
+	genName := "gen-name"
 	ns := "ns"
 	or := v12.OwnerReference{}
 	l := map[string]string{"l1": "lv1"}
