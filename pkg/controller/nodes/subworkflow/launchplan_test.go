@@ -255,6 +255,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				WorkflowExecutionIdentifier: recoveredExecID,
 			},
 		})
+		ectx.OnIncrementParallelism().Return(1)
 		nCtx.OnExecutionContext().Return(ectx)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 		nCtx.OnNode().Return(mockNode)

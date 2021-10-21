@@ -95,7 +95,8 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 			return handler.UnknownTransition, err
 		}
 	} else {
-		logger.Infof(ctx, "Launched launchplan with ID [%s]", childID.Name)
+		eCtx := nCtx.ExecutionContext()
+		logger.Infof(ctx, "Launched launchplan with ID [%s], Parallelism is now set to [%d]", childID.Name, eCtx.IncrementParallelism())
 	}
 
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{
@@ -134,7 +135,8 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 
 	if wfStatusClosure == nil {
 		logger.Info(ctx, "Retrieved Launch Plan status is nil. This might indicate pressure on the admin cache."+
-			" Consider tweaking its size to allow for more concurrent executions to be cached.")
+			" Consider tweaking its size to allow for more concurrent executions to be cached."+
+			" Assuming LP is running, parallelism [%d].", nCtx.ExecutionContext().IncrementParallelism())
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 		})), nil
@@ -184,6 +186,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 			OutputInfo:       oInfo,
 		})), nil
 	}
+	logger.Infof(ctx, "LaunchPlan running, parallelism is now set to [%d]", nCtx.ExecutionContext().IncrementParallelism())
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
