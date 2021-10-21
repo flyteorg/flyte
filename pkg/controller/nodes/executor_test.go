@@ -8,14 +8,10 @@ import (
 	"testing"
 	"time"
 
-	controllerEvents "github.com/flyteorg/flytepropeller/pkg/controller/events"
-
 	"github.com/golang/protobuf/proto"
 
 	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	storageMocks "github.com/flyteorg/flytestdlib/storage/mocks"
-
-	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -27,15 +23,16 @@ import (
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	eventMocks "github.com/flyteorg/flytepropeller/events/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	eventMocks "github.com/flyteorg/flytepropeller/pkg/controller/events/mocks"
 	mocks4 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 	nodeHandlerMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
 	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
@@ -66,7 +63,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 	enQWf := func(workflowID v1alpha1.WorkflowID) {}
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-	exec, err := NewExecutor(ctx, config.GetConfig().NodeConfig, mockStorage, enQWf, events.NewMockEventSink(), adminClient,
+	exec, err := NewExecutor(ctx, config.GetConfig().NodeConfig, mockStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
 		adminClient, 10, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, eventConfig, promutils.NewTestScope())
 	assert.NoError(t, err)
 	inputs := &core.LiteralMap{
@@ -113,7 +110,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 	})
 
 	failStorage := createFailingDatastore(t, testScope.NewSubScope("failing"))
-	execFail, err := NewExecutor(ctx, config.GetConfig().NodeConfig, failStorage, enQWf, events.NewMockEventSink(), adminClient,
+	execFail, err := NewExecutor(ctx, config.GetConfig().NodeConfig, failStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
 		adminClient, 10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, promutils.NewTestScope())
 	assert.NoError(t, err)
 	t.Run("StorageFailure", func(t *testing.T) {
@@ -133,7 +130,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
 
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
@@ -171,7 +168,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 
@@ -275,7 +272,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 
@@ -484,7 +481,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	defaultNodeID := "n1"
 	taskID := taskID
@@ -994,7 +991,7 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
@@ -1104,7 +1101,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 
@@ -1220,7 +1217,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 	ctx := context.TODO()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 
@@ -1338,7 +1335,7 @@ func Test_nodeExecutor_RecordTransitionLatency(t *testing.T) {
 		nodeHandlerFactory HandlerFactory
 		enqueueWorkflow    v1alpha1.EnqueueWorkflow
 		store              *storage.DataStore
-		nodeRecorder       controllerEvents.NodeEventRecorder
+		nodeRecorder       events.NodeEventRecorder
 		metrics            *nodeMetrics
 	}
 	type args struct {
@@ -1770,7 +1767,7 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 	ctx := context.Background()
 	enQWf := func(workflowID v1alpha1.WorkflowID) {
 	}
-	mockEventSink := events.NewMockEventSink().(*events.MockEventSink)
+	mockEventSink := eventMocks.NewMockEventSink()
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 
@@ -1933,7 +1930,7 @@ func Test_nodeExecutor_IdempotentRecordEvent(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		rec     controllerEvents.NodeEventRecorder
+		rec     events.NodeEventRecorder
 		p       core.NodeExecution_Phase
 		wantErr bool
 	}{

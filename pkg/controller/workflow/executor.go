@@ -7,11 +7,8 @@ import (
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
-	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	controllerEvents "github.com/flyteorg/flytepropeller/pkg/controller/events"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -19,6 +16,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/record"
 
+	"github.com/flyteorg/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
@@ -62,7 +61,7 @@ func StatusFailed(err *core.ExecutionError) Status {
 type workflowExecutor struct {
 	enqueueWorkflow v1alpha1.EnqueueWorkflow
 	store           *storage.DataStore
-	wfRecorder      controllerEvents.WorkflowEventRecorder
+	wfRecorder      events.WorkflowEventRecorder
 	k8sRecorder     record.EventRecorder
 	metadataPrefix  storage.DataReference
 	nodeExecutor    executors.Node
@@ -507,7 +506,7 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 		nodeExecutor:    nodeExecutor,
 		store:           store,
 		enqueueWorkflow: enQWorkflow,
-		wfRecorder:      controllerEvents.NewWorkflowEventRecorder(eventSink, workflowScope, store),
+		wfRecorder:      events.NewWorkflowEventRecorder(eventSink, workflowScope, store),
 		k8sRecorder:     k8sEventRecorder,
 		metadataPrefix:  basePrefix,
 		metrics:         newMetrics(workflowScope),

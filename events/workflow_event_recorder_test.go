@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytepropeller/events/mocks"
 	"github.com/flyteorg/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flytestdlib/storage/mocks"
 	"github.com/golang/protobuf/proto"
@@ -16,51 +17,28 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var taskID = &core.Identifier{
-	Project: "p",
-	Domain:  "d",
-	Name:    "n",
-	Version: "v",
-}
-
-func getReferenceTaskEv() *event.TaskExecutionEvent {
-	return &event.TaskExecutionEvent{
-		TaskId:                taskID,
-		RetryAttempt:          1,
-		ParentNodeExecutionId: nodeExecID,
-		OutputResult: &event.TaskExecutionEvent_OutputUri{
+func getReferenceWorkflowEv() *event.WorkflowExecutionEvent {
+	return &event.WorkflowExecutionEvent{
+		ExecutionId: workflowExecID,
+		OutputResult: &event.WorkflowExecutionEvent_OutputUri{
 			OutputUri: referenceURI,
 		},
 	}
 }
 
-func getRawOutputTaskEv() *event.TaskExecutionEvent {
-	return &event.TaskExecutionEvent{
-		TaskId:                taskID,
-		RetryAttempt:          1,
-		ParentNodeExecutionId: nodeExecID,
-		OutputResult: &event.TaskExecutionEvent_OutputData{
+func getRawOutputWorkflowEv() *event.WorkflowExecutionEvent {
+	return &event.WorkflowExecutionEvent{
+		ExecutionId: workflowExecID,
+		OutputResult: &event.WorkflowExecutionEvent_OutputData{
 			OutputData: outputData,
 		},
 	}
 }
 
-// TODO: move this mock definition to flyteidl/events
-type mockTaskEventRecorder struct {
-	RecordTaskEventCb func(ctx context.Context, event *event.TaskExecutionEvent) error
-}
-
-func (r *mockTaskEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent) error {
-	if r.RecordTaskEventCb != nil {
-		return r.RecordTaskEventCb(ctx, event)
-	}
-	return nil
-}
-
-func TestRecordTaskEvent_Success_ReferenceOutputs(t *testing.T) {
-	eventRecorder := mockTaskEventRecorder{}
-	eventRecorder.RecordTaskEventCb = func(ctx context.Context, event *event.TaskExecutionEvent) error {
-		assert.True(t, proto.Equal(event, getReferenceTaskEv()))
+func TestRecordWorkflowEvent_Success_ReferenceOutputs(t *testing.T) {
+	eventRecorder := mocks.MockRecorder{}
+	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
 		return nil
 	}
 	mockStore := &storage.DataStore{
@@ -68,18 +46,18 @@ func TestRecordTaskEvent_Success_ReferenceOutputs(t *testing.T) {
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
 
-	recorder := &taskEventRecorder{
+	recorder := &workflowEventRecorder{
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordTaskEvent(context.TODO(), getReferenceTaskEv(), referenceEventConfig)
+	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), referenceEventConfig)
 	assert.NoError(t, err)
 }
 
-func TestRecordTaskEvent_Success_InlineOutputs(t *testing.T) {
-	eventRecorder := mockTaskEventRecorder{}
-	eventRecorder.RecordTaskEventCb = func(ctx context.Context, event *event.TaskExecutionEvent) error {
-		assert.True(t, proto.Equal(event, getRawOutputTaskEv()))
+func TestRecordWorkflowEvent_Success_InlineOutputs(t *testing.T) {
+	eventRecorder := mocks.MockRecorder{}
+	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+		assert.True(t, proto.Equal(event, getRawOutputWorkflowEv()))
 		return nil
 	}
 	pbStore := &storageMocks.ComposedProtobufStore{}
@@ -94,18 +72,18 @@ func TestRecordTaskEvent_Success_InlineOutputs(t *testing.T) {
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
 
-	recorder := &taskEventRecorder{
+	recorder := &workflowEventRecorder{
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordTaskEvent(context.TODO(), getReferenceTaskEv(), inlineEventConfig)
+	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
-func TestRecordTaskEvent_Failure_FetchInlineOutputs(t *testing.T) {
-	eventRecorder := mockTaskEventRecorder{}
-	eventRecorder.RecordTaskEventCb = func(ctx context.Context, event *event.TaskExecutionEvent) error {
-		assert.True(t, proto.Equal(event, getReferenceTaskEv()))
+func TestRecordWorkflowEvent_Failure_FetchInlineOutputs(t *testing.T) {
+	eventRecorder := mocks.MockRecorder{}
+	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
 		return nil
 	}
 	pbStore := &storageMocks.ComposedProtobufStore{}
@@ -117,21 +95,21 @@ func TestRecordTaskEvent_Failure_FetchInlineOutputs(t *testing.T) {
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
 
-	recorder := &taskEventRecorder{
+	recorder := &workflowEventRecorder{
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordTaskEvent(context.TODO(), getReferenceTaskEv(), inlineEventConfig)
+	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
-func TestRecordTaskEvent_Failure_FallbackReference_Retry(t *testing.T) {
-	eventRecorder := mockTaskEventRecorder{}
-	eventRecorder.RecordTaskEventCb = func(ctx context.Context, event *event.TaskExecutionEvent) error {
+func TestRecordWorkflowEvent_Failure_FallbackReference_Retry(t *testing.T) {
+	eventRecorder := mocks.MockRecorder{}
+	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
 		if event.GetOutputData() != nil {
 			return status.Error(codes.ResourceExhausted, "message too large")
 		}
-		assert.True(t, proto.Equal(event, getReferenceTaskEv()))
+		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
 		return nil
 	}
 	pbStore := &storageMocks.ComposedProtobufStore{}
@@ -146,17 +124,17 @@ func TestRecordTaskEvent_Failure_FallbackReference_Retry(t *testing.T) {
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
 
-	recorder := &taskEventRecorder{
+	recorder := &workflowEventRecorder{
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordTaskEvent(context.TODO(), getReferenceTaskEv(), inlineEventConfigFallback)
+	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfigFallback)
 	assert.NoError(t, err)
 }
 
-func TestRecordTaskEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
-	eventRecorder := mockTaskEventRecorder{}
-	eventRecorder.RecordTaskEventCb = func(ctx context.Context, event *event.TaskExecutionEvent) error {
+func TestRecordWorkflowEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
+	eventRecorder := mocks.MockRecorder{}
+	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
 		return errors.New("foo")
 	}
 	pbStore := &storageMocks.ComposedProtobufStore{}
@@ -171,10 +149,10 @@ func TestRecordTaskEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
 
-	recorder := &taskEventRecorder{
+	recorder := &workflowEventRecorder{
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordTaskEvent(context.TODO(), getReferenceTaskEv(), inlineEventConfigFallback)
+	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfigFallback)
 	assert.EqualError(t, err, "foo")
 }
