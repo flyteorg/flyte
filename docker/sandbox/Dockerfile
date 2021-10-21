@@ -19,16 +19,16 @@ RUN mkdir -p /flyteorg/bin /flyteorg/share
 
 # Install k3s
 ARG K3S_VERSION="v1.21.1%2Bk3s1"
-RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s \
+RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s-arm64 \
     && chmod +x /flyteorg/bin/k3s
 
 # Install Helm
 ENV HELM_URL="https://get.helm.sh"
 ARG HELM_VERSION="v3.6.3"
-RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xz && \
-    mv linux-amd64/helm /flyteorg/bin/helm && \
+RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-arm64.tar.gz -O - | tar -xz && \
+    mv linux-arm64/helm /flyteorg/bin/helm && \
     chmod +x /flyteorg/bin/helm && \
-    rm -rf linux-amd64
+    rm -rf linux-arm64
 
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/avan-sh/flyte/test/arm-support/install.sh | BINDIR=/flyteorg/bin sh -s
