@@ -288,7 +288,10 @@ The fully supported set of filter functions are
 
 "value_in" is a special case where multiple values are passed to the filter expression. For example::	
 
- value_in(phase, 1;2;3)	
+ value_in(phase, RUNNING;SUCCEEDED;FAILED)	
+
+.. note::
+   If you're issuing your requests over http(s), be sure to URL encode the ";" semicolon using `%3B` like so: `value_in(phase, RUNNING%3BSUCCEEDED%3BFAILED)`
 
 Filterable fields vary based on entity types:	
 
