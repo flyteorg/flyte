@@ -108,6 +108,7 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	ex.OnGetParentInfo().Return(nil)
 	ex.OnGetName().Return("name")
 	ex.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	ex.OnIncrementParallelism().Return(1)
 
 	nCtx.OnExecutionContext().Return(ex)
 
@@ -171,6 +172,8 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
+		c.AssertCalled(t, "IncrementParallelism")
 	})
 
 	t.Run("happy v1", func(t *testing.T) {
@@ -194,6 +197,8 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
+		c.AssertCalled(t, "IncrementParallelism")
 	})
 }
 
@@ -243,6 +248,8 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
+		c.AssertCalled(t, "IncrementParallelism")
 	})
 	t.Run("stillRunning V1", func(t *testing.T) {
 
@@ -262,6 +269,8 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
+		c.AssertCalled(t, "IncrementParallelism")
 	})
 }
 

@@ -347,7 +347,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 				hf := &mocks2.HandlerFactory{}
 				exec.nodeHandlerFactory = hf
 				h := &nodeHandlerMocks.Node{}
-				hf.On("GetHandler", v1alpha1.NodeKindEnd).Return(h, nil)
+				hf.OnGetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
 				mockWf, mockNode, mockNodeStatus := createSingleNodeWf(test.parentNodePhase, 0)
 				execContext := executors.NewExecutionContext(mockWf, nil, nil, nil, executors.InitializeControlFlow())
@@ -1286,6 +1286,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				eCtx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 					RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 				})
+				eCtx.OnIncrementParallelism().Return(0)
 				eCtx.OnCurrentParallelism().Return(0)
 				eCtx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 
@@ -1879,6 +1880,17 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		assert.Equal(t, s.NodePhase.String(), executors.NodePhaseRunning.String())
 	})
 
+	t.Run("parallelism-met-not-yet-started", func(t *testing.T) {
+		mockWf, mockNode, _ := createSingleNodeWf(v1alpha1.NodePhaseNotYetStarted, 1)
+		cf := executors.InitializeControlFlow()
+		cf.IncrementParallelism()
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, nil, nil, cf)
+
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, s.NodePhase.String(), executors.NodePhaseRunning.String())
+	})
+
 	t.Run("parallelism-disabled", func(t *testing.T) {
 		mockWf, mockNode, _ := createSingleNodeWf(v1alpha1.NodePhaseQueued, 0)
 		cf := executors.InitializeControlFlow()
@@ -2298,4 +2310,65 @@ func TestRecover(t *testing.T) {
 		assert.Equal(t, phaseInfo.GetPhase(), handler.EPhaseRecovered)
 		mockPBStore.AssertNumberOfCalls(t, "ReadProtobuf", 1)
 	})
+}
+
+func TestIsMaxParallelismAchieved(t *testing.T) {
+
+	// Creates an execution context for the test
+	createExecContext := func(maxParallelism, currentParallelism uint32) executors.ExecutionContext {
+		m := &mocks4.ExecutionContext{}
+		m.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+			MaxParallelism: maxParallelism,
+		})
+		m.OnCurrentParallelism().Return(currentParallelism)
+		return m
+	}
+
+	createNode := func(kind v1alpha1.NodeKind, lpRef bool) v1alpha1.ExecutableNode {
+		en := &mocks.ExecutableNode{}
+		en.OnGetKind().Return(kind)
+		if kind == v1alpha1.NodeKindWorkflow {
+			wn := &mocks.ExecutableWorkflowNode{}
+			var lp *v1alpha1.LaunchPlanRefID
+			if lpRef {
+				lp = &v1alpha1.LaunchPlanRefID{}
+			}
+			wn.OnGetLaunchPlanRefID().Return(lp)
+			en.OnGetWorkflowNode().Return(wn)
+		}
+		return en
+	}
+
+	type args struct {
+		currentNode  v1alpha1.ExecutableNode
+		currentPhase v1alpha1.NodePhase
+		execContext  executors.ExecutionContext
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"start", args{createNode(v1alpha1.NodeKindStart, false), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, false},
+		{"end", args{createNode(v1alpha1.NodeKindEnd, false), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, false},
+		{"branch", args{createNode(v1alpha1.NodeKindBranch, false), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, false},
+		{"subworkflow", args{createNode(v1alpha1.NodeKindWorkflow, false), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, false},
+		{"lp-met", args{createNode(v1alpha1.NodeKindWorkflow, true), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, true},
+		{"lp-met-larger", args{createNode(v1alpha1.NodeKindWorkflow, true), v1alpha1.NodePhaseQueued, createExecContext(1, 2)}, true},
+		{"lp-disabled", args{createNode(v1alpha1.NodeKindWorkflow, true), v1alpha1.NodePhaseQueued, createExecContext(0, 1)}, false},
+		{"lp-not-met", args{createNode(v1alpha1.NodeKindWorkflow, true), v1alpha1.NodePhaseQueued, createExecContext(4, 1)}, false},
+		{"lp-not-met-1", args{createNode(v1alpha1.NodeKindWorkflow, true), v1alpha1.NodePhaseQueued, createExecContext(2, 1)}, false},
+		{"task-met", args{createNode(v1alpha1.NodeKindTask, false), v1alpha1.NodePhaseQueued, createExecContext(1, 1)}, true},
+		{"task-met-larger", args{createNode(v1alpha1.NodeKindTask, false), v1alpha1.NodePhaseQueued, createExecContext(1, 2)}, true},
+		{"task-disabled", args{createNode(v1alpha1.NodeKindTask, false), v1alpha1.NodePhaseQueued, createExecContext(0, 1)}, false},
+		{"task-not-met", args{createNode(v1alpha1.NodeKindTask, false), v1alpha1.NodePhaseQueued, createExecContext(4, 1)}, false},
+		{"task-not-met-1", args{createNode(v1alpha1.NodeKindTask, false), v1alpha1.NodePhaseQueued, createExecContext(2, 1)}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsMaxParallelismAchieved(context.TODO(), tt.args.currentNode, tt.args.currentPhase, tt.args.execContext); got != tt.want {
+				t.Errorf("IsMaxParallelismAchieved() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
