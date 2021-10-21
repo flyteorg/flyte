@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-test/deep"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -179,7 +178,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 
 	ctx := context.Background()
 	type args struct {
-		secret *core.Secret
+		secret *coreIdl.Secret
 		p      *corev1.Pod
 	}
 	tests := []struct {
