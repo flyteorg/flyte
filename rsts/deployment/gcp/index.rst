@@ -191,20 +191,20 @@ flyteadmin
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flyteadmin]" gsa-flyteadmin@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flyteadmin]" gsa-flyteadmin@${PROJECT_ID}.iam.gserviceaccount.com
 
 
 flytepropeller
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flytepropeller]" gsa-flytepropeller@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flytepropeller]" gsa-flytepropeller@${PROJECT_ID}.iam.gserviceaccount.com
 
 datacatalog
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/datacatalog]" gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/datacatalog]" gsa-datacatalog@${PROJECT_ID}.iam.gserviceaccount.com
 
 Cluster resource manager
 We create binding for production,staging and development domains for the flyte workflows to use.
@@ -213,19 +213,19 @@ Production
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[production/default]" gsa-production@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[production/default]" gsa-production@${PROJECT_ID}.iam.gserviceaccount.com
 
 Staging
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[staging/default]" gsa-staging@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[staging/default]" gsa-staging@${PROJECT_ID}.iam.gserviceaccount.com
 
 Development
 
 .. code-block:: bash
 
- gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[development/default]" gsa-development@flyte-gcp.iam.gserviceaccount.com
+ gcloud iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[development/default]" gsa-development@${PROJECT_ID}.iam.gserviceaccount.com
 
 
 Create GKE Cluster
