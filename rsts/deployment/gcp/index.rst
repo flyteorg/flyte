@@ -19,6 +19,7 @@ Before you begin, please ensure that you have the following tools installed:
 * `gcloud <https://cloud.google.com/sdk/docs/install>`__
 * `Helm <https://helm.sh/docs/intro/install/>`__
 * `kubectl <https://kubernetes.io/docs/tasks/tools/>`__
+* `flytectl <https://docs.flyte.org/projects/flytectl/en/stable/#install>`__
 
 Initialize Gcloud
 ===================
@@ -48,7 +49,7 @@ Sample output
    DISPLAY_NAME                 ID    DIRECTORY_CUSTOMER_ID
    example-org        123456789999                C02ewszsz
 
-<ORG-ID> = ID column value for the organization
+<id> = ID column value for the organization
 
 .. code-block:: bash
 
@@ -58,8 +59,8 @@ Create GCE Project
 ==================
 .. code-block:: bash
 
-  export PROJECT-ID=<my-project>
-  gcloud projects create $PROJECT-ID --organization $ORG_ID
+  export PROJECT_ID=<my-project>
+  gcloud projects create $PROJECT_ID --organization $ORG_ID
 
 Of course you can also use an existing project if your account has appropriate permissions to create the required resources.
 
@@ -67,7 +68,7 @@ Set project <my-project> as the default in gcloud or use gcloud init to set this
 
 .. code-block:: bash
 
-  gcloud config set project ${PROJECT-ID}
+  gcloud config set project ${PROJECT_ID}
 
 We assume that <my-project> has been set as default for all gcloud commands below.
 
@@ -98,99 +99,130 @@ This creates the GSA's which would be mapped to the KSA(kubernetes service accou
 
 * Create GSA for cluster resource manager
 
-.. code-block:: bash
-
-  gcloud iam service-accounts create flyte-clusterresources
-
-
-* Create a new customized role enveloping `storage.buckets.get` with name StorageBucketGet which will be used while adding roles.
-
-* Add IAM policy binding for flyteadmin GSA. It requires permissions to get the bucket, create/delete/update objects in the bucket, connecting to cloud sql and also workload identity user role.
+Production
 
 .. code-block:: bash
 
-  gcloud iam service-accounts add-iam-policy-binding \
-    --role "roles/iam.workloadIdentityUser" \
-    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
-    --role "roles/cloudsql.client" \
-    --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flyteadmin]" \
-    gsa-flyteadmin@${PROJECT-ID}.iam.gserviceaccount.com
+  gcloud iam service-accounts create gsa-production
 
-* Add IAM policy binding for datacatalog GSA. It requires permissions to get the bucket, create/delete/update objects in the bucket, connecting to cloud sql and also workload identity user role.
+Staging
 
 .. code-block:: bash
 
-  gcloud iam service-accounts add-iam-policy-binding \
-    --role "roles/iam.workloadIdentityUser" \
-    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
-    --role "roles/cloudsql.client" \
-    --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/datacatalog]" \
-    gsa-datacatalog@${PROJECT-ID}.iam.gserviceaccount.com
+  gcloud iam service-accounts create gsa-staging
 
-* Add IAM policy binding for flytepropeller GSA. It requires permissions to get the bucket, create/delete/update objects in the bucket, create/update/delete kubernetes objects in the cluster and also workload identity user role.
+Development
 
 .. code-block:: bash
 
-  gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
-    --role "roles/container.developer" \
-    --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flytepropeller]" \
-    gsa-flytepropeller@${PROJECT-ID}.iam.gserviceaccount.com
+  gcloud iam service-accounts create gsa-development
 
-* Add IAM policy binding for cluster resource manager GSA. It requires permissions to get the bucket, create/delete/update objects in the bucket and also workload identity user role.
+* Create a new role DataCatalogRole with following permissions
+   * storage.buckets.get
+   * storage.objects.create
+   * storage.objects.delete
+* Create a new role FlyteAdminRole with following permissions
+   * storage.buckets.get
+   * storage.objects.create
+   * storage.objects.delete
+   * storage.objects.get
+   * storage.objects.getIamPolicy
+   * storage.objects.update
+* Create a new role FlytePropellerRole with following permissions
+   * storage.buckets.get
+   * storage.objects.create
+   * storage.objects.delete
+   * storage.objects.get
+   * storage.objects.getIamPolicy
+   * storage.objects.update
+* Create a new role FlyteWorkflowRole with following permissions
+   * storage.buckets.get
+   * storage.objects.create
+   * storage.objects.delete
+
+Refer the following `role <https://cloud.google.com/iam/docs/understanding-roles>`__ page for more details
+
+* Add IAM policy binding for flyteadmin GSA using FlyteAdminRole.
 
 .. code-block:: bash
 
-  gcloud iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --role "projects/${PROJECT-ID}/roles/StorageBucketGet" \
-    --role "roles/storage.objectAdmin" \
-    --member "serviceAccount:${PROJECT-ID}.svc.id.goog[flyte/flytepropeller]" \
-    flyte-clusterresources@${PROJECT-ID}.iam.gserviceaccount.com
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-flyteadmin@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteAdminRole"
+
+* Add IAM policy binding for datacatalog GSA using DataCatalogRole.
+
+.. code-block:: bash
+
+   gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-datacatalog@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/DataCatalogRole"
+
+* Add IAM policy binding for flytepropeller GSA using FlytePropellerRole.
+
+.. code-block:: bash
+
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-flytepropeller@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlytePropellerRole"
+
+* Add IAM policy binding for cluster resource manager GSA using FlyteWorkflowRole.
+
+Production
+
+.. code-block:: bash
+
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-production@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteWorkflowRole"
 
 
-* Allow the Kubernetes service account to impersonate the Google service account by creating an IAM policy binding between the two. This binding allows the Kubernetes Service account to act as the Google service account
+Staging
+
+.. code-block:: bash
+
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-staging@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteWorkflowRole"
+
+Development
+
+.. code-block:: bash
+
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-development@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteWorkflowRole"
+
+
+* Allow the Kubernetes service account to impersonate the Google service account by creating an IAM policy binding between the two. This binding allows the Kubernetes Service account to act as the Google service account.
 
 flyteadmin
 
 .. code-block:: bash
 
- gcloud iam service-accounts add-iam-policy-binding \
- --role roles/iam.workloadIdentityUser \
- --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flyteadmin]” \
- gsa-flyteadmin@flyte-gcp.iam.gserviceaccount.com
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flyteadmin]" gsa-flyteadmin@flyte-gcp.iam.gserviceaccount.com
+
 
 flytepropeller
 
 .. code-block:: bash
 
- gcloud iam service-accounts add-iam-policy-binding \
- --role roles/iam.workloadIdentityUser \
- --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/flytepropeller]” \
- gsa-flytepropeller@flyte-gcp.iam.gserviceaccount.com
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/flytepropeller]" gsa-flytepropeller@flyte-gcp.iam.gserviceaccount.com
 
 datacatalog
 
 .. code-block:: bash
 
- gcloud iam service-accounts add-iam-policy-binding \
- --role roles/iam.workloadIdentityUser \
- --member "serviceAccount:flyte-gcp.svc.id.goog[flyte/datacatalog]” \
- gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[flyte/datacatalog]" gsa-datacatalog@flyte-gcp.iam.gserviceaccount.com
 
-flyte-clusterresources
-Do the following for all project-domain combination of namespaces. Following example shows for flytesnacks-development namespace
+Cluster resource manager
+We create binding for production,staging and development domains for the flyte workflows to use.
+
+Production
 
 .. code-block:: bash
 
- gcloud iam service-accounts add-iam-policy-binding \
- --role roles/iam.workloadIdentityUser \
- --member "serviceAccount:flyte-gcp.svc.id.goog[flytesnacks-development/default]” \
- flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser"  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[production/default]" gsa-production@flyte-gcp.iam.gserviceaccount.com
+
+Staging
+
+.. code-block:: bash
+
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[staging/default]" gsa-staging@flyte-gcp.iam.gserviceaccount.com
+
+Development
+
+.. code-block:: bash
+
+ gcloud  iam service-accounts add-iam-policy-binding --role "roles/iam.workloadIdentityUser" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[development/default]" gsa-development@flyte-gcp.iam.gserviceaccount.com
 
 
 Create GKE Cluster
@@ -199,7 +231,7 @@ Create GKE cluster with VPC-native networking and workload identity enabled.
 Browse to the gcloud console and Kubernetes Engine tab to start creating the k8s cluster.
 
 Ensure that VPC native traffic routing is enabled under Security enable Workload identity and use project default pool
-which would be `${PROJECT-ID}.svc.id.goog`
+which would be `${PROJECT_ID}.svc.id.goog`
 
 The recommended way is to create it from the console. This is to make sure the options of VPC-native networking and Workload identity are enabled correctly.
 There are multiple commands needed to achieve this. If you create it through the console, it'll take care of creating and configuring the right resources
@@ -207,7 +239,7 @@ There are multiple commands needed to achieve this. If you create it through the
 .. code-block:: bash
 
   gcloud container clusters create <my-flyte-cluster> \
-    --workload-pool=${PROJECT-ID}.svc.id.goog
+    --workload-pool=${PROJECT_ID}.svc.id.goog
     --region us-west1 \
     --num-nodes 6
 
@@ -341,10 +373,10 @@ Create <BUCKETNAME> with uniform access
 
 Add access permission for the following principals
 
-* gsa-flytepropeller@${PROJECT-ID}.iam.gserviceaccount.com
-* gsa-datacatalog@${PROJECT-ID}.iam.gserviceaccount.com
-* gsa-flyteadmin@f${PROJECT-ID}.iam.gserviceaccount.com
-* gsa-flyte-clusterresources@${PROJECT-ID}.iam.gserviceaccount.com
+* gsa-flytepropeller@${PROJECT_ID}.iam.gserviceaccount.com
+* gsa-datacatalog@${PROJECT_ID}.iam.gserviceaccount.com
+* gsa-flyteadmin@f${PROJECT_ID}.iam.gserviceaccount.com
+* gsa-flyte-clusterresources@${PROJECT_ID}.iam.gserviceaccount.com
 
 Time for Helm
 =============
@@ -368,40 +400,11 @@ Installing Flyte
 .. code-block::
 
    <RELEASE-NAME> to be used as prefix for ssl certificate secretName
-   <PROJECT-ID> of your GCP project
+   <PROJECT_ID> of your GCP project
    <CLOUD-SQL-IP> private IP of cloud sql instance
    <DBPASSWORD> of the flyteadmin user created for the cloud sql instance
    <BUCKETNAME> of the GCS bucket created
    <HOSTNAME> DNS name of the Flyte deployment
-
-Also update the PROJECT-ID in the cluster_resource_manager section in the values-gcp.yaml file. Following example show flyte-gcp project id being replaced
-
-.. code-block:: yaml
-
-  config:
-    cluster_resources:
-      customData:
-        - production:
-            - projectQuotaCpu:
-                value: "5"
-            - projectQuotaMemory:
-                value: "4000Mi"
-            - defaultIamRole:
-                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
-        - staging:
-            - projectQuotaCpu:
-                value: "2"
-            - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
-        - development:
-            - projectQuotaCpu:
-                value: "2"
-            - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: flyte-clusterresources@flyte-gcp.iam.gserviceaccount.com
 
 #. Update helm dependencies
 
@@ -609,3 +612,4 @@ Change your logger config to this:
   level: 6
 
 * In case you have a new ingress IP for your Flyte deployment, you would need to flush DNS cache using `this <https://developers.google.com/speed/public-dns/cache>`__
+* In case you need to get access logs for your buckets then follow `this <https://cloud.google.com/storage/docs/access-logs>`__ GCP guide
