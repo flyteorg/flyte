@@ -114,8 +114,7 @@ data:
       annotations:
         # Needed for gcp workload identity to function
         # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-        # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
-        iam.gke.io/gcp-service-account: flyte-clusterresources@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+        iam.gke.io/gcp-service-account: {{ gsa }}
     
   ab_project_resource_quota.yaml: | 
     apiVersion: v1
@@ -163,8 +162,7 @@ data:
       annotations:
         # Needed for gcp workload identity to function
         # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-        # Replace this value {{ .Values.userSettings.googleProjectId }} with actual value since substitution doesn't work in case of gcp deployments
-        iam.gke.io/gcp-service-account: flyte-clusterresourcs@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+        iam.gke.io/gcp-service-account: {{ gsa }}
     
   af_spark_role_binding.yaml: | 
     apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -302,6 +300,9 @@ data:
         gpu: 1
         memory: 1Gi
         storage: 2000Mi
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -310,22 +311,22 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
-        - defaultIamRole:
-            value: flyte-clusterresources@<PROJECT-ID>.iam.gserviceaccount.com
+        - gsa:
+            value: gsa-production@<PROJECT-ID>.iam.gserviceaccount.com
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: flyte-clusterresources@<PROJECT-ID>.iam.gserviceaccount.com
+        - gsa:
+            value: gsa-staging@<PROJECT-ID>.iam.gserviceaccount.com
       - development:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: flyte-clusterresources@<PROJECT-ID>.iam.gserviceaccount.com
+        - gsa:
+            value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -903,7 +904,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "dc934cf5497f24737ca2661d33e349b0123679aa0233df75f8e86096abde09a"
+        configChecksum: "251c111641430dd6a9fc6a292f90fd97b46cd85eeccd60d085ef30b85d7e852"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1184,7 +1185,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "dc934cf5497f24737ca2661d33e349b0123679aa0233df75f8e86096abde09a"
+        configChecksum: "251c111641430dd6a9fc6a292f90fd97b46cd85eeccd60d085ef30b85d7e852"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
