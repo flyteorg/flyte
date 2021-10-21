@@ -10,10 +10,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
-	eventErrors "github.com/flyteorg/flyteidl/clients/go/events/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	eventErrors "github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	workflowErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"

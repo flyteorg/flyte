@@ -18,6 +18,7 @@ import (
 
 	errors3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 
+	"github.com/flyteorg/flytepropeller/events"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
@@ -341,7 +341,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	}
 
 	logger.Info(ctx, "Setting up event sink and recorder")
-	eventSink, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	eventSink, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create EventSink [%v], error %v", events.GetConfig(ctx).Type, err)
 	}

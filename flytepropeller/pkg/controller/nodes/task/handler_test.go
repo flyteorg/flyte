@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/events"
+	"github.com/flyteorg/flytepropeller/events"
 
 	pluginK8sMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 

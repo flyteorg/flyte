@@ -6,7 +6,6 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
@@ -26,7 +25,7 @@ type NodeEventRecorder interface {
 }
 
 type nodeEventRecorder struct {
-	eventRecorder events.NodeEventRecorder
+	eventRecorder EventRecorder
 	store         *storage.DataStore
 }
 
@@ -78,9 +77,9 @@ func (r *nodeEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeE
 	return nil
 }
 
-func NewNodeEventRecorder(eventSink events.EventSink, scope promutils.Scope, store *storage.DataStore) NodeEventRecorder {
+func NewNodeEventRecorder(eventSink EventSink, scope promutils.Scope, store *storage.DataStore) NodeEventRecorder {
 	return &nodeEventRecorder{
-		eventRecorder: events.NewNodeEventRecorder(eventSink, scope),
+		eventRecorder: NewEventRecorder(eventSink, scope),
 		store:         store,
 	}
 }

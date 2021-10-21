@@ -6,7 +6,6 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
@@ -26,7 +25,7 @@ type WorkflowEventRecorder interface {
 }
 
 type workflowEventRecorder struct {
-	eventRecorder events.WorkflowEventRecorder
+	eventRecorder EventRecorder
 	store         *storage.DataStore
 }
 
@@ -78,9 +77,9 @@ func (r *workflowEventRecorder) RecordWorkflowEvent(ctx context.Context, ev *eve
 	return nil
 }
 
-func NewWorkflowEventRecorder(eventSink events.EventSink, scope promutils.Scope, store *storage.DataStore) WorkflowEventRecorder {
+func NewWorkflowEventRecorder(eventSink EventSink, scope promutils.Scope, store *storage.DataStore) WorkflowEventRecorder {
 	return &workflowEventRecorder{
-		eventRecorder: events.NewWorkflowEventRecorder(eventSink, scope),
+		eventRecorder: NewEventRecorder(eventSink, scope),
 		store:         store,
 	}
 }

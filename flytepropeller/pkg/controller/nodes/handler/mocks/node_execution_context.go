@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	events "github.com/flyteorg/flytepropeller/pkg/controller/events"
+	events "github.com/flyteorg/flytepropeller/events"
 	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
 
 	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"

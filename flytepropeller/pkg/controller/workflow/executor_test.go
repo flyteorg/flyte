@@ -11,7 +11,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/flyteorg/flyteidl/clients/go/events"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
@@ -29,8 +28,9 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flytestdlib/logger"
 
-	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
-
+	"github.com/flyteorg/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	eventMocks "github.com/flyteorg/flytepropeller/events/mocks"
 	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/fakeplugins"
@@ -38,7 +38,6 @@ import (
 	wfErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	eventMocks "github.com/flyteorg/flytepropeller/pkg/controller/events/mocks"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/flyteorg/flytestdlib/yamlutils"
@@ -227,16 +226,17 @@ func createTaskExecutorErrorInCheck(t assert.TestingT) pluginCore.PluginEntry {
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	ctx := context.Background()
-	store := createInmemoryDataStore(t, testScope.NewSubScope("12"))
+	scope := testScope.NewSubScope("12")
+	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
 	assert.NoError(t, err)
 
 	te := createTaskExecutorErrorInCheck(t)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
-	eventSink := events.NewMockEventSink()
+	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
 	recoveryClient := &recoveryMocks.RecoveryClient{}
@@ -305,9 +305,10 @@ func walkAndPrint(conns v1alpha1.Connections, ns map[v1alpha1.NodeID]*v1alpha1.N
 
 func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	ctx := context.Background()
-	store := createInmemoryDataStore(t, testScope.NewSubScope("13"))
+	scope := testScope.NewSubScope("13")
+	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
@@ -315,7 +316,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
-	eventSink := events.NewMockEventSink()
+	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
 	recoveryClient := &recoveryMocks.RecoveryClient{}
@@ -372,14 +373,14 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	ctx := context.Background()
 	store := createInmemoryDataStore(b, scope.NewSubScope(strconv.Itoa(b.N)))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
 	assert.NoError(b, err)
 
 	te := createHappyPathTaskExecutor(b, false)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
-	eventSink := events.NewMockEventSink()
+	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(b, err)
 	recoveryClient := &recoveryMocks.RecoveryClient{}
@@ -442,9 +443,10 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	ctx := context.Background()
-	store := createInmemoryDataStore(t, promutils.NewTestScope())
+	scope := promutils.NewTestScope()
+	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
 	assert.NoError(t, err)
 
 	te := createFailingTaskExecutor(t)
@@ -455,9 +457,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	recordedRunning := false
 	recordedFailed := false
 	recordedFailing := true
-	eventSink := events.NewMockEventSink()
-	mockSink := eventSink.(*events.MockEventSink)
-	mockSink.SinkCb = func(ctx context.Context, message proto.Message) error {
+	eventSink := eventMocks.NewMockEventSink()
+	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
 
 		if ok {
@@ -537,9 +538,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	ctx := context.Background()
-	store := createInmemoryDataStore(t, promutils.NewTestScope())
+	scope := promutils.NewTestScope()
+	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
@@ -550,9 +552,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	recordedRunning := false
 	recordedSuccess := false
 	recordedFailing := true
-	eventSink := events.NewMockEventSink()
-	mockSink := eventSink.(*events.MockEventSink)
-	mockSink.SinkCb = func(ctx context.Context, message proto.Message) error {
+	eventSink := eventMocks.NewMockEventSink()
+	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
 		if ok {
 			switch e.Phase {
@@ -622,9 +623,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	ctx := context.Background()
-	store := createInmemoryDataStore(t, promutils.NewTestScope())
+	scope := promutils.NewTestScope()
+	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
+	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
@@ -635,7 +637,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	assert.NoError(t, err)
 
-	nodeEventSink := events.NewMockEventSink()
+	nodeEventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCatalogClient(ctx)
 	assert.NoError(t, err)
 	recoveryClient := &recoveryMocks.RecoveryClient{}
@@ -647,14 +649,13 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 
 	t.Run("EventAlreadyInTerminalStateError", func(t *testing.T) {
 
-		eventSink := events.NewMockEventSink()
-		mockSink := eventSink.(*events.MockEventSink)
-		mockSink.SinkCb = func(ctx context.Context, message proto.Message) error {
+		eventSink := eventMocks.NewMockEventSink()
+		eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 			return &eventsErr.EventError{Code: eventsErr.EventAlreadyInTerminalStateError,
 				Cause: errors.New("already exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, mockSink, recorder, "metadata", nodeExec, eventConfig, promutils.NewTestScope())
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -667,9 +668,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	})
 
 	t.Run("EventSinkAlreadyExistsError", func(t *testing.T) {
-		eventSink := events.NewMockEventSink()
-		mockSink := eventSink.(*events.MockEventSink)
-		mockSink.SinkCb = func(ctx context.Context, message proto.Message) error {
+		eventSink := eventMocks.NewMockEventSink()
+		eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 			return &eventsErr.EventError{Code: eventsErr.AlreadyExists,
 				Cause: errors.New("already exists"),
 			}
@@ -684,9 +684,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	})
 
 	t.Run("EventSinkGenericError", func(t *testing.T) {
-		eventSink := events.NewMockEventSink()
-		mockSink := eventSink.(*events.MockEventSink)
-		mockSink.SinkCb = func(ctx context.Context, message proto.Message) error {
+		eventSink := eventMocks.NewMockEventSink()
+		eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 			return &eventsErr.EventError{Code: eventsErr.EventSinkError,
 				Cause: errors.New("generic exists"),
 			}
