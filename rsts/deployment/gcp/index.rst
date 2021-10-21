@@ -139,6 +139,9 @@ Development
    * storage.buckets.get
    * storage.objects.create
    * storage.objects.delete
+   * storage.objects.get
+   * storage.objects.list
+   * storage.objects.update
 
 Refer the following `role <https://cloud.google.com/iam/docs/understanding-roles>`__ page for more details
 
