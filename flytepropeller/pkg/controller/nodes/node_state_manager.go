@@ -83,7 +83,7 @@ func (n nodeStateManager) GetWorkflowNodeState() handler.WorkflowNodeState {
 	return ws
 }
 
-func (n nodeStateManager) clearNodeStatus() {
+func (n *nodeStateManager) clearNodeStatus() {
 	n.t = nil
 	n.b = nil
 	n.d = nil

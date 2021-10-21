@@ -665,10 +665,19 @@ func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.finalize(ctx, h, nCtx); err != nil {
 			return executors.NodeStatusUndefined, err
 		}
+		t := v1.Now()
 
+		started := nodeStatus.GetStartedAt()
+		if started == nil {
+			started = &t
+		}
+		stopped := nodeStatus.GetStoppedAt()
+		if stopped == nil {
+			stopped = &t
+		}
+		c.metrics.SuccessDuration.Observe(ctx, started.Time, stopped.Time)
 		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, v1.Now(), "completed successfully", nil)
-		c.metrics.SuccessDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", nil)
 		if nCtx.md.IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
