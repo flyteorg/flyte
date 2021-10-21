@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -767,6 +769,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
@@ -990,12 +993,12 @@ spec:
         resources: 
           limits:
             cpu: 250m
-            ephemeral-storage: 100Mi
+            ephemeral-storage: 2Gi
             memory: 500Mi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 200Mi
         volumeMounts:
         - mountPath: /etc/db
           name: db-pass
@@ -1021,6 +1024,13 @@ spec:
         - name: auth
           secret:
             secretName: flyte-admin-secrets
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flyteadmin
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
@@ -1637,12 +1647,8 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
-      host: dev.gcp.union.ai
   tls:
     - secretName: flyte-flyte-tls
-      hosts:
-        - dev.gcp.union.ai
-  
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -1694,8 +1700,5 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
-      host: dev.gcp.union.ai
   tls:
     - secretName: flyte-flyte-tls
-      hosts:
-        - dev.gcp.union.ai

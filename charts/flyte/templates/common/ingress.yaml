@@ -170,14 +170,16 @@ spec:
           {{- if not .Values.common.ingress.separateGrpcIngress }}
           {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
-      {{- with .Values.common.ingress.host }}
-      host: {{ . }}
-      {{- end }}
+      {{- if .Values.common.ingress.host }}
+      host: {{ .Values.common.ingress.host }}
+      {{- end -}}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
+      {{- if .Values.common.ingress.host }}
       hosts:
         - {{ .Values.common.ingress.host }}
+      {{- end -}}
   {{ end }}
 
 
@@ -209,14 +211,16 @@ spec:
           #   pathType: ImplementationSpecific
           # {{- end }}
           {{- include "grpcRoutes" . | nindent 10 -}}
-      {{- with .Values.common.ingress.host }}
-      host: {{ . }}
-      {{- end }}
+      {{- if .Values.common.ingress.host }}
+      host: {{ .Values.common.ingress.host }}
+      {{- end -}}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
+      {{- if .Values.common.ingress.host }}
       hosts:
         - {{ .Values.common.ingress.host }}
+      {{- end -}}
   {{ end }}
 {{- end }}
 {{- end }}

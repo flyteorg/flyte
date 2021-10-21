@@ -12,6 +12,7 @@ userSettings:
 #
 
 flyteadmin:
+  deployRedoc: false
   replicaCount: 1
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the flyteadmin role will be added
@@ -136,7 +137,6 @@ workflow_scheduler:
 workflow_notifications:
   enabled: false
 
-
 #
 # REDIS
 #
@@ -169,19 +169,11 @@ contour:
   enabled: false
 
 #
-# FlyteAdmin
-#
-
-flyteadmin:
-  deployRedoc: false
-
-#
 # COMMON
 #
 
 common:
-  ingress:  
-    host: dev.gcp.union.ai
+  ingress:
     tls:
       enabled: true
     annotations:
@@ -229,7 +221,6 @@ storage:
     projectId: "{{ .Values.userSettings.googleProjectId }}"
 
 db:
-
   datacatalog:
     database:
       port: 5432
@@ -239,7 +230,7 @@ db:
       # -- Create a DB called datacatalog (OR change the name here)
       dbname: flyteadmin
       passwordPath: /etc/db/pass.txt
- 
+
   admin:
     database:
       port: 5432
@@ -249,7 +240,6 @@ db:
       # -- Create a DB called flyteadmin (OR change the name here)
       dbname: flyteadmin
       passwordPath: /etc/db/pass.txt
-
 
 #
 # CONFIGMAPS
@@ -278,12 +268,11 @@ configmap:
         storage: 1000Mi
       limits:
         storage: 2000Mi
-  
+
   # Adds the namespace mapping to default to only domain name instead of project-domain in case of GCP
   namespace_config:
     namespace_mapping:
       template: "{{ domain }}"
-
 
   core:
     propeller:
@@ -469,7 +458,6 @@ cluster_resource_manager:
         - kind: ServiceAccount
           name: spark
           namespace: {{ namespace }}
-
 
 #
 # SPARKOPERATOR
