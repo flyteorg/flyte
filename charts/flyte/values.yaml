@@ -763,62 +763,7 @@ workflow_notifications:
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
-  enabled: true
-  # -- Configmap for ClusterResource parameters
-  config:
-    # -- ClusterResource parameters
-    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
-    cluster_resources:
-      refreshInterval: 5m
-      templatePath: "/etc/flyte/clusterresource/templates"
-      customData:
-        - production:
-            - projectQuotaCpu:
-                value: "5"
-            - projectQuotaMemory:
-                value: "4000Mi"
-            - defaultIamRole:
-                value: ""
-        - staging:
-            - projectQuotaCpu:
-                value: "2"
-            - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: ""
-        - development:
-            - projectQuotaCpu:
-                value: "4"
-            - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: ""
-      refresh: 5m
-
-  # -- Resource templates that should be applied
-  templates:
-    # -- Template for namespaces resources
-    - key: aa_namespace
-      value: |
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: {{ namespace }}
-        spec:
-          finalizers:
-          - kubernetes
-
-    - key: ab_project_resource_quota
-      value: |
-        apiVersion: v1
-        kind: ResourceQuota
-        metadata:
-          name: project-quota
-          namespace: {{ namespace }}
-        spec:
-          hard:
-            limits.cpu: {{ projectQuotaCpu }}
-            limits.memory: {{ projectQuotaMemory }}
+  enabled: false
 
 # --------------------------------------------------------
 # Optional Plugins

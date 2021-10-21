@@ -394,6 +394,9 @@ cluster_resource_manager:
   enabled: true
   config:
     cluster_resources:
+      refresh: 5m
+      refreshInterval: 5m
+      templatePath: /etc/flyte/clusterresource/templates
       customData:
         - production:
             - projectQuotaCpu:
