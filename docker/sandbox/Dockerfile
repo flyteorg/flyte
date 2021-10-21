@@ -19,12 +19,14 @@ RUN mkdir -p /flyteorg/bin /flyteorg/share
 
 # Install k3s
 ARG K3S_VERSION="v1.21.1%2Bk3s1"
+#TODO: Change this to download based on any architecture
 RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s-arm64 \
     && chmod +x /flyteorg/bin/k3s
 
 # Install Helm
 ENV HELM_URL="https://get.helm.sh"
 ARG HELM_VERSION="v3.6.3"
+#TODO: Change this to download based on any architecture
 RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-arm64.tar.gz -O - | tar -xz && \
     mv linux-arm64/helm /flyteorg/bin/helm && \
     chmod +x /flyteorg/bin/helm && \
@@ -90,4 +92,4 @@ VOLUME /var/log
 # Expose Flyte ports
 EXPOSE 30081 30082 30084 30087
 
-# ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
+ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
