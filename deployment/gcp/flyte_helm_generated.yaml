@@ -114,6 +114,57 @@ metadata:
   namespace: flyte
 type: Opaque
 ---
+# Source: flyte/templates/admin/cluster_resource_configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clusterresource-template
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  aa_namespace.yaml: | 
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+    
+  ab_project_resource_quota.yaml: | 
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }}
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }}
+        limits.memory: {{ projectQuotaMemory }}
+    
+  zz_copilot_config.yaml: | 
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: flyte-data-config
+      namespace: {{ namespace }}
+    data:
+      config.yaml: | 
+        storage:
+          type: stow
+          stow:
+            kind: google
+            config:
+              json: ""
+              project_id: <GOOGLE_PROJECT_ID>
+              scopes: https://www.googleapis.com/auth/devstorage.read_write
+          container: "<BUCKET_NAME>"
+          enable-multicontainer: true
+---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -216,6 +267,27 @@ data:
         gpu: 1
         memory: 1Gi
         storage: 20Mi
+  cluster_resources.yaml: | 
+    cluster_resources:
+      customData:
+      - production:
+        - projectQuotaCpu:
+            value: "5"
+        - projectQuotaMemory:
+            value: 4000Mi
+      - staging:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+      - development:
+        - projectQuotaCpu:
+            value: "4"
+        - projectQuotaMemory:
+            value: 3000Mi
+      refresh: 5m
+      refreshInterval: 5m
+      templatePath: /etc/flyte/clusterresource/templates
 ---
 # Source: flyte/templates/console/configmap.yaml
 apiVersion: v1
@@ -1198,7 +1270,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9be53d5eaf4c1322e91a978117a386995c946c6193377f789119d8a49a39291"
+        configChecksum: "b89a7a12bb07ceda9849214e5e5fc4f1f50840294724105fb788495d4bb0682"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1233,6 +1305,21 @@ spec:
           name: seed-projects
           volumeMounts:
           
+          - mountPath: /etc/flyte/config
+            name: config-volume
+        - command:
+          - flyteadmin
+          - --config
+          - /etc/flyte/config/*.yaml
+          - clusterresource
+          - sync
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          imagePullPolicy: "IfNotPresent"
+          name: sync-cluster-resources
+          volumeMounts:
+          
+          - mountPath: /etc/flyte/clusterresource/templates
+            name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
@@ -1288,6 +1375,9 @@ spec:
         - configMap:
             name: flyte-admin-config
           name: config-volume
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
         - name: auth
           secret:
             secretName: flyte-admin-secrets
@@ -1437,7 +1527,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9be53d5eaf4c1322e91a978117a386995c946c6193377f789119d8a49a39291"
+        configChecksum: "b89a7a12bb07ceda9849214e5e5fc4f1f50840294724105fb788495d4bb0682"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1758,6 +1848,50 @@ spec:
       volumes:
       - emptyDir: {}
         name: redis-data
+---
+# Source: flyte/templates/admin/cronjob.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: syncresources
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: '*/1 * * * *'
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - flyteadmin
+            - --config
+            - /etc/flyte/config/*.yaml
+            - clusterresource
+            - sync
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+            imagePullPolicy: "IfNotPresent"
+            name: sync-cluster-resources
+            volumeMounts:
+            
+            - mountPath: /etc/flyte/clusterresource/templates
+              name: resource-templates
+            - mountPath: /etc/flyte/config
+              name: config-volume
+          restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
+          volumes:
+          
+          - configMap:
+              name: clusterresource-template
+            name: resource-templates
+          - configMap:
+              name: flyte-admin-config
+            name: config-volume
 ---
 # Source: flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1

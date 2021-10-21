@@ -230,7 +230,6 @@ cluster_resource_manager:
   config:
     cluster_resources:
       refreshInterval: 5m
-      refresh: 5m
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:
