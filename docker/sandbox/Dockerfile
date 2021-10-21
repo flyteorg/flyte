@@ -31,7 +31,7 @@ RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-arm64.tar.gz -O - | tar -xz && \
     rm -rf linux-arm64
 
 # Install flytectl
-RUN wget -q -O - https://raw.githubusercontent.com/avan-sh/flyte/test/arm-support/install.sh | BINDIR=/flyteorg/bin sh -s
+RUN wget -q -O - https://raw.githubusercontent.com/avan-sh/flytectl/test/arm-support/install.sh | BINDIR=/flyteorg/bin sh -s
 
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
