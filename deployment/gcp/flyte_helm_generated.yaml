@@ -1,35 +1,4 @@
 ---
-# Source: flyte/templates/pytorch-operator/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: pytorch-operator
----
-# Source: flyte/charts/sparkoperator/templates/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyte-sparkoperator
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
----
-# Source: flyte/charts/sparkoperator/templates/spark-serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyte-spark
-  namespace: flyte
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
----
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -41,6 +10,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -53,6 +24,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-datacatalog@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
@@ -65,6 +38,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flytepropeller@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
@@ -74,18 +49,6 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 ---
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: pytorch-operator
-  namespace: pytorch-operator
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
----
 # Source: flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
@@ -94,6 +57,15 @@ metadata:
   namespace: flyte
 type: Opaque
 stringData:
+---
+# Source: flyte/templates/common/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-pass
+stringData:
+  pass.txt: '<DBPASSWORD>'
+type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
 apiVersion: v1
@@ -135,6 +107,17 @@ data:
       finalizers:
       - kubernetes
     
+  aab_default_service_account.yaml: | 
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default
+      namespace: {{ namespace }}
+      annotations:
+        # Needed for gcp workload identity to function
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+        iam.gke.io/gcp-service-account: {{ gsa }}
+    
   ab_project_resource_quota.yaml: | 
     apiVersion: v1
     kind: ResourceQuota
@@ -145,6 +128,58 @@ data:
       hard:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
+    
+  ad_spark_role.yaml: | 
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: spark-role
+      namespace: {{ namespace }}
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - '*'
+    
+  ae_spark_service_account.yaml: | 
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: spark
+      namespace: {{ namespace }}
+      annotations:
+        # Needed for gcp workload identity to function
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+        iam.gke.io/gcp-service-account: {{ gsa }}
+    
+  af_spark_role_binding.yaml: | 
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: RoleBinding
+    metadata:
+      name: spark-role-binding
+      namespace: {{ namespace }}
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: spark-role
+    subjects:
+    - kind: ServiceAccount
+      name: spark
+      namespace: {{ namespace }}
     
   zz_copilot_config.yaml: | 
     kind: ConfigMap
@@ -160,9 +195,9 @@ data:
             kind: google
             config:
               json: ""
-              project_id: <GOOGLE_PROJECT_ID>
-              scopes: https://www.googleapis.com/auth/devstorage.read_write
-          container: "<BUCKET_NAME>"
+              project_id: <PROJECT-ID>
+              scopes: https://www.googleapis.com/auth/devstorage.full_control
+          container: "<BUCKETNAME>"
           enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
@@ -180,9 +215,10 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: postgres
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   domain.yaml: | 
     domains:
     - id: development
@@ -193,7 +229,7 @@ data:
       name: production
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   server.yaml: | 
     auth:
@@ -233,15 +269,13 @@ data:
         allowCors: true
         allowedHeaders:
         - Content-Type
-        - flyte-authorization
         allowedOrigins:
         - '*'
         secure: false
         useAuth: false
   remoteData.yaml: | 
     remoteData:
-      region: us-east-1
-      scheme: gcp
+      scheme: gcs
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
@@ -251,22 +285,25 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+          project_id: <PROJECT-ID>
+          scopes: https://www.googleapis.com/auth/devstorage.full_control
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
-        cpu: 100m
-        memory: 100Mi
-        storage: 5Mi
+        cpu: 1000m
+        memory: 1000Mi
+        storage: 1000Mi
       limits:
         cpu: 2
         gpu: 1
         memory: 1Gi
-        storage: 20Mi
+        storage: 2000Mi
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -275,16 +312,22 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
+        - gsa:
+            value: gsa-production@<PROJECT-ID>.iam.gserviceaccount.com
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - gsa:
+            value: gsa-staging@<PROJECT-ID>.iam.gserviceaccount.com
       - development:
         - projectQuotaCpu:
-            value: "4"
+            value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - gsa:
+            value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -319,13 +362,14 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: datacatalog
-      host: postgres
+      dbname: flyteadmin
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   server.yaml: | 
     application:
@@ -343,9 +387,9 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+          project_id: <PROJECT-ID>
+          scopes: https://www.googleapis.com/auth/devstorage.full_control
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
 ---
@@ -374,12 +418,13 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: postgres
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
 ---
 # Source: flyte/templates/propeller/configmap.yaml
@@ -420,6 +465,11 @@ data:
     propeller:
       downstream-eval-duration: 30s
       enable-admin-launcher: true
+      gc-interval: 12h
+      kube-client-config:
+        burst: 25
+        qps: 100
+        timeout: 30s
       leader-election:
         enabled: true
         lease-duration: 15s
@@ -429,7 +479,7 @@ data:
         renew-deadline: 10s
         retry-period: 2s
       limit-namespace: all
-      max-workflow-retries: 30
+      max-workflow-retries: 50
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
       prof-port: 10254
@@ -443,12 +493,12 @@ data:
           rate: 100
           type: maxof
         sub-queue:
-          capacity: 100
-          rate: 10
+          capacity: 1000
+          rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://my-s3-bucket/
-      workers: 4
+      rawoutput-prefix: gs://<BUCKETNAME>/
+      workers: 40
       workflow-reeval-duration: 30s
     webhook:
       certDir: /etc/webhook/certs
@@ -460,9 +510,11 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
+          spark: spark
         enabled-plugins:
         - container
         - sidecar
+        - spark
         - k8s-array
   k8s.yaml: | 
     plugins:
@@ -472,7 +524,7 @@ data:
         default-memory: 100Mi
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   resource_manager.yaml: | 
     propeller:
@@ -482,24 +534,6 @@ data:
           hostPath: redis-resource-manager:6379
         resourceMaxQuota: 10000
         type: redis
-  spark.yaml: | 
-    plugins:
-      spark:
-        spark-config-default:
-        - spark.hadoop.fs.s3a.aws.credentials.provider: com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-        - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-        - spark.kubernetes.allocation.batch.size: "50"
-        - spark.hadoop.fs.s3a.acl.default: BucketOwnerFullControl
-        - spark.hadoop.fs.s3n.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-        - spark.hadoop.fs.AbstractFileSystem.s3n.impl: org.apache.hadoop.fs.s3a.S3A
-        - spark.hadoop.fs.s3.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-        - spark.hadoop.fs.AbstractFileSystem.s3.impl: org.apache.hadoop.fs.s3a.S3A
-        - spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-        - spark.hadoop.fs.AbstractFileSystem.s3a.impl: org.apache.hadoop.fs.s3a.S3A
-        - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-        - spark.blacklist.enabled: "true"
-        - spark.blacklist.timeout: 5m
-        - spark.task.maxfailures: "8"
   storage.yaml: | 
     storage:
       type: stow
@@ -507,20 +541,27 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+          project_id: <PROJECT-ID>
+          scopes: https://www.googleapis.com/auth/devstorage.full_control
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
     cache:
-      max_size_mbs: 0
+      max_size_mbs: 1024
       target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
+      k8s-array:
+        logs:
+          config:
+            stackdriver-enabled: true
+            stackdriver-logresourcename: k8s_container
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: false
+        stackdriver-enabled: true
+        stackdriver-logresourcename: k8s_container
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -537,139 +578,6 @@ spec:
     singular: flyteworkflow
   scope: Namespaced
   version: v1alpha1
----
-# Source: flyte/templates/pytorch-operator/crds/pytorchjobs.yaml
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: pytorchjobs.kubeflow.org
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .status.conditions[-1:].type
-    name: State
-    type: string
-  - JSONPath: .metadata.creationTimestamp
-    name: Age
-    type: date
-  group: kubeflow.org
-  names:
-    kind: PyTorchJob
-    plural: pytorchjobs
-    singular: pytorchjob
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          properties:
-            pytorchReplicaSpecs:
-              properties:
-                Master:
-                  properties:
-                    replicas:
-                      maximum: 1
-                      minimum: 1
-                      type: integer
-                Worker:
-                  properties:
-                    replicas:
-                      minimum: 1
-                      type: integer
-  versions:
-  - name: v1
-    served: true
-    storage: true
----
-# Source: flyte/charts/sparkoperator/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: flyte-sparkoperator
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - services
-  - configmaps
-  - secrets
-  verbs:
-  - create
-  - get
-  - delete
-  - update
-- apiGroups:
-  - extensions
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - create
-  - get
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - update
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - resourcequotas
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - create
-  - get
-  - update
-  - delete
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  - validatingwebhookconfigurations
-  verbs:
-  - create
-  - get
-  - update
-  - delete
-- apiGroups:
-  - sparkoperator.k8s.io
-  resources:
-  - sparkapplications
-  - sparkapplications/status
-  - scheduledsparkapplications
-  - scheduledsparkapplications/status
-  verbs:
-  - "*"
 ---
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -794,123 +702,6 @@ rules:
       - update
       - patch
 ---
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: pytorch-operator-admin
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules: []
-aggregationRule:
-  clusterRoleSelectors:
-  - matchLabels:
-      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-pytorchjobs-admin: "true"
----
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: pytorch-operator-edit
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - kubeflow.org
-  resources:
-  - pytorchjobs
-  - pytorchjobs/status
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - delete
-  - deletecollection
-  - patch
-  - update
----
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: pytorch-operator-view
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - kubeflow.org
-  resources:
-  - pytorchjobs
-  - pytorchjobs/status
-  verbs:
-  - get
-  - list
-  - watch
----
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: pytorch-operator
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - kubeflow.org
-  resources:
-  - pytorchjobs
-  - pytorchjobs/status
-  verbs:
-  - '*'
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - '*'
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - services
-  - endpoints
-  - events
-  verbs:
-  - '*'
----
-# Source: flyte/charts/sparkoperator/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: flyte-sparkoperator
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
-subjects:
-  - kind: ServiceAccount
-    name: flyte-sparkoperator
-    namespace: flyte
-roleRef:
-  kind: ClusterRole
-  name: flyte-sparkoperator
-  apiGroup: rbac.authorization.k8s.io
----
 # Source: flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -965,72 +756,6 @@ subjects:
     name: flyte-pod-webhook
     namespace: flyte
 ---
-# Source: flyte/templates/pytorch-operator/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: pytorch-operator
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: pytorch-operator
-subjects:
-- kind: ServiceAccount
-  name: pytorch-operator
-  namespace: pytorch-operator
----
-# Source: flyte/charts/sparkoperator/templates/spark-rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: spark-role
-  namespace: flyte
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - "*"
----
-# Source: flyte/charts/sparkoperator/templates/spark-rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: spark
-  namespace: flyte
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
-subjects:
-- kind: ServiceAccount
-  name: flyte-spark
-  namespace: flyte
-roleRef:
-  kind: Role
-  name: spark-role
-  apiGroup: rbac.authorization.k8s.io
----
 # Source: flyte/templates/admin/service.yaml
 apiVersion: v1
 kind: Service
@@ -1043,6 +768,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
@@ -1099,6 +825,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: NodePort
@@ -1137,27 +864,6 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Source: flyte/templates/pytorch-operator/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: pytorch-operator
-  namespace: pytorch-operator
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-  - name: monitoring-port
-    port: 8443
-    targetPort: 8443
-  selector: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
----
 # Source: flyte/templates/redis/service.yaml
 apiVersion: v1
 kind: Service
@@ -1180,76 +886,6 @@ spec:
     app.kubernetes.io/name: redis
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte/charts/sparkoperator/templates/deployment.yaml
-# If the admission webhook is enabled, then a post-install step is required
-# to generate and install the secret in the operator namespace.
-
-# In the post-install hook, the token corresponding to the operator service account
-# is used to authenticate with the Kubernetes API server to install the secret bundle.
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flyte-sparkoperator
-  labels:
-    helm.sh/chart: sparkoperator-1.0.6
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: sparkoperator
-      app.kubernetes.io/instance: flyte
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "10254"
-        prometheus.io/path: /metrics
-      labels:
-        app.kubernetes.io/name: sparkoperator
-        app.kubernetes.io/instance: flyte
-    spec:
-      serviceAccountName: flyte-sparkoperator
-      securityContext:
-        {}
-      containers:
-      - name: sparkoperator
-        image: gcr.io/spark-operator/spark-operator:v1beta2-1.2.0-3.0.0
-        imagePullPolicy: IfNotPresent
-        securityContext:
-          {}
-        ports:
-          - name: "metrics"
-            containerPort: 10254
-        
-        args:
-        - -v=2
-        - -logtostderr
-        - -namespace=
-        - -ingress-url-format=
-        - -controller-threads=10
-        - -resync-interval=30
-        - -enable-batch-scheduler=false
-        - -enable-metrics=true
-        - -metrics-labels=app_type
-        - -metrics-port=10254
-        - -metrics-endpoint=/metrics
-        - -metrics-prefix=
-        - -enable-resource-quota-enforcement=false
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 500M
-          requests:
-            cpu: 10m
-            memory: 50M
----
 # Source: flyte/templates/admin/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1270,7 +906,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b89a7a12bb07ceda9849214e5e5fc4f1f50840294724105fb788495d4bb0682"
+        configChecksum: "964e5330159b2406c682eac0be30cf6931dca6207897a9417de5f4f2f89e01e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1294,7 +930,8 @@ spec:
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
         - command:
@@ -1310,7 +947,8 @@ spec:
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
         - command:
@@ -1323,7 +961,8 @@ spec:
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
@@ -1359,14 +998,15 @@ spec:
         resources: 
           limits:
             cpu: 250m
-            ephemeral-storage: 100Mi
+            ephemeral-storage: 2Gi
             memory: 500Mi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 200Mi
         volumeMounts:
-        
+        - mountPath: /etc/db
+          name: db-pass
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
@@ -1375,7 +1015,9 @@ spec:
           mountPath: /etc/secrets/
       serviceAccountName: flyteadmin
       volumes:
-        
+        - name: db-pass
+          secret:
+            secretName: db-pass
         - emptyDir: {}
           name: shared-data
         - configMap:
@@ -1387,6 +1029,13 @@ spec:
         - name: auth
           secret:
             secretName: flyte-admin-secrets
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flyteadmin
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
@@ -1426,7 +1075,7 @@ spec:
         - containerPort: 8080
         resources: 
           limits:
-            cpu: 500m
+            cpu: 250m
             memory: 250Mi
           requests:
             cpu: 10m
@@ -1437,6 +1086,13 @@ spec:
       volumes:
       - emptyDir: {}
         name: shared-data
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flyteconsole
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/datacatalog/deployment.yaml
 apiVersion: apps/v1
@@ -1458,7 +1114,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c20fead6cb4c5d998252e322321f8b618558f4698555778400c64361c90c0f8"
+        configChecksum: "624f4a78eabbe0e914a3892e0bfae01850b63cb1ca536e8451c94ee03e57ee1"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1482,7 +1138,8 @@ spec:
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
-            
+            - mountPath: /etc/db
+              name: db-pass
             - mountPath: /etc/datacatalog/config
               name: config-volume
       containers:
@@ -1500,24 +1157,34 @@ spec:
           resources: 
             limits:
               cpu: 500m
-              ephemeral-storage: 100Mi
+              ephemeral-storage: 2Gi
               memory: 500Mi
             requests:
-              cpu: 10m
-              ephemeral-storage: 50Mi
-              memory: 50Mi
+              cpu: 50m
+              ephemeral-storage: 2Gi
+              memory: 200Mi
           volumeMounts:
-            
+            - mountPath: /etc/db
+              name: db-pass
             - mountPath: /etc/datacatalog/config
               name: config-volume
       serviceAccountName: datacatalog
       volumes:
-        
+        - name: db-pass
+          secret:
+            secretName: db-pass
         - emptyDir: {}
           name: shared-data
         - configMap:
             name: datacatalog-config
           name: config-volume
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: datacatalog
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
@@ -1539,7 +1206,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b89a7a12bb07ceda9849214e5e5fc4f1f50840294724105fb788495d4bb0682"
+        configChecksum: "964e5330159b2406c682eac0be30cf6931dca6207897a9417de5f4f2f89e01e"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1556,7 +1223,8 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
       containers:
@@ -1578,12 +1246,15 @@ spec:
             ephemeral-storage: 50Mi
             memory: 50Mi
         volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
       serviceAccountName: flyteadmin
       volumes:
-        
+        - name: db-pass
+          secret:
+            secretName: db-pass
         - emptyDir: {}
           name: shared-data
         - configMap:
@@ -1610,7 +1281,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
+        configChecksum: "b41160e27be1ed8f73cee360376eab35907a3923e0e443df3c6fa28281fca2d"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1634,13 +1305,13 @@ spec:
         - containerPort: 10254
         resources: 
           limits:
-            cpu: 200m
-            ephemeral-storage: 100Mi
-            memory: 200Mi
+            cpu: 500m
+            ephemeral-storage: 2Gi
+            memory: 1Gi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 1Gi
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -1654,6 +1325,13 @@ spec:
       - name: auth
         secret:
           secretName: flyte-propeller-auth
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flytepropeller
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create the actual deployment
@@ -1675,7 +1353,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "74a531ef6a3e75afe97758d43e74136703f3e873337992c1a25f379d0016769"
+        configChecksum: "b41160e27be1ed8f73cee360376eab35907a3923e0e443df3c6fa28281fca2d"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -1734,58 +1412,6 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
----
-# Source: flyte/templates/pytorch-operator/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: pytorch-operator
-  namespace: pytorch-operator
-  labels: 
-    app.kubernetes.io/name: pytorch-operator
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app.kubernetes.io/name: pytorch-operator
-      app.kubernetes.io/instance: flyte
-  template:
-    metadata:
-      labels: 
-        app.kubernetes.io/name: pytorch-operator
-        app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
-        app.kubernetes.io/managed-by: Helm
-    spec:
-      containers:
-      - image: "gcr.io/kubeflow-images-public/pytorch-operator:v1.0.0-g047cf0f"
-        imagePullPolicy: "IfNotPresent"
-        name: pytorch-operator
-        command:
-        - /pytorch-operator.v1
-        - --alsologtostderr
-        - -v=1
-        - --monitoring-port=8443
-        env:
-        - name: MY_POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: MY_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        resources: 
-          limits:
-            cpu: 500m
-            memory: 1000M
-          requests:
-            cpu: 10m
-            memory: 50M
-      serviceAccountName: pytorch-operator
 ---
 # Source: flyte/templates/redis/statefulset.yaml
 apiVersion: apps/v1
@@ -1849,8 +1475,8 @@ spec:
             cpu: 1000m
             memory: 1Gi
           requests:
-            cpu: 10m
-            memory: 50Mi
+            cpu: 100m
+            memory: 250Mi
         volumeMounts:
         - mountPath: /bitnami
           name: redis-data
@@ -1889,7 +1515,8 @@ spec:
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
-            
+            - mountPath: /etc/db
+              name: db-pass
             - mountPath: /etc/flyte/clusterresource/templates
               name: resource-templates
             - mountPath: /etc/flyte/config
@@ -1897,7 +1524,9 @@ spec:
           restartPolicy: OnFailure
           serviceAccountName: flyteadmin
           volumes:
-          
+          - name: db-pass
+            secret:
+              secretName: db-pass
           - configMap:
               name: clusterresource-template
             name: resource-templates
@@ -1912,7 +1541,10 @@ metadata:
   name: flyte
   namespace: flyte
   annotations: 
+    cert-manager.io/issuer: letsencrypt-production
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
     - http:
@@ -2026,6 +1658,33 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+      host: '<HOSTNAME>'
+  tls:
+    - secretName: flyte-flyte-tls
+      hosts:
+      - '<HOSTNAME>'
+  
+# Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
+# enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
+---
+# Source: flyte/templates/common/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: flyte-grpc
+  namespace: flyte
+  annotations:
+    cert-manager.io/issuer: letsencrypt-production
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+spec:
+  rules:
+    - host: '<HOSTNAME>'
+      http:
+        paths:
+          #
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
@@ -2057,3 +1716,7 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
+  tls:
+    - secretName: flyte-flyte-tls
+      hosts:
+      - '<HOSTNAME>'

@@ -14,7 +14,7 @@ helm dep update ${DIR}/../charts/flyte/
 helm dep update ${DIR}/../charts/flyte-core/
 
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
 for deployment in ${DEPLOYMENT_CORE}; do
