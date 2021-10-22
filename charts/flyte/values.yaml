@@ -486,7 +486,7 @@ storage:
 
 # Database configuration
 db:
-  check: true
+  checks: true
   datacatalog:
     database:
       port: 5432
@@ -778,22 +778,16 @@ cluster_resource_manager:
                 value: "5"
             - projectQuotaMemory:
                 value: "4000Mi"
-            - defaultIamRole:
-                value: ""
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
-            - defaultIamRole:
-                value: ""
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-            - defaultIamRole:
-                value: ""
       refresh: 5m
 
   # -- Resource templates that should be applied

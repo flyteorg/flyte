@@ -230,7 +230,7 @@ storage:
     region: "{{ .Values.userSettings.accountRegion }}"
 
 db:
-  check: false
+  checks: false
   datacatalog:
     database:
       port: 5432
