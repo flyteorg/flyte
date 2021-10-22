@@ -17,10 +17,6 @@ for deployment in ${DEPLOYMENT}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
-for deployment in ${DEPLOYMENT_CORE}; do
-    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_core_helm_generated.yaml
-done
-
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
 then
