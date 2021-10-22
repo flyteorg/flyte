@@ -408,6 +408,7 @@ Installing Flyte
    <CLOUD-SQL-IP> private IP of cloud sql instance
    <DBPASSWORD> of the flyteadmin user created for the cloud sql instance
    <BUCKETNAME> of the GCS bucket created
+   <HOSTNAME> to the flyte FQDN (e.g. flyte.example.org)
 
 #. Update helm dependencies
 
@@ -420,8 +421,7 @@ Installing Flyte
 
 .. code-block:: bash
 
-   helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte \
-      --set common.ingress.host=<FLYTE-ENDPOINT>
+   helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte
 
 
 #. Verify all the pods have come up correctly

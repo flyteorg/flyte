@@ -6,6 +6,7 @@ userSettings:
   dbHost: <CLOUD-SQL-IP>
   dbPassword: <DBPASSWORD>
   bucketName: <BUCKETNAME>
+  hostName: <HOSTNAME>
 
 #
 # FLYTEADMIN
@@ -174,6 +175,7 @@ contour:
 
 common:
   ingress:
+    host: "{{ .Values.userSettings.hostName }}"
     tls:
       enabled: true
     annotations:

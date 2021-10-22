@@ -275,8 +275,7 @@ data:
         useAuth: false
   remoteData.yaml: | 
     remoteData:
-      region: us-east-1
-      scheme: local
+      scheme: gcs
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
@@ -907,7 +906,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "251c111641430dd6a9fc6a292f90fd97b46cd85eeccd60d085ef30b85d7e852"
+        configChecksum: "964e5330159b2406c682eac0be30cf6931dca6207897a9417de5f4f2f89e01e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1195,7 +1194,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "251c111641430dd6a9fc6a292f90fd97b46cd85eeccd60d085ef30b85d7e852"
+        configChecksum: "964e5330159b2406c682eac0be30cf6931dca6207897a9417de5f4f2f89e01e"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1647,8 +1646,12 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+      host: '<HOSTNAME>'
   tls:
     - secretName: flyte-flyte-tls
+      hosts:
+      - '<HOSTNAME>'
+  
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -1666,7 +1669,8 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
   rules:
-    - http:
+    - host: '<HOSTNAME>'
+      http:
         paths:
           #
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
@@ -1702,3 +1706,5 @@ spec:
               servicePort: 81
   tls:
     - secretName: flyte-flyte-tls
+      hosts:
+      - '<HOSTNAME>'

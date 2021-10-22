@@ -170,16 +170,12 @@ spec:
           {{- if not .Values.common.ingress.separateGrpcIngress }}
           {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
-      {{- if .Values.common.ingress.host }}
-      host: {{ .Values.common.ingress.host }}
-      {{- end -}}
+      host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
-      {{- if .Values.common.ingress.host }}
       hosts:
-        - {{ .Values.common.ingress.host }}
-      {{- end -}}
+      - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
 
 
@@ -201,7 +197,8 @@ metadata:
   {{- end }}
 spec:
   rules:
-    - http:
+    - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
+      http:
         paths:
           # {{- if .Values.common.ingress.albSSLRedirect }}
           # - backend:
@@ -211,16 +208,11 @@ spec:
           #   pathType: ImplementationSpecific
           # {{- end }}
           {{- include "grpcRoutes" . | nindent 10 -}}
-      {{- if .Values.common.ingress.host }}
-      host: {{ .Values.common.ingress.host }}
-      {{- end -}}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
-      {{- if .Values.common.ingress.host }}
       hosts:
-        - {{ .Values.common.ingress.host }}
-      {{- end -}}
+      - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
 {{- end }}
 {{- end }}
