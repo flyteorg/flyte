@@ -19,12 +19,12 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
    For every IAM Role that will be used by tasks running on AWS Batch, modify the trust policy to allow ECS to assume the role.
    Follow the guide `AWS Batch Execution IAM role <https://docs.aws.amazon.com/batch/latest/userguide/execution-IAM-role.html>`_.
 
-4. Modify System's AWS IAM Role policies
+3. Modify System's AWS IAM Role policies
 
    For the IAM Role used by flytepropeller, modify the policy document to allow the role to pass other roles to AWS Batch.
    Follow the guide: `Granting a user permissions to pass a role to an AWS service <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html>`_.
 
-5. Update Flyte Admin's Config
+4. Update Flyte Admin's Config
 
    Flyte Admin needs to be made aware of all the AWS Batch Job Queues and how the system should distribute the load onto them.
    The simplest setup looks something like this:
@@ -82,7 +82,7 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
             - tags:
               - default
 
-6. Update Flyte Propeller's Config
+5. Update Flyte Propeller's Config
 
    AWS Array Plugin requires some configurations to correctly communicate with AWS Batch Service.
 
@@ -111,7 +111,7 @@ Let's now look at how to launch an execution to leverage AWS Batch to execute jo
 1. Follow `this guide <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html#sphx-glr-auto-core-control-flow-map-task-py>`_ to
    write a workflow with a Map Task.
 
-2. Serialize and Register the workflow/task to a flyte backend.
+2. Serialize and Register the workflow/task to a Flyte backend.
 
 3. Launch an execution
 
@@ -138,7 +138,7 @@ Let's now look at how to launch an execution to leverage AWS Batch to execute jo
 
            flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/map_wf.yaml
 
-As soon as the task starts executing, a link for the AWS Array Job will appear in the log links section in flyte console. 
+As soon as the task starts executing, a link for the AWS Array Job will appear in the log links section in Flyte Console. 
 As individual jobs start getting scheduled, links to their individual cloudWatch log streams will also appear in the UI.
 
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/assets/img/map-task-success.png
