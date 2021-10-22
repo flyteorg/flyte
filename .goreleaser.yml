@@ -23,6 +23,8 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+universal_binaries:
+  - replace: false
 checksum:
   name_template: 'checksums.txt'
 snapshot:
