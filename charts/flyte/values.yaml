@@ -439,6 +439,8 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
+    # --- Ingress hostname
+    host: ""
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
@@ -453,8 +455,7 @@ common:
       nginx.ingress.kubernetes.io/app-root: /console
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
-    # --- Ingress hostname
-    # host:
+    # --- TLS Settings
     tls:
       enabled: false
   flyteNamespaceTemplate:
@@ -479,8 +480,10 @@ storage:
     region: us-east-1
   # -- settings for storage type gcs
   gcs:
-  # -- GCP project ID. Required for storage type gcs.
-  # projectId:
+    # -- GCP project ID. Required for storage type gcs.
+    # projectId:
+    # -- GCP service account key for GSA with bucket access. Leave empty if you use workload identity.
+    # serviceAccountKey: ""
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
 

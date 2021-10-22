@@ -2054,6 +2054,7 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+      host: ""
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -2077,7 +2078,8 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
   rules:
-    - http:
+    - host: ""
+      http:
         paths:
           #
           # - backend:
