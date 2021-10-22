@@ -42,7 +42,7 @@ images:
     newTag: 13-21.04_beta
     newName: ecr.flyte.org/ubuntu/postgres
   - name: minio
-    newTag: 2021.9.18-debian-10-r1
+    newTag: 2021.10.13-debian-10-r0
     newName: ecr.flyte.org/bitnami/minio
   - name: redis
     newTag: 6.2.5-debian-10-r59

@@ -13,7 +13,7 @@ production ready deployment might look like.
 Usage of Helm
 *******************
 
-Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart and templates are located under the `helm folder <https://github.com/flyteorg/flyte/tree/master/helm>`__. There is a base ``values.yaml`` file but there are several files that fine tune those settings.
+Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart and templates are located under the `helm folder <https://github.com/flyteorg/flyte/tree/master/charts>`__. There is a base ``values.yaml`` file but there are several files that fine tune those settings.
 
 * ``values-eks.yaml`` should be additionally applied for AWS EKS deployments.
 * ``values-gcp.yaml`` should be additionally applied for GCP GKE deployments.

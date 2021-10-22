@@ -48,6 +48,14 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    .. link-button:: deployment-plugin-setup
+       :type: ref
+       :text: Plugin Setup
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    How to set up a plugin for your deployment.
+
+    ---
     .. link-button:: deployment-cluster-config
        :type: ref
        :text: Cluster Configuration
@@ -66,3 +74,4 @@ solution). The following pages will help you effectively deploy and manage an en
     gcp/index
     cluster_config/index
     sandbox
+    plugin_setup/index

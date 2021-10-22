@@ -3611,7 +3611,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "ecr.flyte.org/bitnami/minio:2021.9.18-debian-10-r1"
+      - image: "ecr.flyte.org/bitnami/minio:2021.10.13-debian-10-r0"
         imagePullPolicy: "IfNotPresent"
         name: minio
         env:
