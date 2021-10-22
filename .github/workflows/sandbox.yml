@@ -1,7 +1,7 @@
 name: Build & Push Sandbox Docker Image
 
 on:
-  push:
+  # push:
   pull_request:
   release:
     types: [published]
@@ -29,5 +29,5 @@ jobs:
           platforms: linux/arm64
           push: true
           target: dind
-          tags: flyte-sandbox:dind
+          tags: avaneeshy/flyte-sandbox:dind
           file: docker/sandbox/Dockerfile
