@@ -2,9 +2,9 @@ name: Build & Push Sandbox Docker Image
 
 on:
   push:
-  # pull_request:
-  # release:
-  #   types: [published]
+  pull_request:
+  release:
+    types: [published]
 
 jobs:
   buildx:
