@@ -486,6 +486,7 @@ storage:
 
 # Database configuration
 db:
+  check: true
   datacatalog:
     database:
       port: 5432
@@ -764,6 +765,7 @@ workflow_notifications:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
     # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
@@ -776,16 +778,22 @@ cluster_resource_manager:
                 value: "5"
             - projectQuotaMemory:
                 value: "4000Mi"
+            - defaultIamRole:
+                value: ""
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
+            - defaultIamRole:
+                value: ""
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+            - defaultIamRole:
+                value: ""
       refresh: 5m
 
   # -- Resource templates that should be applied
@@ -800,6 +808,7 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
+
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
@@ -811,6 +820,7 @@ cluster_resource_manager:
           hard:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
+
 # --------------------------------------------------------
 # Optional Plugins
 # --------------------------------------------------------

@@ -28,7 +28,6 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-
 {{- define "flytescheduler.name" -}}
 flytescheduler
 {{- end -}}
