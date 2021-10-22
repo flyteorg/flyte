@@ -269,6 +269,14 @@ configmap:
       limits:
         storage: 2000Mi
 
+  # Adds the remoteData config setting
+  remoteData:
+    remoteData:
+      region:
+      scheme: "gcs"
+      signedUrls:
+        durationMinutes: 3
+
   # Adds the namespace mapping to default to only domain name instead of project-domain in case of GCP
   namespace_config:
     namespace_mapping:

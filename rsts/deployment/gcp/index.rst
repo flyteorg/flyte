@@ -31,8 +31,9 @@ and optionally set the default compute zone. `Init <https://cloud.google.com/sdk
    gcloud init
 
 
-Create Organization
-===================
+Create Organization (Optional)
+==============================
+This step is optional if you already have an org linked with billing account.
 Use the following docs to understand the organization creation process in Google cloud
 `Organization Management <https://cloud.google.com/resource-manager/docs/creating-managing-organization>`__
 
@@ -479,7 +480,7 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
     admin:
      # For GRPC endpoints you might want to use dns:///flyte.myexample.com
      endpoint: dns:///<FLYTE-ENDPOINT>
-     insecure: true
+     insecure: false
     logger:
      show-source: true
      level: 0
@@ -616,3 +617,11 @@ Change your logger config to this:
 
 * In case you have a new ingress IP for your Flyte deployment, you would need to flush DNS cache using `this <https://developers.google.com/speed/public-dns/cache>`__
 * In case you need to get access logs for your buckets then follow `this <https://cloud.google.com/storage/docs/access-logs>`__ GCP guide
+* In case you get the following error
+
+.. code-block::
+
+   ERROR: Policy modification failed. For a binding with condition, run "gcloud alpha iam policies lint-condition" to identify issues in condition.
+   ERROR: (gcloud.iam.service-accounts.add-iam-policy-binding) INVALID_ARGUMENT: Identity Pool does not exist
+
+This means that you haven't enabled workload identity on the cluster. Use the following `docs <https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity>`__
