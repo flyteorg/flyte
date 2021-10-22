@@ -16,12 +16,15 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
 
 2. Modify Users' AWS IAM Role trust policy document
 
-   For every IAM Role that will be used by tasks running on AWS Batch, modify the trust policy to allow ECS to assume the role.
+   When running Workflows in Flyte, users have the option to specify a K8s Account and/or an IAM Role to run as. For AWS Batch, an IAM Role must be specified.
+   For every one of these IAM Roles, modify the trust policy to allow ECS to assume the role.
    Follow the guide `AWS Batch Execution IAM role <https://docs.aws.amazon.com/batch/latest/userguide/execution-IAM-role.html>`_.
 
 3. Modify System's AWS IAM Role policies
 
-   For the IAM Role used by flytepropeller, modify the policy document to allow the role to pass other roles to AWS Batch.
+   The recommended way of assigning permissions to flyte components is using `OIDC <https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html>`_.
+   This involves assigning an IAM Role for every service account used. You will need to find the IAM Role assigned to the flytepropeller's kubernetes service account.
+   Then modify the policy document to allow the role to pass other roles to AWS Batch.
    Follow the guide: `Granting a user permissions to pass a role to an AWS service <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html>`_.
 
 4. Update Flyte Admin's Config
