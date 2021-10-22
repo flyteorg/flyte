@@ -37,6 +37,7 @@ app.kubernetes.io/name: {{ template "flytescheduler.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+
 {{- define "flytescheduler.labels" -}}
 {{ include "flytescheduler.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}

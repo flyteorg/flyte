@@ -114,6 +114,7 @@ helm install gateway bitnami/contour -n flyte
 | db.admin.database.host | string | `"postgres"` |  |
 | db.admin.database.port | int | `5432` |  |
 | db.admin.database.username | string | `"postgres"` |  |
+| db.checks | bool | `true` |  |
 | db.datacatalog.database.dbname | string | `"datacatalog"` |  |
 | db.datacatalog.database.host | string | `"postgres"` |  |
 | db.datacatalog.database.port | int | `5432` |  |
