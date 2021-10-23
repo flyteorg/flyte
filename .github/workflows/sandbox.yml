@@ -24,7 +24,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push Sandbox image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: true
+          target: dind
+          tags: avaneeshy/flyte-sandbox:latest
+          file: docker/sandbox/Dockerfile
+          cache-from: type=local
+          cache-to: type=inline, type=local
+      - name: Build and push DIND Image
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -33,3 +44,13 @@ jobs:
           target: dind
           tags: avaneeshy/flyte-sandbox:dind
           file: docker/sandbox/Dockerfile
+          cache-from: type=gha
+          cache-to: type=inline, type=gha
+          # TODO: explore caching to CI # https://evilmartians.com/chronicles/build-images-on-github-actions-with-docker-layer-caching
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
