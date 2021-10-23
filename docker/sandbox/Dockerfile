@@ -26,10 +26,10 @@ ARG TARGETARCH
 #TODO: Change this to download based on any architecture
 RUN case $TARGETARCH in \
     amd64) export SUFFIX=;; \
-    arm64) export SUFFIX=arm64;; \
-    aarch64)  export SUFFIX=arm64;; \
+    arm64) export SUFFIX=-arm64;; \
+    aarch64)  export SUFFIX=-arm64;; \
     esac; \
-    wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s-${SUFFIX} \
+    wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s${SUFFIX} \
     && chmod +x /flyteorg/bin/k3s
 
 
