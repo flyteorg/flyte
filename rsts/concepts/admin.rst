@@ -7,7 +7,7 @@ Flyte Admin
 Admin Structure
 ===============
 
-FlyteAdmin serves the main Flyte API. It processes all client requests to the system. Clients include the FlyteConsole, which calls FlyteAdmin to list workflows, get execution details, etc., and FlyteKit, which calls FlyteAdmin to registering workflows, launch workflows etc.
+FlyteAdmin serves the main Flyte API. It processes all client requests to the system. Clients include the FlyteConsole, which calls FlyteAdmin to list workflows, get execution details, etc., and FlyteKit, which calls FlyteAdmin to register workflows, launch workflows, etc.
 
 Below, we'll dive into each component defined in admin in more detail.
 
@@ -19,10 +19,10 @@ FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gatewa
 incoming gRPC and HTTP requests with identical handlers. For a more detailed overview of the API,
 including request and response entities, see the admin
 service :std:ref:`definition <protos/docs/service/service:flyteidl/service/admin.proto>`. The
-RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <divedeep-admin-manager>`.
-methods to process requests.
+RPC handlers are thin shims that enforce some request structure validation and call out to appropriate :ref:`manager <divedeep-admin-manager>`.
+Methods to process requests.
 
-A detailed explanation of the service can be found in the :ref:`admin service <divedeep-admin-service>` page.
+A detailed explanation of the service can be found in the:ref:`admin service <divedeep-admin-service>` page.
 
 .. _divedeep-admin-manager:
 
@@ -39,8 +39,8 @@ The Admin API is broken up into entities:
 - Tasks
 - Workflows
 
-Each API entity has an entity manager in FlyteAdmin reposible for implementing business logic for the entity.
-Entity managers handle full validation for create, update and get requests, and
+Each API entity has an entity manager in FlyteAdmin responsible for implementing business logic for the entity.
+Entity managers handle full validation for creating, update and getting requests and
 data persistence in the backing store (see the :ref:`divedeep-admin-repository` section).
 
 
@@ -60,7 +60,7 @@ Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
 `here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/admin>`__.
-We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a postgres
+We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a Postgres
 implementation.  The actual code for issuing queries with gorm can be found in the
 `gormimpl <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
 
@@ -96,7 +96,7 @@ This section dives into detail for each top-level directories defined in ``pkg/`
 Asynchronous Components
 -----------------------
 
-Notifications and schedules are handled by async routines that are reponsible for enqueing and subsequently processing dequeued messages.
+Notifications and schedules are handled by async routines that are responsible for enqueing and subsequently processing dequeued messages.
 
 Flyteadmin uses the `gizmo toolkit <https://github.com/nytimes/gizmo>`__ to abstract queueing implementation. Gizmo's
 `pubsub <https://github.com/nytimes/gizmo#pubsub>`__ library offers implementations for Amazon SNS/SQS, Google's Pubsub, Kafka topics and publishing over HTTP.
@@ -129,7 +129,7 @@ Values specific to the flyteadmin application as well as task and workflow regis
 
 .. _divedeep-admin-workflowengine:
 
-Workflowengine
+Workflow engine
 --------------
 
 This directory contains interfaces to build and execute workflows leveraging flytepropeller compiler and client components.
@@ -183,7 +183,7 @@ A named entity also includes metadata, which are mutable attributes about the re
 
 This metadata includes:
 
-- Description: a human readable description for the Named Entity collection
+- Description: a human-readable description for the Named Entity collection
 - State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain
 
 Permitted operations:
@@ -240,7 +240,7 @@ Matchable resources
 +++++++++++++++++++
 
 A thorough background on :std:ref:`matchable resources <protos/docs/admin/admin:matchableresource>` explains
-their purpose and application logic. As a summary, these are used to override system level defaults for kubernetes cluster
+their purpose and application logic. As a summary, these are used to override system level defaults for Kubernetes cluster
 resource management, default execution values, and more all across different levels of specificity.
 
 These entities consist of:
@@ -262,7 +262,7 @@ Using the Admin Service
 Adding request filters	
 ++++++++++++++++++++++	
 
-We use `gRPC Gateway <https://github.com/grpc-ecosystem/grpc-gateway>`_ to reverse proxy http requests into gRPC.	
+We use `gRPC Gateway <https://github.com/grpc-ecosystem/grpc-gateway>`_ to reverse proxy HTTP requests into gRPC.	
 While this allows for a single implementation for both HTTP and gRPC, an important limitation is that fields mapped to the path pattern cannot be	
 repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead use	
 the internal syntax shown below::	
@@ -452,7 +452,7 @@ Sorting syntax
 
 Adding sorting to a request requires specifying the ``key``, e.g. the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
 
-Example sorting http param:	
+Example sorting HTTP parameter:	
 
 ::	
 
