@@ -33,8 +33,8 @@ jobs:
           target: dind
           tags: avaneeshy/flyte-sandbox:latest
           file: docker/sandbox/Dockerfile
-          cache-from: type=local
-          cache-to: type=inline, type=local
+          cache-from: type=local, src=docker-cache
+          cache-to: type=inline, type=local, dest=docker-cache
       - name: Build and push DIND Image
         uses: docker/build-push-action@v2
         with:
@@ -44,8 +44,8 @@ jobs:
           target: dind
           tags: avaneeshy/flyte-sandbox:dind
           file: docker/sandbox/Dockerfile
-          cache-from: type=gha
-          cache-to: type=inline, type=gha
+          cache-from: type=local, src=docker-cache
+          cache-to: type=inline, type=local, dest=docker-cache
           # TODO: explore caching to CI # https://evilmartians.com/chronicles/build-images-on-github-actions-with-docker-layer-caching
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
