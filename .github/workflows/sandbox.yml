@@ -1,5 +1,5 @@
 name: Build & Push Sandbox Docker Image
-
+# Isn't it a security risk if I can force to rewrite a new docker image without others permission
 on:
   # push:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: true
+          push: ${{ github.event_name == 'release' }}
           target: dind
           tags: avaneeshy/flyte-sandbox:latest
           file: docker/sandbox/Dockerfile
@@ -47,7 +47,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: true
+          push: ${{ github.event_name == 'release' }}
           target: dind
           tags: avaneeshy/flyte-sandbox:dind
           file: docker/sandbox/Dockerfile
