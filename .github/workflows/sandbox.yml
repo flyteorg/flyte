@@ -13,13 +13,31 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: "0"
+      - name: Prepare sandbox Image Names
+        id: sandbox-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox
+          tags: |
+            latest
+            type=sha,format=long
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox
+          tags: |
+            dind
+            type=sha,format=long, prefix=dind-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
-      - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -39,8 +57,8 @@ jobs:
           context: .
           platforms: linux/arm64, linux/amd64
           push: ${{ github.event_name == 'release' }}
-          target: dind
-          tags: avaneeshy/flyte-sandbox:latest
+          target: default
+          tags: ${{ steps.sandbox-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
@@ -51,7 +69,7 @@ jobs:
           platforms: linux/arm64, linux/amd64
           push: ${{ github.event_name == 'release' }}
           target: dind
-          tags: avaneeshy/flyte-sandbox:dind
+          tags: ${{ steps.dind-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
