@@ -1,5 +1,4 @@
 name: Build & Push Sandbox Docker Image
-# Isn't it a security risk if I can force to rewrite a new docker image without others permission
 on:
   # push:
   pull_request:
