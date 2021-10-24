@@ -50,7 +50,7 @@ jobs:
         env:
           SANDBOX: "1"
         run: |
-          make -C ${{ matrix.directory }} serialize
+          REGISTRY=ghcr.io/flyteorg make -C ${{ matrix.directory }} serialize
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
