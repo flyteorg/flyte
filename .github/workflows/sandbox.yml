@@ -6,42 +6,77 @@ on:
     types: [published]
 
 jobs:
-  push-sandbox-image:
-    name: Push sandbox image to GHCR
+  sandbox-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-      - name: Push Sandbox Docker Image to Github Registry
-        uses: whoan/docker-build-with-cache-action@v5
+      - name: Prepare sandbox Image Names
+        id: sandbox-names
+        uses: docker/metadata-action@v3
         with:
-          # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox
+          tags: |
+            latest
+            type=sha,format=long
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox
+          tags: |
+            dind
+            type=sha,format=long, prefix=dind-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-single-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-single-buildx
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-          image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: latest,${{ github.sha }},${{ github.event.ref }}
-          registry: ghcr.io
-          build_extra_args: "--target=default --compress=true"
-          context: ./
-          dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event_name == 'release' }}
-  push-sandbox-dind-image:
-    name: Push sandbox DinD image to GHCR
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+      - name: Build and push Sandbox image
+        uses: docker/build-push-action@v2
         with:
-          fetch-depth: "0"
-      - name: Push Sandbox DinD Docker Image to Github Registry
-        uses: whoan/docker-build-with-cache-action@v5
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          target: default
+          tags: ${{ steps.sandbox-names.outputs.tags }}
+          file: docker/sandbox/Dockerfile
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+      - name: Build and push DIND Image
+        uses: docker/build-push-action@v2
         with:
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
-          image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
-          registry: ghcr.io
-          build_extra_args: "--target=dind --compress=true"
-          context: ./
-          dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event_name == 'release' }}
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          target: dind
+          tags: ${{ steps.dind-names.outputs.tags }}
+          file: docker/sandbox/Dockerfile
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
