@@ -28,13 +28,13 @@ RUN case $TARGETARCH in \
     amd64) export SUFFIX=;; \
     arm64) export SUFFIX=-arm64;; \
     aarch64)  export SUFFIX=-arm64;; \
+    # TODO: Check if we need to add case fail
     esac; \
     wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s${SUFFIX} \
     && chmod +x /flyteorg/bin/k3s
 
 
 # Install Helm
-ENV HELM_URL="https://get.helm.sh"
 ARG HELM_VERSION="v3.6.3"
 
 RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/helm/${HELM_VERSION}/scripts/get-helm-3 && \

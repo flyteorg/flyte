@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -30,6 +32,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: ghcr.io
+      #     username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+      #     password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push Sandbox image
         uses: docker/build-push-action@v2
         with:
@@ -52,7 +60,6 @@ jobs:
           file: docker/sandbox/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-          # TODO: explore caching to CI # https://evilmartians.com/chronicles/build-images-on-github-actions-with-docker-layer-caching
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
         # https://github.com/moby/buildkit/issues/1896
