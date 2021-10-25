@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.2](http://github.com/lyft/flyteconsole/compare/v0.29.1...v0.29.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* json bug on struct input ([#233](http://github.com/lyft/flyteconsole/issues/233)) ([88c23a6](http://github.com/lyft/flyteconsole/commit/88c23a6ee9f598c9cf31f1999cf6a9c712d8d6e0))
+
 ## [0.29.1](http://github.com/lyft/flyteconsole/compare/v0.29.0...v0.29.1) (2021-10-20)
 
 
