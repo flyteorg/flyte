@@ -103,10 +103,12 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	}
 
 	tev, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
-		TaskExecContext:       tCtx,
-		InputReader:           in,
-		OutputWriter:          out,
-		Info:                  pluginCore.PhaseInfoWaitingForResources(n, 0, "reason"),
+		TaskExecContext: tCtx,
+		InputReader:     in,
+		OutputWriter:    out,
+		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(n, 0, "reason", &pluginCore.TaskInfo{
+			OccurredAt: &n,
+		}),
 		NodeExecutionMetadata: &nodeExecutionMetadata,
 		ExecContext:           mockExecContext,
 		TaskType:              containerTaskType,
@@ -254,10 +256,12 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	}
 
 	tev, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
-		TaskExecContext:       tCtx,
-		InputReader:           in,
-		OutputWriter:          out,
-		Info:                  pluginCore.PhaseInfoWaitingForResources(n, 0, "reason"),
+		TaskExecContext: tCtx,
+		InputReader:     in,
+		OutputWriter:    out,
+		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(n, 0, "reason", &pluginCore.TaskInfo{
+			OccurredAt: &n,
+		}),
 		NodeExecutionMetadata: &nodeExecutionMetadata,
 		ExecContext:           mockExecContext,
 		TaskType:              containerTaskType,

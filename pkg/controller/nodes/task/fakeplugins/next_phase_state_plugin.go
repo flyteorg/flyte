@@ -69,7 +69,7 @@ func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskEx
 	case pluginCore.PhaseRunning:
 		return pluginCore.DoTransition(pluginCore.PhaseInfoRunning(s.PhaseVersion, s.TaskInfo)), nil
 	case pluginCore.PhaseWaitingForResources:
-		return pluginCore.DoTransition(pluginCore.PhaseInfoWaitingForResources(time.Now(), s.PhaseVersion, "waiting")), nil
+		return pluginCore.DoTransition(pluginCore.PhaseInfoWaitingForResourcesInfo(time.Now(), s.PhaseVersion, "waiting", nil)), nil
 	}
 	return pluginCore.UnknownTransition, nil
 }

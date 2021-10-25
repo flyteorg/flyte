@@ -227,11 +227,11 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if backoff.IsBackoffError(err) {
 			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
 		} else if k8serrors.IsForbidden(err) {
 			if e.backOffController == nil && strings.Contains(err.Error(), "exceeded quota") {
 				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
-				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
 			}
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
