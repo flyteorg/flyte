@@ -13,6 +13,13 @@ const muiTheme = createMuiTheme({
         MuiTextField: {
             variant: 'outlined'
         }
+    },
+    overrides: {
+        MuiButton: {
+            label: {
+                color: 'gray'
+            }
+        }
     }
 });
 
@@ -76,7 +83,7 @@ export const StructInput: React.FC<InputProps> = props => {
     }
 
     const [paramData, setParamData] = useState(
-        jsonFormRenderable ? JSON.parse(value as string) : {}
+        jsonFormRenderable && value ? JSON.parse(value as string) : {}
     );
 
     const onFormChange = ({ formData }, e) => {
