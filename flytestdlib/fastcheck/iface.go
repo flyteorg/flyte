@@ -3,8 +3,9 @@ package fastcheck
 import (
 	"context"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 // Filter provides an interface to check if a Key of type []byte was ever seen.
@@ -27,14 +28,14 @@ type Filter interface {
 // Every implementation of the Filter Interface provides these metrics
 type Metrics struct {
 	// Indicates if the item was found in the cache
-	Hit labeled.Counter
+	Hit prometheus.Counter
 	// Indicates if the item was not found in the cache
-	Miss labeled.Counter
+	Miss prometheus.Counter
 }
 
 func newMetrics(scope promutils.Scope) Metrics {
 	return Metrics{
-		Hit:  labeled.NewCounter("cache_hit", "Indicates that the item was found in the cache", scope),
-		Miss: labeled.NewCounter("cache_miss", "Indicates that the item was found in the cache", scope),
+		Hit:  scope.MustNewCounter("cache_hit", "Indicates that the item was found in the cache"),
+		Miss: scope.MustNewCounter("cache_miss", "Indicates that the item was found in the cache"),
 	}
 }
