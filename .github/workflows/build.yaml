@@ -20,18 +20,19 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
       - name: Run GoReleaser dry run
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: --snapshot  --skip-publish --rm-dist
       - name: Unit Tests
-        uses: cedrickring/golang-action@1.5.2
         env:
           GO111MODULE: "on"
           CI_ENV: "true"
-        with:
-          args: make install && make test_unit_without_flag
+        run: make install && make test_unit_without_flag
       - name: Push CodeCov
         uses: codecov/codecov-action@v1.0.5
         with:
@@ -39,8 +40,6 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
       - name: Lint
-        uses: cedrickring/golang-action@1.5.2
         env:
           GO111MODULE: "on"
-        with:
-          args: make install && make lint
+        run: make install && make lint
