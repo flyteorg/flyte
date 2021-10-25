@@ -19,6 +19,9 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
+// IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
+//go:generate mockery -dir ../../../gen/pb-go/flyteidl/service -name AdminServiceClient -output ../admin/mocks
+
 var (
 	once            = sync.Once{}
 	adminConnection *grpc.ClientConn
