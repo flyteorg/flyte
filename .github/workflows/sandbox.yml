@@ -46,18 +46,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-single-buildx
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name == 'release' }}
+#         if: ${{ github.event_name == 'release' }}
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Sandbox image
         uses: docker/build-push-action@v2
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: ${{ github.event_name == 'release' }}
+          push: true
           target: default
           tags: ${{ steps.sandbox-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
@@ -68,7 +68,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: ${{ github.event_name == 'release' }}
+          push: true
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
