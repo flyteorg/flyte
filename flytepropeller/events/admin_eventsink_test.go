@@ -19,10 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// This test suite uses Mockery to mock the AdminServiceClient. Run the following command in CLI or in the IntelliJ
-// IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
-//go:generate mockery -dir ../../../gen/pb-go/flyteidl/service -name AdminServiceClient -output ../admin/mocks
-
 var (
 	wfEvent = &event.WorkflowExecutionEvent{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
