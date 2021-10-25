@@ -2,14 +2,18 @@ package events
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/golang/protobuf/proto"
 )
+
+const maxErrorMessageLength = 104857600 //100KB
 
 type recordingMetrics struct {
 	EventRecordingFailure           labeled.StopWatch
@@ -54,15 +58,35 @@ func (r *eventRecorder) sinkEvent(ctx context.Context, event proto.Message) erro
 }
 
 func (r *eventRecorder) RecordNodeEvent(ctx context.Context, e *event.NodeExecutionEvent) error {
+	if err, ok := e.GetOutputResult().(*event.NodeExecutionEvent_Error); ok {
+		truncateErrorMessage(err.Error, maxErrorMessageLength)
+	}
+
 	return r.sinkEvent(ctx, e)
 }
 
 func (r *eventRecorder) RecordTaskEvent(ctx context.Context, e *event.TaskExecutionEvent) error {
+	if err, ok := e.GetOutputResult().(*event.TaskExecutionEvent_Error); ok {
+		truncateErrorMessage(err.Error, maxErrorMessageLength)
+	}
+
 	return r.sinkEvent(ctx, e)
 }
 
 func (r *eventRecorder) RecordWorkflowEvent(ctx context.Context, e *event.WorkflowExecutionEvent) error {
+	if err, ok := e.GetOutputResult().(*event.WorkflowExecutionEvent_Error); ok {
+		truncateErrorMessage(err.Error, maxErrorMessageLength)
+	}
+
 	return r.sinkEvent(ctx, e)
+}
+
+// If error message too large, truncate to mitigate grpc message size limit. Split the truncated size equally between
+// the beginning and the end of the message to capture the most relevant information.
+func truncateErrorMessage(err *core.ExecutionError, length int) {
+	if len(err.Message) > length {
+		err.Message = fmt.Sprintf("%s%s", err.Message[:length/2], err.Message[(len(err.Message)-length/2):])
+	}
 }
 
 // Construct a new Event Recorder
