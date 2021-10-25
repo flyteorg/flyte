@@ -232,22 +232,16 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
-        - defaultIamRole:
-            value: ""
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
-        - defaultIamRole:
-            value: ""
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -782,7 +776,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "74eb371737e6c51961936b37a7517efd0b58b8ec22ba99d882c2cdfe9eeac65"
+        configChecksum: "1790bfe2992b2ae451600cea8fea808ffd37acb434df55634d460d79406f5f3"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1051,7 +1045,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "74eb371737e6c51961936b37a7517efd0b58b8ec22ba99d882c2cdfe9eeac65"
+        configChecksum: "1790bfe2992b2ae451600cea8fea808ffd37acb434df55634d460d79406f5f3"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
