@@ -123,7 +123,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the flyteadmin application, including task and workflow registration and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the flyteadmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
