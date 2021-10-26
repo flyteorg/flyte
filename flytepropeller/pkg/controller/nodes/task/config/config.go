@@ -27,7 +27,7 @@ var (
 		},
 		BackOffConfig: BackOffConfig{
 			BaseSecond:  2,
-			MaxDuration: config.Duration{Duration: time.Minute * 10},
+			MaxDuration: config.Duration{Duration: time.Second * 20},
 		},
 		MaxErrorMessageLength: 2048,
 	}
