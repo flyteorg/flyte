@@ -6,13 +6,19 @@ echo "Generating Helm"
 helm version
 # All the values files to be built
 DEPLOYMENT=${1:-sandbox eks gcp}
+DEPLOYMENT_CORE=${1:-eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 helm dep update ${DIR}/../charts/flyte/
+helm dep update ${DIR}/../charts/flyte-core/
 
 for deployment in ${DEPLOYMENT}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml -f ${DIR}/../charts/flyte/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+done
+
+for deployment in ${DEPLOYMENT_CORE}; do
+    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_core_helm_generated.yaml
 done
 
 echo "Generating helm docs"
