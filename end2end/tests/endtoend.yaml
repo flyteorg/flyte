@@ -8,15 +8,15 @@ spec:
   containers:
     - args:
         - make end2end_test
-      command:
+      command:q
         - bash
         - -c
-      image: evalsocket/flytetools:latest
+      image: evalsocket/flytetools:v1
       imagePullPolicy: IfNotPresent
       name: flytetester
       env:
         - name: FLYTE_INTERNAL_IMAGE
-          value: "evalsocket/flytetools:latest"
+          value: "evalsocket/flytetools:v1"
       resources:
         requests:
           cpu: "0.2"
