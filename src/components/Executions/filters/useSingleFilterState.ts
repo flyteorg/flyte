@@ -61,7 +61,7 @@ export function useSingleFilterState<FilterKey extends string>({
 
     useEffect(() => {
         const { value } = selectedOption;
-        const queryValue = value === defaultValue.value ? undefined : value;
+        const queryValue = value;
         setQueryStateValue(queryStateKey, queryValue);
     }, [selectedOption, queryStateKey]);
 

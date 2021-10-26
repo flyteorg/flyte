@@ -4,6 +4,7 @@ import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData } from 'components/common/WaitForData';
 import { EntityDescription } from 'components/Entities/EntityDescription';
 import { useProject } from 'components/hooks/useProjects';
+import { useChartState } from 'components/hooks/useChartState';
 import { LaunchForm } from 'components/Launch/LaunchForm/LaunchForm';
 import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import * as React from 'react';
@@ -82,6 +83,7 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
     const [showLaunchForm, setShowLaunchForm] = React.useState(false);
     const onLaunch = () => setShowLaunchForm(true);
     const onCancelLaunch = () => setShowLaunchForm(false);
+    const { chartIds, onToggle, clearCharts } = useChartState();
 
     return (
         <WaitForData {...project}>
@@ -120,10 +122,20 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({
                     </div>
                 </>
             ) : null}
-            {!versionView && <EntityExecutionsBarChart id={id} />}
+            {!versionView && (
+                <EntityExecutionsBarChart
+                    onToggle={onToggle}
+                    chartIds={chartIds}
+                    id={id}
+                />
+            )}
             {sections.executions && !versionView ? (
                 <div className={styles.executionsContainer}>
-                    <EntityExecutions id={id} />
+                    <EntityExecutions
+                        chartIds={chartIds}
+                        id={id}
+                        clearCharts={clearCharts}
+                    />
                 </div>
             ) : null}
             {sections.launch ? (

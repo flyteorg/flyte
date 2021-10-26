@@ -27,7 +27,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     item: {
         flex: 1,
         display: 'flex',
-        alignItems: 'flex-end',
+        flexDirection: 'column',
+        alignItems: 'center',
         '&:last-child': {
             marginRight: 0
         }
@@ -37,7 +38,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         flex: 1,
         marginRight: theme.spacing(0.25),
         minHeight: theme.spacing(0.75),
-        cursor: 'pointer'
+        cursor: 'pointer',
+        width: '80%',
+        marginLeft: '10%'
     }
 }));
 
@@ -50,12 +53,14 @@ interface BarChartData {
 
 interface BarChartItemProps extends BarChartData {
     onClick?: () => void;
+    isSelected: boolean;
 }
 
 interface BarChartProps {
     data: BarChartData[];
     startDate?: string;
     onClickItem?: (item: any) => void;
+    chartIds: string[];
 }
 
 /**
@@ -67,6 +72,7 @@ interface BarChartProps {
 const BarChartItem: React.FC<BarChartItemProps> = ({
     value,
     color,
+    isSelected,
     tooltip,
     onClick
 }) => {
@@ -74,11 +80,17 @@ const BarChartItem: React.FC<BarChartItemProps> = ({
     const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
     const content = (
-        <div
-            className={styles.itemBar}
-            style={{ backgroundColor: color, height: `${value}%` }}
-            onClick={onClick}
-        />
+        <>
+            <div
+                className={styles.itemBar}
+                style={{
+                    backgroundColor: color,
+                    height: `${value}%`,
+                    opacity: isSelected ? '100%' : '50%'
+                }}
+                onClick={onClick}
+            />
+        </>
     );
 
     return (
@@ -121,6 +133,7 @@ const BarChartItem: React.FC<BarChartItemProps> = ({
  * @constructor
  */
 export const BarChart: React.FC<BarChartProps> = ({
+    chartIds,
     data,
     startDate,
     onClickItem
@@ -154,6 +167,12 @@ export const BarChart: React.FC<BarChartProps> = ({
                         tooltip={item.tooltip}
                         onClick={handleClickItem(item)}
                         key={`bar-chart-item-${index}`}
+                        isSelected={
+                            chartIds.length === 0
+                                ? true
+                                : item.metadata &&
+                                  chartIds.includes(item.metadata.name)
+                        }
                     />
                 ))}
             </div>

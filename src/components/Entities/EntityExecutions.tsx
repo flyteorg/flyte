@@ -25,10 +25,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface EntityExecutionsProps {
     id: ResourceIdentifier;
+    chartIds: string[];
+    clearCharts: () => void;
 }
 
 /** The tab/page content for viewing a workflow's executions */
-export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
+export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
+    id,
+    chartIds,
+    clearCharts
+}) => {
     const { domain, project, resourceType } = id;
     const styles = useStyles();
     const filtersState = useWorkflowExecutionFiltersState();
@@ -50,6 +56,10 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
         }
     );
 
+    if (chartIds.length > 0)
+        executions.value = executions.value.filter(item =>
+            chartIds.includes(item.id.name)
+        );
     /** Don't render component until finish fetching user profile */
     if (filtersState.filters[4].status !== 'LOADED') {
         return null;
@@ -61,7 +71,11 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
                 All Executions in the Workflow
             </Typography>
             <div className={styles.filtersContainer}>
-                <ExecutionFilters {...filtersState} />
+                <ExecutionFilters
+                    {...filtersState}
+                    chartIds={chartIds}
+                    clearCharts={clearCharts}
+                />
             </div>
             <WaitForData {...executions}>
                 <WorkflowExecutionsTable

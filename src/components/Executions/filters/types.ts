@@ -31,6 +31,7 @@ export interface FilterState {
     status?: string;
     getFilter: () => FilterOperation[];
     onReset: () => void;
+    onChange?: (value) => void;
 }
 
 export interface SingleFilterState<FilterKey extends string>

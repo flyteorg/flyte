@@ -32,6 +32,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface EntityExecutionsBarChartProps {
     id: ResourceIdentifier;
+    onToggle: (id: string) => void;
+    chartIds: string[];
 }
 
 const getExecutionTimeData = (executions: Execution[], fillSize = 100) => {
@@ -88,7 +90,9 @@ const getStartExecutionTime = (executions: Execution[]) => {
  * @constructor
  */
 export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> = ({
-    id
+    id,
+    onToggle,
+    chartIds
 }) => {
     const styles = useStyles();
     const { domain, project, resourceType } = id;
@@ -116,6 +120,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
 
     const handleClickItem = React.useCallback(item => {
         if (item.metadata) {
+            onToggle(item.metadata.name);
             // const executionId = item.metadata as WorkflowExecutionIdentifier;
             // history.push(Routes.ExecutionDetails.makeUrl(executionId));
         }
@@ -133,6 +138,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
             </Typography>
             <div className={styles.body}>
                 <BarChart
+                    chartIds={chartIds}
                     data={getExecutionTimeData(executions.value)}
                     startDate={getStartExecutionTime(executions.value)}
                     onClickItem={handleClickItem}

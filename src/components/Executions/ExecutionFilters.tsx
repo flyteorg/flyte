@@ -60,8 +60,19 @@ const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
  */
 export const ExecutionFilters: React.FC<{
     filters: (FilterState | BooleanFilterState)[];
-}> = ({ filters }) => {
+    chartIds?: string[];
+    clearCharts?: () => void;
+}> = ({ filters, chartIds, clearCharts }) => {
     const styles = useStyles();
+
+    filters = filters.map(filter => {
+        const onChangeFunc = filter.onChange;
+        filter.onChange = value => {
+            if (clearCharts) clearCharts();
+            if (onChangeFunc) onChangeFunc(value);
+        };
+        return filter;
+    });
 
     return (
         <div className={styles.container}>
@@ -102,6 +113,17 @@ export const ExecutionFilters: React.FC<{
                     />
                 );
             })}
+            {chartIds && chartIds.length > 0 && (
+                <FilterPopoverButton
+                    open={false}
+                    active={true}
+                    renderContent={() => <></>}
+                    className={styles.filterButton}
+                    buttonText="Clear Manually Selected Executions"
+                    onReset={clearCharts}
+                    key="charts"
+                />
+            )}
         </div>
     );
 };
