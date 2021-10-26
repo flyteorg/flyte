@@ -47,6 +47,7 @@ var (
 		"spark.flyte.feature1.enabled":    "true",
 		"spark.flyteorg.feature2.enabled": "true",
 		"spark.flyteorg.feature3.enabled": "true",
+		"spark.batchScheduler":            "volcano",
 	}
 
 	dummyEnvVars = []*core.KeyValuePair{
@@ -384,6 +385,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, int32(execInstances), *sparkApp.Spec.Executor.Instances)
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+	assert.Equal(t, dummySparkConf["spark.batchScheduler"], *sparkApp.Spec.BatchScheduler)
 
 	// Validate Interruptible Toleration and NodeSelector set for Executor but not Driver.
 	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))

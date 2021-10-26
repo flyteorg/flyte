@@ -210,6 +210,10 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		},
 	}
 
+	if val, ok := sparkConfig["spark.batchScheduler"]; ok {
+		j.Spec.BatchScheduler = &val
+	}
+
 	if sparkJob.MainApplicationFile != "" {
 		j.Spec.MainApplicationFile = &sparkJob.MainApplicationFile
 	}
