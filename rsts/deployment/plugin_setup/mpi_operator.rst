@@ -65,7 +65,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
    .. code-block:: bash
 
-      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
