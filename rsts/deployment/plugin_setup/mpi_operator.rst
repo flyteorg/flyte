@@ -54,7 +54,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
       helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the MPI plugin example.
+6. Build & Serialize the MPI plugin example(Optional).
 
    .. code-block:: bash
 
@@ -65,7 +65,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
    .. code-block:: bash
 
-      flytectl register files cookbook/integrations/kubernetes/kfmpi/_pb_output/* -p flytesnacks -d development
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
@@ -73,4 +73,4 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
       flytectl get launchplan --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
       flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
-      flytectl get execution --project flytesnacks --domain development <execname>
+      flytectl get execution --project flytesnacks --domain development <execution_id>
