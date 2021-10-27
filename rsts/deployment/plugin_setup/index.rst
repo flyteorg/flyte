@@ -8,12 +8,23 @@ Plugin Setup
 .. panels::
     :header: text-center
 
-    .. link-button:: deployment-plugin-setup-k8s
+
+    .. link-button:: deployment-plugin-setup-mpi-operator
+       :type: ref
+       :text: MPI Plugin
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Kubeflow MPI Operator Plugin.
+
+    ---
+
+    .. link-button:: deployment-plugin-setup-pytorch-operator
        :type: ref
        :text: K8s Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the K8s Operator Plugins.
+    Guide to setting up the Kubeflow PyTorch Operator Plugin.
+
 
     ---
 
@@ -29,5 +40,5 @@ Plugin Setup
     :name: Plugin
     :hidden:
 
-    aws/index
-    k8s/index
+    mpi_operator
+    pytorch_operator
