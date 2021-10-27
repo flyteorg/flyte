@@ -269,6 +269,7 @@ examples_dirs = [
     "../integrations/kubernetes/k8s_spark",
     # "../integrations/kubernetes/kftensorflow",  # TODO: need to update content
     "../integrations/kubernetes/kfpytorch",
+    "../integrations/kubernetes/kfmpi",
     "../integrations/aws/athena",
     "../integrations/aws/sagemaker_training",
     "../integrations/aws/sagemaker_pytorch",
@@ -301,6 +302,7 @@ gallery_dirs = [
     "auto/integrations/kubernetes/k8s_spark",
     # "auto/integrations/kubernetes/kftensorflow",  # TODO: need to update content
     "auto/integrations/kubernetes/kfpytorch",
+    "auto/integrations/kubernetes/kfmpi",
     "auto/integrations/aws/athena",
     "auto/integrations/aws/sagemaker_training",
     "auto/integrations/aws/sagemaker_pytorch",

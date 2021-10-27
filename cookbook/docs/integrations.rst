@@ -108,6 +108,15 @@ orchestrated by Flyte itself, within its provisioned kubernetes clusters.
     ^^^^^^^^^^^^
     Run distributed pytorch training jobs using ``Kubeflow``.
 
+    ---
+
+    .. link-button:: auto/integrations/kubernetes/kfmpi/index
+       :type: ref
+       :text: MPI Operator
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Run distributed deep learning training jobs using Horovod and MPI.
+
 ********************************
 External Service Backend Plugins
 ********************************
@@ -234,7 +243,7 @@ The :ref:`community <community>` would love to help you with your own ideas of b
     :maxdepth: -1
     :caption: Integrations
     :hidden:
- 
+
     auto/integrations/flytekit_plugins/sql/index
     auto/integrations/flytekit_plugins/greatexpectations/index
     auto/integrations/flytekit_plugins/papermilltasks/index
@@ -243,6 +252,7 @@ The :ref:`community <community>` would love to help you with your own ideas of b
     auto/integrations/kubernetes/pod/index
     auto/integrations/kubernetes/k8s_spark/index
     auto/integrations/kubernetes/kfpytorch/index
+    auto/integrations/kubernetes/kfmpi/index
     auto/integrations/aws/sagemaker_training/index
     auto/integrations/aws/sagemaker_pytorch/index
     auto/integrations/aws/athena/index
