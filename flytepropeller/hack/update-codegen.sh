@@ -19,6 +19,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+set +u
 
 : "${RESOURCE_NAME:?should be set for CRD}"
 : "${OPERATOR_PKG:?should be set for operator}"
@@ -28,16 +29,34 @@ echo "Generating CRD: ${RESOURCE_NAME}, in package ${OPERATOR_PKG}..."
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo ../code-generator)}
 
-# generate the code with:
-# --output-base    because this script should also be able to run inside the vendor dir of
-#                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
-#                  instead of the $GOPATH directly. For normal projects this can be dropped.
-bash ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
-  ${OPERATOR_PKG}/pkg/client \
-  ${OPERATOR_PKG}/pkg/apis \
-  ${RESOURCE_NAME}:v1alpha1 \
-  --output-base "$(dirname ${BASH_SOURCE})/../../../.." \
-  --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.go.txt
+if [[ -d ${CODEGEN_PKG} ]]; then
+    # generate the code with:
+    # --output-base    because this script should also be able to run inside the vendor dir of
+    #                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
+    #                  instead of the $GOPATH directly. For normal projects this can be dropped.
+    bash ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
+      ${OPERATOR_PKG}/pkg/client \
+      ${OPERATOR_PKG}/pkg/apis \
+      ${RESOURCE_NAME}:v1alpha1 \
+      --output-base "$(dirname ${BASH_SOURCE})/../../../.." \
+      --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.go.txt
+fi
 
 # To use your own boilerplate text use:
 #   --go-header-file ${SCRIPT_ROOT}/hack/custom-boilerplate.go.txt
+
+# This section is used by GitHub workflow to ensure that the generation step was run
+if [[ "$DELTA_CHECK" == true ]]; then
+  DIRTY=$(git status --porcelain)
+  if [ -n "$DIRTY" ]; then
+    echo "FAILED: CRD code updated without committing generated code."
+    echo "Ensure make op_code_generate has run and all changes are committed."
+    DIFF=$(git diff)
+    echo "diff detected: $DIFF"
+    DIFF=$(git diff --name-only)
+    echo "files different: $DIFF"
+    exit 1
+  else
+    echo "SUCCESS: Generated CRD code is up to date."
+  fi
+fi

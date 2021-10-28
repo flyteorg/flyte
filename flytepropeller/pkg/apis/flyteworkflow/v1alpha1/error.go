@@ -9,7 +9,7 @@ import (
 
 // Wrapper around core.Execution error. Execution Error has a protobuf enum and hence needs to be wrapped by custom marshaller
 type ExecutionError struct {
-	*core.ExecutionError
+	*core.ExecutionError `json:",inline"`
 }
 
 func (in *ExecutionError) UnmarshalJSON(b []byte) error {
