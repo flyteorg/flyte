@@ -8,7 +8,7 @@ import (
 )
 
 type Identifier struct {
-	*core.Identifier
+	*core.Identifier `json:",inline"`
 }
 
 func (in *Identifier) UnmarshalJSON(b []byte) error {
@@ -29,7 +29,7 @@ func (in *Identifier) DeepCopyInto(out *Identifier) {
 }
 
 type WorkflowExecutionIdentifier struct {
-	*core.WorkflowExecutionIdentifier
+	*core.WorkflowExecutionIdentifier `json:",inline"`
 }
 
 func (in *WorkflowExecutionIdentifier) DeepCopyInto(out *WorkflowExecutionIdentifier) {
@@ -37,7 +37,7 @@ func (in *WorkflowExecutionIdentifier) DeepCopyInto(out *WorkflowExecutionIdenti
 }
 
 type TaskExecutionIdentifier struct {
-	*core.TaskExecutionIdentifier
+	*core.TaskExecutionIdentifier `json:",inline"`
 }
 
 func (in *TaskExecutionIdentifier) DeepCopyInto(out *TaskExecutionIdentifier) {
