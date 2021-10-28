@@ -309,6 +309,7 @@ storage:
 
 # Database configuration
 db:
+  checks: true
   datacatalog:
     database:
       port: 5432
@@ -582,6 +583,7 @@ workflow_notifications:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
     # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
@@ -618,6 +620,7 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
+
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1

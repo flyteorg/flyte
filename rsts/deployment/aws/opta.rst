@@ -116,7 +116,7 @@ is strongly recommended that users `add authentication <https://docs.flyte.org/p
 
 **Extra configuration**
 It is possible to add extra configuration to your Flyte deployment by modifying the values passed in the helm chart
-used by Opta. Please refer to the possible values allowed from the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/helm>`_
+used by Opta. Please refer to the possible values allowed from the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte>`_
 and update the values field of the Flyte module in the flyte.yaml file accordingly.
 
 
@@ -124,7 +124,7 @@ Raw Helm Deployment
 *******************
 It is certainly possible to deploy a production Flyte cluster directly using the helm chart if a user does not wish to
 use Opta. To do so properly, one will need to ensure they have completed the initial security/ha/robustness checklist
-from above, and then use `helm <https://helm.sh/>`_ to deploy the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/helm>`_.
+from above, and then use `helm <https://helm.sh/>`_ to deploy the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte>`_.
 
 .. role:: raw-html-m2r(raw)
    :format: html

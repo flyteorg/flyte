@@ -18,7 +18,7 @@ spec:
       labels: {{ include "datacatalog.labels" . | nindent 8 }}
     spec:
       initContainers:
-      {{- if .Values.postgres.enabled }}
+      {{- if .Values.db.checks }}
       - name: check-db-ready
         image: postgres:10.16-alpine
         command:
