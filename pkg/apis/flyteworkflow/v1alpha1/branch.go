@@ -8,7 +8,7 @@ import (
 )
 
 type Error struct {
-	*core.Error `json:",inline"`
+	*core.Error
 }
 
 func (in Error) UnmarshalJSON(b []byte) error {
@@ -36,7 +36,6 @@ func (in *Error) DeepCopyInto(out *Error) {
 
 }
 
-// +kubebuilder:validation:Type=object
 type BooleanExpression struct {
 	*core.BooleanExpression
 }
@@ -79,8 +78,7 @@ func (in *IfBlock) GetThenNode() *NodeID {
 }
 
 type BranchNodeSpec struct {
-	If IfBlock `json:"if"`
-	// +listType=atomic
+	If       IfBlock    `json:"if"`
 	ElseIf   []*IfBlock `json:"elseIf,omitempty"`
 	Else     *NodeID    `json:"else,omitempty"`
 	ElseFail *Error     `json:"elseFail,omitempty"`

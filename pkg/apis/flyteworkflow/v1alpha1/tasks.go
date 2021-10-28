@@ -7,7 +7,6 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 )
 
-// +kubebuilder:validation:Type=object
 type TaskSpec struct {
 	*core.TaskTemplate
 }

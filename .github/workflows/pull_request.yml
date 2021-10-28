@@ -109,12 +109,3 @@ jobs:
           GO111MODULE: "on"
         with:
           args: make install && make lint
-
-  crd-check:
-    name: Check CRD code is up to date
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Check CRD code
-        run: DELTA_CHECK=true make op_code_generate
