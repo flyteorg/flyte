@@ -15,12 +15,9 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import warnings
 
 import sphinx.application
 import sphinx.errors
-
-warnings.filterwarnings("ignore")
 
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 

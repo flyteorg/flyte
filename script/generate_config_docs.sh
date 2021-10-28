@@ -15,12 +15,12 @@ OUTPUT_PATH="${OUTPUT_DIR}"/$2_config.rst
 echo ".. _$2-config-specification:
 
 #########################################
-$1
+Flyte $1 Configuration
 #########################################
 " > "${OUTPUT_PATH}"
 
 "${GOPATH:-~/go}"/bin/$2 config docs >> "${OUTPUT_PATH}"
 }
 
-output_config "Flyte Admin Configuration" flyteadmin
-output_config "Flyte Propeller Configuration" flytepropeller
+output_config "Admin" flyteadmin
+output_config "Propeller" flytepropeller
