@@ -21,4 +21,4 @@
 1. Run [Create Flyte Release workflow](https://github.com/flyteorg/flyte/actions/workflows/create-release.yml):
    It will create a tag and then publish all deployment manifest in github release and will create a discussion thread in github release 
 1. Close the milestone
-1. Ping #core ([slack](https://flyte-org.slack.com/) channel) to: Send announcements about the milestone with the contents of the CHANGELOG to all social channels..
+1. Ping #core ([slack](https://slack.flyte.org/) channel) to: Send announcements about the milestone with the contents of the CHANGELOG to all social channels..
