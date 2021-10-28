@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+
 	"sync"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -17,6 +18,7 @@ import (
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 // IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
@@ -36,6 +38,7 @@ var (
 type Clientset struct {
 	adminServiceClient        service.AdminServiceClient
 	authMetadataServiceClient service.AuthMetadataServiceClient
+	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
 }
 
@@ -47,6 +50,11 @@ func (c Clientset) AdminClient() service.AdminServiceClient {
 // AuthMetadataClient retrieves the AuthMetadataServiceClient
 func (c Clientset) AuthMetadataClient() service.AuthMetadataServiceClient {
 	return c.authMetadataServiceClient
+}
+
+// HealthServiceClient retrieves the grpc_health_v1.HealthClient
+func (c Clientset) HealthServiceClient() grpc_health_v1.HealthClient {
+	return c.healthServiceClient
 }
 
 func (c Clientset) IdentityClient() service.IdentityServiceClient {
@@ -192,6 +200,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 	cs.adminServiceClient = NewAdminClient(ctx, adminConnection)
 	cs.authMetadataServiceClient = service.NewAuthMetadataServiceClient(adminConnection)
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
+	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	return &cs, nil
 }
 

@@ -72,6 +72,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.AdminClient())
 		assert.NotNil(t, clientSet.AuthMetadataClient())
 		assert.NotNil(t, clientSet.IdentityClient())
+		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
@@ -80,6 +81,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
 		assert.NotNil(t, clientSet.AdminClient())
+		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
 }
 
