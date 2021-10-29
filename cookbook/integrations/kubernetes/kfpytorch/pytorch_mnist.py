@@ -180,12 +180,12 @@ TrainingOutputs = typing.NamedTuple(
 @task(
     task_config=PyTorch(
         num_workers=2,
-        per_replica_requests=Resources(cpu=cpu_request, mem=mem_request, gpu=gpu_request),
-        per_replica_limits=Resources(mem=mem_limit, gpu=gpu_limit),
     ),
     retries=2,
     cache=True,
     cache_version="1.0",
+    requests=Resources(cpu=cpu_request, mem=mem_request, gpu=gpu_request),
+    limits=Resources(mem=mem_limit, gpu=gpu_limit)
 )
 def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
     log_dir = "logs"
