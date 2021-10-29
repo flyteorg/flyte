@@ -53,15 +53,15 @@ prepare_artifacts:
 
 .PHONE: helm_update
 helm_update: ## Update helm charts' dependencies.
-	helm dep update ./charts/flyte-sandbox/
+	helm dep update ./charts/flyte/
 
 .PHONY: helm_install
 helm_install: ## Install helm charts
-	helm install flyte --debug ./charts/flyte-sandbox -f ./charts/flyte-sandbox/values.yaml --create-namespace --namespace=flyte
+	helm install flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
 .PHONY: helm_upgrade
 helm_upgrade: ## Upgrade helm charts
-	helm upgrade flyte --debug ./charts/flyte-sandbox -f ./charts/flyte-sandbox/values.yaml --create-namespace --namespace=flyte
+	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
 .PHONY: docs
 docs:

@@ -3,12 +3,12 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte-sandbox-contour-contour
+  name: flyte-contour-contour
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour
 ---
@@ -16,12 +16,12 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte-sandbox-contour-envoy
+  name: flyte-contour-envoy
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: envoy
 ---
@@ -33,7 +33,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
@@ -45,7 +45,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
@@ -57,7 +57,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flytepropeller
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
@@ -90,20 +90,20 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
 ---
 # Source: flyte-sandbox/charts/sparkoperator/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte-sandbox-sparkoperator
+  name: flyte-sparkoperator
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 ---
@@ -111,12 +111,12 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte-sandbox-spark
+  name: flyte-spark
   namespace: flyte
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 ---
@@ -170,10 +170,10 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
-  name: flyte-sandbox-kubernetes-dashboard-certs
+  name: flyte-kubernetes-dashboard-certs
 type: Opaque
 ---
 # Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
@@ -184,7 +184,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
   name: kubernetes-dashboard-csrf
@@ -198,7 +198,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
   name: kubernetes-dashboard-key-holder
@@ -208,19 +208,19 @@ type: Opaque
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-sandbox-contour
+  name: flyte-contour
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour
 data:
   contour.yaml: |
     accesslog-format: envoy
     disablePermitInsecure: false
-    envoy-service-name: 'flyte-sandbox-contour-envoy'
+    envoy-service-name: 'flyte-contour-envoy'
     leaderelection:
       configmap-namespace: 'flyte'
     tls: {}
@@ -233,7 +233,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
@@ -285,7 +285,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
@@ -410,7 +410,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data: 
@@ -426,7 +426,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
@@ -471,7 +471,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
@@ -504,7 +504,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
@@ -640,7 +640,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
   name: kubernetes-dashboard-settings
@@ -1953,11 +1953,11 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyte-sandbox-contour-contour
+  name: flyte-contour-contour
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
@@ -2066,7 +2066,7 @@ metadata:
   name: flyteadmin
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2096,7 +2096,7 @@ metadata:
   name: flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2200,11 +2200,11 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: "flyte-sandbox-kubernetes-dashboard-metrics"
+  name: "flyte-kubernetes-dashboard-metrics"
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2231,11 +2231,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: "flyte-sandbox-kubernetes-dashboard-readonly"
+  name: "flyte-kubernetes-dashboard-readonly"
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2367,11 +2367,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyte-sandbox-sparkoperator
+  name: flyte-sparkoperator
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2456,19 +2456,19 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyte-sandbox-contour-contour
+  name: flyte-contour-contour
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-sandbox-contour-contour
+  name: flyte-contour-contour
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-contour-contour
+    name: flyte-contour-contour
     namespace: flyte
 ---
 # Source: flyte-sandbox/charts/flyte/templates/admin/rbac.yaml
@@ -2478,7 +2478,7 @@ metadata:
   name: flyteadmin-binding
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
@@ -2497,7 +2497,7 @@ metadata:
   name: flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
@@ -2543,20 +2543,20 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "flyte-sandbox-kubernetes-dashboard-metrics"
+  name: "flyte-kubernetes-dashboard-metrics"
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-sandbox-kubernetes-dashboard-metrics
+  name: flyte-kubernetes-dashboard-metrics
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-kubernetes-dashboard
+    name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
 # Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
@@ -2577,40 +2577,40 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyte-sandbox-kubernetes-dashboard-readonly
+  name: flyte-kubernetes-dashboard-readonly
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-sandbox-kubernetes-dashboard-readonly
+  name: flyte-kubernetes-dashboard-readonly
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-kubernetes-dashboard
+    name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
 # Source: flyte-sandbox/charts/sparkoperator/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyte-sandbox-sparkoperator
+  name: flyte-sparkoperator
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-sparkoperator
+    name: flyte-sparkoperator
     namespace: flyte
 roleRef:
   kind: ClusterRole
-  name: flyte-sandbox-sparkoperator
+  name: flyte-sparkoperator
   apiGroup: rbac.authorization.k8s.io
 ---
 # Source: flyte-sandbox/charts/kubernetes-dashboard/templates/role.yaml
@@ -2631,11 +2631,11 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2668,7 +2668,7 @@ metadata:
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -2703,20 +2703,20 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-kubernetes-dashboard
+    name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
 # Source: flyte-sandbox/charts/sparkoperator/templates/spark-rbac.yaml
@@ -2728,12 +2728,12 @@ metadata:
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 subjects:
 - kind: ServiceAccount
-  name: flyte-sandbox-spark
+  name: flyte-spark
   namespace: flyte
 roleRef:
   kind: Role
@@ -2744,12 +2744,12 @@ roleRef:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte-sandbox-contour
+  name: flyte-contour
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour
 spec:
@@ -2760,7 +2760,7 @@ spec:
       targetPort: 8001
   selector:
     app.kubernetes.io/name: contour
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: contour
   type: ClusterIP
 ---
@@ -2768,12 +2768,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte-sandbox-contour-envoy
+  name: flyte-contour-envoy
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: envoy
   annotations:
@@ -2799,7 +2799,7 @@ spec:
       targetPort: https
   selector:
     app.kubernetes.io/name: contour
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: envoy
   type: NodePort
 ---
@@ -2811,7 +2811,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
@@ -2836,7 +2836,7 @@ spec:
       port: 10254
   selector: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-sandbox/charts/flyte/templates/console/service.yaml
 apiVersion: v1
@@ -2846,7 +2846,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -2857,7 +2857,7 @@ spec:
     targetPort: 8080
   selector: 
     app.kubernetes.io/name: flyteconsole
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-sandbox/charts/flyte/templates/datacatalog/service.yaml
 apiVersion: v1
@@ -2867,7 +2867,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
@@ -2889,7 +2889,7 @@ spec:
     targetPort: 8089
   selector: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
 # Service
@@ -2927,11 +2927,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kubernetes-dashboard
@@ -2945,7 +2945,7 @@ spec:
     nodePort: 30082
   selector:
     app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: kubernetes-dashboard
 ---
 # Source: flyte-sandbox/templates/minio/service.yaml
@@ -2956,7 +2956,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: minio
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-sandbox-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -2974,7 +2974,7 @@ spec:
     targetPort: minio-console
   selector: 
     app.kubernetes.io/name: minio
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-sandbox/templates/postgres/service.yaml
 apiVersion: v1
@@ -2984,7 +2984,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: postgres
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-sandbox-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -2996,18 +2996,18 @@ spec:
     targetPort: postgres
   selector: 
     app.kubernetes.io/name: postgres
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-sandbox/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: flyte-sandbox-contour-envoy
+  name: flyte-contour-envoy
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: envoy
 spec:
@@ -3018,14 +3018,14 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: contour
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
       app.kubernetes.io/component: envoy
   template:
     metadata:
       labels:
         app.kubernetes.io/name: contour
         helm.sh/chart: contour-4.1.2
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: envoy
     spec:
@@ -3143,7 +3143,7 @@ spec:
           args:
             - bootstrap
             - /config/envoy.json
-            - --xds-address=flyte-sandbox-contour
+            - --xds-address=flyte-contour
             - --xds-port=8001
             - --resources-dir=/config/resources
             - --envoy-cafile=/certs/ca.crt
@@ -3171,7 +3171,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
       automountServiceAccountToken: false
-      serviceAccountName: flyte-sandbox-contour-envoy
+      serviceAccountName: flyte-contour-envoy
       volumes:
         - name: envoy-config
           emptyDir: {}
@@ -3184,12 +3184,12 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-sandbox-contour-contour
+  name: flyte-contour-contour
   namespace: flyte
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour
 spec:
@@ -3203,16 +3203,16 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: contour
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
       app.kubernetes.io/component: contour
   template:
     metadata:
       annotations:
-        checksum/config: 6cceb90704778f2e6378b5f9a7113f8be60326b576208e3364ec54a3f47cdb4c
+        checksum/config: 5653797be256c34530f8f4002c2b997af941d56f68b110582887fafe0784864e
       labels:
         app.kubernetes.io/name: contour
         helm.sh/chart: contour-4.1.2
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: contour
     spec:
@@ -3226,7 +3226,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     app.kubernetes.io/name: contour
-                    app.kubernetes.io/instance: flyte-sandbox
+                    app.kubernetes.io/instance: flyte
                     app.kubernetes.io/component: contour
                 namespaces:
                   - "flyte"
@@ -3301,7 +3301,7 @@ spec:
                   apiVersion: v1
                   fieldPath: metadata.name
       dnsPolicy: ClusterFirst
-      serviceAccountName: flyte-sandbox-contour-contour
+      serviceAccountName: flyte-contour-contour
       securityContext:
         runAsUser: 1001
         runAsGroup: 1001
@@ -3313,7 +3313,7 @@ spec:
             secretName: contourcert
         - name: contour-config
           configMap:
-            name: flyte-sandbox-contour
+            name: flyte-contour
             defaultMode: 0644
             items:
               - key: contour.yaml
@@ -3327,7 +3327,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3335,14 +3335,14 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: flyteadmin
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        configChecksum: "f372ae72237988b3a54275e5954dc0cff9b6ec5741ff0bb1d4fddb8c32f171a"
+        configChecksum: "884efea0e0b5b70bfef4f7c5ac0d15946222a1bb6d37cf2c8d7c83acf28cc43"
       labels: 
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -3485,7 +3485,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3493,14 +3493,14 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: flyteconsole
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        configChecksum: "baaeb96355e3a6085f4158101bee41b814aba5adcf8086539301e20c903c3e1"
+        configChecksum: "8ef03d2ed4468082a4585c0454139c5df15794f3340e17c7ea338cd6e781b91"
       labels: 
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -3535,7 +3535,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3543,14 +3543,14 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: datacatalog
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        configChecksum: "a09acd4903de87933ef902dc5c0c108e770fbb9fba7f93e6ee35e2c626847a8"
+        configChecksum: "90e37e01b80f8691d9c0ec86a13dbfb65ba66bb2d39afdf9840fa62e088fcd1"
       labels: 
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -3616,7 +3616,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3624,14 +3624,14 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: flytescheduler
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        configChecksum: "f372ae72237988b3a54275e5954dc0cff9b6ec5741ff0bb1d4fddb8c32f171a"
+        configChecksum: "884efea0e0b5b70bfef4f7c5ac0d15946222a1bb6d37cf2c8d7c83acf28cc43"
       labels: 
         app.kubernetes.io/name: flytescheduler
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -3687,7 +3687,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flytepropeller
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3695,14 +3695,14 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: flytepropeller
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
-        configChecksum: "04d4f37b338f7e1399fdaf56678d913fe58f28d9c1da8c0532a4d6764d9592a"
+        configChecksum: "f6b5630c54c59a1cb8b26452515126431536d12ea2697c228cd3bf3e1d4b80e"
       labels: 
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -3764,7 +3764,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "04d4f37b338f7e1399fdaf56678d913fe58f28d9c1da8c0532a4d6764d9592a"
+        configChecksum: "f6b5630c54c59a1cb8b26452515126431536d12ea2697c228cd3bf3e1d4b80e"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -3842,11 +3842,11 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-sandbox-kubernetes-dashboard
+  name: flyte-kubernetes-dashboard
   labels:
     app.kubernetes.io/name: kubernetes-dashboard
     helm.sh/chart: kubernetes-dashboard-4.0.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "2.2.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kubernetes-dashboard
@@ -3860,7 +3860,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kubernetes-dashboard
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
       app.kubernetes.io/component: kubernetes-dashboard
   template:
     metadata:
@@ -3869,12 +3869,12 @@ spec:
       labels:
         app.kubernetes.io/name: kubernetes-dashboard
         helm.sh/chart: kubernetes-dashboard-4.0.2
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         app.kubernetes.io/version: "2.2.0"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kubernetes-dashboard
     spec:
-      serviceAccountName: flyte-sandbox-kubernetes-dashboard
+      serviceAccountName: flyte-kubernetes-dashboard
       containers:
       - name: kubernetes-dashboard
         image: "kubernetesui/dashboard:v2.2.0"
@@ -3917,7 +3917,7 @@ spec:
       volumes:
       - name: kubernetes-dashboard-certs
         secret:
-          secretName: flyte-sandbox-kubernetes-dashboard-certs
+          secretName: flyte-kubernetes-dashboard-certs
       - name: tmp-volume
         emptyDir: {}
 ---
@@ -3931,11 +3931,11 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-sandbox-sparkoperator
+  name: flyte-sparkoperator
   labels:
     helm.sh/chart: sparkoperator-1.0.6
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -3943,7 +3943,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: sparkoperator
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   strategy:
     type: Recreate
   template:
@@ -3954,9 +3954,9 @@ spec:
         prometheus.io/path: /metrics
       labels:
         app.kubernetes.io/name: sparkoperator
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
     spec:
-      serviceAccountName: flyte-sandbox-sparkoperator
+      serviceAccountName: flyte-sparkoperator
       securityContext:
         {}
       containers:
@@ -3999,7 +3999,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: minio
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-sandbox-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -4007,12 +4007,12 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: minio
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       labels: 
         app.kubernetes.io/name: minio
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-sandbox-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -4054,7 +4054,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: postgres
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-sandbox-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -4062,12 +4062,12 @@ spec:
   selector:
     matchLabels: 
       app.kubernetes.io/name: postgres
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       labels: 
         app.kubernetes.io/name: postgres
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-sandbox-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
@@ -4105,7 +4105,7 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -4363,7 +4363,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte-sandbox-contour-contour-certgen
+  name: flyte-contour-contour-certgen
   namespace: flyte
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
@@ -4371,7 +4371,7 @@ metadata:
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour-certgen
 ---
@@ -4379,7 +4379,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: flyte-sandbox-contour-contour-certgen
+  name: flyte-contour-contour-certgen
   namespace: flyte
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
@@ -4387,7 +4387,7 @@ metadata:
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour-certgen
 rules:
@@ -4403,7 +4403,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: flyte-sandbox-contour-contour-certgen
+  name: flyte-contour-contour-certgen
   namespace: flyte
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
@@ -4411,22 +4411,22 @@ metadata:
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour-certgen
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: flyte-sandbox-contour-contour-certgen
+  name: flyte-contour-contour-certgen
 subjects:
   - kind: ServiceAccount
-    name: flyte-sandbox-contour-contour-certgen
+    name: flyte-contour-contour-certgen
 ---
 # Source: flyte-sandbox/charts/contour/templates/certgen/job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: flyte-sandbox-contour-contour-certgen
+  name: flyte-contour-contour-certgen
   namespace: flyte
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
@@ -4435,7 +4435,7 @@ metadata:
   labels:
     app.kubernetes.io/name: contour
     helm.sh/chart: contour-4.1.2
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour-certgen
 spec:
@@ -4445,7 +4445,7 @@ spec:
       labels:
         app.kubernetes.io/name: contour
         helm.sh/chart: contour-4.1.2
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: contour-certgen
     spec:
@@ -4476,7 +4476,7 @@ spec:
               cpu: 10m
               memory: 50Mi
       restartPolicy: Never
-      serviceAccountName: flyte-sandbox-contour-contour-certgen
+      serviceAccountName: flyte-contour-contour-certgen
       securityContext:
         runAsUser: 1001
         runAsGroup: 1001

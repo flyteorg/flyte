@@ -13,38 +13,32 @@
 
 {{ template "chart.requirementsSection" . }}
 
-### Flyte INSTALLATION:
+### SANDBOX INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
-- Fetch chart dependencies ``
-- Install Flyte:
+- Fetch chart dependencies `helm dep up`
+- Install Flyte sandbox:
 
 ```bash
-helm repo add flyte https://flyteorg.github.io/flyte
-helm install -n flyte -f values-eks.yaml --create-namespace flyte flyte/flyte-core
+cd helm
+helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
 ```
 
-Customize your installation by changing settings in `values-eks.yaml`.
+Customize your installation by changing settings in `values-sandbox.yaml`.
 You can use the helm diff plugin to review any value changes you've made to your values:
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
-helm diff upgrade -f values-eks.yaml flyte flyte/flyte-core
+helm diff upgrade -f values-sandbox.yaml flyte .
 ```
 
 Then apply your changes:
 ```bash
-helm upgrade -f values-eks.yaml flyte flyte/flyte-core
-```
-
-Install ingress controller (By default Flyte helm chart have contour ingress resource)
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install gateway bitnami/contour -n flyte
+helm upgrade -f values-sandbox.yaml flyte .
 ```
 
 #### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-eks . -n flyte -f values-eks.yaml > flyte_generated_eks.yaml`
-- Deploy the manifest `kubectl apply -f flyte_generated_eks.yaml`
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
 
 
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
