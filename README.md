@@ -245,6 +245,14 @@ Here are some resources to help you learn more about Flyte.
 - Upcoming meeting agenda, previous meeting notes, and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
 - If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
+### Blog Posts
+
+- [Flyte blog site](https://blog.flyte.org/)
+
+### Newsletter
+
+- [Flyte Monthly](https://www.getrevue.co/profile/flyte)
+
 ### Conference Talks
 
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
@@ -255,17 +263,21 @@ Here are some resources to help you learn more about Flyte.
 - Datacouncil [video](https://www.youtube.com/watch?v=1BjXC5TZAiI) | [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 - FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)
 - [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)
-- [OSPOCon 2021](https://events.linuxfoundation.org/ospocon/) Catch a variety of Flyte talks - final schedule and topics to be released soon.
-
-### Blog Posts
-
-- [Flyte blog site](https://blog.flyte.org/)
+- OSPOCon 2021:
+  - Building and Growing an Open Source Community for an Incubating Project [video](https://www.youtube.com/watch?v=DhXlTzCDeGI&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=37)
+  - Enforcing Data Quality in Data Processing and ML Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=IB3KrIk4ics&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=84)
+  - Self-serve Feature Engineering Platform Using Flyte and Feast [video](https://www.youtube.com/watch?v=Km2ii0F8Yl0&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=215)
+  - Efficient Data Parallel Distributed Training with Flyte, Spark & Horovod [video](https://www.youtube.com/watch?v=gF3cVTdgLUY&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=77)
+- KubeCon+CloudNativeCon North America 2021 - How Spotify Leverages Flyte To Coordinate Financial Analytics Company-Wide [session](https://sched.co/lV59)
+- PyData Global 2021 - Robust, End-to-end Online Machine Learning Applications with Flytekit, Pandera and Streamlit [session](https://pydata.org/global2021/schedule/presentation/119/robust-end-to-end-online-machine-learning-applications-with-flytekit-pandera-and-streamlit/)
+- ODSC West Reconnect - Deep Dive Into Flyte [workshop](https://odsc.com/speakers/deep-dive-into-flyte/) 
 
 ### Podcasts
 
 - TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
+- Open Data Science - [West Warm Up session with Ketan Umare - Creator of Flyte](https://twitter.com/odsc/status/1451594432369758212)
 
 ## 💖 All Contributors
 
