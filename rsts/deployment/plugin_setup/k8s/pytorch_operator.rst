@@ -22,7 +22,7 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
    .. code-block:: bash
 
-      export KUBECONFIG=~/.flyte/k3s/k3s.yaml
+      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
       git clone https://github.com/kubeflow/pytorch-operator.git
       kustomize build pytorch-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
