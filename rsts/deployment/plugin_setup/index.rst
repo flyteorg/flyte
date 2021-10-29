@@ -11,7 +11,7 @@ Plugin Setup
 
     .. link-button:: deployment-plugin-setup-mpi-operator
        :type: ref
-       :text: MPI Plugin
+       :text: MPI Operator
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Guide to setting up the Kubeflow MPI Operator Plugin.
