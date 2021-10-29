@@ -25,6 +25,14 @@ Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the Kubeflow PyTorch Operator Plugin.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-spark-operator
+       :type: ref
+       :text: Spark Operator
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Spark Operator Plugin.
 
 
 .. toctree::
@@ -34,3 +42,4 @@ Plugin Setup
 
     mpi_operator
     pytorch_operator
+    spark_operator
