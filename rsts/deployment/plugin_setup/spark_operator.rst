@@ -15,7 +15,6 @@ This guide gives an overview of how to set up the Spark operator in your Flyte d
 
    .. code-block:: bash
 
-      // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
       flytectl sandbox start --source=./flytesnacks
 
 3. Install the Spark Operator.
@@ -175,7 +174,7 @@ This guide gives an overview of how to set up the Spark operator in your Flyte d
 
       helm upgrade -n flyte -f values-spark.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the Spark plugin example(Optional).
+6. (Optional) Build & Serialize the Spark plugin example.
 
    .. code-block:: bash
 
