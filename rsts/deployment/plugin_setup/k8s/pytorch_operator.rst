@@ -55,7 +55,7 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
       helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the PyTorch plugin example(Optional).
+6. (Optional) Build & Serialize the PyTorch plugin example.
 
    .. code-block:: bash
 

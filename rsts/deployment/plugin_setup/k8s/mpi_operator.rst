@@ -56,7 +56,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
       helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the MPI plugin example(Optional).
+6. (Optional) Build & Serialize the MPI plugin example.
 
    .. code-block:: bash
 
