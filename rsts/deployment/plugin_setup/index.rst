@@ -14,7 +14,7 @@ Plugin Setup
        :text: K8s Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the K8s Operator Plugin.
+    Guide to setting up the K8s Operator Plugins.
 
 
 .. toctree::
