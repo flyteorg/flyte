@@ -20,6 +20,7 @@ from flytekit.types.schema import FlyteSchema
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
+from typing import Tuple
 
 # %%
 # Since we are working with a specific dataset, we will create a strictly typed schema for the dataset.
@@ -70,12 +71,12 @@ CLASSES_COLUMNS = OrderedDict({"class": int})
 @task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def split_traintest_dataset(
     dataset: FlyteFile[typing.TypeVar("csv")], seed: int, test_split_ratio: float
-) -> (
+) -> Tuple[
     FlyteSchema[FEATURE_COLUMNS],
     FlyteSchema[FEATURE_COLUMNS],
     FlyteSchema[CLASSES_COLUMNS],
     FlyteSchema[CLASSES_COLUMNS],
-):
+]:
     """
     Retrieves the training dataset from the given blob location and then splits it using the split ratio and returns the result
     This splitter is only for the dataset that has the format as specified in the example csv. The last column is assumed to be

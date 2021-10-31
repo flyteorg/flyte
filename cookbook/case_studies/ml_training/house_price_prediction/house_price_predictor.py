@@ -25,6 +25,7 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
 from flytekit import Resources, dynamic, task, workflow
 from flytekit.types.file import FlyteFile
+from typing import Tuple
 
 # %%
 # Initializing the Variables
@@ -96,7 +97,7 @@ def gen_houses(num_houses) -> pd.DataFrame:
 # Split the data into train, val, and test datasets.
 def split_data(
     df: pd.DataFrame, seed: int, split: typing.List[float]
-) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
     seed = seed
     val_size = split[1]

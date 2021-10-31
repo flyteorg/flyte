@@ -17,7 +17,7 @@ and the Enum types are not optional. So when defining enums, design them well to
 valid default.
 """
 from flytekit import task, workflow
-import typing
+from typing import Tuple
 from enum import Enum
 
 
@@ -50,7 +50,7 @@ def string_to_enum(c: str) -> Color:
 
 
 @workflow
-def enum_wf(c: Color = Color.RED) -> (Color, str):
+def enum_wf(c: Color = Color.RED) -> Tuple[Color, str]:
     v = enum_stringify(c=c)
     return string_to_enum(c=v), v
 

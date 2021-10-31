@@ -19,6 +19,7 @@ behind workflows for additional information.
 import typing
 
 from flytekit import task, workflow
+from typing import Tuple
 
 
 @task
@@ -35,7 +36,7 @@ def t2(a: str, b: str) -> str:
 # You can treat the outputs of a task as you normally would a Python function. Assign the output to two variables
 # and use them in subsequent tasks as normal. See :py:func:`flytekit.workflow`
 @workflow
-def my_wf(a: int, b: str) -> (int, str):
+def my_wf(a: int, b: str) -> Tuple[int, str]:
     x, y = t1(a=a)
     d = t2(a=y, b=b)
     return x, d

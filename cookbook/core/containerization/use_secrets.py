@@ -67,6 +67,7 @@ or injected into a file.
 # %%
 import os
 import flytekit
+from typing import Tuple
 
 # %%
 # Flytekit exposes a type/class called Secrets. It can be imported as follows.
@@ -120,7 +121,7 @@ PASSWORD_SECRET = "password"
 # The Secret structure allows passing two fields, matching the key and the group, as previously described:
 @task(
     secret_requests=[Secret(key=USERNAME_SECRET, group=SECRET_GROUP), Secret(key=PASSWORD_SECRET, group=SECRET_GROUP)])
-def user_info_task() -> (str, str):
+def user_info_task() -> Tuple[str, str]:
     secret_username = flytekit.current_context().secrets.get(SECRET_GROUP, USERNAME_SECRET)
     secret_pwd = flytekit.current_context().secrets.get(SECRET_GROUP, PASSWORD_SECRET)
     # Please do not print the secret value, this is just a demonstration.
@@ -135,7 +136,7 @@ def user_info_task() -> (str, str):
 # In these scenarios you can specify the mount_requirement. In the following example we force the mounting to be
 # an Env variable
 @task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME, mount_requirement=Secret.MountType.ENV_VAR)])
-def secret_file_task() -> (str, str):
+def secret_file_task() -> Tuple[str, str]:
     # SM here is a handle to the secrets manager
     sm = flytekit.current_context().secrets
     f = sm.get_secrets_file(SECRET_GROUP, SECRET_NAME)
@@ -147,7 +148,7 @@ def secret_file_task() -> (str, str):
 # %%
 # These tasks can be used in your workflow as usual
 @workflow
-def my_secret_workflow() -> (str, str, str, str, str):
+def my_secret_workflow() -> Tuple[str, str, str, str, str]:
     x = secret_task()
     y, z = user_info_task()
     f, s = secret_file_task()

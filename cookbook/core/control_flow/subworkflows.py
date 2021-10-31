@@ -35,7 +35,7 @@ potentially to multiple clusters.
 """
 
 import typing
-
+from typing import Tuple
 from flytekit import task, workflow
 
 
@@ -54,7 +54,7 @@ def t1(a: int) -> op:
 # This will be the subworkflow of our examples, but note that this is a workflow like any other. It can be run just
 # like any other workflow. Note here that the workflow has been declared with a default.
 @workflow
-def my_subwf(a: int = 42) -> (str, str):
+def my_subwf(a: int = 42) -> Tuple[str, str]:
     x, y = t1(a=a)
     u, v = t1(a=x)
     return y, v
@@ -74,7 +74,7 @@ def my_subwf(a: int = 42) -> (str, str):
 #
 #    Also note the use of with_overrides to provide a new name to the graph-node for better rendering or readability
 @workflow
-def parent_wf(a: int) -> (int, str, str):
+def parent_wf(a: int) -> Tuple[int, str, str]:
     x, y = t1(a=a).with_overrides(node_name="node-t1-parent")
     u, v = my_subwf(a=x)
     return x, u, v
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 # can be simply composed from other workflows, even if the other workflows are standalone entities. Each of the
 # workflows in this module can exist independently and executed independently
 @workflow
-def nested_parent_wf(a: int) -> (int, str, str, str):
+def nested_parent_wf(a: int) -> Tuple[int, str, str, str]:
     x, y = my_subwf(a=a)
     m, n, o = parent_wf(a=a)
     return m, n, o, y

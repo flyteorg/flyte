@@ -17,6 +17,7 @@ from datetime import datetime
 from random import random, seed
 
 from flytekit import conditional, dynamic, task, workflow
+from typing import Tuple
 
 # seed random number generator
 seed(datetime.now().microsecond)
@@ -25,7 +26,7 @@ seed(datetime.now().microsecond)
 # %%
 # A simple split function that divides a list into two halves.
 @task
-def split(numbers: typing.List[int]) -> (typing.List[int], typing.List[int], int):
+def split(numbers: typing.List[int]) -> Tuple[typing.List[int], typing.List[int], int]:
     return (
         numbers[0:int(len(numbers) / 2)],
         numbers[int(len(numbers) / 2):],

@@ -22,6 +22,7 @@ from tensorboardX import SummaryWriter
 from torch import distributed as dist
 from torch import nn, optim
 from torchvision import datasets, transforms
+from typing import Tuple
 
 WORLD_SIZE = int(os.environ.get("WORLD_SIZE", 1))
 
@@ -297,7 +298,7 @@ def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImageFile:
 @workflow
 def pytorch_training_wf(
     hp: Hyperparameters,
-) -> (PythonPickledFile, PNGImageFile, TensorboardLogs):
+) -> Tuple[PythonPickledFile, PNGImageFile, TensorboardLogs]:
     accuracies, model, logs = mnist_pytorch_job(hp=hp)
     plot = plot_accuracy(epoch_accuracies=accuracies)
     return model, plot, logs

@@ -11,6 +11,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from flytekit import task, workflow
 from flytekit.types.directory import TensorboardLogs
+from typing import Tuple
 
 # %%
 # Training Algorithm
@@ -184,7 +185,7 @@ def plot_loss_and_accuracy(epoch_logs: dict) -> PlotOutputs:
 @workflow
 def mnist_trainer(
     epochs: int = 5, batch_size: int = 128
-) -> (HDF5EncodedFile, PNGImageFile, PNGImageFile, TensorboardLogs):
+) -> Tuple[HDF5EncodedFile, PNGImageFile, PNGImageFile, TensorboardLogs]:
     model, history, logs = custom_training_task(epochs=epochs, batch_size=batch_size)
     accuracy, loss = plot_loss_and_accuracy(epoch_logs=history)
     return model, accuracy, loss, logs
