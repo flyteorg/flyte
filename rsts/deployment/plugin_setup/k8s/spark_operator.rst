@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-spark-operator:
+.. _deployment-plugin-setup-k8s-spark-operator:
 
 Kubeflow Spark Operator Plugin Setup
 ------------------------------------

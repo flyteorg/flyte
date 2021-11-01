@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-pytorch-operator:
+.. _deployment-plugin-setup-k8s-pytorch-operator:
 
 Kubeflow PyTorch Operator Plugin Setup
 --------------------------------------
@@ -16,13 +16,15 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
    .. code-block:: bash
 
       flytectl sandbox start --source=./flytesnacks
+      flytectl config init
 
 3. Install the PyTorch Operator.
 
    .. code-block:: bash
 
-      helm repo add bitnami https://charts.bitnami.com/bitnami --kubeconfig=~/.flyte/k3s/k3s.yaml
-      helm install my-release bitnami/pytorch
+      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
+      git clone https://github.com/kubeflow/pytorch-operator.git
+      kustomize build pytorch-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
 4. Create a file named ``values-pytorch.yaml`` and add the following config to it:
 
