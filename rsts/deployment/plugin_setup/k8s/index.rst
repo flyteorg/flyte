@@ -1,8 +1,8 @@
 .. _deployment-plugin-setup-k8s:
 
-#################
-K8s Plugins Setup
-#################
+################
+K8s Plugin Setup
+################
 
 
 .. panels::
