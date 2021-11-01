@@ -3,6 +3,7 @@ package k8s
 
 import (
 	"fmt"
+	"hash/fnv"
 	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -13,8 +14,22 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const ExecutionIDLabel = "execution-id"
-const WorkflowNameLabel = "workflow-name"
+const (
+	// Labels are set on the FlyteWorkflow CRD to aid downstream processing
+
+	// The FlyteWorkflow domain according to registration ownership
+	DomainLabel = "domain"
+	// A concatenation of project, domain, workflow name, and a unique ID
+	ExecutionIDLabel = "execution-id"
+	// The FlyteWorkflow project according to registration ownership
+	ProjectLabel = "project"
+	// Shard keys are used during FlytePropeller sharding, this value is set to a hash of the FlyteWorkflow ExecutionID.
+	// The pseudo-random unique ID component means this value is deterministic for the same ExecutionID, but will vary
+	// across executions of the same workflow.
+	ShardKeyLabel = "shard-key"
+	// The fully qualified FlyteWorkflow name
+	WorkflowNameLabel = "workflow-name"
+)
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
 	if w == nil || w.GetInterface() == nil || w.GetInterface().GetInputs() == nil ||
@@ -126,22 +141,18 @@ func withSeparatorIfNotEmpty(value string) string {
 }
 
 func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifier) (
-	name string, generateName string, label string, err error) {
+	name string, generateName string, label string, project string, domain string, err error) {
 
 	if execID != nil {
-		return execID.Name, "", execID.Name, nil
+		return execID.Name, "", execID.Name, execID.Project, execID.Domain, nil
 	} else if wfID != nil {
-		wid := fmt.Sprintf("%v%v%v",
-			withSeparatorIfNotEmpty(wfID.Project),
-			withSeparatorIfNotEmpty(wfID.Domain),
-			wfID.Name,
-		)
+		wid := fmt.Sprintf("%v%v%v", withSeparatorIfNotEmpty(wfID.Project), withSeparatorIfNotEmpty(wfID.Domain), wfID.Name)
 
 		// TODO: this is a hack until we figure out how to restrict generated names. K8s has a limitation of 63 chars
 		wid = wid[:minInt(32, len(wid))]
-		return "", fmt.Sprintf("%v-", wid), wid, nil
+		return "", fmt.Sprintf("%v-", wid), wid, wfID.Project, wfID.Domain, nil
 	} else {
-		return "", "", "", fmt.Errorf("expected param not set. wfID or execID must be non-nil values")
+		return "", "", "", "", "", fmt.Errorf("expected param not set. wfID or execID must be non-nil values")
 	}
 }
 
@@ -207,13 +218,23 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		NodeDefaults: v1alpha1.NodeDefaults{Interruptible: interruptible},
 	}
 
-	obj.ObjectMeta.Name, obj.ObjectMeta.GenerateName, obj.ObjectMeta.Labels[ExecutionIDLabel], err =
-		generateName(wf.GetId(), executionID)
-
+	name, generatedName, label, project, domain, err := generateName(wf.GetId(), executionID)
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
+
+	obj.ObjectMeta.Name = name
+	obj.ObjectMeta.GenerateName = generatedName
+	obj.ObjectMeta.Labels[ExecutionIDLabel] = label
+	obj.ObjectMeta.Labels[ProjectLabel] = project
+	obj.ObjectMeta.Labels[DomainLabel] = domain
 	obj.ObjectMeta.Labels[WorkflowNameLabel] = utils.SanitizeLabelValue(WorkflowNameFromID(primarySpec.ID))
+
+	h := fnv.New32a()
+	h.Write([]byte(label))
+	hash := h.Sum32() % v1alpha1.ShardKeyspaceSize
+
+	obj.ObjectMeta.Labels[ShardKeyLabel] = fmt.Sprint(hash)
 
 	if obj.Nodes == nil || obj.Connections.Downstream == nil {
 		// If we come here, we'd better have an error generated earlier. Otherwise, add one to make sure build fails.

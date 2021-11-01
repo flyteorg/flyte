@@ -116,6 +116,7 @@ func TestBuildFlyteWorkflow(t *testing.T) {
 	assert.True(t, *wf.WorkflowSpec.Nodes["n_1"].Interruptibe)
 	assert.Nil(t, wf.WorkflowSpec.Nodes[common.StartNodeID].Interruptibe)
 	assert.Equal(t, "wf-1", wf.Labels[WorkflowNameLabel])
+	assert.Equal(t, "4", wf.Labels[ShardKeyLabel])
 	assert.NoError(t, err)
 	assert.NotNil(t, wf)
 	errors.SetConfig(errors.Config{})
@@ -186,12 +187,12 @@ func TestBuildFlyteWorkflow_withInputs(t *testing.T) {
 
 func TestGenerateName(t *testing.T) {
 	t.Run("Invalid params", func(t *testing.T) {
-		_, _, _, err := generateName(nil, nil)
+		_, _, _, _, _, err := generateName(nil, nil)
 		assert.Error(t, err)
 	})
 
 	t.Run("wfID full", func(t *testing.T) {
-		name, generateName, _, err := generateName(&core.Identifier{
+		name, generateName, _, project, domain, err := generateName(&core.Identifier{
 			Name:    "myworkflow",
 			Project: "myproject",
 			Domain:  "development",
@@ -200,20 +201,24 @@ func TestGenerateName(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, name)
 		assert.Equal(t, "myproject-development-myworkflow-", generateName)
+		assert.Equal(t, "myproject", project)
+		assert.Equal(t, "development", domain)
 	})
 
 	t.Run("wfID missing project domain", func(t *testing.T) {
-		name, generateName, _, err := generateName(&core.Identifier{
+		name, generateName, _, project, domain, err := generateName(&core.Identifier{
 			Name: "myworkflow",
 		}, nil)
 
 		assert.NoError(t, err)
 		assert.Empty(t, name)
 		assert.Equal(t, "myworkflow-", generateName)
+		assert.Equal(t, "", project)
+		assert.Equal(t, "", domain)
 	})
 
 	t.Run("wfID too long", func(t *testing.T) {
-		name, generateName, _, err := generateName(&core.Identifier{
+		name, generateName, _, project, domain, err := generateName(&core.Identifier{
 			Name:    "workflowsomethingsomethingsomething",
 			Project: "myproject",
 			Domain:  "development",
@@ -222,10 +227,12 @@ func TestGenerateName(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, name)
 		assert.Equal(t, "myproject-development-workflowso-", generateName)
+		assert.Equal(t, "myproject", project)
+		assert.Equal(t, "development", domain)
 	})
 
 	t.Run("execID full", func(t *testing.T) {
-		name, generateName, _, err := generateName(nil, &core.WorkflowExecutionIdentifier{
+		name, generateName, _, project, domain, err := generateName(nil, &core.WorkflowExecutionIdentifier{
 			Name:    "myexecution",
 			Project: "myproject",
 			Domain:  "development",
@@ -234,16 +241,20 @@ func TestGenerateName(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, generateName)
 		assert.Equal(t, "myexecution", name)
+		assert.Equal(t, "myproject", project)
+		assert.Equal(t, "development", domain)
 	})
 
 	t.Run("execID missing project domain", func(t *testing.T) {
-		name, generateName, _, err := generateName(nil, &core.WorkflowExecutionIdentifier{
+		name, generateName, _, project, domain, err := generateName(nil, &core.WorkflowExecutionIdentifier{
 			Name: "myexecution",
 		})
 
 		assert.NoError(t, err)
 		assert.Empty(t, generateName)
 		assert.Equal(t, "myexecution", name)
+		assert.Equal(t, "", project)
+		assert.Equal(t, "", domain)
 	})
 }
 
