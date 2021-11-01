@@ -6,7 +6,10 @@
     "namespace": "namespace",
     "creationTimestamp": null,
     "labels": {
+      "domain": "domain",
       "execution-id": "name",
+      "project": "hello",
+      "shard-key": "6",
       "workflow-name": "test-serialization-my-wf"
     }
   },

@@ -15,6 +15,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Defines a non-configurable keyspace size for shard keys. This needs to be a small value because we use label
+// selectors to define shard key ranges which do not support range queries. It should only be modified increasingly
+// to ensure backward compatibility.
+const ShardKeyspaceSize = 32
+
 const StartNodeID = "start-node"
 const EndNodeID = "end-node"
 
