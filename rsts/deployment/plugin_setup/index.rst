@@ -8,26 +8,17 @@ Plugin Setup
 .. panels::
     :header: text-center
 
-    .. link-button:: deployment-plugin-setup-pytorch-operator
+    .. link-button:: deployment-plugin-setup-k8s
        :type: ref
-       :text: PyTorch Operator
+       :text: K8s Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the PyTorch Operator.
-
-    ---
-
-    .. link-button:: deployment-plugin-setup-aws-array
-       :type: ref
-       :text: AWS Batch for Map Tasks
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up AWS Batch for Map Tasks.
+    Guide to setting up the K8s Operator Plugins.
 
 .. toctree::
     :maxdepth: 1
-    :name: Plugin Setup
+    :name: K8s Plugin
     :hidden:
 
     pytorch_operator
-    aws_array
+    k8s/index

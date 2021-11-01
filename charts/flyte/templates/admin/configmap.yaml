@@ -24,6 +24,9 @@ data:
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.namespace_config }}
+  namespace_config.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
 {{- if .Values.workflow_notifications.enabled }}
 {{- with .Values.workflow_notifications.config }}
   notifications.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}

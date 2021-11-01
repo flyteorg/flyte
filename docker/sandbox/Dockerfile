@@ -14,21 +14,34 @@ RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 h
 
 FROM alpine:3.13.5 AS base_
 
+# Install dependencies
+RUN apk add --no-cache openssl
+
 # Make directory to store artifacts
 RUN mkdir -p /flyteorg/bin /flyteorg/share
 
 # Install k3s
 ARG K3S_VERSION="v1.21.1%2Bk3s1"
-RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s \
+ARG TARGETARCH
+
+RUN case $TARGETARCH in \
+    amd64) export SUFFIX=;; \
+    arm64) export SUFFIX=-arm64;; \
+    aarch64)  export SUFFIX=-arm64;; \
+    # TODO: Check if we need to add case fail
+    esac; \
+    wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s${SUFFIX} \
     && chmod +x /flyteorg/bin/k3s
 
 # Install Helm
-ENV HELM_URL="https://get.helm.sh"
 ARG HELM_VERSION="v3.6.3"
-RUN wget ${HELM_URL}/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xz && \
-    mv linux-amd64/helm /flyteorg/bin/helm && \
-    chmod +x /flyteorg/bin/helm && \
-    rm -rf linux-amd64
+
+RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/helm/${HELM_VERSION}/scripts/get-helm-3 && \
+    chmod 700 /flyteorg/bin/get_helm.sh && \
+    sh /flyteorg/bin/get_helm.sh --version ${HELM_VERSION} && \
+    mv /usr/local/bin/helm /flyteorg/bin/helm && \
+    rm /flyteorg/bin/get_helm.sh 
+
 
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s

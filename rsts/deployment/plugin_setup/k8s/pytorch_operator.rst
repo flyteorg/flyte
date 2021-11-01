@@ -1,7 +1,7 @@
-.. _deployment-plugin-setup-pytorch-operator:
+.. _deployment-plugin-setup-k8s-pytorch-operator:
 
-PyTorch Operator Setup
-----------------------
+Kubeflow PyTorch Operator Plugin Setup
+--------------------------------------
 
 This guide gives an overview of how to set up the PyTorch operator in your Flyte deployment.
 
@@ -16,13 +16,15 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
    .. code-block:: bash
 
       flytectl sandbox start --source=./flytesnacks
+      flytectl config init
 
 3. Install the PyTorch Operator.
 
    .. code-block:: bash
 
-      helm repo add bitnami https://charts.bitnami.com/bitnami --kubeconfig=~/.flyte/k3s/k3s.yaml
-      helm install my-release bitnami/pytorch
+      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
+      git clone https://github.com/kubeflow/pytorch-operator.git
+      kustomize build pytorch-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
 4. Create a file named ``values-pytorch.yaml`` and add the following config to it:
 
@@ -40,7 +42,6 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
                  - container
                  - sidecar
                  - k8s-array
-                 - mpi
                  - pytorch
                default-for-task-types:
                  container: container
@@ -54,7 +55,7 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
       helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the PyTorch plugin example.
+6. (Optional) Build & Serialize the PyTorch plugin example.
 
    .. code-block:: bash
 
@@ -65,8 +66,7 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
    .. code-block:: bash
 
-      flytectl register files cookbook/integrations/kubernetes/kfpytorch/_pb_output/* -p flytesnacks -d development
-
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
@@ -74,4 +74,4 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
       flytectl get launchplan --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
       flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
-      flytectl get execution --project flytesnacks --domain development <execname>
+      flytectl get execution --project flytesnacks --domain development <execution_id>

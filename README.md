@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b> and <b>ML processes</b> at scale 
+  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b>, and <b>ML processes</b> at scale 
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable, and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type-safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI, and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it uses `workflow` as a core concept and `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
+Flyte is more than a workflow engine -- it uses `workflow` as a core concept, and `task` (a single unit of execution) as a top-level concept. Multiple tasks arranged in a data
 producer-consumer order creates a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out-of-the-box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
@@ -93,15 +93,15 @@ This creates a local Flyte sandbox. Once the sandbox is ready, you should see th
 
 Visit http://localhost:30081/console to view the Flyte dashboard.
 
-Here's a quick visual tour of the console.
+Here's a quick visual tour of the console:
 
 ![Flyte console Example](https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif)
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
 ## ⭐️ Current Deployments & Contributors
-**NOTE**
-Please maintain an alphabetical order in the following list
+<!-- **NOTE**
+Please maintain an alphabetical order in the following list -->
 
 - [appliedAI Initiative](https://appliedai.de)
 - [Blackshark.ai](https://blackshark.ai/)
@@ -124,7 +124,7 @@ Please maintain an alphabetical order in the following list
 </h2>
 </html>
 
-- Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
+- Used at _Scale_ in production by **500+** users at Lyft, with more than **1 million** executions, and **40+ million** container executions per month
 - A data-aware platform
 - Enables **collaboration across your organization** by:
   - Executing distributed data pipelines/workflows
@@ -137,7 +137,7 @@ Please maintain an alphabetical order in the following list
 - **[Quick registration](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
 - **Centralized Inventory** constituting Tasks, Workflows, and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
-- **Type safe** construction of pipelines -- each task has an interface that is characterized by its input and output, so illegal construction of pipelines fails during declaration rather than at runtime
+- **Type safe** construction of pipelines -- each task has an interface characterized by its input and output, so illegal construction of pipelines fails during declaration, rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.
 - Memoization and Lineage tracking
 - Provides logging and observability
@@ -158,7 +158,7 @@ Please maintain an alphabetical order in the following list
   - Declarative pipelines
 - **Multi-cloud support** (AWS, GCP, and others)
 - Extensible core, modularized, and deep observability
-- No single point of failure and is resilient by design
+- No single point of failure, and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
@@ -241,9 +241,17 @@ Here are some resources to help you learn more about Flyte.
 
 ### Biweekly Community Sync
 
-- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Check out the [calendar](https://www.addevent.com/calendar/kE355955) and register to stay up-to-date with our meeting times. Or simply join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- 📣 **Flyte OSS Community Sync** Every other Tuesday, 9am-10am PDT. Check out the [calendar](https://www.addevent.com/calendar/kE355955), and register to stay up-to-date with our meeting times. Or join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Upcoming meeting agenda, previous meeting notes, and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
 - If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
+
+### Blog Posts
+
+- [Flyte blog site](https://blog.flyte.org/)
+
+### Newsletter
+
+- [Flyte Monthly](https://www.getrevue.co/profile/flyte)
 
 ### Conference Talks
 
@@ -255,17 +263,21 @@ Here are some resources to help you learn more about Flyte.
 - Datacouncil [video](https://www.youtube.com/watch?v=1BjXC5TZAiI) | [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 - FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)
 - [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)
-- [OSPOCon 2021](https://events.linuxfoundation.org/ospocon/) Catch a variety of Flyte talks - final schedule and topics to be released soon.
-
-### Blog Posts
-
-- [Flyte blog site](https://blog.flyte.org/)
+- OSPOCon 2021:
+  - Building and Growing an Open Source Community for an Incubating Project [video](https://www.youtube.com/watch?v=DhXlTzCDeGI&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=37)
+  - Enforcing Data Quality in Data Processing and ML Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=IB3KrIk4ics&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=84)
+  - Self-serve Feature Engineering Platform Using Flyte and Feast [video](https://www.youtube.com/watch?v=Km2ii0F8Yl0&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=215)
+  - Efficient Data Parallel Distributed Training with Flyte, Spark & Horovod [video](https://www.youtube.com/watch?v=gF3cVTdgLUY&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=77)
+- KubeCon+CloudNativeCon North America 2021 - How Spotify Leverages Flyte To Coordinate Financial Analytics Company-Wide [session](https://sched.co/lV59)
+- PyData Global 2021 - Robust, End-to-end Online Machine Learning Applications with Flytekit, Pandera and Streamlit [session](https://pydata.org/global2021/schedule/presentation/119/robust-end-to-end-online-machine-learning-applications-with-flytekit-pandera-and-streamlit/)
+- ODSC West Reconnect - Deep Dive Into Flyte [workshop](https://odsc.com/speakers/deep-dive-into-flyte/) 
 
 ### Podcasts
 
 - TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
+- Open Data Science - [West Warm Up session with Ketan Umare - Creator of Flyte](https://twitter.com/odsc/status/1451594432369758212)
 
 ## 💖 All Contributors
 
