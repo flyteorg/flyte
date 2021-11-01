@@ -7,7 +7,7 @@ CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 ROOT_DIR=${CUR_DIR}/..
 OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/cluster_config
 
-# GO111MODULE=on go get github.com/flyteorg/flyteadmin/cmd@config_docs
+GO111MODULE=on go get github.com/flyteorg/flyteadmin/cmd@config_docs
 
 output_config () {
 OUTPUT_PATH="${OUTPUT_DIR}"/$2_config.rst

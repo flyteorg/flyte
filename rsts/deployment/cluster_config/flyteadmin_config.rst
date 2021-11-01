@@ -4,800 +4,1253 @@
 Flyte Admin Configuration
 #########################################
 
-auth
+Section: auth
 -----------------------------------------
-+-------------------------+-----------------+--------------------------------+
-|          NAME           |      TYPE       |          DESCRIPTION           |
-+-------------------------+-----------------+--------------------------------+
-| httpAuthorizationHeader | string          |                                |
-+-------------------------+-----------------+--------------------------------+
-| grpcAuthorizationHeader | string          |                                |
-+-------------------------+-----------------+--------------------------------+
-| disableForHttp          | bool            | Disables auth enforcement on   |
-|                         |                 | HTTP Endpoints.                |
-+-------------------------+-----------------+--------------------------------+
-| disableForGrpc          | bool            | Disables auth enforcement on   |
-|                         |                 | Grpc Endpoints.                |
-+-------------------------+-----------------+--------------------------------+
-| authorizedUris          | []config.URL    | Optional: Defines the set      |
-|                         |                 | of URIs that clients are       |
-|                         |                 | allowed to visit the service   |
-|                         |                 | on. If set, the system will    |
-|                         |                 | attempt to match the incoming  |
-|                         |                 | host to the first authorized   |
-|                         |                 | URIs and use that (including   |
-|                         |                 | the scheme) when generating    |
-|                         |                 | metadata endpoints and when    |
-|                         |                 | validating audience and issuer |
-|                         |                 | claims. If not provided, the   |
-|                         |                 | urls will be deduced based     |
-|                         |                 | on the request url and the     |
-|                         |                 | 'secure' setting.              |
-+-------------------------+-----------------+--------------------------------+
-| userAuth                | UserAuthConfig_ | Defines Auth options for       |
-|                         |                 | users.                         |
-+-------------------------+-----------------+--------------------------------+
-| appAuth                 | OAuth2Options_  | Defines Auth options for apps. |
-|                         |                 | UserAuth must be enabled for   |
-|                         |                 | AppAuth to work.               |
-+-------------------------+-----------------+--------------------------------+
-
-OAuth2Options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------------------+--------------------------------+--------------------------------+
-|        NAME        |              TYPE              |          DESCRIPTION           |
-+--------------------+--------------------------------+--------------------------------+
-| authServerType     | config.AuthorizationServerType | Determines authorization       |
-|                    |                                | server type to use. Additional |
-|                    |                                | config should be provided for  |
-|                    |                                | the chosen AuthorizationServer |
-+--------------------+--------------------------------+--------------------------------+
-| selfAuthServer     | AuthorizationServer_           | Authorization Server config    |
-|                    |                                | to run as a service. Use this  |
-|                    |                                | when using an IdP that does    |
-|                    |                                | not offer a custom OAuth2      |
-|                    |                                | Authorization Server.          |
-+--------------------+--------------------------------+--------------------------------+
-| externalAuthServer | ExternalAuthorizationServer_   | External Authorization Server  |
-|                    |                                | config.                        |
-+--------------------+--------------------------------+--------------------------------+
-| thirdPartyConfig   | ThirdPartyConfigOptions_       | Defines settings to instruct   |
-|                    |                                | flyte cli tools (and           |
-|                    |                                | optionally others) on what     |
-|                    |                                | config to use to setup their   |
-|                    |                                | client.                        |
-+--------------------+--------------------------------+--------------------------------+
-
-ThirdPartyConfigOptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------+--------------------+-------------+
-|    NAME     |        TYPE        | DESCRIPTION |
-+-------------+--------------------+-------------+
-| flyteClient | FlyteClientConfig_ |             |
-+-------------+--------------------+-------------+
-
-FlyteClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------+----------+--------------------------------+
-|    NAME     |   TYPE   |          DESCRIPTION           |
-+-------------+----------+--------------------------------+
-| clientId    | string   | public identifier for the app  |
-|             |          | which handles authorization    |
-|             |          | for a Flyte deployment         |
-+-------------+----------+--------------------------------+
-| redirectUri | string   | This is the callback uri       |
-|             |          | registered with the app which  |
-|             |          | handles authorization for a    |
-|             |          | Flyte deployment               |
-+-------------+----------+--------------------------------+
-| scopes      | []string | Recommended scopes for the     |
-|             |          | client to request.             |
-+-------------+----------+--------------------------------+
-
-ExternalAuthorizationServer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-----------------+----------+--------------------------------------------------+
-|      NAME       |   TYPE   |                   DESCRIPTION                    |
-+-----------------+----------+--------------------------------------------------+
-| baseUrl         | URL_     | This should be the base url of the authorization |
-|                 |          | server that you are trying to hit. With Okta     |
-|                 |          | for instance, it will look something like        |
-|                 |          | https://company.okta.com/oauth2/abcdef123456789/ |
-+-----------------+----------+--------------------------------------------------+
-| allowedAudience | []string | Optional: A list of allowed audiences. If not    |
-|                 |          | provided, the audience is expected to be the     |
-|                 |          | public Uri of the service.                       |
-+-----------------+----------+--------------------------------------------------+
-| metadataUrl     | URL_     | Optional: If the server doesn't support          |
-|                 |          | /.well-known/oauth-authorization-server, you can |
-|                 |          | set a custom metadata url here.'                 |
-+-----------------+----------+--------------------------------------------------+
-
-URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------+------+-------------+
-| NAME | TYPE | DESCRIPTION |
-+------+------+-------------+
-| URL  | URL_ |             |
-+------+------+-------------+
-
-AuthorizationServer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+---------------------------------------+----------------------------------+-----------------------------------+
-|                 NAME                  |               TYPE               |            DESCRIPTION            |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| issuer                                | string                           | Defines the issuer to use         |
-|                                       |                                  | when issuing and validating       |
-|                                       |                                  | tokens. The default value is      |
-|                                       |                                  | https://<requestUri.HostAndPort>/ |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| accessTokenLifespan                   | Duration_                        | Defines the lifespan of issued    |
-|                                       |                                  | access tokens.                    |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| refreshTokenLifespan                  | Duration_                        | Defines the lifespan of issued    |
-|                                       |                                  | access tokens.                    |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| authorizationCodeLifespan             | Duration_                        | Defines the lifespan of issued    |
-|                                       |                                  | access tokens.                    |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| claimSymmetricEncryptionKeySecretName | string                           | OPTIONAL: Secret name to use to   |
-|                                       |                                  | encrypt claims in authcode token. |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| tokenSigningRSAKeySecretName          | string                           | OPTIONAL: Secret name to use to   |
-|                                       |                                  | retrieve RSA Signing Key.         |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| oldTokenSigningRSAKeySecretName       | string                           | OPTIONAL: Secret name to use to   |
-|                                       |                                  | retrieve Old RSA Signing Key.     |
-|                                       |                                  | This can be useful during key     |
-|                                       |                                  | rotation to continue to accept    |
-|                                       |                                  | older tokens.                     |
-+---------------------------------------+----------------------------------+-----------------------------------+
-| staticClients                         | map[string]*fosite.DefaultClient | Defines statically defined list   |
-|                                       |                                  | of clients to allow.              |
-+---------------------------------------+----------------------------------+-----------------------------------+
-
-Duration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------+---------------+-------------+
-|   NAME   |     TYPE      | DESCRIPTION |
-+----------+---------------+-------------+
-| Duration | time.Duration |             |
-+----------+---------------+-------------+
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|          NAME           |       TYPE        |                                              DEFAULT VALUE                                              |                                                                                                                                                                                           DESCRIPTION                                                                                                                                                                                           |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| httpAuthorizationHeader | string            | flyte-authorization                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| grpcAuthorizationHeader | string            | flyte-authorization                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| disableForHttp          | bool              | false                                                                                                   | Disables auth enforcement on HTTP Endpoints.                                                                                                                                                                                                                                                                                                                                                    |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| disableForGrpc          | bool              | false                                                                                                   | Disables auth enforcement on Grpc Endpoints.                                                                                                                                                                                                                                                                                                                                                    |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| authorizedUris          | []config.URL      | .. code-block:: yaml                                                                                    | Optional: Defines the set of URIs that clients are allowed to visit the service on. If set, the system will attempt to match the incoming host to the first authorized URIs and use that (including the scheme) when generating metadata endpoints and when validating audience and issuer claims. If not provided, the urls will be deduced based on the request url and the 'secure' setting. |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   []                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| userAuth                | `UserAuthConfig`_ | .. code-block:: yaml                                                                                    | Defines Auth options for users.                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   cookieBlockKeySecretName: cookie_block_key                                                            |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   cookieHashKeySecretName: cookie_hash_key                                                              |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   openId:                                                                                               |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     baseUrl: ""                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     clientId: ""                                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     clientSecretFile: ""                                                                                |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     clientSecretName: oidc_client_secret                                                                |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     scopes: []                                                                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   redirectUrl: /console                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| appAuth                 | `OAuth2Options`_  | .. code-block:: yaml                                                                                    | Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.                                                                                                                                                                                                                                                                                                                    |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   authServerType: Self                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   externalAuthServer:                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     allowedAudience: []                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     baseUrl: ""                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     metadataUrl: ""                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   selfAuthServer:                                                                                       |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     accessTokenLifespan: 30m0s                                                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     authorizationCodeLifespan: 5m0s                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     claimSymmetricEncryptionKeySecretName: claim_symmetric_key                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     issuer: ""                                                                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     oldTokenSigningRSAKeySecretName: token_rsa_key_old.pem                                              |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     refreshTokenLifespan: 1h0m0s                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     staticClients:                                                                                      |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       flyte-cli:                                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         audience: null                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         grant_types:                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - refresh_token                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - authorization_code                                                                            |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         id: flyte-cli                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         public: true                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         redirect_uris:                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - http://localhost:53593/callback                                                               |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - http://localhost:12345/callback                                                               |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         response_types:                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - code                                                                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - token                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         scopes:                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - all                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - offline                                                                                       |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - access_token                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       flytectl:                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         audience: null                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         grant_types:                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - refresh_token                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - authorization_code                                                                            |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         id: flytectl                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         public: true                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         redirect_uris:                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - http://localhost:53593/callback                                                               |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - http://localhost:12345/callback                                                               |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         response_types:                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - code                                                                                          |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - token                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         scopes:                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - all                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - offline                                                                                       |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - access_token                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       flytepropeller:                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         audience: null                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         grant_types:                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - refresh_token                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - client_credentials                                                                            |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         id: flytepropeller                                                                              |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         public: false                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         redirect_uris:                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - http://localhost:3846/callback                                                                |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         response_types:                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - token                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         scopes:                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - all                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - offline                                                                                       |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |         - access_token                                                                                  |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     tokenSigningRSAKeySecretName: token_rsa_key.pem                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |   thirdPartyConfig:                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |     flyteClient:                                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       clientId: flytectl                                                                                |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       redirectUri: http://localhost:53593/callback                                                      |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |       scopes: []                                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                         |                   |                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                 |
++-------------------------+-------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 UserAuthConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------------------------+----------------+--------------------------------+
-|           NAME           |      TYPE      |          DESCRIPTION           |
-+--------------------------+----------------+--------------------------------+
-| redirectUrl              | URL_           |                                |
-+--------------------------+----------------+--------------------------------+
-| openId                   | OpenIDOptions_ | OpenID Configuration for User  |
-|                          |                | Auth                           |
-+--------------------------+----------------+--------------------------------+
-| cookieHashKeySecretName  | string         | OPTIONAL: Secret name to use   |
-|                          |                | for cookie hash key.           |
-+--------------------------+----------------+--------------------------------+
-| cookieBlockKeySecretName | string         | OPTIONAL: Secret name to use   |
-|                          |                | for cookie block key.          |
-+--------------------------+----------------+--------------------------------+
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+|           NAME           |       TYPE       |             DEFAULT VALUE              |                    DESCRIPTION                     |
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+| redirectUrl              | `URL`_           | .. code-block:: yaml                   |                                                    |
+|                          |                  |                                        |                                                    |
+|                          |                  |   /console                             |                                                    |
+|                          |                  |                                        |                                                    |
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+| openId                   | `OpenIDOptions`_ | .. code-block:: yaml                   | OpenID Configuration for User Auth                 |
+|                          |                  |                                        |                                                    |
+|                          |                  |   baseUrl: ""                          |                                                    |
+|                          |                  |   clientId: ""                         |                                                    |
+|                          |                  |   clientSecretFile: ""                 |                                                    |
+|                          |                  |   clientSecretName: oidc_client_secret |                                                    |
+|                          |                  |   scopes: []                           |                                                    |
+|                          |                  |                                        |                                                    |
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+| cookieHashKeySecretName  | string           | cookie\_hash\_key                      | OPTIONAL: Secret name to use for cookie hash key.  |
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+| cookieBlockKeySecretName | string           | cookie\_block\_key                     | OPTIONAL: Secret name to use for cookie block key. |
++--------------------------+------------------+----------------------------------------+----------------------------------------------------+
+
+URL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++------+--------------+----------------------+-------------+
+| NAME |     TYPE     |    DEFAULT VALUE     | DESCRIPTION |
++------+--------------+----------------------+-------------+
+| URL  | `URL (URL)`_ | .. code-block:: yaml |             |
+|      |              |                      |             |
+|      |              |   ForceQuery: false  |             |
+|      |              |   Fragment: ""       |             |
+|      |              |   Host: ""           |             |
+|      |              |   Opaque: ""         |             |
+|      |              |   Path: /console     |             |
+|      |              |   RawFragment: ""    |             |
+|      |              |   RawPath: ""        |             |
+|      |              |   RawQuery: ""       |             |
+|      |              |   Scheme: ""         |             |
+|      |              |   User: null         |             |
+|      |              |                      |             |
++------+--------------+----------------------+-------------+
+
+URL (URL)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------+----------+----------------------+-------------+
+|    NAME     |   TYPE   |    DEFAULT VALUE     | DESCRIPTION |
++-------------+----------+----------------------+-------------+
+| Scheme      | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| Opaque      | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| User        | Userinfo | .. code-block:: yaml |             |
+|             |          |                      |             |
+|             |          |   null               |             |
+|             |          |                      |             |
++-------------+----------+----------------------+-------------+
+| Host        | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| Path        | string   | /console             |             |
++-------------+----------+----------------------+-------------+
+| RawPath     | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| ForceQuery  | bool     | false                |             |
++-------------+----------+----------------------+-------------+
+| RawQuery    | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| Fragment    | string   |                      |             |
++-------------+----------+----------------------+-------------+
+| RawFragment | string   |                      |             |
++-------------+----------+----------------------+-------------+
 
 OpenIDOptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------------------+----------+-------------+
-|       NAME       |   TYPE   | DESCRIPTION |
-+------------------+----------+-------------+
-| clientId         | string   |             |
-+------------------+----------+-------------+
-| clientSecretName | string   |             |
-+------------------+----------+-------------+
-| clientSecretFile | string   |             |
-+------------------+----------+-------------+
-| baseUrl          | URL_     |             |
-+------------------+----------+-------------+
-| scopes           | []string |             |
-+------------------+----------+-------------+
++------------------+----------+----------------------+-------------+
+|       NAME       |   TYPE   |    DEFAULT VALUE     | DESCRIPTION |
++------------------+----------+----------------------+-------------+
+| clientId         | string   |                      |             |
++------------------+----------+----------------------+-------------+
+| clientSecretName | string   | oidc\_client\_secret |             |
++------------------+----------+----------------------+-------------+
+| clientSecretFile | string   |                      |             |
++------------------+----------+----------------------+-------------+
+| baseUrl          | `URL`_   | .. code-block:: yaml |             |
+|                  |          |                      |             |
+|                  |          |   ""                 |             |
+|                  |          |                      |             |
++------------------+----------+----------------------+-------------+
+| scopes           | []string | .. code-block:: yaml |             |
+|                  |          |                      |             |
+|                  |          |   []                 |             |
+|                  |          |                      |             |
++------------------+----------+----------------------+-------------+
 
-cluster_resources
------------------------------------------
-+-----------------+---------------------------------------------+-------------+
-|      NAME       |                    TYPE                     | DESCRIPTION |
-+-----------------+---------------------------------------------+-------------+
-| templatePath    | string                                      |             |
-+-----------------+---------------------------------------------+-------------+
-| templateData    | map[string]interfaces.DataSource            |             |
-+-----------------+---------------------------------------------+-------------+
-| refreshInterval | Duration_                                   |             |
-+-----------------+---------------------------------------------+-------------+
-| customData      | map[string]map[string]interfaces.DataSource |             |
-+-----------------+---------------------------------------------+-------------+
+OAuth2Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+|        NAME        |              TYPE              |                                             DEFAULT VALUE                                             |                                                              DESCRIPTION                                                              |
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| authServerType     | int                            | Self                                                                                                  |                                                                                                                                       |
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| selfAuthServer     | `AuthorizationServer`_         | .. code-block:: yaml                                                                                  | Authorization Server config to run as a service. Use this when using an IdP that does not offer a custom OAuth2 Authorization Server. |
+|                    |                                |                                                                                                       |                                                                                                                                       |
+|                    |                                |   accessTokenLifespan: 30m0s                                                                          |                                                                                                                                       |
+|                    |                                |   authorizationCodeLifespan: 5m0s                                                                     |                                                                                                                                       |
+|                    |                                |   claimSymmetricEncryptionKeySecretName: claim_symmetric_key                                          |                                                                                                                                       |
+|                    |                                |   issuer: ""                                                                                          |                                                                                                                                       |
+|                    |                                |   oldTokenSigningRSAKeySecretName: token_rsa_key_old.pem                                              |                                                                                                                                       |
+|                    |                                |   refreshTokenLifespan: 1h0m0s                                                                        |                                                                                                                                       |
+|                    |                                |   staticClients:                                                                                      |                                                                                                                                       |
+|                    |                                |     flyte-cli:                                                                                        |                                                                                                                                       |
+|                    |                                |       audience: null                                                                                  |                                                                                                                                       |
+|                    |                                |       grant_types:                                                                                    |                                                                                                                                       |
+|                    |                                |       - refresh_token                                                                                 |                                                                                                                                       |
+|                    |                                |       - authorization_code                                                                            |                                                                                                                                       |
+|                    |                                |       id: flyte-cli                                                                                   |                                                                                                                                       |
+|                    |                                |       public: true                                                                                    |                                                                                                                                       |
+|                    |                                |       redirect_uris:                                                                                  |                                                                                                                                       |
+|                    |                                |       - http://localhost:53593/callback                                                               |                                                                                                                                       |
+|                    |                                |       - http://localhost:12345/callback                                                               |                                                                                                                                       |
+|                    |                                |       response_types:                                                                                 |                                                                                                                                       |
+|                    |                                |       - code                                                                                          |                                                                                                                                       |
+|                    |                                |       - token                                                                                         |                                                                                                                                       |
+|                    |                                |       scopes:                                                                                         |                                                                                                                                       |
+|                    |                                |       - all                                                                                           |                                                                                                                                       |
+|                    |                                |       - offline                                                                                       |                                                                                                                                       |
+|                    |                                |       - access_token                                                                                  |                                                                                                                                       |
+|                    |                                |     flytectl:                                                                                         |                                                                                                                                       |
+|                    |                                |       audience: null                                                                                  |                                                                                                                                       |
+|                    |                                |       grant_types:                                                                                    |                                                                                                                                       |
+|                    |                                |       - refresh_token                                                                                 |                                                                                                                                       |
+|                    |                                |       - authorization_code                                                                            |                                                                                                                                       |
+|                    |                                |       id: flytectl                                                                                    |                                                                                                                                       |
+|                    |                                |       public: true                                                                                    |                                                                                                                                       |
+|                    |                                |       redirect_uris:                                                                                  |                                                                                                                                       |
+|                    |                                |       - http://localhost:53593/callback                                                               |                                                                                                                                       |
+|                    |                                |       - http://localhost:12345/callback                                                               |                                                                                                                                       |
+|                    |                                |       response_types:                                                                                 |                                                                                                                                       |
+|                    |                                |       - code                                                                                          |                                                                                                                                       |
+|                    |                                |       - token                                                                                         |                                                                                                                                       |
+|                    |                                |       scopes:                                                                                         |                                                                                                                                       |
+|                    |                                |       - all                                                                                           |                                                                                                                                       |
+|                    |                                |       - offline                                                                                       |                                                                                                                                       |
+|                    |                                |       - access_token                                                                                  |                                                                                                                                       |
+|                    |                                |     flytepropeller:                                                                                   |                                                                                                                                       |
+|                    |                                |       audience: null                                                                                  |                                                                                                                                       |
+|                    |                                |       client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2 |                                                                                                                                       |
+|                    |                                |       grant_types:                                                                                    |                                                                                                                                       |
+|                    |                                |       - refresh_token                                                                                 |                                                                                                                                       |
+|                    |                                |       - client_credentials                                                                            |                                                                                                                                       |
+|                    |                                |       id: flytepropeller                                                                              |                                                                                                                                       |
+|                    |                                |       public: false                                                                                   |                                                                                                                                       |
+|                    |                                |       redirect_uris:                                                                                  |                                                                                                                                       |
+|                    |                                |       - http://localhost:3846/callback                                                                |                                                                                                                                       |
+|                    |                                |       response_types:                                                                                 |                                                                                                                                       |
+|                    |                                |       - token                                                                                         |                                                                                                                                       |
+|                    |                                |       scopes:                                                                                         |                                                                                                                                       |
+|                    |                                |       - all                                                                                           |                                                                                                                                       |
+|                    |                                |       - offline                                                                                       |                                                                                                                                       |
+|                    |                                |       - access_token                                                                                  |                                                                                                                                       |
+|                    |                                |   tokenSigningRSAKeySecretName: token_rsa_key.pem                                                     |                                                                                                                                       |
+|                    |                                |                                                                                                       |                                                                                                                                       |
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| externalAuthServer | `ExternalAuthorizationServer`_ | .. code-block:: yaml                                                                                  | External Authorization Server config.                                                                                                 |
+|                    |                                |                                                                                                       |                                                                                                                                       |
+|                    |                                |   allowedAudience: []                                                                                 |                                                                                                                                       |
+|                    |                                |   baseUrl: ""                                                                                         |                                                                                                                                       |
+|                    |                                |   metadataUrl: ""                                                                                     |                                                                                                                                       |
+|                    |                                |                                                                                                       |                                                                                                                                       |
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| thirdPartyConfig   | `ThirdPartyConfigOptions`_     | .. code-block:: yaml                                                                                  | Defines settings to instruct flyte cli tools (and optionally others) on what config to use to setup their client.                     |
+|                    |                                |                                                                                                       |                                                                                                                                       |
+|                    |                                |   flyteClient:                                                                                        |                                                                                                                                       |
+|                    |                                |     clientId: flytectl                                                                                |                                                                                                                                       |
+|                    |                                |     redirectUri: http://localhost:53593/callback                                                      |                                                                                                                                       |
+|                    |                                |     scopes: []                                                                                        |                                                                                                                                       |
+|                    |                                |                                                                                                       |                                                                                                                                       |
++--------------------+--------------------------------+-------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 
-clusters
------------------------------------------
-+-----------------+---------------------------------------+-------------+
-|      NAME       |                 TYPE                  | DESCRIPTION |
-+-----------------+---------------------------------------+-------------+
-| clusterConfigs  | []interfaces.ClusterConfig            |             |
-+-----------------+---------------------------------------+-------------+
-| labelClusterMap | map[string][]interfaces.ClusterEntity |             |
-+-----------------+---------------------------------------+-------------+
+AuthorizationServer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+|                 NAME                  |               TYPE               |                                            DEFAULT VALUE                                            |                                                               DESCRIPTION                                                                |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| issuer                                | string                           |                                                                                                     | Defines the issuer to use when issuing and validating tokens. The default value is https://<requestUri.HostAndPort>/                     |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| accessTokenLifespan                   | `Duration`_                      | .. code-block:: yaml                                                                                | Defines the lifespan of issued access tokens.                                                                                            |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
+|                                       |                                  |   30m0s                                                                                             |                                                                                                                                          |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| refreshTokenLifespan                  | `Duration`_                      | .. code-block:: yaml                                                                                | Defines the lifespan of issued access tokens.                                                                                            |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
+|                                       |                                  |   1h0m0s                                                                                            |                                                                                                                                          |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| authorizationCodeLifespan             | `Duration`_                      | .. code-block:: yaml                                                                                | Defines the lifespan of issued access tokens.                                                                                            |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
+|                                       |                                  |   5m0s                                                                                              |                                                                                                                                          |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| claimSymmetricEncryptionKeySecretName | string                           | claim\_symmetric\_key                                                                               | OPTIONAL: Secret name to use to encrypt claims in authcode token.                                                                        |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| tokenSigningRSAKeySecretName          | string                           | token\_rsa\_key.pem                                                                                 | OPTIONAL: Secret name to use to retrieve RSA Signing Key.                                                                                |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| oldTokenSigningRSAKeySecretName       | string                           | token\_rsa\_key\_old.pem                                                                            | OPTIONAL: Secret name to use to retrieve Old RSA Signing Key. This can be useful during key rotation to continue to accept older tokens. |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| staticClients                         | map[string]*fosite.DefaultClient | .. code-block:: yaml                                                                                |                                                                                                                                          |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
+|                                       |                                  |   flyte-cli:                                                                                        |                                                                                                                                          |
+|                                       |                                  |     audience: null                                                                                  |                                                                                                                                          |
+|                                       |                                  |     grant_types:                                                                                    |                                                                                                                                          |
+|                                       |                                  |     - refresh_token                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - authorization_code                                                                            |                                                                                                                                          |
+|                                       |                                  |     id: flyte-cli                                                                                   |                                                                                                                                          |
+|                                       |                                  |     public: true                                                                                    |                                                                                                                                          |
+|                                       |                                  |     redirect_uris:                                                                                  |                                                                                                                                          |
+|                                       |                                  |     - http://localhost:53593/callback                                                               |                                                                                                                                          |
+|                                       |                                  |     - http://localhost:12345/callback                                                               |                                                                                                                                          |
+|                                       |                                  |     response_types:                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - code                                                                                          |                                                                                                                                          |
+|                                       |                                  |     - token                                                                                         |                                                                                                                                          |
+|                                       |                                  |     scopes:                                                                                         |                                                                                                                                          |
+|                                       |                                  |     - all                                                                                           |                                                                                                                                          |
+|                                       |                                  |     - offline                                                                                       |                                                                                                                                          |
+|                                       |                                  |     - access_token                                                                                  |                                                                                                                                          |
+|                                       |                                  |   flytectl:                                                                                         |                                                                                                                                          |
+|                                       |                                  |     audience: null                                                                                  |                                                                                                                                          |
+|                                       |                                  |     grant_types:                                                                                    |                                                                                                                                          |
+|                                       |                                  |     - refresh_token                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - authorization_code                                                                            |                                                                                                                                          |
+|                                       |                                  |     id: flytectl                                                                                    |                                                                                                                                          |
+|                                       |                                  |     public: true                                                                                    |                                                                                                                                          |
+|                                       |                                  |     redirect_uris:                                                                                  |                                                                                                                                          |
+|                                       |                                  |     - http://localhost:53593/callback                                                               |                                                                                                                                          |
+|                                       |                                  |     - http://localhost:12345/callback                                                               |                                                                                                                                          |
+|                                       |                                  |     response_types:                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - code                                                                                          |                                                                                                                                          |
+|                                       |                                  |     - token                                                                                         |                                                                                                                                          |
+|                                       |                                  |     scopes:                                                                                         |                                                                                                                                          |
+|                                       |                                  |     - all                                                                                           |                                                                                                                                          |
+|                                       |                                  |     - offline                                                                                       |                                                                                                                                          |
+|                                       |                                  |     - access_token                                                                                  |                                                                                                                                          |
+|                                       |                                  |   flytepropeller:                                                                                   |                                                                                                                                          |
+|                                       |                                  |     audience: null                                                                                  |                                                                                                                                          |
+|                                       |                                  |     client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2 |                                                                                                                                          |
+|                                       |                                  |     grant_types:                                                                                    |                                                                                                                                          |
+|                                       |                                  |     - refresh_token                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - client_credentials                                                                            |                                                                                                                                          |
+|                                       |                                  |     id: flytepropeller                                                                              |                                                                                                                                          |
+|                                       |                                  |     public: false                                                                                   |                                                                                                                                          |
+|                                       |                                  |     redirect_uris:                                                                                  |                                                                                                                                          |
+|                                       |                                  |     - http://localhost:3846/callback                                                                |                                                                                                                                          |
+|                                       |                                  |     response_types:                                                                                 |                                                                                                                                          |
+|                                       |                                  |     - token                                                                                         |                                                                                                                                          |
+|                                       |                                  |     scopes:                                                                                         |                                                                                                                                          |
+|                                       |                                  |     - all                                                                                           |                                                                                                                                          |
+|                                       |                                  |     - offline                                                                                       |                                                                                                                                          |
+|                                       |                                  |     - access_token                                                                                  |                                                                                                                                          |
+|                                       |                                  |                                                                                                     |                                                                                                                                          |
++---------------------------------------+----------------------------------+-----------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
 
-database
------------------------------------------
-+--------------+--------+-------------+
-|     NAME     |  TYPE  | DESCRIPTION |
-+--------------+--------+-------------+
-| host         | string |             |
-+--------------+--------+-------------+
-| port         | int    |             |
-+--------------+--------+-------------+
-| dbname       | string |             |
-+--------------+--------+-------------+
-| username     | string |             |
-+--------------+--------+-------------+
-| password     | string |             |
-+--------------+--------+-------------+
-| passwordPath | string |             |
-+--------------+--------+-------------+
-| options      | string |             |
-+--------------+--------+-------------+
-| debug        | bool   |             |
-+--------------+--------+-------------+
+Duration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++----------+-------+---------------+-------------+
+|   NAME   | TYPE  | DEFAULT VALUE | DESCRIPTION |
++----------+-------+---------------+-------------+
+| Duration | int64 | 30m0s         |             |
++----------+-------+---------------+-------------+
 
-domains
------------------------------------------
-+------+--------+-------------+
-| NAME |  TYPE  | DESCRIPTION |
-+------+--------+-------------+
-| id   | string |             |
-+------+--------+-------------+
-| name | string |             |
-+------+--------+-------------+
+ExternalAuthorizationServer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-----------------+----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|      NAME       |   TYPE   |    DEFAULT VALUE     |                                                                                       DESCRIPTION                                                                                        |
++-----------------+----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| baseUrl         | `URL`_   | .. code-block:: yaml | This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/ |
+|                 |          |                      |                                                                                                                                                                                          |
+|                 |          |   ""                 |                                                                                                                                                                                          |
+|                 |          |                      |                                                                                                                                                                                          |
++-----------------+----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| allowedAudience | []string | .. code-block:: yaml | Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service.                                                                    |
+|                 |          |                      |                                                                                                                                                                                          |
+|                 |          |   []                 |                                                                                                                                                                                          |
+|                 |          |                      |                                                                                                                                                                                          |
++-----------------+----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| metadataUrl     | `URL`_   | .. code-block:: yaml | Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'                                                                |
+|                 |          |                      |                                                                                                                                                                                          |
+|                 |          |   ""                 |                                                                                                                                                                                          |
+|                 |          |                      |                                                                                                                                                                                          |
++-----------------+----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-externalevents
+ThirdPartyConfigOptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------+----------------------+------------------------------------------------+-------------+
+|    NAME     |         TYPE         |                 DEFAULT VALUE                  | DESCRIPTION |
++-------------+----------------------+------------------------------------------------+-------------+
+| flyteClient | `FlyteClientConfig`_ | .. code-block:: yaml                           |             |
+|             |                      |                                                |             |
+|             |                      |   clientId: flytectl                           |             |
+|             |                      |   redirectUri: http://localhost:53593/callback |             |
+|             |                      |   scopes: []                                   |             |
+|             |                      |                                                |             |
++-------------+----------------------+------------------------------------------------+-------------+
+
+FlyteClientConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------+----------+---------------------------------+-----------------------------------------------------------------------------------------------------+
+|    NAME     |   TYPE   |          DEFAULT VALUE          |                                             DESCRIPTION                                             |
++-------------+----------+---------------------------------+-----------------------------------------------------------------------------------------------------+
+| clientId    | string   | flytectl                        | public identifier for the app which handles authorization for a Flyte deployment                    |
++-------------+----------+---------------------------------+-----------------------------------------------------------------------------------------------------+
+| redirectUri | string   | http://localhost:53593/callback | This is the callback uri registered with the app which handles authorization for a Flyte deployment |
++-------------+----------+---------------------------------+-----------------------------------------------------------------------------------------------------+
+| scopes      | []string | .. code-block:: yaml            | Recommended scopes for the client to request.                                                       |
+|             |          |                                 |                                                                                                     |
+|             |          |   []                            |                                                                                                     |
+|             |          |                                 |                                                                                                     |
++-------------+----------+---------------------------------+-----------------------------------------------------------------------------------------------------+
+
+Section: cluster_resources
 -----------------------------------------
-+-----------------------+------------------------+-------------+
-|         NAME          |          TYPE          | DESCRIPTION |
-+-----------------------+------------------------+-------------+
-| enable                | bool                   |             |
-+-----------------------+------------------------+-------------+
-| type                  | string                 |             |
-+-----------------------+------------------------+-------------+
-| aws                   | AWSConfig_             |             |
-+-----------------------+------------------------+-------------+
-| gcp                   | GCPConfig_             |             |
-+-----------------------+------------------------+-------------+
-| eventsPublisher       | EventsPublisherConfig_ |             |
-+-----------------------+------------------------+-------------+
-| reconnectAttempts     | int                    |             |
-+-----------------------+------------------------+-------------+
-| reconnectDelaySeconds | int                    |             |
-+-----------------------+------------------------+-------------+
++-----------------+---------------------------------------------+----------------------+-------------+
+|      NAME       |                    TYPE                     |    DEFAULT VALUE     | DESCRIPTION |
++-----------------+---------------------------------------------+----------------------+-------------+
+| templatePath    | string                                      |                      |             |
++-----------------+---------------------------------------------+----------------------+-------------+
+| templateData    | map[string]interfaces.DataSource            | .. code-block:: yaml |             |
+|                 |                                             |                      |             |
+|                 |                                             |   {}                 |             |
+|                 |                                             |                      |             |
++-----------------+---------------------------------------------+----------------------+-------------+
+| refreshInterval | `Duration`_                                 | .. code-block:: yaml |             |
+|                 |                                             |                      |             |
+|                 |                                             |   1m0s               |             |
+|                 |                                             |                      |             |
++-----------------+---------------------------------------------+----------------------+-------------+
+| customData      | map[string]map[string]interfaces.DataSource | .. code-block:: yaml |             |
+|                 |                                             |                      |             |
+|                 |                                             |   {}                 |             |
+|                 |                                             |                      |             |
++-----------------+---------------------------------------------+----------------------+-------------+
+
+Section: clusters
+-----------------------------------------
++-----------------+---------------------------------------+----------------------+-------------+
+|      NAME       |                 TYPE                  |    DEFAULT VALUE     | DESCRIPTION |
++-----------------+---------------------------------------+----------------------+-------------+
+| clusterConfigs  | []interfaces.ClusterConfig            | .. code-block:: yaml |             |
+|                 |                                       |                      |             |
+|                 |                                       |   null               |             |
+|                 |                                       |                      |             |
++-----------------+---------------------------------------+----------------------+-------------+
+| labelClusterMap | map[string][]interfaces.ClusterEntity | .. code-block:: yaml |             |
+|                 |                                       |                      |             |
+|                 |                                       |   null               |             |
+|                 |                                       |                      |             |
++-----------------+---------------------------------------+----------------------+-------------+
+
+Section: database
+-----------------------------------------
++--------------+--------+-----------------+-------------+
+|     NAME     |  TYPE  |  DEFAULT VALUE  | DESCRIPTION |
++--------------+--------+-----------------+-------------+
+| host         | string | postgres        |             |
++--------------+--------+-----------------+-------------+
+| port         | int    | 5432            |             |
++--------------+--------+-----------------+-------------+
+| dbname       | string | postgres        |             |
++--------------+--------+-----------------+-------------+
+| username     | string | postgres        |             |
++--------------+--------+-----------------+-------------+
+| password     | string |                 |             |
++--------------+--------+-----------------+-------------+
+| passwordPath | string |                 |             |
++--------------+--------+-----------------+-------------+
+| options      | string | sslmode=disable |             |
++--------------+--------+-----------------+-------------+
+| debug        | bool   | false           |             |
++--------------+--------+-----------------+-------------+
+
+Section: domains
+-----------------------------------------
++------+--------+---------------+-------------+
+| NAME |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++------+--------+---------------+-------------+
+| id   | string | development   |             |
++------+--------+---------------+-------------+
+| name | string | development   |             |
++------+--------+---------------+-------------+
+
+Section: externalevents
+-----------------------------------------
++-----------------------+--------------------------+----------------------+-------------+
+|         NAME          |           TYPE           |    DEFAULT VALUE     | DESCRIPTION |
++-----------------------+--------------------------+----------------------+-------------+
+| enable                | bool                     | false                |             |
++-----------------------+--------------------------+----------------------+-------------+
+| type                  | string                   | local                |             |
++-----------------------+--------------------------+----------------------+-------------+
+| aws                   | `AWSConfig`_             | .. code-block:: yaml |             |
+|                       |                          |                      |             |
+|                       |                          |   region: ""         |             |
+|                       |                          |                      |             |
++-----------------------+--------------------------+----------------------+-------------+
+| gcp                   | `GCPConfig`_             | .. code-block:: yaml |             |
+|                       |                          |                      |             |
+|                       |                          |   projectId: ""      |             |
+|                       |                          |                      |             |
++-----------------------+--------------------------+----------------------+-------------+
+| eventsPublisher       | `EventsPublisherConfig`_ | .. code-block:: yaml |             |
+|                       |                          |                      |             |
+|                       |                          |   eventTypes: null   |             |
+|                       |                          |   topicName: ""      |             |
+|                       |                          |                      |             |
++-----------------------+--------------------------+----------------------+-------------+
+| reconnectAttempts     | int                      | 0                    |             |
++-----------------------+--------------------------+----------------------+-------------+
+| reconnectDelaySeconds | int                      | 0                    |             |
++-----------------------+--------------------------+----------------------+-------------+
 
 EventsPublisherConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------------+----------+-------------+
-|    NAME    |   TYPE   | DESCRIPTION |
-+------------+----------+-------------+
-| topicName  | string   |             |
-+------------+----------+-------------+
-| eventTypes | []string |             |
-+------------+----------+-------------+
-
-GCPConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-----------+--------+-------------+
-|   NAME    |  TYPE  | DESCRIPTION |
-+-----------+--------+-------------+
-| projectId | string |             |
-+-----------+--------+-------------+
++------------+----------+----------------------+-------------+
+|    NAME    |   TYPE   |    DEFAULT VALUE     | DESCRIPTION |
++------------+----------+----------------------+-------------+
+| topicName  | string   |                      |             |
++------------+----------+----------------------+-------------+
+| eventTypes | []string | .. code-block:: yaml |             |
+|            |          |                      |             |
+|            |          |   null               |             |
+|            |          |                      |             |
++------------+----------+----------------------+-------------+
 
 AWSConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------+--------+-------------+
-|  NAME  |  TYPE  | DESCRIPTION |
-+--------+--------+-------------+
-| region | string |             |
-+--------+--------+-------------+
++--------+--------+---------------+-------------+
+|  NAME  |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++--------+--------+---------------+-------------+
+| region | string |               |             |
++--------+--------+---------------+-------------+
 
-flyteadmin
------------------------------------------
-+-----------------------+----------+-------------+
-|         NAME          |   TYPE   | DESCRIPTION |
-+-----------------------+----------+-------------+
-| roleNameKey           | string   |             |
-+-----------------------+----------+-------------+
-| metricsScope          | string   |             |
-+-----------------------+----------+-------------+
-| profilerPort          | int      |             |
-+-----------------------+----------+-------------+
-| metadataStoragePrefix | []string |             |
-+-----------------------+----------+-------------+
-| eventVersion          | int      |             |
-+-----------------------+----------+-------------+
-| asyncEventsBufferSize | int      |             |
-+-----------------------+----------+-------------+
+GCPConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-----------+--------+---------------+-------------+
+|   NAME    |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++-----------+--------+---------------+-------------+
+| projectId | string |               |             |
++-----------+--------+---------------+-------------+
 
-logger
+Section: flyteadmin
 -----------------------------------------
-+-------------+------------------+--------------------------------+
-|    NAME     |       TYPE       |          DESCRIPTION           |
-+-------------+------------------+--------------------------------+
-| show-source | bool             | Includes source code location  |
-|             |                  | in logs.                       |
-+-------------+------------------+--------------------------------+
-| mute        | bool             | Mutes all logs regardless      |
-|             |                  | of severity. Intended for      |
-|             |                  | benchmarks/tests only.         |
-+-------------+------------------+--------------------------------+
-| level       | int              | Sets the minimum logging       |
-|             |                  | level.                         |
-+-------------+------------------+--------------------------------+
-| formatter   | FormatterConfig_ | Sets logging format.           |
-+-------------+------------------+--------------------------------+
++-----------------------+----------+----------------------+-------------+
+|         NAME          |   TYPE   |    DEFAULT VALUE     | DESCRIPTION |
++-----------------------+----------+----------------------+-------------+
+| roleNameKey           | string   |                      |             |
++-----------------------+----------+----------------------+-------------+
+| metricsScope          | string   | flyte:               |             |
++-----------------------+----------+----------------------+-------------+
+| profilerPort          | int      | 10254                |             |
++-----------------------+----------+----------------------+-------------+
+| metadataStoragePrefix | []string | .. code-block:: yaml |             |
+|                       |          |                      |             |
+|                       |          |   - metadata         |             |
+|                       |          |   - admin            |             |
+|                       |          |                      |             |
++-----------------------+----------+----------------------+-------------+
+| eventVersion          | int      | 1                    |             |
++-----------------------+----------+----------------------+-------------+
+| asyncEventsBufferSize | int      | 100                  |             |
++-----------------------+----------+----------------------+-------------+
+
+Section: logger
+-----------------------------------------
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
+|    NAME     |        TYPE        |    DEFAULT VALUE     |                                DESCRIPTION                                 |
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
+| show-source | bool               | false                | Includes source code location in logs.                                     |
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
+| mute        | bool               | false                | Mutes all logs regardless of severity. Intended for benchmarks/tests only. |
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
+| level       | int                | 4                    | Sets the minimum logging level.                                            |
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
+| formatter   | `FormatterConfig`_ | .. code-block:: yaml | Sets logging format.                                                       |
+|             |                    |                      |                                                                            |
+|             |                    |   type: json         |                                                                            |
+|             |                    |                      |                                                                            |
++-------------+--------------------+----------------------+----------------------------------------------------------------------------+
 
 FormatterConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------+--------+---------------------------+
-| NAME |  TYPE  |        DESCRIPTION        |
-+------+--------+---------------------------+
-| type | string | Sets logging format type. |
-+------+--------+---------------------------+
++------+--------+---------------+---------------------------+
+| NAME |  TYPE  | DEFAULT VALUE |        DESCRIPTION        |
++------+--------+---------------+---------------------------+
+| type | string | json          | Sets logging format type. |
++------+--------+---------------+---------------------------+
 
-namespace_mapping
+Section: namespace_mapping
 -----------------------------------------
-+--------------+----------------------------------+-------------+
-|     NAME     |               TYPE               | DESCRIPTION |
-+--------------+----------------------------------+-------------+
-| mapping      | string                           |             |
-+--------------+----------------------------------+-------------+
-| template     | string                           |             |
-+--------------+----------------------------------+-------------+
-| templateData | map[string]interfaces.DataSource |             |
-+--------------+----------------------------------+-------------+
++--------------+----------------------------------+----------------------------+-------------+
+|     NAME     |               TYPE               |       DEFAULT VALUE        | DESCRIPTION |
++--------------+----------------------------------+----------------------------+-------------+
+| mapping      | string                           |                            |             |
++--------------+----------------------------------+----------------------------+-------------+
+| template     | string                           | {{ project }}-{{ domain }} |             |
++--------------+----------------------------------+----------------------------+-------------+
+| templateData | map[string]interfaces.DataSource | .. code-block:: yaml       |             |
+|              |                                  |                            |             |
+|              |                                  |   null                     |             |
+|              |                                  |                            |             |
++--------------+----------------------------------+----------------------------+-------------+
 
-notifications
+Section: notifications
 -----------------------------------------
-+-----------------------+-------------------------------+-------------+
-|         NAME          |             TYPE              | DESCRIPTION |
-+-----------------------+-------------------------------+-------------+
-| type                  | string                        |             |
-+-----------------------+-------------------------------+-------------+
-| region                | string                        |             |
-+-----------------------+-------------------------------+-------------+
-| aws                   | AWSConfig_                    |             |
-+-----------------------+-------------------------------+-------------+
-| gcp                   | GCPConfig_                    |             |
-+-----------------------+-------------------------------+-------------+
-| publisher             | NotificationsPublisherConfig_ |             |
-+-----------------------+-------------------------------+-------------+
-| processor             | NotificationsProcessorConfig_ |             |
-+-----------------------+-------------------------------+-------------+
-| emailer               | NotificationsEmailerConfig_   |             |
-+-----------------------+-------------------------------+-------------+
-| reconnectAttempts     | int                           |             |
-+-----------------------+-------------------------------+-------------+
-| reconnectDelaySeconds | int                           |             |
-+-----------------------+-------------------------------+-------------+
-
-NotificationsEmailerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------------+--------------------+-------------+
-|       NAME        |        TYPE        | DESCRIPTION |
-+-------------------+--------------------+-------------+
-| emailServerConfig | EmailServerConfig_ |             |
-+-------------------+--------------------+-------------+
-| subject           | string             |             |
-+-------------------+--------------------+-------------+
-| sender            | string             |             |
-+-------------------+--------------------+-------------+
-| body              | string             |             |
-+-------------------+--------------------+-------------+
-
-EmailServerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------------+--------+-------------+
-|      NAME      |  TYPE  | DESCRIPTION |
-+----------------+--------+-------------+
-| serviceName    | string |             |
-+----------------+--------+-------------+
-| apiKeyEnvVar   | string |             |
-+----------------+--------+-------------+
-| apiKeyFilePath | string |             |
-+----------------+--------+-------------+
++-----------------------+---------------------------------+------------------------+-------------+
+|         NAME          |              TYPE               |     DEFAULT VALUE      | DESCRIPTION |
++-----------------------+---------------------------------+------------------------+-------------+
+| type                  | string                          | local                  |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| region                | string                          |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| aws                   | `AWSConfig`_                    | .. code-block:: yaml   |             |
+|                       |                                 |                        |             |
+|                       |                                 |   region: ""           |             |
+|                       |                                 |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| gcp                   | `GCPConfig`_                    | .. code-block:: yaml   |             |
+|                       |                                 |                        |             |
+|                       |                                 |   projectId: ""        |             |
+|                       |                                 |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| publisher             | `NotificationsPublisherConfig`_ | .. code-block:: yaml   |             |
+|                       |                                 |                        |             |
+|                       |                                 |   topicName: ""        |             |
+|                       |                                 |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| processor             | `NotificationsProcessorConfig`_ | .. code-block:: yaml   |             |
+|                       |                                 |                        |             |
+|                       |                                 |   accountId: ""        |             |
+|                       |                                 |   queueName: ""        |             |
+|                       |                                 |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| emailer               | `NotificationsEmailerConfig`_   | .. code-block:: yaml   |             |
+|                       |                                 |                        |             |
+|                       |                                 |   body: ""             |             |
+|                       |                                 |   emailServerConfig:   |             |
+|                       |                                 |     apiKeyEnvVar: ""   |             |
+|                       |                                 |     apiKeyFilePath: "" |             |
+|                       |                                 |     serviceName: ""    |             |
+|                       |                                 |   sender: ""           |             |
+|                       |                                 |   subject: ""          |             |
+|                       |                                 |                        |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| reconnectAttempts     | int                             | 0                      |             |
++-----------------------+---------------------------------+------------------------+-------------+
+| reconnectDelaySeconds | int                             | 0                      |             |
++-----------------------+---------------------------------+------------------------+-------------+
 
 NotificationsProcessorConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-----------+--------+-------------+
-|   NAME    |  TYPE  | DESCRIPTION |
-+-----------+--------+-------------+
-| queueName | string |             |
-+-----------+--------+-------------+
-| accountId | string |             |
-+-----------+--------+-------------+
++-----------+--------+---------------+-------------+
+|   NAME    |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++-----------+--------+---------------+-------------+
+| queueName | string |               |             |
++-----------+--------+---------------+-------------+
+| accountId | string |               |             |
++-----------+--------+---------------+-------------+
+
+NotificationsEmailerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------------+----------------------+----------------------+-------------+
+|       NAME        |         TYPE         |    DEFAULT VALUE     | DESCRIPTION |
++-------------------+----------------------+----------------------+-------------+
+| emailServerConfig | `EmailServerConfig`_ | .. code-block:: yaml |             |
+|                   |                      |                      |             |
+|                   |                      |   apiKeyEnvVar: ""   |             |
+|                   |                      |   apiKeyFilePath: "" |             |
+|                   |                      |   serviceName: ""    |             |
+|                   |                      |                      |             |
++-------------------+----------------------+----------------------+-------------+
+| subject           | string               |                      |             |
++-------------------+----------------------+----------------------+-------------+
+| sender            | string               |                      |             |
++-------------------+----------------------+----------------------+-------------+
+| body              | string               |                      |             |
++-------------------+----------------------+----------------------+-------------+
+
+EmailServerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++----------------+--------+---------------+-------------+
+|      NAME      |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++----------------+--------+---------------+-------------+
+| serviceName    | string |               |             |
++----------------+--------+---------------+-------------+
+| apiKeyEnvVar   | string |               |             |
++----------------+--------+---------------+-------------+
+| apiKeyFilePath | string |               |             |
++----------------+--------+---------------+-------------+
 
 NotificationsPublisherConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-----------+--------+-------------+
-|   NAME    |  TYPE  | DESCRIPTION |
-+-----------+--------+-------------+
-| topicName | string |             |
-+-----------+--------+-------------+
++-----------+--------+---------------+-------------+
+|   NAME    |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++-----------+--------+---------------+-------------+
+| topicName | string |               |             |
++-----------+--------+---------------+-------------+
 
-plugins
+Section: plugins
 -----------------------------------------
-+-----------------+----------+--------------------------------+
-|      NAME       |   TYPE   |          DESCRIPTION           |
-+-----------------+----------+--------------------------------+
-| enabled-plugins | []string | List of enabled plugins,       |
-|                 |          | default value is to enable all |
-|                 |          | plugins.                       |
-+-----------------+----------+--------------------------------+
++-----------------+-------------------+----------------------+------------------------------------------------------------------+
+|      NAME       |       TYPE        |    DEFAULT VALUE     |                           DESCRIPTION                            |
++-----------------+-------------------+----------------------+------------------------------------------------------------------+
+| enabled-plugins | []string          | .. code-block:: yaml | List of enabled plugins, default value is to enable all plugins. |
+|                 |                   |                      |                                                                  |
+|                 |                   |   - '*'              |                                                                  |
+|                 |                   |                      |                                                                  |
++-----------------+-------------------+----------------------+------------------------------------------------------------------+
+| catalogcache    | `catalog.Config`_ | .. code-block:: yaml |                                                                  |
+|                 |                   |                      |                                                                  |
+|                 |                   |   reader:            |                                                                  |
+|                 |                   |     maxItems: 1000   |                                                                  |
+|                 |                   |     maxRetries: 3    |                                                                  |
+|                 |                   |     workers: 10      |                                                                  |
+|                 |                   |   writer:            |                                                                  |
+|                 |                   |     maxItems: 1000   |                                                                  |
+|                 |                   |     maxRetries: 3    |                                                                  |
+|                 |                   |     workers: 10      |                                                                  |
+|                 |                   |                      |                                                                  |
++-----------------+-------------------+----------------------+------------------------------------------------------------------+
 
-qualityofservice
------------------------------------------
-+---------------------+--------------------------------------------+-------------+
-|        NAME         |                    TYPE                    | DESCRIPTION |
-+---------------------+--------------------------------------------+-------------+
-| tierExecutionValues | map[string]interfaces.QualityOfServiceSpec |             |
-+---------------------+--------------------------------------------+-------------+
-| defaultTiers        | map[string]string                          |             |
-+---------------------+--------------------------------------------+-------------+
+catalog.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++--------+-----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+|  NAME  |   TYPE    |    DEFAULT VALUE     |                                                                    DESCRIPTION                                                                    |
++--------+-----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| reader | `Config`_ | .. code-block:: yaml | Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system. |
+|        |           |                      |                                                                                                                                                   |
+|        |           |   maxItems: 1000     |                                                                                                                                                   |
+|        |           |   maxRetries: 3      |                                                                                                                                                   |
+|        |           |   workers: 10        |                                                                                                                                                   |
+|        |           |                      |                                                                                                                                                   |
++--------+-----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| writer | `Config`_ | .. code-block:: yaml | Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system. |
+|        |           |                      |                                                                                                                                                   |
+|        |           |   maxItems: 1000     |                                                                                                                                                   |
+|        |           |   maxRetries: 3      |                                                                                                                                                   |
+|        |           |   workers: 10        |                                                                                                                                                   |
+|        |           |                      |                                                                                                                                                   |
++--------+-----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
-queues
------------------------------------------
-+-----------------+----------------------------+-------------+
-|      NAME       |            TYPE            | DESCRIPTION |
-+-----------------+----------------------------+-------------+
-| executionQueues | interfaces.ExecutionQueues |             |
-+-----------------+----------------------------+-------------+
-| workflowConfigs | interfaces.WorkflowConfigs |             |
-+-----------------+----------------------------+-------------+
+Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++------------+------+---------------+-------------------------------------------------------------+
+|    NAME    | TYPE | DEFAULT VALUE |                         DESCRIPTION                         |
++------------+------+---------------+-------------------------------------------------------------+
+| workers    | int  | 10            | Number of concurrent workers to start processing the queue. |
++------------+------+---------------+-------------------------------------------------------------+
+| maxRetries | int  | 3             | Maximum number of retries per item.                         |
++------------+------+---------------+-------------------------------------------------------------+
+| maxItems   | int  | 1000          | Maximum number of entries to keep in the index.             |
++------------+------+---------------+-------------------------------------------------------------+
 
-registration
+Section: qualityofservice
 -----------------------------------------
-+----------------------+--------+-------------+
-|         NAME         |  TYPE  | DESCRIPTION |
-+----------------------+--------+-------------+
-| maxWorkflowNodes     | int    |             |
-+----------------------+--------+-------------+
-| maxLabelEntries      | int    |             |
-+----------------------+--------+-------------+
-| maxAnnotationEntries | int    |             |
-+----------------------+--------+-------------+
-| workflowSizeLimit    | string |             |
-+----------------------+--------+-------------+
++---------------------+--------------------------------------------+----------------------+-------------+
+|        NAME         |                    TYPE                    |    DEFAULT VALUE     | DESCRIPTION |
++---------------------+--------------------------------------------+----------------------+-------------+
+| tierExecutionValues | map[string]interfaces.QualityOfServiceSpec | .. code-block:: yaml |             |
+|                     |                                            |                      |             |
+|                     |                                            |   {}                 |             |
+|                     |                                            |                      |             |
++---------------------+--------------------------------------------+----------------------+-------------+
+| defaultTiers        | map[string]string                          | .. code-block:: yaml |             |
+|                     |                                            |                      |             |
+|                     |                                            |   {}                 |             |
+|                     |                                            |                      |             |
++---------------------+--------------------------------------------+----------------------+-------------+
 
-remotedata
+Section: queues
 -----------------------------------------
-+----------------+------------+-------------+
-|      NAME      |    TYPE    | DESCRIPTION |
-+----------------+------------+-------------+
-| scheme         | string     |             |
-+----------------+------------+-------------+
-| region         | string     |             |
-+----------------+------------+-------------+
-| signedUrls     | SignedURL_ |             |
-+----------------+------------+-------------+
-| maxSizeInBytes | int64      |             |
-+----------------+------------+-------------+
++-----------------+----------------------------+----------------------+-------------+
+|      NAME       |            TYPE            |    DEFAULT VALUE     | DESCRIPTION |
++-----------------+----------------------------+----------------------+-------------+
+| executionQueues | interfaces.ExecutionQueues | .. code-block:: yaml |             |
+|                 |                            |                      |             |
+|                 |                            |   []                 |             |
+|                 |                            |                      |             |
++-----------------+----------------------------+----------------------+-------------+
+| workflowConfigs | interfaces.WorkflowConfigs | .. code-block:: yaml |             |
+|                 |                            |                      |             |
+|                 |                            |   []                 |             |
+|                 |                            |                      |             |
++-----------------+----------------------------+----------------------+-------------+
+
+Section: registration
+-----------------------------------------
++----------------------+--------+---------------+-------------+
+|         NAME         |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++----------------------+--------+---------------+-------------+
+| maxWorkflowNodes     | int    | 100           |             |
++----------------------+--------+---------------+-------------+
+| maxLabelEntries      | int    | 0             |             |
++----------------------+--------+---------------+-------------+
+| maxAnnotationEntries | int    | 0             |             |
++----------------------+--------+---------------+-------------+
+| workflowSizeLimit    | string |               |             |
++----------------------+--------+---------------+-------------+
+
+Section: remotedata
+-----------------------------------------
++----------------+--------------+------------------------+-------------+
+|      NAME      |     TYPE     |     DEFAULT VALUE      | DESCRIPTION |
++----------------+--------------+------------------------+-------------+
+| scheme         | string       | none                   |             |
++----------------+--------------+------------------------+-------------+
+| region         | string       |                        |             |
++----------------+--------------+------------------------+-------------+
+| signedUrls     | `SignedURL`_ | .. code-block:: yaml   |             |
+|                |              |                        |             |
+|                |              |   durationMinutes: 0   |             |
+|                |              |   signingPrincipal: "" |             |
+|                |              |                        |             |
++----------------+--------------+------------------------+-------------+
+| maxSizeInBytes | int64        | 2097152                |             |
++----------------+--------------+------------------------+-------------+
 
 SignedURL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------------------+--------+-------------+
-|       NAME       |  TYPE  | DESCRIPTION |
-+------------------+--------+-------------+
-| durationMinutes  | int    |             |
-+------------------+--------+-------------+
-| signingPrincipal | string |             |
-+------------------+--------+-------------+
++------------------+--------+---------------+-------------+
+|       NAME       |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++------------------+--------+---------------+-------------+
+| durationMinutes  | int    | 0             |             |
++------------------+--------+---------------+-------------+
+| signingPrincipal | string |               |             |
++------------------+--------+---------------+-------------+
 
-scheduler
+Section: scheduler
 -----------------------------------------
-+-----------------------+-------------------------+-------------+
-|         NAME          |          TYPE           | DESCRIPTION |
-+-----------------------+-------------------------+-------------+
-| eventScheduler        | EventSchedulerConfig_   |             |
-+-----------------------+-------------------------+-------------+
-| workflowExecutor      | WorkflowExecutorConfig_ |             |
-+-----------------------+-------------------------+-------------+
-| reconnectAttempts     | int                     |             |
-+-----------------------+-------------------------+-------------+
-| reconnectDelaySeconds | int                     |             |
-+-----------------------+-------------------------+-------------+
-
-WorkflowExecutorConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------------+-----------------------------------------+-------------+
-|       NAME        |                  TYPE                   | DESCRIPTION |
-+-------------------+-----------------------------------------+-------------+
-| scheme            | string                                  |             |
-+-------------------+-----------------------------------------+-------------+
-| region            | string                                  |             |
-+-------------------+-----------------------------------------+-------------+
-| scheduleQueueName | string                                  |             |
-+-------------------+-----------------------------------------+-------------+
-| accountId         | string                                  |             |
-+-------------------+-----------------------------------------+-------------+
-| aws               | interfaces.AWSWorkflowExecutorConfig    |             |
-+-------------------+-----------------------------------------+-------------+
-| local             | interfaces.FlyteWorkflowExecutorConfig_ |             |
-+-------------------+-----------------------------------------+-------------+
-
-interfaces.FlyteWorkflowExecutorConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------------+----------------------------+-------------+
-|      NAME      |            TYPE            | DESCRIPTION |
-+----------------+----------------------------+-------------+
-| adminRateLimit | interfaces.AdminRateLimit_ |             |
-+----------------+----------------------------+-------------+
-
-interfaces.AdminRateLimit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------+------------+-------------+
-| NAME  |    TYPE    | DESCRIPTION |
-+-------+------------+-------------+
-| tps   | rate.Limit |             |
-+-------+------------+-------------+
-| burst | int        |             |
-+-------+------------+-------------+
++-----------------------+---------------------------+--------------------------+-------------+
+|         NAME          |           TYPE            |      DEFAULT VALUE       | DESCRIPTION |
++-----------------------+---------------------------+--------------------------+-------------+
+| eventScheduler        | `EventSchedulerConfig`_   | .. code-block:: yaml     |             |
+|                       |                           |                          |             |
+|                       |                           |   aws: null              |             |
+|                       |                           |   local: {}              |             |
+|                       |                           |   region: ""             |             |
+|                       |                           |   scheduleNamePrefix: "" |             |
+|                       |                           |   scheduleRole: ""       |             |
+|                       |                           |   scheme: local          |             |
+|                       |                           |   targetName: ""         |             |
+|                       |                           |                          |             |
++-----------------------+---------------------------+--------------------------+-------------+
+| workflowExecutor      | `WorkflowExecutorConfig`_ | .. code-block:: yaml     |             |
+|                       |                           |                          |             |
+|                       |                           |   accountId: ""          |             |
+|                       |                           |   aws: null              |             |
+|                       |                           |   local:                 |             |
+|                       |                           |     adminRateLimit:      |             |
+|                       |                           |       burst: 10          |             |
+|                       |                           |       tps: 100           |             |
+|                       |                           |   region: ""             |             |
+|                       |                           |   scheduleQueueName: ""  |             |
+|                       |                           |   scheme: local          |             |
+|                       |                           |                          |             |
++-----------------------+---------------------------+--------------------------+-------------+
+| reconnectAttempts     | int                       | 0                        |             |
++-----------------------+---------------------------+--------------------------+-------------+
+| reconnectDelaySeconds | int                       | 0                        |             |
++-----------------------+---------------------------+--------------------------+-------------+
 
 EventSchedulerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------------------+----------------------------------+-------------+
-|        NAME        |               TYPE               | DESCRIPTION |
-+--------------------+----------------------------------+-------------+
-| scheme             | string                           |             |
-+--------------------+----------------------------------+-------------+
-| region             | string                           |             |
-+--------------------+----------------------------------+-------------+
-| scheduleRole       | string                           |             |
-+--------------------+----------------------------------+-------------+
-| targetName         | string                           |             |
-+--------------------+----------------------------------+-------------+
-| scheduleNamePrefix | string                           |             |
-+--------------------+----------------------------------+-------------+
-| aws                | interfaces.AWSSchedulerConfig    |             |
-+--------------------+----------------------------------+-------------+
-| local              | interfaces.FlyteSchedulerConfig_ |             |
-+--------------------+----------------------------------+-------------+
++--------------------+-------------------------+----------------------+-------------+
+|        NAME        |          TYPE           |    DEFAULT VALUE     | DESCRIPTION |
++--------------------+-------------------------+----------------------+-------------+
+| scheme             | string                  | local                |             |
++--------------------+-------------------------+----------------------+-------------+
+| region             | string                  |                      |             |
++--------------------+-------------------------+----------------------+-------------+
+| scheduleRole       | string                  |                      |             |
++--------------------+-------------------------+----------------------+-------------+
+| targetName         | string                  |                      |             |
++--------------------+-------------------------+----------------------+-------------+
+| scheduleNamePrefix | string                  |                      |             |
++--------------------+-------------------------+----------------------+-------------+
+| aws                | AWSSchedulerConfig      | .. code-block:: yaml |             |
+|                    |                         |                      |             |
+|                    |                         |   null               |             |
+|                    |                         |                      |             |
++--------------------+-------------------------+----------------------+-------------+
+| local              | `FlyteSchedulerConfig`_ | .. code-block:: yaml |             |
+|                    |                         |                      |             |
+|                    |                         |   {}                 |             |
+|                    |                         |                      |             |
++--------------------+-------------------------+----------------------+-------------+
 
-interfaces.FlyteSchedulerConfig
+FlyteSchedulerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------+------+-------------+
-| NAME | TYPE | DESCRIPTION |
-+------+------+-------------+
++------+------+---------------+-------------+
+| NAME | TYPE | DEFAULT VALUE | DESCRIPTION |
++------+------+---------------+-------------+
 
-secrets
------------------------------------------
-+----------------+--------+--------------------------------+
-|      NAME      |  TYPE  |          DESCRIPTION           |
-+----------------+--------+--------------------------------+
-| secrets-prefix | string |  Prefix where to look for      |
-|                |        | secrets file                   |
-+----------------+--------+--------------------------------+
-| env-prefix     | string |  Prefix for environment        |
-|                |        | variables                      |
-+----------------+--------+--------------------------------+
+WorkflowExecutorConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------------+--------------------------------+----------------------+-------------+
+|       NAME        |              TYPE              |    DEFAULT VALUE     | DESCRIPTION |
++-------------------+--------------------------------+----------------------+-------------+
+| scheme            | string                         | local                |             |
++-------------------+--------------------------------+----------------------+-------------+
+| region            | string                         |                      |             |
++-------------------+--------------------------------+----------------------+-------------+
+| scheduleQueueName | string                         |                      |             |
++-------------------+--------------------------------+----------------------+-------------+
+| accountId         | string                         |                      |             |
++-------------------+--------------------------------+----------------------+-------------+
+| aws               | AWSWorkflowExecutorConfig      | .. code-block:: yaml |             |
+|                   |                                |                      |             |
+|                   |                                |   null               |             |
+|                   |                                |                      |             |
++-------------------+--------------------------------+----------------------+-------------+
+| local             | `FlyteWorkflowExecutorConfig`_ | .. code-block:: yaml |             |
+|                   |                                |                      |             |
+|                   |                                |   adminRateLimit:    |             |
+|                   |                                |     burst: 10        |             |
+|                   |                                |     tps: 100         |             |
+|                   |                                |                      |             |
++-------------------+--------------------------------+----------------------+-------------+
 
-server
+FlyteWorkflowExecutorConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++----------------+-------------------+----------------------+-------------+
+|      NAME      |       TYPE        |    DEFAULT VALUE     | DESCRIPTION |
++----------------+-------------------+----------------------+-------------+
+| adminRateLimit | `AdminRateLimit`_ | .. code-block:: yaml |             |
+|                |                   |                      |             |
+|                |                   |   burst: 10          |             |
+|                |                   |   tps: 100           |             |
+|                |                   |                      |             |
++----------------+-------------------+----------------------+-------------+
+
+AdminRateLimit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------+---------+---------------+-------------+
+| NAME  |  TYPE   | DEFAULT VALUE | DESCRIPTION |
++-------+---------+---------------+-------------+
+| tps   | float64 | 100           |             |
++-------+---------+---------------+-------------+
+| burst | int     | 10            |             |
++-------+---------+---------------+-------------+
+
+Section: secrets
 -----------------------------------------
-+----------------------+--------------------------+--------------------------------+
-|         NAME         |           TYPE           |          DESCRIPTION           |
-+----------------------+--------------------------+--------------------------------+
-| httpPort             | int                      | On which http port to serve    |
-|                      |                          | admin                          |
-+----------------------+--------------------------+--------------------------------+
-| grpcPort             | int                      | On which grpc port to serve    |
-|                      |                          | admin                          |
-+----------------------+--------------------------+--------------------------------+
-| grpcServerReflection | bool                     | Enable GRPC Server Reflection  |
-+----------------------+--------------------------+--------------------------------+
-| kube-config          | string                   | Path to kubernetes client      |
-|                      |                          | config file.                   |
-+----------------------+--------------------------+--------------------------------+
-| master               | string                   | The address of the Kubernetes  |
-|                      |                          | API server.                    |
-+----------------------+--------------------------+--------------------------------+
-| security             | ServerSecurityOptions_   |                                |
-+----------------------+--------------------------+--------------------------------+
-| thirdPartyConfig     | ThirdPartyConfigOptions_ | Deprecated please use          |
-|                      |                          | auth.appAuth.thirdPartyConfig  |
-|                      |                          | instead.                       |
-+----------------------+--------------------------+--------------------------------+
++----------------+--------+-----------------+---------------------------------------+
+|      NAME      |  TYPE  |  DEFAULT VALUE  |              DESCRIPTION              |
++----------------+--------+-----------------+---------------------------------------+
+| secrets-prefix | string | /etc/secrets    | Prefix where to look for secrets file |
++----------------+--------+-----------------+---------------------------------------+
+| env-prefix     | string | FLYTE\_SECRET\_ | Prefix for environment variables      |
++----------------+--------+-----------------+---------------------------------------+
+
+Section: server
+-----------------------------------------
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+|         NAME         |            TYPE            |      DEFAULT VALUE      |                         DESCRIPTION                          |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| httpPort             | int                        | 0                       | On which http port to serve admin                            |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| grpcPort             | int                        | 0                       | On which grpc port to serve admin                            |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| grpcServerReflection | bool                       | false                   | Enable GRPC Server Reflection                                |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| kube-config          | string                     |                         | Path to kubernetes client config file.                       |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| master               | string                     |                         | The address of the Kubernetes API server.                    |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| security             | `ServerSecurityOptions`_   | .. code-block:: yaml    |                                                              |
+|                      |                            |                         |                                                              |
+|                      |                            |   allowCors: false      |                                                              |
+|                      |                            |   allowedHeaders: []    |                                                              |
+|                      |                            |   allowedOrigins: []    |                                                              |
+|                      |                            |   auditAccess: false    |                                                              |
+|                      |                            |   secure: false         |                                                              |
+|                      |                            |   ssl:                  |                                                              |
+|                      |                            |     certificateFile: "" |                                                              |
+|                      |                            |     keyFile: ""         |                                                              |
+|                      |                            |   useAuth: false        |                                                              |
+|                      |                            |                         |                                                              |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
+| thirdPartyConfig     | `ThirdPartyConfigOptions`_ | .. code-block:: yaml    | Deprecated please use auth.appAuth.thirdPartyConfig instead. |
+|                      |                            |                         |                                                              |
+|                      |                            |   flyteClient:          |                                                              |
+|                      |                            |     clientId: ""        |                                                              |
+|                      |                            |     redirectUri: ""     |                                                              |
+|                      |                            |     scopes: []          |                                                              |
+|                      |                            |                         |                                                              |
++----------------------+----------------------------+-------------------------+--------------------------------------------------------------+
 
 ServerSecurityOptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------------+-------------+-------------+
-|      NAME      |    TYPE     | DESCRIPTION |
-+----------------+-------------+-------------+
-| secure         | bool        |             |
-+----------------+-------------+-------------+
-| ssl            | SslOptions_ |             |
-+----------------+-------------+-------------+
-| useAuth        | bool        |             |
-+----------------+-------------+-------------+
-| auditAccess    | bool        |             |
-+----------------+-------------+-------------+
-| allowCors      | bool        |             |
-+----------------+-------------+-------------+
-| allowedOrigins | []string    |             |
-+----------------+-------------+-------------+
-| allowedHeaders | []string    |             |
-+----------------+-------------+-------------+
++----------------+---------------+-----------------------+-------------+
+|      NAME      |     TYPE      |     DEFAULT VALUE     | DESCRIPTION |
++----------------+---------------+-----------------------+-------------+
+| secure         | bool          | false                 |             |
++----------------+---------------+-----------------------+-------------+
+| ssl            | `SslOptions`_ | .. code-block:: yaml  |             |
+|                |               |                       |             |
+|                |               |   certificateFile: "" |             |
+|                |               |   keyFile: ""         |             |
+|                |               |                       |             |
++----------------+---------------+-----------------------+-------------+
+| useAuth        | bool          | false                 |             |
++----------------+---------------+-----------------------+-------------+
+| auditAccess    | bool          | false                 |             |
++----------------+---------------+-----------------------+-------------+
+| allowCors      | bool          | false                 |             |
++----------------+---------------+-----------------------+-------------+
+| allowedOrigins | []string      | .. code-block:: yaml  |             |
+|                |               |                       |             |
+|                |               |   []                  |             |
+|                |               |                       |             |
++----------------+---------------+-----------------------+-------------+
+| allowedHeaders | []string      | .. code-block:: yaml  |             |
+|                |               |                       |             |
+|                |               |   []                  |             |
+|                |               |                       |             |
++----------------+---------------+-----------------------+-------------+
 
 SslOptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-----------------+--------+-------------+
-|      NAME       |  TYPE  | DESCRIPTION |
-+-----------------+--------+-------------+
-| certificateFile | string |             |
-+-----------------+--------+-------------+
-| keyFile         | string |             |
-+-----------------+--------+-------------+
++-----------------+--------+---------------+-------------+
+|      NAME       |  TYPE  | DEFAULT VALUE | DESCRIPTION |
++-----------------+--------+---------------+-------------+
+| certificateFile | string |               |             |
++-----------------+--------+---------------+-------------+
+| keyFile         | string |               |             |
++-----------------+--------+---------------+-------------+
 
-storage
+Section: storage
 -----------------------------------------
-+-----------------------+-------------------+--------------------------------+
-|         NAME          |       TYPE        |          DESCRIPTION           |
-+-----------------------+-------------------+--------------------------------+
-| type                  | string            | Sets the type of               |
-|                       |                   | storage to configure           |
-|                       |                   | [s3/minio/local/mem/stow].     |
-+-----------------------+-------------------+--------------------------------+
-| connection            | ConnectionConfig_ |                                |
-+-----------------------+-------------------+--------------------------------+
-| stow                  | StowConfig_       | Storage config for stow        |
-|                       |                   | backend.                       |
-+-----------------------+-------------------+--------------------------------+
-| container             | string            | Initial container (in s3       |
-|                       |                   | a bucket) to create -if it     |
-|                       |                   | doesn't exist-.'               |
-+-----------------------+-------------------+--------------------------------+
-| enable-multicontainer | bool              | If this is true, then          |
-|                       |                   | the container argument is      |
-|                       |                   | overlooked and redundant.      |
-|                       |                   | This config will automatically |
-|                       |                   | open new connections to new    |
-|                       |                   | containers/buckets as they are |
-|                       |                   | encountered                    |
-+-----------------------+-------------------+--------------------------------+
-| cache                 | CachingConfig_    |                                |
-+-----------------------+-------------------+--------------------------------+
-| limits                | LimitsConfig_     | Sets limits for stores.        |
-+-----------------------+-------------------+--------------------------------+
-| defaultHttpClient     | HTTPClientConfig_ | Sets the default http client   |
-|                       |                   | config.                        |
-+-----------------------+-------------------+--------------------------------+
-
-HTTPClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+---------+---------------------+--------------------------------+
-|  NAME   |        TYPE         |          DESCRIPTION           |
-+---------+---------------------+--------------------------------+
-| headers | map[string][]string | Sets http headers to set on    |
-|         |                     | the http client.               |
-+---------+---------------------+--------------------------------+
-| timeout | Duration_           | Sets time out on the http      |
-|         |                     | client.                        |
-+---------+---------------------+--------------------------------+
-
-LimitsConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------------+-------+--------------------------------+
-|      NAME      | TYPE  |          DESCRIPTION           |
-+----------------+-------+--------------------------------+
-| maxDownloadMBs | int64 | Maximum allowed download size  |
-|                |       | (in MBs) per call.             |
-+----------------+-------+--------------------------------+
-
-CachingConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------------+------+--------------------------------+
-|       NAME        | TYPE |          DESCRIPTION           |
-+-------------------+------+--------------------------------+
-| max_size_mbs      | int  | Maximum size of the cache      |
-|                   |      | where the Blob store data      |
-|                   |      | is cached in-memory. If not    |
-|                   |      | specified or set to 0, cache   |
-|                   |      | is not used                    |
-+-------------------+------+--------------------------------+
-| target_gc_percent | int  | Sets the garbage collection    |
-|                   |      | target percentage.             |
-+-------------------+------+--------------------------------+
-
-StowConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------+-------------------+--------------------------------+
-|  NAME  |       TYPE        |          DESCRIPTION           |
-+--------+-------------------+--------------------------------+
-| kind   | string            | Kind of Stow backend to use.   |
-|        |                   | Refer to github/graymeta/stow  |
-+--------+-------------------+--------------------------------+
-| config | map[string]string | Configuration for              |
-|        |                   | stow backend. Refer to         |
-|        |                   | github/graymeta/stow           |
-+--------+-------------------+--------------------------------+
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|         NAME          |        TYPE         |     DEFAULT VALUE      |                                                                                   DESCRIPTION                                                                                   |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| type                  | string              | s3                     | Sets the type of storage to configure [s3/minio/local/mem/stow].                                                                                                                |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| connection            | `ConnectionConfig`_ | .. code-block:: yaml   |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
+|                       |                     |   access-key: ""       |                                                                                                                                                                                 |
+|                       |                     |   auth-type: iam       |                                                                                                                                                                                 |
+|                       |                     |   disable-ssl: false   |                                                                                                                                                                                 |
+|                       |                     |   endpoint: ""         |                                                                                                                                                                                 |
+|                       |                     |   region: us-east-1    |                                                                                                                                                                                 |
+|                       |                     |   secret-key: ""       |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| stow                  | `StowConfig`_       | .. code-block:: yaml   | Storage config for stow backend.                                                                                                                                                |
+|                       |                     |                        |                                                                                                                                                                                 |
+|                       |                     |   {}                   |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| container             | string              |                        | Initial container (in s3 a bucket) to create -if it doesn't exist-.'                                                                                                            |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| enable-multicontainer | bool                | false                  | If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| cache                 | `CachingConfig`_    | .. code-block:: yaml   |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
+|                       |                     |   max_size_mbs: 0      |                                                                                                                                                                                 |
+|                       |                     |   target_gc_percent: 0 |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| limits                | `LimitsConfig`_     | .. code-block:: yaml   | Sets limits for stores.                                                                                                                                                         |
+|                       |                     |                        |                                                                                                                                                                                 |
+|                       |                     |   maxDownloadMBs: 2    |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| defaultHttpClient     | `HTTPClientConfig`_ | .. code-block:: yaml   | Sets the default http client config.                                                                                                                                            |
+|                       |                     |                        |                                                                                                                                                                                 |
+|                       |                     |   headers: null        |                                                                                                                                                                                 |
+|                       |                     |   timeout: 0s          |                                                                                                                                                                                 |
+|                       |                     |                        |                                                                                                                                                                                 |
++-----------------------+---------------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ConnectionConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------------+--------+--------------------------------+
-|    NAME     |  TYPE  |          DESCRIPTION           |
-+-------------+--------+--------------------------------+
-| endpoint    | URL_   | URL for storage client to      |
-|             |        | connect to.                    |
-+-------------+--------+--------------------------------+
-| auth-type   | string | Auth Type to use               |
-|             |        | [iam,accesskey].               |
-+-------------+--------+--------------------------------+
-| access-key  | string | Access key to use. Only        |
-|             |        | required when authtype is set  |
-|             |        | to accesskey.                  |
-+-------------+--------+--------------------------------+
-| secret-key  | string | Secret to use when accesskey   |
-|             |        | is set.                        |
-+-------------+--------+--------------------------------+
-| region      | string | Region to connect to.          |
-+-------------+--------+--------------------------------+
-| disable-ssl | bool   | Disables SSL connection.       |
-|             |        | Should only be used for        |
-|             |        | development.                   |
-+-------------+--------+--------------------------------+
++-------------+--------+----------------------+---------------------------------------------------------------------+
+|    NAME     |  TYPE  |    DEFAULT VALUE     |                             DESCRIPTION                             |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| endpoint    | `URL`_ | .. code-block:: yaml | URL for storage client to connect to.                               |
+|             |        |                      |                                                                     |
+|             |        |   ""                 |                                                                     |
+|             |        |                      |                                                                     |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| auth-type   | string | iam                  | Auth Type to use [iam,accesskey].                                   |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| access-key  | string |                      | Access key to use. Only required when authtype is set to accesskey. |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| secret-key  | string |                      | Secret to use when accesskey is set.                                |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| region      | string | us-east-1            | Region to connect to.                                               |
++-------------+--------+----------------------+---------------------------------------------------------------------+
+| disable-ssl | bool   | false                | Disables SSL connection. Should only be used for development.       |
++-------------+--------+----------------------+---------------------------------------------------------------------+
 
-task_resources
+StowConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++--------+-------------------+----------------------+---------------------------------------------------------------+
+|  NAME  |       TYPE        |    DEFAULT VALUE     |                          DESCRIPTION                          |
++--------+-------------------+----------------------+---------------------------------------------------------------+
+| kind   | string            |                      | Kind of Stow backend to use. Refer to github/graymeta/stow    |
++--------+-------------------+----------------------+---------------------------------------------------------------+
+| config | map[string]string | .. code-block:: yaml | Configuration for stow backend. Refer to github/graymeta/stow |
+|        |                   |                      |                                                               |
+|        |                   |   {}                 |                                                               |
+|        |                   |                      |                                                               |
++--------+-------------------+----------------------+---------------------------------------------------------------+
+
+CachingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++-------------------+------+---------------+--------------------------------------------------------------------------------------------------------------------------+
+|       NAME        | TYPE | DEFAULT VALUE |                                                       DESCRIPTION                                                        |
++-------------------+------+---------------+--------------------------------------------------------------------------------------------------------------------------+
+| max_size_mbs      | int  | 0             | Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used |
++-------------------+------+---------------+--------------------------------------------------------------------------------------------------------------------------+
+| target_gc_percent | int  | 0             | Sets the garbage collection target percentage.                                                                           |
++-------------------+------+---------------+--------------------------------------------------------------------------------------------------------------------------+
+
+LimitsConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++----------------+-------+---------------+--------------------------------------------------+
+|      NAME      | TYPE  | DEFAULT VALUE |                   DESCRIPTION                    |
++----------------+-------+---------------+--------------------------------------------------+
+| maxDownloadMBs | int64 | 2             | Maximum allowed download size (in MBs) per call. |
++----------------+-------+---------------+--------------------------------------------------+
+
+HTTPClientConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++---------+---------------------+----------------------+-----------------------------------+
+|  NAME   |        TYPE         |    DEFAULT VALUE     |            DESCRIPTION            |
++---------+---------------------+----------------------+-----------------------------------+
+| headers | map[string][]string | .. code-block:: yaml |                                   |
+|         |                     |                      |                                   |
+|         |                     |   null               |                                   |
+|         |                     |                      |                                   |
++---------+---------------------+----------------------+-----------------------------------+
+| timeout | `Duration`_         | .. code-block:: yaml | Sets time out on the http client. |
+|         |                     |                      |                                   |
+|         |                     |   0s                 |                                   |
+|         |                     |                      |                                   |
++---------+---------------------+----------------------+-----------------------------------+
+
+Section: task_resources
 -----------------------------------------
-+----------+------------------+-------------+
-|   NAME   |       TYPE       | DESCRIPTION |
-+----------+------------------+-------------+
-| defaults | TaskResourceSet_ |             |
-+----------+------------------+-------------+
-| limits   | TaskResourceSet_ |             |
-+----------+------------------+-------------+
++----------+--------------------+-------------------------+-------------+
+|   NAME   |        TYPE        |      DEFAULT VALUE      | DESCRIPTION |
++----------+--------------------+-------------------------+-------------+
+| defaults | `TaskResourceSet`_ | .. code-block:: yaml    |             |
+|          |                    |                         |             |
+|          |                    |   cpu: "0"              |             |
+|          |                    |   ephemeralStorage: "0" |             |
+|          |                    |   gpu: "0"              |             |
+|          |                    |   memory: "0"           |             |
+|          |                    |   storage: "0"          |             |
+|          |                    |                         |             |
++----------+--------------------+-------------------------+-------------+
+| limits   | `TaskResourceSet`_ | .. code-block:: yaml    |             |
+|          |                    |                         |             |
+|          |                    |   cpu: "0"              |             |
+|          |                    |   ephemeralStorage: "0" |             |
+|          |                    |   gpu: "0"              |             |
+|          |                    |   memory: "0"           |             |
+|          |                    |   storage: "0"          |             |
+|          |                    |                         |             |
++----------+--------------------+-------------------------+-------------+
 
 TaskResourceSet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------------------+-----------+-------------+
-|       NAME       |   TYPE    | DESCRIPTION |
-+------------------+-----------+-------------+
-| cpu              | Quantity_ |             |
-+------------------+-----------+-------------+
-| gpu              | Quantity_ |             |
-+------------------+-----------+-------------+
-| memory           | Quantity_ |             |
-+------------------+-----------+-------------+
-| storage          | Quantity_ |             |
-+------------------+-----------+-------------+
-| ephemeralStorage | Quantity_ |             |
-+------------------+-----------+-------------+
++------------------+-------------+----------------------+-------------+
+|       NAME       |    TYPE     |    DEFAULT VALUE     | DESCRIPTION |
++------------------+-------------+----------------------+-------------+
+| cpu              | `Quantity`_ | .. code-block:: yaml |             |
+|                  |             |                      |             |
+|                  |             |   "0"                |             |
+|                  |             |                      |             |
++------------------+-------------+----------------------+-------------+
+| gpu              | `Quantity`_ | .. code-block:: yaml |             |
+|                  |             |                      |             |
+|                  |             |   "0"                |             |
+|                  |             |                      |             |
++------------------+-------------+----------------------+-------------+
+| memory           | `Quantity`_ | .. code-block:: yaml |             |
+|                  |             |                      |             |
+|                  |             |   "0"                |             |
+|                  |             |                      |             |
++------------------+-------------+----------------------+-------------+
+| storage          | `Quantity`_ | .. code-block:: yaml |             |
+|                  |             |                      |             |
+|                  |             |   "0"                |             |
+|                  |             |                      |             |
++------------------+-------------+----------------------+-------------+
+| ephemeralStorage | `Quantity`_ | .. code-block:: yaml |             |
+|                  |             |                      |             |
+|                  |             |   "0"                |             |
+|                  |             |                      |             |
++------------------+-------------+----------------------+-------------+
 
 Quantity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--------+-----------------+-------------+
-|  NAME  |      TYPE       | DESCRIPTION |
-+--------+-----------------+-------------+
-| i      | int64Amount_    |             |
-+--------+-----------------+-------------+
-| d      | infDecAmount_   |             |
-+--------+-----------------+-------------+
-| s      | string          |             |
-+--------+-----------------+-------------+
-| Format | resource.Format |             |
-+--------+-----------------+-------------+
-
-infDecAmount
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+------+---------+-------------+
-| NAME |  TYPE   | DESCRIPTION |
-+------+---------+-------------+
-| Dec  | inf.Dec |             |
-+------+---------+-------------+
++--------+-----------------+----------------------+-------------+
+|  NAME  |      TYPE       |    DEFAULT VALUE     | DESCRIPTION |
++--------+-----------------+----------------------+-------------+
+| i      | `int64Amount`_  | .. code-block:: yaml |             |
+|        |                 |                      |             |
+|        |                 |   {}                 |             |
+|        |                 |                      |             |
++--------+-----------------+----------------------+-------------+
+| d      | `infDecAmount`_ | .. code-block:: yaml |             |
+|        |                 |                      |             |
+|        |                 |   <nil>              |             |
+|        |                 |                      |             |
++--------+-----------------+----------------------+-------------+
+| s      | string          | 0                    |             |
++--------+-----------------+----------------------+-------------+
+| Format | string          |                      |             |
++--------+-----------------+----------------------+-------------+
 
 int64Amount
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-------+----------------+-------------+
-| NAME  |      TYPE      | DESCRIPTION |
-+-------+----------------+-------------+
-| value | int64          |             |
-+-------+----------------+-------------+
-| scale | resource.Scale |             |
-+-------+----------------+-------------+
++-------+-------+---------------+-------------+
+| NAME  | TYPE  | DEFAULT VALUE | DESCRIPTION |
++-------+-------+---------------+-------------+
+| value | int64 | 0             |             |
++-------+-------+---------------+-------------+
+| scale | int32 | 0             |             |
++-------+-------+---------------+-------------+
+
+infDecAmount
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++------+------+----------------------+-------------+
+| NAME | TYPE |    DEFAULT VALUE     | DESCRIPTION |
++------+------+----------------------+-------------+
+| Dec  | Dec  | .. code-block:: yaml |             |
+|      |      |                      |             |
+|      |      |   null               |             |
+|      |      |                      |             |
++------+------+----------------------+-------------+
 
