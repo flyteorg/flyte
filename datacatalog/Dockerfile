@@ -3,7 +3,7 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
 
-FROM golang:1.13.3-alpine3.10 as builder
+FROM golang:1.17.1-alpine3.14 as builder
 RUN apk add git openssh-client make curl
 
 # COPY only the go mod files for efficient caching
@@ -24,7 +24,7 @@ RUN make linux_compile
 ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
-FROM alpine:3.10
+FROM alpine:3.14
 LABEL org.opencontainers.image.source https://github.com/lyft/datacatalog
 
 COPY --from=builder /artifacts /bin
