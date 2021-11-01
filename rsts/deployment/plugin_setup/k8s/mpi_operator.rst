@@ -29,7 +29,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
 4. Create a file named ``values-mpi.yaml`` and add the following config to it:
 
-.. code-block::
+.. code-block:: yaml
 
     configmap:
       enabled_plugins:

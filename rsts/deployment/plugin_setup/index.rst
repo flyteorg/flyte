@@ -15,10 +15,19 @@ Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the K8s Operator Plugins.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-aws
+       :type: ref
+       :text: AWS Plugin
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the AWS-specific Plugins.
+
 .. toctree::
     :maxdepth: 1
-    :name: K8s Plugin
+    :name: Plugin
     :hidden:
 
-    pytorch_operator
+    aws/index
     k8s/index

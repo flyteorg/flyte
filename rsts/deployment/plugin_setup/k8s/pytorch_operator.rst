@@ -28,7 +28,7 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
 
 4. Create a file named ``values-pytorch.yaml`` and add the following config to it:
 
-   .. code-block::
+   .. code-block:: yaml
 
        configmap:
          enabled_plugins:

@@ -69,7 +69,7 @@ solution). The following pages will help you effectively deploy and manage an en
 
 .. toctree::
     :maxdepth: 1
-    :name: deploymenttoc
+    :name: Deployment Options
     :hidden:
 
     overview

@@ -26,7 +26,7 @@ This guide gives an overview of how to set up the Spark operator in your Flyte d
 
 4. Create a file named ``values-spark.yaml`` and add the following config to it:
 
-.. code-block::
+.. code-block:: yaml
 
     cluster_resource_manager:
       # -- Enables the Cluster resource manager component

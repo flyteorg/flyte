@@ -1,8 +1,8 @@
-.. _deployment-plugin-setup-k8s:
+.. _deployment-plugin-setup-aws:
 
-################
-K8s Plugin Setup
-################
+#################
+AWS Plugins Setup
+#################
 
 
 .. panels::
@@ -11,37 +11,14 @@ K8s Plugin Setup
 
     .. link-button:: deployment-plugin-setup-k8s-mpi-operator
        :type: ref
-       :text: MPI Operator
+       :text: AWS Batch
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Kubeflow MPI Operator Plugin.
-
-    ---
-
-    .. link-button:: deployment-plugin-setup-k8s-pytorch-operator
-       :type: ref
-       :text: PyTorch Operator
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up the Kubeflow PyTorch Operator Plugin.
-
-    ---
-
-    .. link-button:: deployment-plugin-setup-k8s-spark-operator
-       :type: ref
-       :text: Spark Operator
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up the Spark Operator Plugin.
-
+    Guide to setting up the AWS Batch Plugin.
 
 .. toctree::
     :maxdepth: 1
-    :name: K8S Plugin Setup
+    :name: AWS plugin Setup
     :hidden:
 
-    mpi_operator
-    pytorch_operator
-    spark_operator
-
-
+    batch
