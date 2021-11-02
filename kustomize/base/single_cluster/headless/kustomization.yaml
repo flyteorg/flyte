@@ -30,7 +30,6 @@ configMapGenerator:
       # Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
       - ./config/clusterresource-templates/aa_namespace.yaml
       - ./config/clusterresource-templates/ab_project-resource-quota.yaml
-      - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
 
   # Flyte Propeller Configuration
   - name: flyte-propeller-config
