@@ -52,7 +52,8 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
 
    If you are using Helm, this block can be added under `configMaps.adminServer` section `here <https://github.com/flyteorg/flyte/blob/master/charts/flyte/values.yaml#L526-L527>`_.
 
-   An example of a more complex matching config:
+   An example of a more complex matching config below defines 3 different queues with separate attributes and matching 
+   logic based on project/domain/workflowName.
 
    .. code-block:: yaml
 
@@ -84,6 +85,10 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
               - critical
             - tags:
               - default
+    
+   These settings can also be dynamically altered through `flytectl` (or flyteAdmin API).
+   Read about the :ref:`core concept here <divedeep-admin-matchable-resources>`. Then visit :ref:`flytectl docs <flytectl:flytectl_update_execution-queue-attribute>` for a guide on how to dynamically
+   update these configs.
 
 5. Update Flyte Propeller's Config
 

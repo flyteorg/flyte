@@ -9,7 +9,7 @@ AWS Plugins Setup
     :header: text-center
 
 
-    .. link-button:: deployment-plugin-setup-k8s-mpi-operator
+    .. link-button:: deployment-plugin-setup-aws-array
        :type: ref
        :text: AWS Batch
        :classes: btn-block stretched-link
