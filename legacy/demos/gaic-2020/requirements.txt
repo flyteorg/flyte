@@ -1,4 +1,0 @@
-flytekit[schema]==0.12.6
-xgboost==0.90
-scikit-learn==0.23.2
-joblib==0.14.0

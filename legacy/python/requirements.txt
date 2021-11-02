@@ -1,5 +1,0 @@
-flytekit[schema]==0.12.1
-opencv-python==3.4.4.19
-xgboost==0.90
-scikit-learn==0.21.3
-joblib==0.14.0
