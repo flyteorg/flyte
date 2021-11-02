@@ -35,10 +35,16 @@ func SetupFlyteDir() error {
 	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm); err != nil {
 		return err
 	}
+
 	// Created a empty file with right permission
-	if err := ioutil.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
-		return err
+	if _, err := os.Stat(docker.Kubeconfig); err != nil {
+		if os.IsNotExist(err) {
+			if err := ioutil.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
+				return err
+			}
+		}
 	}
+
 	return nil
 }
 
