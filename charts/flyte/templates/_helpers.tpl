@@ -218,14 +218,3 @@ storage:
   limits:
     maxDownloadMBs: 10
 {{- end }}
-
-{{- define "copilot.config" -}}
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: flyte-data-config
-  namespace: {{`{{ namespace }}`}}
-data:
-  config.yaml: | {{ tpl (include "storage.base" .) $ | nindent 4 }}
-      enable-multicontainer: true
-{{- end }}

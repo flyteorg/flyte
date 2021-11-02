@@ -247,26 +247,6 @@ data:
     spec:
       finalizers:
       - kubernetes
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: minio
-          container: "my-s3-bucket"
-          connection:
-            access-key: minio
-            auth-type: accesskey
-            secret-key: miniostorage
-            disable-ssl: true
-            endpoint: http://minio.flyte.svc.cluster.local:9000
-            region: us-east-1
-          enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1

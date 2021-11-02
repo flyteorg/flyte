@@ -102,25 +102,6 @@ data:
       hard:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: stow
-          stow:
-            kind: google
-            config:
-              json: ""
-              project_id: <GOOGLE_PROJECT_ID>
-              scopes: https://www.googleapis.com/auth/devstorage.read_write
-          container: "<BUCKET_NAME>"
-          enable-multicontainer: true
 ---
 # Source: flyte-core/templates/admin/configmap.yaml
 apiVersion: v1
