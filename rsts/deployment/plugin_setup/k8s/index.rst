@@ -41,7 +41,7 @@ K8s Plugin Setup
        :text: Tensorflow Operator
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Spark Operator Plugin.
+    Guide to setting up the Tensorflow Operator Plugin.
 
 
 .. toctree::
