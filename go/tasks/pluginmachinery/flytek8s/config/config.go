@@ -34,7 +34,7 @@ var (
 		},
 		CoPilot: FlyteCoPilotConfig{
 			NamePrefix:           "flyte-copilot-",
-			Image:                "cr.flyte.org/flyteorg/flytecopilot:v0.5.28",
+			Image:                "cr.flyte.org/flyteorg/flytecopilot:v0.0.15",
 			DefaultInputDataPath: "/var/flyte/inputs",
 			InputVolumeName:      "flyte-inputs",
 			DefaultOutputPath:    "/var/flyte/outputs",
@@ -42,7 +42,7 @@ var (
 			CPU:                  "500m",
 			Memory:               "128Mi",
 			StartTimeout: config2.Duration{
-				Duration: time.Second * 60,
+				Duration: time.Second * 100,
 			},
 		},
 		DefaultCPURequest:    defaultCPURequest,
