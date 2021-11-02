@@ -436,7 +436,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -1599,7 +1599,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
+        configChecksum: "f0f56517059d2ab9e6397a7c55ccb4bfbfaa54bf5662902582c768494539b44"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1671,7 +1671,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "1a4678d9e43881ab183a3fce7ee25de8c10b0d5f1cd91f108ff8dddc3cff99f"
+        configChecksum: "f0f56517059d2ab9e6397a7c55ccb4bfbfaa54bf5662902582c768494539b44"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
