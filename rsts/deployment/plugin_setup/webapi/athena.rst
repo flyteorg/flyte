@@ -3,7 +3,7 @@
 Athena Plugin Setup
 ---------------------
 
-This guide gives an overview of how to set up the Athena in your Flyte deployment. 
+This guide gives an overview of how to set up the Athena in your AWS Flyte deployment.
 
 1. Create a file named ``values-athena.yaml`` and add the following config to it:
 
@@ -32,13 +32,13 @@ This guide gives an overview of how to set up the Athena in your Flyte deploymen
 
    .. code-block:: bash
 
-      helm upgrade -n flyte -f values-athena.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+      helm upgrade -n flyte -f values-athena.yaml flyteorg/flyte
 
 3. Register the MPI plugin example.
 
    .. code-block:: bash
 
-      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development --k8sServiceAccount=<Service Account>
 
 4. Lastly, fetch the launch plan, create and monitor the execution.
 
