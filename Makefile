@@ -66,7 +66,7 @@ helm_upgrade: ## Upgrade helm charts
 .PHONY: docs
 docs:
 	script/generate_config_docs.sh
-	make -C rsts clean html SPHINXOPTS=-W
+	make -C rsts clean html # SPHINXOPTS=-W
 
 .PHONY: help
 help: SHELL := /bin/sh

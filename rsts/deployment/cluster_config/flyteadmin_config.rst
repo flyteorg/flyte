@@ -4,10 +4,52 @@
 Flyte Admin Configuration
 #########################################
 
+- `auth <#section-auth>`_
+
+- `cluster_resources <#section-cluster_resources>`_
+
+- `clusters <#section-clusters>`_
+
+- `database <#section-database>`_
+
+- `domains <#section-domains>`_
+
+- `externalevents <#section-externalevents>`_
+
+- `flyteadmin <#section-flyteadmin>`_
+
+- `logger <#section-logger>`_
+
+- `namespace_mapping <#section-namespace_mapping>`_
+
+- `notifications <#section-notifications>`_
+
+- `plugins <#section-plugins>`_
+
+- `qualityofservice <#section-qualityofservice>`_
+
+- `queues <#section-queues>`_
+
+- `registration <#section-registration>`_
+
+- `remotedata <#section-remotedata>`_
+
+- `scheduler <#section-scheduler>`_
+
+- `secrets <#section-secrets>`_
+
+- `server <#section-server>`_
+
+- `storage <#section-storage>`_
+
+- `task_resources <#section-task_resources>`_
+
+- `task_type_whitelist <#section-task_type_whitelist>`_
+
 Section: auth
 ================================================================================
 
-httpAuthorizationHeader string
+httpAuthorizationHeader (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -17,7 +59,7 @@ httpAuthorizationHeader string
   flyte-authorization
   
 
-grpcAuthorizationHeader string
+grpcAuthorizationHeader (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -27,10 +69,10 @@ grpcAuthorizationHeader string
   flyte-authorization
   
 
-disableForHttp bool
+disableForHttp (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Disables auth enforcement on HTTP Endpoints.
+Disables auth enforcement on HTTP Endpoints.
 
 **Default Value**: 
 
@@ -39,10 +81,10 @@ disableForHttp bool
   "false"
   
 
-disableForGrpc bool
+disableForGrpc (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Disables auth enforcement on Grpc Endpoints.
+Disables auth enforcement on Grpc Endpoints.
 
 **Default Value**: 
 
@@ -51,10 +93,10 @@ disableForGrpc bool
   "false"
   
 
-authorizedUris []config.URL
+authorizedUris ([]config.URL)
 --------------------------------------------------------------------------------
 
-**Description**: Optional: Defines the set of URIs that clients are allowed to visit the service on. If set, the system will attempt to match the incoming host to the first authorized URIs and use that (including the scheme) when generating metadata endpoints and when validating audience and issuer claims. If not provided, the urls will be deduced based on the request url and the 'secure' setting.
+Optional: Defines the set of URIs that clients are allowed to visit the service on. If set, the system will attempt to match the incoming host to the first authorized URIs and use that (including the scheme) when generating metadata endpoints and when validating audience and issuer claims. If not provided, the urls will be deduced based on the request url and the 'secure' setting.
 
 **Default Value**: 
 
@@ -63,10 +105,10 @@ authorizedUris []config.URL
   []
   
 
-userAuth `config.UserAuthConfig`_
+userAuth (`config.UserAuthConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Defines Auth options for users.
+Defines Auth options for users.
 
 **Default Value**: 
 
@@ -83,10 +125,10 @@ userAuth `config.UserAuthConfig`_
   redirectUrl: /console
   
 
-appAuth `config.OAuth2Options`_
+appAuth (`config.OAuth2Options`_)
 --------------------------------------------------------------------------------
 
-**Description**: Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
+Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
 
 **Default Value**: 
 
@@ -164,10 +206,10 @@ appAuth `config.OAuth2Options`_
   
 
 config.OAuth2Options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-authServerType int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+authServerType (int)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -176,10 +218,10 @@ authServerType int
   Self
   
 
-selfAuthServer `config.AuthorizationServer`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+selfAuthServer (`config.AuthorizationServer`_)
+--------------------------------------------------------------------------------
 
-**Description**: Authorization Server config to run as a service. Use this when using an IdP that does not offer a custom OAuth2 Authorization Server.
+Authorization Server config to run as a service. Use this when using an IdP that does not offer a custom OAuth2 Authorization Server.
 
 **Default Value**: 
 
@@ -245,10 +287,10 @@ selfAuthServer `config.AuthorizationServer`_
   tokenSigningRSAKeySecretName: token_rsa_key.pem
   
 
-externalAuthServer `config.ExternalAuthorizationServer`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+externalAuthServer (`config.ExternalAuthorizationServer`_)
+--------------------------------------------------------------------------------
 
-**Description**: External Authorization Server config.
+External Authorization Server config.
 
 **Default Value**: 
 
@@ -259,10 +301,10 @@ externalAuthServer `config.ExternalAuthorizationServer`_
   metadataUrl: ""
   
 
-thirdPartyConfig `config.ThirdPartyConfigOptions`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+thirdPartyConfig (`config.ThirdPartyConfigOptions`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines settings to instruct flyte cli tools (and optionally others) on what config to use to setup their client.
+Defines settings to instruct flyte cli tools (and optionally others) on what config to use to setup their client.
 
 **Default Value**: 
 
@@ -275,12 +317,12 @@ thirdPartyConfig `config.ThirdPartyConfigOptions`_
   
 
 config.AuthorizationServer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-issuer string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+issuer (string)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the issuer to use when issuing and validating tokens. The default value is https://<requestUri.HostAndPort>/
+Defines the issuer to use when issuing and validating tokens. The default value is https://<requestUri.HostAndPort>/
 
 **Default Value**: 
 
@@ -289,10 +331,10 @@ issuer string
   ""
   
 
-accessTokenLifespan `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+accessTokenLifespan (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the lifespan of issued access tokens.
+Defines the lifespan of issued access tokens.
 
 **Default Value**: 
 
@@ -301,10 +343,10 @@ accessTokenLifespan `config.Duration`_
   30m0s
   
 
-refreshTokenLifespan `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+refreshTokenLifespan (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the lifespan of issued access tokens.
+Defines the lifespan of issued access tokens.
 
 **Default Value**: 
 
@@ -313,10 +355,10 @@ refreshTokenLifespan `config.Duration`_
   1h0m0s
   
 
-authorizationCodeLifespan `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+authorizationCodeLifespan (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the lifespan of issued access tokens.
+Defines the lifespan of issued access tokens.
 
 **Default Value**: 
 
@@ -325,10 +367,10 @@ authorizationCodeLifespan `config.Duration`_
   5m0s
   
 
-claimSymmetricEncryptionKeySecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+claimSymmetricEncryptionKeySecretName (string)
+--------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Secret name to use to encrypt claims in authcode token.
+OPTIONAL: Secret name to use to encrypt claims in authcode token.
 
 **Default Value**: 
 
@@ -337,10 +379,10 @@ claimSymmetricEncryptionKeySecretName string
   claim_symmetric_key
   
 
-tokenSigningRSAKeySecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+tokenSigningRSAKeySecretName (string)
+--------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Secret name to use to retrieve RSA Signing Key.
+OPTIONAL: Secret name to use to retrieve RSA Signing Key.
 
 **Default Value**: 
 
@@ -349,10 +391,10 @@ tokenSigningRSAKeySecretName string
   token_rsa_key.pem
   
 
-oldTokenSigningRSAKeySecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+oldTokenSigningRSAKeySecretName (string)
+--------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Secret name to use to retrieve Old RSA Signing Key. This can be useful during key rotation to continue to accept older tokens.
+OPTIONAL: Secret name to use to retrieve Old RSA Signing Key. This can be useful during key rotation to continue to accept older tokens.
 
 **Default Value**: 
 
@@ -361,8 +403,8 @@ oldTokenSigningRSAKeySecretName string
   token_rsa_key_old.pem
   
 
-staticClients map[string]*fosite.DefaultClient
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+staticClients (map[string]*fosite.DefaultClient)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -421,10 +463,10 @@ staticClients map[string]*fosite.DefaultClient
   
 
 config.Duration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Duration int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Duration (int64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -434,12 +476,12 @@ Duration int64
   
 
 config.ExternalAuthorizationServer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-baseUrl `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+baseUrl (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/
+This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/
 
 **Default Value**: 
 
@@ -448,10 +490,10 @@ baseUrl `config.URL`_
   ""
   
 
-allowedAudience []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+allowedAudience ([]string)
+--------------------------------------------------------------------------------
 
-**Description**: Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service.
+Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service.
 
 **Default Value**: 
 
@@ -460,10 +502,10 @@ allowedAudience []string
   []
   
 
-metadataUrl `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+metadataUrl (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
+Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
 
 **Default Value**: 
 
@@ -473,10 +515,10 @@ metadataUrl `config.URL`_
   
 
 config.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-URL `url.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+URL (`url.URL`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -495,20 +537,10 @@ URL `url.URL`_
   
 
 url.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Scheme string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Opaque string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Scheme (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -517,8 +549,18 @@ Opaque string
   ""
   
 
-User url.Userinfo
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Opaque (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+User (url.Userinfo)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -527,8 +569,8 @@ User url.Userinfo
   null
   
 
-Host string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Host (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -537,8 +579,8 @@ Host string
   ""
   
 
-Path string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Path (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -547,8 +589,8 @@ Path string
   ""
   
 
-RawPath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawPath (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -557,8 +599,8 @@ RawPath string
   ""
   
 
-ForceQuery bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ForceQuery (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -567,8 +609,8 @@ ForceQuery bool
   "false"
   
 
-RawQuery string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawQuery (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -577,8 +619,8 @@ RawQuery string
   ""
   
 
-Fragment string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Fragment (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -587,8 +629,8 @@ Fragment string
   ""
   
 
-RawFragment string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawFragment (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -598,10 +640,10 @@ RawFragment string
   
 
 config.ThirdPartyConfigOptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-flyteClient `config.FlyteClientConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+flyteClient (`config.FlyteClientConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -613,12 +655,12 @@ flyteClient `config.FlyteClientConfig`_
   
 
 config.FlyteClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-clientId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+clientId (string)
+--------------------------------------------------------------------------------
 
-**Description**: public identifier for the app which handles authorization for a Flyte deployment
+public identifier for the app which handles authorization for a Flyte deployment
 
 **Default Value**: 
 
@@ -627,10 +669,10 @@ clientId string
   flytectl
   
 
-redirectUri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+redirectUri (string)
+--------------------------------------------------------------------------------
 
-**Description**: This is the callback uri registered with the app which handles authorization for a Flyte deployment
+This is the callback uri registered with the app which handles authorization for a Flyte deployment
 
 **Default Value**: 
 
@@ -639,10 +681,10 @@ redirectUri string
   http://localhost:53593/callback
   
 
-scopes []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scopes ([]string)
+--------------------------------------------------------------------------------
 
-**Description**: Recommended scopes for the client to request.
+Recommended scopes for the client to request.
 
 **Default Value**: 
 
@@ -652,10 +694,10 @@ scopes []string
   
 
 config.UserAuthConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-redirectUrl `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+redirectUrl (`config.URL`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -664,10 +706,10 @@ redirectUrl `config.URL`_
   /console
   
 
-openId `config.OpenIDOptions`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+openId (`config.OpenIDOptions`_)
+--------------------------------------------------------------------------------
 
-**Description**: OpenID Configuration for User Auth
+OpenID Configuration for User Auth
 
 **Default Value**: 
 
@@ -680,10 +722,10 @@ openId `config.OpenIDOptions`_
   scopes: []
   
 
-cookieHashKeySecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cookieHashKeySecretName (string)
+--------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Secret name to use for cookie hash key.
+OPTIONAL: Secret name to use for cookie hash key.
 
 **Default Value**: 
 
@@ -692,10 +734,10 @@ cookieHashKeySecretName string
   cookie_hash_key
   
 
-cookieBlockKeySecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cookieBlockKeySecretName (string)
+--------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Secret name to use for cookie block key.
+OPTIONAL: Secret name to use for cookie block key.
 
 **Default Value**: 
 
@@ -705,10 +747,10 @@ cookieBlockKeySecretName string
   
 
 config.OpenIDOptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-clientId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+clientId (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -717,8 +759,8 @@ clientId string
   ""
   
 
-clientSecretName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+clientSecretName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -727,8 +769,8 @@ clientSecretName string
   oidc_client_secret
   
 
-clientSecretFile string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+clientSecretFile (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -737,8 +779,8 @@ clientSecretFile string
   ""
   
 
-baseUrl `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+baseUrl (`config.URL`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -747,8 +789,8 @@ baseUrl `config.URL`_
   ""
   
 
-scopes []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scopes ([]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -760,7 +802,7 @@ scopes []string
 Section: cluster_resources
 ================================================================================
 
-templatePath string
+templatePath (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -770,7 +812,7 @@ templatePath string
   ""
   
 
-templateData map[string]interfaces.DataSource
+templateData (map[string]interfaces.DataSource)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -780,7 +822,7 @@ templateData map[string]interfaces.DataSource
   {}
   
 
-refreshInterval `config.Duration`_
+refreshInterval (`config.Duration`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -790,7 +832,7 @@ refreshInterval `config.Duration`_
   1m0s
   
 
-customData map[string]map[string]interfaces.DataSource
+customData (map[string]map[string]interfaces.DataSource)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -803,7 +845,7 @@ customData map[string]map[string]interfaces.DataSource
 Section: clusters
 ================================================================================
 
-clusterConfigs []interfaces.ClusterConfig
+clusterConfigs ([]interfaces.ClusterConfig)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -813,7 +855,7 @@ clusterConfigs []interfaces.ClusterConfig
   null
   
 
-labelClusterMap map[string][]interfaces.ClusterEntity
+labelClusterMap (map[string][]interfaces.ClusterEntity)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -826,7 +868,7 @@ labelClusterMap map[string][]interfaces.ClusterEntity
 Section: database
 ================================================================================
 
-host string
+host (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -836,7 +878,7 @@ host string
   postgres
   
 
-port int
+port (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -846,7 +888,7 @@ port int
   "5432"
   
 
-dbname string
+dbname (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -856,7 +898,7 @@ dbname string
   postgres
   
 
-username string
+username (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -866,7 +908,7 @@ username string
   postgres
   
 
-password string
+password (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -876,7 +918,7 @@ password string
   ""
   
 
-passwordPath string
+passwordPath (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -886,7 +928,7 @@ passwordPath string
   ""
   
 
-options string
+options (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -896,7 +938,7 @@ options string
   sslmode=disable
   
 
-debug bool
+debug (bool)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -909,7 +951,7 @@ debug bool
 Section: domains
 ================================================================================
 
-id string
+id (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -919,7 +961,7 @@ id string
   development
   
 
-name string
+name (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -932,7 +974,7 @@ name string
 Section: externalevents
 ================================================================================
 
-enable bool
+enable (bool)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -942,7 +984,7 @@ enable bool
   "false"
   
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -952,7 +994,7 @@ type string
   local
   
 
-aws `interfaces.AWSConfig`_
+aws (`interfaces.AWSConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -962,7 +1004,7 @@ aws `interfaces.AWSConfig`_
   region: ""
   
 
-gcp `interfaces.GCPConfig`_
+gcp (`interfaces.GCPConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -972,7 +1014,7 @@ gcp `interfaces.GCPConfig`_
   projectId: ""
   
 
-eventsPublisher `interfaces.EventsPublisherConfig`_
+eventsPublisher (`interfaces.EventsPublisherConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -983,7 +1025,7 @@ eventsPublisher `interfaces.EventsPublisherConfig`_
   topicName: ""
   
 
-reconnectAttempts int
+reconnectAttempts (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -993,7 +1035,7 @@ reconnectAttempts int
   "0"
   
 
-reconnectDelaySeconds int
+reconnectDelaySeconds (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1004,10 +1046,10 @@ reconnectDelaySeconds int
   
 
 interfaces.AWSConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+region (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1017,10 +1059,10 @@ region string
   
 
 interfaces.EventsPublisherConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-topicName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+topicName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1029,8 +1071,8 @@ topicName string
   ""
   
 
-eventTypes []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+eventTypes ([]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1040,10 +1082,10 @@ eventTypes []string
   
 
 interfaces.GCPConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-projectId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+projectId (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1055,7 +1097,7 @@ projectId string
 Section: flyteadmin
 ================================================================================
 
-roleNameKey string
+roleNameKey (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1065,7 +1107,7 @@ roleNameKey string
   ""
   
 
-metricsScope string
+metricsScope (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1075,7 +1117,7 @@ metricsScope string
   'flyte:'
   
 
-profilerPort int
+profilerPort (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1085,7 +1127,7 @@ profilerPort int
   "10254"
   
 
-metadataStoragePrefix []string
+metadataStoragePrefix ([]string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1096,7 +1138,7 @@ metadataStoragePrefix []string
   - admin
   
 
-eventVersion int
+eventVersion (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1106,7 +1148,7 @@ eventVersion int
   "1"
   
 
-asyncEventsBufferSize int
+asyncEventsBufferSize (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1119,10 +1161,10 @@ asyncEventsBufferSize int
 Section: logger
 ================================================================================
 
-show-source bool
+show-source (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Includes source code location in logs.
+Includes source code location in logs.
 
 **Default Value**: 
 
@@ -1131,10 +1173,10 @@ show-source bool
   "false"
   
 
-mute bool
+mute (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Mutes all logs regardless of severity. Intended for benchmarks/tests only.
+Mutes all logs regardless of severity. Intended for benchmarks/tests only.
 
 **Default Value**: 
 
@@ -1143,10 +1185,10 @@ mute bool
   "false"
   
 
-level int
+level (int)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the minimum logging level.
+Sets the minimum logging level.
 
 **Default Value**: 
 
@@ -1155,10 +1197,10 @@ level int
   "4"
   
 
-formatter `logger.FormatterConfig`_
+formatter (`logger.FormatterConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets logging format.
+Sets logging format.
 
 **Default Value**: 
 
@@ -1168,12 +1210,12 @@ formatter `logger.FormatterConfig`_
   
 
 logger.FormatterConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Sets logging format type.
+Sets logging format type.
 
 **Default Value**: 
 
@@ -1185,7 +1227,7 @@ type string
 Section: namespace_mapping
 ================================================================================
 
-mapping string
+mapping (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1195,7 +1237,7 @@ mapping string
   ""
   
 
-template string
+template (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1205,7 +1247,7 @@ template string
   '{{ project }}-{{ domain }}'
   
 
-templateData map[string]interfaces.DataSource
+templateData (map[string]interfaces.DataSource)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1218,7 +1260,7 @@ templateData map[string]interfaces.DataSource
 Section: notifications
 ================================================================================
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1228,7 +1270,7 @@ type string
   local
   
 
-region string
+region (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1238,7 +1280,7 @@ region string
   ""
   
 
-aws `interfaces.AWSConfig`_
+aws (`interfaces.AWSConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1248,7 +1290,7 @@ aws `interfaces.AWSConfig`_
   region: ""
   
 
-gcp `interfaces.GCPConfig`_
+gcp (`interfaces.GCPConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1258,7 +1300,7 @@ gcp `interfaces.GCPConfig`_
   projectId: ""
   
 
-publisher `interfaces.NotificationsPublisherConfig`_
+publisher (`interfaces.NotificationsPublisherConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1268,7 +1310,7 @@ publisher `interfaces.NotificationsPublisherConfig`_
   topicName: ""
   
 
-processor `interfaces.NotificationsProcessorConfig`_
+processor (`interfaces.NotificationsProcessorConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1279,7 +1321,7 @@ processor `interfaces.NotificationsProcessorConfig`_
   queueName: ""
   
 
-emailer `interfaces.NotificationsEmailerConfig`_
+emailer (`interfaces.NotificationsEmailerConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1295,7 +1337,7 @@ emailer `interfaces.NotificationsEmailerConfig`_
   subject: ""
   
 
-reconnectAttempts int
+reconnectAttempts (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1305,7 +1347,7 @@ reconnectAttempts int
   "0"
   
 
-reconnectDelaySeconds int
+reconnectDelaySeconds (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1316,10 +1358,10 @@ reconnectDelaySeconds int
   
 
 interfaces.NotificationsEmailerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-emailServerConfig `interfaces.EmailServerConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+emailServerConfig (`interfaces.EmailServerConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1330,8 +1372,8 @@ emailServerConfig `interfaces.EmailServerConfig`_
   serviceName: ""
   
 
-subject string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+subject (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1340,8 +1382,8 @@ subject string
   ""
   
 
-sender string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+sender (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1350,8 +1392,8 @@ sender string
   ""
   
 
-body string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+body (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1361,20 +1403,10 @@ body string
   
 
 interfaces.EmailServerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-serviceName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-apiKeyEnvVar string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+serviceName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1383,8 +1415,18 @@ apiKeyEnvVar string
   ""
   
 
-apiKeyFilePath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+apiKeyEnvVar (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+apiKeyFilePath (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1394,10 +1436,10 @@ apiKeyFilePath string
   
 
 interfaces.NotificationsProcessorConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-queueName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+queueName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1406,8 +1448,8 @@ queueName string
   ""
   
 
-accountId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+accountId (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1417,10 +1459,10 @@ accountId string
   
 
 interfaces.NotificationsPublisherConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-topicName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+topicName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1432,10 +1474,10 @@ topicName string
 Section: plugins
 ================================================================================
 
-enabled-plugins []string
+enabled-plugins ([]string)
 --------------------------------------------------------------------------------
 
-**Description**: List of enabled plugins, default value is to enable all plugins.
+List of enabled plugins, default value is to enable all plugins.
 
 **Default Value**: 
 
@@ -1444,7 +1486,7 @@ enabled-plugins []string
   - '*'
   
 
-catalogcache `catalog.Config`_
+catalogcache (`catalog.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1462,12 +1504,12 @@ catalogcache `catalog.Config`_
   
 
 catalog.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-reader `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+reader (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
-**Description**: Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
+Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
 **Default Value**: 
 
@@ -1478,10 +1520,10 @@ reader `workqueue.Config`_
   workers: 10
   
 
-writer `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+writer (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
-**Description**: Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
+Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
 **Default Value**: 
 
@@ -1493,12 +1535,12 @@ writer `workqueue.Config`_
   
 
 workqueue.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-workers int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+workers (int)
+--------------------------------------------------------------------------------
 
-**Description**: Number of concurrent workers to start processing the queue.
+Number of concurrent workers to start processing the queue.
 
 **Default Value**: 
 
@@ -1507,10 +1549,10 @@ workers int
   "10"
   
 
-maxRetries int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxRetries (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum number of retries per item.
+Maximum number of retries per item.
 
 **Default Value**: 
 
@@ -1519,10 +1561,10 @@ maxRetries int
   "3"
   
 
-maxItems int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxItems (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum number of entries to keep in the index.
+Maximum number of entries to keep in the index.
 
 **Default Value**: 
 
@@ -1534,7 +1576,7 @@ maxItems int
 Section: qualityofservice
 ================================================================================
 
-tierExecutionValues map[string]interfaces.QualityOfServiceSpec
+tierExecutionValues (map[string]interfaces.QualityOfServiceSpec)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1544,7 +1586,7 @@ tierExecutionValues map[string]interfaces.QualityOfServiceSpec
   {}
   
 
-defaultTiers map[string]string
+defaultTiers (map[string]string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1557,7 +1599,7 @@ defaultTiers map[string]string
 Section: queues
 ================================================================================
 
-executionQueues interfaces.ExecutionQueues
+executionQueues (interfaces.ExecutionQueues)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1567,7 +1609,7 @@ executionQueues interfaces.ExecutionQueues
   []
   
 
-workflowConfigs interfaces.WorkflowConfigs
+workflowConfigs (interfaces.WorkflowConfigs)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1580,7 +1622,7 @@ workflowConfigs interfaces.WorkflowConfigs
 Section: registration
 ================================================================================
 
-maxWorkflowNodes int
+maxWorkflowNodes (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1590,7 +1632,7 @@ maxWorkflowNodes int
   "100"
   
 
-maxLabelEntries int
+maxLabelEntries (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1600,7 +1642,7 @@ maxLabelEntries int
   "0"
   
 
-maxAnnotationEntries int
+maxAnnotationEntries (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1610,7 +1652,7 @@ maxAnnotationEntries int
   "0"
   
 
-workflowSizeLimit string
+workflowSizeLimit (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1623,7 +1665,7 @@ workflowSizeLimit string
 Section: remotedata
 ================================================================================
 
-scheme string
+scheme (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1633,7 +1675,7 @@ scheme string
   none
   
 
-region string
+region (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1643,7 +1685,7 @@ region string
   ""
   
 
-signedUrls `interfaces.SignedURL`_
+signedUrls (`interfaces.SignedURL`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1654,7 +1696,7 @@ signedUrls `interfaces.SignedURL`_
   signingPrincipal: ""
   
 
-maxSizeInBytes int64
+maxSizeInBytes (int64)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1665,10 +1707,10 @@ maxSizeInBytes int64
   
 
 interfaces.SignedURL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-durationMinutes int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+durationMinutes (int)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1677,8 +1719,8 @@ durationMinutes int
   "0"
   
 
-signingPrincipal string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+signingPrincipal (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1690,7 +1732,7 @@ signingPrincipal string
 Section: scheduler
 ================================================================================
 
-eventScheduler `interfaces.EventSchedulerConfig`_
+eventScheduler (`interfaces.EventSchedulerConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1706,7 +1748,7 @@ eventScheduler `interfaces.EventSchedulerConfig`_
   targetName: ""
   
 
-workflowExecutor `interfaces.WorkflowExecutorConfig`_
+workflowExecutor (`interfaces.WorkflowExecutorConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1724,7 +1766,7 @@ workflowExecutor `interfaces.WorkflowExecutorConfig`_
   scheme: local
   
 
-reconnectAttempts int
+reconnectAttempts (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1734,7 +1776,7 @@ reconnectAttempts int
   "0"
   
 
-reconnectDelaySeconds int
+reconnectDelaySeconds (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -1745,10 +1787,10 @@ reconnectDelaySeconds int
   
 
 interfaces.EventSchedulerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-scheme string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheme (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1757,8 +1799,8 @@ scheme string
   local
   
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+region (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1767,8 +1809,8 @@ region string
   ""
   
 
-scheduleRole string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheduleRole (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1777,8 +1819,8 @@ scheduleRole string
   ""
   
 
-targetName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+targetName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1787,8 +1829,8 @@ targetName string
   ""
   
 
-scheduleNamePrefix string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheduleNamePrefix (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1797,8 +1839,8 @@ scheduleNamePrefix string
   ""
   
 
-aws interfaces.AWSSchedulerConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+aws (interfaces.AWSSchedulerConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1807,8 +1849,8 @@ aws interfaces.AWSSchedulerConfig
   null
   
 
-local `interfaces.FlyteSchedulerConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+local (`interfaces.FlyteSchedulerConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1818,13 +1860,13 @@ local `interfaces.FlyteSchedulerConfig`_
   
 
 interfaces.FlyteSchedulerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
 interfaces.WorkflowExecutorConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-scheme string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheme (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1833,8 +1875,8 @@ scheme string
   local
   
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+region (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1843,8 +1885,8 @@ region string
   ""
   
 
-scheduleQueueName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheduleQueueName (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1853,8 +1895,8 @@ scheduleQueueName string
   ""
   
 
-accountId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+accountId (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1863,8 +1905,8 @@ accountId string
   ""
   
 
-aws interfaces.AWSWorkflowExecutorConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+aws (interfaces.AWSWorkflowExecutorConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1873,8 +1915,8 @@ aws interfaces.AWSWorkflowExecutorConfig
   null
   
 
-local `interfaces.FlyteWorkflowExecutorConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+local (`interfaces.FlyteWorkflowExecutorConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1886,10 +1928,10 @@ local `interfaces.FlyteWorkflowExecutorConfig`_
   
 
 interfaces.FlyteWorkflowExecutorConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-adminRateLimit `interfaces.AdminRateLimit`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+adminRateLimit (`interfaces.AdminRateLimit`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1900,10 +1942,10 @@ adminRateLimit `interfaces.AdminRateLimit`_
   
 
 interfaces.AdminRateLimit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-tps float64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+tps (float64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1912,8 +1954,8 @@ tps float64
   "100"
   
 
-burst int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+burst (int)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1925,10 +1967,10 @@ burst int
 Section: secrets
 ================================================================================
 
-secrets-prefix string
+secrets-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: Prefix where to look for secrets file
+Prefix where to look for secrets file
 
 **Default Value**: 
 
@@ -1937,10 +1979,10 @@ secrets-prefix string
   /etc/secrets
   
 
-env-prefix string
+env-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: Prefix for environment variables
+Prefix for environment variables
 
 **Default Value**: 
 
@@ -1952,10 +1994,10 @@ env-prefix string
 Section: server
 ================================================================================
 
-httpPort int
+httpPort (int)
 --------------------------------------------------------------------------------
 
-**Description**: On which http port to serve admin
+On which http port to serve admin
 
 **Default Value**: 
 
@@ -1964,10 +2006,10 @@ httpPort int
   "0"
   
 
-grpcPort int
+grpcPort (int)
 --------------------------------------------------------------------------------
 
-**Description**: On which grpc port to serve admin
+On which grpc port to serve admin
 
 **Default Value**: 
 
@@ -1976,10 +2018,10 @@ grpcPort int
   "0"
   
 
-grpcServerReflection bool
+grpcServerReflection (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Enable GRPC Server Reflection
+Enable GRPC Server Reflection
 
 **Default Value**: 
 
@@ -1988,10 +2030,10 @@ grpcServerReflection bool
   "false"
   
 
-kube-config string
+kube-config (string)
 --------------------------------------------------------------------------------
 
-**Description**: Path to kubernetes client config file.
+Path to kubernetes client config file.
 
 **Default Value**: 
 
@@ -2000,10 +2042,10 @@ kube-config string
   ""
   
 
-master string
+master (string)
 --------------------------------------------------------------------------------
 
-**Description**: The address of the Kubernetes API server.
+The address of the Kubernetes API server.
 
 **Default Value**: 
 
@@ -2012,7 +2054,7 @@ master string
   ""
   
 
-security `config.ServerSecurityOptions`_
+security (`config.ServerSecurityOptions`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2030,10 +2072,10 @@ security `config.ServerSecurityOptions`_
   useAuth: false
   
 
-thirdPartyConfig `config.ThirdPartyConfigOptions`_
+thirdPartyConfig (`config.ThirdPartyConfigOptions`_)
 --------------------------------------------------------------------------------
 
-**Description**: Deprecated please use auth.appAuth.thirdPartyConfig instead.
+Deprecated please use auth.appAuth.thirdPartyConfig instead.
 
 **Default Value**: 
 
@@ -2046,10 +2088,10 @@ thirdPartyConfig `config.ThirdPartyConfigOptions`_
   
 
 config.ServerSecurityOptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-secure bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+secure (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2058,8 +2100,8 @@ secure bool
   "false"
   
 
-ssl `config.SslOptions`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ssl (`config.SslOptions`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2069,8 +2111,8 @@ ssl `config.SslOptions`_
   keyFile: ""
   
 
-useAuth bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+useAuth (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2079,8 +2121,8 @@ useAuth bool
   "false"
   
 
-auditAccess bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+auditAccess (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2089,8 +2131,8 @@ auditAccess bool
   "false"
   
 
-allowCors bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+allowCors (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2099,8 +2141,8 @@ allowCors bool
   "false"
   
 
-allowedOrigins []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+allowedOrigins ([]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2109,8 +2151,8 @@ allowedOrigins []string
   []
   
 
-allowedHeaders []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+allowedHeaders ([]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2120,10 +2162,10 @@ allowedHeaders []string
   
 
 config.SslOptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-certificateFile string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+certificateFile (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2132,8 +2174,8 @@ certificateFile string
   ""
   
 
-keyFile string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+keyFile (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2145,10 +2187,10 @@ keyFile string
 Section: storage
 ================================================================================
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the type of storage to configure [s3/minio/local/mem/stow].
+Sets the type of storage to configure [s3/minio/local/mem/stow].
 
 **Default Value**: 
 
@@ -2157,7 +2199,7 @@ type string
   s3
   
 
-connection `storage.ConnectionConfig`_
+connection (`storage.ConnectionConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2172,10 +2214,10 @@ connection `storage.ConnectionConfig`_
   secret-key: ""
   
 
-stow `storage.StowConfig`_
+stow (`storage.StowConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Storage config for stow backend.
+Storage config for stow backend.
 
 **Default Value**: 
 
@@ -2184,10 +2226,10 @@ stow `storage.StowConfig`_
   {}
   
 
-container string
+container (string)
 --------------------------------------------------------------------------------
 
-**Description**: Initial container (in s3 a bucket) to create -if it doesn't exist-.'
+Initial container (in s3 a bucket) to create -if it doesn't exist-.'
 
 **Default Value**: 
 
@@ -2196,10 +2238,10 @@ container string
   ""
   
 
-enable-multicontainer bool
+enable-multicontainer (bool)
 --------------------------------------------------------------------------------
 
-**Description**: If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
+If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
 
 **Default Value**: 
 
@@ -2208,7 +2250,7 @@ enable-multicontainer bool
   "false"
   
 
-cache `storage.CachingConfig`_
+cache (`storage.CachingConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2219,10 +2261,10 @@ cache `storage.CachingConfig`_
   target_gc_percent: 0
   
 
-limits `storage.LimitsConfig`_
+limits (`storage.LimitsConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets limits for stores.
+Sets limits for stores.
 
 **Default Value**: 
 
@@ -2231,10 +2273,10 @@ limits `storage.LimitsConfig`_
   maxDownloadMBs: 2
   
 
-defaultHttpClient `storage.HTTPClientConfig`_
+defaultHttpClient (`storage.HTTPClientConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the default http client config.
+Sets the default http client config.
 
 **Default Value**: 
 
@@ -2245,12 +2287,12 @@ defaultHttpClient `storage.HTTPClientConfig`_
   
 
 storage.CachingConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-max_size_mbs int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+max_size_mbs (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used
+Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used
 
 **Default Value**: 
 
@@ -2259,10 +2301,10 @@ max_size_mbs int
   "0"
   
 
-target_gc_percent int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+target_gc_percent (int)
+--------------------------------------------------------------------------------
 
-**Description**: Sets the garbage collection target percentage.
+Sets the garbage collection target percentage.
 
 **Default Value**: 
 
@@ -2272,12 +2314,12 @@ target_gc_percent int
   
 
 storage.ConnectionConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-endpoint `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+endpoint (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: URL for storage client to connect to.
+URL for storage client to connect to.
 
 **Default Value**: 
 
@@ -2286,10 +2328,10 @@ endpoint `config.URL`_
   ""
   
 
-auth-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+auth-type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Auth Type to use [iam,accesskey].
+Auth Type to use [iam,accesskey].
 
 **Default Value**: 
 
@@ -2298,22 +2340,10 @@ auth-type string
   iam
   
 
-access-key string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+access-key (string)
+--------------------------------------------------------------------------------
 
-**Description**: Access key to use. Only required when authtype is set to accesskey.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-secret-key string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Secret to use when accesskey is set.
+Access key to use. Only required when authtype is set to accesskey.
 
 **Default Value**: 
 
@@ -2322,10 +2352,22 @@ secret-key string
   ""
   
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+secret-key (string)
+--------------------------------------------------------------------------------
 
-**Description**: Region to connect to.
+Secret to use when accesskey is set.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+region (string)
+--------------------------------------------------------------------------------
+
+Region to connect to.
 
 **Default Value**: 
 
@@ -2334,10 +2376,10 @@ region string
   us-east-1
   
 
-disable-ssl bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+disable-ssl (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Disables SSL connection. Should only be used for development.
+Disables SSL connection. Should only be used for development.
 
 **Default Value**: 
 
@@ -2347,10 +2389,10 @@ disable-ssl bool
   
 
 storage.HTTPClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-headers map[string][]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+headers (map[string][]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2359,10 +2401,10 @@ headers map[string][]string
   null
   
 
-timeout `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Sets time out on the http client.
+Sets time out on the http client.
 
 **Default Value**: 
 
@@ -2372,12 +2414,12 @@ timeout `config.Duration`_
   
 
 storage.LimitsConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-maxDownloadMBs int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxDownloadMBs (int64)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum allowed download size (in MBs) per call.
+Maximum allowed download size (in MBs) per call.
 
 **Default Value**: 
 
@@ -2387,12 +2429,12 @@ maxDownloadMBs int64
   
 
 storage.StowConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-kind string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kind (string)
+--------------------------------------------------------------------------------
 
-**Description**: Kind of Stow backend to use. Refer to github/graymeta/stow
+Kind of Stow backend to use. Refer to github/graymeta/stow
 
 **Default Value**: 
 
@@ -2401,10 +2443,10 @@ kind string
   ""
   
 
-config map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+config (map[string]string)
+--------------------------------------------------------------------------------
 
-**Description**: Configuration for stow backend. Refer to github/graymeta/stow
+Configuration for stow backend. Refer to github/graymeta/stow
 
 **Default Value**: 
 
@@ -2416,7 +2458,7 @@ config map[string]string
 Section: task_resources
 ================================================================================
 
-defaults `interfaces.TaskResourceSet`_
+defaults (`interfaces.TaskResourceSet`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2430,7 +2472,7 @@ defaults `interfaces.TaskResourceSet`_
   storage: "0"
   
 
-limits `interfaces.TaskResourceSet`_
+limits (`interfaces.TaskResourceSet`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2445,20 +2487,10 @@ limits `interfaces.TaskResourceSet`_
   
 
 interfaces.TaskResourceSet
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-cpu `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
-gpu `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cpu (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2467,8 +2499,8 @@ gpu `resource.Quantity`_
   "0"
   
 
-memory `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+gpu (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2477,8 +2509,8 @@ memory `resource.Quantity`_
   "0"
   
 
-storage `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+memory (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2487,8 +2519,18 @@ storage `resource.Quantity`_
   "0"
   
 
-ephemeralStorage `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+storage (`resource.Quantity`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+ephemeralStorage (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2498,10 +2540,10 @@ ephemeralStorage `resource.Quantity`_
   
 
 resource.Quantity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-i `resource.int64Amount`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+i (`resource.int64Amount`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2510,8 +2552,8 @@ i `resource.int64Amount`_
   {}
   
 
-d `resource.infDecAmount`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+d (`resource.infDecAmount`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2520,8 +2562,8 @@ d `resource.infDecAmount`_
   <nil>
   
 
-s string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+s (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2530,8 +2572,8 @@ s string
   ""
   
 
-Format string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Format (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2541,10 +2583,10 @@ Format string
   
 
 resource.infDecAmount
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Dec inf.Dec
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Dec (inf.Dec)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2554,10 +2596,10 @@ Dec inf.Dec
   
 
 resource.int64Amount
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-value int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+value (int64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2566,8 +2608,8 @@ value int64
   "0"
   
 
-scale int32
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scale (int32)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 

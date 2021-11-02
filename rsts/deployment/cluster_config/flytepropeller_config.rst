@@ -4,13 +4,33 @@
 Flyte Propeller Configuration
 #########################################
 
+- `admin <#section-admin>`_
+
+- `catalog-cache <#section-catalog-cache>`_
+
+- `event <#section-event>`_
+
+- `logger <#section-logger>`_
+
+- `plugins <#section-plugins>`_
+
+- `propeller <#section-propeller>`_
+
+- `secrets <#section-secrets>`_
+
+- `storage <#section-storage>`_
+
+- `tasks <#section-tasks>`_
+
+- `webhook <#section-webhook>`_
+
 Section: admin
 ================================================================================
 
-endpoint `config.URL`_
+endpoint (`config.URL`_)
 --------------------------------------------------------------------------------
 
-**Description**: For admin types, specify where the uri of the service is located.
+For admin types, specify where the uri of the service is located.
 
 **Default Value**: 
 
@@ -19,10 +39,10 @@ endpoint `config.URL`_
   ""
   
 
-insecure bool
+insecure (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Use insecure connection.
+Use insecure connection.
 
 **Default Value**: 
 
@@ -31,10 +51,10 @@ insecure bool
   "false"
   
 
-insecureSkipVerify bool
+insecureSkipVerify (bool)
 --------------------------------------------------------------------------------
 
-**Description**: InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
+InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
 
 **Default Value**: 
 
@@ -43,10 +63,10 @@ insecureSkipVerify bool
   "false"
   
 
-maxBackoffDelay `config.Duration`_
+maxBackoffDelay (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: Max delay for grpc backoff
+Max delay for grpc backoff
 
 **Default Value**: 
 
@@ -55,10 +75,10 @@ maxBackoffDelay `config.Duration`_
   8s
   
 
-perRetryTimeout `config.Duration`_
+perRetryTimeout (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: gRPC per retry timeout
+gRPC per retry timeout
 
 **Default Value**: 
 
@@ -67,10 +87,10 @@ perRetryTimeout `config.Duration`_
   15s
   
 
-maxRetries int
+maxRetries (int)
 --------------------------------------------------------------------------------
 
-**Description**: Max number of gRPC retries
+Max number of gRPC retries
 
 **Default Value**: 
 
@@ -79,7 +99,7 @@ maxRetries int
   "4"
   
 
-authType uint8
+authType (uint8)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -89,10 +109,10 @@ authType uint8
   ClientSecret
   
 
-useAuth bool
+useAuth (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
+Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
 
 **Default Value**: 
 
@@ -101,10 +121,10 @@ useAuth bool
   "false"
   
 
-clientId string
+clientId (string)
 --------------------------------------------------------------------------------
 
-**Description**: Client ID
+Client ID
 
 **Default Value**: 
 
@@ -113,10 +133,10 @@ clientId string
   flytepropeller
   
 
-clientSecretLocation string
+clientSecretLocation (string)
 --------------------------------------------------------------------------------
 
-**Description**: File containing the client secret
+File containing the client secret
 
 **Default Value**: 
 
@@ -125,10 +145,10 @@ clientSecretLocation string
   /etc/secrets/client_secret
   
 
-scopes []string
+scopes ([]string)
 --------------------------------------------------------------------------------
 
-**Description**: List of scopes to request
+List of scopes to request
 
 **Default Value**: 
 
@@ -137,10 +157,10 @@ scopes []string
   []
   
 
-authorizationServerUrl string
+authorizationServerUrl (string)
 --------------------------------------------------------------------------------
 
-**Description**: This is the URL to your IdP's authorization server. It'll default to Endpoint
+This is the URL to your IdP's authorization server. It'll default to Endpoint
 
 **Default Value**: 
 
@@ -149,10 +169,10 @@ authorizationServerUrl string
   ""
   
 
-tokenUrl string
+tokenUrl (string)
 --------------------------------------------------------------------------------
 
-**Description**: OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
+OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
 
 **Default Value**: 
 
@@ -161,10 +181,10 @@ tokenUrl string
   ""
   
 
-authorizationHeader string
+authorizationHeader (string)
 --------------------------------------------------------------------------------
 
-**Description**: Custom metadata header to pass JWT
+Custom metadata header to pass JWT
 
 **Default Value**: 
 
@@ -173,10 +193,10 @@ authorizationHeader string
   ""
   
 
-pkceConfig `pkce.Config`_
+pkceConfig (`pkce.Config`_)
 --------------------------------------------------------------------------------
 
-**Description**: Config for Pkce authentication flow.
+Config for Pkce authentication flow.
 
 **Default Value**: 
 
@@ -186,10 +206,10 @@ pkceConfig `pkce.Config`_
   timeout: 15s
   
 
-command []string
+command ([]string)
 --------------------------------------------------------------------------------
 
-**Description**: Command for external authentication token generation
+Command for external authentication token generation
 
 **Default Value**: 
 
@@ -199,10 +219,10 @@ command []string
   
 
 config.Duration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Duration int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Duration (int64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -212,10 +232,10 @@ Duration int64
   
 
 config.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-URL `url.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+URL (`url.URL`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -234,20 +254,10 @@ URL `url.URL`_
   
 
 url.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Scheme string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Opaque string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Scheme (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -256,8 +266,18 @@ Opaque string
   ""
   
 
-User url.Userinfo
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Opaque (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+User (url.Userinfo)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -266,8 +286,8 @@ User url.Userinfo
   null
   
 
-Host string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Host (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -276,8 +296,8 @@ Host string
   ""
   
 
-Path string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Path (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -286,8 +306,8 @@ Path string
   ""
   
 
-RawPath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawPath (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -296,8 +316,8 @@ RawPath string
   ""
   
 
-ForceQuery bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ForceQuery (bool)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -306,8 +326,8 @@ ForceQuery bool
   "false"
   
 
-RawQuery string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawQuery (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -316,8 +336,8 @@ RawQuery string
   ""
   
 
-Fragment string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Fragment (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -326,8 +346,8 @@ Fragment string
   ""
   
 
-RawFragment string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+RawFragment (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -337,10 +357,10 @@ RawFragment string
   
 
 pkce.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-timeout `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -349,8 +369,8 @@ timeout `config.Duration`_
   15s
   
 
-refreshTime `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+refreshTime (`config.Duration`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -362,10 +382,10 @@ refreshTime `config.Duration`_
 Section: catalog-cache
 ================================================================================
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
-**Description**: Catalog Implementation to use
+Catalog Implementation to use
 
 **Default Value**: 
 
@@ -374,10 +394,10 @@ type string
   noop
   
 
-endpoint string
+endpoint (string)
 --------------------------------------------------------------------------------
 
-**Description**: Endpoint for catalog service
+Endpoint for catalog service
 
 **Default Value**: 
 
@@ -386,10 +406,10 @@ endpoint string
   ""
   
 
-insecure bool
+insecure (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Use insecure grpc connection
+Use insecure grpc connection
 
 **Default Value**: 
 
@@ -398,10 +418,10 @@ insecure bool
   "false"
   
 
-max-cache-age `config.Duration`_
+max-cache-age (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: Cache entries past this age will incur cache miss. 0 means cache never expires
+Cache entries past this age will incur cache miss. 0 means cache never expires
 
 **Default Value**: 
 
@@ -413,10 +433,10 @@ max-cache-age `config.Duration`_
 Section: event
 ================================================================================
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the type of EventSink to configure [log/admin/file].
+Sets the type of EventSink to configure [log/admin/file].
 
 **Default Value**: 
 
@@ -425,10 +445,10 @@ type string
   ""
   
 
-file-path string
+file-path (string)
 --------------------------------------------------------------------------------
 
-**Description**: For file types, specify where the file should be located.
+For file types, specify where the file should be located.
 
 **Default Value**: 
 
@@ -437,10 +457,10 @@ file-path string
   ""
   
 
-rate int64
+rate (int64)
 --------------------------------------------------------------------------------
 
-**Description**: Max rate at which events can be recorded per second.
+Max rate at which events can be recorded per second.
 
 **Default Value**: 
 
@@ -449,10 +469,10 @@ rate int64
   "500"
   
 
-capacity int
+capacity (int)
 --------------------------------------------------------------------------------
 
-**Description**: The max bucket size for event recording tokens.
+The max bucket size for event recording tokens.
 
 **Default Value**: 
 
@@ -464,10 +484,10 @@ capacity int
 Section: logger
 ================================================================================
 
-show-source bool
+show-source (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Includes source code location in logs.
+Includes source code location in logs.
 
 **Default Value**: 
 
@@ -476,10 +496,10 @@ show-source bool
   "false"
   
 
-mute bool
+mute (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Mutes all logs regardless of severity. Intended for benchmarks/tests only.
+Mutes all logs regardless of severity. Intended for benchmarks/tests only.
 
 **Default Value**: 
 
@@ -488,10 +508,10 @@ mute bool
   "false"
   
 
-level int
+level (int)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the minimum logging level.
+Sets the minimum logging level.
 
 **Default Value**: 
 
@@ -500,10 +520,10 @@ level int
   "4"
   
 
-formatter `logger.FormatterConfig`_
+formatter (`logger.FormatterConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets logging format.
+Sets logging format.
 
 **Default Value**: 
 
@@ -513,12 +533,12 @@ formatter `logger.FormatterConfig`_
   
 
 logger.FormatterConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Sets logging format type.
+Sets logging format type.
 
 **Default Value**: 
 
@@ -530,10 +550,10 @@ type string
 Section: plugins
 ================================================================================
 
-enabled-plugins []string
+enabled-plugins ([]string)
 --------------------------------------------------------------------------------
 
-**Description**: List of enabled plugins, default value is to enable all plugins.
+List of enabled plugins, default value is to enable all plugins.
 
 **Default Value**: 
 
@@ -542,7 +562,7 @@ enabled-plugins []string
   - '*'
   
 
-athena `athena.Config`_
+athena (`athena.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -573,7 +593,7 @@ athena `athena.Config`_
       qps: 10
   
 
-aws `aws.Config`_
+aws (`aws.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -586,7 +606,7 @@ aws `aws.Config`_
   retries: 3
   
 
-catalogcache `catalog.Config`_
+catalogcache (`catalog.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -603,7 +623,7 @@ catalogcache `catalog.Config`_
     workers: 10
   
 
-k8s `config.K8sPluginConfig`_
+k8s (`config.K8sPluginConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -642,7 +662,7 @@ k8s `config.K8sPluginConfig`_
   scheduler-name: ""
   
 
-k8s-array `k8s.Config`_
+k8s-array (`k8s.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -690,7 +710,7 @@ k8s-array `k8s.Config`_
   tolerations: null
   
 
-logs `logs.LogConfig`_
+logs (`logs.LogConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -711,7 +731,7 @@ logs `logs.LogConfig`_
   templates: null
   
 
-qubole `config.Config`_
+qubole (`config.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -735,7 +755,7 @@ qubole `config.Config`_
   workers: 15
   
 
-sagemaker `config.Config (sagemaker)`_
+sagemaker (`config.Config (sagemaker)`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -754,7 +774,7 @@ sagemaker `config.Config (sagemaker)`_
   roleArn: default_role
   
 
-snowflake `snowflake.Config`_
+snowflake (`snowflake.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -785,7 +805,7 @@ snowflake `snowflake.Config`_
       qps: 10
   
 
-spark `spark.Config`_
+spark (`spark.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -852,12 +872,12 @@ spark `spark.Config`_
   
 
 athena.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-webApi `webapi.PluginConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+webApi (`webapi.PluginConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines config for the base WebAPI plugin.
+Defines config for the base WebAPI plugin.
 
 **Default Value**: 
 
@@ -879,8 +899,8 @@ webApi `webapi.PluginConfig`_
     qps: 10
   
 
-resourceConstraints `core.ResourceConstraintsSpec`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -892,10 +912,10 @@ resourceConstraints `core.ResourceConstraintsSpec`_
     Value: 100
   
 
-defaultWorkGroup string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+defaultWorkGroup (string)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the default workgroup to use when running on Athena unless overwritten by the task.
+Defines the default workgroup to use when running on Athena unless overwritten by the task.
 
 **Default Value**: 
 
@@ -904,10 +924,10 @@ defaultWorkGroup string
   primary
   
 
-defaultCatalog string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+defaultCatalog (string)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the default catalog to use when running on Athena unless overwritten by the task.
+Defines the default catalog to use when running on Athena unless overwritten by the task.
 
 **Default Value**: 
 
@@ -917,10 +937,10 @@ defaultCatalog string
   
 
 core.ResourceConstraintsSpec
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-ProjectScopeResourceConstraint `core.ResourceConstraint`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ProjectScopeResourceConstraint (`core.ResourceConstraint`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -929,8 +949,8 @@ ProjectScopeResourceConstraint `core.ResourceConstraint`_
   Value: 100
   
 
-NamespaceScopeResourceConstraint `core.ResourceConstraint`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+NamespaceScopeResourceConstraint (`core.ResourceConstraint`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -940,10 +960,10 @@ NamespaceScopeResourceConstraint `core.ResourceConstraint`_
   
 
 core.ResourceConstraint
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Value int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Value (int64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -953,10 +973,10 @@ Value int64
   
 
 webapi.PluginConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-resourceQuotas webapi.ResourceQuotas
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceQuotas (webapi.ResourceQuotas)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -965,23 +985,10 @@ resourceQuotas webapi.ResourceQuotas
   default: 1000
   
 
-readRateLimiter `webapi.RateLimiterConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+readRateLimiter (`webapi.RateLimiterConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines rate limiter properties for read actions (e.g. retrieve status).
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  burst: 100
-  qps: 10
-  
-
-writeRateLimiter `webapi.RateLimiterConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Defines rate limiter properties for write actions.
+Defines rate limiter properties for read actions (e.g. retrieve status).
 
 **Default Value**: 
 
@@ -991,10 +998,23 @@ writeRateLimiter `webapi.RateLimiterConfig`_
   qps: 10
   
 
-caching `webapi.CachingConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+writeRateLimiter (`webapi.RateLimiterConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines caching characteristics.
+Defines rate limiter properties for write actions.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 100
+  qps: 10
+  
+
+caching (`webapi.CachingConfig`_)
+--------------------------------------------------------------------------------
+
+Defines caching characteristics.
 
 **Default Value**: 
 
@@ -1006,8 +1026,8 @@ caching `webapi.CachingConfig`_
   workers: 10
   
 
-resourceMeta interface
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceMeta (interface)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1017,12 +1037,12 @@ resourceMeta interface
   
 
 webapi.CachingConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-size int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+size (int)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the maximum number of items to cache.
+Defines the maximum number of items to cache.
 
 **Default Value**: 
 
@@ -1031,10 +1051,10 @@ size int
   "500000"
   
 
-resyncInterval `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resyncInterval (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the sync interval.
+Defines the sync interval.
 
 **Default Value**: 
 
@@ -1043,10 +1063,10 @@ resyncInterval `config.Duration`_
   30s
   
 
-workers int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+workers (int)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the number of workers to start up to process items.
+Defines the number of workers to start up to process items.
 
 **Default Value**: 
 
@@ -1055,10 +1075,10 @@ workers int
   "10"
   
 
-maxSystemFailures int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxSystemFailures (int)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the number of failures to fetch a task before failing the task.
+Defines the number of failures to fetch a task before failing the task.
 
 **Default Value**: 
 
@@ -1068,12 +1088,12 @@ maxSystemFailures int
   
 
 webapi.RateLimiterConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-qps int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+qps (int)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the max rate of calls per second.
+Defines the max rate of calls per second.
 
 **Default Value**: 
 
@@ -1082,10 +1102,10 @@ qps int
   "10"
   
 
-burst int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+burst (int)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the maximum burst size.
+Defines the maximum burst size.
 
 **Default Value**: 
 
@@ -1095,12 +1115,12 @@ burst int
   
 
 aws.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+region (string)
+--------------------------------------------------------------------------------
 
-**Description**: AWS Region to connect to.
+AWS Region to connect to.
 
 **Default Value**: 
 
@@ -1109,10 +1129,10 @@ region string
   us-east-2
   
 
-accountId string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+accountId (string)
+--------------------------------------------------------------------------------
 
-**Description**: AWS Account Identifier.
+AWS Account Identifier.
 
 **Default Value**: 
 
@@ -1121,10 +1141,10 @@ accountId string
   ""
   
 
-retries int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+retries (int)
+--------------------------------------------------------------------------------
 
-**Description**: Number of retries.
+Number of retries.
 
 **Default Value**: 
 
@@ -1133,8 +1153,8 @@ retries int
   "3"
   
 
-logLevel uint64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+logLevel (uint64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1144,12 +1164,12 @@ logLevel uint64
   
 
 catalog.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-reader `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+reader (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
-**Description**: Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
+Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
 **Default Value**: 
 
@@ -1160,10 +1180,10 @@ reader `workqueue.Config`_
   workers: 10
   
 
-writer `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+writer (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
-**Description**: Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
+Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
 **Default Value**: 
 
@@ -1175,12 +1195,12 @@ writer `workqueue.Config`_
   
 
 workqueue.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-workers int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+workers (int)
+--------------------------------------------------------------------------------
 
-**Description**: Number of concurrent workers to start processing the queue.
+Number of concurrent workers to start processing the queue.
 
 **Default Value**: 
 
@@ -1189,10 +1209,10 @@ workers int
   "10"
   
 
-maxRetries int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxRetries (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum number of retries per item.
+Maximum number of retries per item.
 
 **Default Value**: 
 
@@ -1201,10 +1221,10 @@ maxRetries int
   "3"
   
 
-maxItems int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxItems (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum number of entries to keep in the index.
+Maximum number of entries to keep in the index.
 
 **Default Value**: 
 
@@ -1214,12 +1234,12 @@ maxItems int
   
 
 config.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-endpoint `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+endpoint (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: Endpoint for qubole to use
+Endpoint for qubole to use
 
 **Default Value**: 
 
@@ -1228,10 +1248,10 @@ endpoint `config.URL`_
   https://wellness.qubole.com
   
 
-commandApiPath `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+commandApiPath (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: API Path where commands can be launched on Qubole. Should be a valid url.
+API Path where commands can be launched on Qubole. Should be a valid url.
 
 **Default Value**: 
 
@@ -1240,10 +1260,10 @@ commandApiPath `config.URL`_
   /api/v1.2/commands/
   
 
-analyzeLinkPath `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+analyzeLinkPath (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: URL path where queries can be visualized on qubole website. Should be a valid url.
+URL path where queries can be visualized on qubole website. Should be a valid url.
 
 **Default Value**: 
 
@@ -1252,10 +1272,10 @@ analyzeLinkPath `config.URL`_
   /v2/analyze
   
 
-quboleTokenKey string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+quboleTokenKey (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the key where to find Qubole token in the secret manager.
+Name of the key where to find Qubole token in the secret manager.
 
 **Default Value**: 
 
@@ -1264,10 +1284,10 @@ quboleTokenKey string
   FLYTE_QUBOLE_CLIENT_TOKEN
   
 
-lruCacheSize int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lruCacheSize (int)
+--------------------------------------------------------------------------------
 
-**Description**: Size of the AutoRefreshCache
+Size of the AutoRefreshCache
 
 **Default Value**: 
 
@@ -1276,10 +1296,10 @@ lruCacheSize int
   "2000"
   
 
-workers int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+workers (int)
+--------------------------------------------------------------------------------
 
-**Description**: Number of parallel workers to refresh the cache
+Number of parallel workers to refresh the cache
 
 **Default Value**: 
 
@@ -1288,10 +1308,10 @@ workers int
   "15"
   
 
-defaultClusterLabel string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+defaultClusterLabel (string)
+--------------------------------------------------------------------------------
 
-**Description**: The default cluster label. This will be used if label is not specified on the hive job.
+The default cluster label. This will be used if label is not specified on the hive job.
 
 **Default Value**: 
 
@@ -1300,8 +1320,8 @@ defaultClusterLabel string
   default
   
 
-clusterConfigs []config.ClusterConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+clusterConfigs ([]config.ClusterConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1315,8 +1335,8 @@ clusterConfigs []config.ClusterConfig
     projectScopeQuotaProportionCap: 0.7
   
 
-destinationClusterConfigs []config.DestinationClusterConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+destinationClusterConfigs ([]config.DestinationClusterConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1326,12 +1346,12 @@ destinationClusterConfigs []config.DestinationClusterConfig
   
 
 config.Config (sagemaker)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-roleArn string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+roleArn (string)
+--------------------------------------------------------------------------------
 
-**Description**: The role the SageMaker plugin uses to communicate with the SageMaker service
+The role the SageMaker plugin uses to communicate with the SageMaker service
 
 **Default Value**: 
 
@@ -1340,10 +1360,10 @@ roleArn string
   default_role
   
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+region (string)
+--------------------------------------------------------------------------------
 
-**Description**: The AWS region the SageMaker plugin communicates to
+The AWS region the SageMaker plugin communicates to
 
 **Default Value**: 
 
@@ -1352,10 +1372,10 @@ region string
   us-east-1
   
 
-roleAnnotationKey string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+roleAnnotationKey (string)
+--------------------------------------------------------------------------------
 
-**Description**: Map key to use to lookup role from task annotations.
+Map key to use to lookup role from task annotations.
 
 **Default Value**: 
 
@@ -1364,8 +1384,8 @@ roleAnnotationKey string
   ""
   
 
-prebuiltAlgorithms []config.PrebuiltAlgorithmConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+prebuiltAlgorithms ([]config.PrebuiltAlgorithmConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1380,12 +1400,12 @@ prebuiltAlgorithms []config.PrebuiltAlgorithmConfig
   
 
 config.K8sPluginConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-inject-finalizer bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+inject-finalizer (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Instructs the plugin to inject a finalizer on startTask and remove it on task termination.
+Instructs the plugin to inject a finalizer on startTask and remove it on task termination.
 
 **Default Value**: 
 
@@ -1394,8 +1414,8 @@ inject-finalizer bool
   "false"
   
 
-default-annotations map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-annotations (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1404,8 +1424,8 @@ default-annotations map[string]string
   cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   
 
-default-labels map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-labels (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1414,8 +1434,8 @@ default-labels map[string]string
   null
   
 
-default-env-vars map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-env-vars (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1424,8 +1444,8 @@ default-env-vars map[string]string
   null
   
 
-default-env-vars-from-env map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-env-vars-from-env (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1434,10 +1454,10 @@ default-env-vars-from-env map[string]string
   null
   
 
-default-cpus `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-cpus (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines a default value for cpu for containers if not specified.
+Defines a default value for cpu for containers if not specified.
 
 **Default Value**: 
 
@@ -1446,10 +1466,10 @@ default-cpus `resource.Quantity`_
   "1"
   
 
-default-memory `resource.Quantity`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-memory (`resource.Quantity`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines a default value for memory for containers if not specified.
+Defines a default value for memory for containers if not specified.
 
 **Default Value**: 
 
@@ -1458,8 +1478,8 @@ default-memory `resource.Quantity`_
   1Gi
   
 
-default-tolerations []v1.Toleration
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-tolerations ([]v1.Toleration)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1468,8 +1488,8 @@ default-tolerations []v1.Toleration
   null
   
 
-default-node-selector map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-node-selector (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1478,8 +1498,8 @@ default-node-selector map[string]string
   null
   
 
-default-affinity v1.Affinity
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-affinity (v1.Affinity)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1488,10 +1508,10 @@ default-affinity v1.Affinity
   null
   
 
-scheduler-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheduler-name (string)
+--------------------------------------------------------------------------------
 
-**Description**: Defines scheduler name.
+Defines scheduler name.
 
 **Default Value**: 
 
@@ -1500,8 +1520,8 @@ scheduler-name string
   ""
   
 
-interruptible-tolerations []v1.Toleration
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+interruptible-tolerations ([]v1.Toleration)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1510,8 +1530,8 @@ interruptible-tolerations []v1.Toleration
   null
   
 
-interruptible-node-selector map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+interruptible-node-selector (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1520,8 +1540,8 @@ interruptible-node-selector map[string]string
   null
   
 
-interruptible-node-selector-requirement v1.NodeSelectorRequirement
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+interruptible-node-selector-requirement (v1.NodeSelectorRequirement)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1530,8 +1550,8 @@ interruptible-node-selector-requirement v1.NodeSelectorRequirement
   null
   
 
-non-interruptible-node-selector-requirement v1.NodeSelectorRequirement
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+non-interruptible-node-selector-requirement (v1.NodeSelectorRequirement)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1540,8 +1560,8 @@ non-interruptible-node-selector-requirement v1.NodeSelectorRequirement
   null
   
 
-resource-tolerations map[v1.ResourceName][]v1.Toleration
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resource-tolerations (map[v1.ResourceName][]v1.Toleration)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1550,10 +1570,10 @@ resource-tolerations map[v1.ResourceName][]v1.Toleration
   null
   
 
-co-pilot `config.FlyteCoPilotConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+co-pilot (`config.FlyteCoPilotConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Co-Pilot Configuration
+Co-Pilot Configuration
 
 **Default Value**: 
 
@@ -1571,10 +1591,10 @@ co-pilot `config.FlyteCoPilotConfig`_
   storage: ""
   
 
-delete-resource-on-finalize bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+delete-resource-on-finalize (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
+Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
 
 **Default Value**: 
 
@@ -1583,8 +1603,8 @@ delete-resource-on-finalize bool
   "false"
   
 
-create-container-error-grace-period `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+create-container-error-grace-period (`config.Duration`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1593,10 +1613,10 @@ create-container-error-grace-period `config.Duration`_
   3m0s
   
 
-gpu-resource-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+gpu-resource-name (string)
+--------------------------------------------------------------------------------
 
-**Description**: The name of the GPU resource to use when the task resource requests GPUs.
+The name of the GPU resource to use when the task resource requests GPUs.
 
 **Default Value**: 
 
@@ -1606,12 +1626,12 @@ gpu-resource-name string
   
 
 config.FlyteCoPilotConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+name (string)
+--------------------------------------------------------------------------------
 
-**Description**: Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)
+Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)
 
 **Default Value**: 
 
@@ -1620,10 +1640,10 @@ name string
   flyte-copilot-
   
 
-image string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+image (string)
+--------------------------------------------------------------------------------
 
-**Description**: Flyte co-pilot Docker Image FQN
+Flyte co-pilot Docker Image FQN
 
 **Default Value**: 
 
@@ -1632,10 +1652,10 @@ image string
   cr.flyte.org/flyteorg/flytecopilot:v0.0.9
   
 
-default-input-path string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-input-path (string)
+--------------------------------------------------------------------------------
 
-**Description**: Default path where the volume should be mounted
+Default path where the volume should be mounted
 
 **Default Value**: 
 
@@ -1644,10 +1664,10 @@ default-input-path string
   /var/flyte/inputs
   
 
-default-output-path string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-output-path (string)
+--------------------------------------------------------------------------------
 
-**Description**: Default path where the volume should be mounted
+Default path where the volume should be mounted
 
 **Default Value**: 
 
@@ -1656,10 +1676,10 @@ default-output-path string
   /var/flyte/outputs
   
 
-input-vol-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+input-vol-name (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the data volume that is created for storing inputs
+Name of the data volume that is created for storing inputs
 
 **Default Value**: 
 
@@ -1668,10 +1688,10 @@ input-vol-name string
   flyte-inputs
   
 
-output-vol-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+output-vol-name (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the data volume that is created for storing outputs
+Name of the data volume that is created for storing outputs
 
 **Default Value**: 
 
@@ -1680,8 +1700,8 @@ output-vol-name string
   flyte-outputs
   
 
-start-timeout `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+start-timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1690,10 +1710,10 @@ start-timeout `config.Duration`_
   1m0s
   
 
-cpu string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cpu (string)
+--------------------------------------------------------------------------------
 
-**Description**: Used to set cpu for co-pilot containers
+Used to set cpu for co-pilot containers
 
 **Default Value**: 
 
@@ -1702,10 +1722,10 @@ cpu string
   500m
   
 
-memory string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+memory (string)
+--------------------------------------------------------------------------------
 
-**Description**: Used to set memory for co-pilot containers
+Used to set memory for co-pilot containers
 
 **Default Value**: 
 
@@ -1714,10 +1734,10 @@ memory string
   128Mi
   
 
-storage string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+storage (string)
+--------------------------------------------------------------------------------
 
-**Description**: Default storage limit for individual inputs / outputs
+Default storage limit for individual inputs / outputs
 
 **Default Value**: 
 
@@ -1727,10 +1747,10 @@ storage string
   
 
 resource.Quantity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-i `resource.int64Amount`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+i (`resource.int64Amount`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1739,8 +1759,8 @@ i `resource.int64Amount`_
   {}
   
 
-d `resource.infDecAmount`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+d (`resource.infDecAmount`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1749,8 +1769,8 @@ d `resource.infDecAmount`_
   <nil>
   
 
-s string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+s (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1759,8 +1779,8 @@ s string
   "1"
   
 
-Format string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Format (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1770,10 +1790,10 @@ Format string
   
 
 resource.infDecAmount
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Dec inf.Dec
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Dec (inf.Dec)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1783,10 +1803,10 @@ Dec inf.Dec
   
 
 resource.int64Amount
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-value int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+value (int64)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1795,8 +1815,8 @@ value int64
   "1"
   
 
-scale int32
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scale (int32)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1806,12 +1826,12 @@ scale int32
   
 
 k8s.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-scheduler string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+scheduler (string)
+--------------------------------------------------------------------------------
 
-**Description**: Decides the scheduler to use when launching array-pods.
+Decides the scheduler to use when launching array-pods.
 
 **Default Value**: 
 
@@ -1820,10 +1840,10 @@ scheduler string
   ""
   
 
-maxErrorLength int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxErrorLength (int)
+--------------------------------------------------------------------------------
 
-**Description**: Determines the maximum length of the error string returned for the array.
+Determines the maximum length of the error string returned for the array.
 
 **Default Value**: 
 
@@ -1832,10 +1852,10 @@ maxErrorLength int
   "1000"
   
 
-maxArrayJobSize int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxArrayJobSize (int64)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum size of array job.
+Maximum size of array job.
 
 **Default Value**: 
 
@@ -1844,8 +1864,8 @@ maxArrayJobSize int64
   "5000"
   
 
-resourceConfig `k8s.ResourceConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceConfig (`k8s.ResourceConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1855,8 +1875,8 @@ resourceConfig `k8s.ResourceConfig`_
   primaryLabel: ""
   
 
-remoteClusterConfig `k8s.ClusterConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+remoteClusterConfig (`k8s.ClusterConfig`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1871,8 +1891,8 @@ remoteClusterConfig `k8s.ClusterConfig`_
   name: ""
   
 
-node-selector map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+node-selector (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1881,8 +1901,8 @@ node-selector map[string]string
   null
   
 
-tolerations []v1.Toleration
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+tolerations ([]v1.Toleration)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1891,8 +1911,8 @@ tolerations []v1.Toleration
   null
   
 
-namespaceTemplate string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+namespaceTemplate (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1901,8 +1921,8 @@ namespaceTemplate string
   ""
   
 
-OutputAssembler `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+OutputAssembler (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1913,8 +1933,8 @@ OutputAssembler `workqueue.Config`_
   workers: 10
   
 
-ErrorAssembler `workqueue.Config`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ErrorAssembler (`workqueue.Config`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1925,10 +1945,10 @@ ErrorAssembler `workqueue.Config`_
   workers: 10
   
 
-logs `k8s.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+logs (`k8s.LogConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Config for log links for k8s array jobs.
+Config for log links for k8s array jobs.
 
 **Default Value**: 
 
@@ -1950,24 +1970,12 @@ logs `k8s.LogConfig`_
   
 
 k8s.ClusterConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+name (string)
+--------------------------------------------------------------------------------
 
-**Description**: Friendly name of the remote cluster
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-endpoint string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Remote K8s cluster endpoint
+Friendly name of the remote cluster
 
 **Default Value**: 
 
@@ -1976,8 +1984,20 @@ endpoint string
   ""
   
 
-auth `k8s.Auth`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+endpoint (string)
+--------------------------------------------------------------------------------
+
+Remote K8s cluster endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+auth (`k8s.Auth`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1988,10 +2008,10 @@ auth `k8s.Auth`_
   type: ""
   
 
-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+enabled (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Boolean flag to enable or disable
+Boolean flag to enable or disable
 
 **Default Value**: 
 
@@ -2001,24 +2021,12 @@ enabled bool
   
 
 k8s.Auth
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Authentication type
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-tokenPath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Token path
+Authentication type
 
 **Default Value**: 
 
@@ -2027,10 +2035,22 @@ tokenPath string
   ""
   
 
-certPath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+tokenPath (string)
+--------------------------------------------------------------------------------
 
-**Description**: Certificate path
+Token path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+certPath (string)
+--------------------------------------------------------------------------------
+
+Certificate path
 
 **Default Value**: 
 
@@ -2040,12 +2060,12 @@ certPath string
   
 
 k8s.LogConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-config `logs.LogConfig (config)`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+config (`logs.LogConfig (config)`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the log config for k8s logs.
+Defines the log config for k8s logs.
 
 **Default Value**: 
 
@@ -2066,60 +2086,12 @@ config `logs.LogConfig (config)`_
   
 
 logs.LogConfig (config)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-cloudwatch-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-enabled (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Enable Cloudwatch Logging
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-cloudwatch-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: AWS region in which Cloudwatch logs are stored.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-log-group string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Log group to which streams are associated.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Template Uri to use when building cloudwatch log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Enable Kubernetes Logging
+Enable Cloudwatch Logging
 
 **Default Value**: 
 
@@ -2128,22 +2100,10 @@ kubernetes-enabled bool
   "false"
   
 
-kubernetes-url string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-region (string)
+--------------------------------------------------------------------------------
 
-**Description**: Console URL for Kubernetes logs
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Template Uri to use when building kubernetes log links
+AWS region in which Cloudwatch logs are stored.
 
 **Default Value**: 
 
@@ -2152,10 +2112,34 @@ kubernetes-template-uri string
   ""
   
 
-stackdriver-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-log-group (string)
+--------------------------------------------------------------------------------
 
-**Description**: Enable Log-links to stackdriver
+Log group to which streams are associated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-template-uri (string)
+--------------------------------------------------------------------------------
+
+Template Uri to use when building cloudwatch log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-enabled (bool)
+--------------------------------------------------------------------------------
+
+Enable Kubernetes Logging
 
 **Default Value**: 
 
@@ -2164,22 +2148,10 @@ stackdriver-enabled bool
   "false"
   
 
-gcp-project string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kubernetes-url (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the project in GCP
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-stackdriver-logresourcename string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Name of the logresource in stackdriver
+Console URL for Kubernetes logs
 
 **Default Value**: 
 
@@ -2188,10 +2160,10 @@ stackdriver-logresourcename string
   ""
   
 
-stackdriver-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kubernetes-template-uri (string)
+--------------------------------------------------------------------------------
 
-**Description**: Template Uri to use when building stackdriver log links
+Template Uri to use when building kubernetes log links
 
 **Default Value**: 
 
@@ -2200,8 +2172,56 @@ stackdriver-template-uri string
   ""
   
 
-templates []logs.TemplateLogPluginConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+stackdriver-enabled (bool)
+--------------------------------------------------------------------------------
+
+Enable Log-links to stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+gcp-project (string)
+--------------------------------------------------------------------------------
+
+Name of the project in GCP
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-logresourcename (string)
+--------------------------------------------------------------------------------
+
+Name of the logresource in stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-template-uri (string)
+--------------------------------------------------------------------------------
+
+Template Uri to use when building stackdriver log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+templates ([]logs.TemplateLogPluginConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2211,12 +2231,12 @@ templates []logs.TemplateLogPluginConfig
   
 
 k8s.ResourceConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-primaryLabel string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+primaryLabel (string)
+--------------------------------------------------------------------------------
 
-**Description**: PrimaryLabel of a given service cluster
+PrimaryLabel of a given service cluster
 
 **Default Value**: 
 
@@ -2225,10 +2245,10 @@ primaryLabel string
   ""
   
 
-limit int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+limit (int)
+--------------------------------------------------------------------------------
 
-**Description**: Resource quota (in the number of outstanding requests) for the cluster
+Resource quota (in the number of outstanding requests) for the cluster
 
 **Default Value**: 
 
@@ -2238,60 +2258,12 @@ limit int
   
 
 logs.LogConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-cloudwatch-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-enabled (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Enable Cloudwatch Logging
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-cloudwatch-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: AWS region in which Cloudwatch logs are stored.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-log-group string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Log group to which streams are associated.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Template Uri to use when building cloudwatch log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Enable Kubernetes Logging
+Enable Cloudwatch Logging
 
 **Default Value**: 
 
@@ -2300,22 +2272,10 @@ kubernetes-enabled bool
   "false"
   
 
-kubernetes-url string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-region (string)
+--------------------------------------------------------------------------------
 
-**Description**: Console URL for Kubernetes logs
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Template Uri to use when building kubernetes log links
+AWS region in which Cloudwatch logs are stored.
 
 **Default Value**: 
 
@@ -2324,10 +2284,34 @@ kubernetes-template-uri string
   ""
   
 
-stackdriver-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cloudwatch-log-group (string)
+--------------------------------------------------------------------------------
 
-**Description**: Enable Log-links to stackdriver
+Log group to which streams are associated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-template-uri (string)
+--------------------------------------------------------------------------------
+
+Template Uri to use when building cloudwatch log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-enabled (bool)
+--------------------------------------------------------------------------------
+
+Enable Kubernetes Logging
 
 **Default Value**: 
 
@@ -2336,22 +2320,10 @@ stackdriver-enabled bool
   "false"
   
 
-gcp-project string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kubernetes-url (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the project in GCP
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-stackdriver-logresourcename string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Name of the logresource in stackdriver
+Console URL for Kubernetes logs
 
 **Default Value**: 
 
@@ -2360,10 +2332,10 @@ stackdriver-logresourcename string
   ""
   
 
-stackdriver-template-uri string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kubernetes-template-uri (string)
+--------------------------------------------------------------------------------
 
-**Description**: Template Uri to use when building stackdriver log links
+Template Uri to use when building kubernetes log links
 
 **Default Value**: 
 
@@ -2372,8 +2344,56 @@ stackdriver-template-uri string
   ""
   
 
-templates []logs.TemplateLogPluginConfig
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+stackdriver-enabled (bool)
+--------------------------------------------------------------------------------
+
+Enable Log-links to stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+gcp-project (string)
+--------------------------------------------------------------------------------
+
+Name of the project in GCP
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-logresourcename (string)
+--------------------------------------------------------------------------------
+
+Name of the logresource in stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-template-uri (string)
+--------------------------------------------------------------------------------
+
+Template Uri to use when building stackdriver log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+templates ([]logs.TemplateLogPluginConfig)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2383,12 +2403,12 @@ templates []logs.TemplateLogPluginConfig
   
 
 snowflake.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-webApi `webapi.PluginConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+webApi (`webapi.PluginConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines config for the base WebAPI plugin.
+Defines config for the base WebAPI plugin.
 
 **Default Value**: 
 
@@ -2410,8 +2430,8 @@ webApi `webapi.PluginConfig`_
     qps: 10
   
 
-resourceConstraints `core.ResourceConstraintsSpec`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2423,10 +2443,10 @@ resourceConstraints `core.ResourceConstraintsSpec`_
     Value: 100
   
 
-defaultWarehouse string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+defaultWarehouse (string)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the default warehouse to use when running on Snowflake unless overwritten by the task.
+Defines the default warehouse to use when running on Snowflake unless overwritten by the task.
 
 **Default Value**: 
 
@@ -2435,10 +2455,10 @@ defaultWarehouse string
   COMPUTE_WH
   
 
-snowflakeTokenKey string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+snowflakeTokenKey (string)
+--------------------------------------------------------------------------------
 
-**Description**: Name of the key where to find Snowflake token in the secret manager.
+Name of the key where to find Snowflake token in the secret manager.
 
 **Default Value**: 
 
@@ -2447,8 +2467,8 @@ snowflakeTokenKey string
   FLYTE_SNOWFLAKE_CLIENT_TOKEN
   
 
-snowflakeEndpoint string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+snowflakeEndpoint (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2458,10 +2478,10 @@ snowflakeEndpoint string
   
 
 spark.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-spark-config-default map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+spark-config-default (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2470,10 +2490,10 @@ spark-config-default map[string]string
   null
   
 
-spark-history-server-url string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+spark-history-server-url (string)
+--------------------------------------------------------------------------------
 
-**Description**: URL for SparkHistory Server that each job will publish the execution history to.
+URL for SparkHistory Server that each job will publish the execution history to.
 
 **Default Value**: 
 
@@ -2482,8 +2502,8 @@ spark-history-server-url string
   ""
   
 
-features []spark.Feature
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+features ([]spark.Feature)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2492,10 +2512,10 @@ features []spark.Feature
   null
   
 
-logs `spark.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+logs (`spark.LogConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Config for log links for spark applications.
+Config for log links for spark applications.
 
 **Default Value**: 
 
@@ -2557,12 +2577,12 @@ logs `spark.LogConfig`_
   
 
 spark.LogConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-mixed `logs.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+mixed (`logs.LogConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the log config that's not split into user/system.
+Defines the log config that's not split into user/system.
 
 **Default Value**: 
 
@@ -2583,33 +2603,10 @@ mixed `logs.LogConfig`_
   templates: null
   
 
-user `logs.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+user (`logs.LogConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Defines the log config for user logs.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  cloudwatch-enabled: false
-  cloudwatch-log-group: ""
-  cloudwatch-region: ""
-  cloudwatch-template-uri: ""
-  gcp-project: ""
-  kubernetes-enabled: false
-  kubernetes-template-uri: ""
-  kubernetes-url: ""
-  stackdriver-enabled: false
-  stackdriver-logresourcename: ""
-  stackdriver-template-uri: ""
-  templates: null
-  
-
-system `logs.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Defines the log config for system logs.
+Defines the log config for user logs.
 
 **Default Value**: 
 
@@ -2629,10 +2626,33 @@ system `logs.LogConfig`_
   templates: null
   
 
-all-user `logs.LogConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+system (`logs.LogConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: All user logs across driver and executors.
+Defines the log config for system logs.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  gcp-project: ""
+  kubernetes-enabled: false
+  kubernetes-template-uri: ""
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+all-user (`logs.LogConfig`_)
+--------------------------------------------------------------------------------
+
+All user logs across driver and executors.
 
 **Default Value**: 
 
@@ -2655,10 +2675,10 @@ all-user `logs.LogConfig`_
 Section: propeller
 ================================================================================
 
-kube-config string
+kube-config (string)
 --------------------------------------------------------------------------------
 
-**Description**: Path to kubernetes client config file.
+Path to kubernetes client config file.
 
 **Default Value**: 
 
@@ -2667,7 +2687,7 @@ kube-config string
   ""
   
 
-master string
+master (string)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2677,10 +2697,10 @@ master string
   ""
   
 
-workers int
+workers (int)
 --------------------------------------------------------------------------------
 
-**Description**: Number of threads to process workflows
+Number of threads to process workflows
 
 **Default Value**: 
 
@@ -2689,10 +2709,10 @@ workers int
   "20"
   
 
-workflow-reeval-duration `config.Duration`_
+workflow-reeval-duration (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: Frequency of re-evaluating workflows
+Frequency of re-evaluating workflows
 
 **Default Value**: 
 
@@ -2701,10 +2721,10 @@ workflow-reeval-duration `config.Duration`_
   10s
   
 
-downstream-eval-duration `config.Duration`_
+downstream-eval-duration (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: Frequency of re-evaluating downstream tasks
+Frequency of re-evaluating downstream tasks
 
 **Default Value**: 
 
@@ -2713,10 +2733,10 @@ downstream-eval-duration `config.Duration`_
   30s
   
 
-limit-namespace string
+limit-namespace (string)
 --------------------------------------------------------------------------------
 
-**Description**: Namespaces to watch for this propeller
+Namespaces to watch for this propeller
 
 **Default Value**: 
 
@@ -2725,10 +2745,10 @@ limit-namespace string
   all
   
 
-prof-port `config.Port`_
+prof-port (`config.Port`_)
 --------------------------------------------------------------------------------
 
-**Description**: Profiler port
+Profiler port
 
 **Default Value**: 
 
@@ -2737,10 +2757,10 @@ prof-port `config.Port`_
   10254
   
 
-metadata-prefix string
+metadata-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly.
+MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly.
 
 **Default Value**: 
 
@@ -2749,10 +2769,10 @@ metadata-prefix string
   metadata/propeller
   
 
-rawoutput-prefix string
+rawoutput-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored.
+a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored.
 
 **Default Value**: 
 
@@ -2761,10 +2781,10 @@ rawoutput-prefix string
   ""
   
 
-queue `config.CompositeQueueConfig`_
+queue (`config.CompositeQueueConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Workflow workqueue configuration, affects the way the work is consumed from the queue.
+Workflow workqueue configuration, affects the way the work is consumed from the queue.
 
 **Default Value**: 
 
@@ -2787,10 +2807,10 @@ queue `config.CompositeQueueConfig`_
   type: batch
   
 
-metrics-prefix string
+metrics-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: An optional prefix for all published metrics.
+An optional prefix for all published metrics.
 
 **Default Value**: 
 
@@ -2799,10 +2819,10 @@ metrics-prefix string
   flyte
   
 
-enable-admin-launcher bool
+enable-admin-launcher (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Enable remote Workflow launcher to Admin
+Enable remote Workflow launcher to Admin
 
 **Default Value**: 
 
@@ -2811,10 +2831,10 @@ enable-admin-launcher bool
   "true"
   
 
-max-workflow-retries int
+max-workflow-retries (int)
 --------------------------------------------------------------------------------
 
-**Description**: Maximum number of retries per workflow
+Maximum number of retries per workflow
 
 **Default Value**: 
 
@@ -2823,10 +2843,10 @@ max-workflow-retries int
   "10"
   
 
-max-ttl-hours int
+max-ttl-hours (int)
 --------------------------------------------------------------------------------
 
-**Description**: Maximum number of hours a completed workflow should be retained. Number between 1-23 hours
+Maximum number of hours a completed workflow should be retained. Number between 1-23 hours
 
 **Default Value**: 
 
@@ -2835,10 +2855,10 @@ max-ttl-hours int
   "23"
   
 
-gc-interval `config.Duration`_
+gc-interval (`config.Duration`_)
 --------------------------------------------------------------------------------
 
-**Description**: Run periodic GC every 30 minutes
+Run periodic GC every 30 minutes
 
 **Default Value**: 
 
@@ -2847,10 +2867,10 @@ gc-interval `config.Duration`_
   30m0s
   
 
-leader-election `config.LeaderElectionConfig`_
+leader-election (`config.LeaderElectionConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Config for leader election.
+Config for leader election.
 
 **Default Value**: 
 
@@ -2865,10 +2885,10 @@ leader-election `config.LeaderElectionConfig`_
   retry-period: 2s
   
 
-publish-k8s-events bool
+publish-k8s-events (bool)
 --------------------------------------------------------------------------------
 
-**Description**: Enable events publishing to K8s events API.
+Enable events publishing to K8s events API.
 
 **Default Value**: 
 
@@ -2877,10 +2897,10 @@ publish-k8s-events bool
   "false"
   
 
-max-output-size-bytes int64
+max-output-size-bytes (int64)
 --------------------------------------------------------------------------------
 
-**Description**: Maximum size of outputs per task
+Maximum size of outputs per task
 
 **Default Value**: 
 
@@ -2889,10 +2909,10 @@ max-output-size-bytes int64
   "10485760"
   
 
-kube-client-config `config.KubeClientConfig`_
+kube-client-config (`config.KubeClientConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Configuration to control the Kubernetes client
+Configuration to control the Kubernetes client
 
 **Default Value**: 
 
@@ -2903,10 +2923,10 @@ kube-client-config `config.KubeClientConfig`_
   timeout: 30s
   
 
-node-config `config.NodeConfig`_
+node-config (`config.NodeConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: config for a workflow node
+config for a workflow node
 
 **Default Value**: 
 
@@ -2920,10 +2940,10 @@ node-config `config.NodeConfig`_
   max-node-retries-system-failures: 3
   
 
-max-streak-length int
+max-streak-length (int)
 --------------------------------------------------------------------------------
 
-**Description**: Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled.
+Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled.
 
 **Default Value**: 
 
@@ -2932,10 +2952,10 @@ max-streak-length int
   "8"
   
 
-event-config `config.EventConfig`_
+event-config (`config.EventConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Configures execution event behavior.
+Configures execution event behavior.
 
 **Default Value**: 
 
@@ -2945,7 +2965,7 @@ event-config `config.EventConfig`_
   raw-output-policy: reference
   
 
-admin-launcher `launchplan.AdminConfig`_
+admin-launcher (`launchplan.AdminConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2958,7 +2978,7 @@ admin-launcher `launchplan.AdminConfig`_
   workers: 10
   
 
-resourcemanager `config.Config (resourcemanager)`_
+resourcemanager (`config.Config (resourcemanager)`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2975,7 +2995,7 @@ resourcemanager `config.Config (resourcemanager)`_
   type: noop
   
 
-workflowstore `workflowstore.Config`_
+workflowstore (`workflowstore.Config`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -2986,12 +3006,12 @@ workflowstore `workflowstore.Config`_
   
 
 config.CompositeQueueConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Type of composite queue to use for the WorkQueue
+Type of composite queue to use for the WorkQueue
 
 **Default Value**: 
 
@@ -3000,10 +3020,10 @@ type string
   batch
   
 
-queue `config.WorkqueueConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+queue (`config.WorkqueueConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Workflow workqueue configuration, affects the way the work is consumed from the queue.
+Workflow workqueue configuration, affects the way the work is consumed from the queue.
 
 **Default Value**: 
 
@@ -3016,10 +3036,10 @@ queue `config.WorkqueueConfig`_
   type: maxof
   
 
-sub-queue `config.WorkqueueConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+sub-queue (`config.WorkqueueConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: SubQueue configuration, affects the way the nodes cause the top-level Work to be re-evaluated.
+SubQueue configuration, affects the way the nodes cause the top-level Work to be re-evaluated.
 
 **Default Value**: 
 
@@ -3032,10 +3052,10 @@ sub-queue `config.WorkqueueConfig`_
   type: bucket
   
 
-batching-interval `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+batching-interval (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Duration for which downstream updates are buffered
+Duration for which downstream updates are buffered
 
 **Default Value**: 
 
@@ -3044,8 +3064,8 @@ batching-interval `config.Duration`_
   1s
   
 
-batch-size int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+batch-size (int)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3055,12 +3075,12 @@ batch-size int
   
 
 config.WorkqueueConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Type of RateLimiter to use for the WorkQueue
+Type of RateLimiter to use for the WorkQueue
 
 **Default Value**: 
 
@@ -3069,10 +3089,10 @@ type string
   maxof
   
 
-base-delay `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+base-delay (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: base backoff delay for failure
+base backoff delay for failure
 
 **Default Value**: 
 
@@ -3081,10 +3101,10 @@ base-delay `config.Duration`_
   5s
   
 
-max-delay `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+max-delay (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Max backoff delay for failure
+Max backoff delay for failure
 
 **Default Value**: 
 
@@ -3093,10 +3113,10 @@ max-delay `config.Duration`_
   1m0s
   
 
-rate int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+rate (int64)
+--------------------------------------------------------------------------------
 
-**Description**: Bucket Refill rate per second
+Bucket Refill rate per second
 
 **Default Value**: 
 
@@ -3105,10 +3125,10 @@ rate int64
   "100"
   
 
-capacity int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+capacity (int)
+--------------------------------------------------------------------------------
 
-**Description**: Bucket capacity as number of items
+Bucket capacity as number of items
 
 **Default Value**: 
 
@@ -3118,12 +3138,12 @@ capacity int
   
 
 config.Config (resourcemanager)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Which resource manager to use
+Which resource manager to use
 
 **Default Value**: 
 
@@ -3132,10 +3152,10 @@ type string
   noop
   
 
-resourceMaxQuota int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resourceMaxQuota (int)
+--------------------------------------------------------------------------------
 
-**Description**: Global limit for concurrent Qubole queries
+Global limit for concurrent Qubole queries
 
 **Default Value**: 
 
@@ -3144,10 +3164,10 @@ resourceMaxQuota int
   "1000"
   
 
-redis `config.RedisConfig`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+redis (`config.RedisConfig`_)
+--------------------------------------------------------------------------------
 
-**Description**: Config for Redis resourcemanager.
+Config for Redis resourcemanager.
 
 **Default Value**: 
 
@@ -3161,12 +3181,12 @@ redis `config.RedisConfig`_
   
 
 config.RedisConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-hostPaths []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+hostPaths ([]string)
+--------------------------------------------------------------------------------
 
-**Description**: Redis hosts locations.
+Redis hosts locations.
 
 **Default Value**: 
 
@@ -3175,22 +3195,10 @@ hostPaths []string
   []
   
 
-primaryName string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+primaryName (string)
+--------------------------------------------------------------------------------
 
-**Description**: Redis primary name, fill in only if you are connecting to a redis sentinel cluster.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-hostPath string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Redis host location
+Redis primary name, fill in only if you are connecting to a redis sentinel cluster.
 
 **Default Value**: 
 
@@ -3199,10 +3207,10 @@ hostPath string
   ""
   
 
-hostKey string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+hostPath (string)
+--------------------------------------------------------------------------------
 
-**Description**: Key for local Redis access
+Redis host location
 
 **Default Value**: 
 
@@ -3211,10 +3219,22 @@ hostKey string
   ""
   
 
-maxRetries int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+hostKey (string)
+--------------------------------------------------------------------------------
 
-**Description**: See Redis client options for more info
+Key for local Redis access
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+maxRetries (int)
+--------------------------------------------------------------------------------
+
+See Redis client options for more info
 
 **Default Value**: 
 
@@ -3224,12 +3244,12 @@ maxRetries int
   
 
 config.EventConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-raw-output-policy string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+raw-output-policy (string)
+--------------------------------------------------------------------------------
 
-**Description**: How output data should be passed along in execution events.
+How output data should be passed along in execution events.
 
 **Default Value**: 
 
@@ -3238,10 +3258,10 @@ raw-output-policy string
   reference
   
 
-fallback-to-output-reference bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+fallback-to-output-reference (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Whether output data should be sent by reference when it is too large to be sent inline in execution events.
+Whether output data should be sent by reference when it is too large to be sent inline in execution events.
 
 **Default Value**: 
 
@@ -3251,10 +3271,10 @@ fallback-to-output-reference bool
   
 
 config.KubeClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-qps float32
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+qps (float32)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3263,10 +3283,10 @@ qps float32
   "100"
   
 
-burst int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+burst (int)
+--------------------------------------------------------------------------------
 
-**Description**: Max burst rate for throttle. 0 defaults to 10
+Max burst rate for throttle. 0 defaults to 10
 
 **Default Value**: 
 
@@ -3275,10 +3295,10 @@ burst int
   "25"
   
 
-timeout `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.
+Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.
 
 **Default Value**: 
 
@@ -3288,12 +3308,12 @@ timeout `config.Duration`_
   
 
 config.LeaderElectionConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+enabled (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Enables/Disables leader election.
+Enables/Disables leader election.
 
 **Default Value**: 
 
@@ -3302,10 +3322,10 @@ enabled bool
   "false"
   
 
-lock-config-map `types.NamespacedName`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lock-config-map (`types.NamespacedName`_)
+--------------------------------------------------------------------------------
 
-**Description**: ConfigMap namespace/name to use for resource lock.
+ConfigMap namespace/name to use for resource lock.
 
 **Default Value**: 
 
@@ -3315,10 +3335,10 @@ lock-config-map `types.NamespacedName`_
   Namespace: ""
   
 
-lease-duration `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lease-duration (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last observed ack.
+Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last observed ack.
 
 **Default Value**: 
 
@@ -3327,10 +3347,10 @@ lease-duration `config.Duration`_
   15s
   
 
-renew-deadline `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+renew-deadline (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Duration that the acting master will retry refreshing leadership before giving up.
+Duration that the acting master will retry refreshing leadership before giving up.
 
 **Default Value**: 
 
@@ -3339,10 +3359,10 @@ renew-deadline `config.Duration`_
   10s
   
 
-retry-period `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+retry-period (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Duration the LeaderElector clients should wait between tries of actions.
+Duration the LeaderElector clients should wait between tries of actions.
 
 **Default Value**: 
 
@@ -3352,10 +3372,10 @@ retry-period `config.Duration`_
   
 
 types.NamespacedName
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-Namespace string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Namespace (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3364,8 +3384,8 @@ Namespace string
   ""
   
 
-Name string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Name (string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3375,12 +3395,12 @@ Name string
   
 
 config.NodeConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-default-deadlines `config.DefaultDeadlines`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-deadlines (`config.DefaultDeadlines`_)
+--------------------------------------------------------------------------------
 
-**Description**: Default value for timeouts
+Default value for timeouts
 
 **Default Value**: 
 
@@ -3391,10 +3411,10 @@ default-deadlines `config.DefaultDeadlines`_
   workflow-active-deadline: 72h0m0s
   
 
-max-node-retries-system-failures int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+max-node-retries-system-failures (int64)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum number of retries per node for node failure due to infra issues
+Maximum number of retries per node for node failure due to infra issues
 
 **Default Value**: 
 
@@ -3403,10 +3423,10 @@ max-node-retries-system-failures int64
   "3"
   
 
-interruptible-failure-threshold int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+interruptible-failure-threshold (int64)
+--------------------------------------------------------------------------------
 
-**Description**: number of failures for a node to be still considered interruptible'
+number of failures for a node to be still considered interruptible'
 
 **Default Value**: 
 
@@ -3416,24 +3436,12 @@ interruptible-failure-threshold int64
   
 
 config.DefaultDeadlines
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-node-execution-deadline `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+node-execution-deadline (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Default value of node execution timeout
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  48h0m0s
-  
-
-node-active-deadline `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Default value of node timeout
+Default value of node execution timeout
 
 **Default Value**: 
 
@@ -3442,10 +3450,22 @@ node-active-deadline `config.Duration`_
   48h0m0s
   
 
-workflow-active-deadline `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+node-active-deadline (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Default value of workflow timeout
+Default value of node timeout
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  48h0m0s
+  
+
+workflow-active-deadline (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Default value of workflow timeout
 
 **Default Value**: 
 
@@ -3455,10 +3475,10 @@ workflow-active-deadline `config.Duration`_
   
 
 config.Port
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-port int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+port (int)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3468,12 +3488,12 @@ port int
   
 
 launchplan.AdminConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-tps int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+tps (int64)
+--------------------------------------------------------------------------------
 
-**Description**: The maximum number of transactions per second to flyte admin from this client.
+The maximum number of transactions per second to flyte admin from this client.
 
 **Default Value**: 
 
@@ -3482,10 +3502,10 @@ tps int64
   "100"
   
 
-burst int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+burst (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum burst for throttle
+Maximum burst for throttle
 
 **Default Value**: 
 
@@ -3494,10 +3514,10 @@ burst int
   "10"
   
 
-cacheSize int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cacheSize (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum cache in terms of number of items stored.
+Maximum cache in terms of number of items stored.
 
 **Default Value**: 
 
@@ -3506,10 +3526,10 @@ cacheSize int
   "10000"
   
 
-workers int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+workers (int)
+--------------------------------------------------------------------------------
 
-**Description**: Number of parallel workers to work on the queue.
+Number of parallel workers to work on the queue.
 
 **Default Value**: 
 
@@ -3519,12 +3539,12 @@ workers int
   
 
 workflowstore.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-policy string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+policy (string)
+--------------------------------------------------------------------------------
 
-**Description**: Workflow Store Policy to initialize
+Workflow Store Policy to initialize
 
 **Default Value**: 
 
@@ -3536,10 +3556,10 @@ policy string
 Section: secrets
 ================================================================================
 
-secrets-prefix string
+secrets-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: Prefix where to look for secrets file
+Prefix where to look for secrets file
 
 **Default Value**: 
 
@@ -3548,10 +3568,10 @@ secrets-prefix string
   /etc/secrets
   
 
-env-prefix string
+env-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: Prefix for environment variables
+Prefix for environment variables
 
 **Default Value**: 
 
@@ -3563,10 +3583,10 @@ env-prefix string
 Section: storage
 ================================================================================
 
-type string
+type (string)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the type of storage to configure [s3/minio/local/mem/stow].
+Sets the type of storage to configure [s3/minio/local/mem/stow].
 
 **Default Value**: 
 
@@ -3575,7 +3595,7 @@ type string
   s3
   
 
-connection `storage.ConnectionConfig`_
+connection (`storage.ConnectionConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -3590,10 +3610,10 @@ connection `storage.ConnectionConfig`_
   secret-key: ""
   
 
-stow `storage.StowConfig`_
+stow (`storage.StowConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Storage config for stow backend.
+Storage config for stow backend.
 
 **Default Value**: 
 
@@ -3602,10 +3622,10 @@ stow `storage.StowConfig`_
   {}
   
 
-container string
+container (string)
 --------------------------------------------------------------------------------
 
-**Description**: Initial container (in s3 a bucket) to create -if it doesn't exist-.'
+Initial container (in s3 a bucket) to create -if it doesn't exist-.'
 
 **Default Value**: 
 
@@ -3614,10 +3634,10 @@ container string
   ""
   
 
-enable-multicontainer bool
+enable-multicontainer (bool)
 --------------------------------------------------------------------------------
 
-**Description**: If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
+If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
 
 **Default Value**: 
 
@@ -3626,7 +3646,7 @@ enable-multicontainer bool
   "false"
   
 
-cache `storage.CachingConfig`_
+cache (`storage.CachingConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -3637,10 +3657,10 @@ cache `storage.CachingConfig`_
   target_gc_percent: 0
   
 
-limits `storage.LimitsConfig`_
+limits (`storage.LimitsConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets limits for stores.
+Sets limits for stores.
 
 **Default Value**: 
 
@@ -3649,10 +3669,10 @@ limits `storage.LimitsConfig`_
   maxDownloadMBs: 2
   
 
-defaultHttpClient `storage.HTTPClientConfig`_
+defaultHttpClient (`storage.HTTPClientConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Sets the default http client config.
+Sets the default http client config.
 
 **Default Value**: 
 
@@ -3663,12 +3683,12 @@ defaultHttpClient `storage.HTTPClientConfig`_
   
 
 storage.CachingConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-max_size_mbs int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+max_size_mbs (int)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used
+Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used
 
 **Default Value**: 
 
@@ -3677,10 +3697,10 @@ max_size_mbs int
   "0"
   
 
-target_gc_percent int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+target_gc_percent (int)
+--------------------------------------------------------------------------------
 
-**Description**: Sets the garbage collection target percentage.
+Sets the garbage collection target percentage.
 
 **Default Value**: 
 
@@ -3690,12 +3710,12 @@ target_gc_percent int
   
 
 storage.ConnectionConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-endpoint `config.URL`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+endpoint (`config.URL`_)
+--------------------------------------------------------------------------------
 
-**Description**: URL for storage client to connect to.
+URL for storage client to connect to.
 
 **Default Value**: 
 
@@ -3704,10 +3724,10 @@ endpoint `config.URL`_
   ""
   
 
-auth-type string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+auth-type (string)
+--------------------------------------------------------------------------------
 
-**Description**: Auth Type to use [iam,accesskey].
+Auth Type to use [iam,accesskey].
 
 **Default Value**: 
 
@@ -3716,22 +3736,10 @@ auth-type string
   iam
   
 
-access-key string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+access-key (string)
+--------------------------------------------------------------------------------
 
-**Description**: Access key to use. Only required when authtype is set to accesskey.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-secret-key string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Description**: Secret to use when accesskey is set.
+Access key to use. Only required when authtype is set to accesskey.
 
 **Default Value**: 
 
@@ -3740,10 +3748,22 @@ secret-key string
   ""
   
 
-region string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+secret-key (string)
+--------------------------------------------------------------------------------
 
-**Description**: Region to connect to.
+Secret to use when accesskey is set.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+region (string)
+--------------------------------------------------------------------------------
+
+Region to connect to.
 
 **Default Value**: 
 
@@ -3752,10 +3772,10 @@ region string
   us-east-1
   
 
-disable-ssl bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+disable-ssl (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Disables SSL connection. Should only be used for development.
+Disables SSL connection. Should only be used for development.
 
 **Default Value**: 
 
@@ -3765,10 +3785,10 @@ disable-ssl bool
   
 
 storage.HTTPClientConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-headers map[string][]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+headers (map[string][]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3777,10 +3797,10 @@ headers map[string][]string
   null
   
 
-timeout `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Sets time out on the http client.
+Sets time out on the http client.
 
 **Default Value**: 
 
@@ -3790,12 +3810,12 @@ timeout `config.Duration`_
   
 
 storage.LimitsConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-maxDownloadMBs int64
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+maxDownloadMBs (int64)
+--------------------------------------------------------------------------------
 
-**Description**: Maximum allowed download size (in MBs) per call.
+Maximum allowed download size (in MBs) per call.
 
 **Default Value**: 
 
@@ -3805,12 +3825,12 @@ maxDownloadMBs int64
   
 
 storage.StowConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-kind string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+kind (string)
+--------------------------------------------------------------------------------
 
-**Description**: Kind of Stow backend to use. Refer to github/graymeta/stow
+Kind of Stow backend to use. Refer to github/graymeta/stow
 
 **Default Value**: 
 
@@ -3819,10 +3839,10 @@ kind string
   ""
   
 
-config map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+config (map[string]string)
+--------------------------------------------------------------------------------
 
-**Description**: Configuration for stow backend. Refer to github/graymeta/stow
+Configuration for stow backend. Refer to github/graymeta/stow
 
 **Default Value**: 
 
@@ -3834,10 +3854,10 @@ config map[string]string
 Section: tasks
 ================================================================================
 
-task-plugins `config.TaskPluginConfig`_
+task-plugins (`config.TaskPluginConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Task plugin configuration
+Task plugin configuration
 
 **Default Value**: 
 
@@ -3847,10 +3867,10 @@ task-plugins `config.TaskPluginConfig`_
   enabled-plugins: []
   
 
-max-plugin-phase-versions int32
+max-plugin-phase-versions (int32)
 --------------------------------------------------------------------------------
 
-**Description**: Maximum number of plugin phase versions allowed for one phase.
+Maximum number of plugin phase versions allowed for one phase.
 
 **Default Value**: 
 
@@ -3859,10 +3879,10 @@ max-plugin-phase-versions int32
   "100000"
   
 
-barrier `config.BarrierConfig`_
+barrier (`config.BarrierConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Config for Barrier implementation
+Config for Barrier implementation
 
 **Default Value**: 
 
@@ -3873,10 +3893,10 @@ barrier `config.BarrierConfig`_
   enabled: true
   
 
-backoff `config.BackOffConfig`_
+backoff (`config.BackOffConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: Config for Exponential BackOff implementation
+Config for Exponential BackOff implementation
 
 **Default Value**: 
 
@@ -3886,10 +3906,10 @@ backoff `config.BackOffConfig`_
   max-duration: 10m0s
   
 
-maxLogMessageLength int
+maxLogMessageLength (int)
 --------------------------------------------------------------------------------
 
-**Description**: Max length of error message.
+Max length of error message.
 
 **Default Value**: 
 
@@ -3899,12 +3919,12 @@ maxLogMessageLength int
   
 
 config.BackOffConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-base-second int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+base-second (int)
+--------------------------------------------------------------------------------
 
-**Description**: The number of seconds representing the base duration of the exponential backoff
+The number of seconds representing the base duration of the exponential backoff
 
 **Default Value**: 
 
@@ -3913,10 +3933,10 @@ base-second int
   "2"
   
 
-max-duration `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+max-duration (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: The cap of the backoff duration
+The cap of the backoff duration
 
 **Default Value**: 
 
@@ -3926,12 +3946,12 @@ max-duration `config.Duration`_
   
 
 config.BarrierConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-enabled bool
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+enabled (bool)
+--------------------------------------------------------------------------------
 
-**Description**: Enable Barrier transitions using inmemory context
+Enable Barrier transitions using inmemory context
 
 **Default Value**: 
 
@@ -3940,10 +3960,10 @@ enabled bool
   "true"
   
 
-cache-size int
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cache-size (int)
+--------------------------------------------------------------------------------
 
-**Description**: Max number of barrier to preserve in memory
+Max number of barrier to preserve in memory
 
 **Default Value**: 
 
@@ -3952,10 +3972,10 @@ cache-size int
   "10000"
   
 
-cache-ttl `config.Duration`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cache-ttl (`config.Duration`_)
+--------------------------------------------------------------------------------
 
-**Description**: Max duration that a barrier would be respected if the process is not restarted. This should account for time required to store the record into persistent storage (across multiple rounds.
+Max duration that a barrier would be respected if the process is not restarted. This should account for time required to store the record into persistent storage (across multiple rounds.
 
 **Default Value**: 
 
@@ -3965,12 +3985,12 @@ cache-ttl `config.Duration`_
   
 
 config.TaskPluginConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-enabled-plugins []string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+enabled-plugins ([]string)
+--------------------------------------------------------------------------------
 
-**Description**: deprecated
+deprecated
 
 **Default Value**: 
 
@@ -3979,8 +3999,8 @@ enabled-plugins []string
   []
   
 
-default-for-task-types map[string]string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+default-for-task-types (map[string]string)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -3992,10 +4012,10 @@ default-for-task-types map[string]string
 Section: webhook
 ================================================================================
 
-metrics-prefix string
+metrics-prefix (string)
 --------------------------------------------------------------------------------
 
-**Description**: An optional prefix for all published metrics.
+An optional prefix for all published metrics.
 
 **Default Value**: 
 
@@ -4004,10 +4024,10 @@ metrics-prefix string
   'flyte:'
   
 
-certDir string
+certDir (string)
 --------------------------------------------------------------------------------
 
-**Description**: Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/
+Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/
 
 **Default Value**: 
 
@@ -4016,10 +4036,10 @@ certDir string
   /etc/webhook/certs
   
 
-listenPort int
+listenPort (int)
 --------------------------------------------------------------------------------
 
-**Description**: The port to use to listen to webhook calls. Defaults to 9443
+The port to use to listen to webhook calls. Defaults to 9443
 
 **Default Value**: 
 
@@ -4028,10 +4048,10 @@ listenPort int
   "9443"
   
 
-serviceName string
+serviceName (string)
 --------------------------------------------------------------------------------
 
-**Description**: The name of the webhook service.
+The name of the webhook service.
 
 **Default Value**: 
 
@@ -4040,10 +4060,10 @@ serviceName string
   flyte-pod-webhook
   
 
-secretName string
+secretName (string)
 --------------------------------------------------------------------------------
 
-**Description**: Secret name to write generated certs to.
+Secret name to write generated certs to.
 
 **Default Value**: 
 
@@ -4052,7 +4072,7 @@ secretName string
   flyte-pod-webhook
   
 
-secretManagerType int
+secretManagerType (int)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -4062,10 +4082,10 @@ secretManagerType int
   K8s
   
 
-awsSecretManager `config.AWSSecretManagerConfig`_
+awsSecretManager (`config.AWSSecretManagerConfig`_)
 --------------------------------------------------------------------------------
 
-**Description**: AWS Secret Manager config.
+AWS Secret Manager config.
 
 **Default Value**: 
 
@@ -4082,12 +4102,12 @@ awsSecretManager `config.AWSSecretManagerConfig`_
   
 
 config.AWSSecretManagerConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-sidecarImage string
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+sidecarImage (string)
+--------------------------------------------------------------------------------
 
-**Description**: Specifies the sidecar docker image to use
+Specifies the sidecar docker image to use
 
 **Default Value**: 
 
@@ -4096,8 +4116,8 @@ sidecarImage string
   docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
   
 
-resources `v1.ResourceRequirements`_
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+resources (`v1.ResourceRequirements`_)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -4112,10 +4132,10 @@ resources `v1.ResourceRequirements`_
   
 
 v1.ResourceRequirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------------------------------------
 
-limits v1.ResourceList
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+limits (v1.ResourceList)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -4125,8 +4145,8 @@ limits v1.ResourceList
   memory: 500Mi
   
 
-requests v1.ResourceList
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+requests (v1.ResourceList)
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
