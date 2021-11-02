@@ -5,7 +5,22 @@ Athena Plugin Setup
 
 This guide gives an overview of how to set up the Athena in your AWS Flyte deployment.
 
-1. Create a file named ``values-athena.yaml`` and add the following config to it:
+
+1. First, clone the Flytesnacks repo. This is where we have the example.
+
+   .. code-block:: bash
+
+      git clone https://github.com/flyteorg/flytesnacks.git
+
+2. Start the Flyte sandbox for testing.
+
+   .. code-block:: bash
+
+      // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
+      flytectl sandbox start --source=./flytesnacks
+      flytectl config init
+
+3. Create a file named ``values-athena.yaml`` and add the following config to it. Please make sure that propeller has correct service account for athena.
 
 .. code-block::
 
@@ -28,19 +43,19 @@ This guide gives an overview of how to set up the Athena in your AWS Flyte deplo
               container_array: k8s-array
               athena: athena
 
-2. Upgrade the Flyte Helm release.
+4. Upgrade the Flyte Helm release.
 
    .. code-block:: bash
 
       helm upgrade -n flyte -f values-athena.yaml flyteorg/flyte
 
-3. Register the MPI plugin example.
+5. Register the Athena plugin example.
 
    .. code-block:: bash
 
-      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development --k8sServiceAccount=<Service Account>
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development
 
-4. Lastly, fetch the launch plan, create and monitor the execution.
+6. Lastly, fetch the launch plan, create and monitor the execution.
 
    .. code-block:: bash
 
