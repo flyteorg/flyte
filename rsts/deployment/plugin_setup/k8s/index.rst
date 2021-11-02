@@ -34,6 +34,15 @@ K8s Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the Spark Operator Plugin.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-k8s-tensorflow-operator
+       :type: ref
+       :text: Tensorflow Operator
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Spark Operator Plugin.
+
 
 .. toctree::
     :maxdepth: 1
@@ -43,5 +52,6 @@ K8s Plugin Setup
     mpi_operator
     pytorch_operator
     spark_operator
+    tensorflow_operator
 
 
