@@ -168,8 +168,13 @@ func (r *RootOptions) initConfig(cmd *cobra.Command, _ []string) error {
 		SearchPaths: []string{r.cfgFile},
 	})
 
+	rootCmd := cmd
+	for rootCmd.Parent() != nil {
+		rootCmd = rootCmd.Parent()
+	}
+
 	// persistent flags were initially bound to the root command so we must bind to the same command to avoid
-	r.configAccessor.InitializePflags(cmd.PersistentFlags())
+	r.configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
 	err := r.configAccessor.UpdateConfig(context.TODO())
 	if err != nil {

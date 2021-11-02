@@ -20,9 +20,8 @@ linux_compile:
 .PHONY: compile
 compile:
 	mkdir -p ./artifacts
-	go build -o ../artifacts/flyte-copilot .
+	go build -o ./artifacts/flyte-copilot .
 
 cross_compile:
-	@glide install
 	@mkdir -p ./artifacts/cross
-	GOOS=linux GOARCH=amd64 go build -o ../artifacts/flyte-copilot .
+	GOOS=linux GOARCH=amd64 go build -o ./artifacts/flyte-copilot .
