@@ -21,3 +21,4 @@ Plugin Setup
     :hidden:
 
     k8s/index
+
