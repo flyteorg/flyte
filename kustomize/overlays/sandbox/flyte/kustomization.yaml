@@ -25,11 +25,6 @@ configMapGenerator:
 
   - behavior: merge
     files:
-      - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-    name: clusterresource-template
-
-  - behavior: merge
-    files:
       - ./config/propeller/enabled_plugins.yaml
       - ./config/propeller/resource_manager.yaml
       - ./config/propeller/plugins/k8s.yaml

@@ -180,25 +180,6 @@ data:
     - kind: ServiceAccount
       name: spark
       namespace: {{ namespace }}
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: stow
-          stow:
-            kind: google
-            config:
-              json: ""
-              project_id: <PROJECT-ID>
-              scopes: https://www.googleapis.com/auth/devstorage.full_control
-          container: "<BUCKETNAME>"
-          enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1

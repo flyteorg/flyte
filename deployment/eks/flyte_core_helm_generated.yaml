@@ -126,22 +126,6 @@ data:
       hard:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: s3
-          container: "<BUCKET_NAME>"
-          connection:
-            auth-type: iam
-            region: <AWS_REGION>
-          enable-multicontainer: true
 ---
 # Source: flyte-core/templates/admin/configmap.yaml
 apiVersion: v1
