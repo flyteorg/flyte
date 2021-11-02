@@ -49,7 +49,7 @@ flytekit==0.24.0b0
     # via
     #   -r requirements.in
     #   flytekitplugins-kfmpi
-flytekitplugins-kfmpi==0.23.2
+flytekitplugins-kfmpi==0.24.0b0
     # via -r requirements.in
 gast==0.4.0
     # via tensorflow
