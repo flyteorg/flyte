@@ -10,7 +10,7 @@ Plugin Setup
 
     .. link-button:: deployment-plugin-setup-k8s
        :type: ref
-       :text: K8s Plugin
+       :text: K8s Plugins
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Guide to setting up the K8s Operator Plugins.
@@ -24,11 +24,20 @@ Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the Web API Plugins.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-aws
+       :type: ref
+       :text: AWS Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up AWS-specific Plugins.
 
 .. toctree::
     :maxdepth: 1
-    :name: K8s Plugin
+    :name: Plugin Setup
     :hidden:
 
     k8s/index
     webapi/index
+    aws/index

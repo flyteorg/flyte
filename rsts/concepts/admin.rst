@@ -233,6 +233,8 @@ Permitted project operations:
 - Register
 - List
 
+.. _divedeep-admin-matchable-resources:
+
 Matchable resources
 +++++++++++++++++++
 

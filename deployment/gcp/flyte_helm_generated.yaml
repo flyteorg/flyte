@@ -180,25 +180,6 @@ data:
     - kind: ServiceAccount
       name: spark
       namespace: {{ namespace }}
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: stow
-          stow:
-            kind: google
-            config:
-              json: ""
-              project_id: <PROJECT-ID>
-              scopes: https://www.googleapis.com/auth/devstorage.full_control
-          container: "<BUCKETNAME>"
-          enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1
@@ -458,7 +439,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -1281,7 +1262,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b41160e27be1ed8f73cee360376eab35907a3923e0e443df3c6fa28281fca2d"
+        configChecksum: "e6061ecfb96415f4871fd08abec51204dec69e23cb6d8f5d89583676657de08"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1353,7 +1334,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "b41160e27be1ed8f73cee360376eab35907a3923e0e443df3c6fa28281fca2d"
+        configChecksum: "e6061ecfb96415f4871fd08abec51204dec69e23cb6d8f5d89583676657de08"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

@@ -19,13 +19,6 @@ configMapGenerator:
   - ./config/common/storage.yaml
   - ./config/common/logger.yaml
 
-# cluster resource templates
-- name: clusterresource-template
-  behavior: merge
-  files:
-  # Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
-  - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-
 # Flyte Propeller Configuration
 - name: flyte-propeller-config
   behavior: merge

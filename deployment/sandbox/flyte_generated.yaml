@@ -2051,28 +2051,9 @@ data:
       finalizers:
       - kubernetes
   ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
-  ac_project-copilot-dataconfig.yaml: |
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: |
-        storage:
-          connection:
-            access-key: minio
-            auth-type: accesskey
-            disable-ssl: true
-            endpoint: http://minio.flyte.svc.cluster.local:9000
-            region: us-east-1
-            secret-key: miniostorage
-          type: minio
-          container: my-s3-bucket
-          enable-multicontainer: true
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-dtg8ff28mt
+  name: clusterresource-template-dk5mbchdmt
   namespace: flyte
 ---
 apiVersion: v1
@@ -2254,7 +2235,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.5.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.15"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -2340,7 +2321,7 @@ data:
         kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-d9bhkt4m5d
+  name: flyte-propeller-config-g52db28fmc
   namespace: flyte
 ---
 apiVersion: v1
@@ -2881,7 +2862,7 @@ spec:
         secret:
           secretName: user-info
       - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
+          name: flyte-propeller-config-g52db28fmc
         name: config-volume
       - name: webhook-certs
         secret:
@@ -3042,7 +3023,7 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
-          name: clusterresource-template-dtg8ff28mt
+          name: clusterresource-template-dk5mbchdmt
         name: resource-templates
       - emptyDir: {}
         name: shared-data
@@ -3136,7 +3117,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-d9bhkt4m5d
+          name: flyte-propeller-config-g52db28fmc
         name: config-volume
       - name: auth
         secret:
@@ -3452,7 +3433,7 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-dtg8ff28mt
+              name: clusterresource-template-dk5mbchdmt
             name: resource-templates
           - configMap:
               name: flyte-admin-config-dbg8dt2dgb
