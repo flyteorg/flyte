@@ -38,10 +38,10 @@ K8s Plugin Setup
 
     .. link-button:: deployment-plugin-setup-k8s-tensorflow-operator
        :type: ref
-       :text: Tensorflow Operator
+       :text: TensorFlow Operator
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Tensorflow Operator Plugin.
+    Guide to setting up the TensorFlow Operator Plugin.
 
 
 .. toctree::

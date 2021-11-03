@@ -1,6 +1,6 @@
 .. _deployment-plugin-setup-k8s-tensorflow-operator:
 
-Kubeflow Tensorflow Operator Plugin Setup
+Kubeflow TensorFlow Operator Plugin Setup
 -----------------------------------------
 
 This guide gives an overview of how to set up the Tensorflow operator in your Flyte deployment.
@@ -18,7 +18,7 @@ This guide gives an overview of how to set up the Tensorflow operator in your Fl
       flytectl sandbox start --source=./flytesnacks
       flytectl config init
 
-3. Install the PyTorch Operator.
+3. Install the TensorFlow Operator.
 
    .. code-block:: bash
 
@@ -62,7 +62,7 @@ This guide gives an overview of how to set up the Tensorflow operator in your Fl
       cd flytesnacks
       flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kftensorflow serialize
 
-7. Register the Tensorflow plugin example. (TODO: https://github.com/flyteorg/flyte/issues/1757)
+7. Register the TensorFlow plugin example. (TODO: https://github.com/flyteorg/flyte/issues/1757)
 
    .. code-block:: bash
 
