@@ -11,7 +11,7 @@ Web API Plugin Setup
 
     .. link-button:: deployment-plugin-setup-webapi-snowflake
        :type: ref
-       :text: PyTorch Operator
+       :text: Snowflake Operator
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Guide to setting up the Snowflake Plugin.
