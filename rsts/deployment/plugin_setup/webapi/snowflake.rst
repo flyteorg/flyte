@@ -3,9 +3,23 @@
 Snowflake Plugin Setup
 ----------------------
 
-This guide gives an overview of how to set up the Snowflake in your Flyte deployment.
+This guide gives an overview of how to set up Snowflake in your Flyte deployment.
 
-1. Create a file named ``values-snowflake.yaml`` and add the following config to it:
+1. First, clone the Flytesnacks repo. This is where we have the example.
+
+   .. code-block:: bash
+
+      git clone https://github.com/flyteorg/flytesnacks.git
+
+2. Start the Flyte sandbox for testing.
+
+   .. code-block:: bash
+
+      // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
+      flytectl sandbox start --source=./flytesnacks
+      flytectl config init
+
+3. Create a file named ``values-snowflake.yaml`` and add the following config to it:
 
 .. code-block::
 
@@ -28,17 +42,20 @@ This guide gives an overview of how to set up the Snowflake in your Flyte deploy
               container_array: k8s-array
               snowflake: snowflake
 
-2. Create a trial account in snowflake.com and follow the docs for creating API key
+4. Create a trial Snowflake account and follow the docs for creating an API key.
 
-3. Add snowflake JWT token to Flytepropeller. `here <https://docs.snowflake.com/en/developer-guide/sql-api/guide.html#using-key-pair-authentication>`_ to see more detail to setup snowflake JWT token.
+5. Add snowflake JWT token to FlytePropeller.
+
+.. note::
+        Refer to the `Snowflake docs <https://docs.snowflake.com/en/developer-guide/sql-api/guide.html#using-key-pair-authentication>`__ to understand setting up the Snowflake JWT token.
 
 .. code-block:: bash
 
     kubectl edit secret -n flyte flyte-propeller-auth
 
-Configuration will be like below
+The configuration will look as follows:
 
-.. code-block:: bash
+.. code-block:: yaml
 
     apiVersion: v1
     data:
@@ -51,19 +68,21 @@ Configuration will be like below
         meta.helm.sh/release-namespace: flyte
     ...
 
-4. Upgrade the Flyte Helm release.
+Replace ``<JWT_TOKEN>`` with your JWT token.
+
+6. Upgrade the Flyte Helm release.
 
    .. code-block:: bash
 
       helm upgrade -n flyte -f values-snowflake.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-5. Register the Snowflake plugin example.
+7. Register the Snowflake plugin example.
 
    .. code-block:: bash
 
       flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
 
-6. Lastly, fetch the launch plan, create and monitor the execution.
+8. Lastly, fetch the launch plan, create and monitor the execution.
 
    .. code-block:: bash
 

@@ -20,7 +20,7 @@ This guide gives an overview of how to set up the Athena in your AWS Flyte deplo
       flytectl sandbox start --source=./flytesnacks
       flytectl config init
 
-3. Create a file named ``values-athena.yaml`` and add the following config to it. Please make sure that propeller has correct service account for athena.
+3. Create a file named ``values-athena.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for Athena.
 
 .. code-block::
 
