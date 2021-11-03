@@ -31,6 +31,7 @@ class FeatureStoreConfig:
     s3_bucket: str
     online_store_path: str = 'online.db'
 
+
 @dataclass_json
 @dataclass
 class FeatureStore:
