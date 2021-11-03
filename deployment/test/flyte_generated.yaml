@@ -374,7 +374,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.5.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.15"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -455,7 +455,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-d9cm925f8m
+  name: flyte-propeller-config-hhtmttc8b4
   namespace: flyte
 ---
 apiVersion: v1
@@ -716,7 +716,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-d9cm925f8m
+          name: flyte-propeller-config-hhtmttc8b4
         name: config-volume
       - name: webhook-certs
         secret:
@@ -923,7 +923,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-d9cm925f8m
+          name: flyte-propeller-config-hhtmttc8b4
         name: config-volume
       - name: auth
         secret:
