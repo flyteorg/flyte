@@ -147,7 +147,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.43"` | Docker image tag |
+| flyteadmin.image.tag | string | `"haytham-user-1001-8"` | Docker image tag |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |

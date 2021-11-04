@@ -16,7 +16,7 @@ flyteadmin:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
     # -- Docker image tag
-    tag: v0.6.43 # FLYTEADMIN_TAG
+    tag: haytham-user-1001-8 # FLYTEADMIN_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment

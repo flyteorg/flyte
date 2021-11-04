@@ -3232,9 +3232,15 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
         - name: check-db-ready
           image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          securityContext:
+            runAsUser: 0
           command:
           - sh
           - -c
@@ -3245,7 +3251,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3261,7 +3267,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3274,7 +3280,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -3284,16 +3290,18 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
             [
-                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
+                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: scratch
+              mountPath: /etc/scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -3305,7 +3313,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -3351,6 +3359,8 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
         
+        - emptyDir: {}
+          name: scratch
         - emptyDir: {}
           name: shared-data
         - configMap:
@@ -3840,7 +3850,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+            image: "cr.flyte.org/flyteorg/flyteadmin:haytham-user-1001-8"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
