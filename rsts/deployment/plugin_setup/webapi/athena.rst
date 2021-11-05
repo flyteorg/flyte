@@ -1,7 +1,7 @@
 .. _deployment-plugin-setup-webapi-athena:
 
 Athena Plugin Setup
----------------------
+-------------------
 
 This guide gives an overview of how to set up the Athena in your AWS Flyte deployment. Athena plugin need flyte deployment in aws cloud, It will not work in sandbox/GCP/Azure flyte deployment. Please provide correct service account to flyte propeller for athena access.
 
