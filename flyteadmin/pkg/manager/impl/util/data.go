@@ -29,14 +29,18 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	if len(inputURI) == 0 {
 		return nil, nil, nil
 	}
-	inputsURLBlob, err := urlData.Get(ctx, inputURI)
-	if err != nil {
-		return nil, nil, err
+	var inputsURLBlob admin.UrlBlob
+	var err error
+	if remoteDataConfig.SignedURL.Enabled {
+		inputsURLBlob, err = urlData.Get(ctx, inputURI)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	var fullInputs core.LiteralMap
 	if shouldFetchData(remoteDataConfig, inputsURLBlob) {
-		err := storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
+		err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
@@ -90,7 +94,7 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		return nil, nil, nil
 	}
 	var outputsURLBlob admin.UrlBlob
-	if len(closure.GetOutputUri()) > 0 {
+	if len(closure.GetOutputUri()) > 0 && remoteDataConfig.SignedURL.Enabled {
 		var err error
 		outputsURLBlob, err = urlData.Get(ctx, closure.GetOutputUri())
 		if err != nil {

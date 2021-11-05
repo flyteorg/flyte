@@ -123,8 +123,9 @@ func TestGetInputs(t *testing.T) {
 		assert.Equal(t, inputsURI, uri)
 		return expectedURLBlob, nil
 	}
-	remoteDataConfig := interfaces.RemoteDataConfig{}
-	remoteDataConfig.MaxSizeInBytes = 2000
+	remoteDataConfig := interfaces.RemoteDataConfig{
+		MaxSizeInBytes: 2000,
+	}
 
 	mockStorage := commonMocks.GetMockStorageClient()
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
@@ -135,45 +136,74 @@ func TestGetInputs(t *testing.T) {
 		return nil
 	}
 
-	fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
-	assert.NoError(t, err)
-	assert.True(t, proto.Equal(fullInputs, testLiteralMap))
-	assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
+	t.Run("should sign URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: true,
+		}
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
+		assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
+	})
+	t.Run("should not sign URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: false,
+		}
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
+		assert.Empty(t, inputURLBlob)
+	})
+
 }
 
 func TestGetOutputs(t *testing.T) {
-	t.Run("offloaded outputs", func(t *testing.T) {
-		expectedURLBlob := admin.UrlBlob{
-			Url:   "s3://foo/signed/outputs.pb",
-			Bytes: 1000,
-		}
+	expectedURLBlob := admin.UrlBlob{
+		Url:   "s3://foo/signed/outputs.pb",
+		Bytes: 1000,
+	}
 
-		mockRemoteURL := urlMocks.NewMockRemoteURL()
-		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-			assert.Equal(t, testOutputsURI, uri)
-			return expectedURLBlob, nil
-		}
-		remoteDataConfig := interfaces.RemoteDataConfig{}
-		remoteDataConfig.MaxSizeInBytes = 2000
+	mockRemoteURL := urlMocks.NewMockRemoteURL()
+	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+		assert.Equal(t, testOutputsURI, uri)
+		return expectedURLBlob, nil
+	}
 
-		mockStorage := commonMocks.GetMockStorageClient()
-		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-			ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, testOutputsURI, reference.String())
-			marshalled, _ := proto.Marshal(testLiteralMap)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
-		}
-		closure := &admin.NodeExecutionClosure{
-			OutputResult: &admin.NodeExecutionClosure_OutputUri{
-				OutputUri: testOutputsURI,
-			},
+	remoteDataConfig := interfaces.RemoteDataConfig{
+		MaxSizeInBytes: 2000,
+	}
+	mockStorage := commonMocks.GetMockStorageClient()
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, testOutputsURI, reference.String())
+		marshalled, _ := proto.Marshal(testLiteralMap)
+		_ = proto.Unmarshal(marshalled, msg)
+		return nil
+	}
+	closure := &admin.NodeExecutionClosure{
+		OutputResult: &admin.NodeExecutionClosure_OutputUri{
+			OutputUri: testOutputsURI,
+		},
+	}
+	t.Run("offloaded outputs with signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: true,
 		}
 
 		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
+	})
+	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: false,
+		}
+
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
 		mockRemoteURL := urlMocks.NewMockRemoteURL()

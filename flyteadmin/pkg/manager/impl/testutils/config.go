@@ -26,6 +26,9 @@ func GetApplicationConfigWithDefaultDomains() runtimeInterfaces.ApplicationConfi
 			Name: "domain",
 		},
 	})
-	config.SetRemoteDataConfig(runtimeInterfaces.RemoteDataConfig{Scheme: common.Local})
+	config.SetRemoteDataConfig(runtimeInterfaces.RemoteDataConfig{
+		Scheme: common.Local, SignedURL: runtimeInterfaces.SignedURL{
+			Enabled: true,
+		}})
 	return &config
 }

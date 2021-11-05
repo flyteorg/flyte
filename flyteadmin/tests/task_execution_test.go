@@ -5,7 +5,6 @@ package tests
 import (
 	"context"
 	"net/url"
-	"strings"
 	"testing"
 	"time"
 
@@ -324,8 +323,24 @@ func TestGetTaskExecutionData(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to construct data reference [%s]. Error: %v", taskExecInputURI, err)
 	}
-	dataToStore := "task execution input data"
-	err = store.WriteRaw(ctx, inputRef, int64(len(dataToStore)), storage.Options{}, strings.NewReader(dataToStore))
+	taskInputs := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_StringValue{
+									StringValue: "foo",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	err = store.WriteProtobuf(ctx, inputRef, storage.Options{}, &taskInputs)
 	if err != nil {
 		t.Fatalf("Failed to write data. Error: %v", err)
 	}
@@ -335,8 +350,24 @@ func TestGetTaskExecutionData(t *testing.T) {
 		t.Fatalf("Failed to construct data reference. Error: %v", err)
 	}
 
-	dataToStore = "task execution output data"
-	err = store.WriteRaw(ctx, outputRef, int64(len(dataToStore)), storage.Options{}, strings.NewReader(dataToStore))
+	taskOutputs := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"bar": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_StringValue{
+									StringValue: "bar",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	err = store.WriteProtobuf(ctx, outputRef, storage.Options{}, &taskOutputs)
 	if err != nil {
 		t.Fatalf("Failed to write data. Error: %v", err)
 	}
@@ -375,8 +406,8 @@ func TestGetTaskExecutionData(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
 
-	assert.NotEmpty(t, resp.Inputs.Url)
-	assert.Equal(t, int64(25), resp.Inputs.Bytes)
-	assert.NotEmpty(t, resp.Outputs.Url)
-	assert.Equal(t, int64(26), resp.Outputs.Bytes)
+	assert.Empty(t, resp.Inputs)
+	assert.NotEmpty(t, resp.FullInputs)
+	assert.Empty(t, resp.Outputs)
+	assert.NotEmpty(t, resp.FullOutputs)
 }
