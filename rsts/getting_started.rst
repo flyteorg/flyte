@@ -44,15 +44,15 @@ Make sure you have `Git <https://git-scm.com/>`__, and `Python <https://www.pyth
 
 Start a new project / repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo.
+Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__), run a command to initialize your project, that command will prompt you for the name of directory where your example workflows are going to live. The ``init`` command comes with a help menu that can be shown by running ``pyflyte init --help``. For this guide we're going to use ``myflyteapp`` in the initial invocation.
 
 .. prompt:: bash (venv)$
 
     pip3 install flytekit --upgrade
-    git clone https://github.com/flyteorg/flytekit-python-template.git myflyteapp
+    pyflyte init myflyteapp
     cd myflyteapp
 
-The repo comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical Flyte app should be laid out.
+The ``myflyteapp`` directory comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical Flyte app should be laid out.
 
 .. dropdown:: A typical Flyte app should have these files
 
@@ -77,7 +77,7 @@ The repo comes with a sample workflow, which can be found under ``myapp/workflow
 
 Run the Workflow Locally
 ^^^^^^^^^^^^^^^^^^^^^^^^
-The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the `bottom of the file <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py#L58>`__.
+The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the bottom of ``myapp/workflows/example.py``.
 
 .. prompt:: bash (venv)$
 
