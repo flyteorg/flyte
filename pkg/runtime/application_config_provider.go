@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -97,7 +98,9 @@ func (p *ApplicationConfigurationProvider) GetDbConfig() interfaces.DbConfig {
 			logger.Fatalf(context.Background(), "failed to read database password from path [%s] with err: %v",
 				dbConfigSection.PasswordPath, err)
 		}
-		password = string(passwordVal)
+		// Passwords can contain special characters as long as they are percent encoded
+		// https://www.postgresql.org/docs/current/libpq-connect.html
+		password = strings.TrimSpace(string(passwordVal))
 	}
 	return interfaces.DbConfig{
 		Host:         dbConfigSection.Host,
