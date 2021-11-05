@@ -66,12 +66,13 @@ This guide gives an overview of how to set up the Tensorflow operator in your Fl
 
    .. code-block:: bash
 
+      TODO: https://github.com/flyteorg/flyte/issues/1757
       flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kftensorflow.tar.gz --archive -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
    .. code-block:: bash
 
-      flytectl get launchplan --project flytesnacks --domain development <Coming Soon>  --latest --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development <TODO: https://github.com/flyteorg/flyte/issues/1757>  --latest --execFile exec_spec.yaml
       flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
       flytectl get execution --project flytesnacks --domain development <execution_id>
