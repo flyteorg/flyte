@@ -44,7 +44,7 @@ Make sure you have `Git <https://git-scm.com/>`__, and `Python <https://www.pyth
 
 Start a new project / repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__), run a command to initialize your project, that command will prompt you for the name of directory where your example workflows are going to live. The ``init`` command comes with a help menu that can be shown by running ``pyflyte init --help``. For this guide we're going to use ``myflyteapp`` in the initial invocation.
+Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__), run ``pyflyte init {project_name}``, where ``{project_name}`` is the directory that will be created containing the scaffolding for a flyte-ready project. Feel free to use any name as your project name, however for this guide we're going to use ``myflyteapp`` in the  invocation:
 
 .. prompt:: bash (venv)$
 
