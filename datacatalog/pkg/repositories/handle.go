@@ -69,10 +69,6 @@ func (h *DBHandle) CreateDB(dbName string) error {
 }
 
 func (h *DBHandle) Migrate(ctx context.Context) error {
-	if h.db.Config.Dialector.Name() == config.Postgres {
-		logger.Infof(ctx, "Creating postgres extension uuid-ossp if it does not exist")
-		h.db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	}
 	if err := h.db.AutoMigrate(&models.Dataset{}); err != nil {
 		return err
 	}
