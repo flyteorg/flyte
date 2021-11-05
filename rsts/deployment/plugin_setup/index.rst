@@ -24,6 +24,15 @@ Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up AWS-specific Plugins.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-gcp
+       :type: ref
+       :text: GCP Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up GCP-specific Plugins.
+
 .. toctree::
     :maxdepth: 1
     :name: Plugin Setup
@@ -31,3 +40,4 @@ Plugin Setup
 
     k8s/index
     aws/index
+    gcp/index
