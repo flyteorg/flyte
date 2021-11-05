@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-webapi-athena:
+.. _deployment-plugin-setup-aws-athena:
 
 Athena Plugin Setup
 -------------------
