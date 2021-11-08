@@ -3,8 +3,7 @@
 Athena Plugin Setup
 -------------------
 
-This guide gives an overview of how to set up the Athena in your AWS Flyte deployment. Athena plugin need flyte deployment in aws cloud, It will not work in sandbox/GCP/Azure flyte deployment. Please provide correct service account to flyte propeller for athena access.
-
+This guide gives an overview of how to set up Athena in your Flyte deployment. Athena plugin needs Flyte deployment in AWS cloud; sandbox/GCP/Azure wouldn't work.
 
 1. Create a file named ``values-athena.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for Athena.
 

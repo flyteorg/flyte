@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-webapi-snowflake:
+.. _deployment-plugin-setup-task-template-snowflake:
 
 Snowflake Plugin Setup
 ----------------------
@@ -15,7 +15,6 @@ This guide gives an overview of how to set up Snowflake in your Flyte deployment
 
    .. code-block:: bash
 
-      // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
       flytectl sandbox start --source=./flytesnacks
       flytectl config init
 

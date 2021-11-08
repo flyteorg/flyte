@@ -17,12 +17,12 @@ Plugin Setup
 
     ---
 
-    .. link-button:: deployment-plugin-setup-webapi
+    .. link-button:: deployment-plugin-setup-task-template
        :type: ref
-       :text: Web API Plugin
+       :text: Task template Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Web API Plugins.
+    Guide to setting up the Task template Plugins.
 
     ---
 
@@ -39,5 +39,5 @@ Plugin Setup
     :hidden:
 
     k8s/index
-    webapi/index
+    task-template/index
     aws/index
