@@ -3,8 +3,7 @@
 Google Bigquery Plugin Setup
 ----------------------------
 
-This guide gives an overview of how to set up the Big query in your GCP Flyte deployment. Big query plugin need flyte deployment in GCP, It will not work in sandbox/AWS/Azure flyte deployment. Please provide correct service account to flyte propeller for bigquery access.
-
+This guide gives an overview of how to set up Big query in your Flyte deployment. Big query plugin needs Flyte deployment in GCP cloud; sandbox/GCP/Azure wouldn't work.
 
 1. Create a file named ``values-bigquery.yaml`` and add the following config to it.
 
