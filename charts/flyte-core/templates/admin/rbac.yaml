@@ -1,4 +1,4 @@
-
+{{- if .Values.flyteadmin.enabled }}
 ---
 {{- if .Values.flyteadmin.serviceAccount.create }}
 apiVersion: v1
@@ -55,3 +55,4 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "flyteadmin.name" . }}
   namespace: {{ template "flyte.namespace" . }}
+{{- end }}

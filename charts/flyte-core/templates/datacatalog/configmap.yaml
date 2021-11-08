@@ -1,3 +1,4 @@
+{{- if .Values.datacatalog.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,4 +16,4 @@ data:
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
-
+{{- end }}

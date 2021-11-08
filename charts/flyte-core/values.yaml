@@ -10,6 +10,7 @@
 #
 
 flyteadmin:
+  enabled: true
   # -- Replicas count for Flyteadmin deployment
   replicaCount: 1
   image:
@@ -67,6 +68,7 @@ flyteadmin:
 #
 
 flytescheduler:
+  enabled: true
   image:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler
@@ -110,6 +112,7 @@ flytescheduler:
 #
 
 datacatalog:
+  enabled: true
   # -- Replicas count for Datacatalog deployment
   replicaCount: 1
   image:
@@ -158,6 +161,7 @@ datacatalog:
 #
 
 flytepropeller:
+  enabled: true
   # -- Replicas count for Flytepropeller deployment
   replicaCount: 1
   image:
@@ -201,6 +205,7 @@ flytepropeller:
 #
 
 flyteconsole:
+  enabled: true
   # -- Replicas count for Flyteconsole deployment
   replicaCount: 1
   image:

@@ -1,3 +1,4 @@
+{{- if .Values.flytepropeller.enabled }}
 {{- if .Values.webhook.enabled }}
 # Create an empty secret that the first propeller pod will populate
 apiVersion: v1
@@ -155,4 +156,5 @@ subjects:
   - kind: ServiceAccount
     name: {{ template "flyte-pod-webhook.name" . }}
     namespace: {{ template "flyte.namespace" . }}
+{{- end }}
 {{- end }}
