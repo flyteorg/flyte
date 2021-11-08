@@ -126,22 +126,6 @@ data:
       hard:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
-    
-  zz_copilot_config.yaml: | 
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: | 
-        storage:
-          type: s3
-          container: "<BUCKET_NAME>"
-          connection:
-            auth-type: iam
-            region: <AWS_REGION>
-          enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
 apiVersion: v1
@@ -781,7 +765,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "faf2bd6b71f061de4716e29b46b929f85becc0030b93428c9f452b22dc19e04"
+        configChecksum: "adf94d568fc02f9cf174101c5087ccc3c4ce687eb4b1dadc9a8304a582220c7"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -926,7 +910,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8ef03d2ed4468082a4585c0454139c5df15794f3340e17c7ea338cd6e781b91"
+        configChecksum: "31c9b63c5d5979ec6d9c6bf1d6deaa1128117c74a50ad417820d7896e7eb7fd"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
@@ -983,7 +967,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0cf9d3a246a3eb65c44535f3ae9c441761bb4599ec44c50d433774959354336"
+        configChecksum: "d24f6644c4156f11152198f3b0fcf016c7cf9c9c4ac46a95a21b79bf48d2996"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1069,7 +1053,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a578eeaec6de5888f954e8c8edaa59b14beb76a93b993ba19e966591eb01714"
+        configChecksum: "6d10dc2e91e2cfa48db0fc64e52ff78b08fd06b651424f474eeaf6a6e515bde"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1141,7 +1125,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "a578eeaec6de5888f954e8c8edaa59b14beb76a93b993ba19e966591eb01714"
+        configChecksum: "6d10dc2e91e2cfa48db0fc64e52ff78b08fd06b651424f474eeaf6a6e515bde"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:

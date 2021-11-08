@@ -10,6 +10,5 @@ data:
 {{- range .Values.cluster_resource_manager.templates }}
   {{ .key }}.yaml: | {{ .value | nindent 4 }}
 {{- end }}
-  zz_copilot_config.yaml: | {{ include "copilot.config" . | nindent 4 }}
 {{- end }}
 {{- end }}

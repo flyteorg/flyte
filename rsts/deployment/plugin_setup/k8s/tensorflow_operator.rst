@@ -1,9 +1,9 @@
-.. _deployment-plugin-setup-pytorch-operator:
+.. _deployment-plugin-setup-k8s-tensorflow-operator:
 
-Kubeflow PyTorch Operator Plugin Setup
---------------------------------------
+Kubeflow TensorFlow Operator Plugin Setup
+-----------------------------------------
 
-This guide gives an overview of how to set up the PyTorch operator in your Flyte deployment.
+This guide gives an overview of how to set up the Tensorflow operator in your Flyte deployment.
 
 1. First, clone the Flytesnacks repo. This is where we have the example.
 
@@ -16,15 +16,17 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
    .. code-block:: bash
 
       flytectl sandbox start --source=./flytesnacks
+      flytectl config init
 
-3. Install the PyTorch Operator.
+3. Install the TensorFlow Operator.
 
    .. code-block:: bash
 
-      helm repo add bitnami https://charts.bitnami.com/bitnami --kubeconfig=~/.flyte/k3s/k3s.yaml
-      helm install my-release bitnami/pytorch
+      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
+      git clone https://github.com/kubeflow/training-operator.git
+      kustomize build training-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
-4. Create a file named ``values-pytorch.yaml`` and add the following config to it:
+4. Create a file named ``values-tensorflow.yaml`` and add the following config to it:
 
    .. code-block::
 
@@ -40,36 +42,37 @@ This guide gives an overview of how to set up the PyTorch operator in your Flyte
                  - container
                  - sidecar
                  - k8s-array
-                 - pytorch
+                 - tensorflow
                default-for-task-types:
                  container: container
                  sidecar: sidecar
                  container_array: k8s-array
-                 pytorch: pytorch
+                 tensorflow: tensorflow
 
 5. Upgrade the Flyte Helm release.
 
    .. code-block:: bash
 
-      helm upgrade -n flyte -f values-pytorch.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+      helm upgrade -n flyte -f values-tensorflow.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the PyTorch plugin example(Optional).
+6. (Optional) Build & Serialize the Tensorflow plugin example. (TODO: https://github.com/flyteorg/flyte/issues/1757)
 
    .. code-block:: bash
 
       cd flytesnacks
-      flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kfpytorch serialize
+      flytectl sandbox exec -- make -C cookbook/integrations/kubernetes/kftensorflow serialize
 
-7. Register the PyTorch plugin example.
+7. Register the TensorFlow plugin example. (TODO: https://github.com/flyteorg/flyte/issues/1757)
 
    .. code-block:: bash
 
-      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development
+      TODO: https://github.com/flyteorg/flyte/issues/1757
+      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kftensorflow.tar.gz --archive -p flytesnacks -d development
 
 8. Lastly, fetch the launch plan, create and monitor the execution.
 
    .. code-block:: bash
 
-      flytectl get launchplan --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development <TODO: https://github.com/flyteorg/flyte/issues/1757>  --latest --execFile exec_spec.yaml
       flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
       flytectl get execution --project flytesnacks --domain development <execution_id>

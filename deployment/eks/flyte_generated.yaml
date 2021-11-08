@@ -7999,25 +7999,6 @@ data:
       finalizers:
       - kubernetes
   ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
-  ac_project-copilot-dataconfig.yaml: |
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: |
-        storage:
-          connection:
-            access-key: minio
-            auth-type: accesskey
-            disable-ssl: true
-            endpoint: http://minio.flyte.svc.cluster.local:9000
-            region: us-east-1
-            secret-key: miniostorage
-          type: minio
-          container: my-s3-bucket
-          enable-multicontainer: true
   ad_spark-role.yaml: |
     apiVersion: rbac.authorization.k8s.io/v1beta1
     kind: Role
@@ -8052,7 +8033,7 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-tkdkkt4cb5
+  name: clusterresource-template-ccm6fbchft
   namespace: flyte
 ---
 apiVersion: v1
@@ -8251,7 +8232,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.5.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.15"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -8388,7 +8369,7 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-79b62khbc5
+  name: flyte-propeller-config-dtkccdkch8
   namespace: flyte
 ---
 apiVersion: v1
@@ -8735,7 +8716,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-79b62khbc5
+          name: flyte-propeller-config-dtkccdkch8
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8882,7 +8863,7 @@ spec:
           name: flyte-admin-config-29g4dtt8tc
         name: config-volume
       - configMap:
-          name: clusterresource-template-tkdkkt4cb5
+          name: clusterresource-template-ccm6fbchft
         name: resource-templates
       - name: db-pass
         secret:
@@ -8976,7 +8957,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-79b62khbc5
+          name: flyte-propeller-config-dtkccdkch8
         name: config-volume
       - name: auth
         secret:
@@ -9164,7 +9145,7 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-tkdkkt4cb5
+              name: clusterresource-template-ccm6fbchft
             name: resource-templates
           - configMap:
               name: flyte-admin-config-29g4dtt8tc

@@ -32,7 +32,6 @@ configMapGenerator:
     name: flyte-admin-config
   - behavior: merge
     files:
-      - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
       - ./config/clusterresource-templates/ad_spark-role.yaml
       - ./config/clusterresource-templates/ae_spark-service-account.yaml
       - ./config/clusterresource-templates/af_spark-role-binding.yaml

@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-mpi-operator:
+.. _deployment-plugin-setup-k8s-mpi-operator:
 
 Kubeflow MPI Operator Plugin Setup
 ----------------------------------
@@ -17,13 +17,15 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
       // NOTE: MPI plugin is only available in v0.18.0+ flyte release.
       flytectl sandbox start --source=./flytesnacks
+      flytectl config init
 
 3. Install the MPI Operator.
 
    .. code-block:: bash
 
+      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
       git clone https://github.com/kubeflow/mpi-operator.git
-      kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply --kubeconfig=~/.flyte/k3s/k3s.yaml -f -
+      kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
 4. Create a file named ``values-mpi.yaml`` and add the following config to it:
 
@@ -54,7 +56,7 @@ This guide gives an overview of how to set up the Kubeflow MPI operator in your 
 
       helm upgrade -n flyte -f values-mpi.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-6. Build & Serialize the MPI plugin example(Optional).
+6. (Optional) Build & Serialize the MPI plugin example.
 
    .. code-block:: bash
 

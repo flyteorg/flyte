@@ -137,31 +137,38 @@ Modify Code and Test Locally
             .. code-block:: yaml
 
                admin:
-                  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-                  endpoint: dns:///<replace-me>
-                  authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+                 # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+                 endpoint: dns:///<replace-me>
+                 authType: Pkce # authType: Pkce # if using authentication or just drop this.
+                 insecure: true # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
                storage:
-                  kind: s3
-                  config:
-                    auth_type: iam
-                    region: <replace> # Example: us-east-2
-                  container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
+                 type: stow
+                 stow:
+                   kind: s3
+                   config:
+                       auth_type: iam
+                       region: <REGION> # Example: us-east-2
+                 container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
+
 
          .. tabbed:: GCS Configuration
 
             .. code-block:: yaml
 
                admin:
-                  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-                  endpoint: dns:///<replace-me>
-                  authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+                 # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+                 endpoint: dns:///<replace-me>
+                 authType: Pkce # authType: Pkce # if using authentication or just drop this.
+                 insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
                storage:
-                  kind: google
-                  config:
-                    json: ""
-                    project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
-                    scopes: https://www.googleapis.com/auth/devstorage.read_write
-                  container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
+                 type: stow
+                 stow:
+                   kind: google
+                   config:
+                       json: ""
+                       project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
+                       scopes: https://www.googleapis.com/auth/devstorage.read_write
+                 container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
 
          .. tabbed:: Others
 
