@@ -1,4 +1,4 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
@@ -7,7 +7,23 @@ spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: flyte.lyft.com
   # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
   # either Namespaced or Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
