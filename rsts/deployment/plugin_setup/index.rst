@@ -17,6 +17,15 @@ Plugin Setup
 
     ---
 
+    .. link-button:: deployment-plugin-setup-task-template
+       :type: ref
+       :text: Task template Plugin
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Task template Plugins.
+
+    ---
+
     .. link-button:: deployment-plugin-setup-aws
        :type: ref
        :text: AWS Plugins
@@ -30,4 +39,5 @@ Plugin Setup
     :hidden:
 
     k8s/index
+    task-template/index
     aws/index

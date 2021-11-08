@@ -16,9 +16,19 @@ AWS Plugins Setup
     ^^^^^^^^^^^^
     Guide to setting up the AWS Batch Plugin.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-aws-athena
+       :type: ref
+       :text: AWS Athena
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the AWS Athena Plugin.
+
 .. toctree::
     :maxdepth: 1
     :name: AWS plugin Setup
     :hidden:
 
     batch
+    athena
