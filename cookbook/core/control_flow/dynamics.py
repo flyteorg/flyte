@@ -2,12 +2,24 @@
 Dynamic Workflows
 ------------------
 
-A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time. However,
-scenarios exist where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure.
+A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time.
+However, in cases where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure, you can use dynamic workflows by decorating a function with ``@dynamic``.
 
-Dynamic workflows can be used in such cases. Here's a code example that counts the common characters between any two
-strings.
+A dynamic workflow is similar to the :py:func:`~flytekit.workflow`, in that it represents a python-esque DSL to
+declare task interactions or new workflows. One significant difference between a regular workflow and dynamic (workflow) is that
+the latter is evaluated at runtime. This means that the inputs are first materialized and sent to the actual function,
+as if it were a task. However, the return value from a dynamic workflow is a promise rather than an actual value,
+which can be fulfilled by evaluating the various tasks that were invoked in the dynamic workflow.
 
+Within the ``@dynamic`` context (function), every invocation of a :py:func:`~flytekit.task` or a derivative of
+:py:class:`~flytekit.core.base_task.Task` class will result in deferred evaluation using a promise, instead
+of the actual value being materialized. You can also nest other ``@dynamic`` and ``@workflow`` constructs within this
+task, but it is not possible to interact with the outputs of a ``task/workflow`` as they are lazily evaluated.
+If you want to interact with the outputs, break up the logic in dynamic and create a new task to read and resolve the outputs.
+
+Refer to :py:func:`~flytekit.dynamic` for more documentation.
+
+Here's a code example that counts the common characters between any two strings.
 """
 
 # %%
@@ -62,12 +74,12 @@ def derive_count(freq1: typing.List[int], freq2: typing.List[int]) -> int:
 # Therefore, ``@dynamic`` decorator has to be used.
 #
 # Dynamic workflow is effectively both a task and a workflow. The key thing to note is that the _body of tasks is run at run time and the
-# body of workflows is run at compile (aka registration) time_. Essentially, this is what a dynamic workflow leverages -- it’s a workflow that is compiled at run time (the best of both worlds)!
+# body of workflows is run at compile (aka registration) time. Essentially, this is what a dynamic workflow leverages -- it’s a workflow that is compiled at run time (the best of both worlds)!
 #
 # At execution (run) time, Flytekit runs the compilation step, and produces
 # a ``WorkflowTemplate`` (from the dynamic workflow), which Flytekit then passes back to Flyte Propeller for further running, exactly how sub-workflows are handled.
 #
-# .. note:: For iterating over a list, the dynamic pattern is not always the most efficient method. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_ might be more efficient in certain cases, keeping in mind they only work for Python tasks (tasks decorated with the @task decorator, not sql/spark/etc). 
+# .. note:: For iterating over a list, the dynamic pattern is not always the most efficient method. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_ might be more efficient in certain cases, keeping in mind they only work for Python tasks (tasks decorated with the @task decorator, not sql/spark/etc).
 #
 # We now define the dynamic workflow encapsulating the above mentioned points.
 @dynamic
@@ -104,7 +116,7 @@ def count_characters(s1: str, s2: str) -> int:
 # Because of this fact, operations on the ``index`` variable like ``index + 1`` are not valid.
 # To manage this problem, the values need to be passed to the other tasks to unwrap them.
 #
-# .. note:: The local execution will work when a ``@dynamic`` decorator is used because Flytekit treats it like a ``task`` that will run with the Python native inputs. 
+# .. note:: The local execution will work when a ``@dynamic`` decorator is used because Flytekit treats it like a ``task`` that will run with the Python native inputs.
 # Therefore, there are no Promise objects locally within the function decorated with ``@dynamic`` as it is treated as a ``task``.
 
 # %%
