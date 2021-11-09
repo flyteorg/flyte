@@ -1,8 +1,13 @@
 package transformers
 
 import (
+	"context"
 	"testing"
 	"time"
+
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -78,7 +83,8 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 	closure := admin.NodeExecutionClosure{
 		StartedAt: startedAtProto,
 	}
-	err := addTerminalState(&request, &nodeExecutionModel, &closure)
+	err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 	assert.EqualValues(t, outputURI, closure.GetOutputUri())
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
@@ -104,6 +110,14 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 	}
 	request := admin.NodeExecutionEventRequest{
 		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				NodeId: "node id",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+			},
 			Phase: core.NodeExecution_SUCCEEDED,
 			OutputResult: &event.NodeExecutionEvent_OutputData{
 				OutputData: outputData,
@@ -119,10 +133,25 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 	closure := admin.NodeExecutionClosure{
 		StartedAt: startedAtProto,
 	}
-	err := addTerminalState(&request, &nodeExecutionModel, &closure)
-	assert.Nil(t, err)
-	assert.EqualValues(t, outputData, closure.GetOutputData())
-	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+	t.Run("output data stored inline", func(t *testing.T) {
+		err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Nil(t, err)
+		assert.EqualValues(t, outputData, closure.GetOutputData())
+		assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+	})
+	t.Run("output data stored offloaded", func(t *testing.T) {
+		mockStorage := commonMocks.GetMockStorageClient()
+		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/node id/offloaded_outputs")
+			return nil
+		}
+
+		err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+			interfaces.InlineEventDataPolicyOffload, mockStorage)
+		assert.Nil(t, err)
+		assert.Equal(t, "s3://bucket/metadata/project/domain/name/node id/offloaded_outputs", closure.GetOutputUri())
+	})
 }
 
 func TestAddTerminalState_Error(t *testing.T) {
@@ -146,14 +175,15 @@ func TestAddTerminalState_Error(t *testing.T) {
 	closure := admin.NodeExecutionClosure{
 		StartedAt: startedAtProto,
 	}
-	err := addTerminalState(&request, &nodeExecutionModel, &closure)
+	err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(error, closure.GetError()))
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
 }
 
 func TestCreateNodeExecutionModel(t *testing.T) {
-	nodeExecutionModel, err := CreateNodeExecutionModel(ToNodeExecutionModelInput{
+	nodeExecutionModel, err := CreateNodeExecutionModel(context.TODO(), ToNodeExecutionModelInput{
 		Request: &admin.NodeExecutionEventRequest{
 			Event: &event.NodeExecutionEvent{
 				Id: &core.NodeExecutionIdentifier{
@@ -224,7 +254,8 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 		nodeExecutionModel := models.NodeExecution{
 			Phase: core.NodeExecution_UNDEFINED.String(),
 		}
-		err := UpdateNodeExecutionModel(&request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef)
+		err := UpdateNodeExecutionModel(context.TODO(), &request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 		assert.Equal(t, core.NodeExecution_RUNNING.String(), nodeExecutionModel.Phase)
 		assert.Equal(t, occurredAt, *nodeExecutionModel.StartedAt)
@@ -287,7 +318,8 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 		nodeExecutionModel := models.NodeExecution{
 			Phase: core.NodeExecution_UNDEFINED.String(),
 		}
-		err := UpdateNodeExecutionModel(&request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef)
+		err := UpdateNodeExecutionModel(context.TODO(), &request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 		assert.Equal(t, core.NodeExecution_RUNNING.String(), nodeExecutionModel.Phase)
 		assert.Equal(t, occurredAt, *nodeExecutionModel.StartedAt)

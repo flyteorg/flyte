@@ -3,6 +3,9 @@ package transformers
 import (
 	"context"
 
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -24,6 +27,8 @@ type ToNodeExecutionModelInput struct {
 	ParentTaskExecutionID        uint
 	ParentID                     *uint
 	DynamicWorkflowRemoteClosure string
+	InlineEventDataPolicy        interfaces.InlineEventDataPolicy
+	StorageClient                *storage.DataStore
 }
 
 func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
@@ -44,8 +49,9 @@ func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecution
 }
 
 func addTerminalState(
+	ctx context.Context,
 	request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
-	closure *admin.NodeExecutionClosure) error {
+	closure *admin.NodeExecutionClosure, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	if closure.StartedAt == nil {
 		logger.Warning(context.Background(), "node execution is missing StartedAt")
 	} else {
@@ -64,8 +70,22 @@ func addTerminalState(
 			OutputUri: request.Event.GetOutputUri(),
 		}
 	} else if request.Event.GetOutputData() != nil {
-		closure.OutputResult = &admin.NodeExecutionClosure_OutputData{
-			OutputData: request.Event.GetOutputData(),
+		switch inlineEventDataPolicy {
+		case interfaces.InlineEventDataPolicyStoreInline:
+			closure.OutputResult = &admin.NodeExecutionClosure_OutputData{
+				OutputData: request.Event.GetOutputData(),
+			}
+		default:
+			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+				request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
+				request.Event.Id.NodeId, OutputsObjectSuffix)
+			if err != nil {
+				return err
+			}
+			closure.OutputResult = &admin.NodeExecutionClosure_OutputUri{
+				OutputUri: uri.String(),
+			}
 		}
 	} else if request.Event.GetError() != nil {
 		closure.OutputResult = &admin.NodeExecutionClosure_Error{
@@ -78,7 +98,7 @@ func addTerminalState(
 	return nil
 }
 
-func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExecution, error) {
+func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInput) (*models.NodeExecution, error) {
 	nodeExecution := &models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: input.Request.Event.Id.NodeId,
@@ -110,7 +130,7 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 		}
 	}
 	if common.IsNodeExecutionTerminal(input.Request.Event.Phase) {
-		err := addTerminalState(input.Request, nodeExecution, &closure)
+		err := addTerminalState(ctx, input.Request, nodeExecution, &closure, input.InlineEventDataPolicy, input.StorageClient)
 		if err != nil {
 			return nil, err
 		}
@@ -142,8 +162,9 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 }
 
 func UpdateNodeExecutionModel(
-	request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
-	targetExecution *core.WorkflowExecutionIdentifier, dynamicWorkflowRemoteClosure string) error {
+	ctx context.Context, request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
+	targetExecution *core.WorkflowExecutionIdentifier, dynamicWorkflowRemoteClosure string,
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	var nodeExecutionClosure admin.NodeExecutionClosure
 	err := proto.Unmarshal(nodeExecutionModel.Closure, &nodeExecutionClosure)
 	if err != nil {
@@ -161,7 +182,7 @@ func UpdateNodeExecutionModel(
 		}
 	}
 	if common.IsNodeExecutionTerminal(request.Event.Phase) {
-		err := addTerminalState(request, nodeExecutionModel, &nodeExecutionClosure)
+		err := addTerminalState(ctx, request, nodeExecutionModel, &nodeExecutionClosure, inlineEventDataPolicy, storageClient)
 		if err != nil {
 			return err
 		}

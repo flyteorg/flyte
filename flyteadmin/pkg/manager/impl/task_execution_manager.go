@@ -81,8 +81,11 @@ func (m *TaskExecutionManager) createTaskExecution(
 	}
 
 	taskExecutionModel, err := transformers.CreateTaskExecutionModel(
+		ctx,
 		transformers.CreateTaskExecutionModelInput{
-			Request: request,
+			Request:               request,
+			InlineEventDataPolicy: m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy,
+			StorageClient:         m.storageClient,
 		})
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform task execution %+v into database model: %v", request.Event.TaskId, err)
@@ -104,7 +107,8 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 	ctx context.Context, request *admin.TaskExecutionEventRequest, existingTaskExecution *models.TaskExecution) (
 	models.TaskExecution, error) {
 
-	err := transformers.UpdateTaskExecutionModel(request, existingTaskExecution)
+	err := transformers.UpdateTaskExecutionModel(ctx, request, existingTaskExecution,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy, m.storageClient)
 	if err != nil {
 		logger.Debugf(ctx, "failed to update task execution model [%+v] with err: %v", request.Event.TaskId, err)
 		return models.TaskExecution{}, err

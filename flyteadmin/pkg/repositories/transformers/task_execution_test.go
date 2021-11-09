@@ -1,10 +1,15 @@
 package transformers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
+
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/jsonpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -106,7 +111,8 @@ func TestAddTaskTerminalState_Error(t *testing.T) {
 	closure := admin.TaskExecutionClosure{
 		StartedAt: startedAtProto,
 	}
-	err := addTaskTerminalState(&request, &taskExecutionModel, &closure)
+	err := addTaskTerminalState(context.TODO(), &request, &taskExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(expectedErr, closure.GetError()))
 	assert.Equal(t, time.Minute, taskExecutionModel.Duration)
@@ -129,7 +135,8 @@ func TestAddTaskTerminalState_OutputURI(t *testing.T) {
 	}
 
 	closure := &admin.TaskExecutionClosure{}
-	err := addTaskTerminalState(&request, &taskExecutionModel, closure)
+	err := addTaskTerminalState(context.TODO(), &request, &taskExecutionModel, closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 
 	duration, err := ptypes.Duration(closure.GetDuration())
@@ -161,6 +168,22 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 	}
 	request := admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "project",
+				Domain:       "domain",
+				Name:         "name",
+				Version:      "version",
+			},
+			RetryAttempt: 1,
+			ParentNodeExecutionId: &core.NodeExecutionIdentifier{
+				NodeId: "node id",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "ex project",
+					Domain:  "ex domain",
+					Name:    "ex name",
+				},
+			},
 			Phase: core.TaskExecution_SUCCEEDED,
 			OutputResult: &event.TaskExecutionEvent_OutputData{
 				OutputData: outputData,
@@ -173,21 +196,37 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 		StartedAt: &startedAt,
 	}
 
-	closure := &admin.TaskExecutionClosure{}
-	err := addTaskTerminalState(&request, &taskExecutionModel, closure)
-	assert.Nil(t, err)
+	t.Run("output data stored inline", func(t *testing.T) {
+		closure := &admin.TaskExecutionClosure{}
+		err := addTaskTerminalState(context.TODO(), &request, &taskExecutionModel, closure,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Nil(t, err)
 
-	duration, err := ptypes.Duration(closure.GetDuration())
-	assert.Nil(t, err)
-	assert.EqualValues(t, request.Event.OutputResult, closure.OutputResult)
-	assert.True(t, proto.Equal(outputData, closure.GetOutputData()))
-	assert.EqualValues(t, time.Minute, duration)
+		duration, err := ptypes.Duration(closure.GetDuration())
+		assert.Nil(t, err)
+		assert.EqualValues(t, request.Event.OutputResult, closure.OutputResult)
+		assert.True(t, proto.Equal(outputData, closure.GetOutputData()))
+		assert.EqualValues(t, time.Minute, duration)
+	})
+	t.Run("output data stored offloaded", func(t *testing.T) {
+		mockStorage := commonMocks.GetMockStorageClient()
+		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/ex project/ex domain/ex name/node id/project/domain/name/version/1/offloaded_outputs")
+			return nil
+		}
+
+		closure := &admin.TaskExecutionClosure{}
+		err := addTaskTerminalState(context.TODO(), &request, &taskExecutionModel, closure,
+			interfaces.InlineEventDataPolicyOffload, mockStorage)
+		assert.Nil(t, err)
+		assert.Equal(t, "s3://bucket/metadata/ex project/ex domain/ex name/node id/project/domain/name/version/1/offloaded_outputs", closure.GetOutputUri())
+	})
 
 	assert.Equal(t, time.Minute, taskExecutionModel.Duration)
 }
 
 func TestCreateTaskExecutionModelQueued(t *testing.T) {
-	taskExecutionModel, err := CreateTaskExecutionModel(CreateTaskExecutionModelInput{
+	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
 		Request: &admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
 				TaskId:                sampleTaskID,
@@ -243,7 +282,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 }
 
 func TestCreateTaskExecutionModelRunning(t *testing.T) {
-	taskExecutionModel, err := CreateTaskExecutionModel(CreateTaskExecutionModelInput{
+	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
 		Request: &admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
 				TaskId:                sampleTaskID,
@@ -403,7 +442,8 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		},
 	}
 
-	err = UpdateTaskExecutionModel(failedEventRequest, &existingTaskExecution)
+	err = UpdateTaskExecutionModel(context.TODO(), failedEventRequest, &existingTaskExecution,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 
 	expectedClosure := &admin.TaskExecutionClosure{
