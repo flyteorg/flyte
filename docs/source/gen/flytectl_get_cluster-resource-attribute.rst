@@ -3,17 +3,15 @@
 flytectl get cluster-resource-attribute
 ---------------------------------------
 
-Gets matchable resources of cluster resource attributes
+Gets matchable resources of cluster resource attributes.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves cluster resource attributes for given project and domain combination or additionally with workflow name.
-
-Retrieves cluster resource attribute for project and domain
-Here the command get cluster resource attributes for  project flytectldemo and development domain.
+Retrieve cluster resource attributes for the given project and domain.
+Here, the command gets cluster resource attributes for the project flytectldemo and development domain.
 ::
 
  flytectl get cluster-resource-attribute -p flytectldemo -d development 
@@ -24,8 +22,8 @@ eg : output from the command
 
  {"project":"flytectldemo","domain":"development","attributes":{"buzz":"lightyear","foo":"bar"}}
 
-Retrieves cluster resource attribute for project and domain and workflow
-Here the command get cluster resource attributes for  project flytectldemo, development domain and workflow core.control_flow.run_merge_sort.merge_sort
+Retrieve cluster resource attributes for the given project, domain, and workflow.
+Here, the command gets cluster resource attributes for the project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort'.
 ::
 
  flytectl get cluster-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
@@ -36,8 +34,8 @@ eg : output from the command
 
  {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","attributes":{"buzz":"lightyear","foo":"bar"}}
 
-Writing the cluster resource attribute to a file. If there are no cluster resource attributes , command would return an error.
-Here the command gets task resource attributes and writes the config file to cra.yaml
+Writes the cluster resource attributes to a file. If there are no cluster resource attributes,the command throws an error.
+Here, the command gets the task resource attributes and writes the config file to cra.yaml file.
 eg:  content of cra.yaml
 
 ::
