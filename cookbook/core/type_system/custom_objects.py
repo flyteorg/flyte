@@ -7,7 +7,7 @@ flytekit supports passing custom data objects between tasks. Currently only data
 @dataclasses_json are supported.
 
 This example shows how users can serialize custom JSON'able dataclasses between successive tasks using the excellent
-`dataclasses_json <https://pypi.org/project/dataclasses-json/>` library
+`dataclasses_json <https://pypi.org/project/dataclasses-json/>`_ library
 """
 import typing
 from dataclasses import dataclass
