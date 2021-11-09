@@ -123,11 +123,13 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 		}
 		parentID = &parentNodeExecutionModel.ID
 	}
-	nodeExecutionModel, err := transformers.CreateNodeExecutionModel(transformers.ToNodeExecutionModelInput{
+	nodeExecutionModel, err := transformers.CreateNodeExecutionModel(ctx, transformers.ToNodeExecutionModelInput{
 		Request:                      request,
 		ParentTaskExecutionID:        parentTaskExecutionID,
 		ParentID:                     parentID,
 		DynamicWorkflowRemoteClosure: dynamicWorkflowRemoteClosureReference,
+		InlineEventDataPolicy:        m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy,
+		StorageClient:                m.storageClient,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "failed to create node execution model for event request: %s with err: %v",
@@ -175,7 +177,9 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 			return updateFailed, err
 		}
 	}
-	err := transformers.UpdateNodeExecutionModel(request, nodeExecutionModel, childExecutionID, dynamicWorkflowRemoteClosureReference)
+	err := transformers.UpdateNodeExecutionModel(ctx, request, nodeExecutionModel, childExecutionID,
+		dynamicWorkflowRemoteClosureReference, m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy,
+		m.storageClient)
 	if err != nil {
 		logger.Debugf(ctx, "failed to update node execution model: %+v with err: %v", request.Event.Id, err)
 		return updateFailed, err

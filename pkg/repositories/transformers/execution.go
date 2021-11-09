@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -104,7 +106,9 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 
 // Updates an existing model given a WorkflowExecution event.
 func UpdateExecutionModelState(
-	execution *models.Execution, request admin.WorkflowExecutionEventRequest) error {
+	ctx context.Context,
+	execution *models.Execution, request admin.WorkflowExecutionEventRequest,
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)
 	if err != nil {
@@ -143,8 +147,25 @@ func UpdateExecutionModelState(
 			},
 		}
 	} else if request.Event.GetOutputData() != nil {
-		executionClosure.OutputResult = &admin.ExecutionClosure_OutputData{
-			OutputData: request.Event.GetOutputData(),
+		switch inlineEventDataPolicy {
+		case interfaces.InlineEventDataPolicyStoreInline:
+			executionClosure.OutputResult = &admin.ExecutionClosure_OutputData{
+				OutputData: request.Event.GetOutputData(),
+			}
+		default:
+			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+			if err != nil {
+				return err
+			}
+			executionClosure.OutputResult = &admin.ExecutionClosure_Outputs{
+				Outputs: &admin.LiteralMapBlob{
+					Data: &admin.LiteralMapBlob_Uri{
+						Uri: uri.String(),
+					},
+				},
+			}
 		}
 	} else if request.Event.GetError() != nil {
 		executionClosure.OutputResult = &admin.ExecutionClosure_Error{

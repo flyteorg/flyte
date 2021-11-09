@@ -311,7 +311,19 @@ type SignedURL struct {
 	SigningPrincipal string `json:"signingPrincipal"`
 }
 
-// This configuration handles all requests to get remote data such as execution inputs & outputs.
+//go:generate enumer -type=InlineEventDataPolicy -trimprefix=InlineEventDataPolicy
+type InlineEventDataPolicy = int
+
+const (
+	// InlineEventDataPolicyOffload specifies that inline execution event data (e.g. outputs) should be offloaded to the
+	// configured cloud blob store.
+	InlineEventDataPolicyOffload InlineEventDataPolicy = iota
+	// InlineEventDataPolicyStoreInline specifies that inline execution event data should be saved inline with execution
+	// database entries.
+	InlineEventDataPolicyStoreInline
+)
+
+// This configuration handles all requests to get and write remote data such as execution inputs & outputs.
 type RemoteDataConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
 	// scheme is used.
@@ -321,6 +333,8 @@ type RemoteDataConfig struct {
 	SignedURL SignedURL `json:"signedUrls"`
 	// Specifies the max size in bytes for which execution data such as inputs and outputs will be populated in line.
 	MaxSizeInBytes int64 `json:"maxSizeInBytes"`
+	// Specifies how inline execution event data should be saved in the backend
+	InlineEventDataPolicy InlineEventDataPolicy `json:"inlineEventDataPolicy" pflag:",Specifies how inline execution event data should be saved in the backend"`
 }
 
 // This section handles configuration for the workflow notifications pipeline.

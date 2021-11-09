@@ -2,6 +2,10 @@ package transformers
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"google.golang.org/protobuf/encoding/protojson"
 
@@ -23,7 +27,9 @@ var empty _struct.Struct
 var jsonEmpty, _ = protojson.Marshal(&empty)
 
 type CreateTaskExecutionModelInput struct {
-	Request *admin.TaskExecutionEventRequest
+	Request               *admin.TaskExecutionEventRequest
+	InlineEventDataPolicy interfaces.InlineEventDataPolicy
+	StorageClient         *storage.DataStore
 }
 
 func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
@@ -38,8 +44,10 @@ func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecution
 }
 
 func addTaskTerminalState(
+	ctx context.Context,
 	request *admin.TaskExecutionEventRequest,
-	taskExecutionModel *models.TaskExecution, closure *admin.TaskExecutionClosure) error {
+	taskExecutionModel *models.TaskExecution, closure *admin.TaskExecutionClosure,
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	if taskExecutionModel.StartedAt == nil {
 		logger.Warning(context.Background(), "task execution is missing StartedAt")
 	} else {
@@ -62,8 +70,24 @@ func addTaskTerminalState(
 			OutputUri: request.Event.GetOutputUri(),
 		}
 	} else if request.Event.GetOutputData() != nil {
-		closure.OutputResult = &admin.TaskExecutionClosure_OutputData{
-			OutputData: request.Event.GetOutputData(),
+		switch inlineEventDataPolicy {
+		case interfaces.InlineEventDataPolicyStoreInline:
+			closure.OutputResult = &admin.TaskExecutionClosure_OutputData{
+				OutputData: request.Event.GetOutputData(),
+			}
+		default:
+			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
+				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
+				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
+				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
+			if err != nil {
+				return err
+			}
+			closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
+				OutputUri: uri.String(),
+			}
 		}
 	} else if request.Event.GetError() != nil {
 		closure.OutputResult = &admin.TaskExecutionClosure_Error{
@@ -73,7 +97,7 @@ func addTaskTerminalState(
 	return nil
 }
 
-func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.TaskExecution, error) {
+func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionModelInput) (*models.TaskExecution, error) {
 	taskExecution := &models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
@@ -121,7 +145,7 @@ func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.Task
 	}
 
 	if common.IsTaskExecutionTerminal(input.Request.Event.Phase) {
-		err := addTaskTerminalState(input.Request, taskExecution, closure)
+		err := addTaskTerminalState(ctx, input.Request, taskExecution, closure, input.InlineEventDataPolicy, input.StorageClient)
 		if err != nil {
 			return nil, err
 		}
@@ -216,7 +240,8 @@ func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
 	return &response, nil
 }
 
-func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution) error {
+func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	var taskExecutionClosure admin.TaskExecutionClosure
 	err := proto.Unmarshal(taskExecutionModel.Closure, &taskExecutionClosure)
 	if err != nil {
@@ -240,7 +265,7 @@ func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExec
 	}
 
 	if common.IsTaskExecutionTerminal(request.Event.Phase) {
-		err := addTaskTerminalState(request, taskExecutionModel, &taskExecutionClosure)
+		err := addTaskTerminalState(ctx, request, taskExecutionModel, &taskExecutionClosure, inlineEventDataPolicy, storageClient)
 		if err != nil {
 			return err
 		}

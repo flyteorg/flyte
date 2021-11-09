@@ -1,9 +1,14 @@
 package transformers
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
+
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/ptypes"
@@ -124,12 +129,12 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 
 	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
-	err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_RUNNING,
 			OccurredAt: occurredAtProto,
 		},
-	})
+	}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 
 	expectedClosure := admin.ExecutionClosure{
@@ -188,7 +193,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 		Kind:    ek,
 		Message: "bar baz",
 	}
-	err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_ABORTED,
 			OccurredAt: occurredAtProto,
@@ -196,7 +201,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 				Error: &executionError,
 			},
 		},
-	})
+	}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 
 	ekString := ek.String()
@@ -275,7 +280,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	}
 
 	t.Run("output URI set", func(t *testing.T) {
-		err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -283,7 +288,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 					OutputUri: "output.pb",
 				},
 			},
-		})
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 
 		expectedClosure := admin.ExecutionClosure{
@@ -326,7 +331,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 				},
 			},
 		}
-		err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -334,7 +339,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 					OutputData: outputData,
 				},
 			},
-		})
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 
 		expectedClosure := admin.ExecutionClosure{
@@ -349,6 +354,67 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			Duration:  durationProto,
 			OutputResult: &admin.ExecutionClosure_OutputData{
 				OutputData: outputData,
+			},
+		}
+		closureBytes, _ := proto.Marshal(&expectedClosure)
+		expectedModel.Closure = closureBytes
+		assert.EqualValues(t, expectedModel, executionModel)
+	})
+	t.Run("output data offloaded", func(t *testing.T) {
+		outputData := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 4,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		mockStorage := commonMocks.GetMockStorageClient()
+		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/offloaded_outputs")
+			return nil
+		}
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				Phase:      core.WorkflowExecution_SUCCEEDED,
+				OccurredAt: occurredAtProto,
+				OutputResult: &event.WorkflowExecutionEvent_OutputData{
+					OutputData: outputData,
+				},
+			},
+		}, interfaces.InlineEventDataPolicyOffload, mockStorage)
+		assert.Nil(t, err)
+
+		expectedClosure := admin.ExecutionClosure{
+			ComputedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {},
+				},
+			},
+			Phase:     core.WorkflowExecution_SUCCEEDED,
+			StartedAt: startedAtProto,
+			UpdatedAt: occurredAtProto,
+			Duration:  durationProto,
+			OutputResult: &admin.ExecutionClosure_Outputs{
+				Outputs: &admin.LiteralMapBlob{
+					Data: &admin.LiteralMapBlob_Uri{
+						Uri: "s3://bucket/metadata/project/domain/name/offloaded_outputs",
+					},
+				},
 			},
 		}
 		closureBytes, _ := proto.Marshal(&expectedClosure)
