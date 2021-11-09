@@ -5,11 +5,14 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
+
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const database = "database"
@@ -55,6 +58,9 @@ var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.Schedule
 				Burst: 10,
 			},
 		},
+	},
+	PrecheckBackoff: wait.Backoff{
+		Duration: time.Second, Factor: 2.0, Steps: 30, Jitter: 0.1,
 	},
 })
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{
