@@ -123,7 +123,7 @@ func newGRPCServer(ctx context.Context, cfg *config.ServerConfig, authCtx interf
 	}
 
 	healthServer := health.NewServer()
-	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	healthServer.SetServingStatus("flyteadmin", grpc_health_v1.HealthCheckResponse_SERVING)
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
 	if cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)
