@@ -6,6 +6,7 @@ resources:
   # global resources
   - ../../namespace
   - ../../admindeployment
+  - ../../schedulerdeployment
   - ../../datacatalog
   - ../../wf_crd
   - ../../pod_webhook

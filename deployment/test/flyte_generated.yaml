@@ -460,6 +460,38 @@ metadata:
 ---
 apiVersion: v1
 data:
+  admin.yaml: |
+    admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  db.yaml: |
+    database:
+      dbname: postgres
+      host: postgres
+      port: 5432
+      username: postgres
+  logger.yaml: |
+    logger:
+      level: 4
+      show-source: true
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flytescheduler
+    helm.sh/chart: flyte-v0.1.10
+  name: flyte-scheduler-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
   pass.txt: YXdlc29tZXNhdWNl
 kind: Secret
 metadata:
@@ -925,6 +957,78 @@ spec:
       - configMap:
           name: flyte-propeller-config-hhtmttc8b4
         name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-propeller-auth
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flytescheduler
+  name: flytescheduler
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flytescheduler
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flytescheduler
+        app.kubernetes.io/name: flytescheduler
+        app.kubernetes.io/version: 0.3.4
+    spec:
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: cr.flyte.org/flyteorg/flytescheduler:v0.6.49
+        imagePullPolicy: IfNotPresent
+        name: flytescheduler
+        resources:
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+        - mountPath: /etc/secrets/
+          name: auth
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
+      initContainers:
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: cr.flyte.org/flyteorg/flytescheduler:v0.6.49
+        imagePullPolicy: IfNotPresent
+        name: flytescheduler-check
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      serviceAccountName: flyteadmin
+      volumes:
+      - configMap:
+          name: flyte-scheduler-config
+        name: config-volume
+      - name: db-pass
+        secret:
+          secretName: db-pass-9dgchhk2bm
       - name: auth
         secret:
           secretName: flyte-propeller-auth
