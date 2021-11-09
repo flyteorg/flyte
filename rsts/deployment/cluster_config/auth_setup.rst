@@ -111,7 +111,7 @@ Apply Configuration
 
    .. prompt:: bash
 
-     kubectl edit secret -n flyte flyte-admin-auth
+     kubectl edit secret -n flyte flyte-admin-secrets
 
    Add a new key under `stringData`:
 
