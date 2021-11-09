@@ -40,7 +40,7 @@ spec:
             secretName: flyte-admin-auth
       initContainers:
         - name: run-migrations
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -57,7 +57,7 @@ spec:
               mountPath: /etc/db
         # Optional, These just seed the project - TODO move them to only
         - name: seed-projects
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -76,7 +76,7 @@ spec:
             - name: db-pass
               mountPath: /etc/db
         - name: sync-cluster-resources
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -94,7 +94,7 @@ spec:
             - name: db-pass
               mountPath: /etc/db
         - name: generate-secrets
-          image: flyteadmin:v0.4.0
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
@@ -111,7 +111,7 @@ spec:
                   fieldPath: metadata.namespace
       containers:
         - name: flyteadmin
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "serve"]
