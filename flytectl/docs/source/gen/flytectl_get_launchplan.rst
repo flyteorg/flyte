@@ -10,25 +10,25 @@ Synopsis
 
 
 
-Retrieves all the launch plans within project and domain.(launchplan,launchplans can be used interchangeably in these commands)
+Retrieve all launch plans within the project and domain (launchplan, launchplans can be used interchangeably).
 ::
 
  flytectl get launchplan -p flytesnacks -d development
 
-Retrieves launch plan by name within project and domain.
+ Retrieve a launch plan by name within the project and domain.
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
 
-Retrieves latest version of task by name within project and domain.
+Retrieve the latest version of the task by name within the project and domain.
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --latest
 
-Retrieves particular version of launchplan by name within project and domain.
+Retrieves a particular version of the launch plan by name within the project and domain.
 
 ::
 
@@ -51,25 +51,25 @@ Retrieves all the launch plans with limit and sorting.
   bin/flytectl get launchplan -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
  
 
-Retrieves all the launchplan within project and domain in yaml format.
+Retrieves all launch plans within the project and domain in YAML format.
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development -o yaml
 
-Retrieves all the launchplan within project and domain in json format
+Retrieves all launch plans the within the project and domain in JSON format.
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development -o json
 
-Retrieves a launch plans within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution.
+Retrieve a launch plan within the project and domain as per a version and generate the execution spec file; the file can be used to launch the execution using the 'create execution' command.
 
 ::
 
  flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yaml
 
-The generated file would look similar to this
+The generated file would look similar to this:
 
 .. code-block:: yaml
 

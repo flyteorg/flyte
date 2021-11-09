@@ -10,12 +10,12 @@ Synopsis
 
 
 
-Retrieves all the executions within project and domain.(execution,executions can be used interchangeably in these commands)
+Retrieve all executions within the project and domain (execution, executions can be used interchangeably).
 ::
 
  bin/flytectl get execution -p flytesnacks -d development
 
-Retrieves execution by name within project and domain.
+Retrieves executions by name within the project and domain.
 
 ::
 
@@ -27,44 +27,44 @@ Retrieves all the executions with filters.
   bin/flytectl get execution -p flytesnacks -d development --filter.fieldSelector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
 
  
-Retrieves all the execution with limit and sorting.
+Retrieve executions as per the specified limit and sorting parameters.
 ::
   
    bin/flytectl get execution -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
    
 
-Retrieves all the execution within project and domain in yaml format
+Retrieve executions within the project and domain in YAML format.
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development -o yaml
 
-Retrieves all the execution within project and domain in json format.
+Retrieve executions within the project and domain in JSON format.
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development -o json
 
 
-Get more details for the execution using --details flag which shows node executions along with task executions on them. Default view is tree view and TABLE format is not supported on this view
+Get more details of the execution using the --details flag, which shows node and task executions. The default view is a tree view, and the TABLE view format is not supported on this view.
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
 
-Using yaml view for the details. In this view only node details are available. For task details pass --nodeID flag
+Fetch execution details in YAML format. In this view, only node details are available. For task, send the --nodeID flag.
 
 ::
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
 
-Using --nodeID flag to get task executions on a specific node. Use the nodeID attribute from node details view
+Fetch task executions on a specific node using the --nodeID flag. Use the nodeID attribute given by the node details view.
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodeID n0
 
-Task execution view is also available in yaml/json format. Below example shows yaml. This also contains inputs/outputs data for each node
+Task execution view is also available in YAML/JSON format. The following example showcases YAML, where the output also contains input and output data of each node.
 
 ::
 

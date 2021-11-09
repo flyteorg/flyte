@@ -71,9 +71,9 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_get_cluster-resource-attribute` 	 - Gets matchable resources of cluster resource attributes
+* :doc:`flytectl_get_cluster-resource-attribute` 	 - Gets matchable resources of cluster resource attributes.
 * :doc:`flytectl_get_execution` 	 - Gets execution resources
-* :doc:`flytectl_get_execution-cluster-label` 	 - Gets matchable resources of execution cluster label
+* :doc:`flytectl_get_execution-cluster-label` 	 - Gets matchable resources of execution cluster label.
 * :doc:`flytectl_get_execution-queue-attribute` 	 - Gets matchable resources of execution queue attributes
 * :doc:`flytectl_get_launchplan` 	 - Gets launch plan resources
 * :doc:`flytectl_get_plugin-override` 	 - Gets matchable resources of plugin override
