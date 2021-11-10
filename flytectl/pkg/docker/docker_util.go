@@ -15,6 +15,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/enescakir/emoji"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
@@ -174,9 +175,9 @@ func InspectExecResp(ctx context.Context, cli Docker, containerID string) error 
 	if err != nil {
 		return err
 	}
-	s := bufio.NewScanner(resp.Reader)
-	for s.Scan() {
-		fmt.Println(s.Text())
+	_, err = stdcopy.StdCopy(os.Stdout, os.Stderr, resp.Reader)
+	if err != nil {
+		return err
 	}
 	return nil
 }
