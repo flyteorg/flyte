@@ -100,6 +100,7 @@ flytepropeller:
       ephemeral-storage: 2Gi
       memory: 1Gi
   cacheSizeMbs: 1024
+  client_secret: foobar
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

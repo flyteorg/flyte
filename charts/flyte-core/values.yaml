@@ -176,6 +176,7 @@ flytepropeller:
       ephemeral-storage: 50Mi
       memory: 50Mi
   cacheSizeMbs: 0
+  client_secret: foobar
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
