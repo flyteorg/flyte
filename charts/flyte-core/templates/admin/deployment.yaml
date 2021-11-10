@@ -17,6 +17,10 @@ spec:
         {{- end }}
       labels: {{ include "flyteadmin.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
         {{- if .Values.db.checks }}
         - name: check-db-ready

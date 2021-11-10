@@ -19,6 +19,10 @@ spec:
         {{- end }}
       labels: {{ include "flytescheduler.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
       - command:
         - flytescheduler

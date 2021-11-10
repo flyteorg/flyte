@@ -22,6 +22,10 @@ spec:
         prometheus.io/port: "10254"
         prometheus.io/path: "/metrics"
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       serviceAccountName: flyteadmin
       volumes:
         - name: shared-data
