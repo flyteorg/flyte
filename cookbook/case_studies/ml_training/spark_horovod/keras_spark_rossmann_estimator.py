@@ -8,23 +8,18 @@ import os
 import pathlib
 import subprocess
 import sys
-import typing
 from dataclasses import dataclass
 from distutils.version import LooseVersion
 
 import flytekit
 import horovod.spark.keras as hvd
-import pyspark
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 import tensorflow as tf
 import tensorflow.keras.backend as K
 from dataclasses_json import dataclass_json
-from flytekit import LaunchPlan, Resources, task, workflow, FlyteContextManager
-from flytekit.models.common import AuthRole
+from flytekit import Resources, task, workflow
 from flytekit.types.directory import FlyteDirectory
-from flytekit.types.file import CSVFile, FlyteFile
-from flytekit.types.schema import FlyteSchema
 from flytekitplugins.spark import Spark
 from horovod.spark.common.backend import SparkBackend
 from horovod.spark.common.store import Store
@@ -40,6 +35,7 @@ from tensorflow.keras.layers import (
     Input,
     Reshape,
 )
+
 
 ############
 # GET DATA #

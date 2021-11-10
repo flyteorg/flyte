@@ -15,7 +15,7 @@ Kubernetes. It leverages `TF Job <https://github.com/kubeflow/tf-operator>`_ Plu
 
     from flytekit import PythonFunctionTask, Resources
     from flytekit.extend import SerializationSettings, TaskPlugins
-    from flytekit.models import task as _task_model
+    from flytekitplugins.kftensorflow.models import TensorFlowJob
 
 
     @dataclass
@@ -58,7 +58,7 @@ Kubernetes. It leverages `TF Job <https://github.com/kubeflow/tf-operator>`_ Plu
             )
 
         def get_custom(self, settings: SerializationSettings) -> Dict[str, Any]:
-            job = _task_model.TensorFlowJob(
+            job = TensorFlowJob(
                 workers_count=self.task_config.num_workers,
                 ps_replicas_count=self.task_config.num_ps_replicas,
                 chief_replicas_count=self.task_config.num_chief_replicas,

@@ -23,7 +23,7 @@ Launch Plan Usage Example
 
 .. code:: python
 
-    from flytekit.models.common import Labels, Annotations
+    from flytekit import Labels, Annotations
 
     @workflow
     class MyWorkflow(object):
@@ -42,7 +42,7 @@ Execution Example
 
 .. code:: python
 
-    from flytekit.models.common import Labels, Annotations
+    from flytekit import Labels, Annotations
 
     @workflow
     class MyWorkflow(object):

@@ -24,8 +24,7 @@ Notifications
 
 # %%
 # Consider the following example workflow:
-from flytekit import Email, LaunchPlan, task, workflow
-from flytekit.models.core.execution import WorkflowExecutionPhase
+from flytekit import Email, LaunchPlan, task, workflow, WorkflowExecutionPhase
 
 
 @task
