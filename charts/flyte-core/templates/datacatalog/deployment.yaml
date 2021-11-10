@@ -25,6 +25,8 @@ spec:
       {{- if .Values.db.checks }}
       - name: check-db-ready
         image: postgres:10.16-alpine
+        securityContext:
+          runAsUser: 0
         command:
           - sh
           - -c
