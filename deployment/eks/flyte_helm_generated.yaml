@@ -1471,6 +1471,9 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroupChangePolicy: "Always"
       containers:
       - image: "cr.flyte.org/flyteorg/flyteconsole:v0.29.0"
         imagePullPolicy: "IfNotPresent"
@@ -1528,6 +1531,10 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
         - command:
             - datacatalog
@@ -1614,6 +1621,10 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       containers:
       - command:
         - flytepropeller
@@ -1681,6 +1692,10 @@ spec:
       annotations:
         configChecksum: "f0f56517059d2ab9e6397a7c55ccb4bfbfaa54bf5662902582c768494539b44"
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
