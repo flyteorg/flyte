@@ -8705,6 +8705,10 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: datacatalog
       volumes:
       - emptyDir: {}
@@ -8787,6 +8791,10 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
@@ -8929,6 +8937,10 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flyteadmin
       volumes:
       - emptyDir: {}
@@ -8976,6 +8988,9 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsUser: 1000
       volumes:
       - emptyDir: {}
         name: shared-data
@@ -9028,6 +9043,10 @@ spec:
           name: config-volume
         - mountPath: /etc/secrets/
           name: auth
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
