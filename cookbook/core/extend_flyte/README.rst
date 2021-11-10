@@ -6,47 +6,49 @@ Extending Flyte
 
 The core of Flyte is a container execution engine, where you can write one or more tasks and compose them together to
 form a data dependency DAG, called a ``workflow``. If your work involves writing simple python or java tasks that can
-either perform operations on their own or can call out to external services, then there is **no to extend Flyte**.
+either perform operations on their own or can call out to :ref:`supported external services <external_service_backend_plugins>`,
+then there's *no need to extend Flyte*.
 
 =================
 Why Extend Flyte?
 =================
 
-Case 1: I want to use my special Types, e.g. my own DataFrame format
-==========================================================================
-Flyte, just like a programming language has a core type-system, but just like most languages, this type system can be
-extended by allowing users to add ``User defined Data types``. A User defined data type can be something that Flyte does
-not really understand, but is extremely useful for a users specific needs. For example it can be a custom user structure
-or a grouping of images in a specific encoding.
+Define Custom Types
+===================
 
-Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the
-representation format. An example of this is available in FlyteCookbook - :std:doc:`auto/type_system/custom_objects`.
+Flyte, just like a programming language, has a core type-system, which can be extended by adding user-defined data types.
+For example, Flyte supports adding support for a dataframe type from a new library, a custom user data structure, or a
+grouping of images in a specific encoding.
 
-For types that are not simply representable as JSON documents, Flytekit allows users to extends Flyte's type system and
-implement these types in Python. The user has to essentially implement a :py:class:`flytekit.extend.TypeTransformer`
-class to enable translation of the type from user type to Flyte-understood type. As an example, instead of using
-:py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`__ to
-perform validation of an input or output dataframe. An example can be found
-`here <https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/pandera_examples/basic_schema_example.html>`__.
+Flytekit natively supports structured data like :py:func:`~dataclasses.dataclass` using JSON as the
+representation format (see :ref:`Using Custom Python Objects <sphx_glr_auto_core_type_system_custom_objects.py>`).
 
-To extend the type system in flytekit refer to an illustrative example found at - :std:ref:`advanced_custom_types`.
+For types that are not simply representable as JSON documents, Flytekit allows users to extend Flyte's type system and
+implement these types in Python. The user has to implement a :py:class:`~flytekit.extend.TypeTransformer`
+class to enable translation of the type from the user type to the Flyte-understood type.
+
+As an example, instead of using :py:class:`pandas.DataFrame` directly, you may want to use
+`Pandera <https://pandera.readthedocs.io/en/stable/>`__ to perform validation of an input or output dataframe
+(see :ref:`Basic Schema Example <sphx_glr_auto_integrations_flytekit_plugins_pandera_examples_basic_schema_example.py>`).
+
+To extend the type system, refer to :std:ref:`advanced_custom_types`.
 
 
-Case 2: Add a new Task Type
-===============================================
-Often times you want to interact with a service like,
+Adding a New Task Type
+======================
 
-- a Database (Postgres, MySQL, etc)
-- a DataWarehouse like (Snowflake, BigQuery, Redshift etc)
-- a computation platform like (AWS EMR, Databricks etc)
+Often times you want to interact with services like:
 
-You might want this to be available like a template for all other users - open source or within your organization. This
-can be done by creating a task plugin. A task plugin makes it possible for you or other users to use your idea natively
-within Flyte as this capability was built into the flyte platform.
+- Databases (e.g. Postgres, MySQL, etc)
+- DataWarehouses (e.g. Snowflake, BigQuery, Redshift etc)
+- Computation (e.g. AWS EMR, Databricks etc)
 
-Therefore, if you want users to write code simply using the :py:func:`~flytekit.task` decorator, but you want to provide a
-capability of running the function as a spark job or a sagemaker training job, then you can extend Flyte's task system.
-We will refer to this as the plugin and it could be possible to do the following
+You might want this to be available like a template for the open source community or within your organization. This
+can be done by creating a task plugin, which makes it possible to reuse the task's underlying functionality within Flyte
+workflows.
+
+If you want users to write code simply using the :py:func:`~flytekit.task` decorator, but you want to provide the
+capability of running the function as a spark job or a sagemaker training job, then you can extend Flyte's task system:
 
 .. code-block:: python
 
@@ -58,77 +60,122 @@ We will refer to this as the plugin and it could be possible to do the following
     def foo(...) -> ...:
         ...
 
-
-*or* provide an interface like this
+Alternatively, you can provide an interface like this:
 
 .. code-block:: python
 
-    query_task = SnowflakeQuery(query="Select * from x where x.time < {{.inputs.time}}", inputs=(time=datetime), results=pandas.DataFrame)
+    query_task = SnowflakeTask(
+        query="Select * from x where x.time < {{.inputs.time}}",
+        inputs=kwtypes(time=datetime),
+        output_schema_type=pandas.DataFrame,
+    )
 
     @workflow
     def my_wf(t: datetime) -> ...:
         df = query_task(time=t)
         return process(df=df)
 
+There are two options when writing a new task type: you can write a task plugin as an extension in Flytekit or you
+can go deeper and write a plugin in the Flyte backend.
 
+Flytekit-only plugin
+--------------------
 
-==============================================
-Writing a Task Plugin or Adding a New TaskType
-==============================================
+:std:ref:`Writing your own Flytekit plugin <advanced_custom_task_plugin>` is simple and is typically where you want to
+start when enabling custom task functionality.
 
-There are 2 options here: you can write a task plugin simply as an extension in flytekit or you can go deeper and write
-a plugin in the Flyte backend itself.
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
 
-Flytekit only plugin
-======================
-An illustrative example of writing a flytekit plugin can be found at - :std:ref:`advanced_custom_task_plugin`. Flytekit plugins are simple to write and should invariably be
-the first place you start at. Here
-
-**Pros**
-
-#. Simple to write, just implement in python. Flyte will treat it like a container execution and blindly pass control to the plugin
-#. Simple to publish - flytekitplugins can be published as independent libraries and they follow a simple api.
-#. Simple to perform testing - just test locally in flytekit
-
-**Cons**
-
-#. Limited ways of providing additional visibility in progress, or external links etc
-#. Has to be implemented again in every language as these are SDK side plugins only
-#. In case of side-effects, potentially of causing resource leaks. For example if the plugins runs a BigQuery Job, it is possible that the plugin may crash after running the Job and Flyte cannot guarantee that the BigQuery job wil be successfully terminated.
-#. Potentially expensive - In cases where the plugin just runs a remote job - e.g how Airflow does, then running a new pod for every task execution causes severe strain on k8s and the task itself uses almost no CPUs. Also because of stateful natute, using spot-instances is not trivial.
-#. A bug fix to the runtime, needs a new library version of the plugin
-#. Not trivial to implement resource controls - e.g. throttling, resource pooling etc
+   * - Pros
+     - Cons
+   * - Simple to write, just implement in python. Flyte will treat it like a container execution and blindly pass
+       control to the plugin
+     - Limited ways of providing additional visibility in progress, or external links etc
+   * - Simple to publish: ``flytekitplugins`` can be published as independent libraries and they follow a simple API.
+     - Has to be implemented again in every language as these are SDK side plugins only
+   * - Simple to perform testing: just test locally in flytekit
+     - In case of side-effects, potential of causing resource leaks. For example if the plugins runs a BigQuery job,
+       it is possible that the plugin may crash after running the Job and Flyte cannot guarantee that the BigQuery job
+       will be successfully terminated.
+   * -
+     - Potentially expensive: in cases where the plugin runs a remote job, running a new pod for every task execution
+       causes severe strain on k8s and the task itself uses almost no CPUs. Also because of its stateful nature,
+       using spot-instances is not trivial.
+   * - 
+     - A bug fix to the runtime, needs a new library version of the plugin
+   * - 
+     - Not trivial to implement resource controls - e.g. throttling, resource pooling etc
 
 Backend Plugin
-===============
+--------------
 
-A backend plugin essentially makes it possible for users to write extensions for FlytePropeller (Flytes scheduling engine). This enables complete control on the visualization and availability of the plugin.
+:std:ref:`Writing a Backend plugin <extend-plugin-flyte-backend>` makes it possible for users to write extensions for
+FlytePropeller, which is Flyte's scheduling engine. This enables complete control on the visualization and availability
+of the plugin.
 
-.. TODO: Write doc on how to writed a backend plugins. 
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
 
-**Pros**
+   * - Pros
+     - Cons
+   * - Service oriented way of deploying new plugins - strong contracts. Maintainers can deploy new versions of the backend plugin, fix bugs, without needing the users to upgrade Libraries etc
+     - Need to be implemented in golang
+   * - Drastically cheaper and more efficient to execute. FlytePropeller is written in Golang and uses an event loop model. Each process of FlytePropeller can execute 1000's of tasks concurrently. 
+     - Needs a FlytePropeller build - *currently*
+   * - Flyte will guarantee resource cleanup
+     - Need to implement contract in some spec language like protobuf, openAPI etc
+   * - Flyteconsole plugins (capability coming soon) can be added to customize visualization and progress tracking of the execution
+     - Development cycle can be much slower than flytekit only plugins
+   * - Resource controls and backpressure management is available
+     -
+   * - Implement once, use in any SDK or language
+     -
 
-#. Service oriented way of deploying new plugins - strong contracts. Maintainers can deploy new versions of the backend plugin, fix bugs, without needing the users to upgrade Libraries etc
-#. Drastically cheaper and more efficient to execute. FlytePropeller is written in Golang and uses an event loop model. Each process of FlytePropeller can execute 1000's of tasks concurrently.
-#. Flyte will guarantee resource cleanup
-#. Flyteconsole plugins (capability coming soon) can be added to customize visualization and progress tracking of the execution
-#. Resource controls and backpressure management is available
-#. Implement once, use in any SDK or language
+=======
+Summary
+=======
 
-**Cons**
+.. mermaid::
 
-#. Need to be implemented in golang
-#. Needs a FlytePropeller build - *currently*
-#. Need to implement contract in some spec language like protobuf, openAPI etc
-#. Development cycle can be much slower than flytekit only plugins
+    flowchart LR
+        U{Use Case}
+        F([Python Flytekit Plugin])
+        B([Golang<br>Backend Plugin])
 
+        subgraph WFTP[Writing Flytekit Task Plugins]
+        UCP([User Container Plugin])
+        PCP([Pre-built Container Plugin])
+        end
 
-===============================================
-How do I decide which path to take?
-===============================================
+        subgraph WBE[Writing Backend Extensions]
+        K8S([K8s Plugin])
+        WP([WebAPI Plugin])
+        CP([Complex Plugin])
+        end
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/extend_flyte_flowchart.png
-    :alt: Ok you want to add a plugin, but which type? Follow the flowchart and then select the right next steps.
+        subgraph WCFT[Writing Custom Flyte Types]
+        T([Flytekit<br>Type Transformer])
+        end
 
+        U -- Light-weight<br>Extensions --> F
+        U -- Performant<br>Multi-language<br>Extensions --> B
+        U -- Specialized<br>Domain-specific Types --> T
+        F -- Require<br>user-defined<br>container --> UCP
+        F -- Provide<br>prebuilt<br>container --> PCP
+        B --> K8S
+        B --> WP
+        B --> CP
 
-Use the conclusion of the flow-chart to point you to one of the examples below:
+        style WCFT fill:#eee,stroke:#aaa
+        style WFTP fill:#eee,stroke:#aaa
+        style WBE fill:#eee,stroke:#aaa
+        style U fill:#fff2b2,stroke:#333
+        style B fill:#EAD1DC,stroke:#333
+        style K8S fill:#EAD1DC,stroke:#333
+        style WP fill:#EAD1DC,stroke:#333
+        style CP fill:#EAD1DC,stroke:#333
+
+Use the flow-chart above to point you to one of these examples:

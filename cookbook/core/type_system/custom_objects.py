@@ -6,8 +6,8 @@ Flyte supports passing JSONs between tasks. But, to simplify the usage for the u
 flytekit supports passing custom data objects between tasks. Currently only dataclasses that are decorated with
 @dataclasses_json are supported.
 
-This example shows how users can serialize custom JSON'able dataclasses between successive tasks using the excellent
-`dataclasses_json <https://pypi.org/project/dataclasses-json/>`_ library
+This example shows how users can serialize custom JSON-compatible dataclasses between successive tasks using the
+excellent `dataclasses_json <https://pypi.org/project/dataclasses-json/>`__ library
 """
 import typing
 from dataclasses import dataclass

@@ -117,6 +117,8 @@ orchestrated by Flyte itself, within its provisioned kubernetes clusters.
     ^^^^^^^^^^^^
     Run distributed deep learning training jobs using Horovod and MPI.
 
+.. _external_service_backend_plugins:
+
 ********************************
 External Service Backend Plugins
 ********************************
