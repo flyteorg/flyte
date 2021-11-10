@@ -19,7 +19,7 @@ spec:
     spec:
       securityContext:
         runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
+        fsGroupChangePolicy: "Always"
       containers:
       - image: "{{ .Values.flyteconsole.image.repository }}:{{ .Values.flyteconsole.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteconsole.image.pullPolicy }}"

@@ -22,9 +22,9 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       securityContext:
-        fsGroup: 1001
+        fsGroup: 65534
         runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
+        fsGroupChangePolicy: "Always"
       serviceAccountName: datacatalog
       volumes:
       - name: shared-data

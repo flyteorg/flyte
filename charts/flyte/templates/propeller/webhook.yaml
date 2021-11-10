@@ -32,9 +32,9 @@ spec:
         {{- end }}
     spec:
       securityContext:
-        fsGroup: 1001
+        fsGroup: 65534
         runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
+        fsGroupChangePolicy: "Always"
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
 {{- if .Values.webhook.enabled }}
       initContainers:

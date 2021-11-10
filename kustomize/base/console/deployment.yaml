@@ -20,7 +20,7 @@ spec:
     spec:
       securityContext:
         runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
+        fsGroupChangePolicy: "Always"
       volumes:
       - name: shared-data
         emptyDir: {}
