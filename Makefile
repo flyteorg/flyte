@@ -20,6 +20,7 @@ helm: ## Generate K8s Manifest from Helm Charts.
 release_automation:
 	mkdir -p release
 	bash script/release.sh
+	bash script/generate_config_docs.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox: 
@@ -66,7 +67,7 @@ helm_upgrade: ## Upgrade helm charts
 .PHONY: docs
 docs:
 	script/generate_config_docs.sh
-	make -C rsts clean html # SPHINXOPTS=-W
+	make -C rsts clean html SPHINXOPTS=-W
 
 .PHONY: help
 help: SHELL := /bin/sh

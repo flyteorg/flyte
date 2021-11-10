@@ -4,6 +4,7 @@
 Flyte Admin Configuration
 #########################################
 
+Using config file:  []
 - `auth <#section-auth>`_
 
 - `cluster_resources <#section-cluster_resources>`_
@@ -209,7 +210,7 @@ config.OAuth2Options
 --------------------------------------------------------------------------------
 
 authServerType (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -219,7 +220,7 @@ authServerType (int)
   
 
 selfAuthServer (`config.AuthorizationServer`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Authorization Server config to run as a service. Use this when using an IdP that does not offer a custom OAuth2 Authorization Server.
 
@@ -288,7 +289,7 @@ Authorization Server config to run as a service. Use this when using an IdP that
   
 
 externalAuthServer (`config.ExternalAuthorizationServer`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 External Authorization Server config.
 
@@ -302,7 +303,7 @@ External Authorization Server config.
   
 
 thirdPartyConfig (`config.ThirdPartyConfigOptions`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Defines settings to instruct flyte cli tools (and optionally others) on what config to use to setup their client.
 
@@ -320,7 +321,7 @@ config.AuthorizationServer
 --------------------------------------------------------------------------------
 
 issuer (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Defines the issuer to use when issuing and validating tokens. The default value is https://<requestUri.HostAndPort>/
 
@@ -332,7 +333,7 @@ Defines the issuer to use when issuing and validating tokens. The default value 
   
 
 accessTokenLifespan (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Defines the lifespan of issued access tokens.
 
@@ -344,7 +345,7 @@ Defines the lifespan of issued access tokens.
   
 
 refreshTokenLifespan (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Defines the lifespan of issued access tokens.
 
@@ -356,7 +357,7 @@ Defines the lifespan of issued access tokens.
   
 
 authorizationCodeLifespan (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Defines the lifespan of issued access tokens.
 
@@ -368,7 +369,7 @@ Defines the lifespan of issued access tokens.
   
 
 claimSymmetricEncryptionKeySecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OPTIONAL: Secret name to use to encrypt claims in authcode token.
 
@@ -380,7 +381,7 @@ OPTIONAL: Secret name to use to encrypt claims in authcode token.
   
 
 tokenSigningRSAKeySecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OPTIONAL: Secret name to use to retrieve RSA Signing Key.
 
@@ -392,7 +393,7 @@ OPTIONAL: Secret name to use to retrieve RSA Signing Key.
   
 
 oldTokenSigningRSAKeySecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OPTIONAL: Secret name to use to retrieve Old RSA Signing Key. This can be useful during key rotation to continue to accept older tokens.
 
@@ -404,7 +405,7 @@ OPTIONAL: Secret name to use to retrieve Old RSA Signing Key. This can be useful
   
 
 staticClients (map[string]*fosite.DefaultClient)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -466,7 +467,7 @@ config.Duration
 --------------------------------------------------------------------------------
 
 Duration (int64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -479,7 +480,7 @@ config.ExternalAuthorizationServer
 --------------------------------------------------------------------------------
 
 baseUrl (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/
 
@@ -491,7 +492,7 @@ This should be the base url of the authorization server that you are trying to h
   
 
 allowedAudience ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service.
 
@@ -503,7 +504,7 @@ Optional: A list of allowed audiences. If not provided, the audience is expected
   
 
 metadataUrl (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
 
@@ -518,7 +519,7 @@ config.URL
 --------------------------------------------------------------------------------
 
 URL (`url.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -540,7 +541,7 @@ url.URL
 --------------------------------------------------------------------------------
 
 Scheme (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -550,7 +551,7 @@ Scheme (string)
   
 
 Opaque (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -560,7 +561,7 @@ Opaque (string)
   
 
 User (url.Userinfo)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -570,7 +571,7 @@ User (url.Userinfo)
   
 
 Host (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -580,7 +581,7 @@ Host (string)
   
 
 Path (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -590,7 +591,7 @@ Path (string)
   
 
 RawPath (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -600,7 +601,7 @@ RawPath (string)
   
 
 ForceQuery (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -610,7 +611,7 @@ ForceQuery (bool)
   
 
 RawQuery (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -620,7 +621,7 @@ RawQuery (string)
   
 
 Fragment (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -630,7 +631,7 @@ Fragment (string)
   
 
 RawFragment (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -643,7 +644,7 @@ config.ThirdPartyConfigOptions
 --------------------------------------------------------------------------------
 
 flyteClient (`config.FlyteClientConfig`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -658,7 +659,7 @@ config.FlyteClientConfig
 --------------------------------------------------------------------------------
 
 clientId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 public identifier for the app which handles authorization for a Flyte deployment
 
@@ -670,7 +671,7 @@ public identifier for the app which handles authorization for a Flyte deployment
   
 
 redirectUri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 This is the callback uri registered with the app which handles authorization for a Flyte deployment
 
@@ -682,7 +683,7 @@ This is the callback uri registered with the app which handles authorization for
   
 
 scopes ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Recommended scopes for the client to request.
 
@@ -697,7 +698,7 @@ config.UserAuthConfig
 --------------------------------------------------------------------------------
 
 redirectUrl (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -707,7 +708,7 @@ redirectUrl (`config.URL`_)
   
 
 openId (`config.OpenIDOptions`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OpenID Configuration for User Auth
 
@@ -723,7 +724,7 @@ OpenID Configuration for User Auth
   
 
 cookieHashKeySecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OPTIONAL: Secret name to use for cookie hash key.
 
@@ -735,7 +736,7 @@ OPTIONAL: Secret name to use for cookie hash key.
   
 
 cookieBlockKeySecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 OPTIONAL: Secret name to use for cookie block key.
 
@@ -750,7 +751,7 @@ config.OpenIDOptions
 --------------------------------------------------------------------------------
 
 clientId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -760,7 +761,7 @@ clientId (string)
   
 
 clientSecretName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -770,7 +771,7 @@ clientSecretName (string)
   
 
 clientSecretFile (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -780,7 +781,7 @@ clientSecretFile (string)
   
 
 baseUrl (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -790,7 +791,7 @@ baseUrl (`config.URL`_)
   
 
 scopes ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1049,7 +1050,7 @@ interfaces.AWSConfig
 --------------------------------------------------------------------------------
 
 region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1062,7 +1063,7 @@ interfaces.EventsPublisherConfig
 --------------------------------------------------------------------------------
 
 topicName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1072,7 +1073,7 @@ topicName (string)
   
 
 eventTypes ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1085,7 +1086,7 @@ interfaces.GCPConfig
 --------------------------------------------------------------------------------
 
 projectId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1145,7 +1146,7 @@ eventVersion (int)
 
 .. code-block:: yaml
 
-  "1"
+  "2"
   
 
 asyncEventsBufferSize (int)
@@ -1156,6 +1157,16 @@ asyncEventsBufferSize (int)
 .. code-block:: yaml
 
   "100"
+  
+
+maxParallelism (int32)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "25"
   
 
 Section: logger
@@ -1213,7 +1224,7 @@ logger.FormatterConfig
 --------------------------------------------------------------------------------
 
 type (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Sets logging format type.
 
@@ -1361,7 +1372,7 @@ interfaces.NotificationsEmailerConfig
 --------------------------------------------------------------------------------
 
 emailServerConfig (`interfaces.EmailServerConfig`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1373,7 +1384,7 @@ emailServerConfig (`interfaces.EmailServerConfig`_)
   
 
 subject (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1383,7 +1394,7 @@ subject (string)
   
 
 sender (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1393,7 +1404,7 @@ sender (string)
   
 
 body (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1406,7 +1417,7 @@ interfaces.EmailServerConfig
 --------------------------------------------------------------------------------
 
 serviceName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1416,7 +1427,7 @@ serviceName (string)
   
 
 apiKeyEnvVar (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1426,7 +1437,7 @@ apiKeyEnvVar (string)
   
 
 apiKeyFilePath (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1439,7 +1450,7 @@ interfaces.NotificationsProcessorConfig
 --------------------------------------------------------------------------------
 
 queueName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1449,7 +1460,7 @@ queueName (string)
   
 
 accountId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1462,7 +1473,7 @@ interfaces.NotificationsPublisherConfig
 --------------------------------------------------------------------------------
 
 topicName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1503,11 +1514,50 @@ catalogcache (`catalog.Config`_)
     workers: 10
   
 
+k8s (`config.K8sPluginConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  co-pilot:
+    cpu: 500m
+    default-input-path: /var/flyte/inputs
+    default-output-path: /var/flyte/outputs
+    image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+    input-vol-name: flyte-inputs
+    memory: 128Mi
+    name: flyte-copilot-
+    output-vol-name: flyte-outputs
+    start-timeout: 1m0s
+    storage: ""
+  create-container-error-grace-period: 3m0s
+  default-annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  default-cpus: "1"
+  default-env-vars: null
+  default-env-vars-from-env: null
+  default-labels: null
+  default-memory: 1Gi
+  default-node-selector: null
+  default-tolerations: null
+  delete-resource-on-finalize: false
+  gpu-resource-name: nvidia.com/gpu
+  inject-finalizer: false
+  interruptible-node-selector: null
+  interruptible-node-selector-requirement: null
+  interruptible-tolerations: null
+  non-interruptible-node-selector-requirement: null
+  resource-tolerations: null
+  scheduler-name: ""
+  
+
 catalog.Config
 --------------------------------------------------------------------------------
 
 reader (`workqueue.Config`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
@@ -1521,7 +1571,7 @@ Catalog reader workqueue config. Make sure the index cache must be big enough to
   
 
 writer (`workqueue.Config`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system.
 
@@ -1538,7 +1588,7 @@ workqueue.Config
 --------------------------------------------------------------------------------
 
 workers (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Number of concurrent workers to start processing the queue.
 
@@ -1550,7 +1600,7 @@ Number of concurrent workers to start processing the queue.
   
 
 maxRetries (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Maximum number of retries per item.
 
@@ -1562,7 +1612,7 @@ Maximum number of retries per item.
   
 
 maxItems (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Maximum number of entries to keep in the index.
 
@@ -1571,6 +1621,432 @@ Maximum number of entries to keep in the index.
 .. code-block:: yaml
 
   "1000"
+  
+
+config.K8sPluginConfig
+--------------------------------------------------------------------------------
+
+inject-finalizer (bool)
+--------------------------------------------------------------------------------
+
+Instructs the plugin to inject a finalizer on startTask and remove it on task termination.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+default-annotations (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  
+
+default-labels (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-vars (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-vars-from-env (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-cpus (`resource.Quantity`_)
+--------------------------------------------------------------------------------
+
+Defines a default value for cpu for containers if not specified.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1"
+  
+
+default-memory (`resource.Quantity`_)
+--------------------------------------------------------------------------------
+
+Defines a default value for memory for containers if not specified.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1Gi
+  
+
+default-tolerations ([]v1.Toleration)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-node-selector (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-affinity (v1.Affinity)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+scheduler-name (string)
+--------------------------------------------------------------------------------
+
+Defines scheduler name.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interruptible-tolerations ([]v1.Toleration)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+interruptible-node-selector (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+interruptible-node-selector-requirement (v1.NodeSelectorRequirement)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+non-interruptible-node-selector-requirement (v1.NodeSelectorRequirement)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+resource-tolerations (map[v1.ResourceName][]v1.Toleration)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+co-pilot (`config.FlyteCoPilotConfig`_)
+--------------------------------------------------------------------------------
+
+Co-Pilot Configuration
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cpu: 500m
+  default-input-path: /var/flyte/inputs
+  default-output-path: /var/flyte/outputs
+  image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  input-vol-name: flyte-inputs
+  memory: 128Mi
+  name: flyte-copilot-
+  output-vol-name: flyte-outputs
+  start-timeout: 1m0s
+  storage: ""
+  
+
+delete-resource-on-finalize (bool)
+--------------------------------------------------------------------------------
+
+Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+create-container-error-grace-period (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  3m0s
+  
+
+gpu-resource-name (string)
+--------------------------------------------------------------------------------
+
+The name of the GPU resource to use when the task resource requests GPUs.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  nvidia.com/gpu
+  
+
+config.FlyteCoPilotConfig
+--------------------------------------------------------------------------------
+
+name (string)
+--------------------------------------------------------------------------------
+
+Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  flyte-copilot-
+  
+
+image (string)
+--------------------------------------------------------------------------------
+
+Flyte co-pilot Docker Image FQN
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  
+
+default-input-path (string)
+--------------------------------------------------------------------------------
+
+Default path where the volume should be mounted
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /var/flyte/inputs
+  
+
+default-output-path (string)
+--------------------------------------------------------------------------------
+
+Default path where the volume should be mounted
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /var/flyte/outputs
+  
+
+input-vol-name (string)
+--------------------------------------------------------------------------------
+
+Name of the data volume that is created for storing inputs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  flyte-inputs
+  
+
+output-vol-name (string)
+--------------------------------------------------------------------------------
+
+Name of the data volume that is created for storing outputs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  flyte-outputs
+  
+
+start-timeout (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1m0s
+  
+
+cpu (string)
+--------------------------------------------------------------------------------
+
+Used to set cpu for co-pilot containers
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  500m
+  
+
+memory (string)
+--------------------------------------------------------------------------------
+
+Used to set memory for co-pilot containers
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  128Mi
+  
+
+storage (string)
+--------------------------------------------------------------------------------
+
+Default storage limit for individual inputs / outputs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+resource.Quantity
+--------------------------------------------------------------------------------
+
+i (`resource.int64Amount`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
+d (`resource.infDecAmount`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  <nil>
+  
+
+s (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1"
+  
+
+Format (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  DecimalSI
+  
+
+resource.infDecAmount
+--------------------------------------------------------------------------------
+
+Dec (inf.Dec)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+resource.int64Amount
+--------------------------------------------------------------------------------
+
+value (int64)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1"
+  
+
+scale (int32)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 Section: qualityofservice
@@ -1693,6 +2169,7 @@ signedUrls (`interfaces.SignedURL`_)
 .. code-block:: yaml
 
   durationMinutes: 0
+  enabled: false
   signingPrincipal: ""
   
 
@@ -1706,11 +2183,35 @@ maxSizeInBytes (int64)
   "2097152"
   
 
+inlineEventDataPolicy (int)
+--------------------------------------------------------------------------------
+
+Specifies how inline execution event data should be saved in the backend
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 interfaces.SignedURL
 --------------------------------------------------------------------------------
 
+enabled (bool)
+--------------------------------------------------------------------------------
+
+Whether signed urls should even be returned with GetExecutionData, GetNodeExecutionData and GetTaskExecutionData response objects.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 durationMinutes (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1720,7 +2221,7 @@ durationMinutes (int)
   
 
 signingPrincipal (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1731,6 +2232,16 @@ signingPrincipal (string)
 
 Section: scheduler
 ================================================================================
+
+profilerPort (`config.Port`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10253
+  
 
 eventScheduler (`interfaces.EventSchedulerConfig`_)
 --------------------------------------------------------------------------------
@@ -1786,11 +2297,38 @@ reconnectDelaySeconds (int)
   "0"
   
 
+backoff (`wait.Backoff`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Cap: 0
+  Duration: 1000000000
+  Factor: 2
+  Jitter: 0.1
+  Steps: 30
+  
+
+config.Port
+--------------------------------------------------------------------------------
+
+port (int)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10253"
+  
+
 interfaces.EventSchedulerConfig
 --------------------------------------------------------------------------------
 
 scheme (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1800,7 +2338,7 @@ scheme (string)
   
 
 region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1810,7 +2348,7 @@ region (string)
   
 
 scheduleRole (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1820,7 +2358,7 @@ scheduleRole (string)
   
 
 targetName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1830,7 +2368,7 @@ targetName (string)
   
 
 scheduleNamePrefix (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1840,7 +2378,7 @@ scheduleNamePrefix (string)
   
 
 aws (interfaces.AWSSchedulerConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1850,7 +2388,7 @@ aws (interfaces.AWSSchedulerConfig)
   
 
 local (`interfaces.FlyteSchedulerConfig`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1866,7 +2404,7 @@ interfaces.WorkflowExecutorConfig
 --------------------------------------------------------------------------------
 
 scheme (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1876,7 +2414,7 @@ scheme (string)
   
 
 region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1886,7 +2424,7 @@ region (string)
   
 
 scheduleQueueName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1896,7 +2434,7 @@ scheduleQueueName (string)
   
 
 accountId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1906,7 +2444,7 @@ accountId (string)
   
 
 aws (interfaces.AWSWorkflowExecutorConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1916,7 +2454,7 @@ aws (interfaces.AWSWorkflowExecutorConfig)
   
 
 local (`interfaces.FlyteWorkflowExecutorConfig`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1931,7 +2469,7 @@ interfaces.FlyteWorkflowExecutorConfig
 --------------------------------------------------------------------------------
 
 adminRateLimit (`interfaces.AdminRateLimit`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1945,7 +2483,7 @@ interfaces.AdminRateLimit
 --------------------------------------------------------------------------------
 
 tps (float64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -1955,13 +2493,66 @@ tps (float64)
   
 
 burst (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
 .. code-block:: yaml
 
   "10"
+  
+
+wait.Backoff
+--------------------------------------------------------------------------------
+
+Duration (int64)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1s
+  
+
+Factor (float64)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "2"
+  
+
+Jitter (float64)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
+  
+
+Steps (int)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "30"
+  
+
+Cap (int64)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 Section: secrets
@@ -2091,7 +2682,7 @@ config.ServerSecurityOptions
 --------------------------------------------------------------------------------
 
 secure (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2101,7 +2692,7 @@ secure (bool)
   
 
 ssl (`config.SslOptions`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2112,7 +2703,7 @@ ssl (`config.SslOptions`_)
   
 
 useAuth (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2122,7 +2713,7 @@ useAuth (bool)
   
 
 auditAccess (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2132,7 +2723,7 @@ auditAccess (bool)
   
 
 allowCors (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2142,7 +2733,7 @@ allowCors (bool)
   
 
 allowedOrigins ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2152,7 +2743,7 @@ allowedOrigins ([]string)
   
 
 allowedHeaders ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2165,7 +2756,7 @@ config.SslOptions
 --------------------------------------------------------------------------------
 
 certificateFile (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2175,7 +2766,7 @@ certificateFile (string)
   
 
 keyFile (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2290,7 +2881,7 @@ storage.CachingConfig
 --------------------------------------------------------------------------------
 
 max_size_mbs (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0, cache is not used
 
@@ -2302,7 +2893,7 @@ Maximum size of the cache where the Blob store data is cached in-memory. If not 
   
 
 target_gc_percent (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Sets the garbage collection target percentage.
 
@@ -2317,7 +2908,7 @@ storage.ConnectionConfig
 --------------------------------------------------------------------------------
 
 endpoint (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 URL for storage client to connect to.
 
@@ -2329,7 +2920,7 @@ URL for storage client to connect to.
   
 
 auth-type (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Auth Type to use [iam,accesskey].
 
@@ -2341,7 +2932,7 @@ Auth Type to use [iam,accesskey].
   
 
 access-key (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Access key to use. Only required when authtype is set to accesskey.
 
@@ -2353,7 +2944,7 @@ Access key to use. Only required when authtype is set to accesskey.
   
 
 secret-key (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Secret to use when accesskey is set.
 
@@ -2365,7 +2956,7 @@ Secret to use when accesskey is set.
   
 
 region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Region to connect to.
 
@@ -2377,7 +2968,7 @@ Region to connect to.
   
 
 disable-ssl (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Disables SSL connection. Should only be used for development.
 
@@ -2392,7 +2983,7 @@ storage.HTTPClientConfig
 --------------------------------------------------------------------------------
 
 headers (map[string][]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2402,7 +2993,7 @@ headers (map[string][]string)
   
 
 timeout (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Sets time out on the http client.
 
@@ -2417,7 +3008,7 @@ storage.LimitsConfig
 --------------------------------------------------------------------------------
 
 maxDownloadMBs (int64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Maximum allowed download size (in MBs) per call.
 
@@ -2432,7 +3023,7 @@ storage.StowConfig
 --------------------------------------------------------------------------------
 
 kind (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Kind of Stow backend to use. Refer to github/graymeta/stow
 
@@ -2444,7 +3035,7 @@ Kind of Stow backend to use. Refer to github/graymeta/stow
   
 
 config (map[string]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 Configuration for stow backend. Refer to github/graymeta/stow
 
@@ -2465,10 +3056,10 @@ defaults (`interfaces.TaskResourceSet`_)
 
 .. code-block:: yaml
 
-  cpu: "0"
+  cpu: "2"
   ephemeralStorage: "0"
   gpu: "0"
-  memory: "0"
+  memory: 200Mi
   storage: "0"
   
 
@@ -2479,10 +3070,10 @@ limits (`interfaces.TaskResourceSet`_)
 
 .. code-block:: yaml
 
-  cpu: "0"
+  cpu: "2"
   ephemeralStorage: "0"
-  gpu: "0"
-  memory: "0"
+  gpu: "1"
+  memory: 1Gi
   storage: "0"
   
 
@@ -2490,17 +3081,17 @@ interfaces.TaskResourceSet
 --------------------------------------------------------------------------------
 
 cpu (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "0"
+  "2"
   
 
 gpu (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2510,17 +3101,17 @@ gpu (`resource.Quantity`_)
   
 
 memory (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "0"
+  200Mi
   
 
 storage (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------------------------------------
 
 **Default Value**: 
 
@@ -2530,86 +3121,7 @@ storage (`resource.Quantity`_)
   
 
 ephemeralStorage (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
-resource.Quantity
 --------------------------------------------------------------------------------
-
-i (`resource.int64Amount`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  {}
-  
-
-d (`resource.infDecAmount`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  <nil>
-  
-
-s (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Format (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-resource.infDecAmount
---------------------------------------------------------------------------------
-
-Dec (inf.Dec)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
-  
-
-resource.int64Amount
---------------------------------------------------------------------------------
-
-value (int64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
-scale (int32)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 

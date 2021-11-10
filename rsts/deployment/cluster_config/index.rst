@@ -40,7 +40,7 @@ Cluster Config
        :text: Flyte Admin Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Admin config specification are covered here.
+    Flyte Admin configuration specification are covered here.
 
     ---
 
@@ -49,7 +49,7 @@ Cluster Config
        :text: Flyte Propeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Propeller config specification are covered here.
+    Flyte Propeller configuration specification are covered here.
 
     ---
 
