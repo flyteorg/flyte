@@ -55,7 +55,7 @@ def multiplier(my_input: float) -> float:
 
 
 if __name__ == "__main__":
-    print(f"Output of multiplier(my_input=3): {multiplier(my_input=3)}")
+    print(f"Output of multiplier(my_input=3.0): {multiplier(my_input=3.0)}")
     print(f"Output of multiplier(my_input=0.5): {multiplier(my_input=0.5)}")
 
 
@@ -83,7 +83,7 @@ def multiplier_2(my_input: float) -> float:
 
 
 if __name__ == "__main__":
-    print(f"Output of multiplier_2(my_input=10): {multiplier_2(my_input=10)}")
+    print(f"Output of multiplier_2(my_input=10.0): {multiplier_2(my_input=10.0)}")
 
 
 # %%
@@ -108,7 +108,7 @@ def multiplier_3(my_input: float) -> float:
 
 
 if __name__ == "__main__":
-    print(f"Output of multiplier_3(my_input=5): {multiplier_3(my_input=5)}")
+    print(f"Output of multiplier_3(my_input=5.0): {multiplier_3(my_input=5.0)}")
 
 
 # %%

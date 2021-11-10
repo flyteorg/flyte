@@ -46,6 +46,8 @@ class CustomSorter(FileNameSortKey):
         "files.py",
         "folders.py",
         "named_outputs.py",
+        "decorating_tasks.py",
+        "decorating_workflows.py",
         # Control Flow
         "run_conditions.py",
         "chain_tasks.py",
