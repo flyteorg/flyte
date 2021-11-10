@@ -14,7 +14,7 @@ GCP Plugins Setup
        :text: Google Bigquery
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Google Bigquery Plugin.
+    Guide to setting up the Google BigQuery Plugin.
 
 .. toctree::
     :maxdepth: 1

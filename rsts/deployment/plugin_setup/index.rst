@@ -17,6 +17,15 @@ Plugin Setup
 
     ---
 
+    .. link-button:: deployment-plugin-setup-webapi
+       :type: ref
+       :text: Web API Plugin
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Web API Plugins.
+
+    ---
+
     .. link-button:: deployment-plugin-setup-aws
        :type: ref
        :text: AWS Plugins
@@ -41,3 +50,4 @@ Plugin Setup
     k8s/index
     aws/index
     gcp/index
+    webapi/index
