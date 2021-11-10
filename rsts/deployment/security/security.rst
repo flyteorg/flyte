@@ -14,7 +14,7 @@ Flyte uses docker for container packaging and by default its containers run as r
 permissions on the system but may not be suitable for production deployments where a security breach could comprise your
 application deployments.
 It's considered to be a best practice for security because running in constrained permission environment will prevent any
-malicious code from utilizing the full permissions of the host.`Ref <https://kubernetes.io/blog/2018/07/18/11-ways-not-to-get-hacked/#8-run-containers-as-a-non-root-user>`__
+malicious code from utilizing the full permissions of the host `Ref <https://kubernetes.io/blog/2018/07/18/11-ways-not-to-get-hacked/#8-run-containers-as-a-non-root-user>`__
 Also in certain container platforms like `OpenShift <https://engineering.bitnami.com/articles/running-non-root-containers-on-openshift.html>`__ running non-root containers is mandatory.
 
 
