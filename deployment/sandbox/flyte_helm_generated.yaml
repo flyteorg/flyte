@@ -3400,6 +3400,9 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroupChangePolicy: "Always"
       containers:
       - image: "cr.flyte.org/flyteorg/flyteconsole:v0.29.0"
         imagePullPolicy: "IfNotPresent"
@@ -3450,9 +3453,15 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
         - name: check-db-ready
           image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          securityContext:
+             runAsUser: 0
           command:
             - sh
             - -c
@@ -3531,6 +3540,10 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
       - command:
         - flytescheduler
@@ -3715,6 +3728,10 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       containers:
       - command:
         - flytepropeller
@@ -3775,6 +3792,10 @@ spec:
       annotations:
         configChecksum: "75bc68f92c6e42261dbda75899da728751f494060a31ad9088def7aa8c96e53"
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets

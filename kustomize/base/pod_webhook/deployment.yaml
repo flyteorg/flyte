@@ -20,6 +20,10 @@ spec:
         prometheus.io/port: "10254"
         prometheus.io/path: "/metrics"
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: flyte-pod-webhook
       initContainers:
         - name: generate-secrets

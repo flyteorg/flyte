@@ -2803,6 +2803,10 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: datacatalog
       volumes:
       - emptyDir: {}
@@ -2888,6 +2892,10 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flyte-pod-webhook
       volumes:
       - name: sample-secrets
@@ -2990,6 +2998,8 @@ spec:
         - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
         image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: check-db-ready
+        securityContext:
+          runAsUser: 999
       - command:
         - flyteadmin
         - --config
@@ -3037,7 +3047,7 @@ spec:
         - mountPath: /etc/db
           name: db-pass
       - args:
-        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
+        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/scratch/secrets
         command:
         - /bin/sh
         - -c
@@ -3052,6 +3062,12 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/scratch
+          name: scratch
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
@@ -3059,6 +3075,8 @@ spec:
         name: resource-templates
       - emptyDir: {}
         name: shared-data
+      - emptyDir: {}
+        name: scratch
       - configMap:
           name: flyte-admin-config-dbg8dt2dgb
         name: config-volume
@@ -3099,6 +3117,9 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsUser: 1000
       volumes:
       - emptyDir: {}
         name: shared-data
@@ -3146,6 +3167,10 @@ spec:
           name: config-volume
         - mountPath: /etc/secrets/
           name: auth
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsUser: 1001
       serviceAccountName: flytepropeller
       volumes:
       - configMap:

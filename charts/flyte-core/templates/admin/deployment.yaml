@@ -17,10 +17,16 @@ spec:
         {{- end }}
       labels: {{ include "flyteadmin.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
         {{- if .Values.db.checks }}
         - name: check-db-ready
           image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          securityContext:
+             runAsUser: 0
           command:
           - sh
           - -c
@@ -77,11 +83,13 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             [
-                "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
+                "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: scratch
+              mountPath: /etc/scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -139,6 +147,8 @@ spec:
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
           name: shared-data
+        - emptyDir: {}
+          name: scratch
         - configMap:
             name: flyte-admin-config
           name: config-volume
