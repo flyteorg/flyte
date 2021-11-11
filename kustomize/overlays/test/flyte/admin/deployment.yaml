@@ -17,7 +17,8 @@ spec:
           'until pg_isready -h postgres -p 5432;
           do echo waiting for database; sleep 2; done;']
         securityContext:
-          runAsUser: 0
+          runAsUser: 999
+          fsGroup: 999
       - name: run-migrations
         image: flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent

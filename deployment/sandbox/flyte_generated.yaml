@@ -2999,7 +2999,8 @@ spec:
         image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
         name: check-db-ready
         securityContext:
-          runAsUser: 0
+          fsGroup: 999
+          runAsUser: 999
       - command:
         - flyteadmin
         - --config
