@@ -18,7 +18,6 @@ spec:
           do echo waiting for database; sleep 2; done;']
         securityContext:
           runAsUser: 999
-          fsGroup: 999
       - name: run-migrations
         image: flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent
