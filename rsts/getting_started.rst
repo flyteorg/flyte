@@ -58,7 +58,7 @@ The ``myflyteapp`` directory comes with a sample workflow, which can be found un
 
    .. code-block:: text
 
-       .
+       myflyteapp
        ├── Dockerfile
        ├── docker_build_and_tag.sh
        ├── flyte
