@@ -15,8 +15,10 @@ RUN apt-get update && apt-get install -y make build-essential libssl-dev curl
 RUN pip install awscli
 
 # Install gcloud for GCP
+RUN apt-get install curl --assume-yes
+
 RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 # Install gcc , g++ and make
 RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list \

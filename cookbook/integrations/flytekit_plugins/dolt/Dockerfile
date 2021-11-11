@@ -18,8 +18,10 @@ RUN sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/downlo
 RUN pip3 install awscli
 
 # Install gcloud for GCP
+RUN apt-get install curl --assume-yes
+
 RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 ENV VENV /opt/venv
 # Virtual environment

@@ -10,8 +10,10 @@ ENV PYTHONPATH "$PYTHONPATH:/root/feast_integration"
 RUN pip3 install awscli
 
 # Install gcloud for GCP
+RUN apt-get install curl --assume-yes
+
 RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 # Virtual environment
 RUN python3 -m venv ${VENV}
