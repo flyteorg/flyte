@@ -41,9 +41,9 @@ Modify Code and Test Locally
 
    .. code-block::
 
-       myapp/workflows/example.py
+       flyte/workflows/example.py
 
-   .. dropdown:: myapp/workflows/example.py
+   .. dropdown:: flyte/workflows/example.py
 
       .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
          :language: python
@@ -73,7 +73,7 @@ Modify Code and Test Locally
 
    .. prompt:: bash (venv)$
 
-     python myapp/workflows/example.py
+     python flyte/workflows/example.py
 
 
    .. dropdown:: Expected output
@@ -91,7 +91,7 @@ Modify Code and Test Locally
 
    .. prompt:: bash (venv)$
 
-       pyflyte --pkgs myapp.workflows package --image myapp:v1 --fast --force
+       pyflyte --pkgs flyte.workflows package --image myapp:v1 --fast --force
 
    .. note::
 
@@ -174,7 +174,7 @@ Modify Code and Test Locally
 
             For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
 
-#. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/myapp.workflows.example.my_wf>`__, click launch, and give your name as the input.
+#. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/flyte.workflows.example.my_wf>`__, click launch, and give your name as the input.
 
    .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/getting_started_fastreg.gif
       :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
@@ -185,7 +185,7 @@ Modify Code and Test Locally
 
       .. prompt:: bash $
 
-       flytectl get launchplan --project flytesnacks --domain development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
+       flytectl get launchplan --project flytesnacks --domain development flyte.workflows.example.my_wf --latest --execFile exec_spec.yaml
 
    #. Modify the execution spec file and update the input params and save the file. Notice that the version would be changed to your latest one.
 
