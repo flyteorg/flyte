@@ -52,7 +52,7 @@ Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__
     pyflyte init myflyteapp
     cd myflyteapp
 
-The ``myflyteapp`` directory comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical Flyte app should be laid out.
+The ``myflyteapp`` directory comes with a sample workflow, which can be found under ``flyte/workflows/example.py``. The structure below shows the most important files and how a typical Flyte app should be laid out.
 
 .. dropdown:: A typical Flyte app should have these files
 
@@ -61,7 +61,7 @@ The ``myflyteapp`` directory comes with a sample workflow, which can be found un
        .
        ├── Dockerfile
        ├── docker_build_and_tag.sh
-       ├── myapp
+       ├── flyte
        │         ├── __init__.py
        │         └── workflows
        │             ├── __init__.py
@@ -77,11 +77,11 @@ The ``myflyteapp`` directory comes with a sample workflow, which can be found un
 
 Run the Workflow Locally
 ^^^^^^^^^^^^^^^^^^^^^^^^
-The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the bottom of ``myapp/workflows/example.py``.
+The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the bottom of ``flyte/workflows/example.py``.
 
 .. prompt:: bash (venv)$
 
-   python myapp/workflows/example.py
+   python flyte/workflows/example.py
 
 .. dropdown:: Expected output
 
