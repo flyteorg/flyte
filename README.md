@@ -225,7 +225,7 @@ Please maintain an alphabetical order in the following list -->
 
 ## Functional Tests Matrix
 
-We run a suite of tests to ensure that basic functionality and a subset of the integrations work across a variety of release versions. Those tests are run in a cluster where specific versions of flyte console, flyteadmin, datacatalog, and flytepropeller. The table below has different release versions as the columns and the different test suites as rows.
+We run a suite of tests to ensure that basic functionality and a subset of the integrations work across a variety of release versions. Those tests are run in a cluster where specific versions of the flyte components, such as console, flyteadmin, datacatalog, and flytepropeller, are installed. The table below has different release versions as the columns and the result of each test suite as rows.
 
 | workflow group                  | nightly |
 | ------------------------------- | ---------- |
