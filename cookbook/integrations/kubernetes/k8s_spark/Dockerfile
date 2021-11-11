@@ -15,6 +15,10 @@ RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-ess
 # in future versions to make it completely portable
 RUN pip3 install awscli
 
+# Install gcloud for GCP
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+
 ENV VENV /opt/venv
 # Virtual environment
 RUN python3 -m venv ${VENV}

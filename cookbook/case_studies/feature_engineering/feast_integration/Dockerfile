@@ -9,6 +9,10 @@ ENV PYTHONPATH "$PYTHONPATH:/root/feast_integration"
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
 
+# Install gcloud for GCP
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+
 # Virtual environment
 RUN python3 -m venv ${VENV}
 RUN ${VENV}/bin/pip install wheel

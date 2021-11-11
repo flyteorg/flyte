@@ -37,6 +37,10 @@ ENV PATH="${VENV}/bin:$PATH"
 # in future versions to make it completely portable
 RUN pip3 install awscli
 
+# Install gcloud for GCP
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+
 # Install wheel after venv is activated
 RUN pip3 install wheel
 

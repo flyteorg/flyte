@@ -13,6 +13,10 @@ RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg b
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
 
+# Install gcloud for GCP
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:/root/google-cloud-sdk/bin"
+
 ENV VENV /opt/venv
 # Virtual environment
 RUN python3 -m venv ${VENV}
