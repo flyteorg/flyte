@@ -827,11 +827,13 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             [
-                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
+                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: scratch
+              mountPath: /etc/scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -871,6 +873,8 @@ spec:
         
         - emptyDir: {}
           name: shared-data
+        - emptyDir: {}
+          name: scratch
         - configMap:
             name: flyte-admin-config
           name: config-volume

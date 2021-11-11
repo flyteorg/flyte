@@ -8880,7 +8880,7 @@ spec:
         - mountPath: /etc/db
           name: db-pass
       - args:
-        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
+        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/scratch/secrets
         command:
         - /bin/sh
         - -c
@@ -8895,6 +8895,8 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/scratch
+          name: scratch
       securityContext:
         fsGroup: 65534
         fsGroupChangePolicy: Always
@@ -8903,6 +8905,8 @@ spec:
       volumes:
       - emptyDir: {}
         name: shared-data
+      - emptyDir: {}
+        name: scratch
       - configMap:
           name: flyte-admin-config-29g4dtt8tc
         name: config-volume
