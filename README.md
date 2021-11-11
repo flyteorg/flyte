@@ -223,19 +223,21 @@ Please maintain an alphabetical order in the following list -->
 | [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
 | [Flink](https://github.com/lyft/flinkk8soperator)                 | Go       | Apache Flink streaming |
 
-## Tets Matrix
+## Functional Tests Matrix
 
-| workflow group | nightly |
-| ------------ | ---------- |
-| core | ![core](https://byob.yarr.is/unionai/gh-badges/nightly/core) |
-| integrations-hive | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-hive) |
-| integrations-k8s-spark | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-k8s-spark) |
-| integrations-kfpytorch | ![integrations-kfpytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-kfpytorch) |
-| integrations-pod | ![integrations-pod](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pod) |
-| integrations-pandera_examples | ![integrations-pandera_examples](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pandera_examples) |
-| integrations-papermilltasks | ![integrations-papermilltasks](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-papermilltasks) |
-| integrations-greatexpectations | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-greatexpectations) |
-| integrations-sagemaker-pytorch | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-pytorch) |
+We run a suite of tests to ensure that basic functionality and a subset of the integrations work across a variety of release versions. Those tests are run in a cluster where specific versions of flyte console, flyteadmin, datacatalog, and flytepropeller. The table below has different release versions as the columns and the different test suites as rows.
+
+| workflow group                  | nightly |
+| ------------------------------- | ---------- |
+| core                            | ![core](https://byob.yarr.is/unionai/gh-badges/nightly/core) |
+| integrations-hive               | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-hive) |
+| integrations-k8s-spark          | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-k8s-spark) |
+| integrations-kfpytorch          | ![integrations-kfpytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-kfpytorch) |
+| integrations-pod                | ![integrations-pod](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pod) |
+| integrations-pandera_examples   | ![integrations-pandera_examples](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pandera_examples) |
+| integrations-papermilltasks     | ![integrations-papermilltasks](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-papermilltasks) |
+| integrations-greatexpectations  | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-greatexpectations) |
+| integrations-sagemaker-pytorch  | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-pytorch) |
 | integrations-sagemaker-training | ![integrations-sagemaker-training](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-training) |
 
 <html>
