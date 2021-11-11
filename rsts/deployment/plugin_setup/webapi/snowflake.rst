@@ -1,4 +1,4 @@
-.. _deployment-plugin-setup-task-template-snowflake:
+.. _deployment-plugin-setup-webapi-snowflake:
 
 Snowflake Plugin Setup
 ----------------------

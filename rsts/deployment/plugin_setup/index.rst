@@ -17,12 +17,12 @@ Plugin Setup
 
     ---
 
-    .. link-button:: deployment-plugin-setup-task-template
+    .. link-button:: deployment-plugin-setup-webapi
        :type: ref
-       :text: Task template Plugin
+       :text: Web API Plugin
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Task template Plugins.
+    Guide to setting up the Web API Plugins.
 
     ---
 
@@ -33,11 +33,21 @@ Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up AWS-specific Plugins.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-gcp
+       :type: ref
+       :text: GCP Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up GCP-specific Plugins.
+
 .. toctree::
     :maxdepth: 1
     :name: Plugin Setup
     :hidden:
 
     k8s/index
-    task-template/index
     aws/index
+    gcp/index
+    webapi/index

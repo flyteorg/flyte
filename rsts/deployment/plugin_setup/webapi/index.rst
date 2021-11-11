@@ -1,15 +1,15 @@
-.. _deployment-plugin-setup-task-template:
+.. _deployment-plugin-setup-webapi:
 
-##########################
-Task template Plugin Setup
-##########################
+####################
+Web API Plugin Setup
+####################
 
 
 .. panels::
     :header: text-center
 
 
-    .. link-button:: deployment-plugin-setup-task-template-snowflake
+    .. link-button:: deployment-plugin-setup-webapi-snowflake
        :type: ref
        :text: Snowflake Plugin
        :classes: btn-block stretched-link
@@ -19,7 +19,7 @@ Task template Plugin Setup
 
 .. toctree::
     :maxdepth: 1
-    :name: Task template plugin Setup
+    :name: Web API plugin Setup
     :hidden:
 
     snowflake
