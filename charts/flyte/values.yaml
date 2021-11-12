@@ -16,7 +16,7 @@ flyteadmin:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin
     # -- Docker image tag
-    tag: v0.6.49 # FLYTEADMIN_TAG
+    tag: v0.6.53 # FLYTEADMIN_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
@@ -73,7 +73,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler
     # -- Docker image tag
-    tag: v0.6.49 # FLYTESCHEDULER_TAG
+    tag: v0.6.53 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -118,7 +118,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog
     # -- Docker image tag
-    tag: v0.3.9 # DATACATALOG_TAG
+    tag: v0.3.16 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -166,7 +166,7 @@ flytepropeller:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller
     # -- Docker image tag
-    tag: v0.14.13 # FLYTEPROPELLER_TAG
+    tag: v0.15.17 # FLYTEPROPELLER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
@@ -211,7 +211,7 @@ flyteconsole:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole
     # -- Docker image tag
-    tag: v0.29.0 # FLYTECONSOLE_TAG
+    tag: v0.30.0 # FLYTECONSOLE_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
