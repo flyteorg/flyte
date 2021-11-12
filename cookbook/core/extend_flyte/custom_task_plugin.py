@@ -9,9 +9,13 @@ Flyte does come with the capability of extending the backend, but that is only r
 extended to all users of Flyte, or there is a cost/visibility benefit of doing so. To understand when you should write
 a backend plugin refer to - TODO: Flow chart that helps you decide when to write a backend / flytekit plugin?
 
+The following demo shows how to build Flyte container task extensions, with an SQLAlchemy extension as an example:
+
+.. youtube:: hfKbfcJbawE
+
 This tutorial will walk you through writing your own Sensor style plugin, that allows users to wait for a file to land
 in the object store. Remember, if you follow the Flyte/flytekit constructs, you will automatically make your plugin portable
-across all cloud platforms that Flyte supports
+across all cloud platforms that Flyte supports.
 
 Sensor Plugin
 ^^^^^^^^^^^^^^
