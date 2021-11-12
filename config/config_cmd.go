@@ -143,7 +143,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 				addSubsection(subVal.Interface(), subsections, fieldName, &fieldTypeString, tagType, visitedSection, visitedType)
 			}
 		}
-		printSection(fieldName, fieldTypeString, fieldDefaultValue, fieldDescription)
+		printSection(fieldName, fieldTypeString, fieldDefaultValue, fieldDescription, isSubsection)
 	}
 
 	if section != nil {
@@ -159,7 +159,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 			fieldDefaultValue := getDefaultValue(sections[sectionKey].GetConfig())
 
 			addSubsection(sections[sectionKey].GetConfig(), subsections, fieldName, &fieldTypeString, fieldType, visitedSection, visitedType)
-			printSection(fieldName, fieldTypeString, fieldDefaultValue, "")
+			printSection(fieldName, fieldTypeString, fieldDefaultValue, "", isSubsection)
 		}
 	}
 	orderedSectionKeys := sets.NewString()
@@ -182,7 +182,7 @@ func printToc(orderedSectionKeys sets.String) {
 func printTitle(title string, isSubsection bool) {
 	if isSubsection {
 		fmt.Println(title)
-		fmt.Println(strings.Repeat("-", 80))
+		fmt.Println(strings.Repeat("^", 80))
 	} else {
 		fmt.Println("Section:", title)
 		fmt.Println(strings.Repeat("=", 80))
@@ -190,8 +190,11 @@ func printTitle(title string, isSubsection bool) {
 	fmt.Println()
 }
 
-func printSection(name string, dataType string, defaultValue string, description string) {
+func printSection(name string, dataType string, defaultValue string, description string, isSubsection bool) {
 	c := "-"
+	if isSubsection {
+		c = "\""
+	}
 
 	fmt.Printf("%s ", name)
 	fmt.Printf("(%s)\n", dataType)
@@ -217,7 +220,6 @@ func addSubsection(val interface{}, subsections map[string]interface{}, fieldNam
 			// Add field name at the end to tell the difference between them.
 			*fieldTypeString = fmt.Sprintf("%s (%s)", *fieldTypeString, fieldName)
 			subsections[*fieldTypeString] = val
-
 		}
 	} else {
 		visitedSection[*fieldTypeString] = true
