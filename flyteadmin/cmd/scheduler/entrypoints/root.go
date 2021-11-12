@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flytestdlib/logger"
+
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/spf13/cobra"
@@ -66,7 +68,7 @@ func initConfig(flags *pflag.FlagSet) error {
 		StrictMode:  false,
 	})
 
-	fmt.Println("Using config file: ", configAccessor.ConfigFilesUsed())
+	logger.Infof(context.TODO(), "Using config file: %v", configAccessor.ConfigFilesUsed())
 
 	configAccessor.InitializePflags(flags)
 
