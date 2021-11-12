@@ -8,8 +8,11 @@ ROOT_DIR=${CUR_DIR}/..
 OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/cluster_config
 GOBIN=${GOPATH:-~/go}/bin
 
-GO111MODULE=on go get github.com/flyteorg/flyteadmin/cmd@latest
-GO111MODULE=on go get github.com/flyteorg/flytepropeller/cmd/controller@latest
+FLYTEADMIN_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteadmin/releases/latest" | jq -r .tag_name)
+FLYTEPROPELLER_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytepropeller/releases/latest" | jq -r .tag_name)
+
+GO111MODULE=on go get github.com/flyteorg/flyteadmin/cmd@${FLYTEADMIN_TAG}
+GO111MODULE=on go get github.com/flyteorg/flytepropeller/cmd/controller@${FLYTEPROPELLER_TAG}
 mv $GOBIN/cmd $GOBIN/flyteadmin
 mv $GOBIN/controller $GOBIN/flytepropeller
 
