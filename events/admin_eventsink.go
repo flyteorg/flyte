@@ -111,12 +111,12 @@ func IDFromMessage(message proto.Message) ([]byte, error) {
 	case *event.NodeExecutionEvent:
 		nid := eventMessage.Id
 		wid := nid.ExecutionId
-		id = fmt.Sprintf("%s:%s:%s:%s:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, eventMessage.Phase)
+		id = fmt.Sprintf("%s:%s:%s:%s:%s:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, eventMessage.RetryGroup, eventMessage.Phase)
 	case *event.TaskExecutionEvent:
 		tid := eventMessage.TaskId
 		nid := eventMessage.ParentNodeExecutionId
 		wid := nid.ExecutionId
-		id = fmt.Sprintf("%s:%s:%s:%s:%s:%s:%d:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, tid.Name, tid.Version, eventMessage.Phase, eventMessage.PhaseVersion)
+		id = fmt.Sprintf("%s:%s:%s:%s:%s:%s:%d:%d:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, tid.Name, tid.Version, eventMessage.RetryAttempt, eventMessage.Phase, eventMessage.PhaseVersion)
 	default:
 		return nil, fmt.Errorf("unknown event type [%s]", eventMessage.String())
 	}
