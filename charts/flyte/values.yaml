@@ -183,6 +183,8 @@ flyte:
     # -- Default regex string for searching configuration files
     configPath: /etc/flyte/config/*.yaml
 
+    client_secret: foobar
+
     # -- Configuration for service accounts for FlytePropeller
     serviceAccount:
       # -- Should a service account be created for FlytePropeller
