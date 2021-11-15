@@ -8,22 +8,13 @@ spec:
   group: flyte.lyft.com
   # version name to use for REST API: /apis/<group>/<version>
   versions:
-    - name: v1alpha1
-      served: true
-      storage: true
-      schema:
-        openAPIV3Schema:
-          type: object
-          properties:
-            spec:
-              type: object
-              properties:
-                cronSpec:
-                  type: string
-                image:
-                  type: string
-                replicas:
-                  type: integer
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'FlyteWorkflow: represents one Execution Workflow object'
+        type: object
+    served: true
+    storage: true
   # either Namespaced or Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
