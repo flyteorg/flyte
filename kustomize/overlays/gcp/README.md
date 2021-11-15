@@ -30,11 +30,11 @@ needs to replace `<project-id>` and `<region>` accordingly in
 
 ## Create GCS Storage
 1. Create a GCS bucket named as `flyte` in a GCP project.
-1. Replace `<project-id>` in [config/common/storage.yaml](config/common/storage.yaml) with the GCP project ID and if using a bucket other than Flyte then replace the bucket name too
+1. Replace `<project-id>` in [config/common/storage.yaml](flyte/config/common/storage.yaml) with the GCP project ID and if using a bucket other than Flyte then replace the bucket name too
 
 ## flyteadmin
 
-flyteadmin configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/admin/db.yaml)
+flyteadmin configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](flyte/config/admin/db.yaml)
 
 If one has followed [Cloud SQL](#cloud-sql) section, there is nothing to be done for database.
 
@@ -55,7 +55,7 @@ flyteconsole is exposed as a service using [internal load balancer](https://clou
 ## flytepropeller
 
 flytepropeller configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to the config for performance tuning and logs
-For logs configuration Replace `<project-id>` in [config/propeller/plugins/task_logs.yaml](config/propeller/plugins/task_logs.yaml) with the GCP project ID
+For logs configuration Replace `<project-id>` in [config/propeller/plugins/task_logs.yaml](flyte/config/propeller/plugins/task_logs.yaml) with the GCP project ID
 
 Some important points
 
@@ -70,7 +70,7 @@ Some important points
 
 ## datacatalog
 
-datacatalog configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/datacatalog/db.yaml)
+datacatalog configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](flyte/config/datacatalog/db.yaml)
 
 If one has followed [Cloud SQL](#cloud-sql) section, there is nothing to be done for database.
 

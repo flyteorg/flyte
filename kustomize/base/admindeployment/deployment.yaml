@@ -22,10 +22,16 @@ spec:
         prometheus.io/port: "10254"
         prometheus.io/path: "/metrics"
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: flyteadmin
       volumes:
         - name: shared-data
           emptyDir: {}
+        - emptyDir: {}
+          name: scratch
         - name: config-volume
           configMap:
             name: flyte-admin-config
@@ -40,7 +46,7 @@ spec:
             secretName: flyte-admin-auth
       initContainers:
         - name: run-migrations
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -57,7 +63,7 @@ spec:
               mountPath: /etc/db
         # Optional, These just seed the project - TODO move them to only
         - name: seed-projects
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -76,7 +82,7 @@ spec:
             - name: db-pass
               mountPath: /etc/db
         - name: sync-cluster-resources
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -94,16 +100,18 @@ spec:
             - name: db-pass
               mountPath: /etc/db
         - name: generate-secrets
-          image: flyteadmin:v0.4.0
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
             [
-              "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth",
+              "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: scratch
+              mountPath: /etc/scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -111,7 +119,7 @@ spec:
                   fieldPath: metadata.namespace
       containers:
         - name: flyteadmin
-          image: flyteadmin:v0.4.13
+          image: flyteadmin:v0.6.49
           imagePullPolicy: IfNotPresent
           command:
             ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "serve"]

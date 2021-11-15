@@ -803,41 +803,4 @@ kubernetes-dashboard:
 # -- Optional: Spark Plugin using the Spark Operator
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
-  enabled: true
-  # -- Replicas count for Sparkoperator deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Sparkoperator
-    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
-  # -- Default resources requests and limits for Sparkoperator
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 500M
-    requests:
-      cpu: 10m
-      memory: 50M
-
-  # -- Spark plugin configuration
-  plugin_config:
-    plugins:
-      spark:
-        # -- Spark default configuration
-        spark-config-default:
-          # We override the default credentials chain provider for Hadoop so that
-          # it can use the serviceAccount based IAM role or ec2 metadata based.
-          # This is more in line with how AWS works
-          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-          - spark.kubernetes.allocation.batch.size: "50"
-          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-          - spark.blacklist.enabled: "true"
-          - spark.blacklist.timeout: "5m"
-          - spark.task.maxfailures: "8"
+  enabled: false

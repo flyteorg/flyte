@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -22,6 +24,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-datacatalog@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
@@ -34,6 +38,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flytepropeller@<PROJECT-ID>.iam.gserviceaccount.com
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
@@ -51,6 +57,15 @@ metadata:
   namespace: flyte
 type: Opaque
 stringData:
+---
+# Source: flyte/templates/common/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-pass
+stringData:
+  pass.txt: '<DBPASSWORD>'
+type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
 apiVersion: v1
@@ -92,6 +107,17 @@ data:
       finalizers:
       - kubernetes
     
+  aab_default_service_account.yaml: | 
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default
+      namespace: {{ namespace }}
+      annotations:
+        # Needed for gcp workload identity to function
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+        iam.gke.io/gcp-service-account: {{ gsa }}
+    
   ab_project_resource_quota.yaml: | 
     apiVersion: v1
     kind: ResourceQuota
@@ -118,9 +144,10 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: postgres
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   domain.yaml: | 
     domains:
     - id: development
@@ -131,7 +158,7 @@ data:
       name: production
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   server.yaml: | 
     auth:
@@ -171,15 +198,13 @@ data:
         allowCors: true
         allowedHeaders:
         - Content-Type
-        - flyte-authorization
         allowedOrigins:
         - '*'
         secure: false
         useAuth: false
   remoteData.yaml: | 
     remoteData:
-      region: us-east-1
-      scheme: gcp
+      scheme: gcs
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
@@ -189,22 +214,22 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
+          project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
-        cpu: 100m
-        memory: 100Mi
-        storage: 5Mi
+        cpu: 1000m
+        memory: 1000Mi
+        storage: 1000Mi
       limits:
         cpu: 2
         gpu: 1
         memory: 1Gi
-        storage: 20Mi
+        storage: 2000Mi
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -213,16 +238,22 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
+        - gsa:
+            value: gsa-production@<PROJECT-ID>.iam.gserviceaccount.com
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - gsa:
+            value: gsa-staging@<PROJECT-ID>.iam.gserviceaccount.com
       - development:
         - projectQuotaCpu:
-            value: "4"
+            value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - gsa:
+            value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
@@ -257,13 +288,14 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: datacatalog
-      host: postgres
+      dbname: flyteadmin
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   server.yaml: | 
     application:
@@ -281,9 +313,9 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
+          project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
 ---
@@ -312,12 +344,13 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: postgres
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
       port: 5432
-      username: postgres
+      username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
 ---
 # Source: flyte/templates/propeller/configmap.yaml
@@ -358,6 +391,11 @@ data:
     propeller:
       downstream-eval-duration: 30s
       enable-admin-launcher: true
+      gc-interval: 12h
+      kube-client-config:
+        burst: 25
+        qps: 100
+        timeout: 30s
       leader-election:
         enabled: true
         lease-duration: 15s
@@ -367,7 +405,7 @@ data:
         renew-deadline: 10s
         retry-period: 2s
       limit-namespace: all
-      max-workflow-retries: 30
+      max-workflow-retries: 50
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
       prof-port: 10254
@@ -381,12 +419,12 @@ data:
           rate: 100
           type: maxof
         sub-queue:
-          capacity: 100
-          rate: 10
+          capacity: 1000
+          rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://my-s3-bucket/
-      workers: 4
+      rawoutput-prefix: gs://<BUCKETNAME>/
+      workers: 40
       workflow-reeval-duration: 30s
     webhook:
       certDir: /etc/webhook/certs
@@ -398,9 +436,11 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
+          spark: spark
         enabled-plugins:
         - container
         - sidecar
+        - spark
         - k8s-array
   k8s.yaml: | 
     plugins:
@@ -410,7 +450,7 @@ data:
         default-memory: 100Mi
   logger.yaml: | 
     logger:
-      level: 4
+      level: 5
       show-source: true
   resource_manager.yaml: | 
     propeller:
@@ -423,20 +463,27 @@ data:
         kind: google
         config:
           json: ""
-          project_id: <GOOGLE_PROJECT_ID>
+          project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: "<BUCKET_NAME>"
+      container: "<BUCKETNAME>"
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
     cache:
-      max_size_mbs: 0
+      max_size_mbs: 1024
       target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
+      k8s-array:
+        logs:
+          config:
+            stackdriver-enabled: true
+            stackdriver-logresourcename: k8s_container
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: false
+        stackdriver-enabled: true
+        stackdriver-logresourcename: k8s_container
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -643,6 +690,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
@@ -699,6 +747,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: NodePort
@@ -757,31 +806,38 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b9377412066571770fffc7b51e085ef9e13f65a3ecd8727269832227e2d64a9"
+        configChecksum: "bd8b5d74be681394c828a81332553ed1e38cb968553bb58b268541a55962e91"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
         - name: check-db-ready
           image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+          securityContext:
+             runAsUser: 0
           command:
           - sh
           - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h <CLOUD-SQL-IP> -p 5432; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
         - command:
@@ -793,11 +849,12 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
         - command:
@@ -806,26 +863,29 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
             [
-                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
+                "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: scratch
+              mountPath: /etc/scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -837,7 +897,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -846,14 +906,15 @@ spec:
         resources: 
           limits:
             cpu: 250m
-            ephemeral-storage: 100Mi
+            ephemeral-storage: 2Gi
             memory: 500Mi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 200Mi
         volumeMounts:
-        
+        - mountPath: /etc/db
+          name: db-pass
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
@@ -862,9 +923,13 @@ spec:
           mountPath: /etc/secrets/
       serviceAccountName: flyteadmin
       volumes:
-        
+        - name: db-pass
+          secret:
+            secretName: db-pass
         - emptyDir: {}
           name: shared-data
+        - emptyDir: {}
+          name: scratch
         - configMap:
             name: flyte-admin-config
           name: config-volume
@@ -874,6 +939,13 @@ spec:
         - name: auth
           secret:
             secretName: flyte-admin-secrets
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flyteadmin
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
@@ -902,8 +974,11 @@ spec:
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.29.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.30.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -913,7 +988,7 @@ spec:
         - containerPort: 8080
         resources: 
           limits:
-            cpu: 500m
+            cpu: 250m
             memory: 250Mi
           requests:
             cpu: 10m
@@ -924,6 +999,13 @@ spec:
       volumes:
       - emptyDir: {}
         name: shared-data
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flyteconsole
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/datacatalog/deployment.yaml
 apiVersion: apps/v1
@@ -945,31 +1027,38 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5293dc7ff277250307f0c988967f08dafa9b7b3de0d815b761dfa1175ce613e"
+        configChecksum: "0e1bf57cdd577e837af739950061c930e15a92bf4f866df6124c298eff02871"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
       - name: check-db-ready
         image: postgres:10.16-alpine
+        securityContext:
+          runAsUser: 0
         command:
           - sh
           - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h <CLOUD-SQL-IP> -p 5432; do echo waiting for database; sleep 2; done;
       - command:
         - datacatalog
         - --config
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.16"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
-        
+        - mountPath: /etc/db
+          name: db-pass
         - mountPath: /etc/datacatalog/config
           name: config-volume
       containers:
@@ -978,7 +1067,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.9"
+        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.16"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -987,24 +1076,34 @@ spec:
         resources: 
           limits:
             cpu: 500m
-            ephemeral-storage: 100Mi
+            ephemeral-storage: 2Gi
             memory: 500Mi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 200Mi
         volumeMounts:
-        
+        - mountPath: /etc/db
+          name: db-pass
         - mountPath: /etc/datacatalog/config
           name: config-volume
       serviceAccountName: datacatalog
       volumes:
-      
+      - name: db-pass
+        secret:
+          secretName: db-pass
       - emptyDir: {}
         name: shared-data
       - configMap:
           name: datacatalog-config
         name: config-volume
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: datacatalog
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
@@ -1026,24 +1125,29 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b9377412066571770fffc7b51e085ef9e13f65a3ecd8727269832227e2d64a9"
+        configChecksum: "bd8b5d74be681394c828a81332553ed1e38cb968553bb58b268541a55962e91"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       initContainers:
       - command:
         - flytescheduler
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.53"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
       containers:
@@ -1052,7 +1156,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.53"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         resources: 
@@ -1065,12 +1169,15 @@ spec:
             ephemeral-storage: 50Mi
             memory: 50Mi
         volumeMounts:
-          
+          - mountPath: /etc/db
+            name: db-pass
           - mountPath: /etc/flyte/config
             name: config-volume
       serviceAccountName: flyteadmin
       volumes:
-        
+        - name: db-pass
+          secret:
+            secretName: db-pass
         - emptyDir: {}
           name: shared-data
         - configMap:
@@ -1097,13 +1204,17 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0646db03bb3db58e1349cae214ff39eaa21d4457934f639c5c67e7181af177a"
+        configChecksum: "0a9bed8c9f7150ac5725bc006b3a6da9b11c81364ed0f3e7572011b38932819"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       containers:
       - command:
         - flytepropeller
@@ -1114,20 +1225,20 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.15.17"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
         - containerPort: 10254
         resources: 
           limits:
-            cpu: 200m
-            ephemeral-storage: 100Mi
-            memory: 200Mi
+            cpu: 500m
+            ephemeral-storage: 2Gi
+            memory: 1Gi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 1Gi
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -1141,6 +1252,13 @@ spec:
       - name: auth
         secret:
           secretName: flyte-propeller-auth
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: flytepropeller
+            topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create the actual deployment
@@ -1160,14 +1278,18 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.14.13
+        app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "0646db03bb3db58e1349cae214ff39eaa21d4457934f639c5c67e7181af177a"
+        configChecksum: "0a9bed8c9f7150ac5725bc006b3a6da9b11c81364ed0f3e7572011b38932819"
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.15.17"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1190,7 +1312,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.14.13"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.15.17"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1246,11 +1368,12 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.53"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
-            
+            - mountPath: /etc/db
+              name: db-pass
             - mountPath: /etc/flyte/clusterresource/templates
               name: resource-templates
             - mountPath: /etc/flyte/config
@@ -1258,7 +1381,9 @@ spec:
           restartPolicy: OnFailure
           serviceAccountName: flyteadmin
           volumes:
-          
+          - name: db-pass
+            secret:
+              secretName: db-pass
           - configMap:
               name: clusterresource-template
             name: resource-templates
@@ -1273,7 +1398,10 @@ metadata:
   name: flyte
   namespace: flyte
   annotations: 
+    cert-manager.io/issuer: letsencrypt-production
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
     - http:
@@ -1387,6 +1515,33 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+      host: '<HOSTNAME>'
+  tls:
+    - secretName: flyte-flyte-tls
+      hosts:
+        - '<HOSTNAME>'
+  
+# Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
+# enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
+---
+# Source: flyte/templates/common/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: flyte-grpc
+  namespace: flyte
+  annotations:
+    cert-manager.io/issuer: letsencrypt-production
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+spec:
+  rules:
+    - host: '<HOSTNAME>'
+      http:
+        paths:
+          #
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
@@ -1418,3 +1573,7 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
+  tls:
+    - secretName: flyte-flyte-tls
+      hosts:
+        - '<HOSTNAME>'

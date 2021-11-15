@@ -19,11 +19,11 @@ A few things are required for this overlay to function:
 
 ## Create S3 bucket
 1. Create a S3 bucket named as `flyte` (if other name replace it next)
-1. Replace in [config/common/storage.yaml](config/common/storage.yaml) if using a bucket other than Flyte then replace the bucket name too
+1. Replace in [config/common/storage.yaml](flyte/config/common/storage.yaml) if using a bucket other than Flyte then replace the bucket name too
 
 ## flyteadmin
 
-flyteadmin configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/admin/db.yaml)
+flyteadmin configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](flyte/config/admin/db.yaml)
 
 **Advanced / OPTIONAL**
 1. The default CORS setting in flyteAdmin allows cross origin requests. A more secure way would be to allow requests only from the expected domain. To do this, you will have to create a new *server.yaml*
@@ -40,7 +40,7 @@ flyteconsole is exposed as a service using [internal load balancer](https://clou
 ## flytepropeller
 
 flytepropeller configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to the config for performance tuning and logs
-For logs configuration Replace `<project-id>` in [config/propeller/plugins/task_logs.yaml](config/propeller/plugins/task_logs.yaml) to use CloudWatch
+For logs configuration Replace `<project-id>` in [config/propeller/plugins/task_logs.yaml](flyte/config/propeller/plugins/task_logs.yaml) to use CloudWatch
 
 Some important points
 
@@ -53,7 +53,7 @@ Some important points
 
 ## datacatalog
 
-datacatalog configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/datacatalog/db.yaml)
+datacatalog configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](flyte/config/datacatalog/db.yaml)
 
 
 ## How to build your overlay
