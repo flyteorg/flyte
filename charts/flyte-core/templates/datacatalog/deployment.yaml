@@ -17,10 +17,16 @@ spec:
         {{- end }}
       labels: {{ include "datacatalog.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
       {{- if .Values.db.checks }}
       - name: check-db-ready
         image: postgres:10.16-alpine
+        securityContext:
+          runAsUser: 0
         command:
           - sh
           - -c

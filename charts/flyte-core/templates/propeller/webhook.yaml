@@ -31,6 +31,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
 {{- if .Values.webhook.enabled }}
       initContainers:

@@ -17,6 +17,10 @@ spec:
         {{- end }}
       labels: {{ include "flytepropeller.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
       containers:
       - command:
         - flytepropeller

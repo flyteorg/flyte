@@ -139,7 +139,7 @@ Build & Deploy Your Application to the Cluster
 
    .. prompt:: bash (venv)$
 
-      pyflyte --pkgs myapp.workflows package --image <registry/repo:version>
+      pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
 
 #. Upload this package to the Flyte backend. We refer to this as ``registration``. The version here ``v1`` does not have to match the version
    used in the commands above. It's generally recommended to match the versions to make it easier to track.
@@ -157,7 +157,7 @@ Build & Deploy Your Application to the Cluster
 
    .. prompt:: bash $
 
-      flytectl get workflows --project flytesnacks --domain development myapp.workflows.example.my_wf --version v1 -o doturl
+      flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
 
 
 .. _getting-started-execute:
@@ -178,7 +178,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
    .. prompt:: bash $
 
-      flytectl get launchplan --project flytesnacks --domain development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
+      flytectl get launchplan --project flytesnacks --domain development flyte.workflows.example.my_wf --latest --execFile exec_spec.yaml
 
 #. Create an execution using the exec spec file.
 
