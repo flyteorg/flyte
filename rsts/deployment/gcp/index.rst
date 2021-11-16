@@ -85,7 +85,7 @@ This creates the GSA's which would be mapped to the KSA(kubernetes service accou
 
   gcloud iam service-accounts create gsa-flyteadmin
 
-* Create GSA for flyteadmin
+* Create GSA for flytescheduler
 
 .. code-block:: bash
 
