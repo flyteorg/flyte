@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.1](http://github.com/lyft/flyteconsole/compare/v0.31.0...v0.31.1) (2021-11-16)
+
+
+### Bug Fixes
+
+* show correct task type in execution view ([#225](http://github.com/lyft/flyteconsole/issues/225)) ([36d1c8c](http://github.com/lyft/flyteconsole/commit/36d1c8c337f279286125c40c9059fac13cbc339e))
+
 # [0.31.0](http://github.com/lyft/flyteconsole/compare/v0.30.0...v0.31.0) (2021-11-16)
 
 
