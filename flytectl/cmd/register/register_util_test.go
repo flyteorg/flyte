@@ -13,6 +13,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -279,7 +280,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.AssumableIamRole = "iamRole"
 		lpSpec := &admin.LaunchPlanSpec{}
-		hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.AuthRole)
 	})
 	t.Run("k8sService account override", func(t *testing.T) {
@@ -287,7 +289,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
 		lpSpec := &admin.LaunchPlanSpec{}
-		hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
 	})
 	t.Run("Both k8sService and IamRole", func(t *testing.T) {
@@ -296,7 +299,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		rconfig.DefaultFilesConfig.AssumableIamRole = "iamRole"
 		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
 		lpSpec := &admin.LaunchPlanSpec{}
-		hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole",
 			KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
 	})
@@ -305,8 +309,103 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.OutputLocationPrefix = "prefix"
 		lpSpec := &admin.LaunchPlanSpec{}
-		hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
 		assert.Equal(t, &admin.RawOutputDataConfig{OutputLocationPrefix: "prefix"}, lpSpec.RawOutputDataConfig)
+	})
+	t.Run("Validation successful", func(t *testing.T) {
+		lpSpec := &admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "foo",
+					},
+					KickoffTimeInputArg: "kickoff_time_arg",
+				},
+			},
+			FixedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
+		}
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
+	})
+	t.Run("Validation failure", func(t *testing.T) {
+		lpSpec := &admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "expr",
+					},
+					KickoffTimeInputArg: "kickoff_time_arg",
+				},
+			},
+			DefaultInputs: &core.ParameterMap{
+				Parameters: map[string]*core.Parameter{
+					"bar": {
+						Var: &core.Variable{
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+						},
+					},
+				},
+			},
+			FixedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
+		}
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.NotNil(t, err)
+	})
+	t.Run("Validation failed with fixed inputs empty", func(t *testing.T) {
+		lpSpec := &admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "expr",
+					},
+					KickoffTimeInputArg: "kickoff_time_arg",
+				},
+			},
+			DefaultInputs: &core.ParameterMap{
+				Parameters: map[string]*core.Parameter{
+					"bar": {
+						Var: &core.Variable{
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+						},
+					},
+				},
+			},
+		}
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.NotNil(t, err)
+	})
+	t.Run("Validation success with fixed", func(t *testing.T) {
+		lpSpec := &admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "expr",
+					},
+					KickoffTimeInputArg: "kickoff_time_arg",
+				},
+			},
+			DefaultInputs: &core.ParameterMap{
+				Parameters: map[string]*core.Parameter{
+					"bar": {
+						Var: &core.Variable{
+							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+						},
+					},
+				},
+			},
+			FixedInputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"bar": coreutils.MustMakeLiteral("bar-value"),
+				},
+			},
+		}
+		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
+		assert.Nil(t, err)
 	})
 }
 
