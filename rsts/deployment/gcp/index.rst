@@ -85,6 +85,12 @@ This creates the GSA's which would be mapped to the KSA(kubernetes service accou
 
   gcloud iam service-accounts create gsa-flyteadmin
 
+* Create GSA for flyteadmin
+
+.. code-block:: bash
+
+  gcloud iam service-accounts create gsa-flytescheduler
+
 * Create GSA for datacatalog
 
 .. code-block:: bash
@@ -129,6 +135,13 @@ Development
    * storage.objects.get
    * storage.objects.getIamPolicy
    * storage.objects.update
+* Create a new role FlyteSchedulerRole with following permissions
+   * storage.buckets.get
+   * storage.objects.create
+   * storage.objects.delete
+   * storage.objects.get
+   * storage.objects.getIamPolicy
+   * storage.objects.update
 * Create a new role FlytePropellerRole with following permissions
    * storage.buckets.get
    * storage.objects.create
@@ -151,6 +164,12 @@ Refer the following `role <https://cloud.google.com/iam/docs/understanding-roles
 .. code-block:: bash
 
   gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-flyteadmin@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteAdminRole"
+
+* Add IAM policy binding for flytescheduler GSA using FlyteSchedulerRole.
+
+.. code-block:: bash
+
+  gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:gsa-flytescheduler@${PROJECT_ID}.iam.gserviceaccount.com"    --role "projects/${PROJECT_ID}/roles/FlyteSchedulerRole"
 
 * Add IAM policy binding for datacatalog GSA using DataCatalogRole.
 

@@ -27,6 +27,18 @@ metadata:
   annotations: 
     iam.gke.io/gcp-service-account: gsa-datacatalog@<PROJECT-ID>.iam.gserviceaccount.com
 ---
+# Source: flyte/templates/flytescheduler/sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -1258,7 +1270,7 @@ spec:
             name: config-volume
           - name: auth
             mountPath: /etc/secrets/
-      serviceAccountName: flyteadmin
+      serviceAccountName: flytescheduler
       volumes:
         - name: db-pass
           secret:
