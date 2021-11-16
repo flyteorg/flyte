@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flytestdlib/storage"
 
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
-
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

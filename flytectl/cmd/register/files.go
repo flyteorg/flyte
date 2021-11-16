@@ -100,10 +100,10 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	var dataRefs []string
 
 	// Deprecated checks for --k8Service
-	deprecatedCheck(ctx)
+	deprecatedCheck(ctx, &rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.K8ServiceAccount)
 
 	// getSerializeOutputFiles will return you all proto and  source code compress file in sorted order
-	dataRefs, tmpDir, err := getSerializeOutputFiles(ctx, args)
+	dataRefs, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
 	if err != nil {
 		logger.Errorf(ctx, "error while un-archiving files in tmp dir due to %v", err)
 		return err
@@ -123,7 +123,7 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	if len(sourceCode) > 0 {
 		logger.Infof(ctx, "Fast Registration detected")
 		_, sourceCodeName = filepath.Split(sourceCode)
-		if err = uploadFastRegisterArtifact(ctx, sourceCode, sourceCodeName, rconfig.DefaultFilesConfig.Version); err != nil {
+		if err = uploadFastRegisterArtifact(ctx, sourceCode, sourceCodeName, rconfig.DefaultFilesConfig.Version, &rconfig.DefaultFilesConfig.SourceUploadPath); err != nil {
 			return fmt.Errorf("please check your Storage Config. It failed while uploading the source code. %v", err)
 		}
 		logger.Infof(ctx, "Source code successfully uploaded %v/%v ", rconfig.DefaultFilesConfig.SourceUploadPath, sourceCodeName)
@@ -132,7 +132,7 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	var registerResults []Result
 	fastFail := rconfig.DefaultFilesConfig.ContinueOnError
 	for i := 0; i < len(validProto) && !(fastFail && regErr != nil); i++ {
-		registerResults, regErr = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx)
+		registerResults, regErr = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
 	}
 
 	payload, _ := json.Marshal(registerResults)
