@@ -78,9 +78,7 @@ function createTaskNodeExecutionDetails(
     return {
         taskTemplate,
         displayId: taskTemplate.id.name,
-        displayType:
-            taskTypeToNodeExecutionDisplayType[taskTemplate.type as TaskType] ??
-            NodeExecutionDisplayType.UnknownTask
+        displayType: taskTemplate.type
     };
 }
 
