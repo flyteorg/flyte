@@ -5,6 +5,7 @@ import * as CompressionWebpackPlugin from 'compression-webpack-plugin';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
 import * as webpack from 'webpack';
+const { WebpackPluginServe: ServePlugin } = require('webpack-plugin-serve');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const FavIconWebpackPlugin = require('favicons-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -291,10 +292,21 @@ export const clientConfig: webpack.Configuration = {
         if (isDev) {
             return [
                 ...plugins,
-                hmrPlugin
                 // namedModulesPlugin,
+                new ServePlugin({
+                    middleware: (app, builtins) =>
+                        app.use(async (ctx, next) => {
+                            await next();
+                            ctx.setHeader(
+                                'Content-Type',
+                                'application/javascript; charset=UTF-8'
+                            );
+                        }),
+                    port: 7777
+                })
             ];
         }
+
         return plugins;
     }
 };
