@@ -261,7 +261,39 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string, sourceUploadPath s
 	return nil
 }
 
-func hydrateLaunchPlanSpec(configAssumableIamRole string, configK8sServiceAccount string, configOutputLocationPrefix string, lpSpec *admin.LaunchPlanSpec) {
+func validateLaunchSpec(lpSpec *admin.LaunchPlanSpec) error {
+	if lpSpec == nil {
+		return nil
+	}
+	if lpSpec.EntityMetadata != nil && lpSpec.EntityMetadata.Schedule != nil {
+		schedule := lpSpec.EntityMetadata.Schedule
+		var scheduleFixedParams []string
+		if lpSpec.DefaultInputs != nil {
+			for paramKey := range lpSpec.DefaultInputs.Parameters {
+				if paramKey != schedule.KickoffTimeInputArg {
+					scheduleFixedParams = append(scheduleFixedParams, paramKey)
+				}
+			}
+		}
+		if (lpSpec.FixedInputs == nil && len(scheduleFixedParams) > 0) ||
+			(len(scheduleFixedParams) > len(lpSpec.FixedInputs.Literals)) {
+			fixedInputLen := 0
+			if lpSpec.FixedInputs != nil {
+				fixedInputLen = len(lpSpec.FixedInputs.Literals)
+			}
+			return fmt.Errorf("param values are missing on scheduled workflow."+
+				"additional args other than %v on scheduled workflow are %v > %v fixed values", schedule.KickoffTimeInputArg,
+				len(scheduleFixedParams), fixedInputLen)
+		}
+	}
+	return nil
+}
+
+func hydrateLaunchPlanSpec(configAssumableIamRole string, configK8sServiceAccount string, configOutputLocationPrefix string, lpSpec *admin.LaunchPlanSpec) error {
+
+	if err := validateLaunchSpec(lpSpec); err != nil {
+		return err
+	}
 	assumableIamRole := len(configAssumableIamRole) > 0
 	k8sServiceAcct := len(configK8sServiceAccount) > 0
 	outputLocationPrefix := len(configOutputLocationPrefix) > 0
@@ -276,6 +308,7 @@ func hydrateLaunchPlanSpec(configAssumableIamRole string, configK8sServiceAccoun
 			OutputLocationPrefix: configOutputLocationPrefix,
 		}
 	}
+	return nil
 }
 
 func hydrateSpec(message proto.Message, sourceCode string, config rconfig.FilesConfig) error {
@@ -283,7 +316,9 @@ func hydrateSpec(message proto.Message, sourceCode string, config rconfig.FilesC
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
 		hydrateIdentifier(launchPlan.Spec.WorkflowId, config.Version)
-		hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.Spec)
+		if err := hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.Spec); err != nil {
+			return err
+		}
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		for _, Noderef := range workflowSpec.Template.Nodes {
