@@ -40,7 +40,7 @@ func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Com
 	var release string
 
 	// Deprecated checks for --k8Service
-	deprecatedCheck(ctx)
+	deprecatedCheck(ctx, &rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.K8ServiceAccount)
 
 	if len(args) == 1 {
 		release = args[0]

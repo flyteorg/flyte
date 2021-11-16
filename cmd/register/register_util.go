@@ -97,11 +97,11 @@ func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (
 
 }
 
-func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext) error {
+func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext, dryRun bool, version string) error {
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
-		if rconfig.DefaultFilesConfig.DryRun {
+		if dryRun {
 			logger.Debugf(ctx, "skipping CreateLaunchPlan request (DryRun)")
 			return nil
 		}
@@ -112,14 +112,14 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         launchPlan.Id.Name,
-					Version:      rconfig.DefaultFilesConfig.Version,
+					Version:      version,
 				},
 				Spec: launchPlan.Spec,
 			})
 		return err
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
-		if rconfig.DefaultFilesConfig.DryRun {
+		if dryRun {
 			logger.Debugf(ctx, "skipping CreateWorkflow request (DryRun)")
 			return nil
 		}
@@ -130,14 +130,14 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         workflowSpec.Template.Id.Name,
-					Version:      rconfig.DefaultFilesConfig.Version,
+					Version:      version,
 				},
 				Spec: workflowSpec,
 			})
 		return err
 	case *admin.TaskSpec:
 		taskSpec := message.(*admin.TaskSpec)
-		if rconfig.DefaultFilesConfig.DryRun {
+		if dryRun {
 			logger.Debugf(ctx, "skipping CreateTask request (DryRun)")
 			return nil
 		}
@@ -148,7 +148,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         taskSpec.Template.Id.Name,
-					Version:      rconfig.DefaultFilesConfig.Version,
+					Version:      version,
 				},
 				Spec: taskSpec,
 			})
@@ -158,33 +158,33 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 	}
 }
 
-func hydrateNode(node *core.Node) error {
+func hydrateNode(node *core.Node, version string) error {
 	targetNode := node.Target
 	switch v := targetNode.(type) {
 	case *core.Node_TaskNode:
 		taskNodeWrapper := targetNode.(*core.Node_TaskNode)
 		taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
-		hydrateIdentifier(taskNodeReference.ReferenceId)
+		hydrateIdentifier(taskNodeReference.ReferenceId, version)
 	case *core.Node_WorkflowNode:
 		workflowNodeWrapper := targetNode.(*core.Node_WorkflowNode)
 		switch workflowNodeWrapper.WorkflowNode.Reference.(type) {
 		case *core.WorkflowNode_SubWorkflowRef:
 			subWorkflowNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_SubWorkflowRef)
-			hydrateIdentifier(subWorkflowNodeReference.SubWorkflowRef)
+			hydrateIdentifier(subWorkflowNodeReference.SubWorkflowRef, version)
 		case *core.WorkflowNode_LaunchplanRef:
 			launchPlanNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_LaunchplanRef)
-			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef)
+			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef, version)
 		default:
 			return fmt.Errorf("unknown type %T", workflowNodeWrapper.WorkflowNode.Reference)
 		}
 	case *core.Node_BranchNode:
 		branchNodeWrapper := targetNode.(*core.Node_BranchNode)
-		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode); err != nil {
+		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode, version); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
 		if len(branchNodeWrapper.BranchNode.IfElse.Other) > 0 {
 			for _, ifBlock := range branchNodeWrapper.BranchNode.IfElse.Other {
-				if err := hydrateNode(ifBlock.ThenNode); err != nil {
+				if err := hydrateNode(ifBlock.ThenNode, version); err != nil {
 					return fmt.Errorf("failed to hydrateNode")
 				}
 			}
@@ -192,7 +192,7 @@ func hydrateNode(node *core.Node) error {
 		switch branchNodeWrapper.BranchNode.IfElse.Default.(type) {
 		case *core.IfElseBlock_ElseNode:
 			elseNodeReference := branchNodeWrapper.BranchNode.IfElse.Default.(*core.IfElseBlock_ElseNode)
-			if err := hydrateNode(elseNodeReference.ElseNode); err != nil {
+			if err := hydrateNode(elseNodeReference.ElseNode, version); err != nil {
 				return fmt.Errorf("failed to hydrateNode")
 			}
 
@@ -207,7 +207,7 @@ func hydrateNode(node *core.Node) error {
 	return nil
 }
 
-func hydrateIdentifier(identifier *core.Identifier) {
+func hydrateIdentifier(identifier *core.Identifier, version string) {
 	if identifier.Project == "" || identifier.Project == registrationProjectPattern {
 		identifier.Project = config.GetConfig().Project
 	}
@@ -215,15 +215,15 @@ func hydrateIdentifier(identifier *core.Identifier) {
 		identifier.Domain = config.GetConfig().Domain
 	}
 	if identifier.Version == "" || identifier.Version == registrationVersionPattern {
-		identifier.Version = rconfig.DefaultFilesConfig.Version
+		identifier.Version = version
 	}
 }
 
-func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
+func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string, sourceUploadPath string, version string) error {
 	if task.Template.GetContainer() != nil {
 		for k := range task.Template.GetContainer().Args {
 			if task.Template.GetContainer().Args[k] == "" || task.Template.GetContainer().Args[k] == registrationRemotePackagePattern {
-				remotePath, err := getRemoteStoragePath(context.Background(), Client, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCode, rconfig.DefaultFilesConfig.Version)
+				remotePath, err := getRemoteStoragePath(context.Background(), Client, sourceUploadPath, sourceCode, version)
 				if err != nil {
 					return err
 				}
@@ -239,7 +239,7 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
 		for containerIdx, container := range podSpec.Containers {
 			for argIdx, arg := range container.Args {
 				if arg == registrationRemotePackagePattern {
-					remotePath, err := getRemoteStoragePath(context.Background(), Client, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCode, rconfig.DefaultFilesConfig.Version)
+					remotePath, err := getRemoteStoragePath(context.Background(), Client, sourceUploadPath, sourceCode, version)
 					if err != nil {
 						return err
 					}
@@ -261,50 +261,50 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
 	return nil
 }
 
-func hydrateLaunchPlanSpec(lpSpec *admin.LaunchPlanSpec) {
-	assumableIamRole := len(rconfig.DefaultFilesConfig.AssumableIamRole) > 0
-	k8sServiceAcct := len(rconfig.DefaultFilesConfig.K8sServiceAccount) > 0
-	outputLocationPrefix := len(rconfig.DefaultFilesConfig.OutputLocationPrefix) > 0
+func hydrateLaunchPlanSpec(configAssumableIamRole string, configK8sServiceAccount string, configOutputLocationPrefix string, lpSpec *admin.LaunchPlanSpec) {
+	assumableIamRole := len(configAssumableIamRole) > 0
+	k8sServiceAcct := len(configK8sServiceAccount) > 0
+	outputLocationPrefix := len(configOutputLocationPrefix) > 0
 	if assumableIamRole || k8sServiceAcct {
 		lpSpec.AuthRole = &admin.AuthRole{
-			AssumableIamRole:         rconfig.DefaultFilesConfig.AssumableIamRole,
-			KubernetesServiceAccount: rconfig.DefaultFilesConfig.K8sServiceAccount,
+			AssumableIamRole:         configAssumableIamRole,
+			KubernetesServiceAccount: configK8sServiceAccount,
 		}
 	}
 	if outputLocationPrefix {
 		lpSpec.RawOutputDataConfig = &admin.RawOutputDataConfig{
-			OutputLocationPrefix: rconfig.DefaultFilesConfig.OutputLocationPrefix,
+			OutputLocationPrefix: configOutputLocationPrefix,
 		}
 	}
 }
 
-func hydrateSpec(message proto.Message, sourceCode string) error {
+func hydrateSpec(message proto.Message, sourceCode string, config rconfig.FilesConfig) error {
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
-		hydrateIdentifier(launchPlan.Spec.WorkflowId)
-		hydrateLaunchPlanSpec(launchPlan.Spec)
+		hydrateIdentifier(launchPlan.Spec.WorkflowId, config.Version)
+		hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.Spec)
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		for _, Noderef := range workflowSpec.Template.Nodes {
-			if err := hydrateNode(Noderef); err != nil {
+			if err := hydrateNode(Noderef, config.Version); err != nil {
 				return err
 			}
 		}
-		hydrateIdentifier(workflowSpec.Template.Id)
+		hydrateIdentifier(workflowSpec.Template.Id, config.Version)
 		for _, subWorkflow := range workflowSpec.SubWorkflows {
 			for _, Noderef := range subWorkflow.Nodes {
-				if err := hydrateNode(Noderef); err != nil {
+				if err := hydrateNode(Noderef, config.Version); err != nil {
 					return err
 				}
 			}
-			hydrateIdentifier(subWorkflow.Id)
+			hydrateIdentifier(subWorkflow.Id, config.Version)
 		}
 	case *admin.TaskSpec:
 		taskSpec := message.(*admin.TaskSpec)
-		hydrateIdentifier(taskSpec.Template.Id)
+		hydrateIdentifier(taskSpec.Template.Id, config.Version)
 		// In case of fast serialize input proto also have on additional variable to substitute i.e destination bucket for source code
-		if err := hydrateTaskSpec(taskSpec, sourceCode); err != nil {
+		if err := hydrateTaskSpec(taskSpec, sourceCode, config.SourceUploadPath, config.Version); err != nil {
 			return err
 		}
 
@@ -331,8 +331,8 @@ Get serialize output file list from the args list.
 If the archive flag is on then download the archives to temp directory and extract it. In case of fast register it will also return the compressed source code
 The o/p of this function would be sorted list of the file locations.
 */
-func getSerializeOutputFiles(ctx context.Context, args []string) ([]string, string, error) {
-	if !rconfig.DefaultFilesConfig.Archive {
+func getSerializeOutputFiles(ctx context.Context, args []string, archive bool) ([]string, string, error) {
+	if !archive {
 		/*
 		 * Sorting is required for non-archived case since its possible for the user to pass in a list of unordered
 		 * serialized protobuf files , but flyte expects them to be registered in topologically sorted order that it had
@@ -406,7 +406,7 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 	}
 }
 
-func registerFile(ctx context.Context, fileName, sourceCode string, registerResults []Result, cmdCtx cmdCore.CommandContext) ([]Result, error) {
+func registerFile(ctx context.Context, fileName, sourceCode string, registerResults []Result, cmdCtx cmdCore.CommandContext, config rconfig.FilesConfig) ([]Result, error) {
 	var registerResult Result
 	var fileContents []byte
 	var err error
@@ -422,7 +422,7 @@ func registerFile(ctx context.Context, fileName, sourceCode string, registerResu
 		return registerResults, err
 	}
 
-	if err := hydrateSpec(spec, sourceCode); err != nil {
+	if err := hydrateSpec(spec, sourceCode, config); err != nil {
 		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error hydrating spec due to %v", err)}
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
@@ -430,7 +430,7 @@ func registerFile(ctx context.Context, fileName, sourceCode string, registerResu
 
 	logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
 
-	if err := register(ctx, spec, cmdCtx); err != nil {
+	if err := register(ctx, spec, cmdCtx, config.DryRun, config.Version); err != nil {
 		// If error is AlreadyExists then dont consider this to be an error but just a warning state
 		if grpcError := status.Code(err); grpcError == codes.AlreadyExists {
 			registerResult = Result{Name: fileName, Status: "Success", Info: fmt.Sprintf("%v", grpcError.String())}
@@ -532,21 +532,21 @@ func getRemoteStoragePath(ctx context.Context, s *storage.DataStore, remoteLocat
 	return remotePath, nil
 }
 
-func uploadFastRegisterArtifact(ctx context.Context, file, sourceCodeName, version string) error {
+func uploadFastRegisterArtifact(ctx context.Context, file, sourceCodeName, version string, sourceUploadPath *string) error {
 	dataStore, err := getStorageClient(ctx)
 	if err != nil {
 		return err
 	}
 	var dataRefReaderCloser io.ReadCloser
-	remotePath := storage.DataReference(rconfig.DefaultFilesConfig.SourceUploadPath)
-	if len(rconfig.DefaultFilesConfig.SourceUploadPath) == 0 {
+	remotePath := storage.DataReference(*sourceUploadPath)
+	if len(*sourceUploadPath) == 0 {
 		remotePath, err = dataStore.ConstructReference(ctx, dataStore.GetBaseContainerFQN(ctx), "fast")
 		if err != nil {
 			return err
 		}
 	}
-	rconfig.DefaultFilesConfig.SourceUploadPath = string(remotePath)
-	fullRemotePath, err := getRemoteStoragePath(ctx, dataStore, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCodeName, version)
+	*sourceUploadPath = string(remotePath)
+	fullRemotePath, err := getRemoteStoragePath(ctx, dataStore, *sourceUploadPath, sourceCodeName, version)
 	if err != nil {
 		return err
 	}
@@ -608,10 +608,10 @@ func segregateSourceAndProtos(dataRefs []string) (string, []string, []string) {
 	return sourceCode, validProto, InvalidFiles
 }
 
-func deprecatedCheck(ctx context.Context) {
-	if len(rconfig.DefaultFilesConfig.K8ServiceAccount) > 0 {
+func deprecatedCheck(ctx context.Context, k8sServiceAccount *string, k8ServiceAccount string) {
+	if len(k8ServiceAccount) > 0 {
 		logger.Warning(ctx, "--K8ServiceAccount is deprecated, Please use --K8sServiceAccount")
-		rconfig.DefaultFilesConfig.K8sServiceAccount = rconfig.DefaultFilesConfig.K8ServiceAccount
+		*k8sServiceAccount = k8ServiceAccount
 	}
 }
 
