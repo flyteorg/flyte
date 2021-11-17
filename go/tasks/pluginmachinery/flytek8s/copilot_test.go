@@ -276,8 +276,6 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 						}
 					}
 
-					_, ok := vmap[flyteDataConfigVolume]
-					assert.True(t, ok)
 				} else {
 					assert.Len(t, c.VolumeMounts, 0)
 				}

@@ -462,12 +462,6 @@ func TestToK8sPod(t *testing.T) {
 		})
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-			DefaultTolerations: []v1.Toleration{
-				{
-					Key:   "tolerationKey",
-					Value: flyteDataConfigVolume,
-				},
-			},
 			DefaultNodeSelector: map[string]string{
 				"nodeId": "123",
 			},
@@ -478,7 +472,6 @@ func TestToK8sPod(t *testing.T) {
 
 		p, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
-		assert.Equal(t, 1, len(p.Tolerations))
 		assert.Equal(t, 1, len(p.NodeSelector))
 		assert.Equal(t, "myScheduler", p.SchedulerName)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
