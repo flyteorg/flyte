@@ -20,9 +20,6 @@ import (
 )
 
 const (
-	flyteDataConfigVolume     = "data-config-volume"
-	flyteDataConfigPath       = "/etc/flyte/config-data"
-	flyteDataConfigMap        = "flyte-data-config"
 	flyteSidecarContainerName = "sidecar"
 	flyteInitContainerName    = "downloader"
 )
@@ -213,26 +210,6 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 	shareProcessNamespaceEnabled := true
 	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
 	if iFace != nil {
-		// TODO think about MountPropagationMode. Maybe we want to use that for acceleration in the future
-		if iFace.Inputs != nil || iFace.Outputs != nil {
-			// This is temporary. we have to mount the flyte data configuration into the pod
-			// TODO Remove the data configuration requirements
-			coPilotPod.Volumes = append(coPilotPod.Volumes, v1.Volume{
-				Name: flyteDataConfigVolume,
-				VolumeSource: v1.VolumeSource{
-					ConfigMap: &v1.ConfigMapVolumeSource{
-						LocalObjectReference: v1.LocalObjectReference{
-							Name: flyteDataConfigMap,
-						},
-					},
-				},
-			})
-		}
-		cfgVMount := v1.VolumeMount{
-			Name:      flyteDataConfigVolume,
-			MountPath: flyteDataConfigPath,
-		}
-
 		if iFace.Inputs != nil {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
@@ -256,7 +233,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount, cfgVMount)
+			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
 				return err
 			}
@@ -285,7 +262,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount, cfgVMount)
+			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
 			if err != nil {
 				return err
 			}
