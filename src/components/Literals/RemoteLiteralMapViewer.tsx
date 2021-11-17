@@ -30,16 +30,17 @@ export const RemoteLiteralMapViewer: React.FC<{
     blob: UrlBlob;
     map: LiteralMap | null;
 }> = ({ blob, map }) => {
+    /** Note: if full_outputs has a value, we want to use that first */
+    if (map != null) {
+        return <LiteralMapViewer map={map} />;
+    }
+
     if (!blob.url || !blob.bytes) {
         return (
             <p>
                 <em>No data is available.</em>
             </p>
         );
-    }
-
-    if (map != null) {
-        return <LiteralMapViewer map={map} />;
     }
 
     return blob.bytes.gt(maxBlobDownloadSizeBytes) ? (
