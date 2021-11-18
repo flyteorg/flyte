@@ -279,7 +279,18 @@ export const clientConfig: webpack.Configuration = {
             new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
             favIconPlugin,
             statsWriterPlugin,
-            getDefinePlugin(false)
+            getDefinePlugin(false),
+            new ServePlugin({
+                middleware: (app, builtins) =>
+                    app.use(async (ctx, next) => {
+                        ctx.setHeader(
+                            'Content-Type',
+                            'application/javascript; charset=UTF-8'
+                        );
+                        await next();
+                    }),
+                port: 7777
+            })
         ];
 
         // Apply production specific configs
@@ -291,19 +302,8 @@ export const clientConfig: webpack.Configuration = {
 
         if (isDev) {
             return [
-                ...plugins,
+                ...plugins
                 // namedModulesPlugin,
-                new ServePlugin({
-                    middleware: (app, builtins) =>
-                        app.use(async (ctx, next) => {
-                            await next();
-                            ctx.setHeader(
-                                'Content-Type',
-                                'application/javascript; charset=UTF-8'
-                            );
-                        }),
-                    port: 7777
-                })
             ];
         }
 
