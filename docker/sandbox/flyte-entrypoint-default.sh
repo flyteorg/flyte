@@ -15,10 +15,19 @@ K3S_PID=$!
 timeout 600 sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
 echo "Done."
 
+
+FLYTE_VERSION=${FLYTE_VERSION:-latest}
+if [[ $FLYTE_VERSION = "latest" ]]
+then
+  FLYTE_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flyte/releases/latest" | jq -r .tag_name)
+fi
+
 # Deploy flyte
 echo "Deploying Flyte..."
-helm dep update /flyteorg/share/flyte/
-helm upgrade -n flyte -f /flyteorg/share/flyte/values-sandbox.yaml --create-namespace flyte /flyteorg/share/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml --install
+helm repo add flyteorg https://flyteorg.github.io/flyte
+helm repo update
+helm fetch flyteorg/flyte --version=$FLYTE_VERSION
+helm upgrade -n flyte -f /flyteorg/share/flyte/values-sandbox.yaml --create-namespace flyte flyteorg/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml --install --version $FLYTE_VERSION
 
 wait-for-flyte.sh
 

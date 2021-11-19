@@ -59,7 +59,7 @@ COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait
 FROM base_ AS default
 
 # Install dependencies
-RUN apk add --no-cache bash git make tini
+RUN apk add --no-cache bash git make tini curl jq
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
@@ -83,7 +83,7 @@ ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
 FROM docker:20.10.8-dind AS dind
 
 # Install dependencies
-RUN apk add --no-cache bash git make tini
+RUN apk add --no-cache bash git make tini curl jq
 
 # Copy artifacts from base
 COPY --from=base_ /flyteorg/ /flyteorg/
