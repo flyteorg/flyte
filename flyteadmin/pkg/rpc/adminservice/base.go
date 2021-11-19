@@ -20,7 +20,8 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repositoryConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	workflowengine "github.com/flyteorg/flyteadmin/pkg/workflowengine/impl"
+	"github.com/flyteorg/flyteadmin/pkg/workflowengine"
+	workflowengineImpl "github.com/flyteorg/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -92,12 +93,12 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		master,
 		configuration,
 		db)
-	workflowExecutor := workflowengine.NewFlytePropeller(
-		applicationConfiguration.GetRoleNameKey(),
-		execCluster,
-		adminScope.NewSubScope("executor").NewSubScope("flytepropeller"),
-		configuration.NamespaceMappingConfiguration(), applicationConfiguration.GetEventVersion())
+	workflowBuilder := workflowengineImpl.NewFlyteWorkflowBuilder(
+		adminScope.NewSubScope("builder").NewSubScope("flytepropeller"))
+	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(execCluster, workflowBuilder)
 	logger.Info(context.Background(), "Successfully created a workflow executor engine")
+	workflowengine.GetRegistry().RegisterDefault(workflowExecutor)
+
 	dataStorageClient, err := storage.NewDataStore(storeConfig, adminScope.NewSubScope("storage"))
 	if err != nil {
 		logger.Error(context.Background(), "Failed to initialize storage config")
@@ -136,7 +137,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	}).GetRemoteURLInterface()
 
 	workflowManager := manager.NewWorkflowManager(
-		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
+		db, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
 		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
 
@@ -145,7 +146,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		executionEventWriter.Run()
 	}()
 
-	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient, workflowExecutor,
+	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
 		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
@@ -173,7 +174,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 
 	logger.Info(context.Background(), "Initializing a new AdminService")
 	return &AdminService{
-		TaskManager: manager.NewTaskManager(db, configuration, workflowengine.NewCompiler(),
+		TaskManager: manager.NewTaskManager(db, configuration, workflowengineImpl.NewCompiler(),
 			adminScope.NewSubScope("task_manager")),
 		WorkflowManager:    workflowManager,
 		LaunchPlanManager:  launchPlanManager,
