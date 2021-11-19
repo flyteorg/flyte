@@ -68,14 +68,16 @@ Flyte is more than a workflow engine -- it uses `workflow` as a core concept, an
 producer-consumer order creates a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out-of-the-box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
+Flyte was designed to manage complexity that arises in Data and ML teams and ensures them to keep up their high velocity of delivering business impacting features. One way to it achieves this is by separating
+the control-plane from the user-plane. Thus, every organization can offer Flyte like a service to their end users and the service is managed by folks who are more infrastructure focused, while the users use the intuitive interface of flytekit.
 
 
 ## ⏳ Five Reasons to Use Flyte
 - Kubernetes-Native Workflow Automation Platform
 - Ergonomic SDK's in Python, Java & Scala
-- Versioned & Auditable
-- Reproducible Pipelines
-- Strong Data Typing
+- Versioned, Auditable & Reproducible Pipelines
+- Data Aware and Strongly typed
+- Resource aware and deployed to scale with your organization
 
 <html>
 <h2 id="quickstart"> 
@@ -124,18 +126,15 @@ Please maintain an alphabetical order in the following list -->
 </h2>
 </html>
 
-- Used at _Scale_ in production by **500+** users at Lyft, with more than **1 million** executions, and **40+ million** container executions per month
-- A data-aware platform
+<details>
+- Used at _Scale_ in production by **500+** on one deployment. Used in production at multiple firms. Proved to scale to more than **1 million** executions, and **40+ million** containers
+- Data Aware and Resource aware (Allows organizations to separate concerns - users can use the API, platforms/infra teams can manage the deployments and scaling)
 - Enables **collaboration across your organization** by:
   - Executing distributed data pipelines/workflows
-  - Reusing tasks across projects, users, and workflows
-  - Making it easy to stitch together workflows from different teams and domain experts
-  - Backtracing to a specified workflow
+  - Making it easy to stitch together workflows from different teams and domain experts and share them across teams
   - Comparing results of training workflows over time and across pipelines
-  - Sharing workflows and tasks across your teams
   - Simplifying the complexity of multi-step, multi-owner workflows
-- **[Quick registration](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
-- **Centralized Inventory** constituting Tasks, Workflows, and Executions
+- **[Get Started quickly](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
 - **gRPC / REST** interface to define and execute tasks and workflows
 - **Type safe** construction of pipelines -- each task has an interface characterized by its input and output, so illegal construction of pipelines fails during declaration, rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.
@@ -146,37 +145,28 @@ Please maintain an alphabetical order in the following list -->
   - Parallel step execution
   - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
   - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
- - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embedded within one node of the top-level workflow)
+  - Workflow of workflows - **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embedded within one node of the top-level workflow)
   - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
   - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
-  - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
-  - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
-  - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
+  - **[Dynamic workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
+  - [flytekit plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
+  - Arbitrary flytekit-less containers tasks ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
 - Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
-  - Versioned data, code, and models
-  - Automatically tracked executions
-  - Declarative pipelines
 - **Multi-cloud support** (AWS, GCP, and others)
-- Extensible core, modularized, and deep observability
 - No single point of failure, and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
-- Snappy Console
-- Python CLI and Golang CLI (flytectl)
-- Written in **Golang** and optimized for large running jobs' performance
+- Snappy Console & Golang CLI (flytectl)
+- Written in **Golang** and optimized for jobs that run for a long period of time.
 - [Grafana templates](https://grafana.com/orgs/flyte) (user/system observability)
+- Deploy with Helm and kustomize
 
-### In Progress
-
-- Demos; Distributed Pytorch, feature engineering, etc.
-- Integrations; Great Expectations, Feast
-- Least-privilege Minimal Helm Chart
-- Relaunch execution in recover mode
-- Documentation as code
+</details>
 
 ## 🔌 Available Plugins
 
+<details>
 - Containers
 - [K8s Pods](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - AWS Batch Arrays
@@ -194,6 +184,7 @@ Please maintain an alphabetical order in the following list -->
 - Use SQLAlchemy to query any relational database 
 - Build your own plugins that use library containers
 
+</details>
 
 <html>
 <h2 id="component-repos"> 
@@ -201,6 +192,7 @@ Please maintain an alphabetical order in the following list -->
 </h2>
 </html>
 
+<details>
 | Repo                                                         | Language      | Purpose                                        | Status           |
 | ------------------------------------------------------------ | ------------- | ---------------------------------------------- | ---------------- |
 | [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
@@ -216,16 +208,14 @@ Please maintain an alphabetical order in the following list -->
 | [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
 | [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
 
-## 🔩 Production K8s Operators
-
-| Repo                                                                  | Language | Purpose                |
-| --------------------------------------------------------------------- | -------- | ---------------------- |
-| [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
-| [Flink](https://github.com/lyft/flinkk8soperator)                 | Go       | Apache Flink streaming |
+</details>
 
 ## Functional Tests Matrix
 
 We run a suite of tests (defined in https://github.com/flyteorg/flytesnacks/blob/master/cookbook/flyte_tests_manifest.json) to ensure that basic functionality and a subset of the integrations work across a variety of release versions. Those tests are run in a cluster where specific versions of the flyte components, such as console, flyteadmin, datacatalog, and flytepropeller, are installed. The table below has different release versions as the columns and the result of each test suite as rows.
+
+<details>
+<center>
 
 | workflow group                  | nightly |
 | ------------------------------- | ---------- |
@@ -239,6 +229,9 @@ We run a suite of tests (defined in https://github.com/flyteorg/flytesnacks/blob
 | integrations-greatexpectations  | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-greatexpectations) |
 | integrations-sagemaker-pytorch  | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-pytorch) |
 | integrations-sagemaker-training | ![integrations-sagemaker-training](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-training) |
+
+</center>
+</details>
 
 <html>
 <h2 id="community--resources"> 
@@ -270,7 +263,11 @@ Here are some resources to help you learn more about Flyte.
 
 - [Flyte Monthly](https://www.getrevue.co/profile/flyte)
 
-### Conference Talks
+### Conference Talks & Pod Casts
+
+<details>
+
+### Conference
 
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
 - Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)
@@ -296,6 +293,7 @@ Here are some resources to help you learn more about Flyte.
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 - Open Data Science - [West Warm Up session with Ketan Umare - Creator of Flyte](https://twitter.com/odsc/status/1451594432369758212)
 
+</details>
 ## 💖 All Contributors
 
 A big thank you to the community for making Flyte possible!
