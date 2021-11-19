@@ -127,6 +127,7 @@ Please maintain an alphabetical order in the following list -->
 </html>
 
 <details>
+
 - Used at _Scale_ in production by **500+** on one deployment. Used in production at multiple firms. Proved to scale to more than **1 million** executions, and **40+ million** containers
 - Data Aware and Resource aware (Allows organizations to separate concerns - users can use the API, platforms/infra teams can manage the deployments and scaling)
 - Enables **collaboration across your organization** by:
@@ -167,9 +168,10 @@ Please maintain an alphabetical order in the following list -->
 ## 🔌 Available Plugins
 
 <details>
+
 - Containers
 - [K8s Pods](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
-- AWS Batch Arrays
+- AWS Batch ArrayJobs
 - K8s Pod Arrays
 - K8s Spark (native [Pyspark](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html) and Java/Scala)
 - AWS Athena
@@ -183,6 +185,7 @@ Please maintain an alphabetical order in the following list -->
 - Versioned datastores using DoltHub and Dolt
 - Use SQLAlchemy to query any relational database 
 - Build your own plugins that use library containers
+- Snowflake queries
 
 </details>
 
@@ -193,6 +196,7 @@ Please maintain an alphabetical order in the following list -->
 </html>
 
 <details>
+
 | Repo                                                         | Language      | Purpose                                        | Status           |
 | ------------------------------------------------------------ | ------------- | ---------------------------------------------- | ---------------- |
 | [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
