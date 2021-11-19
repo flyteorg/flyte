@@ -80,7 +80,8 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
     defaultAuthRole?: Admin.IAuthRole;
     disableAll?: boolean | null;
     maxParallelism?: number | null;
-    qualityOfService?: Core.IQualityOfService | null;
+    labels?: Admin.ILabels | null;
+    annotations?: Admin.IAnnotations | null;
 }
 
 export interface TaskLaunchContext extends BaseLaunchContext {

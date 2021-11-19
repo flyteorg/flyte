@@ -92,10 +92,11 @@ export const getExecutionData = (
     );
 
 export interface CreateWorkflowExecutionArguments {
+    annotations?: Admin.IAnnotations | null;
     authRole?: Admin.IAuthRole;
     domain: string;
     disableAll?: boolean | null;
-    qualityOfServiceTier?: Core.QualityOfService.Tier | null;
+    labels?: Admin.ILabels | null;
     maxParallelism?: number | null;
     inputs: Core.ILiteralMap;
     launchPlanId: Identifier;
@@ -107,10 +108,11 @@ export interface CreateWorkflowExecutionArguments {
  */
 export const createWorkflowExecution = (
     {
+        annotations,
         authRole,
         domain,
         disableAll,
-        qualityOfServiceTier,
+        labels,
         maxParallelism,
         inputs,
         launchPlanId: launchPlan,
@@ -125,18 +127,15 @@ export const createWorkflowExecution = (
         metadata: {
             referenceExecution,
             principal: defaultExecutionPrincipal
-        }
+        },
+        labels,
+        annotations
     };
     if (authRole?.assumableIamRole || authRole?.kubernetesServiceAccount) {
         spec.authRole = authRole;
     }
     if (disableAll) {
         spec.disableAll = disableAll;
-    }
-    if (qualityOfServiceTier !== undefined) {
-        spec.qualityOfService = {
-            tier: qualityOfServiceTier
-        };
     }
     if (maxParallelism !== undefined) {
         spec.maxParallelism = maxParallelism;

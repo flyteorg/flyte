@@ -77,7 +77,7 @@ function getInitialValues(
     // field from the initial value if no cached value was passed.
     if (initialValue != null) {
         const initialRoleType = Object.values(roleTypes).find(
-            rt => initialValue[rt.value] != null
+            rt => initialValue[rt.value]
         );
         if (initialRoleType != null && roleType == null) {
             roleType = initialRoleType;

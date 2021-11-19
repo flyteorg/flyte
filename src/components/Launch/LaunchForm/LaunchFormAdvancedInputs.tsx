@@ -1,176 +1,280 @@
 import * as React from 'react';
 import { Admin } from 'flyteidl';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Checkbox from '@material-ui/core/Checkbox';
-import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Form from '@rjsf/material-ui';
 
-import { qualityOfServiceTier, qualityOfServiceTierLabels } from './constants';
 import { LaunchAdvancedOptionsRef } from './types';
 import { flyteidl } from '@flyteorg/flyteidl/gen/pb-js/flyteidl';
 import IExecutionSpec = flyteidl.admin.IExecutionSpec;
-import { Grid, TextField } from '@material-ui/core';
+import { State } from 'xstate';
+import {
+    WorkflowLaunchContext,
+    WorkflowLaunchEvent,
+    WorkflowLaunchTypestate
+} from './launchMachine';
+import { useStyles } from './styles';
 
-const useStyles = makeStyles((theme: Theme) => ({
-    sectionTitle: {
-        marginBottom: theme.spacing(2)
+const muiTheme = createMuiTheme({
+    props: {
+        MuiTextField: {
+            variant: 'outlined'
+        }
     },
-    sectionContainer: {
-        display: 'flex',
-        flexDirection: 'column'
+    overrides: {
+        MuiButton: {
+            label: {
+                color: 'gray'
+            }
+        },
+        MuiCard: {
+            root: {
+                marginBottom: 16,
+                width: '100%'
+            }
+        }
     },
-    qosContainer: {
-        display: 'flex'
-    },
-    autoFlex: {
-        flex: 1,
-        display: 'flex'
+    typography: {
+        h5: {
+            fontSize: '.875rem',
+            fontWeight: 500
+        }
     }
-}));
+});
 
 interface LaunchAdvancedOptionsProps {
-    spec: Admin.IExecutionSpec;
+    state: State<
+        WorkflowLaunchContext,
+        WorkflowLaunchEvent,
+        any,
+        WorkflowLaunchTypestate
+    >;
 }
+
+const isValueValid = (value: any) => {
+    return value !== undefined && value !== null;
+};
 
 export const LaunchFormAdvancedInputs = React.forwardRef<
     LaunchAdvancedOptionsRef,
     LaunchAdvancedOptionsProps
->(({ spec }, ref) => {
-    const styles = useStyles();
-    const [qosTier, setQosTier] = React.useState(
-        qualityOfServiceTier.UNDEFINED.toString()
-    );
-    const [disableAll, setDisableAll] = React.useState(false);
-    const [maxParallelism, setMaxParallelism] = React.useState('');
-    const [queueingBudget, setQueueingBudget] = React.useState('');
-
-    React.useEffect(() => {
-        if (spec.disableAll !== undefined && spec.disableAll !== null) {
-            setDisableAll(spec.disableAll);
-        }
-        if (spec.maxParallelism !== undefined && spec.maxParallelism !== null) {
-            setMaxParallelism(`${spec.maxParallelism}`);
-        }
-        if (
-            spec.qualityOfService?.tier !== undefined &&
-            spec.qualityOfService?.tier !== null
-        ) {
-            setQosTier(spec.qualityOfService.tier.toString());
-        }
-    }, [spec]);
-
-    React.useImperativeHandle(
-        ref,
-        () => ({
-            getValues: () => {
-                return {
-                    disableAll,
-                    qualityOfService: {
-                        tier: parseInt(qosTier || '0', 10)
-                    },
-                    maxParallelism: parseInt(maxParallelism || '', 10)
-                } as IExecutionSpec;
-            },
-            validate: () => {
-                return true;
+>(
+    (
+        {
+            state: {
+                context: { launchPlan, ...other }
             }
-        }),
-        [disableAll, qosTier, maxParallelism]
-    );
-
-    const handleQosTierChange = React.useCallback(({ target: { value } }) => {
-        setQosTier(value);
-    }, []);
-
-    const handleDisableAllChange = React.useCallback(() => {
-        setDisableAll(prevState => !prevState);
-    }, []);
-
-    const handleMaxParallelismChange = React.useCallback(
-        ({ target: { value } }) => {
-            setMaxParallelism(value);
         },
-        []
-    );
+        ref
+    ) => {
+        const styles = useStyles();
+        const [labelsParamData, setLabelsParamData] = React.useState({});
+        const [annotationsParamData, setAnnotationsParamData] = React.useState(
+            {}
+        );
+        const [disableAll, setDisableAll] = React.useState(false);
+        const [maxParallelism, setMaxParallelism] = React.useState('');
+        const [rawOutputDataConfig, setRawOutputDataConfig] = React.useState(
+            ''
+        );
 
-    const handleQueueingBudgetChange = React.useCallback(
-        ({ target: { value } }) => {
-            setQueueingBudget(value);
-        },
-        []
-    );
+        React.useEffect(() => {
+            if (isValueValid(other.disableAll)) {
+                setDisableAll(other.disableAll!);
+            }
+            if (isValueValid(other.maxParallelism)) {
+                setMaxParallelism(`${other.maxParallelism}`);
+            }
+            if (
+                launchPlan?.spec.rawOutputDataConfig?.outputLocationPrefix !==
+                    undefined &&
+                launchPlan?.spec.rawOutputDataConfig.outputLocationPrefix !==
+                    null
+            ) {
+                setRawOutputDataConfig(
+                    launchPlan.spec.rawOutputDataConfig.outputLocationPrefix
+                );
+            }
+            const newLabels = {
+                ...(other.labels?.values || {}),
+                ...(launchPlan?.spec?.labels?.values || {})
+            };
+            const newAnnotations = {
+                ...(other.annotations?.values || {}),
+                ...(launchPlan?.spec?.annotations?.values || {})
+            };
+            setLabelsParamData(newLabels);
+            setAnnotationsParamData(newAnnotations);
+        }, [
+            other.disableAll,
+            other.maxParallelism,
+            other.labels,
+            other.annotations,
+            launchPlan?.spec
+        ]);
 
-    return (
-        <>
-            <section title="Enable/Disable all notifications">
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={disableAll}
-                            onChange={handleDisableAllChange}
-                        />
-                    }
-                    label="Disable all notifications"
-                />
-            </section>
-            <section title="Max parallelism">
-                <TextField
-                    variant="outlined"
-                    label="Max parallelism"
-                    fullWidth
-                    margin="normal"
-                    value={maxParallelism}
-                    onChange={handleMaxParallelismChange}
-                />
-            </section>
-            <section
-                title="Quality of Service"
-                className={styles.sectionContainer}
-            >
-                <Typography variant="h6" className={styles.sectionTitle}>
-                    Quality of Service
-                </Typography>
-                <Grid container spacing={2}>
-                    <Grid item sm={6}>
-                        <FormControl variant="outlined" fullWidth>
-                            <InputLabel id="quality-of-service-tier-id">
-                                Quality of Service Tier
-                            </InputLabel>
-                            <Select
-                                variant="outlined"
-                                id="quality-of-service-tier-id"
-                                label="Quality of Service Tier"
-                                value={qosTier}
-                                onChange={handleQosTierChange}
-                            >
-                                {Object.keys(qualityOfServiceTierLabels).map(
-                                    tier => (
-                                        <MenuItem
-                                            key={`quality-of-service-${tier}`}
-                                            value={tier}
+        React.useImperativeHandle(
+            ref,
+            () => ({
+                getValues: () => {
+                    return {
+                        disableAll,
+                        maxParallelism: parseInt(maxParallelism || '', 10),
+                        labels: {
+                            values: labelsParamData
+                        },
+                        annotations: {
+                            values: annotationsParamData
+                        }
+                    } as IExecutionSpec;
+                },
+                validate: () => {
+                    return true;
+                }
+            }),
+            [disableAll, maxParallelism, labelsParamData, annotationsParamData]
+        );
+
+        const handleDisableAllChange = React.useCallback(() => {
+            setDisableAll(prevState => !prevState);
+        }, []);
+
+        const handleMaxParallelismChange = React.useCallback(
+            ({ target: { value } }) => {
+                setMaxParallelism(value);
+            },
+            []
+        );
+
+        const handleLabelsChange = React.useCallback(({ formData }) => {
+            setLabelsParamData(formData);
+        }, []);
+
+        const handleAnnotationsParamData = React.useCallback(({ formData }) => {
+            setAnnotationsParamData(formData);
+        }, []);
+
+        const handleRawOutputDataConfigChange = React.useCallback(
+            ({ target: { value } }) => {
+                setRawOutputDataConfig(value);
+            },
+            []
+        );
+
+        return (
+            <>
+                <section title="Labels" className={styles.collapsibleSection}>
+                    <Accordion>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="Labels"
+                            id="labels-form"
+                        >
+                            <header className={styles.sectionHeader}>
+                                <Typography variant="h6">Labels</Typography>
+                            </header>
+                        </AccordionSummary>
+
+                        <AccordionDetails>
+                            <MuiThemeProvider theme={muiTheme}>
+                                <Card variant="outlined">
+                                    <CardContent>
+                                        <Form
+                                            schema={{
+                                                type: 'object',
+                                                additionalProperties: true
+                                            }}
+                                            formData={labelsParamData}
+                                            onChange={handleLabelsChange}
                                         >
-                                            {qualityOfServiceTierLabels[tier]}
-                                        </MenuItem>
-                                    )
-                                )}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item sm={6}>
-                        <TextField
-                            variant="outlined"
-                            label="Queueing budget"
-                            fullWidth
-                            value={queueingBudget}
-                            onChange={handleQueueingBudgetChange}
-                        />
-                    </Grid>
-                </Grid>
-            </section>
-        </>
-    );
-});
+                                            <div />
+                                        </Form>
+                                    </CardContent>
+                                </Card>
+                            </MuiThemeProvider>
+                        </AccordionDetails>
+                    </Accordion>
+                </section>
+                <section
+                    title="Annotations"
+                    className={styles.collapsibleSection}
+                >
+                    <Accordion>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="Annotations"
+                            id="annotations-form"
+                        >
+                            <header className={styles.sectionHeader}>
+                                <Typography variant="h6">
+                                    Annotations
+                                </Typography>
+                            </header>
+                        </AccordionSummary>
+
+                        <AccordionDetails>
+                            <MuiThemeProvider theme={muiTheme}>
+                                <Card variant="outlined">
+                                    <CardContent>
+                                        <Form
+                                            schema={{
+                                                type: 'object',
+                                                additionalProperties: true
+                                            }}
+                                            formData={annotationsParamData}
+                                            onChange={
+                                                handleAnnotationsParamData
+                                            }
+                                        >
+                                            <div />
+                                        </Form>
+                                    </CardContent>
+                                </Card>
+                            </MuiThemeProvider>
+                        </AccordionDetails>
+                    </Accordion>
+                </section>
+                <section title="Enable/Disable all notifications">
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={disableAll}
+                                onChange={handleDisableAllChange}
+                            />
+                        }
+                        label="Disable all notifications"
+                    />
+                </section>
+                <section title="Raw output data config">
+                    <TextField
+                        variant="outlined"
+                        label="Raw output data config"
+                        fullWidth
+                        margin="normal"
+                        value={rawOutputDataConfig}
+                        onChange={handleRawOutputDataConfigChange}
+                    />
+                </section>
+                <section title="Max parallelism">
+                    <TextField
+                        variant="outlined"
+                        label="Max parallelism"
+                        fullWidth
+                        margin="normal"
+                        value={maxParallelism}
+                        onChange={handleMaxParallelismChange}
+                    />
+                </section>
+            </>
+        );
+    }
+);

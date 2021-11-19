@@ -118,18 +118,17 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     <AccordionDetails classes={{ root: styles.detailsWrapper }}>
                         {isEnterInputsState(baseState) ? (
                             <LaunchRoleInput
-                                initialValue={state.context.defaultAuthRole}
+                                initialValue={
+                                    selectedLaunchPlan?.data.spec.authRole ||
+                                    state.context.defaultAuthRole
+                                }
                                 ref={roleInputRef}
                                 showErrors={state.context.showErrors}
                             />
                         ) : null}
                         <LaunchFormAdvancedInputs
                             ref={advancedOptionsRef}
-                            spec={{
-                                disableAll: state.context.disableAll,
-                                maxParallelism: state.context.maxParallelism,
-                                qualityOfService: state.context.qualityOfService
-                            }}
+                            state={state}
                         />
                     </AccordionDetails>
                 </Accordion>

@@ -57,7 +57,8 @@ export interface WorkflowInitialLaunchParameters
     authRole?: Admin.IAuthRole;
     disableAll?: boolean | null;
     maxParallelism?: number | null;
-    qualityOfService?: Core.IQualityOfService | null;
+    labels?: Admin.ILabels | null;
+    annotations?: Admin.IAnnotations | null;
 }
 export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
     workflowId: NamedEntityIdentifier;

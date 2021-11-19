@@ -52,5 +52,8 @@ export const useStyles = makeStyles((theme: Theme) => ({
         '& section': {
             flex: 1
         }
+    },
+    collapsibleSection: {
+        margin: '0 -16px'
     }
 }));

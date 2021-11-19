@@ -180,17 +180,18 @@ async function submit(
 
     const authRole = roleInputRef.current?.getValue();
     const literals = formInputsRef.current.getValues();
-    const { disableAll, qualityOfService, maxParallelism } =
+    const { disableAll, labels, annotations, maxParallelism } =
         advancedOptionsRef.current?.getValues() || {};
     const launchPlanId = launchPlan.id;
     const { domain, project } = workflowVersion;
 
     const response = await createWorkflowExecution({
+        annotations,
         authRole,
         disableAll,
-        qualityOfServiceTier: qualityOfService?.tier,
         maxParallelism,
         domain,
+        labels,
         launchPlanId,
         project,
         referenceExecutionId,
@@ -262,7 +263,8 @@ export function useLaunchWorkflowFormState({
         values: defaultInputValues,
         disableAll,
         maxParallelism,
-        qualityOfService
+        labels,
+        annotations
     } = initialParameters;
 
     const apiContext = useAPIContext();
@@ -297,7 +299,8 @@ export function useLaunchWorkflowFormState({
             sourceId,
             disableAll,
             maxParallelism,
-            qualityOfService
+            labels,
+            annotations
         }
     });
 

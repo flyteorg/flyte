@@ -38,7 +38,8 @@ function useRelaunchWorkflowFormState({
                         launchPlan,
                         disableAll,
                         maxParallelism,
-                        qualityOfService
+                        labels,
+                        annotations
                     }
                 } = execution;
                 const workflow = await apiContext.getWorkflow(workflowId);
@@ -56,7 +57,8 @@ function useRelaunchWorkflowFormState({
                     workflowId,
                     disableAll,
                     maxParallelism,
-                    qualityOfService
+                    labels,
+                    annotations
                 };
             }
         },
