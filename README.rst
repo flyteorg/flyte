@@ -218,3 +218,9 @@ URL of your target FlyteAdmin API instance. These instructions will use
 .. note:: Hint
 
    Ensure you don't have `ADMIN_API_URL` or `DISABLE_AUTH` set (eg, in your `/.profile`.)
+
+=======
+Release
+=======
+To release, you have to annotate the PR message to include either #minor,
+#patch or #major
