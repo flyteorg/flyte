@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.3](http://github.com/lyft/flyteconsole/compare/v0.31.2...v0.31.3) (2021-11-19)
+
+
+### Bug Fixes
+
+* auth role to be aligned with launch plan and be editable by user ([#236](http://github.com/lyft/flyteconsole/issues/236)) ([afc2ae4](http://github.com/lyft/flyteconsole/commit/afc2ae4ef8767e74753217cfc62faf057626993a))
+
 ## [0.31.1](http://github.com/lyft/flyteconsole/compare/v0.31.0...v0.31.1) (2021-11-16)
 
 
