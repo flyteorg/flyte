@@ -6,8 +6,7 @@ Writing Your Own Flytekit Task Plugins
 
 Flytekit is designed to be extremely extensible. You can add new task-types that are useful only for your use-cases.
 Flyte does come with the capability of extending the backend, but that is only required if you want the capability to be
-extended to all users of Flyte, or there is a cost/visibility benefit of doing so. To understand when you should write
-a backend plugin refer to - TODO: Flow chart that helps you decide when to write a backend / flytekit plugin?
+extended to all users of Flyte, or there is a cost/visibility benefit of doing so. 
 
 The following demo shows how to build Flyte container task extensions, with an SQLAlchemy extension as an example:
 
