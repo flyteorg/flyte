@@ -35,6 +35,24 @@ Cluster Config
 
     ---
 
+    .. link-button:: flyteadmin-config-specification
+       :type: ref
+       :text: Flyte Admin Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Admin configuration specification are covered here.
+
+    ---
+
+    .. link-button:: flytepropeller-config-specification
+       :type: ref
+       :text: Flyte Propeller Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Propeller configuration specification are covered here.
+
+    ---
+
     .. link-button:: deployment-cluster-config-notifications
        :type: ref
        :text: Notifications
@@ -79,6 +97,8 @@ Cluster Config
     auth_migration
     auth_appendix
     general
+    flyteadmin_config
+    flytepropeller_config
     monitoring
     notifications
     performance
