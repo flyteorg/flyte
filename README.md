@@ -298,6 +298,8 @@ Here are some resources to help you learn more about Flyte.
 - Open Data Science - [West Warm Up session with Ketan Umare - Creator of Flyte](https://twitter.com/odsc/status/1451594432369758212)
 
 </details>
+
+
 ## 💖 All Contributors
 
 A big thank you to the community for making Flyte possible!
