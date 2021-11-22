@@ -117,7 +117,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label key [#badkey]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label key [#badkey]: [name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')]",
 		},
 		{
 			request: admin.ProjectRegisterRequest{
@@ -132,7 +132,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label value [.bad-label-value]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label value [.bad-label-value]: [a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')]",
 		},
 	}
 
@@ -150,7 +150,8 @@ func TestValidateProject_ValidProject(t *testing.T) {
 		State:       admin.Project_ARCHIVED,
 		Labels: &admin.Labels{
 			Values: map[string]string{
-				"foo": "bar",
+				"foo":                "bar",
+				"example.com/my-key": "my-value",
 			},
 		},
 	}))
@@ -234,7 +235,7 @@ func TestValidateProject(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label key [#badkey]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label key [#badkey]: [name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')]",
 		},
 	}
 

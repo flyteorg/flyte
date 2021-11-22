@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package tests
@@ -223,5 +224,5 @@ func TestUpdateProjectLabels_BadLabels(t *testing.T) {
 	})
 
 	// Assert that update went through without an error.
-	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = invalid label value [#bar]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
+	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = invalid label value [#bar]: [a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')]")
 }
