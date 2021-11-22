@@ -62,10 +62,10 @@ func validateLabels(labels *admin.Labels) error {
 // i.e. alphanumeric + - and _
 func validateLabelsAlphanumeric(labels *admin.Labels) error {
 	for key, value := range labels.Values {
-		if errs := validation.IsDNS1123Label(key); len(errs) > 0 {
+		if errs := validation.IsQualifiedName(key); len(errs) > 0 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label key [%s]: %v", key, errs)
 		}
-		if errs := validation.IsDNS1123Label(value); len(errs) > 0 {
+		if errs := validation.IsValidLabelValue(value); len(errs) > 0 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label value [%s]: %v", value, errs)
 		}
 	}
