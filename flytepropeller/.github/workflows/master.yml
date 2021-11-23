@@ -26,11 +26,11 @@ jobs:
         run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
       - name: Build dockerfile
         run: |
-          docker build -t lyft/${{ github.event.repository.name }}:builder --target builder --cache-from=lyft/${{ github.event.repository.name }}:builder .
-          docker build -t lyft/${{ github.event.repository.name }}:latest --cache-from=lyft/${{ github.event.repository.name }}:builder .
+          docker build -t flyteorg/${{ github.event.repository.name }}:builder --target builder --cache-from=flyteorg/${{ github.event.repository.name }}:builder .
+          docker build -t flyteorg/${{ github.event.repository.name }}:latest --cache-from=flyteorg/${{ github.event.repository.name }}:builder .
 
       - name: Tag and cache docker image
-        run: mkdir -p /tmp/tmp/docker-images && docker save lyft/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save lyft/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+        run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
 
   # Duplicated from pull request workflow because sharing is not yet supported
   endtoend:
@@ -40,24 +40,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: unionai/flytectl-setup-action@v0.0.1
+        name: Setup flytectl
       - id: load-docker-cache
         name: Load Docker Cache
         uses: actions/cache@v1
         with:
           path: /tmp/tmp/docker-images
           key: /tmp/docker-images-${{ github.event.after }}
+      - name: Create Sandbox Cluster
+        run: |
+          cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
+          flytectl sandbox start --source=$(pwd)
+          flytectl config init
       - name: Prime docker cache
-        run: docker load -i /tmp/tmp/docker-images/snapshot.tar || true
-      - uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.11.1"
+        run: |
+          flytectl sandbox exec -- docker load -i /root/snapshot.tar
+      - name: Upgrade Helm charts
+        run: flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /flyteorg/share/flyte -f /flyteorg/share/flyte/values-sandbox.yaml --set flytepropeller.image.repository=flyteorg/${{ github.event.repository.name }},flytepropeller.image.tag=latest
       - name: End2End
+        env:
+          KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
         run: |
           kubectl cluster-info
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
-          IMAGE_NAME=${{ github.event.repository.name }} IMAGE=lyft/${{ github.event.repository.name }}:latest make end2end_execute
+          make end2end_execute
 
   bump-version:
     name: Bump Version
