@@ -99,6 +99,8 @@ message TaskNodeMetadata {
     core.CatalogCacheStatus cache_status = 1;
     // This structure carries the catalog artifact information
     core.CatalogMetadata catalog_key = 2;
+    // Captures the status of cache reservations for this execution.
+    core.CatalogReservation.Status reservation_status = 3;
 
     // In the case this task launched a dynamic workflow we capture its structure here.
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;

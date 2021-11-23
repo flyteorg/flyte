@@ -236,6 +236,7 @@ TaskNodeMetadata
 
    "cache_status", ":ref:`ref_flyteidl.core.CatalogCacheStatus`", "", "Captures the status of caching for this execution."
    "catalog_key", ":ref:`ref_flyteidl.core.CatalogMetadata`", "", "This structure carries the catalog artifact information"
+   "reservation_status", ":ref:`ref_flyteidl.core.CatalogReservation.Status`", "", "Captures the status of cache reservations for this execution."
    "dynamic_workflow", ":ref:`ref_flyteidl.event.DynamicWorkflowNodeMetadata`", "", "In the case this task launched a dynamic workflow we capture its structure here."
 
 

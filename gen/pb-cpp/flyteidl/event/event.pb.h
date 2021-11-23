@@ -894,6 +894,12 @@ class TaskNodeMetadata final :
   ::flyteidl::core::CatalogCacheStatus cache_status() const;
   void set_cache_status(::flyteidl::core::CatalogCacheStatus value);
 
+  // .flyteidl.core.CatalogReservation.Status reservation_status = 3;
+  void clear_reservation_status();
+  static const int kReservationStatusFieldNumber = 3;
+  ::flyteidl::core::CatalogReservation_Status reservation_status() const;
+  void set_reservation_status(::flyteidl::core::CatalogReservation_Status value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.event.TaskNodeMetadata)
  private:
   class HasBitSetters;
@@ -902,6 +908,7 @@ class TaskNodeMetadata final :
   ::flyteidl::core::CatalogMetadata* catalog_key_;
   ::flyteidl::event::DynamicWorkflowNodeMetadata* dynamic_workflow_;
   int cache_status_;
+  int reservation_status_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
 };
@@ -3209,6 +3216,20 @@ inline void TaskNodeMetadata::set_allocated_catalog_key(::flyteidl::core::Catalo
   }
   catalog_key_ = catalog_key;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskNodeMetadata.catalog_key)
+}
+
+// .flyteidl.core.CatalogReservation.Status reservation_status = 3;
+inline void TaskNodeMetadata::clear_reservation_status() {
+  reservation_status_ = 0;
+}
+inline ::flyteidl::core::CatalogReservation_Status TaskNodeMetadata::reservation_status() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskNodeMetadata.reservation_status)
+  return static_cast< ::flyteidl::core::CatalogReservation_Status >(reservation_status_);
+}
+inline void TaskNodeMetadata::set_reservation_status(::flyteidl::core::CatalogReservation_Status value) {
+  
+  reservation_status_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskNodeMetadata.reservation_status)
 }
 
 // .flyteidl.event.DynamicWorkflowNodeMetadata dynamic_workflow = 16;

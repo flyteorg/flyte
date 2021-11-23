@@ -3,6 +3,7 @@ syntax = "proto3";
 package datacatalog;
 
 import "flyteidl/core/literals.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 /*
@@ -34,25 +35,18 @@ service DataCatalog {
     // Return a paginated list of datasets
     rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
 
-    // Get an artifact and the corresponding data. If the artifact does not exist,
-    // try to reserve a spot for populating the artifact.
-    // Once you preserve a spot, you should call ExtendReservation API periodically
-    // to extend the reservation. Otherwise, the reservation can expire and other
-    // tasks may take the spot.
-    // If the same owner_id calls this API for the same dataset and it has an active reservation and the artifacts have not been written yet by a different owner, the API will respond with an Acquired Reservation Status (providing idempotency).
-    // Note: We may have multiple concurrent tasks with the same signature
-    // and the same input that try to populate the same artifact at the same time.
-    // Thus with reservation, only one task can run at a time, until the reservation
-    // expires.
-    // Note: If task A does not extend the reservation in time and the reservation
-    // expires, another task B may take over the reservation, resulting in two tasks
-    // A and B running in parallel. So a third task C may get the Artifact from A or B,
-    // whichever writes last.
-    rpc GetOrReserveArtifact (GetOrReserveArtifactRequest) returns (GetOrReserveArtifactResponse);
-
-    // Extend the reservation to keep it from expiring. If the reservation expires,
-    // other tasks can take over the reservation by calling GetOrReserveArtifact.
-    rpc ExtendReservation (ExtendReservationRequest) returns (ExtendReservationResponse);
+    // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
+    // (ie. another entity owns the reservation) then that reservation is retrieved.
+    // Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    // identical call. If the reservation is not extended before the defined expiration, it may be
+    // acquired by another task.
+    // Note: We may have multiple concurrent tasks with the same signature and the same input that
+    // try to populate the same artifact at the same time. Thus with reservation, only one task can
+    // run at a time, until the reservation expires.
+    // Note: If task A does not extend the reservation in time and the reservation expires, another
+    // task B may take over the reservation, resulting in two tasks A and B running in parallel. So
+    // a third task C may get the Artifact from A or B, whichever writes last.
+    rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
 
     // Release the reservation when the task holding the spot fails so that the other tasks
     // can grab the spot.
@@ -174,53 +168,39 @@ message ListDatasetsResponse {
     string next_token = 2;
 }
 
-// Get the Artifact or try to reserve a spot if the Artifact does not exist.
-message GetOrReserveArtifactRequest {
+/*
+ * ReservationID message that is composed of several string fields.
+ */
+message ReservationID {
     DatasetID dataset_id = 1;
     string tag_name = 2;
-    string owner_id = 3;
 }
 
-// Whether we successfully reserve a spot.
-message ReservationStatus {
-    enum State {
-        // Acquired the reservation successfully.
-        ACQUIRED = 0;
-
-        // Indicates an existing active reservation exist for a different owner_id.
-        ALREADY_IN_PROGRESS = 1;
-    };
-
-    State state = 1;
-    Metadata metadata = 2;
-    string owner_id = 3;
+// Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+message GetOrExtendReservationRequest {
+    ReservationID reservation_id = 1;
+    string owner_id = 2;
+    google.protobuf.Duration heartbeat_interval = 3; // Requested reservation extension heartbeat interval
 }
 
-// Response to get artifact or reserve spot.
-message GetOrReserveArtifactResponse {
-    oneof value {
-        Artifact artifact = 1;
-        ReservationStatus reservation_status = 2;
-    }
+// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
+message Reservation {
+    ReservationID reservation_id = 1;
+    string owner_id = 2;
+    google.protobuf.Duration heartbeat_interval = 3; // Recommended heartbeat interval to extend reservation
+    google.protobuf.Timestamp expires_at = 4; // Expiration timestamp of this reservation
+    Metadata metadata = 6;
 }
 
-// Request to extend reservation
-message ExtendReservationRequest {
-    DatasetID dataset_id = 1;
-    string tag_name = 2;
-    string owner_id = 3;
-}
-
-// Response to extend reservation
-message ExtendReservationResponse {
-
+// Response including either a newly minted reservation or the existing reservation
+message GetOrExtendReservationResponse {
+    Reservation reservation = 1;
 }
 
 // Request to release reservation
 message ReleaseReservationRequest {
-    DatasetID dataset_id = 1;
-    string tag_name = 2;
-    string owner_id = 3;
+    ReservationID reservation_id = 1;
+    string owner_id = 2;
 }
 
 // Response to release reservation

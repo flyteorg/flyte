@@ -2547,6 +2547,22 @@ definitions:
     - "SINGLE"
     - "MULTIPART"
     default: "SINGLE"
+  CatalogReservationStatus:
+    type: "string"
+    description: "Indicates the status of a catalog reservation operation.\n\n - RESERVATION_DISABLED:\
+      \ Used to indicate that reservations are disabled\n - RESERVATION_ACQUIRED:\
+      \ Used to indicate that a reservation was successfully acquired or extended\n\
+      \ - RESERVATION_EXISTS: Used to indicate that an active reservation currently\
+      \ exists\n - RESERVATION_RELEASED: Used to indicate that the reservation has\
+      \ been successfully released\n - RESERVATION_FAILURE: Used to indicate that\
+      \ a reservation operation resulted in failure"
+    enum:
+    - "RESERVATION_DISABLED"
+    - "RESERVATION_ACQUIRED"
+    - "RESERVATION_EXISTS"
+    - "RESERVATION_RELEASED"
+    - "RESERVATION_FAILURE"
+    default: "RESERVATION_DISABLED"
   ComparisonExpressionOperator:
     type: "string"
     title: "Binary Operator for each expression"
@@ -7750,6 +7766,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -7949,6 +7966,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -9637,6 +9655,7 @@ definitions:
                 flavor: "flavor"
                 type: {}
                 version: "version"
+              cache_serializable: true
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
@@ -9852,6 +9871,7 @@ definitions:
               flavor: "flavor"
               type: {}
               version: "version"
+            cache_serializable: true
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
@@ -10379,6 +10399,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -10587,6 +10608,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -12635,6 +12657,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -12834,6 +12857,7 @@ definitions:
                   flavor: "flavor"
                   type: {}
                   version: "version"
+                cache_serializable: true
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
@@ -15806,6 +15830,7 @@ definitions:
                 flavor: "flavor"
                 type: {}
                 version: "version"
+              cache_serializable: true
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
@@ -16005,6 +16030,7 @@ definitions:
                 flavor: "flavor"
                 type: {}
                 version: "version"
+              cache_serializable: true
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
@@ -18913,6 +18939,7 @@ definitions:
                     flavor: "flavor"
                     type: {}
                     version: "version"
+                  cache_serializable: true
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
@@ -19112,6 +19139,7 @@ definitions:
                     flavor: "flavor"
                     type: {}
                     version: "version"
+                  cache_serializable: true
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
@@ -21933,6 +21961,7 @@ definitions:
                     flavor: "flavor"
                     type: {}
                     version: "version"
+                  cache_serializable: true
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
@@ -22132,6 +22161,7 @@ definitions:
                     flavor: "flavor"
                     type: {}
                     version: "version"
+                  cache_serializable: true
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
@@ -23672,6 +23702,7 @@ definitions:
             flavor: "flavor"
             type: {}
             version: "version"
+          cache_serializable: true
           discovery_version: "discovery_version"
           deprecated_error_message: "deprecated_error_message"
           interruptible: true
@@ -26522,6 +26553,7 @@ definitions:
               flavor: "flavor"
               type: {}
               version: "version"
+            cache_serializable: true
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
@@ -26721,6 +26753,7 @@ definitions:
               flavor: "flavor"
               type: {}
               version: "version"
+            cache_serializable: true
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
@@ -29417,6 +29450,11 @@ definitions:
       interruptible:
         type: "boolean"
         format: "boolean"
+      cache_serializable:
+        type: "boolean"
+        format: "boolean"
+        title: "Indicates whether the system should attempt to execute discoverable\
+          \ instances in serial to avoid duplicate work"
     title: "Task Metadata"
     example:
       retries:
@@ -29426,6 +29464,7 @@ definitions:
         flavor: "flavor"
         type: {}
         version: "version"
+      cache_serializable: true
       discovery_version: "discovery_version"
       deprecated_error_message: "deprecated_error_message"
       interruptible: true
@@ -29579,6 +29618,7 @@ definitions:
           flavor: "flavor"
           type: {}
           version: "version"
+        cache_serializable: true
         discovery_version: "discovery_version"
         deprecated_error_message: "deprecated_error_message"
         interruptible: true
@@ -32906,6 +32946,7 @@ definitions:
                 flavor: "flavor"
                 type: {}
                 version: "version"
+              cache_serializable: true
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
@@ -33105,6 +33146,7 @@ definitions:
                 flavor: "flavor"
                 type: {}
                 version: "version"
+              cache_serializable: true
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
@@ -34379,6 +34421,9 @@ definitions:
       catalog_key:
         title: "This structure carries the catalog artifact information"
         $ref: "#/definitions/coreCatalogMetadata"
+      reservation_status:
+        description: "Captures the status of cache reservations for this execution."
+        $ref: "#/definitions/CatalogReservationStatus"
       dynamic_workflow:
         description: "In the case this task launched a dynamic workflow we capture\
           \ its structure here."

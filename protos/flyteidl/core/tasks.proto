@@ -92,6 +92,9 @@ message TaskMetadata {
     oneof interruptible_value {
         bool interruptible = 8;
     };
+
+    // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+    bool cache_serializable = 9;
 }
 
 // A Task structure that uniquely identifies a task in the system

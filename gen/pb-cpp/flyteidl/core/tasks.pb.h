@@ -913,6 +913,12 @@ class TaskMetadata final :
   bool discoverable() const;
   void set_discoverable(bool value);
 
+  // bool cache_serializable = 9;
+  void clear_cache_serializable();
+  static const int kCacheSerializableFieldNumber = 9;
+  bool cache_serializable() const;
+  void set_cache_serializable(bool value);
+
   // bool interruptible = 8;
   private:
   bool has_interruptible() const;
@@ -939,6 +945,7 @@ class TaskMetadata final :
   ::google::protobuf::Duration* timeout_;
   ::flyteidl::core::RetryStrategy* retries_;
   bool discoverable_;
+  bool cache_serializable_;
   union InterruptibleValueUnion {
     InterruptibleValueUnion() {}
     bool interruptible_;
@@ -2978,6 +2985,20 @@ inline void TaskMetadata::set_interruptible(bool value) {
   }
   interruptible_value_.interruptible_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.interruptible)
+}
+
+// bool cache_serializable = 9;
+inline void TaskMetadata::clear_cache_serializable() {
+  cache_serializable_ = false;
+}
+inline bool TaskMetadata::cache_serializable() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.cache_serializable)
+  return cache_serializable_;
+}
+inline void TaskMetadata::set_cache_serializable(bool value) {
+  
+  cache_serializable_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.cache_serializable)
 }
 
 inline bool TaskMetadata::has_interruptible_value() const {
