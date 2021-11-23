@@ -2851,6 +2851,18 @@
       ],
       "default": "SINGLE"
     },
+    "CatalogReservationStatus": {
+      "type": "string",
+      "enum": [
+        "RESERVATION_DISABLED",
+        "RESERVATION_ACQUIRED",
+        "RESERVATION_EXISTS",
+        "RESERVATION_RELEASED",
+        "RESERVATION_FAILURE"
+      ],
+      "default": "RESERVATION_DISABLED",
+      "description": "Indicates the status of a catalog reservation operation.\n\n - RESERVATION_DISABLED: Used to indicate that reservations are disabled\n - RESERVATION_ACQUIRED: Used to indicate that a reservation was successfully acquired or extended\n - RESERVATION_EXISTS: Used to indicate that an active reservation currently exists\n - RESERVATION_RELEASED: Used to indicate that the reservation has been successfully released\n - RESERVATION_FAILURE: Used to indicate that a reservation operation resulted in failure"
+    },
     "ComparisonExpressionOperator": {
       "type": "string",
       "enum": [
@@ -5940,6 +5952,11 @@
         "interruptible": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "cache_serializable": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
         }
       },
       "title": "Task Metadata"
@@ -6536,6 +6553,10 @@
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
           "title": "This structure carries the catalog artifact information"
+        },
+        "reservation_status": {
+          "$ref": "#/definitions/CatalogReservationStatus",
+          "description": "Captures the status of cache reservations for this execution."
         },
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidleventDynamicWorkflowNodeMetadata",

@@ -140,6 +140,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CatalogReservation. */
+        interface ICatalogReservation {
+        }
+
+        /** Represents a CatalogReservation. */
+        class CatalogReservation implements ICatalogReservation {
+
+            /**
+             * Constructs a new CatalogReservation.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ICatalogReservation);
+
+            /**
+             * Creates a new CatalogReservation instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CatalogReservation instance
+             */
+            public static create(properties?: flyteidl.core.ICatalogReservation): flyteidl.core.CatalogReservation;
+
+            /**
+             * Encodes the specified CatalogReservation message. Does not implicitly {@link flyteidl.core.CatalogReservation.verify|verify} messages.
+             * @param message CatalogReservation message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ICatalogReservation, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CatalogReservation message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CatalogReservation
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.CatalogReservation;
+
+            /**
+             * Verifies a CatalogReservation message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace CatalogReservation {
+
+            /** Status enum. */
+            enum Status {
+                RESERVATION_DISABLED = 0,
+                RESERVATION_ACQUIRED = 1,
+                RESERVATION_EXISTS = 2,
+                RESERVATION_RELEASED = 3,
+                RESERVATION_FAILURE = 4
+            }
+        }
+
         /** ResourceType enum. */
         enum ResourceType {
             UNSPECIFIED = 0,
@@ -4175,6 +4233,9 @@ export namespace flyteidl {
 
             /** TaskMetadata interruptible */
             interruptible?: (boolean|null);
+
+            /** TaskMetadata cacheSerializable */
+            cacheSerializable?: (boolean|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -4206,6 +4267,9 @@ export namespace flyteidl {
 
             /** TaskMetadata interruptible. */
             public interruptible: boolean;
+
+            /** TaskMetadata cacheSerializable. */
+            public cacheSerializable: boolean;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -5781,6 +5845,9 @@ export namespace flyteidl {
             /** TaskNodeMetadata catalogKey */
             catalogKey?: (flyteidl.core.ICatalogMetadata|null);
 
+            /** TaskNodeMetadata reservationStatus */
+            reservationStatus?: (flyteidl.core.CatalogReservation.Status|null);
+
             /** TaskNodeMetadata dynamicWorkflow */
             dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
         }
@@ -5799,6 +5866,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey. */
             public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata reservationStatus. */
+            public reservationStatus: flyteidl.core.CatalogReservation.Status;
 
             /** TaskNodeMetadata dynamicWorkflow. */
             public dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);

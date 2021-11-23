@@ -40,7 +40,8 @@ class CoreTaskMetadata(object):
         'retries': 'CoreRetryStrategy',
         'discovery_version': 'str',
         'deprecated_error_message': 'str',
-        'interruptible': 'bool'
+        'interruptible': 'bool',
+        'cache_serializable': 'bool'
     }
 
     attribute_map = {
@@ -50,10 +51,11 @@ class CoreTaskMetadata(object):
         'retries': 'retries',
         'discovery_version': 'discovery_version',
         'deprecated_error_message': 'deprecated_error_message',
-        'interruptible': 'interruptible'
+        'interruptible': 'interruptible',
+        'cache_serializable': 'cache_serializable'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._discoverable = None
@@ -63,6 +65,7 @@ class CoreTaskMetadata(object):
         self._discovery_version = None
         self._deprecated_error_message = None
         self._interruptible = None
+        self._cache_serializable = None
         self.discriminator = None
 
         if discoverable is not None:
@@ -79,6 +82,8 @@ class CoreTaskMetadata(object):
             self.deprecated_error_message = deprecated_error_message
         if interruptible is not None:
             self.interruptible = interruptible
+        if cache_serializable is not None:
+            self.cache_serializable = cache_serializable
 
     @property
     def discoverable(self):
@@ -238,6 +243,27 @@ class CoreTaskMetadata(object):
         """
 
         self._interruptible = interruptible
+
+    @property
+    def cache_serializable(self):
+        """Gets the cache_serializable of this CoreTaskMetadata.  # noqa: E501
+
+
+        :return: The cache_serializable of this CoreTaskMetadata.  # noqa: E501
+        :rtype: bool
+        """
+        return self._cache_serializable
+
+    @cache_serializable.setter
+    def cache_serializable(self, cache_serializable):
+        """Sets the cache_serializable of this CoreTaskMetadata.
+
+
+        :param cache_serializable: The cache_serializable of this CoreTaskMetadata.  # noqa: E501
+        :type: bool
+        """
+
+        self._cache_serializable = cache_serializable
 
     def to_dict(self):
         """Returns the model properties as a dict"""

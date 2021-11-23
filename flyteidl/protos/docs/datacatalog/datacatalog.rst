@@ -261,43 +261,6 @@ Dataset properties we can filter by
 
 
 
-.. _ref_datacatalog.ExtendReservationRequest:
-
-ExtendReservationRequest
-------------------------------------------------------------------
-
-Request to extend reservation
-
-
-
-.. csv-table:: ExtendReservationRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "dataset_id", ":ref:`ref_datacatalog.DatasetID`", "", ""
-   "tag_name", ":ref:`ref_string`", "", ""
-   "owner_id", ":ref:`ref_string`", "", ""
-
-
-
-
-
-
-
-.. _ref_datacatalog.ExtendReservationResponse:
-
-ExtendReservationResponse
-------------------------------------------------------------------
-
-Response to extend reservation
-
-
-
-
-
-
-
-
 .. _ref_datacatalog.FilterExpression:
 
 FilterExpression
@@ -410,22 +373,22 @@ Dataset.
 
 
 
-.. _ref_datacatalog.GetOrReserveArtifactRequest:
+.. _ref_datacatalog.GetOrExtendReservationRequest:
 
-GetOrReserveArtifactRequest
+GetOrExtendReservationRequest
 ------------------------------------------------------------------
 
-Get the Artifact or try to reserve a spot if the Artifact does not exist.
+Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
 
 
 
-.. csv-table:: GetOrReserveArtifactRequest type fields
+.. csv-table:: GetOrExtendReservationRequest type fields
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "dataset_id", ":ref:`ref_datacatalog.DatasetID`", "", ""
-   "tag_name", ":ref:`ref_string`", "", ""
+   "reservation_id", ":ref:`ref_datacatalog.ReservationID`", "", ""
    "owner_id", ":ref:`ref_string`", "", ""
+   "heartbeat_interval", ":ref:`ref_google.protobuf.Duration`", "", "Requested reservation extension heartbeat interval"
 
 
 
@@ -433,21 +396,20 @@ Get the Artifact or try to reserve a spot if the Artifact does not exist.
 
 
 
-.. _ref_datacatalog.GetOrReserveArtifactResponse:
+.. _ref_datacatalog.GetOrExtendReservationResponse:
 
-GetOrReserveArtifactResponse
+GetOrExtendReservationResponse
 ------------------------------------------------------------------
 
-Response to get artifact or reserve spot.
+Response including either a newly minted reservation or the existing reservation
 
 
 
-.. csv-table:: GetOrReserveArtifactResponse type fields
+.. csv-table:: GetOrExtendReservationResponse type fields
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "artifact", ":ref:`ref_datacatalog.Artifact`", "", ""
-   "reservation_status", ":ref:`ref_datacatalog.ReservationStatus`", "", ""
+   "reservation", ":ref:`ref_datacatalog.Reservation`", "", ""
 
 
 
@@ -689,8 +651,7 @@ Request to release reservation
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "dataset_id", ":ref:`ref_datacatalog.DatasetID`", "", ""
-   "tag_name", ":ref:`ref_string`", "", ""
+   "reservation_id", ":ref:`ref_datacatalog.ReservationID`", "", ""
    "owner_id", ":ref:`ref_string`", "", ""
 
 
@@ -713,22 +674,46 @@ Response to release reservation
 
 
 
-.. _ref_datacatalog.ReservationStatus:
+.. _ref_datacatalog.Reservation:
 
-ReservationStatus
+Reservation
 ------------------------------------------------------------------
 
-Whether we successfully reserve a spot.
+A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 
 
 
-.. csv-table:: ReservationStatus type fields
+.. csv-table:: Reservation type fields
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "state", ":ref:`ref_datacatalog.ReservationStatus.State`", "", ""
-   "metadata", ":ref:`ref_datacatalog.Metadata`", "", ""
+   "reservation_id", ":ref:`ref_datacatalog.ReservationID`", "", ""
    "owner_id", ":ref:`ref_string`", "", ""
+   "heartbeat_interval", ":ref:`ref_google.protobuf.Duration`", "", "Recommended heartbeat interval to extend reservation"
+   "expires_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Expiration timestamp of this reservation"
+   "metadata", ":ref:`ref_datacatalog.Metadata`", "", ""
+
+
+
+
+
+
+
+.. _ref_datacatalog.ReservationID:
+
+ReservationID
+------------------------------------------------------------------
+
+ReservationID message that is composed of several string fields.
+
+
+
+.. csv-table:: ReservationID type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "dataset_id", ":ref:`ref_datacatalog.DatasetID`", "", ""
+   "tag_name", ":ref:`ref_string`", "", ""
 
 
 
@@ -839,22 +824,6 @@ PaginationOptions.SortOrder
 
 
 
-.. _ref_datacatalog.ReservationStatus.State:
-
-ReservationStatus.State
-------------------------------------------------------------------
-
-
-
-.. csv-table:: Enum ReservationStatus.State values
-   :header: "Name", "Number", "Description"
-   :widths: auto
-
-   "ACQUIRED", "0", "Acquired the reservation successfully."
-   "ALREADY_IN_PROGRESS", "1", "Indicates an existing active reservation exist for a different owner_id."
-
-
-
 .. _ref_datacatalog.SinglePropertyFilter.ComparisonOperator:
 
 SinglePropertyFilter.ComparisonOperator
@@ -894,8 +863,7 @@ Artifacts are associated with a Dataset, and can be tagged for retrieval.
    "AddTag", ":ref:`ref_datacatalog.AddTagRequest`", ":ref:`ref_datacatalog.AddTagResponse`", "Associate a tag with an artifact. Tags are unique within a Dataset."
    "ListArtifacts", ":ref:`ref_datacatalog.ListArtifactsRequest`", ":ref:`ref_datacatalog.ListArtifactsResponse`", "Return a paginated list of artifacts"
    "ListDatasets", ":ref:`ref_datacatalog.ListDatasetsRequest`", ":ref:`ref_datacatalog.ListDatasetsResponse`", "Return a paginated list of datasets"
-   "GetOrReserveArtifact", ":ref:`ref_datacatalog.GetOrReserveArtifactRequest`", ":ref:`ref_datacatalog.GetOrReserveArtifactResponse`", "Get an artifact and the corresponding data. If the artifact does not exist, try to reserve a spot for populating the artifact. Once you preserve a spot, you should call ExtendReservation API periodically to extend the reservation. Otherwise, the reservation can expire and other tasks may take the spot. If the same owner_id calls this API for the same dataset and it has an active reservation and the artifacts have not been written yet by a different owner, the API will respond with an Acquired Reservation Status (providing idempotency). Note: We may have multiple concurrent tasks with the same signature and the same input that try to populate the same artifact at the same time. Thus with reservation, only one task can run at a time, until the reservation expires. Note: If task A does not extend the reservation in time and the reservation expires, another task B may take over the reservation, resulting in two tasks A and B running in parallel. So a third task C may get the Artifact from A or B, whichever writes last."
-   "ExtendReservation", ":ref:`ref_datacatalog.ExtendReservationRequest`", ":ref:`ref_datacatalog.ExtendReservationResponse`", "Extend the reservation to keep it from expiring. If the reservation expires, other tasks can take over the reservation by calling GetOrReserveArtifact."
+   "GetOrExtendReservation", ":ref:`ref_datacatalog.GetOrExtendReservationRequest`", ":ref:`ref_datacatalog.GetOrExtendReservationResponse`", "Attempts to get or extend a reservation for the corresponding artifact. If one already exists (ie. another entity owns the reservation) then that reservation is retrieved. Once you acquire a reservation, you need to periodically extend the reservation with an identical call. If the reservation is not extended before the defined expiration, it may be acquired by another task. Note: We may have multiple concurrent tasks with the same signature and the same input that try to populate the same artifact at the same time. Thus with reservation, only one task can run at a time, until the reservation expires. Note: If task A does not extend the reservation in time and the reservation expires, another task B may take over the reservation, resulting in two tasks A and B running in parallel. So a third task C may get the Artifact from A or B, whichever writes last."
    "ReleaseReservation", ":ref:`ref_datacatalog.ReleaseReservationRequest`", ":ref:`ref_datacatalog.ReleaseReservationResponse`", "Release the reservation when the task holding the spot fails so that the other tasks can grab the spot."
  <!-- end services -->
 

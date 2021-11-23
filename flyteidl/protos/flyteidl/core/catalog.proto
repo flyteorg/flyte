@@ -41,3 +41,19 @@ message CatalogMetadata {
        TaskExecutionIdentifier source_task_execution = 3;
     }
 };
+
+message CatalogReservation {
+    // Indicates the status of a catalog reservation operation.
+    enum Status {
+      // Used to indicate that reservations are disabled
+      RESERVATION_DISABLED = 0;
+      // Used to indicate that a reservation was successfully acquired or extended
+      RESERVATION_ACQUIRED = 1;
+      // Used to indicate that an active reservation currently exists
+      RESERVATION_EXISTS = 2;
+      // Used to indicate that the reservation has been successfully released
+      RESERVATION_RELEASED = 3;
+      // Used to indicate that a reservation operation resulted in failure
+      RESERVATION_FAILURE = 4;
+    }
+}

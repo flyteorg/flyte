@@ -23,4 +23,5 @@ type CoreTaskMetadata struct {
 	// If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers of the ending of support for a given task.
 	DeprecatedErrorMessage string `json:"deprecated_error_message,omitempty"`
 	Interruptible bool `json:"interruptible,omitempty"`
+	CacheSerializable bool `json:"cache_serializable,omitempty"`
 }

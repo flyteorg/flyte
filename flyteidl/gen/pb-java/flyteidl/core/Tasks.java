@@ -3436,6 +3436,15 @@ public final class Tasks {
      */
     boolean getInterruptible();
 
+    /**
+     * <pre>
+     * Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+     * </pre>
+     *
+     * <code>bool cache_serializable = 9;</code>
+     */
+    boolean getCacheSerializable();
+
     public flyteidl.core.Tasks.TaskMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
@@ -3542,6 +3551,11 @@ public final class Tasks {
             case 64: {
               interruptibleValueCase_ = 8;
               interruptibleValue_ = input.readBool();
+              break;
+            }
+            case 72: {
+
+              cacheSerializable_ = input.readBool();
               break;
             }
             default: {
@@ -3821,6 +3835,19 @@ public final class Tasks {
       return false;
     }
 
+    public static final int CACHE_SERIALIZABLE_FIELD_NUMBER = 9;
+    private boolean cacheSerializable_;
+    /**
+     * <pre>
+     * Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+     * </pre>
+     *
+     * <code>bool cache_serializable = 9;</code>
+     */
+    public boolean getCacheSerializable() {
+      return cacheSerializable_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3856,6 +3883,9 @@ public final class Tasks {
       if (interruptibleValueCase_ == 8) {
         output.writeBool(
             8, (boolean)((java.lang.Boolean) interruptibleValue_));
+      }
+      if (cacheSerializable_ != false) {
+        output.writeBool(9, cacheSerializable_);
       }
       unknownFields.writeTo(output);
     }
@@ -3893,6 +3923,10 @@ public final class Tasks {
           .computeBoolSize(
               8, (boolean)((java.lang.Boolean) interruptibleValue_));
       }
+      if (cacheSerializable_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, cacheSerializable_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3929,6 +3963,8 @@ public final class Tasks {
           .equals(other.getDiscoveryVersion())) return false;
       if (!getDeprecatedErrorMessage()
           .equals(other.getDeprecatedErrorMessage())) return false;
+      if (getCacheSerializable()
+          != other.getCacheSerializable()) return false;
       if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
       switch (interruptibleValueCase_) {
         case 8:
@@ -3968,6 +4004,9 @@ public final class Tasks {
       hash = (53 * hash) + getDiscoveryVersion().hashCode();
       hash = (37 * hash) + DEPRECATED_ERROR_MESSAGE_FIELD_NUMBER;
       hash = (53 * hash) + getDeprecatedErrorMessage().hashCode();
+      hash = (37 * hash) + CACHE_SERIALIZABLE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getCacheSerializable());
       switch (interruptibleValueCase_) {
         case 8:
           hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
@@ -4138,6 +4177,8 @@ public final class Tasks {
 
         deprecatedErrorMessage_ = "";
 
+        cacheSerializable_ = false;
+
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
         return this;
@@ -4187,6 +4228,7 @@ public final class Tasks {
         if (interruptibleValueCase_ == 8) {
           result.interruptibleValue_ = interruptibleValue_;
         }
+        result.cacheSerializable_ = cacheSerializable_;
         result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
         return result;
@@ -4255,6 +4297,9 @@ public final class Tasks {
         if (!other.getDeprecatedErrorMessage().isEmpty()) {
           deprecatedErrorMessage_ = other.deprecatedErrorMessage_;
           onChanged();
+        }
+        if (other.getCacheSerializable() != false) {
+          setCacheSerializable(other.getCacheSerializable());
         }
         switch (other.getInterruptibleValueCase()) {
           case INTERRUPTIBLE: {
@@ -5016,6 +5061,44 @@ public final class Tasks {
           interruptibleValue_ = null;
           onChanged();
         }
+        return this;
+      }
+
+      private boolean cacheSerializable_ ;
+      /**
+       * <pre>
+       * Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+       * </pre>
+       *
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public boolean getCacheSerializable() {
+        return cacheSerializable_;
+      }
+      /**
+       * <pre>
+       * Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+       * </pre>
+       *
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public Builder setCacheSerializable(boolean value) {
+        
+        cacheSerializable_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+       * </pre>
+       *
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public Builder clearCacheSerializable() {
+        
+        cacheSerializable_ = false;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -17604,66 +17687,67 @@ public final class Tasks {
       "ype\030\001 \001(\0162*.flyteidl.core.RuntimeMetadat" +
       "a.RuntimeType\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor" +
       "\030\003 \001(\t\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFLYT" +
-      "E_SDK\020\001\"\235\002\n\014TaskMetadata\022\024\n\014discoverable" +
+      "E_SDK\020\001\"\271\002\n\014TaskMetadata\022\024\n\014discoverable" +
       "\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.core." +
       "RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.googl" +
       "e.protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.f" +
       "lyteidl.core.RetryStrategy\022\031\n\021discovery_" +
       "version\030\006 \001(\t\022 \n\030deprecated_error_messag" +
-      "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000B\025\n\023inte" +
-      "rruptible_value\"\220\004\n\014TaskTemplate\022%\n\002id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022\014\n\004type\030" +
-      "\002 \001(\t\022-\n\010metadata\030\003 \001(\0132\033.flyteidl.core." +
-      "TaskMetadata\0220\n\tinterface\030\004 \001(\0132\035.flytei" +
-      "dl.core.TypedInterface\022\'\n\006custom\030\005 \001(\0132\027" +
-      ".google.protobuf.Struct\022-\n\tcontainer\030\006 \001" +
-      "(\0132\030.flyteidl.core.ContainerH\000\022(\n\007k8s_po" +
-      "d\030\021 \001(\0132\025.flyteidl.core.K8sPodH\000\022!\n\003sql\030" +
-      "\022 \001(\0132\022.flyteidl.core.SqlH\000\022\031\n\021task_type" +
-      "_version\030\007 \001(\005\0228\n\020security_context\030\010 \001(\013" +
-      "2\036.flyteidl.core.SecurityContext\0227\n\006conf" +
-      "ig\030\020 \003(\0132\'.flyteidl.core.TaskTemplate.Co" +
-      "nfigEntry\032-\n\013ConfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rContainerP" +
-      "ort\022\026\n\016container_port\030\001 \001(\r\"\255\003\n\tContaine" +
-      "r\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004arg" +
-      "s\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.co" +
-      "re.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.cor" +
-      "e.KeyValuePair\022/\n\006config\030\006 \003(\0132\033.flyteid" +
-      "l.core.KeyValuePairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034" +
-      ".flyteidl.core.ContainerPort\0225\n\013data_con" +
-      "fig\030\t \001(\0132 .flyteidl.core.DataLoadingCon" +
-      "fig\022;\n\014architecture\030\n \001(\0162%.flyteidl.cor" +
-      "e.Container.Architecture\"I\n\014Architecture" +
-      "\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n\n\006A" +
-      "RM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n\nIOStrategy\022=\n\rdo" +
-      "wnload_mode\030\001 \001(\0162&.flyteidl.core.IOStra" +
-      "tegy.DownloadMode\0229\n\013upload_mode\030\002 \001(\0162$" +
-      ".flyteidl.core.IOStrategy.UploadMode\"L\n\014" +
-      "DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWN" +
-      "LOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUp" +
-      "loadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_E" +
-      "AGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadin" +
-      "gConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_path\030\002" +
-      " \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006format\030\004 \001(" +
-      "\01621.flyteidl.core.DataLoadingConfig.Lite" +
-      "ralMapFormat\022.\n\013io_strategy\030\005 \001(\0132\031.flyt" +
-      "eidl.core.IOStrategy\"1\n\020LiteralMapFormat" +
-      "\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPo" +
-      "d\0222\n\010metadata\030\001 \001(\0132 .flyteidl.core.K8sO" +
-      "bjectMetadata\022)\n\010pod_spec\030\002 \001(\0132\027.google" +
-      ".protobuf.Struct\"\374\001\n\021K8sObjectMetadata\022<" +
-      "\n\006labels\030\001 \003(\0132,.flyteidl.core.K8sObject" +
-      "Metadata.LabelsEntry\022F\n\013annotations\030\002 \003(" +
-      "\01321.flyteidl.core.K8sObjectMetadata.Anno" +
-      "tationsEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t" +
-      "\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022" +
-      "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021" +
-      "\n\tstatement\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.fly" +
-      "teidl.core.Sql.Dialect\"7\n\007Dialect\022\r\n\tUND" +
-      "EFINED\020\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B" +
-      "6Z4github.com/flyteorg/flyteidl/gen/pb-g" +
-      "o/flyteidl/coreb\006proto3"
+      "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000\022\032\n\022cach" +
+      "e_serializable\030\t \001(\010B\025\n\023interruptible_va" +
+      "lue\"\220\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flyte" +
+      "idl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010met" +
+      "adata\030\003 \001(\0132\033.flyteidl.core.TaskMetadata" +
+      "\0220\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Type" +
+      "dInterface\022\'\n\006custom\030\005 \001(\0132\027.google.prot" +
+      "obuf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteid" +
+      "l.core.ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.fl" +
+      "yteidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyt" +
+      "eidl.core.SqlH\000\022\031\n\021task_type_version\030\007 \001" +
+      "(\005\0228\n\020security_context\030\010 \001(\0132\036.flyteidl." +
+      "core.SecurityContext\0227\n\006config\030\020 \003(\0132\'.f" +
+      "lyteidl.core.TaskTemplate.ConfigEntry\032-\n" +
+      "\013ConfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      ":\0028\001B\010\n\006target\"\'\n\rContainerPort\022\026\n\016conta" +
+      "iner_port\030\001 \001(\r\"\255\003\n\tContainer\022\r\n\005image\030\001" +
+      " \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tr" +
+      "esources\030\004 \001(\0132\030.flyteidl.core.Resources" +
+      "\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyValuePa" +
+      "ir\022/\n\006config\030\006 \003(\0132\033.flyteidl.core.KeyVa" +
+      "luePairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.co" +
+      "re.ContainerPort\0225\n\013data_config\030\t \001(\0132 ." +
+      "flyteidl.core.DataLoadingConfig\022;\n\014archi" +
+      "tecture\030\n \001(\0162%.flyteidl.core.Container." +
+      "Architecture\"I\n\014Architecture\022\013\n\007UNKNOWN\020" +
+      "\000\022\t\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006A" +
+      "RM_V7\020\004\"\233\002\n\nIOStrategy\022=\n\rdownload_mode\030" +
+      "\001 \001(\0162&.flyteidl.core.IOStrategy.Downloa" +
+      "dMode\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl.co" +
+      "re.IOStrategy.UploadMode\"L\n\014DownloadMode" +
+      "\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020" +
+      "\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016" +
+      "UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO" +
+      "_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007e" +
+      "nabled\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013outp" +
+      "ut_path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteidl" +
+      ".core.DataLoadingConfig.LiteralMapFormat" +
+      "\022.\n\013io_strategy\030\005 \001(\0132\031.flyteidl.core.IO" +
+      "Strategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010" +
+      "\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metadat" +
+      "a\030\001 \001(\0132 .flyteidl.core.K8sObjectMetadat" +
+      "a\022)\n\010pod_spec\030\002 \001(\0132\027.google.protobuf.St" +
+      "ruct\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 \003" +
+      "(\0132,.flyteidl.core.K8sObjectMetadata.Lab" +
+      "elsEntry\022F\n\013annotations\030\002 \003(\01321.flyteidl" +
+      ".core.K8sObjectMetadata.AnnotationsEntry" +
+      "\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
+      "\001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t" +
+      "\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030" +
+      "\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core.S" +
+      "ql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004" +
+      "ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
+      "oreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -17706,7 +17790,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
-        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "InterruptibleValue", });
+        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "InterruptibleValue", });
     internal_static_flyteidl_core_TaskTemplate_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new

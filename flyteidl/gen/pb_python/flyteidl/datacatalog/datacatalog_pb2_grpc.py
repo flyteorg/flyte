@@ -52,15 +52,10 @@ class DataCatalogStub(object):
         request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.SerializeToString,
         response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.FromString,
         )
-    self.GetOrReserveArtifact = channel.unary_unary(
-        '/datacatalog.DataCatalog/GetOrReserveArtifact',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrReserveArtifactRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrReserveArtifactResponse.FromString,
-        )
-    self.ExtendReservation = channel.unary_unary(
-        '/datacatalog.DataCatalog/ExtendReservation',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ExtendReservationRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ExtendReservationResponse.FromString,
+    self.GetOrExtendReservation = channel.unary_unary(
+        '/datacatalog.DataCatalog/GetOrExtendReservation',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationResponse.FromString,
         )
     self.ReleaseReservation = channel.unary_unary(
         '/datacatalog.DataCatalog/ReleaseReservation',
@@ -127,29 +122,18 @@ class DataCatalogServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def GetOrReserveArtifact(self, request, context):
-    """Get an artifact and the corresponding data. If the artifact does not exist,
-    try to reserve a spot for populating the artifact.
-    Once you preserve a spot, you should call ExtendReservation API periodically
-    to extend the reservation. Otherwise, the reservation can expire and other
-    tasks may take the spot.
-    If the same owner_id calls this API for the same dataset and it has an active reservation and the artifacts have not been written yet by a different owner, the API will respond with an Acquired Reservation Status (providing idempotency).
-    Note: We may have multiple concurrent tasks with the same signature
-    and the same input that try to populate the same artifact at the same time.
-    Thus with reservation, only one task can run at a time, until the reservation
-    expires.
-    Note: If task A does not extend the reservation in time and the reservation
-    expires, another task B may take over the reservation, resulting in two tasks
-    A and B running in parallel. So a third task C may get the Artifact from A or B,
-    whichever writes last.
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def ExtendReservation(self, request, context):
-    """Extend the reservation to keep it from expiring. If the reservation expires,
-    other tasks can take over the reservation by calling GetOrReserveArtifact.
+  def GetOrExtendReservation(self, request, context):
+    """Attempts to get or extend a reservation for the corresponding artifact. If one already exists
+    (ie. another entity owns the reservation) then that reservation is retrieved.
+    Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    identical call. If the reservation is not extended before the defined expiration, it may be
+    acquired by another task.
+    Note: We may have multiple concurrent tasks with the same signature and the same input that
+    try to populate the same artifact at the same time. Thus with reservation, only one task can
+    run at a time, until the reservation expires.
+    Note: If task A does not extend the reservation in time and the reservation expires, another
+    task B may take over the reservation, resulting in two tasks A and B running in parallel. So
+    a third task C may get the Artifact from A or B, whichever writes last.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -201,15 +185,10 @@ def add_DataCatalogServicer_to_server(servicer, server):
           request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.FromString,
           response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.SerializeToString,
       ),
-      'GetOrReserveArtifact': grpc.unary_unary_rpc_method_handler(
-          servicer.GetOrReserveArtifact,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrReserveArtifactRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrReserveArtifactResponse.SerializeToString,
-      ),
-      'ExtendReservation': grpc.unary_unary_rpc_method_handler(
-          servicer.ExtendReservation,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ExtendReservationRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ExtendReservationResponse.SerializeToString,
+      'GetOrExtendReservation': grpc.unary_unary_rpc_method_handler(
+          servicer.GetOrExtendReservation,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationResponse.SerializeToString,
       ),
       'ReleaseReservation': grpc.unary_unary_rpc_method_handler(
           servicer.ReleaseReservation,

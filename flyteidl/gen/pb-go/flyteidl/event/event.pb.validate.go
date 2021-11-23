@@ -40,6 +40,8 @@ var (
 
 	_ = core.CatalogCacheStatus(0)
 
+	_ = core.CatalogReservation_Status(0)
+
 	_ = core.TaskExecution_Phase(0)
 )
 
@@ -442,6 +444,8 @@ func (m *TaskNodeMetadata) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ReservationStatus
 
 	if v, ok := interface{}(m.GetDynamicWorkflow()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

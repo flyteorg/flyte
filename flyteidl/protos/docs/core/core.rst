@@ -57,6 +57,20 @@ Catalog artifact information with specific metadata
 
 
 
+
+
+.. _ref_flyteidl.core.CatalogReservation:
+
+CatalogReservation
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
  
 
 
@@ -78,6 +92,25 @@ Indicates the status of CatalogCaching. The reason why this is not embedded in T
    "CACHE_POPULATED", "3", "used to indicate that the resultant artifact was added to the cache"
    "CACHE_LOOKUP_FAILURE", "4", "Used to indicate that cache lookup failed because of an error"
    "CACHE_PUT_FAILURE", "5", "Used to indicate that cache lookup failed because of an error"
+
+
+
+.. _ref_flyteidl.core.CatalogReservation.Status:
+
+CatalogReservation.Status
+------------------------------------------------------------------
+
+Indicates the status of a catalog reservation operation.
+
+.. csv-table:: Enum CatalogReservation.Status values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "RESERVATION_DISABLED", "0", "Used to indicate that reservations are disabled"
+   "RESERVATION_ACQUIRED", "1", "Used to indicate that a reservation was successfully acquired or extended"
+   "RESERVATION_EXISTS", "2", "Used to indicate that an active reservation currently exists"
+   "RESERVATION_RELEASED", "3", "Used to indicate that the reservation has been successfully released"
+   "RESERVATION_FAILURE", "4", "Used to indicate that a reservation operation resulted in failure"
 
  
 
@@ -1732,6 +1765,7 @@ Container
    "config", ":ref:`ref_flyteidl.core.KeyValuePair`", "repeated", "**Deprecated.** Allows extra configs to be available for the container. TODO: elaborate on how configs will become available. Deprecated, please use TaskTemplate.config instead."
    "ports", ":ref:`ref_flyteidl.core.ContainerPort`", "repeated", "Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but not supported on AWS Batch) Only K8s"
    "data_config", ":ref:`ref_flyteidl.core.DataLoadingConfig`", "", "BETA: Optional configuration for DataLoading. If not specified, then default values are used. This makes it possible to to run a completely portable container, that uses inputs and outputs only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment. If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation to understand the default paths. Only K8s"
+   "architecture", ":ref:`ref_flyteidl.core.Container.Architecture`", "", ""
 
 
 
@@ -2007,6 +2041,7 @@ Task Metadata
    "discovery_version", ":ref:`ref_string`", "", "Indicates a logical version to apply to this task for the purpose of discovery."
    "deprecated_error_message", ":ref:`ref_string`", "", "If set, this indicates that this task is deprecated. This will enable owners of tasks to notify consumers of the ending of support for a given task."
    "interruptible", ":ref:`ref_bool`", "", ""
+   "cache_serializable", ":ref:`ref_bool`", "", "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
 
 
 
@@ -2067,6 +2102,25 @@ TaskTemplate.ConfigEntry
 
 
  
+
+
+
+.. _ref_flyteidl.core.Container.Architecture:
+
+Container.Architecture
+------------------------------------------------------------------
+
+Architecture-type the container image supports.
+
+.. csv-table:: Enum Container.Architecture values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "UNKNOWN", "0", ""
+   "AMD64", "1", ""
+   "ARM64", "2", ""
+   "ARM_V6", "3", ""
+   "ARM_V7", "4", ""
 
 
 
@@ -2425,6 +2479,46 @@ Define a set of simple types.
 
 
 
+.. _ref_flyteidl/core/workflow_closure.proto:
+
+flyteidl/core/workflow_closure.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.core.WorkflowClosure:
+
+WorkflowClosure
+------------------------------------------------------------------
+
+Defines an enclosed package of workflow and tasks it references.
+
+
+
+.. csv-table:: WorkflowClosure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
+   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
 .. _ref_flyteidl/core/workflow.proto:
 
 flyteidl/core/workflow.proto
@@ -2735,46 +2829,6 @@ Failure Handling Strategy
 
    "FAIL_IMMEDIATELY", "0", "FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It&#39;ll automatically abort all currently running nodes and clean up resources before finally marking the workflow executions as failed."
    "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE", "1", "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will not alter the dependencies of the execution graph so any node that depend on the failed node will not be run. Other nodes that will be executed to completion before cleaning up resources and marking the workflow execution as failed."
-
- 
-
- 
-
- 
-
-
-
-
-.. _ref_flyteidl/core/workflow_closure.proto:
-
-flyteidl/core/workflow_closure.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.core.WorkflowClosure:
-
-WorkflowClosure
-------------------------------------------------------------------
-
-Defines an enclosed package of workflow and tasks it references.
-
-
-
-.. csv-table:: WorkflowClosure type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
-   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
-
-
-
-
-
- 
 
  
 
@@ -3101,8 +3155,8 @@ Value
 
 `Value` represents a dynamically typed value which can be either
 null, a number, a string, a boolean, a recursive struct value, or a
-list of values. A producer of value is expected to set one of that
-variants, absence of any variant indicates an error.
+list of values. A producer of value is expected to set one of these
+variants. Absence of any variant indicates an error.
 
 The JSON representation for `Value` is JSON value.
 
