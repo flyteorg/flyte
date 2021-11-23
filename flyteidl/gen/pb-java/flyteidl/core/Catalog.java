@@ -2231,6 +2231,586 @@ public final class Catalog {
 
   }
 
+  public interface CatalogReservationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.CatalogReservation)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code flyteidl.core.CatalogReservation}
+   */
+  public  static final class CatalogReservation extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.CatalogReservation)
+      CatalogReservationOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CatalogReservation.newBuilder() to construct.
+    private CatalogReservation(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CatalogReservation() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CatalogReservation(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Catalog.internal_static_flyteidl_core_CatalogReservation_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Catalog.internal_static_flyteidl_core_CatalogReservation_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Catalog.CatalogReservation.class, flyteidl.core.Catalog.CatalogReservation.Builder.class);
+    }
+
+    /**
+     * <pre>
+     * Indicates the status of a catalog reservation operation.
+     * </pre>
+     *
+     * Protobuf enum {@code flyteidl.core.CatalogReservation.Status}
+     */
+    public enum Status
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <pre>
+       * Used to indicate that reservations are disabled
+       * </pre>
+       *
+       * <code>RESERVATION_DISABLED = 0;</code>
+       */
+      RESERVATION_DISABLED(0),
+      /**
+       * <pre>
+       * Used to indicate that a reservation was successfully acquired or extended
+       * </pre>
+       *
+       * <code>RESERVATION_ACQUIRED = 1;</code>
+       */
+      RESERVATION_ACQUIRED(1),
+      /**
+       * <pre>
+       * Used to indicate that an active reservation currently exists
+       * </pre>
+       *
+       * <code>RESERVATION_EXISTS = 2;</code>
+       */
+      RESERVATION_EXISTS(2),
+      /**
+       * <pre>
+       * Used to indicate that the reservation has been successfully released
+       * </pre>
+       *
+       * <code>RESERVATION_RELEASED = 3;</code>
+       */
+      RESERVATION_RELEASED(3),
+      /**
+       * <pre>
+       * Used to indicate that a reservation operation resulted in failure
+       * </pre>
+       *
+       * <code>RESERVATION_FAILURE = 4;</code>
+       */
+      RESERVATION_FAILURE(4),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <pre>
+       * Used to indicate that reservations are disabled
+       * </pre>
+       *
+       * <code>RESERVATION_DISABLED = 0;</code>
+       */
+      public static final int RESERVATION_DISABLED_VALUE = 0;
+      /**
+       * <pre>
+       * Used to indicate that a reservation was successfully acquired or extended
+       * </pre>
+       *
+       * <code>RESERVATION_ACQUIRED = 1;</code>
+       */
+      public static final int RESERVATION_ACQUIRED_VALUE = 1;
+      /**
+       * <pre>
+       * Used to indicate that an active reservation currently exists
+       * </pre>
+       *
+       * <code>RESERVATION_EXISTS = 2;</code>
+       */
+      public static final int RESERVATION_EXISTS_VALUE = 2;
+      /**
+       * <pre>
+       * Used to indicate that the reservation has been successfully released
+       * </pre>
+       *
+       * <code>RESERVATION_RELEASED = 3;</code>
+       */
+      public static final int RESERVATION_RELEASED_VALUE = 3;
+      /**
+       * <pre>
+       * Used to indicate that a reservation operation resulted in failure
+       * </pre>
+       *
+       * <code>RESERVATION_FAILURE = 4;</code>
+       */
+      public static final int RESERVATION_FAILURE_VALUE = 4;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static Status valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static Status forNumber(int value) {
+        switch (value) {
+          case 0: return RESERVATION_DISABLED;
+          case 1: return RESERVATION_ACQUIRED;
+          case 2: return RESERVATION_EXISTS;
+          case 3: return RESERVATION_RELEASED;
+          case 4: return RESERVATION_FAILURE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Status>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Status> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Status>() {
+              public Status findValueByNumber(int number) {
+                return Status.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Catalog.CatalogReservation.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Status[] VALUES = values();
+
+      public static Status valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private Status(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.CatalogReservation.Status)
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Catalog.CatalogReservation)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Catalog.CatalogReservation other = (flyteidl.core.Catalog.CatalogReservation) obj;
+
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Catalog.CatalogReservation parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Catalog.CatalogReservation prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.core.CatalogReservation}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.CatalogReservation)
+        flyteidl.core.Catalog.CatalogReservationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Catalog.internal_static_flyteidl_core_CatalogReservation_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Catalog.internal_static_flyteidl_core_CatalogReservation_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Catalog.CatalogReservation.class, flyteidl.core.Catalog.CatalogReservation.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Catalog.CatalogReservation.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Catalog.internal_static_flyteidl_core_CatalogReservation_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Catalog.CatalogReservation getDefaultInstanceForType() {
+        return flyteidl.core.Catalog.CatalogReservation.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Catalog.CatalogReservation build() {
+        flyteidl.core.Catalog.CatalogReservation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Catalog.CatalogReservation buildPartial() {
+        flyteidl.core.Catalog.CatalogReservation result = new flyteidl.core.Catalog.CatalogReservation(this);
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Catalog.CatalogReservation) {
+          return mergeFrom((flyteidl.core.Catalog.CatalogReservation)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Catalog.CatalogReservation other) {
+        if (other == flyteidl.core.Catalog.CatalogReservation.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Catalog.CatalogReservation parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Catalog.CatalogReservation) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.CatalogReservation)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.CatalogReservation)
+    private static final flyteidl.core.Catalog.CatalogReservation DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Catalog.CatalogReservation();
+    }
+
+    public static flyteidl.core.Catalog.CatalogReservation getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CatalogReservation>
+        PARSER = new com.google.protobuf.AbstractParser<CatalogReservation>() {
+      @java.lang.Override
+      public CatalogReservation parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CatalogReservation(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CatalogReservation> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CatalogReservation> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Catalog.CatalogReservation getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_CatalogArtifactTag_descriptor;
   private static final 
@@ -2241,6 +2821,11 @@ public final class Catalog {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_CatalogMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_CatalogReservation_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_CatalogReservation_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2258,12 +2843,16 @@ public final class Catalog {
       "\0227\n\014artifact_tag\030\002 \001(\0132!.flyteidl.core.C" +
       "atalogArtifactTag\022G\n\025source_task_executi" +
       "on\030\003 \001(\0132&.flyteidl.core.TaskExecutionId" +
-      "entifierH\000B\022\n\020source_execution*\215\001\n\022Catal" +
-      "ogCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCAC" +
-      "HE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPULA" +
-      "TED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACHE" +
-      "_PUT_FAILURE\020\005B6Z4github.com/flyteorg/fl" +
-      "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "entifierH\000B\022\n\020source_execution\"\236\001\n\022Catal" +
+      "ogReservation\"\207\001\n\006Status\022\030\n\024RESERVATION_" +
+      "DISABLED\020\000\022\030\n\024RESERVATION_ACQUIRED\020\001\022\026\n\022" +
+      "RESERVATION_EXISTS\020\002\022\030\n\024RESERVATION_RELE" +
+      "ASED\020\003\022\027\n\023RESERVATION_FAILURE\020\004*\215\001\n\022Cata" +
+      "logCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCA" +
+      "CHE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPUL" +
+      "ATED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACH" +
+      "E_PUT_FAILURE\020\005B6Z4github.com/flyteorg/f" +
+      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2290,6 +2879,12 @@ public final class Catalog {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_CatalogMetadata_descriptor,
         new java.lang.String[] { "DatasetId", "ArtifactTag", "SourceTaskExecution", "SourceExecution", });
+    internal_static_flyteidl_core_CatalogReservation_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_core_CatalogReservation_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_CatalogReservation_descriptor,
+        new java.lang.String[] { });
     flyteidl.core.IdentifierOuterClass.getDescriptor();
   }
 

@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fcore_2fcatalog_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -58,17 +58,45 @@ extern CatalogArtifactTagDefaultTypeInternal _CatalogArtifactTag_default_instanc
 class CatalogMetadata;
 class CatalogMetadataDefaultTypeInternal;
 extern CatalogMetadataDefaultTypeInternal _CatalogMetadata_default_instance_;
+class CatalogReservation;
+class CatalogReservationDefaultTypeInternal;
+extern CatalogReservationDefaultTypeInternal _CatalogReservation_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::CatalogArtifactTag* Arena::CreateMaybeMessage<::flyteidl::core::CatalogArtifactTag>(Arena*);
 template<> ::flyteidl::core::CatalogMetadata* Arena::CreateMaybeMessage<::flyteidl::core::CatalogMetadata>(Arena*);
+template<> ::flyteidl::core::CatalogReservation* Arena::CreateMaybeMessage<::flyteidl::core::CatalogReservation>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
 namespace core {
 
+enum CatalogReservation_Status {
+  CatalogReservation_Status_RESERVATION_DISABLED = 0,
+  CatalogReservation_Status_RESERVATION_ACQUIRED = 1,
+  CatalogReservation_Status_RESERVATION_EXISTS = 2,
+  CatalogReservation_Status_RESERVATION_RELEASED = 3,
+  CatalogReservation_Status_RESERVATION_FAILURE = 4,
+  CatalogReservation_Status_CatalogReservation_Status_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  CatalogReservation_Status_CatalogReservation_Status_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool CatalogReservation_Status_IsValid(int value);
+const CatalogReservation_Status CatalogReservation_Status_Status_MIN = CatalogReservation_Status_RESERVATION_DISABLED;
+const CatalogReservation_Status CatalogReservation_Status_Status_MAX = CatalogReservation_Status_RESERVATION_FAILURE;
+const int CatalogReservation_Status_Status_ARRAYSIZE = CatalogReservation_Status_Status_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* CatalogReservation_Status_descriptor();
+inline const ::std::string& CatalogReservation_Status_Name(CatalogReservation_Status value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    CatalogReservation_Status_descriptor(), value);
+}
+inline bool CatalogReservation_Status_Parse(
+    const ::std::string& name, CatalogReservation_Status* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<CatalogReservation_Status>(
+    CatalogReservation_Status_descriptor(), name, value);
+}
 enum CatalogCacheStatus {
   CACHE_DISABLED = 0,
   CACHE_MISS = 1,
@@ -380,6 +408,143 @@ class CatalogMetadata final :
 
   friend struct ::TableStruct_flyteidl_2fcore_2fcatalog_2eproto;
 };
+// -------------------------------------------------------------------
+
+class CatalogReservation final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.CatalogReservation) */ {
+ public:
+  CatalogReservation();
+  virtual ~CatalogReservation();
+
+  CatalogReservation(const CatalogReservation& from);
+
+  inline CatalogReservation& operator=(const CatalogReservation& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CatalogReservation(CatalogReservation&& from) noexcept
+    : CatalogReservation() {
+    *this = ::std::move(from);
+  }
+
+  inline CatalogReservation& operator=(CatalogReservation&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CatalogReservation& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CatalogReservation* internal_default_instance() {
+    return reinterpret_cast<const CatalogReservation*>(
+               &_CatalogReservation_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(CatalogReservation* other);
+  friend void swap(CatalogReservation& a, CatalogReservation& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CatalogReservation* New() const final {
+    return CreateMaybeMessage<CatalogReservation>(nullptr);
+  }
+
+  CatalogReservation* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CatalogReservation>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CatalogReservation& from);
+  void MergeFrom(const CatalogReservation& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CatalogReservation* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef CatalogReservation_Status Status;
+  static const Status RESERVATION_DISABLED =
+    CatalogReservation_Status_RESERVATION_DISABLED;
+  static const Status RESERVATION_ACQUIRED =
+    CatalogReservation_Status_RESERVATION_ACQUIRED;
+  static const Status RESERVATION_EXISTS =
+    CatalogReservation_Status_RESERVATION_EXISTS;
+  static const Status RESERVATION_RELEASED =
+    CatalogReservation_Status_RESERVATION_RELEASED;
+  static const Status RESERVATION_FAILURE =
+    CatalogReservation_Status_RESERVATION_FAILURE;
+  static inline bool Status_IsValid(int value) {
+    return CatalogReservation_Status_IsValid(value);
+  }
+  static const Status Status_MIN =
+    CatalogReservation_Status_Status_MIN;
+  static const Status Status_MAX =
+    CatalogReservation_Status_Status_MAX;
+  static const int Status_ARRAYSIZE =
+    CatalogReservation_Status_Status_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Status_descriptor() {
+    return CatalogReservation_Status_descriptor();
+  }
+  static inline const ::std::string& Status_Name(Status value) {
+    return CatalogReservation_Status_Name(value);
+  }
+  static inline bool Status_Parse(const ::std::string& name,
+      Status* value) {
+    return CatalogReservation_Status_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.CatalogReservation)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fcatalog_2eproto;
+};
 // ===================================================================
 
 
@@ -641,9 +806,15 @@ inline void CatalogMetadata::clear_has_source_execution() {
 inline CatalogMetadata::SourceExecutionCase CatalogMetadata::source_execution_case() const {
   return CatalogMetadata::SourceExecutionCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// CatalogReservation
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
@@ -655,6 +826,11 @@ inline CatalogMetadata::SourceExecutionCase CatalogMetadata::source_execution_ca
 namespace google {
 namespace protobuf {
 
+template <> struct is_proto_enum< ::flyteidl::core::CatalogReservation_Status> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::CatalogReservation_Status>() {
+  return ::flyteidl::core::CatalogReservation_Status_descriptor();
+}
 template <> struct is_proto_enum< ::flyteidl::core::CatalogCacheStatus> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::CatalogCacheStatus>() {

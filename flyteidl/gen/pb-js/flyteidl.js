@@ -342,6 +342,119 @@ export const flyteidl = $root.flyteidl = (() => {
             return CatalogMetadata;
         })();
 
+        core.CatalogReservation = (function() {
+
+            /**
+             * Properties of a CatalogReservation.
+             * @memberof flyteidl.core
+             * @interface ICatalogReservation
+             */
+
+            /**
+             * Constructs a new CatalogReservation.
+             * @memberof flyteidl.core
+             * @classdesc Represents a CatalogReservation.
+             * @implements ICatalogReservation
+             * @constructor
+             * @param {flyteidl.core.ICatalogReservation=} [properties] Properties to set
+             */
+            function CatalogReservation(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new CatalogReservation instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.CatalogReservation
+             * @static
+             * @param {flyteidl.core.ICatalogReservation=} [properties] Properties to set
+             * @returns {flyteidl.core.CatalogReservation} CatalogReservation instance
+             */
+            CatalogReservation.create = function create(properties) {
+                return new CatalogReservation(properties);
+            };
+
+            /**
+             * Encodes the specified CatalogReservation message. Does not implicitly {@link flyteidl.core.CatalogReservation.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.CatalogReservation
+             * @static
+             * @param {flyteidl.core.ICatalogReservation} message CatalogReservation message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CatalogReservation.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a CatalogReservation message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.CatalogReservation
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.CatalogReservation} CatalogReservation
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CatalogReservation.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.CatalogReservation();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CatalogReservation message.
+             * @function verify
+             * @memberof flyteidl.core.CatalogReservation
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CatalogReservation.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            /**
+             * Status enum.
+             * @name flyteidl.core.CatalogReservation.Status
+             * @enum {string}
+             * @property {number} RESERVATION_DISABLED=0 RESERVATION_DISABLED value
+             * @property {number} RESERVATION_ACQUIRED=1 RESERVATION_ACQUIRED value
+             * @property {number} RESERVATION_EXISTS=2 RESERVATION_EXISTS value
+             * @property {number} RESERVATION_RELEASED=3 RESERVATION_RELEASED value
+             * @property {number} RESERVATION_FAILURE=4 RESERVATION_FAILURE value
+             */
+            CatalogReservation.Status = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "RESERVATION_DISABLED"] = 0;
+                values[valuesById[1] = "RESERVATION_ACQUIRED"] = 1;
+                values[valuesById[2] = "RESERVATION_EXISTS"] = 2;
+                values[valuesById[3] = "RESERVATION_RELEASED"] = 3;
+                values[valuesById[4] = "RESERVATION_FAILURE"] = 4;
+                return values;
+            })();
+
+            return CatalogReservation;
+        })();
+
         /**
          * ResourceType enum.
          * @name flyteidl.core.ResourceType
@@ -9895,6 +10008,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [discoveryVersion] TaskMetadata discoveryVersion
              * @property {string|null} [deprecatedErrorMessage] TaskMetadata deprecatedErrorMessage
              * @property {boolean|null} [interruptible] TaskMetadata interruptible
+             * @property {boolean|null} [cacheSerializable] TaskMetadata cacheSerializable
              */
 
             /**
@@ -9968,6 +10082,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskMetadata.prototype.interruptible = false;
 
+            /**
+             * TaskMetadata cacheSerializable.
+             * @member {boolean} cacheSerializable
+             * @memberof flyteidl.core.TaskMetadata
+             * @instance
+             */
+            TaskMetadata.prototype.cacheSerializable = false;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -10020,6 +10142,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 7, wireType 2 =*/58).string(message.deprecatedErrorMessage);
                 if (message.interruptible != null && message.hasOwnProperty("interruptible"))
                     writer.uint32(/* id 8, wireType 0 =*/64).bool(message.interruptible);
+                if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
+                    writer.uint32(/* id 9, wireType 0 =*/72).bool(message.cacheSerializable);
                 return writer;
             };
 
@@ -10061,6 +10185,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 8:
                         message.interruptible = reader.bool();
+                        break;
+                    case 9:
+                        message.cacheSerializable = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -10111,6 +10238,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (typeof message.interruptible !== "boolean")
                         return "interruptible: boolean expected";
                 }
+                if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
+                    if (typeof message.cacheSerializable !== "boolean")
+                        return "cacheSerializable: boolean expected";
                 return null;
             };
 
@@ -13984,6 +14114,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskNodeMetadata
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
+             * @property {flyteidl.core.CatalogReservation.Status|null} [reservationStatus] TaskNodeMetadata reservationStatus
              * @property {flyteidl.event.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] TaskNodeMetadata dynamicWorkflow
              */
 
@@ -14017,6 +14148,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             TaskNodeMetadata.prototype.catalogKey = null;
+
+            /**
+             * TaskNodeMetadata reservationStatus.
+             * @member {flyteidl.core.CatalogReservation.Status} reservationStatus
+             * @memberof flyteidl.event.TaskNodeMetadata
+             * @instance
+             */
+            TaskNodeMetadata.prototype.reservationStatus = 0;
 
             /**
              * TaskNodeMetadata dynamicWorkflow.
@@ -14054,6 +14193,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.cacheStatus);
                 if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.reservationStatus != null && message.hasOwnProperty("reservationStatus"))
+                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.reservationStatus);
                 if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
                     $root.flyteidl.event.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
@@ -14082,6 +14223,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.reservationStatus = reader.int32();
                         break;
                     case 16:
                         message.dynamicWorkflow = $root.flyteidl.event.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
@@ -14122,6 +14266,17 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "catalogKey." + error;
                 }
+                if (message.reservationStatus != null && message.hasOwnProperty("reservationStatus"))
+                    switch (message.reservationStatus) {
+                    default:
+                        return "reservationStatus: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        break;
+                    }
                 if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
                     let error = $root.flyteidl.event.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
                     if (error)
