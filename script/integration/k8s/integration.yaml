@@ -393,7 +393,7 @@ spec:
         - name: check-db-ready
           image: postgres:10.1
           command: ['sh', '-c',
-                    'until pg_isready -h postgres -p 5432;
+              'until pg_isready -h postgres -p 5432;
           do echo waiting for database; sleep 2; done;']
         - name: run-migrations
           image: flyteadmin:test
