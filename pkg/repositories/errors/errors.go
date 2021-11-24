@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	AlreadyExists = "entity already exists"
 	notFound      = "missing entity of type %s with identifier %v"
 	invalidJoin   = "cannot relate entity %s with entity %s"
 	invalidEntity = "no such entity %s"

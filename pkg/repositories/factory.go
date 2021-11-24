@@ -26,6 +26,7 @@ type RepositoryInterface interface {
 	DatasetRepo() interfaces.DatasetRepo
 	ArtifactRepo() interfaces.ArtifactRepo
 	TagRepo() interfaces.TagRepo
+	ReservationRepo() interfaces.ReservationRepo
 }
 
 func GetRepository(repoType RepoConfig, dbConfig config.DbConfig, scope promutils.Scope) RepositoryInterface {

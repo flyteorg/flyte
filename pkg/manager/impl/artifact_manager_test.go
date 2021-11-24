@@ -90,8 +90,9 @@ func getTestArtifact() *datacatalog.Artifact {
 
 func newMockDataCatalogRepo() *mocks.DataCatalogRepo {
 	return &mocks.DataCatalogRepo{
-		MockDatasetRepo:  &mocks.DatasetRepo{},
-		MockArtifactRepo: &mocks.ArtifactRepo{},
+		MockDatasetRepo:     &mocks.DatasetRepo{},
+		MockArtifactRepo:    &mocks.ArtifactRepo{},
+		MockReservationRepo: &mocks.ReservationRepo{},
 	}
 }
 

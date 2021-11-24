@@ -93,5 +93,9 @@ func (h *DBHandle) Migrate(ctx context.Context) error {
 		return err
 	}
 
+	if err := h.db.AutoMigrate(&models.Reservation{}); err != nil {
+		return err
+	}
+
 	return nil
 }
