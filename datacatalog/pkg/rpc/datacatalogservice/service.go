@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"time"
 
 	"github.com/flyteorg/datacatalog/pkg/manager/impl"
 	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
@@ -20,9 +21,10 @@ import (
 )
 
 type DataCatalogService struct {
-	DatasetManager  interfaces.DatasetManager
-	ArtifactManager interfaces.ArtifactManager
-	TagManager      interfaces.TagManager
+	DatasetManager     interfaces.DatasetManager
+	ArtifactManager    interfaces.ArtifactManager
+	TagManager         interfaces.TagManager
+	ReservationManager interfaces.ReservationManager
 }
 
 func (s *DataCatalogService) CreateDataset(ctx context.Context, request *catalog.CreateDatasetRequest) (*catalog.CreateDatasetResponse, error) {
@@ -51,6 +53,14 @@ func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTag
 
 func (s *DataCatalogService) ListDatasets(ctx context.Context, request *catalog.ListDatasetsRequest) (*catalog.ListDatasetsResponse, error) {
 	return s.DatasetManager.ListDatasets(ctx, request)
+}
+
+func (s *DataCatalogService) GetOrExtendReservation(ctx context.Context, request *catalog.GetOrExtendReservationRequest) (*catalog.GetOrExtendReservationResponse, error) {
+	return s.ReservationManager.GetOrExtendReservation(ctx, request)
+}
+
+func (s *DataCatalogService) ReleaseReservation(ctx context.Context, request *catalog.ReleaseReservationRequest) (*catalog.ReleaseReservationResponse, error) {
+	return s.ReservationManager.ReleaseReservation(ctx, request)
 }
 
 func NewDataCatalogService() *DataCatalogService {
@@ -110,5 +120,7 @@ func NewDataCatalogService() *DataCatalogService {
 		DatasetManager:  impl.NewDatasetManager(repos, dataStorageClient, catalogScope.NewSubScope("dataset")),
 		ArtifactManager: impl.NewArtifactManager(repos, dataStorageClient, storagePrefix, catalogScope.NewSubScope("artifact")),
 		TagManager:      impl.NewTagManager(repos, dataStorageClient, catalogScope.NewSubScope("tag")),
+		ReservationManager: impl.NewReservationManager(repos, time.Duration(dataCatalogConfig.HeartbeatGracePeriodMultiplier), dataCatalogConfig.MaxReservationHeartbeat.Duration, time.Now,
+			catalogScope.NewSubScope("reservation")),
 	}
 }
