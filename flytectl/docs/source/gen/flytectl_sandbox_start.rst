@@ -34,6 +34,11 @@ Specify a Flyte Sandbox compliant image with the registry. This is useful, in ca
 
   flytectl sandbox start --image docker.io/my-override:latest
 
+	
+Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never
+::
+
+ flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
 Usage
 
 
@@ -46,10 +51,11 @@ Options
 
 ::
 
-  -h, --help             help for start
-      --image string     Optional. Provide a fully qualified path to a Flyte compliant docker image.
-      --source string    Path of your source code
-      --version string   Version of flyte. Only supports flyte releases greater than v0.10.0
+  -h, --help                              help for start
+      --image string                      Optional. Provide a fully qualified path to a Flyte compliant docker image.
+      --imagePullPolicy ImagePullPolicy   Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --source string                     Path of your source code
+      --version string                    Version of flyte. Only supports flyte releases greater than v0.10.0
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
