@@ -149,6 +149,9 @@ Options
       --relaunch string          execution id to be relaunched.
       --targetDomain string      project where execution needs to be created.If not specified configured domain would be used.
       --targetProject string     project where execution needs to be created.If not specified configured project would be used.
+      --task string              
+      --version string           
+      --workflow string          
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
