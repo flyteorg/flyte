@@ -34,3 +34,19 @@ func (d *URL) UnmarshalJSON(b []byte) error {
 		return errors.New("invalid url")
 	}
 }
+
+// Set implements PFlag's Value interface's set method to set the value of duration from string.
+func (d *URL) Set(val string) error {
+	u, err := url.Parse(val)
+	if err != nil {
+		return err
+	}
+
+	d.URL = *u
+	return nil
+}
+
+// Type implements PFlag's Value interface's Type method to return the name of the type.
+func (URL) Type() string {
+	return "URL"
+}

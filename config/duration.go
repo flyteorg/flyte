@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// A wrapper around time.Duration that enables Json Marshalling capabilities
+// Duration is a wrapper around time.Duration that enables Json Marshalling capabilities
 type Duration struct {
 	time.Duration
 }
@@ -44,4 +44,16 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+// Set implements PFlag's Value interface's set method to set the value of duration from string.
+func (d *Duration) Set(val string) error {
+	var err error
+	d.Duration, err = time.ParseDuration(val)
+	return err
+}
+
+// Type implements PFlag's Value interface's Type method to return the name of the type.
+func (Duration) Type() string {
+	return "Duration"
 }

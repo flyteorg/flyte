@@ -74,5 +74,7 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.defaultHttpClient.timeout"), DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "i"), DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int), "")
 	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "m"), DefaultTestType.StringMap, "I'm a map of strings")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "constType"), DefaultTestType.ConstType.String(), "")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "aliasType"), DefaultTestType.AliasType, "")
 	return cmdFlags
 }

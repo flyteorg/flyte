@@ -71,6 +71,7 @@ func TestMarshalObjToStruct(t *testing.T) {
 				t.Errorf("MarshalObjToStruct() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if diff := deep.Equal(got, tt.want); diff != nil {
 				t.Errorf("MarshalObjToStruct() = %v, want %v, diff: %v", got, tt.want, diff)
 			}

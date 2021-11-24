@@ -67,10 +67,18 @@ func ({{ .Name }}) mustMarshalJSON(v json.Marshaler) string {
 func (cfg {{ .Name }}) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("{{ .Name }}", pflag.ExitOnError)
 	{{- range .Fields }}
+	{{- if eq .FlagMethodName "" }}
+	{{- if .ShouldBindDefault }}
+	cmdFlags.{{ .FlagMethodName }}Var(&{{ .DefaultValue }}, fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .UsageString }})
+	{{- else }}
+	cmdFlags.{{ .FlagMethodName }}(fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .UsageString }})
+	{{- end }}
+	{{- else }}
 	{{- if .ShouldBindDefault }}
 	cmdFlags.{{ .FlagMethodName }}Var(&{{ .DefaultValue }}, fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .DefaultValue }}, {{ .UsageString }})
 	{{- else }}
 	cmdFlags.{{ .FlagMethodName }}(fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .DefaultValue }}, {{ .UsageString }})
+	{{- end }}
 	{{- end }}
 	{{- end }}
 	return cmdFlags
@@ -202,7 +210,15 @@ func Test{{ .Name }}_SetFlags(t *testing.T) {
 			{{ else }}testValue := join_{{ $ParentName }}({{ .TestValue }}, ",")
 			{{ end }}
 			cmdFlags.Set("{{ .Name }}", testValue)
-			if {{ $varName }}, err := cmdFlags.Get{{ .FlagMethodName }}("{{ .Name }}"); err == nil {
+			{{- if eq .FlagMethodName "" }}
+			if {{ $varName }} := cmdFlags.Lookup("{{ .Name }}"); {{ $varName }} != nil {
+				{{ if eq .TestStrategy "Json" }}testDecodeJson_{{ $ParentName }}(t, fmt.Sprintf("%v", v.Value.String()), &actual.{{ .GoName }})
+				{{ else if eq .TestStrategy "Raw" }}testDecodeRaw_{{ $ParentName }}(t, v.Value.String(), &actual.{{ .GoName }})
+				{{ else }}testDecodeRaw_{{ $ParentName }}(t, join_{{ $ParentName }}({{ print "v" .FlagMethodName }}, ",").Value.String(), &actual.{{ .GoName }})
+				{{ end }}
+			}
+			{{- else }}
+			if {{ $varName }}, err := cmdFlags.Get{{ .TestFlagMethodName }}("{{ .Name }}"); err == nil {
 				{{ if eq .TestStrategy "Json" }}testDecodeJson_{{ $ParentName }}(t, fmt.Sprintf("%v", {{ print "v" .FlagMethodName }}), &actual.{{ .GoName }})
 				{{ else if eq .TestStrategy "Raw" }}testDecodeRaw_{{ $ParentName }}(t, {{ print "v" .FlagMethodName }}, &actual.{{ .GoName }})
 				{{ else }}testDecodeRaw_{{ $ParentName }}(t, join_{{ $ParentName }}({{ print "v" .FlagMethodName }}, ","), &actual.{{ .GoName }})
@@ -210,6 +226,7 @@ func Test{{ .Name }}_SetFlags(t *testing.T) {
 			} else {
 				assert.FailNow(t, err.Error())
 			}
+			{{- end }}
 		})
 	})
 	{{- end }}

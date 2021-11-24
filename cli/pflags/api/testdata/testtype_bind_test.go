@@ -217,11 +217,9 @@ func TestTestType_SetFlags(t *testing.T) {
 			testValue := DefaultTestType.StorageConfig.Connection.Endpoint.String()
 
 			cmdFlags.Set("storage.connection.endpoint", testValue)
-			if vString, err := cmdFlags.GetString("storage.connection.endpoint"); err == nil {
-				testDecodeJson_TestType(t, fmt.Sprintf("%v", vString), &actual.StorageConfig.Connection.Endpoint)
+			if v := cmdFlags.Lookup("storage.connection.endpoint"); v != nil {
+				testDecodeJson_TestType(t, fmt.Sprintf("%v", v.Value.String()), &actual.StorageConfig.Connection.Endpoint)
 
-			} else {
-				assert.FailNow(t, err.Error())
 			}
 		})
 	})
@@ -399,11 +397,9 @@ func TestTestType_SetFlags(t *testing.T) {
 			testValue := DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String()
 
 			cmdFlags.Set("storage.defaultHttpClient.timeout", testValue)
-			if vString, err := cmdFlags.GetString("storage.defaultHttpClient.timeout"); err == nil {
-				testDecodeJson_TestType(t, fmt.Sprintf("%v", vString), &actual.StorageConfig.DefaultHTTPClient.Timeout)
+			if v := cmdFlags.Lookup("storage.defaultHttpClient.timeout"); v != nil {
+				testDecodeJson_TestType(t, fmt.Sprintf("%v", v.Value.String()), &actual.StorageConfig.DefaultHTTPClient.Timeout)
 
-			} else {
-				assert.FailNow(t, err.Error())
 			}
 		})
 	})

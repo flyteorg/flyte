@@ -1,6 +1,6 @@
 module github.com/flyteorg/boilerplate
 
-go 1.16
+go 1.17
 
 require (
 	github.com/alvaroloes/enumer v1.1.2

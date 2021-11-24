@@ -58,3 +58,19 @@ func parsePortString(port string) (int, error) {
 func validPortRange(port float64) bool {
 	return 0 <= port && port <= 65535
 }
+
+// Set implements PFlag's Value interface's set method to set the value of duration from string.
+func (p *Port) Set(val string) error {
+	u, err := parsePortString(val)
+	if err != nil {
+		return err
+	}
+
+	p.Port = u
+	return nil
+}
+
+// Type implements PFlag's Value interface's Type method to return the name of the type.
+func (Port) Type() string {
+	return "URL"
+}
