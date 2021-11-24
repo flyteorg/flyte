@@ -31,7 +31,7 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/mouuff/go-rocket-update v1.5.1
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/opencontainers/image-spec v1.0.1
+	github.com/opencontainers/image-spec v1.0.2
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.0
