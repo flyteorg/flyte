@@ -65,8 +65,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	tr.OnGetTaskID().Return(taskID)
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-	ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+	ns.OnGetDataDir().Return("data-dir")
+	ns.OnGetOutputDir().Return("output-dir")
 
 	res := &corev1.ResourceRequirements{
 		Requests: make(corev1.ResourceList),
@@ -180,13 +180,24 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	// assert.Equal(t, got.InputReader(), ir)
 
 	anotherPlugin := &pluginCoreMocks.Plugin{}
-	anotherPlugin.On("GetID").Return("plugin2")
+	anotherPlugin.OnGetID().Return("plugin2")
 	maxLength := 8
 	anotherPlugin.OnGetProperties().Return(pluginCore.PluginProperties{
 		GeneratedNameMaxLength: &maxLength,
 	})
-	anotherTaskExecCtx, _ := tk.newTaskExecutionContext(context.TODO(), nCtx, anotherPlugin)
+	anotherTaskExecCtx, err := tk.newTaskExecutionContext(context.TODO(), nCtx, anotherPlugin)
+	assert.NoError(t, err)
 	assert.Equal(t, anotherTaskExecCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "fpmmhh6q")
+	assert.NotNil(t, anotherTaskExecCtx.ow)
+	assert.Equal(t, storage.DataReference("s3://sandbox/x/fpmmhh6q"), anotherTaskExecCtx.ow.GetRawOutputPrefix())
+	assert.Equal(t, storage.DataReference("s3://sandbox/x/fpmmhh6q/_flytecheckpoints"), anotherTaskExecCtx.ow.GetCheckpointPrefix())
+	assert.Equal(t, storage.DataReference("s3://sandbox/x/fpqmhlei/_flytecheckpoints"), anotherTaskExecCtx.ow.GetPreviousCheckpointsPrefix())
+	assert.NotNil(t, anotherTaskExecCtx.psm)
+	assert.NotNil(t, anotherTaskExecCtx.ber)
+	assert.NotNil(t, anotherTaskExecCtx.rm)
+	assert.NotNil(t, anotherTaskExecCtx.sm)
+	assert.NotNil(t, anotherTaskExecCtx.tm)
+	assert.NotNil(t, anotherTaskExecCtx.tr)
 }
 
 func TestAssignResource(t *testing.T) {
@@ -339,4 +350,71 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
 		},
 	}, resourceRequirements)
+}
+
+func TestComputeRawOutputPrefix(t *testing.T) {
+
+	nCtx := &nodeMocks.NodeExecutionContext{}
+	nm := &nodeMocks.NodeExecutionMetadata{}
+	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	ds, err := storage.NewDataStore(
+		&storage.Config{
+			Type: storage.TypeMemory,
+		},
+		promutils.NewTestScope(),
+	)
+	assert.NoError(t, err)
+	nCtx.OnDataStore().Return(ds)
+	nCtx.OnNodeExecutionMetadata().Return(nm)
+
+	pre, uid, err := ComputeRawOutputPrefix(context.TODO(), 100, nCtx, "n1", 0)
+	assert.NoError(t, err)
+	assert.Equal(t, "name-n1-0", uid)
+	assert.NotNil(t, pre)
+	assert.Equal(t, storage.DataReference("s3://sandbox/x/name-n1-0"), pre.GetRawOutputPrefix())
+
+	pre, uid, err = ComputeRawOutputPrefix(context.TODO(), 8, nCtx, "n1", 0)
+	assert.NoError(t, err)
+	assert.Equal(t, "fpqmhlei", uid)
+	assert.NotNil(t, pre)
+	assert.Equal(t, storage.DataReference("s3://sandbox/x/fpqmhlei"), pre.GetRawOutputPrefix())
+
+	_, _, err = ComputeRawOutputPrefix(context.TODO(), 5, nCtx, "n1", 0)
+	assert.Error(t, err)
+}
+
+func TestComputePreviousCheckpointPath(t *testing.T) {
+	t.Run("attempt-0", func(t *testing.T) {
+		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nil, "n1", 0)
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference(""), c)
+	})
+
+	nCtx := &nodeMocks.NodeExecutionContext{}
+	nm := &nodeMocks.NodeExecutionMetadata{}
+	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	ds, err := storage.NewDataStore(
+		&storage.Config{
+			Type: storage.TypeMemory,
+		},
+		promutils.NewTestScope(),
+	)
+	assert.NoError(t, err)
+	nCtx.OnDataStore().Return(ds)
+	nCtx.OnNodeExecutionMetadata().Return(nm)
+	t.Run("attempt-0-nCtx", func(t *testing.T) {
+		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference(""), c)
+	})
+
+	t.Run("attempt-1-nCtx", func(t *testing.T) {
+		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 1)
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference("s3://sandbox/x/name-n1-0/_flytecheckpoints"), c)
+	})
 }

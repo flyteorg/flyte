@@ -5,29 +5,22 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	pluginCatalog "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var (
@@ -193,6 +186,36 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 
 }
 
+// ComputeRawOutputPrefix constructs the output directory, where raw outputs of a task can be stored by the task. FlytePropeller may not have
+// access to this location and can be passed in per execution.
+// the function also returns the uniqueID generated
+func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx handler.NodeExecutionContext, currentNodeUniqueID v1alpha1.NodeID, currentAttempt uint32) (io.RawOutputPaths, string, error) {
+	uniqueID, err := encoding.FixedLengthUniqueIDForParts(length, nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(currentAttempt)))
+	if err != nil {
+		// SHOULD never really happen
+		return nil, uniqueID, err
+	}
+
+	rawOutputPrefix, err := ioutils.NewShardedRawOutputPath(ctx, nCtx.OutputShardSelector(), nCtx.RawOutputPrefix(), uniqueID, nCtx.DataStore())
+	if err != nil {
+		return nil, uniqueID, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "failed to create output sandbox for node execution")
+	}
+	return rawOutputPrefix, uniqueID, nil
+}
+
+// ComputePreviousCheckpointPath returns the checkpoint path for the previous attempt, if this is the first attempt then returns an empty path
+func ComputePreviousCheckpointPath(ctx context.Context, length int, nCtx handler.NodeExecutionContext, currentNodeUniqueID v1alpha1.NodeID, currentAttempt uint32) (storage.DataReference, error) {
+	if currentAttempt == 0 {
+		return "", nil
+	}
+	prevAttempt := currentAttempt - 1
+	prevRawOutputPrefix, _, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, prevAttempt)
+	if err != nil {
+		return "", err
+	}
+	return ioutils.ConstructCheckpointPath(nCtx.DataStore(), prevRawOutputPrefix.GetRawOutputPrefix()), nil
+}
+
 func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.NodeExecutionContext, plugin pluginCore.Plugin) (*taskExecutionContext, error) {
 	id := GetTaskExecutionIdentifier(nCtx)
 
@@ -210,17 +233,17 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 		length = *l
 	}
 
-	uniqueID, err := encoding.FixedLengthUniqueIDForParts(length, nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(id.RetryAttempt)))
+	rawOutputPrefix, uniqueID, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
 	if err != nil {
-		// SHOULD never really happen
 		return nil, err
 	}
 
-	outputSandbox, err := ioutils.NewShardedRawOutputPath(ctx, nCtx.OutputShardSelector(), nCtx.RawOutputPrefix(), uniqueID, nCtx.DataStore())
+	prevCheckpointPath, err := ComputePreviousCheckpointPath(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
 	if err != nil {
-		return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "failed to create output sandbox for node execution")
+		return nil, err
 	}
-	ow := ioutils.NewBufferedOutputWriter(ctx, ioutils.NewRemoteFileOutputPaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir(), outputSandbox))
+
+	ow := ioutils.NewBufferedOutputWriter(ctx, ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir(), rawOutputPrefix, prevCheckpointPath))
 	ts := nCtx.NodeStateReader().GetTaskNodeState()
 	var b *bytes.Buffer
 	if ts.PluginState != nil {
