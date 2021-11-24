@@ -19,7 +19,7 @@ type responseCodeMetrics struct {
 	responseCodeCounters map[codes.Code]prometheus.Counter
 }
 
-// Per-endpoint request metrics.
+// RequestMetrics per-endpoint request metrics.
 type RequestMetrics struct {
 	scope promutils.Scope
 
