@@ -16,6 +16,38 @@ type OutputWriter struct {
 	mock.Mock
 }
 
+type OutputWriter_GetCheckpointPrefix struct {
+	*mock.Call
+}
+
+func (_m OutputWriter_GetCheckpointPrefix) Return(_a0 storage.DataReference) *OutputWriter_GetCheckpointPrefix {
+	return &OutputWriter_GetCheckpointPrefix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputWriter) OnGetCheckpointPrefix() *OutputWriter_GetCheckpointPrefix {
+	c := _m.On("GetCheckpointPrefix")
+	return &OutputWriter_GetCheckpointPrefix{Call: c}
+}
+
+func (_m *OutputWriter) OnGetCheckpointPrefixMatch(matchers ...interface{}) *OutputWriter_GetCheckpointPrefix {
+	c := _m.On("GetCheckpointPrefix", matchers...)
+	return &OutputWriter_GetCheckpointPrefix{Call: c}
+}
+
+// GetCheckpointPrefix provides a mock function with given fields:
+func (_m *OutputWriter) GetCheckpointPrefix() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type OutputWriter_GetErrorPath struct {
 	*mock.Call
 }
@@ -100,6 +132,38 @@ func (_m *OutputWriter) OnGetOutputPrefixPathMatch(matchers ...interface{}) *Out
 
 // GetOutputPrefixPath provides a mock function with given fields:
 func (_m *OutputWriter) GetOutputPrefixPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
+type OutputWriter_GetPreviousCheckpointsPrefix struct {
+	*mock.Call
+}
+
+func (_m OutputWriter_GetPreviousCheckpointsPrefix) Return(_a0 storage.DataReference) *OutputWriter_GetPreviousCheckpointsPrefix {
+	return &OutputWriter_GetPreviousCheckpointsPrefix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputWriter) OnGetPreviousCheckpointsPrefix() *OutputWriter_GetPreviousCheckpointsPrefix {
+	c := _m.On("GetPreviousCheckpointsPrefix")
+	return &OutputWriter_GetPreviousCheckpointsPrefix{Call: c}
+}
+
+func (_m *OutputWriter) OnGetPreviousCheckpointsPrefixMatch(matchers ...interface{}) *OutputWriter_GetPreviousCheckpointsPrefix {
+	c := _m.On("GetPreviousCheckpointsPrefix", matchers...)
+	return &OutputWriter_GetPreviousCheckpointsPrefix{Call: c}
+}
+
+// GetPreviousCheckpointsPrefix provides a mock function with given fields:
+func (_m *OutputWriter) GetPreviousCheckpointsPrefix() storage.DataReference {
 	ret := _m.Called()
 
 	var r0 storage.DataReference

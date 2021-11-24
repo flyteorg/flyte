@@ -188,6 +188,8 @@ func Test_ExtractQueryInfo(t *testing.T) {
 			tCtx.OnOutputWriter().Return(ow)
 			ow.OnGetOutputPrefixPath().Return("s3://another")
 			ow.OnGetRawOutputPrefix().Return("s3://another/output")
+			ow.OnGetCheckpointPrefix().Return("/checkpoint")
+			ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 			ir := &mocks3.InputReader{}
 			tCtx.OnInputReader().Return(ir)

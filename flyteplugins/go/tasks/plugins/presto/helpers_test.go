@@ -96,6 +96,8 @@ func GetMockTaskExecutionContext() core.TaskExecutionContext {
 	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))
 	outputReader.On("GetOutputPrefixPath").Return(storage.DataReference("/data/"))
 	outputReader.On("GetRawOutputPrefix").Return(storage.DataReference("s3://"))
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 	taskCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &coreMock.TaskReader{}

@@ -58,7 +58,7 @@ func (Plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext,
 	return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info), nil
 }
 
-// Creates a new Pod that will Exit on completion. The pods have no retries by design
+// BuildResource creates a new Pod that will Exit on completion. The pods have no retries by design
 func (Plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 
 	podSpec, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
