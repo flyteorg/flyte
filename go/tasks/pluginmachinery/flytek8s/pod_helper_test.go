@@ -86,6 +86,8 @@ func dummyExecContext(r *v1.ResourceRequirements) pluginsCore.TaskExecutionConte
 	ow := &pluginsIOMock.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("")
 	ow.OnGetRawOutputPrefix().Return("")
+	ow.OnGetCheckpointPrefix().Return("/checkpoint")
+	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r))

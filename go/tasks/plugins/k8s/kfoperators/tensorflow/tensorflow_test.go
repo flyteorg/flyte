@@ -17,8 +17,6 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flytestdlib/storage"
-
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
@@ -104,15 +102,17 @@ func dummySparkTaskTemplate(id string, tensorflowCustomObj *plugins.DistributedT
 func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
-	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference(""))
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}

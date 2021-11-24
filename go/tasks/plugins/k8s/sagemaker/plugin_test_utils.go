@@ -143,8 +143,8 @@ func generateMockHyperparameterTuningJobTaskTemplate(id string, hpoJobCustomObj 
 func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate, outputReaderPutError bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
 
 	trainBlobLoc := storage.DataReference("train-blob-loc")
 	validationBlobLoc := storage.DataReference("validation-blob-loc")
@@ -163,9 +163,12 @@ func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTem
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
-	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("/raw/")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+
 	if outputReaderPutError {
 		outputReader.OnPutMatch(mock.Anything, mock.Anything).Return(errors.Errorf("err"))
 	} else {
@@ -225,8 +228,8 @@ func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTem
 func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate, outputReaderPutError bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
 
 	trainBlobLoc := storage.DataReference("train-blob-loc")
 	validationBlobLoc := storage.DataReference("validation-blob-loc")
@@ -244,9 +247,12 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate,
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
-	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("/raw/")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+
 	if outputReaderPutError {
 		outputReader.OnPutMatch(mock.Anything).Return(errors.Errorf("err"))
 	}
@@ -311,8 +317,8 @@ func generateMockBlobLiteral(loc storage.DataReference) *flyteIdlCore.Literal {
 func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
 
 	trainBlobLoc := storage.DataReference("train-blob-loc")
 	validationBlobLoc := storage.DataReference("validation-blob-loc")
@@ -356,9 +362,9 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
-	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("/raw/")
 
 	taskCtx.OnOutputWriter().Return(outputReader)
 

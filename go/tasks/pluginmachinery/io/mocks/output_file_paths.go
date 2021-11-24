@@ -12,6 +12,38 @@ type OutputFilePaths struct {
 	mock.Mock
 }
 
+type OutputFilePaths_GetCheckpointPrefix struct {
+	*mock.Call
+}
+
+func (_m OutputFilePaths_GetCheckpointPrefix) Return(_a0 storage.DataReference) *OutputFilePaths_GetCheckpointPrefix {
+	return &OutputFilePaths_GetCheckpointPrefix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputFilePaths) OnGetCheckpointPrefix() *OutputFilePaths_GetCheckpointPrefix {
+	c := _m.On("GetCheckpointPrefix")
+	return &OutputFilePaths_GetCheckpointPrefix{Call: c}
+}
+
+func (_m *OutputFilePaths) OnGetCheckpointPrefixMatch(matchers ...interface{}) *OutputFilePaths_GetCheckpointPrefix {
+	c := _m.On("GetCheckpointPrefix", matchers...)
+	return &OutputFilePaths_GetCheckpointPrefix{Call: c}
+}
+
+// GetCheckpointPrefix provides a mock function with given fields:
+func (_m *OutputFilePaths) GetCheckpointPrefix() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type OutputFilePaths_GetErrorPath struct {
 	*mock.Call
 }
@@ -96,6 +128,38 @@ func (_m *OutputFilePaths) OnGetOutputPrefixPathMatch(matchers ...interface{}) *
 
 // GetOutputPrefixPath provides a mock function with given fields:
 func (_m *OutputFilePaths) GetOutputPrefixPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
+type OutputFilePaths_GetPreviousCheckpointsPrefix struct {
+	*mock.Call
+}
+
+func (_m OutputFilePaths_GetPreviousCheckpointsPrefix) Return(_a0 storage.DataReference) *OutputFilePaths_GetPreviousCheckpointsPrefix {
+	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputFilePaths) OnGetPreviousCheckpointsPrefix() *OutputFilePaths_GetPreviousCheckpointsPrefix {
+	c := _m.On("GetPreviousCheckpointsPrefix")
+	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c}
+}
+
+func (_m *OutputFilePaths) OnGetPreviousCheckpointsPrefixMatch(matchers ...interface{}) *OutputFilePaths_GetPreviousCheckpointsPrefix {
+	c := _m.On("GetPreviousCheckpointsPrefix", matchers...)
+	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c}
+}
+
+// GetPreviousCheckpointsPrefix provides a mock function with given fields:
+func (_m *OutputFilePaths) GetPreviousCheckpointsPrefix() storage.DataReference {
 	ret := _m.Called()
 
 	var r0 storage.DataReference

@@ -431,6 +431,8 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockOutputPathPrefix := storage.DataReference("s3://output/path")
 	mockOutputPath.OnGetRawOutputPrefix().Return(mockOutputPathPrefix)
 	mockOutputPath.OnGetOutputPrefixPath().Return(mockOutputPathPrefix)
+	mockOutputPath.OnGetCheckpointPrefix().Return("/checkpoint")
+	mockOutputPath.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	return template.Parameters{
 		TaskExecMetadata: &mockTaskExecMetadata,

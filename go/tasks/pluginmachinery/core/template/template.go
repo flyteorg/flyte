@@ -1,24 +1,51 @@
+// Package template exports the Render method
+// Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
+// Supported templates are:
+// - {{ .InputFile }} to receive the input file path. The protocol used will depend on the underlying system
+// 		configuration. E.g. s3://bucket/key/to/file.pb or /var/run/local.pb are both valid.
+// - {{ .OutputPrefix }} to receive the path prefix for where to store the outputs.
+// - {{ .Inputs.myInput }} to receive the actual value of the input passed. See docs on LiteralMapToTemplateArgs for how
+// 		what to expect each literal type to be serialized as.
+// - {{ .RawOutputDataPrefix }} to receive a path where the raw output data should be ideally written. It is guaranteed
+//      to be unique per retry and finally one will be saved as the output path
+// - {{ .PerRetryUniqueKey }} A key/id/str that is generated per retry and is guaranteed to be unique. Useful in query
+//     manipulations
+// - {{ .TaskTemplatePath }} A path in blobstore/metadata store (e.g. s3, gcs etc) to where an offloaded version of the
+//     task template exists and can be accessed by the container / task execution environment. The template is a
+//     a serialized protobuf
+// - {{ .PrevCheckpointPrefix }} A path to the checkpoint directory for the previous attempt. If this is the first attempt
+//     then this is replaced by an empty string
+// - {{ .CheckpointOutputPrefix }} A Flyte aware path where the current execution should write the checkpoints.
 package template
 
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"reflect"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 )
 
 var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")
 var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
+
+// Regexes for Supported templates
+var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
+var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
+var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
+var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
+var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
+var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
+var taskTemplateRegex = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
+var prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
+var currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
 
 type ErrorCollection struct {
 	Errors []error
@@ -33,7 +60,7 @@ func (e ErrorCollection) Error() string {
 	return sb.String()
 }
 
-// The Parameters struct is used by the Templating Engine to replace the templated parameters
+// Parameters struct is used by the Templating Engine to replace the templated parameters
 type Parameters struct {
 	TaskExecMetadata core.TaskExecutionMetadata
 	Inputs           io.InputReader
@@ -41,14 +68,9 @@ type Parameters struct {
 	Task             core.TaskTemplatePath
 }
 
-// Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
-// Supported templates are:
-// - {{ .InputFile }} to receive the input file path. The protocol used will depend on the underlying system
-// 		configuration. E.g. s3://bucket/key/to/file.pb or /var/run/local.pb are both valid.
-// - {{ .OutputPrefix }} to receive the path prefix for where to store the outputs.
-// - {{ .Inputs.myInput }} to receive the actual value of the input passed. See docs on LiteralMapToTemplateArgs for how
-// 		what to expect each literal type to be serialized as.
+// Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
 // If a command isn't a valid template or failed to evaluate, it'll be returned as is.
+// Refer to the package docs for a list of supported templates
 // NOTE: I wanted to do in-place replacement, until I realized that in-place replacement will alter the definition of the
 // graph. This is not desirable, as we may have to retry and in that case the replacement will not work and we want
 // to create a new location for outputs
@@ -79,20 +101,18 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 	return res, nil
 }
 
-var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
-var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
-var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
-var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
-var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
-var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
-var taskTemplateRegex = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
-
 func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
 
 	val := inputFileRegex.ReplaceAllString(inputTemplate, params.Inputs.GetInputPath().String())
 	val = outputRegex.ReplaceAllString(val, params.OutputPath.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, params.Inputs.GetInputPrefixPath().String())
 	val = rawOutputDataPrefixRegex.ReplaceAllString(val, params.OutputPath.GetRawOutputPrefix().String())
+	prevCheckpoint := params.OutputPath.GetPreviousCheckpointsPrefix().String()
+	if prevCheckpoint == "" {
+		prevCheckpoint = "\"\""
+	}
+	val = prevCheckpointPrefixRegex.ReplaceAllString(val, prevCheckpoint)
+	val = currCheckpointPrefixRegex.ReplaceAllString(val, params.OutputPath.GetCheckpointPrefix().String())
 	val = perRetryUniqueKey.ReplaceAllString(val, perRetryKey)
 
 	// For Task template, we will replace only if there is a match. This is because, task template replacement

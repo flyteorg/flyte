@@ -50,7 +50,7 @@ func (m *FakeKubeCache) Get(ctx context.Context, key client.ObjectKey, out clien
 	item, found := m.Cache[formatKey(key, out.GetObjectKind().GroupVersionKind())]
 	if found {
 		// deep copy to avoid mutating cache
-		item = item.(runtime.Object).DeepCopyObject()
+		item = item.DeepCopyObject()
 		_, isUnstructured := out.(*unstructured.Unstructured)
 		if isUnstructured {
 			// Copy the value of the item in the cache to the returned value
@@ -96,7 +96,7 @@ func (m *FakeKubeCache) List(ctx context.Context, list client.ObjectList, opts .
 			}
 		}
 
-		objs = append(objs, val.(runtime.Object).DeepCopyObject())
+		objs = append(objs, val.DeepCopyObject())
 	}
 
 	return meta.SetList(list, objs)

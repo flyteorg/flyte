@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -84,22 +83,25 @@ func dummyContainerTaskContext(resources *v1.ResourceRequirements, command []str
 	dummyTaskMetadata := dummyContainerTaskMetadata(resources)
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
+	inputReader.OnGetInputPath().Return("test-data-reference")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.On("GetOutputPrefixPath").Return(storage.DataReference("/data/"))
-	outputReader.On("GetRawOutputPrefix").Return(storage.DataReference(""))
-	taskCtx.On("OutputWriter").Return(outputReader)
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+
+	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.On("Read", mock.Anything).Return(task, nil)
-	taskCtx.On("TaskReader").Return(taskReader)
+	taskReader.OnReadMatch(mock.Anything).Return(task, nil)
+	taskCtx.OnTaskReader().Return(taskReader)
 
-	taskCtx.On("TaskExecutionMetadata").Return(dummyTaskMetadata)
+	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
 	return taskCtx
 }
 

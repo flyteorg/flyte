@@ -174,6 +174,8 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	or := &mocks2.OutputWriter{}
 	or.OnGetOutputPrefixPath().Return("/path/output")
 	or.OnGetRawOutputPrefix().Return("s3://")
+	or.OnGetCheckpointPrefix().Return("/checkpoint")
+	or.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	taskCtx := &mocks.TaskExecutionContext{}
 	taskCtx.OnTaskExecutionMetadata().Return(tMetadata)

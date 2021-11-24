@@ -41,6 +41,16 @@ func (d dummyInputReader) Get(ctx context.Context) (*core.LiteralMap, error) {
 type dummyOutputPaths struct {
 	outputPath          storage.DataReference
 	rawOutputDataPrefix storage.DataReference
+	prevCheckpointPath  storage.DataReference
+	checkpointPath      storage.DataReference
+}
+
+func (d dummyOutputPaths) GetPreviousCheckpointsPrefix() storage.DataReference {
+	return d.prevCheckpointPath
+}
+
+func (d dummyOutputPaths) GetCheckpointPrefix() storage.DataReference {
+	return d.checkpointPath
 }
 
 func (d dummyOutputPaths) GetRawOutputPrefix() storage.DataReference {
@@ -442,6 +452,122 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"{{ .taskTemplatePath }}",
 		}, params)
 		assert.Error(t, err)
+	})
+
+	t.Run("missing checkpoint args", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: out.rawOutputDataPrefix,
+				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
+				checkpointPath:      "s3://new-checkpoint/prefix",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+		}, actual)
+	})
+
+	t.Run("no prev checkpoint", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: out.rawOutputDataPrefix,
+				prevCheckpointPath:  "",
+				checkpointPath:      "s3://new-checkpoint/prefix",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+			"--prev={{ .PrevCheckpointPrefix }}",
+			"--checkpoint={{ .CheckpointOutputPrefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+			"--prev=\"\"",
+			"--checkpoint=s3://new-checkpoint/prefix",
+		}, actual)
+	})
+
+	t.Run("all checkpoints", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: out.rawOutputDataPrefix,
+				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
+				checkpointPath:      "s3://new-checkpoint/prefix",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+			"--prev={{ .PrevCheckpointPrefix }}",
+			"--checkpoint={{ .CheckpointOutputPrefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+			"--prev=s3://prev-checkpoint/prefix",
+			"--checkpoint=s3://new-checkpoint/prefix",
+		}, actual)
+	})
+
+	t.Run("all checkpoints ignore case", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: out.rawOutputDataPrefix,
+				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
+				checkpointPath:      "s3://new-checkpoint/prefix",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+			"--prev={{ .prevcheckpointprefix }}",
+			"--checkpoint={{ .checkpointoutputprefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+			"--prev=s3://prev-checkpoint/prefix",
+			"--checkpoint=s3://new-checkpoint/prefix",
+		}, actual)
 	})
 }
 

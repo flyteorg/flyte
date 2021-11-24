@@ -13,7 +13,6 @@ import (
 
 	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,22 +98,24 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	dummyTaskMetadata := dummyContainerTaskMetadata(resources)
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.On("GetInputPrefixPath").Return(storage.DataReference("test-data-prefix"))
-	inputReader.On("GetInputPath").Return(storage.DataReference("test-data-reference"))
-	inputReader.On("Get", mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.On("InputReader").Return(inputReader)
+	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
+	inputReader.OnGetInputPath().Return("test-data-reference")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.On("GetOutputPrefixPath").Return(storage.DataReference("/data/"))
-	outputReader.On("GetRawOutputPrefix").Return(storage.DataReference(""))
-	taskCtx.On("OutputWriter").Return(outputReader)
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
-	taskCtx.On("TaskReader").Return(taskReader)
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.OnTaskReader().Return(taskReader)
 
-	taskCtx.On("TaskExecutionMetadata").Return(dummyTaskMetadata)
+	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
 
 	return taskCtx
 }

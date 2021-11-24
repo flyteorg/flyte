@@ -11,8 +11,6 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flytestdlib/storage"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -282,24 +280,26 @@ func dummySparkTaskTemplate(id string, sparkConf map[string]string) *core.TaskTe
 func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
-	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))
-	outputReader.On("GetOutputPrefixPath").Return(storage.DataReference("/data/"))
-	outputReader.On("GetRawOutputPrefix").Return(storage.DataReference(""))
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	taskCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
-	taskCtx.On("TaskReader").Return(taskReader)
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.OnTaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",

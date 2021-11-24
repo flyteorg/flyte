@@ -162,7 +162,7 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 					t.State = t.State.SetPhase(arrayCore.PhaseRetryableFailure, 0).SetReason("Failed to launch job.")
 				}
 
-				t.State = t.State.SetReason(err.Error())
+				t.State.SetReason(err.Error())
 				return LaunchReturnState, nil
 			}
 
