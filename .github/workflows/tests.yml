@@ -44,7 +44,7 @@ jobs:
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
           # launch flyte end2end
-          flytectl sandbox exec -- k3s kubectl apply -f "root/deployment/sandbox/flyte_generated.yaml"
+          flytectl sandbox exec -- k3s kubectl apply -n flyte -f "root/deployment/sandbox/flyte_generated.yaml"
           make end2end_execute
 
   end-to-end-helm:
