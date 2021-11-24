@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
+
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/docker/docker/api/types/container"
@@ -101,13 +103,13 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 }
 
 func TestPullDockerImage(t *testing.T) {
-	t.Run("Successfully pull image", func(t *testing.T) {
+	t.Run("Successfully pull image Always", func(t *testing.T) {
 		setupSandbox()
 		mockDocker := &mocks.Docker{}
 		context := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		err := PullDockerImage(context, mockDocker, "nginx")
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways)
 		assert.Nil(t, err)
 	})
 
@@ -117,10 +119,28 @@ func TestPullDockerImage(t *testing.T) {
 		context := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("error"))
-		err := PullDockerImage(context, mockDocker, "nginx")
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways)
 		assert.NotNil(t, err)
 	})
 
+	t.Run("Successfully pull image IfNotPresent", func(t *testing.T) {
+		setupSandbox()
+		mockDocker := &mocks.Docker{}
+		context := context.Background()
+		// Verify the attributes
+		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnImageListMatch(context, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyIfNotPresent)
+		assert.Nil(t, err)
+	})
+
+	t.Run("Successfully pull image Never", func(t *testing.T) {
+		setupSandbox()
+		mockDocker := &mocks.Docker{}
+		context := context.Background()
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyNever)
+		assert.Nil(t, err)
+	})
 }
 
 func TestStartContainer(t *testing.T) {

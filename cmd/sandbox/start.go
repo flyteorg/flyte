@@ -56,6 +56,11 @@ Specify a Flyte Sandbox compliant image with the registry. This is useful, in ca
 
   flytectl sandbox start --image docker.io/my-override:latest
 
+	
+Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never
+::
+
+ flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
 Usage
 `
 	k8sEndpoint             = "https://127.0.0.1:30086"
@@ -143,7 +148,8 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		return nil, err
 	}
 	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, image)
-	if err := docker.PullDockerImage(ctx, cli, image); err != nil {
+
+	if err := docker.PullDockerImage(ctx, cli, image, sandboxConfig.DefaultConfig.ImagePullPolicy); err != nil {
 		return nil, err
 	}
 

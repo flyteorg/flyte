@@ -141,4 +141,16 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_imagePullPolicy", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("imagePullPolicy", testValue)
+			if v := cmdFlags.Lookup("imagePullPolicy"); v != nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", v.Value.String()), &actual.ImagePullPolicy)
+
+			}
+		})
+	})
 }
