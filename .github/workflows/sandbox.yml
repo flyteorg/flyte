@@ -13,6 +13,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: "0"
+      - name: Set flyte version to release
+        id: set_version
+        run: |
+          if [ ${{ github.event_name}} = "release" ]; then
+            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
+          else
+            echo ::set-output name=flyte_version::latest)
+          fi
       - name: Prepare sandbox Image Names
         id: sandbox-names
         uses: docker/metadata-action@v3
@@ -59,6 +67,7 @@ jobs:
           platforms: linux/arm64, linux/amd64
           push: ${{ github.event_name == 'release' }}
           target: default
+          build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           tags: ${{ steps.sandbox-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
@@ -71,6 +80,7 @@ jobs:
           push: ${{ github.event_name == 'release' }}
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           file: docker/sandbox/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new

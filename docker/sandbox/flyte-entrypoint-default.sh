@@ -15,7 +15,6 @@ K3S_PID=$!
 timeout 600 sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
 echo "Done."
 
-
 FLYTE_VERSION=${FLYTE_VERSION:-latest}
 if [[ $FLYTE_VERSION = "latest" ]]
 then

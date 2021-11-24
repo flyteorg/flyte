@@ -65,6 +65,9 @@ RUN apk add --no-cache bash git make tini curl jq
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 COPY docker/sandbox/bashrc /root/.bashrc
 
+ARG FLYTE_VERSION="latest"
+ENV FLYTE_VERSION "${FLYTE_VERSION}"
+
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
 
@@ -90,6 +93,9 @@ COPY --from=base_ /flyteorg/ /flyteorg/
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
+
+ARG FLYTE_VERSION="latest"
+ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
