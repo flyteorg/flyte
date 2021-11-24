@@ -9,6 +9,8 @@ import (
 	"os"
 	"strings"
 
+	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
+
 	"github.com/flyteorg/flytectl/clierrors"
 
 	"github.com/docker/docker/api/types"
@@ -88,14 +90,30 @@ func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, e
 }
 
 // PullDockerImage will Pull docker image
-func PullDockerImage(ctx context.Context, cli Docker, image string) error {
-	r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
-	if err != nil {
+func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy sandboxConfig.ImagePullPolicy) error {
+	if pullPolicy == sandboxConfig.ImagePullPolicyAlways || pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
+		if pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
+			imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
+			if err != nil {
+				return err
+			}
+			for _, img := range imageSummary {
+				for _, tags := range img.RepoTags {
+					if image == tags {
+						return nil
+					}
+				}
+			}
+		}
+		r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(os.Stdout, r)
 		return err
 	}
-
-	_, err = io.Copy(os.Stdout, r)
-	return err
+	return nil
 }
 
 //StartContainer will create and start docker container

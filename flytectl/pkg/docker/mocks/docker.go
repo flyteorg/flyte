@@ -368,6 +368,47 @@ func (_m *Docker) ContainerWait(ctx context.Context, containerID string, conditi
 	return r0, r1
 }
 
+type Docker_ImageList struct {
+	*mock.Call
+}
+
+func (_m Docker_ImageList) Return(_a0 []types.ImageSummary, _a1 error) *Docker_ImageList {
+	return &Docker_ImageList{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *Docker) OnImageList(ctx context.Context, listOption types.ImageListOptions) *Docker_ImageList {
+	c := _m.On("ImageList", ctx, listOption)
+	return &Docker_ImageList{Call: c}
+}
+
+func (_m *Docker) OnImageListMatch(matchers ...interface{}) *Docker_ImageList {
+	c := _m.On("ImageList", matchers...)
+	return &Docker_ImageList{Call: c}
+}
+
+// ImageList provides a mock function with given fields: ctx, listOption
+func (_m *Docker) ImageList(ctx context.Context, listOption types.ImageListOptions) ([]types.ImageSummary, error) {
+	ret := _m.Called(ctx, listOption)
+
+	var r0 []types.ImageSummary
+	if rf, ok := ret.Get(0).(func(context.Context, types.ImageListOptions) []types.ImageSummary); ok {
+		r0 = rf(ctx, listOption)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]types.ImageSummary)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, types.ImageListOptions) error); ok {
+		r1 = rf(ctx, listOption)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type Docker_ImagePull struct {
 	*mock.Call
 }
