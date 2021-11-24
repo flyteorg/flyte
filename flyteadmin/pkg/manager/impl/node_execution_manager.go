@@ -432,6 +432,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
 	}
+
 	ctx = getNodeExecutionContext(ctx, request.Id)
 	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Id)
 	if err != nil {
@@ -439,6 +440,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			request.Id, err)
 		return nil, err
 	}
+
 	nodeExecution, err := transformers.FromNodeExecutionModel(*nodeExecutionModel)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform node execution model [%+v] when fetching data: %v", request.Id, err)
@@ -450,11 +452,13 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	if err != nil {
 		return nil, err
 	}
+
 	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, nodeExecution.Closure)
 	if err != nil {
 		return nil, err
 	}
+
 	response := &admin.NodeExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
@@ -469,9 +473,16 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal,
 				"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
 		}
-		response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
-			Id:               closure.Primary.Template.Id,
-			CompiledWorkflow: closure,
+
+		if wf := closure.Primary; wf == nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow definition in loaded dynamic workflow model.")
+		} else if template := wf.Template; template == nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
+		} else {
+			response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
+				Id:               closure.Primary.Template.Id,
+				CompiledWorkflow: closure,
+			}
 		}
 	}
 

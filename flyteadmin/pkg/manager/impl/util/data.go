@@ -22,14 +22,17 @@ func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob a
 	return len(outputURI) > 0 && shouldFetchData(config, urlBlob)
 }
 
-// Returns an inputs URL blob and if config settings permit, inline inputs data for an execution.
+// GetInputs returns an inputs URL blob and if config settings permit, inline inputs data for an execution.
 func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, inputURI string) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
-	if len(inputURI) == 0 {
-		return nil, nil, nil
-	}
 	var inputsURLBlob admin.UrlBlob
+	var fullInputs core.LiteralMap
+
+	if len(inputURI) == 0 {
+		return &fullInputs, &inputsURLBlob, nil
+	}
+
 	var err error
 	if remoteDataConfig.SignedURL.Enabled {
 		inputsURLBlob, err = urlData.Get(ctx, inputURI)
@@ -38,7 +41,6 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		}
 	}
 
-	var fullInputs core.LiteralMap
 	if shouldFetchData(remoteDataConfig, inputsURLBlob) {
 		err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
 		if err != nil {
@@ -50,7 +52,7 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	return &fullInputs, &inputsURLBlob, nil
 }
 
-// Defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
+// ExecutionClosure defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
 type ExecutionClosure interface {
 	GetOutputUri() string //nolint
 	GetOutputData() *core.LiteralMap
@@ -78,22 +80,24 @@ func (c workflowExecutionClosure) GetOutputData() *core.LiteralMap {
 	return c.ExecutionClosure.GetOutputData()
 }
 
-// Converts a workflow execution closure to an implementation of the ExecutionClosure interface
-// for use in producing execution output data.
+// ToExecutionClosureInterface converts a workflow execution closure to an implementation of the ExecutionClosure
+// interface for use in producing execution output data.
 func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosure {
 	return &workflowExecutionClosure{
 		ExecutionClosure: closure,
 	}
 }
 
-// Returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
+// GetOutputs returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
 func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
-	if closure == nil {
-		return nil, nil, nil
-	}
 	var outputsURLBlob admin.UrlBlob
+	var fullOutputs = &core.LiteralMap{}
+	if closure == nil {
+		return fullOutputs, &outputsURLBlob, nil
+	}
+
 	if len(closure.GetOutputUri()) > 0 && remoteDataConfig.SignedURL.Enabled {
 		var err error
 		outputsURLBlob, err = urlData.Get(ctx, closure.GetOutputUri())
@@ -102,7 +106,6 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		}
 	}
 
-	var fullOutputs = &core.LiteralMap{}
 	if closure.GetOutputData() != nil {
 		if int64(proto.Size(closure.GetOutputData())) < remoteDataConfig.MaxSizeInBytes {
 			fullOutputs = closure.GetOutputData()
@@ -117,5 +120,6 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
 		}
 	}
+
 	return fullOutputs, &outputsURLBlob, nil
 }
