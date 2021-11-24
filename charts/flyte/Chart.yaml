@@ -4,7 +4,8 @@ description: A Helm chart for Flyte Sandbox
 type: application
 version: v0.1.10 # VERSION
 dependencies:
-  - name: flyte
+  - name: flyte-core
+    alias: flyte
     version: v0.1.10 # VERSION
     repository: file://../flyte-core # REPOSITORY
   - name: contour

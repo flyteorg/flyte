@@ -1,5 +1,5 @@
 ---
-# Source: flyte/templates/admin/rbac.yaml
+# Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -8,12 +8,12 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
 ---
-# Source: flyte/templates/datacatalog/rbac.yaml
+# Source: flyte-core/templates/datacatalog/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -22,12 +22,12 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     iam.gke.io/gcp-service-account: gsa-datacatalog@<PROJECT-ID>.iam.gserviceaccount.com
 ---
-# Source: flyte/templates/propeller/rbac.yaml
+# Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -36,12 +36,12 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     iam.gke.io/gcp-service-account: gsa-flytepropeller@<PROJECT-ID>.iam.gserviceaccount.com
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
 apiVersion: v1
 kind: ServiceAccount
@@ -49,7 +49,7 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 ---
-# Source: flyte/templates/admin/secret-auth.yaml
+# Source: flyte-core/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -58,7 +58,7 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte/templates/common/secret.yaml
+# Source: flyte-core/templates/common/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -67,7 +67,7 @@ stringData:
   pass.txt: '<DBPASSWORD>'
 type: Opaque
 ---
-# Source: flyte/templates/propeller/secret-auth.yaml
+# Source: flyte-core/templates/propeller/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -77,7 +77,7 @@ type: Opaque
 stringData:
   client_secret: foobar
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
 apiVersion: v1
 kind: Secret
@@ -86,7 +86,7 @@ metadata:
   namespace: flyte
 type: Opaque
 ---
-# Source: flyte/templates/admin/cluster_resource_configmap.yaml
+# Source: flyte-core/templates/admin/cluster_resource_configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -95,7 +95,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   aa_namespace.yaml: | 
@@ -129,7 +129,7 @@ data:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
 ---
-# Source: flyte/templates/admin/configmap.yaml
+# Source: flyte-core/templates/admin/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -138,7 +138,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -258,7 +258,7 @@ data:
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
-# Source: flyte/templates/console/configmap.yaml
+# Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -267,14 +267,14 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data: 
   BASE_URL: /console
   CONFIG_DIR: /etc/flyte/config
   DISABLE_AUTH: "1"
 ---
-# Source: flyte/templates/datacatalog/configmap.yaml
+# Source: flyte-core/templates/datacatalog/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -283,7 +283,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   db.yaml: | 
@@ -319,7 +319,7 @@ data:
       limits:
         maxDownloadMBs: 10
 ---
-# Source: flyte/templates/flytescheduler/configmap.yaml
+# Source: flyte-core/templates/flytescheduler/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -328,7 +328,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytescheduler
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   admin.yaml: | 
@@ -353,7 +353,7 @@ data:
       level: 5
       show-source: true
 ---
-# Source: flyte/templates/propeller/configmap.yaml
+# Source: flyte-core/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -362,7 +362,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
   admin.yaml: | 
@@ -485,7 +485,7 @@ data:
         stackdriver-enabled: true
         stackdriver-logresourcename: k8s_container
 ---
-# Source: flyte/templates/propeller/crds/flyteworkflow.yaml
+# Source: flyte-core/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -501,7 +501,7 @@ spec:
   scope: Namespaced
   version: v1alpha1
 ---
-# Source: flyte/templates/admin/rbac.yaml
+# Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -509,7 +509,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -531,7 +531,7 @@ rules:
   verbs:
   - '*'
 ---
-# Source: flyte/templates/propeller/rbac.yaml
+# Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -539,7 +539,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
 # Allow RO access to PODS
@@ -603,7 +603,7 @@ rules:
   - post
   - deletecollection
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Create a ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
@@ -624,7 +624,7 @@ rules:
       - update
       - patch
 ---
-# Source: flyte/templates/admin/rbac.yaml
+# Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -632,7 +632,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -643,7 +643,7 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
-# Source: flyte/templates/propeller/rbac.yaml
+# Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -651,7 +651,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -662,7 +662,7 @@ subjects:
   name: flytepropeller
   namespace: flyte
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -678,7 +678,7 @@ subjects:
     name: flyte-pod-webhook
     namespace: flyte
 ---
-# Source: flyte/templates/admin/service.yaml
+# Source: flyte-core/templates/admin/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -687,7 +687,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
@@ -714,7 +714,7 @@ spec:
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte/templates/console/service.yaml
+# Source: flyte-core/templates/console/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -723,7 +723,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -735,7 +735,7 @@ spec:
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte/templates/datacatalog/service.yaml
+# Source: flyte-core/templates/datacatalog/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -744,7 +744,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
@@ -768,7 +768,7 @@ spec:
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Service
 apiVersion: v1
 kind: Service
@@ -786,7 +786,7 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Source: flyte/templates/admin/deployment.yaml
+# Source: flyte-core/templates/admin/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -795,7 +795,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -806,11 +806,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bd8b5d74be681394c828a81332553ed1e38cb968553bb58b268541a55962e91"
+        configChecksum: "8198ec011a4d51f4ac71e64b61e9a2bacebf476da569aa6fb369fd388d7744e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
+        helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -947,7 +947,7 @@ spec:
                 app.kubernetes.io/name: flyteadmin
             topologyKey: kubernetes.io/hostname
 ---
-# Source: flyte/templates/console/deployment.yaml
+# Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -956,7 +956,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -967,11 +967,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "31c9b63c5d5979ec6d9c6bf1d6deaa1128117c74a50ad417820d7896e7eb7fd"
+        configChecksum: "7f868bf47b27523ca99ad1070cbde82bd09a51d99ab35ed486c642f33d58e2a"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
+        helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -1007,7 +1007,7 @@ spec:
                 app.kubernetes.io/name: flyteconsole
             topologyKey: kubernetes.io/hostname
 ---
-# Source: flyte/templates/datacatalog/deployment.yaml
+# Source: flyte-core/templates/datacatalog/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1016,7 +1016,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1027,11 +1027,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0e1bf57cdd577e837af739950061c930e15a92bf4f866df6124c298eff02871"
+        configChecksum: "fdad9da823ad6d23758d4bba59359605322f07064c0e52b1a51b2ac6fbae27b"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
+        helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -1105,7 +1105,7 @@ spec:
                 app.kubernetes.io/name: datacatalog
             topologyKey: kubernetes.io/hostname
 ---
-# Source: flyte/templates/flytescheduler/deployment.yaml
+# Source: flyte-core/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1114,7 +1114,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytescheduler
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1125,11 +1125,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bd8b5d74be681394c828a81332553ed1e38cb968553bb58b268541a55962e91"
+        configChecksum: "8198ec011a4d51f4ac71e64b61e9a2bacebf476da569aa6fb369fd388d7744e"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
+        helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -1184,7 +1184,7 @@ spec:
             name: flyte-scheduler-config
           name: config-volume
 ---
-# Source: flyte/templates/propeller/deployment.yaml
+# Source: flyte-core/templates/propeller/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1193,7 +1193,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1204,11 +1204,11 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0a9bed8c9f7150ac5725bc006b3a6da9b11c81364ed0f3e7572011b38932819"
+        configChecksum: "e8d05167bb25745084970666f09b34b71d15ceed25742a6ce53565dac314ca6"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
+        helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -1260,7 +1260,7 @@ spec:
                 app.kubernetes.io/name: flytepropeller
             topologyKey: kubernetes.io/hostname
 ---
-# Source: flyte/templates/propeller/webhook.yaml
+# Source: flyte-core/templates/propeller/webhook.yaml
 # Create the actual deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -1280,7 +1280,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "0a9bed8c9f7150ac5725bc006b3a6da9b11c81364ed0f3e7572011b38932819"
+        configChecksum: "e8d05167bb25745084970666f09b34b71d15ceed25742a6ce53565dac314ca6"
     spec:
       securityContext:
         fsGroup: 65534
@@ -1344,7 +1344,7 @@ spec:
           secret:
             secretName: flyte-pod-webhook
 ---
-# Source: flyte/templates/admin/cronjob.yaml
+# Source: flyte-core/templates/admin/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -1353,7 +1353,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
+    helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   schedule: '*/1 * * * *'
@@ -1391,11 +1391,11 @@ spec:
               name: flyte-admin-config
             name: config-volume
 ---
-# Source: flyte/templates/common/ingress.yaml
+# Source: flyte-core/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: flyte
+  name: flyte-core
   namespace: flyte
   annotations: 
     cert-manager.io/issuer: letsencrypt-production
@@ -1524,11 +1524,11 @@ spec:
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
-# Source: flyte/templates/common/ingress.yaml
+# Source: flyte-core/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: flyte-grpc
+  name: flyte-core-grpc
   namespace: flyte
   annotations:
     cert-manager.io/issuer: letsencrypt-production
