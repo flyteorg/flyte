@@ -211,4 +211,46 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_workflow", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("workflow", testValue)
+			if vString, err := cmdFlags.GetString("workflow"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.Workflow)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_task", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("task", testValue)
+			if vString, err := cmdFlags.GetString("task"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.Task)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_version", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("version", testValue)
+			if vString, err := cmdFlags.GetString("version"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.Version)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

@@ -35,6 +35,22 @@ const (
 	OutputFormatDOTURL
 )
 
+// Set implements PFlag's Value interface to attempt to set the value of the flag from string.
+func (i *OutputFormat) Set(val string) error {
+	policy, err := OutputFormatString(val)
+	if err != nil {
+		return err
+	}
+
+	*i = policy
+	return nil
+}
+
+// Type implements PFlag's Value interface to return type name.
+func (i OutputFormat) Type() string {
+	return "OutputFormat"
+}
+
 const GraphVisualizationServiceURL = "http://graph.flyte.org/#"
 
 func OutputFormats() []string {
