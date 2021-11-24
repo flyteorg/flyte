@@ -13,7 +13,7 @@ import (
 
 var jsonPbMarshaler = jsonpb.Marshaler{}
 
-// Unmarshals a proto struct into a proto message using jsonPb marshaler.
+// UnmarshalStructToPb unmarshals a proto struct into a proto message using jsonPb marshaler.
 func UnmarshalStructToPb(structObj *structpb.Struct, msg proto.Message) error {
 	if structObj == nil {
 		return fmt.Errorf("nil Struct object passed")
@@ -35,7 +35,7 @@ func UnmarshalStructToPb(structObj *structpb.Struct, msg proto.Message) error {
 	return nil
 }
 
-// Marshals a proto message into proto Struct using jsonPb marshaler.
+// MarshalPbToStruct marshals a proto message into proto Struct using jsonPb marshaler.
 func MarshalPbToStruct(in proto.Message) (out *structpb.Struct, err error) {
 	if in == nil {
 		return nil, fmt.Errorf("nil proto message passed")
@@ -54,12 +54,12 @@ func MarshalPbToStruct(in proto.Message) (out *structpb.Struct, err error) {
 	return out, nil
 }
 
-// Marshals a proto message using jsonPb marshaler to string.
+// MarshalPbToString marshals a proto message using jsonPb marshaler to string.
 func MarshalPbToString(msg proto.Message) (string, error) {
 	return jsonPbMarshaler.MarshalToString(msg)
 }
 
-// Marshals obj into a struct. Will use jsonPb if input is a proto message, otherwise, it'll use json
+// MarshalObjToStruct marshals obj into a struct. Will use jsonPb if input is a proto message, otherwise, it'll use json
 // marshaler.
 func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 	if p, casted := input.(proto.Message); casted {
@@ -80,7 +80,7 @@ func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 	return structObj, nil
 }
 
-// Unmarshals a struct to the passed obj. Don't use this if the unmarshalled obj is a proto message.
+// UnmarshalStructToObj unmarshals a struct to the passed obj. Don't use this if the unmarshalled obj is a proto message.
 func UnmarshalStructToObj(structObj *structpb.Struct, obj interface{}) error {
 	if structObj == nil {
 		return fmt.Errorf("nil Struct Object passed")

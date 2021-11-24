@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Determines how tests should be generated.
+// TestStrategy determines how tests should be generated.
 type TestStrategy string
 
 const (
@@ -15,24 +15,32 @@ const (
 )
 
 type FieldInfo struct {
-	Name              string
-	GoName            string
-	Typ               types.Type
-	DefaultValue      string
-	UsageString       string
-	FlagMethodName    string
-	TestValue         string
-	TestStrategy      TestStrategy
-	ShouldBindDefault bool
-	ShouldTestDefault bool
+	Name               string
+	GoName             string
+	Typ                types.Type
+	LocalTypeName      string
+	DefaultValue       string
+	UsageString        string
+	FlagMethodName     string
+	TestFlagMethodName string
+	TestValue          string
+	TestStrategy       TestStrategy
+	ShouldBindDefault  bool
+	ShouldTestDefault  bool
 }
 
-// Holds the finalized information passed to the template for evaluation.
+// TypeInfo holds the finalized information passed to the template for evaluation.
 type TypeInfo struct {
-	Timestamp time.Time
-	Fields    []FieldInfo
-	Package   string
-	Name      string
-	TypeRef   string
-	Imports   map[string]string
+	Timestamp       time.Time
+	Fields          []FieldInfo
+	PFlagValueTypes []PFlagValueType
+	Package         string
+	Name            string
+	TypeRef         string
+	Imports         map[string]string
+}
+
+type PFlagValueType struct {
+	Name                     string
+	ShouldGenerateSetAndType bool
 }

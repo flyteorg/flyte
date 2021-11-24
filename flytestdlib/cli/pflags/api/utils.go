@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"go/types"
 	"unicode"
+
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func camelCase(str string) string {
@@ -32,6 +34,14 @@ func isStringer(t types.Type) bool {
 	return implementsAnyOfMethods(t, "String")
 }
 
+func isPFlagValue(t types.Type) bool {
+	return implementsAllOfMethods(t, "String", "Set", "Type")
+}
+
+func hasStringConstructor(t *types.Named) bool {
+	return t.Obj().Parent().Lookup(fmt.Sprintf("%sString", t.Obj().Name())) != nil
+}
+
 func implementsAnyOfMethods(t types.Type, methodNames ...string) (found bool) {
 	mset := types.NewMethodSet(t)
 	for _, name := range methodNames {
@@ -48,4 +58,23 @@ func implementsAnyOfMethods(t types.Type, methodNames ...string) (found bool) {
 	}
 
 	return false
+}
+
+func implementsAllOfMethods(t types.Type, methodNames ...string) (found bool) {
+	mset := types.NewMethodSet(t)
+	foundMethods := sets.NewString()
+	for _, name := range methodNames {
+		if foundMethod := mset.Lookup(nil, name); foundMethod != nil {
+			foundMethods.Insert(name)
+		}
+	}
+
+	mset = types.NewMethodSet(types.NewPointer(t))
+	for _, name := range methodNames {
+		if mset.Lookup(nil, name) != nil {
+			foundMethods.Insert(name)
+		}
+	}
+
+	return foundMethods.Len() == len(methodNames)
 }

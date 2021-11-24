@@ -13,12 +13,13 @@ import (
 )
 
 type PFlagProvider struct {
-	typeName string
-	pkg      *types.Package
-	fields   []FieldInfo
+	typeName        string
+	pkg             *types.Package
+	fields          []FieldInfo
+	pflagValueTypes []PFlagValueType
 }
 
-// Adds any needed imports for types not directly declared in this package.
+// Imports adds any needed imports for types not directly declared in this package.
 func (p PFlagProvider) Imports() map[string]string {
 	imp := imports.New(p.pkg.Name())
 	for _, m := range p.fields {
@@ -28,7 +29,7 @@ func (p PFlagProvider) Imports() map[string]string {
 	return imp.Imports()
 }
 
-// Evaluates the main code file template and writes the output to outputFilePath
+// WriteCodeFile evaluates the main code file template and writes the output to outputFilePath
 func (p PFlagProvider) WriteCodeFile(outputFilePath string) error {
 	buf := bytes.Buffer{}
 	err := p.generate(GenerateCodeFile, &buf, outputFilePath)
@@ -39,7 +40,7 @@ func (p PFlagProvider) WriteCodeFile(outputFilePath string) error {
 	return p.writeToFile(&buf, outputFilePath)
 }
 
-// Evaluates the test code file template and writes the output to outputFilePath
+// WriteTestFile evaluates the test code file template and writes the output to outputFilePath
 func (p PFlagProvider) WriteTestFile(outputFilePath string) error {
 	buf := bytes.Buffer{}
 	err := p.generate(GenerateTestFile, &buf, outputFilePath)
@@ -54,15 +55,16 @@ func (p PFlagProvider) writeToFile(buffer *bytes.Buffer, fileName string) error 
 	return ioutil.WriteFile(fileName, buffer.Bytes(), os.ModePerm)
 }
 
-// Evaluates the generator and writes the output to buffer. targetFileName is used only to influence how imports are
+// generate evaluates the generator and writes the output to buffer. targetFileName is used only to influence how imports are
 // generated/optimized.
 func (p PFlagProvider) generate(generator func(buffer *bytes.Buffer, info TypeInfo) error, buffer *bytes.Buffer, targetFileName string) error {
 	info := TypeInfo{
-		Name:      p.typeName,
-		Fields:    p.fields,
-		Package:   p.pkg.Name(),
-		Timestamp: time.Now(),
-		Imports:   p.Imports(),
+		Name:            p.typeName,
+		Fields:          p.fields,
+		Package:         p.pkg.Name(),
+		Timestamp:       time.Now(),
+		Imports:         p.Imports(),
+		PFlagValueTypes: p.pflagValueTypes,
 	}
 
 	if err := generator(buffer, info); err != nil {
@@ -81,10 +83,11 @@ func (p PFlagProvider) generate(generator func(buffer *bytes.Buffer, info TypeIn
 	return err
 }
 
-func newPflagProvider(pkg *types.Package, typeName string, fields []FieldInfo) PFlagProvider {
+func newPflagProvider(pkg *types.Package, typeName string, fields []FieldInfo, pflagValueTypes []PFlagValueType) PFlagProvider {
 	return PFlagProvider{
-		typeName: typeName,
-		pkg:      pkg,
-		fields:   fields,
+		typeName:        typeName,
+		pkg:             pkg,
+		fields:          fields,
+		pflagValueTypes: pflagValueTypes,
 	}
 }

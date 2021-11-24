@@ -12,18 +12,31 @@ var DefaultTestType = &TestType{
 }
 
 type TestType struct {
-	StringValue      string            `json:"str" pflag:"\"hello world\",\"life is short\""`
-	BoolValue        bool              `json:"bl" pflag:"true"`
-	NestedType       NestedType        `json:"nested"`
-	IntArray         []int             `json:"ints" pflag:"[]int{12%2C1}"`
-	StringArray      []string          `json:"strs" pflag:"[]string{\"12\"%2C\"1\"}"`
-	ComplexJSONArray []ComplexJSONType `json:"complexArr"`
-	StringToJSON     ComplexJSONType   `json:"c" pflag:",I'm a complex type but can be converted from string."`
-	IgnoredMap       map[string]string `json:"ignored-map" pflag:"-,"`
-	StorageConfig    storage.Config    `json:"storage"`
-	IntValue         *int              `json:"i"`
-	StringMap        map[string]string `json:"m" pflag:",I'm a map of strings"`
+	StringValue      string             `json:"str" pflag:"\"hello world\",\"life is short\""`
+	BoolValue        bool               `json:"bl" pflag:"true"`
+	NestedType       NestedType         `json:"nested"`
+	IntArray         []int              `json:"ints" pflag:"[]int{12%2C1}"`
+	StringArray      []string           `json:"strs" pflag:"[]string{\"12\"%2C\"1\"}"`
+	ComplexJSONArray []ComplexJSONType  `json:"complexArr"`
+	StringToJSON     ComplexJSONType    `json:"c" pflag:",I'm a complex type but can be converted from string."`
+	IgnoredMap       map[string]string  `json:"ignored-map" pflag:"-,"`
+	StorageConfig    storage.Config     `json:"storage"`
+	IntValue         *int               `json:"i"`
+	StringMap        map[string]string  `json:"m" pflag:",I'm a map of strings"`
+	ConstType        NamedType          `json:"constType"`
+	AliasType        TestConstTypeAlias `json:"aliasType"`
 }
+
+//go:generate enumer --type=NamedType --trimprefix=NamedType -json
+
+type NamedType int
+
+const (
+	NamedTypeA NamedType = iota
+	NamedTypeB
+)
+
+type TestConstTypeAlias = int
 
 type NestedType struct {
 	IntValue int `json:"i" pflag:",this is an important flag"`

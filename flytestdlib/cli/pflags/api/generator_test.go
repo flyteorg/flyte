@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,53 +49,82 @@ func TestElemValueOrNil(t *testing.T) {
 }
 
 func TestNewGenerator(t *testing.T) {
-	g, err := NewGenerator("github.com/flyteorg/flytestdlib/cli/pflags/api", "TestType", "DefaultTestType", false)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-	ctx := context.Background()
-	p, err := g.Generate(ctx)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	codeOutput, err := ioutil.TempFile("", "output-*.go")
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	defer func() { assert.NoError(t, os.Remove(codeOutput.Name())) }()
-
-	testOutput, err := ioutil.TempFile("", "output-*_test.go")
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	testCases := []struct {
+		TypeName                  string
+		DefaultVariableName       string
+		shouldBindDefaultVariable bool
+	}{
+		{
+			TypeName:                  "TestType",
+			DefaultVariableName:       "DefaultTestType",
+			shouldBindDefaultVariable: false,
+		},
+		{
+			TypeName:                  "TestType",
+			DefaultVariableName:       "DefaultTestType",
+			shouldBindDefaultVariable: true,
+		},
 	}
 
-	defer func() { assert.NoError(t, os.Remove(testOutput.Name())) }()
+	for _, typ := range testCases {
+		t.Run("Test "+typ.TypeName, func(t *testing.T) {
+			g, err := NewGenerator("github.com/flyteorg/flytestdlib/cli/pflags/api", typ.TypeName, typ.DefaultVariableName, typ.shouldBindDefaultVariable)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+			ctx := context.Background()
+			p, err := g.Generate(ctx)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	assert.NoError(t, p.WriteCodeFile(codeOutput.Name()))
-	assert.NoError(t, p.WriteTestFile(testOutput.Name()))
+			codeOutput, err := ioutil.TempFile("", "output-*.go")
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	codeBytes, err := ioutil.ReadFile(codeOutput.Name())
-	assert.NoError(t, err)
+			defer func() { assert.NoError(t, os.Remove(codeOutput.Name())) }()
 
-	testBytes, err := ioutil.ReadFile(testOutput.Name())
-	assert.NoError(t, err)
+			testOutput, err := ioutil.TempFile("", "output-*_test.go")
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	goldenFilePath := filepath.Join("testdata", "testtype.go")
-	goldenTestFilePath := filepath.Join("testdata", "testtype_test.go")
-	if *update {
-		assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, os.ModePerm))
-		assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, os.ModePerm))
+			defer func() { assert.NoError(t, os.Remove(testOutput.Name())) }()
+
+			assert.NoError(t, p.WriteCodeFile(codeOutput.Name()))
+			assert.NoError(t, p.WriteTestFile(testOutput.Name()))
+
+			codeBytes, err := ioutil.ReadFile(codeOutput.Name())
+			assert.NoError(t, err)
+
+			testBytes, err := ioutil.ReadFile(testOutput.Name())
+			assert.NoError(t, err)
+
+			var goldenFilePath string
+			var goldenTestFilePath string
+			goldenFilePath = filepath.Join("testdata", strings.ToLower(typ.TypeName)+".go")
+			goldenTestFilePath = filepath.Join("testdata", strings.ToLower(typ.TypeName)+"_test.go")
+			if typ.shouldBindDefaultVariable {
+				goldenFilePath = filepath.Join("testdata", strings.ToLower(typ.TypeName)+"_bind.go")
+				goldenTestFilePath = filepath.Join("testdata", strings.ToLower(typ.TypeName)+"_bind_test.go")
+			}
+
+			if *update {
+				assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, os.ModePerm))
+				assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, os.ModePerm))
+			}
+
+			goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))
+			assert.NoError(t, err)
+			assert.Equal(t, string(goldenOutput), string(codeBytes))
+
+			goldenTestOutput, err := ioutil.ReadFile(filepath.Clean(goldenTestFilePath))
+			assert.NoError(t, err)
+			assert.Equal(t, string(goldenTestOutput), string(testBytes))
+		})
 	}
 
-	goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))
-	assert.NoError(t, err)
-	assert.Equal(t, string(goldenOutput), string(codeBytes))
-
-	goldenTestOutput, err := ioutil.ReadFile(filepath.Clean(goldenTestFilePath))
-	assert.NoError(t, err)
-	assert.Equal(t, string(goldenTestOutput), string(testBytes))
 	t.Run("empty package", func(t *testing.T) {
 		gen, err := NewGenerator("", "TestType", "DefaultTestType", false)
 		assert.Nil(t, err)
@@ -176,7 +206,7 @@ func TestDiscoverFieldsRecursive(t *testing.T) {
 		n1 := types.NewTypeName(token.NoPos, pkg, "T1", nil)
 		namedTypes := types.NewNamed(n1, new(types.Struct), nil)
 		//namedTypes := types.NewNamed(n1, nil, nil)
-		fields, err := discoverFieldsRecursive(ctx, namedTypes, defaultValueAccessor, fieldPath, false)
+		fields, _, err := discoverFieldsRecursive(ctx, "p", namedTypes, defaultValueAccessor, fieldPath, false)
 		assert.Nil(t, err)
 		assert.Equal(t, len(fields), 0)
 	})

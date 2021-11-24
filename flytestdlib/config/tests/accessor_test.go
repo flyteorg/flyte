@@ -158,6 +158,7 @@ func TestAccessor_InitializePflags(t *testing.T) {
 			otherC := reg.GetSection(OtherComponentSectionKey).GetConfig().(*OtherComponentConfig)
 			assert.Equal(t, 4, otherC.IntValue)
 			assert.Equal(t, []string{"default value"}, otherC.StringArrayWithDefaults)
+			assert.Equal(t, NamedTypeB, otherC.NamedType)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Sub-sections", provider(config.Options{}).ID()), func(t *testing.T) {

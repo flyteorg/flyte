@@ -7,9 +7,9 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var=defaultConfig
 
-// Defines the storage config type.
+// Type defines the storage config type.
 type Type = string
 
 // The reserved config section key for storage.
@@ -43,7 +43,7 @@ var (
 	}
 )
 
-// A common storage config.
+// Config is a common storage config.
 type Config struct {
 	Type       Type             `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
 	Connection ConnectionConfig `json:"connection"`
@@ -65,10 +65,10 @@ type Config struct {
 // HTTPClientConfig encapsulates common settings that can be applied to an HTTP Client.
 type HTTPClientConfig struct {
 	Headers map[string][]string `json:"headers" pflag:"-,Sets http headers to set on the http client."`
-	Timeout config.Duration     `json:"timeout" pflag:"timeout,Sets time out on the http client."`
+	Timeout config.Duration     `json:"timeout" pflag:",Sets time out on the http client."`
 }
 
-// Defines connection configurations.
+// ConnectionConfig defines connection configurations.
 type ConnectionConfig struct {
 	Endpoint   config.URL `json:"endpoint" pflag:",URL for storage client to connect to."`
 	AuthType   string     `json:"auth-type" pflag:",Auth Type to use [iam,accesskey]."`
