@@ -348,8 +348,8 @@ func (_m AdminFetcherExtInterface_FetchNodeExecutionDetails) Return(_a0 *admin.N
 	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string, uniqueParentId string) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
-	c := _m.On("FetchNodeExecutionDetails", ctx, name, project, domain, uniqueParentId)
+func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string, uniqueParentID string) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
+	c := _m.On("FetchNodeExecutionDetails", ctx, name, project, domain, uniqueParentID)
 	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
 }
 
@@ -358,13 +358,13 @@ func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetailsMatch(matchers ..
 	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
 }
 
-// FetchNodeExecutionDetails provides a mock function with given fields: ctx, name, project, domain, uniqueParentId
-func (_m *AdminFetcherExtInterface) FetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string, uniqueParentId string) (*admin.NodeExecutionList, error) {
-	ret := _m.Called(ctx, name, project, domain, uniqueParentId)
+// FetchNodeExecutionDetails provides a mock function with given fields: ctx, name, project, domain, uniqueParentID
+func (_m *AdminFetcherExtInterface) FetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string, uniqueParentID string) (*admin.NodeExecutionList, error) {
+	ret := _m.Called(ctx, name, project, domain, uniqueParentID)
 
 	var r0 *admin.NodeExecutionList
 	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) *admin.NodeExecutionList); ok {
-		r0 = rf(ctx, name, project, domain, uniqueParentId)
+		r0 = rf(ctx, name, project, domain, uniqueParentID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.NodeExecutionList)
@@ -373,7 +373,7 @@ func (_m *AdminFetcherExtInterface) FetchNodeExecutionDetails(ctx context.Contex
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
-		r1 = rf(ctx, name, project, domain, uniqueParentId)
+		r1 = rf(ctx, name, project, domain, uniqueParentID)
 	} else {
 		r1 = ret.Error(1)
 	}
