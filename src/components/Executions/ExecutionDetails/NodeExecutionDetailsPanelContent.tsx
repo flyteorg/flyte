@@ -256,6 +256,11 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     ) : (
         <Skeleton />
     );
+    const displayName = detailsQuery.data ? (
+        detailsQuery.data.displayName
+    ) : (
+        <Skeleton />
+    );
     const taskTemplate = detailsQuery.data
         ? detailsQuery.data.taskTemplate
         : null;
@@ -343,7 +348,7 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
                         variant="subtitle1"
                         color="textSecondary"
                     >
-                        {displayId}
+                        {displayName}
                     </Typography>
                     {statusContent}
                     {detailsContent}

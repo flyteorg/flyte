@@ -413,14 +413,15 @@ describe('NodeExecutionsTable', () => {
             });
 
             it('correctly renders groups', async () => {
-                const parentNodeExecution =
+                const parentNodeId =
                     fixture.workflowExecutions.top.nodeExecutions
-                        .dynamicWorkflowGenerator.data;
+                        .dynamicWorkflowGenerator.data.metadata?.specNodeId ||
+                    'not found';
                 // We returned a single WF execution child, so there should only
                 // be one child group
                 const { container } = renderTable();
                 const nodeNameEl = await waitFor(() =>
-                    getByText(container, parentNodeExecution.id.nodeId)
+                    getByText(container, parentNodeId)
                 );
                 const rowEl = findNearestAncestorByRole(nodeNameEl, 'listitem');
                 const childGroups = await expandParentNode(rowEl);

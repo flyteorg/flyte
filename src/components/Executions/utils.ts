@@ -114,7 +114,7 @@ export const taskExecutionIsTerminal = (taskExecution: TaskExecution) =>
 
 /** Returns a NodeId from a given NodeExecution  */
 export function getNodeExecutionSpecId(nodeExecution: NodeExecution): string {
-    return nodeExecution.id.nodeId;
+    return nodeExecution.metadata?.specNodeId ?? nodeExecution.id.nodeId;
 }
 
 interface GetExecutionDurationMSArgs {
@@ -182,6 +182,23 @@ export function isCompiledBranchNode(
     node: CompiledNode
 ): node is CompiledBranchNode {
     return node.branchNode != null;
+}
+
+export function flattenBranchNodes(node: CompiledNode): CompiledNode[] {
+    const ifElse = node.branchNode?.ifElse;
+    if (!ifElse) {
+        return [node];
+    }
+    return [
+        node,
+        ...[
+            ifElse.case?.thenNode,
+            ifElse.elseNode,
+            ...(ifElse.other?.map(x => x.thenNode) ?? [])
+        ]
+            .filter((x): x is CompiledNode => !!x)
+            .flatMap(flattenBranchNodes)
+    ];
 }
 
 /** Returns timing information (duration, queue time, ...) for a WorkflowExecution */

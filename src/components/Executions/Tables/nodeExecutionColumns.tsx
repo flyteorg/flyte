@@ -31,36 +31,45 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     const detailsQuery = useNodeExecutionDetails(execution);
     const commonStyles = useCommonStyles();
     const styles = useColumnStyles();
-    const name = execution.id.nodeId;
+    const nodeId = execution.id.nodeId;
 
     const isSelected =
         state.selectedExecution != null &&
         isEqual(execution.id, state.selectedExecution);
 
-    const nameContent = isSelected ? (
-        <Typography variant="body1" className={styles.selectedExecutionName}>
-            {name}
-        </Typography>
-    ) : (
-        <SelectNodeExecutionLink
-            className={commonStyles.primaryLink}
-            execution={execution}
-            linkText={name}
-            state={state}
-        />
-    );
-
-    const renderNodeSpecName = ({ displayId }: NodeExecutionDetails) => (
-        <Typography variant="subtitle1" color="textSecondary">
-            {displayId}
-        </Typography>
-    );
+    const renderReadableName = ({
+        displayId,
+        displayName
+    }: NodeExecutionDetails) => {
+        const readableName = isSelected ? (
+            <Typography
+                variant="body1"
+                className={styles.selectedExecutionName}
+            >
+                {displayId || nodeId}
+            </Typography>
+        ) : (
+            <SelectNodeExecutionLink
+                className={commonStyles.primaryLink}
+                execution={execution}
+                linkText={displayId || nodeId}
+                state={state}
+            />
+        );
+        return (
+            <>
+                {readableName}
+                <Typography variant="subtitle1" color="textSecondary">
+                    {displayName}
+                </Typography>
+            </>
+        );
+    };
 
     return (
         <>
-            {nameContent}
             <WaitForQuery query={detailsQuery}>
-                {renderNodeSpecName}
+                {renderReadableName}
             </WaitForQuery>
         </>
     );

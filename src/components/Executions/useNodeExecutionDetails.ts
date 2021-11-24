@@ -1,3 +1,5 @@
+
+   
 import { log } from 'common/log';
 import { QueryType } from 'components/data/types';
 import { fetchTaskTemplate } from 'components/Task/taskQueries';
@@ -24,9 +26,9 @@ import {
     isCompiledBranchNode,
     isCompiledTaskNode,
     isCompiledWorkflowNode,
-    isWorkflowNodeExecution
+    isWorkflowNodeExecution,
+    flattenBranchNodes
 } from './utils';
-
 function createExternalWorkflowNodeExecutionDetails(
     workflow: Workflow
 ): NodeExecutionDetails {
@@ -42,6 +44,7 @@ function createWorkflowNodeExecutionDetails(
 ): NodeExecutionDetails {
     const displayType = NodeExecutionDisplayType.Workflow;
     let displayId = '';
+    let displayName = '';
     const { launchplanRef, subWorkflowRef } = node.workflowNode;
     const identifier = (launchplanRef
         ? launchplanRef
@@ -53,11 +56,13 @@ function createWorkflowNodeExecutionDetails(
             )}`
         );
     } else {
-        displayId = identifier.name;
+        displayId = node.id;
+        displayName = identifier.name;
     }
 
     return {
         displayId,
+        displayName,
         displayType
     };
 }
@@ -67,17 +72,20 @@ function createBranchNodeExecutionDetails(
     node: CompiledBranchNode
 ): NodeExecutionDetails {
     return {
-        displayId: 'branchNode',
+        displayId: node.id,
+        displayName: "branchNode",
         displayType: NodeExecutionDisplayType.BranchNode
     };
 }
 
 function createTaskNodeExecutionDetails(
-    taskTemplate: TaskTemplate
+    taskTemplate: TaskTemplate,
+    displayId: string | undefined
 ): NodeExecutionDetails {
     return {
         taskTemplate,
-        displayId: taskTemplate.id.name,
+        displayId: displayId,
+        displayName: taskTemplate.id.name,
         displayType: taskTemplate.type
     };
 }
@@ -110,9 +118,10 @@ function findCompiledNode(
     compiledWorkflows: CompiledWorkflow[]
 ) {
     for (let i = 0; i < compiledWorkflows.length; i += 1) {
-        const found = compiledWorkflows[i].template.nodes.find(
-            ({ id }) => id === nodeId
-        );
+        const found = compiledWorkflows[i].template.nodes
+            .map(flattenBranchNodes)
+            .flat()
+            .find(({ id }) => id === nodeId);
         if (found) {
             return found;
         }
@@ -133,7 +142,8 @@ function findNodeInWorkflow(
 
 async function fetchTaskNodeExecutionDetails(
     queryClient: QueryClient,
-    taskId: Identifier
+    taskId: Identifier,
+    displayId: string | undefined
 ) {
     const taskTemplate = await fetchTaskTemplate(queryClient, taskId);
     if (!taskTemplate) {
@@ -143,7 +153,7 @@ async function fetchTaskNodeExecutionDetails(
             )}`
         );
     }
-    return createTaskNodeExecutionDetails(taskTemplate);
+    return createTaskNodeExecutionDetails(taskTemplate, displayId);
 }
 
 async function fetchNodeExecutionDetailsFromNodeSpec(
@@ -167,7 +177,8 @@ async function fetchNodeExecutionDetailsFromNodeSpec(
         if (isCompiledTaskNode(compiledNode)) {
             return fetchTaskNodeExecutionDetails(
                 queryClient,
-                compiledNode.taskNode.referenceId
+                compiledNode.taskNode.referenceId,
+                compiledNode.id
             );
         }
         if (isCompiledWorkflowNode(compiledNode)) {
@@ -190,7 +201,8 @@ async function fetchNodeExecutionDetailsFromNodeSpec(
     if (taskExecutions.length > 0) {
         return fetchTaskNodeExecutionDetails(
             queryClient,
-            taskExecutions[0].id.taskId
+            taskExecutions[0].id.taskId,
+            undefined
         );
     }
 
