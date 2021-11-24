@@ -19,7 +19,7 @@ jobs:
           if [ ${{ github.event_name}} = "release" ]; then
             echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
           else
-            echo ::set-output name=flyte_version::latest)
+            echo ::set-output name=flyte_version::latest
           fi
       - name: Prepare sandbox Image Names
         id: sandbox-names
