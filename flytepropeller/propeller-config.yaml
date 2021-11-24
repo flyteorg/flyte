@@ -62,7 +62,7 @@ plugins:
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
     co-pilot:
       name: "flyte-copilot-"
-      image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
+      image: "ghcr.io/flyteorg/flytecopilot:v0.0.15"
       start-timeout: "5s"
   sagemaker:
     roleArn: "arn:aws:iam::123456789012:role/test-development"
@@ -81,15 +81,17 @@ plugins:
     kubernetes-enabled: true
     kubernetes-url: "http://localhost:30082"
 storage:
+  type: minio
+  container: "my-s3-bucket"
   connection:
     access-key: minio
     auth-type: accesskey
+    secret-key: miniostorage
     disable-ssl: true
     endpoint: http://localhost:30084
     region: us-east-1
-    secret-key: miniostorage
-  type: minio
-  container: "my-s3-bucket"
+  limits:
+    maxDownloadMBs: 10
 event:
   type: admin
   rate: 500
