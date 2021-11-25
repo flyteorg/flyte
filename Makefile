@@ -20,6 +20,7 @@ helm: ## Generate K8s Manifest from Helm Charts.
 release_automation:
 	mkdir -p release
 	bash script/release.sh
+	bash script/generate_config_docs.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox: 
@@ -57,11 +58,11 @@ helm_update: ## Update helm charts' dependencies.
 
 .PHONY: helm_install
 helm_install: ## Install helm charts
-	helm install flyte --debug ./charts/flyte -f ./charts/flyte/values-sandbox.yaml --create-namespace --namespace=flyte
+	helm install flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
 .PHONY: helm_upgrade
 helm_upgrade: ## Upgrade helm charts
-	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values-sandbox.yaml --create-namespace --namespace=flyte
+	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
 .PHONY: docs
 docs:

@@ -1,5 +1,6 @@
 
 ---
+{{- if .Values.datacatalog.enabled }}
 {{- if .Values.datacatalog.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
@@ -12,5 +13,6 @@ metadata:
   {{- end }}
 {{- with .Values.datacatalog.serviceAccount.imagePullSecrets }}
 imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}

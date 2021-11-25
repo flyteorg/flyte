@@ -1,4 +1,4 @@
-
+{{- if .Values.flytepropeller.enabled }}
 ---
 {{- if .Values.flytepropeller.serviceAccount.create }}
 apiVersion: v1
@@ -96,3 +96,4 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "flytepropeller.name" . }}
   namespace: {{ template "flyte.namespace" . }}
+{{- end }}
