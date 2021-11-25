@@ -5,13 +5,12 @@ package logger
 
 import (
 	"context"
-	"io"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-
 	"fmt"
+	"io"
 	"runtime"
 	"strings"
+
+	"github.com/flyteorg/flytestdlib/contextutils"
 
 	"github.com/sirupsen/logrus"
 )
@@ -34,6 +33,10 @@ func onConfigUpdated(cfg Config) {
 					logrus.FieldKeyTime: "ts",
 				},
 			})
+		}
+	case FormatterGCP:
+		if _, isGCP := logrus.StandardLogger().Formatter.(*GcpFormatter); !isGCP {
+			logrus.SetFormatter(&GcpFormatter{})
 		}
 	default:
 		if _, isJSON := logrus.StandardLogger().Formatter.(*logrus.JSONFormatter); !isJSON {

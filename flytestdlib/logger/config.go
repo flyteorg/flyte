@@ -15,6 +15,7 @@ type FormatterType = string
 const (
 	FormatterJSON FormatterType = "json"
 	FormatterText FormatterType = "text"
+	FormatterGCP  FormatterType = "gcp"
 )
 
 const (
