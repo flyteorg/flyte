@@ -576,7 +576,9 @@ func Test_onConfigUpdated(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{"testtext", args{Config{Formatter: FormatterConfig{FormatterText}}}},
+		{"testjson", args{Config{Formatter: FormatterConfig{FormatterJSON}}}},
+		{"testgcp", args{Config{Formatter: FormatterConfig{FormatterGCP}}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
