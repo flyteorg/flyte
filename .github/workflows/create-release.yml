@@ -40,8 +40,13 @@ jobs:
           fetch-depth: "0"
 
       - name: Get Latest Version of component
+        id: set_version
         run: |
-          VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/${{ matrix.component }}/releases/latest" | jq -r .tag_name)
+          if [ ${{ matrix.component }} = "flytescheduler" ]; then
+             VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flyteadmin/releases/latest" | jq -r .tag_name)
+          else
+             VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/${{ matrix.component }}/releases/latest" | jq -r .tag_name)
+          fi
           echo ::set-output name=version::$(echo $VERSION)
         shell: bash
 
@@ -54,6 +59,7 @@ jobs:
 
       - name: Tag Image to release version
         run: |
+          docker pull ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}
           docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
           docker push ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
 
