@@ -41,7 +41,7 @@ jobs:
 
       - name: Get Latest Version of component
         run: |
-          VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flyteidl/releases/latest" | jq -r .tag_name)
+          VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/${{ matrix.component }}/releases/latest" | jq -r .tag_name)
           echo ::set-output name=version::$(echo $VERSION)
         shell: bash
 
