@@ -54,7 +54,7 @@ jobs:
 
       - name: Tag Image to release version
         run: |
-          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.flyte_version }} ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
+          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
           docker push ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
 
   helm-release:
