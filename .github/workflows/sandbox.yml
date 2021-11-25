@@ -65,9 +65,8 @@ jobs:
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           tags: ${{ steps.sandbox-names.outputs.tags }}
           file: docker/sandbox/Dockerfile
-          load: true
-          cache-from: type=docker,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}
+          cache-to: type=registry,mode=max,ref=ghcr.io/${{ github.repository_owner }}
       - name: Run Sandbox
         run: |
           flytectl sandbox start --image ${{ steps.sandbox-names.outputs.tags[0] }} --imagePullPolicy Never
@@ -135,9 +134,8 @@ jobs:
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           file: docker/sandbox/Dockerfile
-          load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}
+          cache-to: type=registry,mode=max,ref=ghcr.io/${{ github.repository_owner }}
       - name: Run Sandbox
         run: |
           flytectl sandbox start --image ghcr.io/flyteorg/flyte-sandbox:dind --imagePullPolicy Never
