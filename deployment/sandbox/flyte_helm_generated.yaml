@@ -3470,6 +3470,8 @@ spec:
           
           - mountPath: /etc/flyte/config
             name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
       containers:
       - command:
         - flytescheduler
@@ -3492,6 +3494,8 @@ spec:
           
           - mountPath: /etc/flyte/config
             name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
       serviceAccountName: flyteadmin
       volumes:
         
@@ -3500,6 +3504,9 @@ spec:
         - configMap:
             name: flyte-scheduler-config
           name: config-volume
+        - name: auth
+          secret:
+            secretName: flyte-propeller-auth
 ---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
