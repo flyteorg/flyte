@@ -222,5 +222,4 @@ URL of your target FlyteAdmin API instance. These instructions will use
 =======
 Release
 =======
-To release, you have to annotate the PR message to include either #minor,
-#patch or #major.
+To release, you have to annotate the PR message to include one of the following `commit-analyzer types <https://github.com/semantic-release/commit-analyzer#rules-matching>`_.
