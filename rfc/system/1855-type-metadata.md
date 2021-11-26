@@ -12,10 +12,7 @@ A small patch to introduce flytekit support for python-native type metadata.
 ## 2 Motivation
 
 Users of flyte wish to have access to arbitrary parameter metadata specified in
-common docstring formats (eg.  ReST, Google, Numpydoc-style, etc.) after a
-workflows has been registered.
-
-There already exists property on the `LiteralType` model for metadata.
+typing annotations.
 
 The `LiteralType` definition in flyteidl already has a `metadata` field in its
 message definition
@@ -30,6 +27,11 @@ recognize and parse the use of
 This could be to change the presentation of a form input ingesting typed values,
 surface descriptions to users or store indexes to control the order of
 parameters with custom frontends.
+
+This feature will not send metadata to the container at runtime when a task is
+invoked.  If the container has access to the original code, it will be able to
+access/load metadata from that. This is particularly important to note for
+TaskTemplate-based flytekit plugins.
 
 An example of how we would use this annotation to tag a parameter with
 presentation information:
