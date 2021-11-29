@@ -3,11 +3,6 @@ package clusterresource
 import (
 	"context"
 	"encoding/json"
-
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
-	"k8s.io/apimachinery/pkg/types"
-
-	//"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,7 +12,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/runtime"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
+	"k8s.io/apimachinery/pkg/util/mergepatch"
+	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	"k8s.io/client-go/kubernetes/scheme"
+
 	"k8s.io/apimachinery/pkg/api/meta"
+	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
@@ -27,9 +33,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	//"k8s.io/apimachinery/pkg/types"
-
-	v1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
@@ -44,15 +47,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"k8s.io/client-go/kubernetes/scheme"
-
 	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repositoriesInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -63,6 +63,7 @@ const projectVariable = "project"
 const domainVariable = "domain"
 const templateVariableFormat = "{{ %s }}"
 const replaceAllInstancesOfString = -1
+const noChange = "{}"
 
 // The clusterresource Controller manages applying desired templatized kubernetes resource files as resources
 // in the execution kubernetes cluster.
@@ -108,18 +109,6 @@ var descCreatedAtSortParam, _ = common.NewSortParameter(admin.Sort{
 	Direction: admin.Sort_DESCENDING,
 	Key:       "created_at",
 })
-
-// Use a strategic-merge-patch to mimic `kubectl apply` behavior for serviceaccounts.
-// Kubectl defaults to using the StrategicMergePatch strategy.
-// However the controller-runtime only has an implementation for MergePatch which we were formerly
-// using but failed to actually always merge resources in the Patch call.
-// INTERESTINGLY Patch doesn't actually appear to update the majority of resources. We default to using Update but
-// whitelist the specific set of resources that require a Patch to work instead.
-// If you use update with a ServiceAccount - *every* call to Update results in a new corresponding secret being created
-// which has the (not so) fun side-effect of overwhelming API server when this Sync script is run as a cron.
-var strategicPatchTypes = map[string]bool{
-	v1.ServiceAccountKind: true,
-}
 
 func (c *controller) templateAlreadyApplied(namespace NamespaceName, templateFile os.FileInfo) bool {
 	namespacedAppliedTemplates, ok := c.appliedTemplates[namespace]
@@ -284,10 +273,10 @@ func prepareDynamicCreate(target executioncluster.ExecutionTarget, config string
 
 // This function loops through the kubernetes resource template files in the configured template directory.
 // For each unapplied template file (wrt the namespace) this func attempts to
-//   1) read the template file
-//   2) substitute templatized variables with their resolved values
-//   3) decode the output of the above into a kubernetes resource
-//   4) create the resource on the kubernetes cluster and cache successful outcomes
+//   1) create k8s object resource from template by performing:
+//      a) read template file
+//      b) substitute templatized variables with their resolved values
+//   2) create the resource on the kubernetes cluster and cache successful outcomes
 func (c *controller) syncNamespace(ctx context.Context, project models.Project, domain runtimeInterfaces.Domain, namespace NamespaceName,
 	templateValues, customTemplateValues templateValuesType) error {
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
@@ -319,68 +308,29 @@ func (c *controller) syncNamespace(ctx context.Context, project models.Project, 
 			continue
 		}
 
-		// 1) read the template file
-		template, err := ioutil.ReadFile(path.Join(templateDir, templateFileName))
+		// 1) create resource from template:
+		k8sManifest, err := c.createResourceFromTemplate(ctx, templateDir, templateFileName, project, domain, namespace, templateValues, customTemplateValues)
 		if err != nil {
-			logger.Warningf(ctx,
-				"failed to read config template from path [%s] for namespace [%s] with err: %v",
-				templateFileName, namespace, err)
-			err := errors.NewFlyteAdminErrorf(
-				codes.Internal, "failed to read config template from path [%s] for namespace [%s] with err: %v",
-				templateFileName, namespace, err)
 			collectedErrs = append(collectedErrs, err)
-			c.metrics.TemplateReadErrors.Inc()
-			continue
-		}
-		logger.Debugf(ctx, "successfully read template config file [%s]", templateFileName)
-
-		// 2) substitute templatized variables with their resolved values
-		// First, add the special case namespace template which is always substituted by the system
-		// rather than fetched via a user-specified source.
-		templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
-		templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.Identifier
-		templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.ID
-
-		var config = string(template)
-		for templateKey, templateValue := range templateValues {
-			config = strings.Replace(config, templateKey, templateValue, replaceAllInstancesOfString)
-		}
-		// Replace remaining template variables from domain specific defaults.
-		for templateKey, templateValue := range customTemplateValues {
-			config = strings.Replace(config, templateKey, templateValue, replaceAllInstancesOfString)
-		}
-
-		// 3) decode the kubernetes resource template file into an actual resource object
-		decode := scheme.Codecs.UniversalDeserializer().Decode
-		k8sObj, _, err := decode([]byte(config), nil, nil)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to decode config template [%s] for namespace [%s] into a kubernetes object with err: %v",
-				templateFileName, namespace, err)
-			err := errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-				"Failed to decode namespace config template [%s] for namespace [%s] into a kubernetes object with err: %v",
-				templateFileName, namespace, err)
-			collectedErrs = append(collectedErrs, err)
-			c.metrics.TemplateDecodeErrors.Inc()
 			continue
 		}
 
-		// 4) create the resource on the kubernetes cluster and cache successful outcomes
+		// 2) create the resource on the kubernetes cluster and cache successful outcomes
 		if _, ok := c.appliedTemplates[namespace]; !ok {
 			c.appliedTemplates[namespace] = make(LastModTimeCache)
 		}
 		for _, target := range c.executionCluster.GetAllValidTargets() {
-			k8sObjCopy := k8sObj.DeepCopyObject()
-			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s]",
-				k8sObj.GetObjectKind().GroupVersionKind().Kind, target.ID, namespace)
-
-			dynamicObj, err := prepareDynamicCreate(target, config)
+			dynamicObj, err := prepareDynamicCreate(target, k8sManifest)
 			if err != nil {
-				logger.Warningf(ctx, "Failed to transform kubernetes template file for [%+v] for namespace [%s] "+
-					"into a dynamic unstructured mapping with err: %v", k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
+				logger.Warningf(ctx, "Failed to transform kubernetes manifest for namespace [%s] "+
+					"into a dynamic unstructured mapping with err: %v, manifest: %v", namespace, err, k8sManifest)
 				collectedErrs = append(collectedErrs, err)
 				c.metrics.KubernetesResourcesCreateErrors.Inc()
 				continue
 			}
+
+			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s]",
+				dynamicObj.obj.GetKind(), target.ID, namespace)
 
 			dr := getDynamicResourceInterface(dynamicObj.mapping, target.DynamicClient, namespace)
 			_, err = dr.Create(ctx, dynamicObj.obj, metav1.CreateOptions{})
@@ -388,45 +338,54 @@ func (c *controller) syncNamespace(ctx context.Context, project models.Project, 
 			if err != nil {
 				if k8serrors.IsAlreadyExists(err) {
 					logger.Debugf(ctx, "Type [%+v] in namespace [%s] already exists - attempting update instead",
-						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
+						dynamicObj.obj.GetKind(), namespace)
 					c.metrics.AppliedTemplateExists.Inc()
 
-					// Update can be performed in 1 of 2 ways. For specific kinds, like ServiceAccount, we use merge-patch.
-					// For all other kinds we use a simple update.
-					if ok := strategicPatchTypes[k8sObjCopy.GetObjectKind().GroupVersionKind().Kind]; ok {
-						data, err := json.Marshal(dynamicObj.obj)
-						if err != nil {
-							c.metrics.TemplateUpdateErrors.Inc()
-							logger.Warningf(ctx, "Failed to marshal resource [%+v] in namespace [%s] to json with err: %v",
-								k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
-							collectedErrs = append(collectedErrs, err)
-							continue
-						}
+					currentObj, err := dr.Get(ctx, dynamicObj.obj.GetName(), metav1.GetOptions{})
+					if err != nil {
+						c.metrics.TemplateUpdateErrors.Inc()
+						logger.Warningf(ctx, "Failed to get current resource from server [%+v] in namespace [%s] with err: %v",
+							dynamicObj.obj.GetKind(), namespace, err)
+						collectedErrs = append(collectedErrs, err)
+						continue
+					}
 
-						dr := getDynamicResourceInterface(dynamicObj.mapping, target.DynamicClient, namespace)
-						_, err = dr.Patch(ctx, dynamicObj.obj.GetName(),
-							types.StrategicMergePatchType, data, metav1.PatchOptions{})
-						if err != nil {
-							c.metrics.TemplateUpdateErrors.Inc()
-							logger.Warningf(ctx, "Failed to merge patch resource [%+v] in namespace [%s] with err: %v",
-								k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
-							collectedErrs = append(collectedErrs, err)
-							continue
-						}
-					} else {
-						dr := getDynamicResourceInterface(dynamicObj.mapping, target.DynamicClient, namespace)
-						_, err = dr.Update(ctx, dynamicObj.obj, metav1.UpdateOptions{})
-						if err != nil && !k8serrors.IsAlreadyExists(err) {
-							c.metrics.TemplateUpdateErrors.Inc()
-							logger.Warningf(ctx, "Failed to dynamically update resource [%+v] in namespace [%s] with err :%v",
-								k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
-							collectedErrs = append(collectedErrs, err)
-							continue
-						}
+					modified, err := json.Marshal(dynamicObj.obj)
+					if err != nil {
+						c.metrics.TemplateUpdateErrors.Inc()
+						logger.Warningf(ctx, "Failed to marshal resource [%+v] in namespace [%s] to json with err: %v",
+							dynamicObj.obj.GetKind(), namespace, err)
+						collectedErrs = append(collectedErrs, err)
+						continue
+					}
+
+					patch, patchType, err := c.createPatch(dynamicObj.mapping.GroupVersionKind, currentObj, modified, namespace)
+					if err != nil {
+						c.metrics.TemplateUpdateErrors.Inc()
+						logger.Warningf(ctx, "Failed to create patch for resource [%+v] in namespace [%s] err: %v",
+							dynamicObj.obj.GetKind(), namespace, err)
+						collectedErrs = append(collectedErrs, err)
+						continue
+					}
+
+					if string(patch) == noChange {
+						logger.Infof(ctx, "Resource [%+v] in namespace [%s] is not modified",
+							dynamicObj.obj.GetKind(), namespace)
+						continue
+					}
+
+					_, err = dr.Patch(ctx, dynamicObj.obj.GetName(),
+						patchType, patch, metav1.PatchOptions{})
+					if err != nil {
+						c.metrics.TemplateUpdateErrors.Inc()
+						logger.Warningf(ctx, "Failed to patch resource [%+v] in namespace [%s] with err: %v",
+							dynamicObj.obj.GetKind(), namespace, err)
+						collectedErrs = append(collectedErrs, err)
+						continue
 					}
 
 					logger.Debugf(ctx, "Successfully updated resource [%+v] in namespace [%s]",
-						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
+						dynamicObj.obj.GetKind(), namespace)
 					c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 				} else {
 					// Some error other than AlreadyExists was raised when we tried to Create the k8s object.
@@ -440,7 +399,7 @@ func (c *controller) syncNamespace(ctx context.Context, project models.Project, 
 				}
 			} else {
 				logger.Debugf(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
-					k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
+					dynamicObj.obj.GetKind(), namespace)
 				c.metrics.KubernetesResourcesCreated.Inc()
 				c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 			}
@@ -450,6 +409,147 @@ func (c *controller) syncNamespace(ctx context.Context, project models.Project, 
 		return errors.NewCollectedFlyteAdminError(codes.Internal, collectedErrs)
 	}
 	return nil
+}
+
+var metadataAccessor = meta.NewAccessor()
+
+// getLastApplied get last applied manifest from object's annotation
+func getLastApplied(obj k8sruntime.Object) ([]byte, error) {
+	annots, err := metadataAccessor.Annotations(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	if annots == nil {
+		return nil, nil
+	}
+
+	lastApplied, ok := annots[corev1.LastAppliedConfigAnnotation]
+	if !ok {
+		return nil, nil
+	}
+
+	return []byte(lastApplied), nil
+}
+
+func addResourceVersion(patch []byte, rv string) ([]byte, error) {
+	var patchMap map[string]interface{}
+	err := json.Unmarshal(patch, &patchMap)
+	if err != nil {
+		return nil, err
+	}
+	u := unstructured.Unstructured{Object: patchMap}
+	a, err := meta.Accessor(&u)
+	if err != nil {
+		return nil, err
+	}
+	a.SetResourceVersion(rv)
+
+	return json.Marshal(patchMap)
+}
+
+// createResourceFromTemplate this method perform following processes:
+//      1) read template file pointed by templateDir and templateFileName
+//      2) substitute templatized variables with their resolved values
+// the method will return the kubernetes raw manifest
+func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir string,
+	templateFileName string, project models.Project, domain runtimeInterfaces.Domain, namespace NamespaceName,
+	templateValues, customTemplateValues templateValuesType) (string, error) {
+	// 1) read the template file
+	template, err := ioutil.ReadFile(path.Join(templateDir, templateFileName))
+	if err != nil {
+		logger.Warningf(ctx,
+			"failed to read config template from path [%s] for namespace [%s] with err: %v",
+			templateFileName, namespace, err)
+		err := errors.NewFlyteAdminErrorf(
+			codes.Internal, "failed to read config template from path [%s] for namespace [%s] with err: %v",
+			templateFileName, namespace, err)
+		c.metrics.TemplateReadErrors.Inc()
+		return "", err
+	}
+	logger.Debugf(ctx, "successfully read template config file [%s]", templateFileName)
+
+	// 2) substitute templatized variables with their resolved values
+	// First, add the special case namespace template which is always substituted by the system
+	// rather than fetched via a user-specified source.
+	templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
+	templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.Identifier
+	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.ID
+
+	var k8sManifest = string(template)
+	for templateKey, templateValue := range templateValues {
+		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
+	}
+	// Replace remaining template variables from domain specific defaults.
+	for templateKey, templateValue := range customTemplateValues {
+		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
+	}
+
+	return k8sManifest, nil
+}
+
+// createPatch create 3-way merge patch of current object, original object (retrieved from last applied annotation), and the modification
+// for native k8s resource, strategic merge patch is used
+// for custom resource, json merge patch is used
+// heavily inspired by kubectl's patcher
+func (c *controller) createPatch(gvk schema.GroupVersionKind, currentObj *unstructured.Unstructured, modified []byte, namespace string) ([]byte, types.PatchType, error) {
+	current, err := k8sruntime.Encode(unstructured.UnstructuredJSONScheme, currentObj)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to encode [%+v] in namespace [%s] to json with err: %v",
+			currentObj.GetKind(), namespace, err)
+	}
+
+	original, err := getLastApplied(currentObj)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get original resource [%+v] in namespace [%s] with err: %v",
+			currentObj.GetKind(), namespace, err)
+	}
+
+	var patch []byte
+	patchType := types.StrategicMergePatchType
+	obj, err := scheme.Scheme.New(gvk)
+	switch {
+	case err == nil:
+		lookupPatchMeta, err := strategicpatch.NewPatchMetaFromStruct(obj)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to create lookup patch meta for [%+v] in namespace [%s] with err: %v",
+				currentObj.GetKind(), namespace, err)
+		}
+
+		patch, err = strategicpatch.CreateThreeWayMergePatch(original, modified, current, lookupPatchMeta, true)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to create 3 way merge patch for resource [%+v] in namespace [%s] with err: %v\noriginal:\n%s\nmodified:\n%s\ncurrent:\n%s",
+				currentObj.GetKind(), namespace, err, original, modified, current)
+		}
+	case k8sruntime.IsNotRegisteredError(err):
+		patchType = types.MergePatchType
+		preconditions := []mergepatch.PreconditionFunc{mergepatch.RequireKeyUnchanged("apiVersion"),
+			mergepatch.RequireKeyUnchanged("kind"), mergepatch.RequireMetadataKeyUnchanged("name")}
+		patch, err = jsonmergepatch.CreateThreeWayJSONMergePatch(original, modified, current, preconditions...)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to create 3 way json merge patch for resource [%+v] in namespace [%s] with err: %v",
+				currentObj.GetKind(), namespace, err)
+		}
+	default:
+		return nil, "", fmt.Errorf("failed to create get instance of versioned object [%+v] in namespace [%s] with err: %v",
+			currentObj.GetKind(), namespace, err)
+
+	}
+
+	if string(patch) == noChange {
+		// not modified
+		return patch, patchType, nil
+	}
+
+	if len(currentObj.GetResourceVersion()) > 0 {
+		patch, err = addResourceVersion(patch, currentObj.GetResourceVersion())
+		if err != nil {
+			return nil, "", fmt.Errorf("failed adding resource version for object [%+v] in namespace [%s] with err: %v",
+				currentObj.GetKind(), namespace, err)
+		}
+	}
+
+	return patch, patchType, nil
 }
 
 func (c *controller) Sync(ctx context.Context) error {
@@ -555,6 +655,7 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 
 func NewClusterResourceController(db repositories.RepositoryInterface, executionCluster interfaces.ClusterInterface, scope promutils.Scope) Controller {
 	config := runtime.NewConfigurationProvider()
+
 	return &controller{
 		db:               db,
 		config:           config,
