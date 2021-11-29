@@ -14,11 +14,8 @@ A small patch to introduce flytekit support for python-native type metadata.
 Users of flyte wish to have access to arbitrary parameter metadata specified in
 typing annotations.
 
-The `LiteralType` definition in flyteidl already has a `metadata` field in its
-message definition
-(https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/types.proto#L89),
-suggesting that support for metadata annotations for flyte types was in the
-works.
+We propose adding a new message called `TypeAnnotation` to hold arbitrary annotations
+associated with parameter types.
 
 We wish to add python-native support for this field by allowing flytekit to
 recognize and parse the use of
@@ -59,6 +56,24 @@ amplicon_min_alignment_score: Optional[
 
 ## 3 Proposed Implementation
 
+The addition of an additional field to `LiteralType` in flyteidl and an additional
+message to represent a `TypeAnnotation` object.
+
+```
+message TypeAnnotation {
+  google.protobuf.Struct annotations = 1;
+  // string type_hint = 2;
+  // google.protobuf.Struct json_schema = 2;
+ ...
+}
+
+message LiteralType 
+{
+...
+   TypeAnnotation annotation = 7;
+}
+```
+
 Expansion of the `to_literal_type` method in the core [`TypeEngine`
 class](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engine.py#L341).
 
@@ -73,14 +88,14 @@ class](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engin
         meta = None
         if hasattr(python_type, "__metadata__"):
             for x in python_type.__metadata__:
-                if not isinstance(x, FlyteMetadata):
+                if not isinstance(x, FlyteTypeAnnotation):
                     continue
                 if x.data.get("__consumed", False):
                     continue
-                meta = x.data
+                annotation = x.data
                 x.data["__consumed"] = True
 
-        if meta is not None:
+        if annotation is not None:
             return LiteralType(
                 simple=res.simple,
                 schema=res.schema,
@@ -88,7 +103,7 @@ class](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engin
                 map_value_type=res.map_value_type,
                 blob=res.blob,
                 enum_type=res.enum_type,
-                metadata=meta,
+                annotation=annotation,
             )
         return res
 ```
@@ -96,7 +111,7 @@ class](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engin
 coupled with the introduction of a custom object to represent parsed metadata:
 
 ```
-class FlyteMetadata:
+class FlyteTypeAnnotation:
     def __init__(self, data: Dict[str, Any]):
         self._data = data
 
