@@ -104,11 +104,11 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/secret-auth.yaml
+# Source: flyte-sandbox/charts/flyte/templates/common/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-propeller-auth
+  name: flyte-secret-auth
   namespace: flyte
 type: Opaque
 stringData:
@@ -3506,7 +3506,7 @@ spec:
           name: config-volume
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
 ---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
@@ -3575,7 +3575,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
 ---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
 # Create the actual deployment

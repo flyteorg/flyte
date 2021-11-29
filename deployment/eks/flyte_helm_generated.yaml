@@ -58,6 +58,16 @@ metadata:
 type: Opaque
 stringData:
 ---
+# Source: flyte-core/templates/common/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-secret-auth
+  namespace: flyte
+type: Opaque
+stringData:
+  client_secret: foobar
+---
 # Source: flyte-core/templates/common/secret.yaml
 apiVersion: v1
 kind: Secret
@@ -66,16 +76,6 @@ metadata:
 stringData:
   pass.txt: '<DB_PASSWORD>'
 type: Opaque
----
-# Source: flyte-core/templates/propeller/secret-auth.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-propeller-auth
-  namespace: flyte
-type: Opaque
-stringData:
-  client_secret: foobar
 ---
 # Source: flyte-core/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
@@ -1115,7 +1115,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
