@@ -1161,6 +1161,8 @@ spec:
         image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.53"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
+        ports:
+          - containerPort: 10254
         resources: 
           limits:
             cpu: 250m

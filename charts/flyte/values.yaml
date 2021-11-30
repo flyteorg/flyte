@@ -250,7 +250,7 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to the webhook
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
+      # -- ImagePullSecrets to automatically assign to the service account
       imagePullSecrets: {}
     # -- Service settings for the webhook
     service:
