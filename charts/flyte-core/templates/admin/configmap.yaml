@@ -1,3 +1,4 @@
+{{- if .Values.flyteadmin.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -37,5 +38,6 @@ data:
 {{- if .Values.workflow_scheduler.enabled }}
 {{- with .Values.workflow_scheduler.config }}
   scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}

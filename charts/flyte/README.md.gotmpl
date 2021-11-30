@@ -19,8 +19,8 @@
 - Install Flyte sandbox:
 
 ```bash
-cd helm
-helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+helm repo add flyte https://flyteorg.github.io/flyte
+helm install -n flyte -f values.yaml --create-namespace flyte flyteorg/flyte
 ```
 
 Customize your installation by changing settings in `values-sandbox.yaml`.

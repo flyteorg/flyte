@@ -1,3 +1,4 @@
+{{- if .Values.flyteconsole.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,3 +46,4 @@ spec:
       {{- with .Values.flyteconsole.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
