@@ -101,7 +101,7 @@ Options
       --k8sServiceAccount string       custom kubernetes service account auth role to register launch plans with.
       --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
       --sourceUploadPath string        Location for source code in storage.
-      --version string                version of the entity to be registered with flyte. (default "v1")
+      --version string                version of the entity to be registered with flyte.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
