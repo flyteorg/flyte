@@ -538,15 +538,15 @@ func filterExampleFromRelease(releases github.RepositoryRelease) []github.Releas
 	return assets
 }
 
-func getAllFlytesnacksExample(org, repository, release string) ([]github.ReleaseAsset, string, error) {
+func getAllFlytesnacksExample(org, repository, version string) ([]github.ReleaseAsset, string, error) {
 	c := github.NewClient(nil)
 	opt := &github.ListOptions{Page: 1, PerPage: 1}
-	if len(release) > 0 {
-		releases, _, err := c.Repositories.GetReleaseByTag(context.Background(), org, repository, release)
+	if len(version) > 0 {
+		releases, _, err := c.Repositories.GetReleaseByTag(context.Background(), org, repository, version)
 		if err != nil {
 			return nil, "", err
 		}
-		return filterExampleFromRelease(*releases), release, nil
+		return filterExampleFromRelease(*releases), version, nil
 	}
 	releases, _, err := c.Repositories.ListReleases(context.Background(), org, repository, opt)
 	if err != nil {

@@ -4,7 +4,7 @@ package register
 
 var (
 	DefaultFilesConfig = &FilesConfig{
-		Version:         "v1",
+		Version:         "",
 		ContinueOnError: false,
 	}
 )
