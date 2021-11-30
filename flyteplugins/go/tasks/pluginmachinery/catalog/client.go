@@ -3,11 +3,13 @@ package catalog
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 )
@@ -73,10 +75,61 @@ func NewCatalogEntry(outputs io.OutputReader, status Status) Entry {
 	return Entry{outputs: outputs, status: status}
 }
 
+// ReservationEntry encapsulates the current state of an artifact reservation within the catalog
+type ReservationEntry struct {
+	expiresAt         time.Time
+	heartbeatInterval time.Duration
+	ownerID           string
+	status            core.CatalogReservation_Status
+}
+
+// Returns the expiration timestamp at which the reservation will no longer be valid
+func (r ReservationEntry) GetExpiresAt() time.Time {
+	return r.expiresAt
+}
+
+// Returns the heartbeat interval, denoting how often the catalog expects a reservation extension request
+func (r ReservationEntry) GetHeartbeatInterval() time.Duration {
+	return r.heartbeatInterval
+}
+
+// Returns the ID of the current reservation owner
+func (r ReservationEntry) GetOwnerID() string {
+	return r.ownerID
+}
+
+// Returns the status of the attempted reservation operation
+func (r ReservationEntry) GetStatus() core.CatalogReservation_Status {
+	return r.status
+}
+
+// Creates a new ReservationEntry using the status, all other fields are set to default values
+func NewReservationEntryStatus(status core.CatalogReservation_Status) ReservationEntry {
+	duration := 0 * time.Second
+	return ReservationEntry{
+		expiresAt:         time.Time{},
+		heartbeatInterval: duration,
+		ownerID:           "",
+		status:            status,
+	}
+}
+
+// Creates a new ReservationEntry populated with the specified parameters
+func NewReservationEntry(expiresAt time.Time, heartbeatInterval time.Duration, ownerID string, status core.CatalogReservation_Status) ReservationEntry {
+	return ReservationEntry{
+		expiresAt:         expiresAt,
+		heartbeatInterval: heartbeatInterval,
+		ownerID:           ownerID,
+		status:            status,
+	}
+}
+
 // Default Catalog client that allows memoization and indexing of intermediate data in Flyte
 type Client interface {
 	Get(ctx context.Context, key Key) (Entry, error)
+	GetOrExtendReservation(ctx context.Context, key Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error)
 	Put(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
+	ReleaseReservation(ctx context.Context, key Key, ownerID string) error
 }
 
 func IsNotFound(err error) bool {

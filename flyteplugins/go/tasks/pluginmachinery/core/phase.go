@@ -35,6 +35,8 @@ const (
 	PhaseRetryableFailure
 	// Indicate that the failure is non recoverable even if retries exist
 	PhasePermanentFailure
+	// Indicates the task is waiting for the cache to be populated so it can reuse results
+	PhaseWaitingForCache
 )
 
 var Phases = []Phase{
@@ -47,6 +49,7 @@ var Phases = []Phase{
 	PhaseSuccess,
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
+	PhaseWaitingForCache,
 }
 
 // Returns true if the given phase is failure, retryable failure or success
@@ -217,4 +220,9 @@ func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
 
 func PhaseInfoSystemRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
+}
+
+// Creates a new PhaseInfo with phase set to PhaseWaitingForCache
+func PhaseInfoWaitingForCache(version uint32, info *TaskInfo) PhaseInfo {
+	return phaseInfo(PhaseWaitingForCache, version, nil, info)
 }
