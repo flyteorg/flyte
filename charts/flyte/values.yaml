@@ -14,7 +14,7 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: cr.flyte.org/flyteorg/flyteadmin
+    repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
     # -- Docker image tag
     tag: v0.6.53 # FLYTEADMIN_TAG
     # -- Docker image pull policy
@@ -71,7 +71,7 @@ flyteadmin:
 flytescheduler:
   image:
     # -- Docker image for Flytescheduler deployment
-    repository: cr.flyte.org/flyteorg/flytescheduler
+    repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
     tag: v0.6.53 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
@@ -116,7 +116,7 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: cr.flyte.org/flyteorg/datacatalog
+    repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
     tag: v0.3.16 # DATACATALOG_TAG
     # -- Docker image pull policy
@@ -164,7 +164,7 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: cr.flyte.org/flyteorg/flytepropeller
+    repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
     # -- Docker image tag
     tag: v0.15.17 # FLYTEPROPELLER_TAG
     # -- Docker image pull policy
@@ -210,7 +210,7 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: cr.flyte.org/flyteorg/flyteconsole
+    repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
     # -- Docker image tag
     tag: v0.30.0 # FLYTECONSOLE_TAG
     # -- Docker image pull policy

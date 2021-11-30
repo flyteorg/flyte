@@ -60,8 +60,8 @@ jobs:
       - name: Tag Image to release version
         run: |
           docker pull ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}
-          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
-          docker push ghcr.io/flyteorg/${{ matrix.component }}:${{ needs.bump-version.outputs.version }}
+          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
+          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
 
   helm-release:
     name: Flyte helm release
