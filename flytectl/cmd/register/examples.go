@@ -18,12 +18,12 @@ const (
 Registers all latest flytesnacks example
 ::
 
- bin/flytectl register examples  -d development  -p flytesnacks
+ bin/flytectl register examples  -d development  -p flytesnacks 
 
 Registers specific release of flytesnacks example
 ::
 
- bin/flytectl register examples  -d development  -p flytesnacks v0.2.176
+ bin/flytectl register examples  -d development  -p flytesnacks --version v0.2.176
 	
 Note: register command automatically override the version with release version	
 Usage
@@ -37,15 +37,11 @@ var (
 
 func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	var examples []github.ReleaseAsset
-	var release string
 
 	// Deprecated checks for --k8Service
 	deprecatedCheck(ctx, &rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.K8ServiceAccount)
 
-	if len(args) == 1 {
-		release = args[0]
-	}
-	examples, tag, err := getAllFlytesnacksExample(githubOrg, flytesnacksRepository, release)
+	examples, tag, err := getAllFlytesnacksExample(githubOrg, flytesnacksRepository, rconfig.DefaultFilesConfig.Version)
 	if err != nil {
 		return err
 	}
