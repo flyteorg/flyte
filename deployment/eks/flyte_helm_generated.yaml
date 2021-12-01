@@ -27,6 +27,18 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
+# Source: flyte-core/templates/flytescheduler/sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
