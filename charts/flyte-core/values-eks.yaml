@@ -209,7 +209,7 @@ db:
       username: flyteadmin
       host: "{{ .Values.userSettings.rdsHost }}"
       # -- Create a DB called datacatalog (OR change the name here)
-      dbname: flyteadmin
+      dbname: datacatalog
       passwordPath: /etc/db/pass.txt
   admin:
     database:

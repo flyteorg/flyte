@@ -296,7 +296,7 @@ metadata:
 data:
   db.yaml: | 
     database:
-      dbname: flyteadmin
+      dbname: datacatalog
       host: '<RDS_HOST>'
       passwordPath: /etc/db/pass.txt
       port: 5432
@@ -990,7 +990,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "16485df0a5bd977709b6fe864dac703333ac764982922e2680fec44db3dccd8"
+        configChecksum: "c91d5f7fc00ee34b4c8915f8696ec4c76c0e42ac1fe270a1c23dec69fc1e437"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
