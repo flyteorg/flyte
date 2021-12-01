@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	pluginCatalogMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
@@ -939,6 +940,215 @@ func Test_task_Handle_Catalog(t *testing.T) {
 	}
 }
 
+func Test_task_Handle_Reservation(t *testing.T) {
+
+	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder) *nodeMocks.NodeExecutionContext {
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
+
+		nodeID := "n1"
+
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.OnGetAnnotations().Return(map[string]string{})
+		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+			NodeId:      nodeID,
+			ExecutionId: wfExecID,
+		})
+		nm.OnGetK8sServiceAccount().Return("service-account")
+		nm.OnGetLabels().Return(map[string]string{})
+		nm.OnGetNamespace().Return("namespace")
+		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.OnGetOwnerReference().Return(v12.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+		nm.OnIsInterruptible().Return(true)
+
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				Discoverable:      true,
+				CacheSerializable: true,
+			},
+			Interface: &core.TypedInterface{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_BOOLEAN,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.OnGetTaskID().Return(taskID)
+		tr.OnGetTaskType().Return(ttype)
+		tr.OnReadMatch(mock.Anything).Return(tk, nil)
+
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
+		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+
+		res := &v1.ResourceRequirements{}
+		n := &flyteMocks.ExecutableNode{}
+		ma := 5
+		n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.OnGetResources().Return(res)
+
+		ir := &ioMocks.InputReader{}
+		ir.OnGetInputPath().Return(storage.DataReference("input"))
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.OnNodeExecutionMetadata().Return(nm)
+		nCtx.OnNode().Return(n)
+		nCtx.OnInputReader().Return(ir)
+		nCtx.OnInputReader().Return(ir)
+		ds, err := storage.NewDataStore(
+			&storage.Config{
+				Type: storage.TypeMemory,
+			},
+			promutils.NewTestScope(),
+		)
+		assert.NoError(t, err)
+		nCtx.OnDataStore().Return(ds)
+		nCtx.OnCurrentAttempt().Return(uint32(1))
+		nCtx.OnTaskReader().Return(tr)
+		nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
+		nCtx.OnNodeStatus().Return(ns)
+		nCtx.OnNodeID().Return(nodeID)
+		nCtx.OnEventsRecorder().Return(recorder)
+		nCtx.OnEnqueueOwnerFunc().Return(nil)
+
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnIncrementParallelism().Return(1)
+		nCtx.OnExecutionContext().Return(executionContext)
+
+		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+
+		nCtx.OnNodeStateWriter().Return(s)
+		return nCtx
+	}
+
+	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
+
+	type args struct {
+		catalogFetch bool
+		pluginPhase  pluginCore.Phase
+		ownerID      string
+	}
+	type want struct {
+		pluginPhase  pluginCore.Phase
+		handlerPhase handler.EPhase
+		eventPhase   core.TaskExecution_Phase
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			"reservation-create-or-update",
+			args{
+				catalogFetch: false,
+				pluginPhase:  pluginCore.PhaseUndefined,
+				ownerID:      "name-n1-1",
+			},
+			want{
+				pluginPhase:  pluginCore.PhaseSuccess,
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
+		{
+			"reservation-exists",
+			args{
+				catalogFetch: false,
+				pluginPhase:  pluginCore.PhaseUndefined,
+				ownerID:      "nilOwner",
+			},
+			want{
+				pluginPhase:  pluginCore.PhaseWaitingForCache,
+				handlerPhase: handler.EPhaseRunning,
+				eventPhase:   core.TaskExecution_UNDEFINED,
+			},
+		},
+		{
+			"cache-hit",
+			args{
+				catalogFetch: true,
+				pluginPhase:  pluginCore.PhaseWaitingForCache,
+			},
+			want{
+				pluginPhase:  pluginCore.PhaseSuccess,
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			state := &taskNodeStateHolder{}
+			ev := &fakeBufferedTaskEventRecorder{}
+			nCtx := createNodeContext(ev, "test", state)
+			c := &pluginCatalogMocks.Client{}
+			nr := &nodeMocks.NodeStateReader{}
+			st := bytes.NewBuffer([]byte{})
+			cod := codex.GobStateCodec{}
+			assert.NoError(t, cod.Encode(&fakeplugins.NextPhaseState{
+				Phase:        pluginCore.PhaseSuccess,
+				OutputExists: true,
+			}, st))
+			nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
+				PluginPhase: tt.args.pluginPhase,
+				PluginState: st.Bytes(),
+			})
+			nCtx.OnNodeStateReader().Return(nr)
+			if tt.args.catalogFetch {
+				or := &ioMocks.OutputReader{}
+				or.OnReadMatch(mock.Anything).Return(&core.LiteralMap{}, nil, nil)
+				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewCatalogEntry(or, catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, nil)), nil)
+			} else {
+				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, nil)), nil)
+			}
+			c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
+			c.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&datacatalog.Reservation{OwnerId: tt.args.ownerID}, nil)
+			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, eventConfig, promutils.NewTestScope())
+			assert.NoError(t, err)
+			tk.defaultPlugins = map[pluginCore.TaskType]pluginCore.Plugin{
+				"test": fakeplugins.NewPhaseBasedPlugin(),
+			}
+			tk.catalog = c
+			tk.resourceManager = noopRm
+			got, err := tk.Handle(context.TODO(), nCtx)
+			if err != nil {
+				t.Errorf("Handler.Handle() error = %v", err)
+				return
+			}
+			if err == nil {
+				assert.Equal(t, tt.want.handlerPhase.String(), got.Info().GetPhase().String())
+				if assert.Equal(t, 1, len(ev.evs)) {
+					e := ev.evs[0]
+					assert.Equal(t, tt.want.eventPhase.String(), e.Phase.String())
+				}
+				assert.Equal(t, tt.want.pluginPhase.String(), state.s.PluginPhase.String())
+				assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
+			}
+		})
+	}
+}
+
 func Test_task_Handle_Barrier(t *testing.T) {
 	// NOTE: Caching is disabled for this test
 
@@ -1532,93 +1742,119 @@ func Test_task_Abort_v1(t *testing.T) {
 
 func Test_task_Finalize(t *testing.T) {
 
-	wfExecID := &core.WorkflowExecutionIdentifier{
-		Project: "project",
-		Domain:  "domain",
-		Name:    "name",
+	createNodeContext := func(cacheSerializable bool) *nodeMocks.NodeExecutionContext {
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
+
+		nodeID := "n1"
+
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.OnGetAnnotations().Return(map[string]string{})
+		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+			NodeId:      nodeID,
+			ExecutionId: wfExecID,
+		})
+		nm.OnGetK8sServiceAccount().Return("service-account")
+		nm.OnGetLabels().Return(map[string]string{})
+		nm.OnGetNamespace().Return("namespace")
+		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.OnGetOwnerReference().Return(v12.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				CacheSerializable: cacheSerializable,
+				Discoverable:      cacheSerializable,
+			},
+			Interface: &core.TypedInterface{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_BOOLEAN,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.OnGetTaskID().Return(taskID)
+		tr.OnGetTaskType().Return("x")
+		tr.OnReadMatch(mock.Anything).Return(tk, nil)
+
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
+		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+
+		res := &v1.ResourceRequirements{}
+		n := &flyteMocks.ExecutableNode{}
+		ma := 5
+		n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.OnGetResources().Return(res)
+
+		ir := &ioMocks.InputReader{}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.OnNodeExecutionMetadata().Return(nm)
+		nCtx.OnNode().Return(n)
+		nCtx.OnInputReader().Return(ir)
+		ds, err := storage.NewDataStore(
+			&storage.Config{
+				Type: storage.TypeMemory,
+			},
+			promutils.NewTestScope(),
+		)
+		assert.NoError(t, err)
+		nCtx.OnDataStore().Return(ds)
+		nCtx.OnCurrentAttempt().Return(uint32(1))
+		nCtx.OnTaskReader().Return(tr)
+		nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
+		nCtx.OnNodeStatus().Return(ns)
+		nCtx.OnNodeID().Return("n1")
+		nCtx.OnEventsRecorder().Return(nil)
+		nCtx.OnEnqueueOwnerFunc().Return(nil)
+
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		nCtx.OnExecutionContext().Return(executionContext)
+
+		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+
+		st := bytes.NewBuffer([]byte{})
+		a := 45
+		type test struct {
+			A int
+		}
+		cod := codex.GobStateCodec{}
+		assert.NoError(t, cod.Encode(test{A: a}, st))
+		nr := &nodeMocks.NodeStateReader{}
+		nr.On("GetTaskNodeState").Return(handler.TaskNodeState{
+			PluginState: st.Bytes(),
+		})
+		nCtx.On("NodeStateReader").Return(nr)
+		return nCtx
 	}
-
-	nodeID := "n1"
-
-	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.OnGetAnnotations().Return(map[string]string{})
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
-		NodeId:      nodeID,
-		ExecutionId: wfExecID,
-	})
-	nm.OnGetK8sServiceAccount().Return("service-account")
-	nm.OnGetLabels().Return(map[string]string{})
-	nm.OnGetNamespace().Return("namespace")
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.OnGetOwnerReference().Return(v12.OwnerReference{
-		Kind: "sample",
-		Name: "name",
-	})
-
-	taskID := &core.Identifier{}
-	tr := &nodeMocks.TaskReader{}
-	tr.OnGetTaskID().Return(taskID)
-	tr.OnGetTaskType().Return("x")
-
-	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-	ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
-
-	res := &v1.ResourceRequirements{}
-	n := &flyteMocks.ExecutableNode{}
-	ma := 5
-	n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
-	n.OnGetResources().Return(res)
-
-	ir := &ioMocks.InputReader{}
-	nCtx := &nodeMocks.NodeExecutionContext{}
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnNode().Return(n)
-	nCtx.OnInputReader().Return(ir)
-	ds, err := storage.NewDataStore(
-		&storage.Config{
-			Type: storage.TypeMemory,
-		},
-		promutils.NewTestScope(),
-	)
-	assert.NoError(t, err)
-	nCtx.OnDataStore().Return(ds)
-	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnTaskReader().Return(tr)
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
-	nCtx.OnNodeStatus().Return(ns)
-	nCtx.OnNodeID().Return("n1")
-	nCtx.OnEventsRecorder().Return(nil)
-	nCtx.OnEnqueueOwnerFunc().Return(nil)
-
-	executionContext := &mocks.ExecutionContext{}
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	executionContext.OnGetParentInfo().Return(nil)
-	executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-	nCtx.OnExecutionContext().Return(executionContext)
-
-	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
-
-	st := bytes.NewBuffer([]byte{})
-	a := 45
-	type test struct {
-		A int
-	}
-	cod := codex.GobStateCodec{}
-	assert.NoError(t, cod.Encode(test{A: a}, st))
-	nr := &nodeMocks.NodeStateReader{}
-	nr.On("GetTaskNodeState").Return(handler.TaskNodeState{
-		PluginState: st.Bytes(),
-	})
-	nCtx.On("NodeStateReader").Return(nr)
 	type fields struct {
 		defaultPluginCallback func() pluginCore.Plugin
 	}
 	type args struct {
-		nCtx handler.NodeExecutionContext
+		releaseReservation      bool
+		releaseReservationError bool
 	}
 	tests := []struct {
 		name     string
@@ -1629,7 +1865,7 @@ func Test_task_Finalize(t *testing.T) {
 	}{
 		{"no-plugin", fields{defaultPluginCallback: func() pluginCore.Plugin {
 			return nil
-		}}, args{nCtx: nCtx}, true, false},
+		}}, args{}, true, false},
 
 		{"finalize-fails", fields{defaultPluginCallback: func() pluginCore.Plugin {
 			p := &pluginCoreMocks.Plugin{}
@@ -1637,23 +1873,46 @@ func Test_task_Finalize(t *testing.T) {
 			p.OnGetProperties().Return(pluginCore.PluginProperties{})
 			p.On("Finalize", mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 			return p
-		}}, args{nCtx: nCtx}, true, true},
+		}}, args{}, true, true},
 		{"finalize-success", fields{defaultPluginCallback: func() pluginCore.Plugin {
 			p := &pluginCoreMocks.Plugin{}
 			p.On("GetID").Return("id")
 			p.OnGetProperties().Return(pluginCore.PluginProperties{})
 			p.On("Finalize", mock.Anything, mock.Anything).Return(nil)
 			return p
-		}}, args{nCtx: nCtx}, false, true},
+		}}, args{}, false, true},
+		{"release-reservation", fields{defaultPluginCallback: func() pluginCore.Plugin {
+			p := &pluginCoreMocks.Plugin{}
+			p.On("GetID").Return("id")
+			p.OnGetProperties().Return(pluginCore.PluginProperties{})
+			p.On("Finalize", mock.Anything, mock.Anything).Return(nil)
+			return p
+		}}, args{releaseReservation: true}, false, true},
+		{"release-reservation-error", fields{defaultPluginCallback: func() pluginCore.Plugin {
+			p := &pluginCoreMocks.Plugin{}
+			p.On("GetID").Return("id")
+			p.OnGetProperties().Return(pluginCore.PluginProperties{})
+			p.On("Finalize", mock.Anything, mock.Anything).Return(nil)
+			return p
+		}}, args{releaseReservation: true, releaseReservationError: true}, true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := tt.fields.defaultPluginCallback()
-			tk := Handler{
-				defaultPlugin:   m,
-				resourceManager: noopRm,
+			nCtx := createNodeContext(tt.args.releaseReservation)
+
+			catalog := &pluginCatalogMocks.Client{}
+			if tt.args.releaseReservationError {
+				catalog.OnReleaseReservationMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("failed to release reservation"))
+			} else {
+				catalog.OnReleaseReservationMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			}
-			if err := tk.Finalize(context.TODO(), tt.args.nCtx); (err != nil) != tt.wantErr {
+
+			m := tt.fields.defaultPluginCallback()
+			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), catalog, eventConfig, promutils.NewTestScope())
+			assert.NoError(t, err)
+			tk.defaultPlugin = m
+			tk.resourceManager = noopRm
+			if err := tk.Finalize(context.TODO(), nCtx); (err != nil) != tt.wantErr {
 				t.Errorf("Handler.Finalize() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			c := 0

@@ -539,3 +539,132 @@ func TestCatalog_Put(t *testing.T) {
 	})
 
 }
+
+var tagName = "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY"
+var reservationID = datacatalog.ReservationID{
+	DatasetId: datasetID,
+	TagName:   tagName,
+}
+var prevOwner = "prevOwner"
+var currentOwner = "currentOwner"
+
+func TestCatalog_GetOrExtendReservation(t *testing.T) {
+	ctx := context.Background()
+
+	heartbeatInterval := time.Second * 5
+	prevReservation := datacatalog.Reservation{
+		ReservationId: &reservationID,
+		OwnerId:       prevOwner,
+	}
+
+	currentReservation := datacatalog.Reservation{
+		ReservationId: &reservationID,
+		OwnerId:       currentOwner,
+	}
+
+	t.Run("CreateOrUpdateReservation", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("GetOrExtendReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &currentReservation}, nil, "")
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		reservation, err := catalogClient.GetOrExtendReservation(ctx, newKey, currentOwner, heartbeatInterval)
+
+		assert.NoError(t, err)
+		assert.Equal(t, reservation.OwnerId, currentOwner)
+	})
+
+	t.Run("ExistingReservation", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("GetOrExtendReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &prevReservation}, nil, "")
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		reservation, err := catalogClient.GetOrExtendReservation(ctx, newKey, currentOwner, heartbeatInterval)
+
+		assert.NoError(t, err)
+		assert.Equal(t, reservation.OwnerId, prevOwner)
+	})
+}
+
+func TestCatalog_ReleaseReservation(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("ReleaseReservation", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("ReleaseReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.ReleaseReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(&datacatalog.ReleaseReservationResponse{}, nil, "")
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		err := catalogClient.ReleaseReservation(ctx, newKey, currentOwner)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("ReleaseReservationFailure", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("ReleaseReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.ReleaseReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(nil, status.Error(codes.NotFound, "reservation not found"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		err := catalogClient.ReleaseReservation(ctx, newKey, currentOwner)
+
+		assertGrpcErr(t, err, codes.NotFound)
+	})
+}

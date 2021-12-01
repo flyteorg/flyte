@@ -26,6 +26,12 @@ func (w *WorkflowError) Is(target error) bool {
 	if !ok {
 		return false
 	}
+	if w == nil && t == nil {
+		return true
+	}
+	if w == nil || t == nil {
+		return false
+	}
 	return w.Code == t.Code
 }
 
@@ -45,6 +51,12 @@ func (w *WorkflowErrorWithCause) Error() string {
 func (w *WorkflowErrorWithCause) Is(target error) bool {
 	t, ok := target.(*WorkflowErrorWithCause)
 	if !ok {
+		return false
+	}
+	if w == nil && t == nil {
+		return true
+	}
+	if w == nil || t == nil {
 		return false
 	}
 	return w.Code == t.Code && (w.cause == t.cause || t.cause == nil) && (w.Message == t.Message || t.Message == "") && (w.Workflow == t.Workflow || t.Workflow == "")
