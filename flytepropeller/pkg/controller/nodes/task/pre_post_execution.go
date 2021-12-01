@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
@@ -69,6 +70,49 @@ func (t *Handler) CheckCatalogCache(ctx context.Context, tr pluginCore.TaskReade
 	}
 	logger.Infof(ctx, "Catalog CacheDisabled: for Task [%s/%s/%s/%s]", tk.Id.Project, tk.Id.Domain, tk.Id.Name, tk.Id.Version)
 	return catalog.NewCatalogEntry(nil, cacheDisabled), nil
+}
+
+// GetOrExtendCatalogReservation attempts to acquire an artifact reservation if the task is
+// cachable and cache serializable. If the reservation already exists for this owner, the
+// reservation is extended.
+func (t *Handler) GetOrExtendCatalogReservation(ctx context.Context, ownerID string, heartbeatInterval time.Duration, tr pluginCore.TaskReader, inputReader io.InputReader) (catalog.ReservationEntry, error) {
+	tk, err := tr.Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read TaskTemplate, error :%s", err.Error())
+		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_FAILURE), err
+	}
+
+	if tk.Metadata.Discoverable && tk.Metadata.CacheSerializable {
+		logger.Infof(ctx, "Catalog CacheSerializeEnabled: creating catalog reservation.")
+		key := catalog.Key{
+			Identifier:     *tk.Id,
+			CacheVersion:   tk.Metadata.DiscoveryVersion,
+			TypedInterface: *tk.Interface,
+			InputReader:    inputReader,
+		}
+
+		reservation, err := t.catalog.GetOrExtendReservation(ctx, key, ownerID, heartbeatInterval)
+		if err != nil {
+			t.metrics.reservationGetFailureCount.Inc(ctx)
+			logger.Errorf(ctx, "Catalog Failure: reservation get or extend failed. err: %v", err.Error())
+			return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_FAILURE), err
+		}
+
+		expiresAt := reservation.ExpiresAt.AsTime()
+		heartbeatInterval := reservation.HeartbeatInterval.AsDuration()
+
+		var status core.CatalogReservation_Status
+		if reservation.OwnerId == ownerID {
+			status = core.CatalogReservation_RESERVATION_ACQUIRED
+		} else {
+			status = core.CatalogReservation_RESERVATION_EXISTS
+		}
+
+		t.metrics.reservationGetSuccessCount.Inc(ctx)
+		return catalog.NewReservationEntry(expiresAt, heartbeatInterval, reservation.OwnerId, status), nil
+	}
+	logger.Infof(ctx, "Catalog CacheSerializeDisabled: for Task [%s/%s/%s/%s]", tk.Id.Project, tk.Id.Domain, tk.Id.Name, tk.Id.Version)
+	return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED), nil
 }
 
 func (t *Handler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
@@ -187,4 +231,37 @@ func (t *Handler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1
 	t.metrics.catalogPutSuccessCount.Inc(ctx)
 	logger.Infof(ctx, "Successfully cached results to catalog - Task [%v]", tk.GetId())
 	return s, nil, nil
+}
+
+// ReleaseCatalogReservation attempts to release an artifact reservation if the task is cachable
+// and cache serializable. If the reservation does not exist for this owner (e.x. it never existed
+// or has been acquired by another owner) this call is still successful.
+func (t *Handler) ReleaseCatalogReservation(ctx context.Context, ownerID string, tr pluginCore.TaskReader, inputReader io.InputReader) (catalog.ReservationEntry, error) {
+	tk, err := tr.Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read TaskTemplate, error :%s", err.Error())
+		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_FAILURE), err
+	}
+
+	if tk.Metadata.Discoverable && tk.Metadata.CacheSerializable {
+		logger.Infof(ctx, "Catalog CacheSerializeEnabled: releasing catalog reservation.")
+		key := catalog.Key{
+			Identifier:     *tk.Id,
+			CacheVersion:   tk.Metadata.DiscoveryVersion,
+			TypedInterface: *tk.Interface,
+			InputReader:    inputReader,
+		}
+
+		err := t.catalog.ReleaseReservation(ctx, key, ownerID)
+		if err != nil {
+			t.metrics.reservationReleaseFailureCount.Inc(ctx)
+			logger.Errorf(ctx, "Catalog Failure: release reservation failed. err: %v", err.Error())
+			return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_FAILURE), err
+		}
+
+		t.metrics.reservationReleaseSuccessCount.Inc(ctx)
+		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_RELEASED), nil
+	}
+	logger.Infof(ctx, "Catalog CacheSerializeDisabled: for Task [%s/%s/%s/%s]", tk.Id.Project, tk.Id.Domain, tk.Id.Name, tk.Id.Version)
+	return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED), nil
 }

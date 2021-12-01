@@ -264,6 +264,85 @@ func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.Outp
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
 }
 
+// GetOrExtendReservation attempts to get a reservation for the cachable task. If you have
+// previously acquired a reservation it will be extended. If another entity holds the reservation
+// that is returned.
+func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error) {
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	inputs := &core.LiteralMap{}
+	if key.TypedInterface.Inputs != nil {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read inputs when trying to query catalog")
+		}
+		inputs = retInputs
+	}
+
+	tag, err := GenerateArtifactTagName(ctx, inputs)
+	if err != nil {
+		return nil, err
+	}
+
+	reservationQuery := &datacatalog.GetOrExtendReservationRequest{
+		ReservationId: &datacatalog.ReservationID{
+			DatasetId: datasetID,
+			TagName:   tag,
+		},
+		OwnerId:           ownerID,
+		HeartbeatInterval: ptypes.DurationProto(heartbeatInterval),
+	}
+
+	response, err := m.client.GetOrExtendReservation(ctx, reservationQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Reservation, nil
+}
+
+// ReleaseReservation attempts to release a reservation for a cachable task. If the reservation
+// does not exist (e.x. it never existed or has been acquired by another owner) then this call
+// still succeeds.
+func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) error {
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
+	if err != nil {
+		return err
+	}
+
+	inputs := &core.LiteralMap{}
+	if key.TypedInterface.Inputs != nil {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			return errors.Wrap(err, "failed to read inputs when trying to query catalog")
+		}
+		inputs = retInputs
+	}
+
+	tag, err := GenerateArtifactTagName(ctx, inputs)
+	if err != nil {
+		return err
+	}
+
+	reservationQuery := &datacatalog.ReleaseReservationRequest{
+		ReservationId: &datacatalog.ReservationID{
+			DatasetId: datasetID,
+			TagName:   tag,
+		},
+		OwnerId: ownerID,
+	}
+
+	_, err = m.client.ReleaseReservation(ctx, reservationQuery)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Create a new Datacatalog client for task execution caching
 func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration) (*CatalogClient, error) {
 	var opts []grpc.DialOption
