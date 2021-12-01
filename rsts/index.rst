@@ -273,7 +273,7 @@ For the most current list of Flyte's deployments, please click `here <https://gi
 Next Steps
 ----------
 
-Whether you want to write Flyte workflows, deploy the Flyte platform to your k8 cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
+Whether you want to write Flyte workflows, deploy the Flyte platform to your K8s cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
 
 * :ref:`Get Started <gettingstarted_implement>`
 * :ref:`Main Concepts <divedeep>`
