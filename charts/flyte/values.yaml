@@ -235,13 +235,13 @@ flyte:
     # -- affinity for Flyteconsole deployment
     affinity: {}
 
-#
-# Common secret auth
-#
+  #
+  # Common secret auth
+  #
 
-adminOauthClientCredentials:
-  clientId: flytepropeller
-  clientSecret: foobar
+  adminOauthClientCredentials:
+    clientId: flytepropeller
+    clientSecret: foobar
 
   #
   # WEBHOOK SETTINGS
