@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/flyteorg/flyteidl v0.21.11
-	github.com/flyteorg/flytestdlib v0.4.4
+	github.com/flyteorg/flytestdlib v0.4.7
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.4.3
 	github.com/jackc/pgconn v1.8.1
