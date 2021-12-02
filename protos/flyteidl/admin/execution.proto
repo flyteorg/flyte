@@ -126,7 +126,8 @@ message ExecutionClosure {
     // A pending (non-terminal) execution will not have any output result.
     oneof output_result {
         // Output URI in the case of a successful execution.
-        LiteralMapBlob outputs = 1;
+        // DEPRECATED. Use GetExecutionData to fetch output data instead.
+        LiteralMapBlob outputs = 1 [deprecated = true];
 
         // Error information in the case of a failed execution.
         core.ExecutionError error = 2;
@@ -138,7 +139,8 @@ message ExecutionClosure {
         AbortMetadata abort_metadata = 12;
 
         // Raw output data produced by this execution.
-        core.LiteralMap output_data = 13;
+        // DEPRECATED. Use GetExecutionData to fetch output data instead.
+        core.LiteralMap output_data = 13 [deprecated = true];
     }
 
     // Inputs computed and passed for execution.

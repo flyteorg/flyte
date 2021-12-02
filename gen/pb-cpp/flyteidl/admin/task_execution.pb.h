@@ -856,22 +856,22 @@ class TaskExecutionClosure final :
   ::flyteidl::core::TaskExecution_Phase phase() const;
   void set_phase(::flyteidl::core::TaskExecution_Phase value);
 
-  // string output_uri = 1;
+  // string output_uri = 1 [deprecated = true];
   private:
   bool has_output_uri() const;
   public:
-  void clear_output_uri();
-  static const int kOutputUriFieldNumber = 1;
-  const ::std::string& output_uri() const;
-  void set_output_uri(const ::std::string& value);
+  PROTOBUF_DEPRECATED void clear_output_uri();
+  PROTOBUF_DEPRECATED static const int kOutputUriFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::std::string& output_uri() const;
+  PROTOBUF_DEPRECATED void set_output_uri(const ::std::string& value);
   #if LANG_CXX11
-  void set_output_uri(::std::string&& value);
+  PROTOBUF_DEPRECATED void set_output_uri(::std::string&& value);
   #endif
-  void set_output_uri(const char* value);
-  void set_output_uri(const char* value, size_t size);
-  ::std::string* mutable_output_uri();
-  ::std::string* release_output_uri();
-  void set_allocated_output_uri(::std::string* output_uri);
+  PROTOBUF_DEPRECATED void set_output_uri(const char* value);
+  PROTOBUF_DEPRECATED void set_output_uri(const char* value, size_t size);
+  PROTOBUF_DEPRECATED ::std::string* mutable_output_uri();
+  PROTOBUF_DEPRECATED ::std::string* release_output_uri();
+  PROTOBUF_DEPRECATED void set_allocated_output_uri(::std::string* output_uri);
 
   // .flyteidl.core.ExecutionError error = 2;
   bool has_error() const;
@@ -882,14 +882,14 @@ class TaskExecutionClosure final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
-  // .flyteidl.core.LiteralMap output_data = 12;
-  bool has_output_data() const;
-  void clear_output_data();
-  static const int kOutputDataFieldNumber = 12;
-  const ::flyteidl::core::LiteralMap& output_data() const;
-  ::flyteidl::core::LiteralMap* release_output_data();
-  ::flyteidl::core::LiteralMap* mutable_output_data();
-  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+  // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_output_data() const;
+  PROTOBUF_DEPRECATED void clear_output_data();
+  PROTOBUF_DEPRECATED static const int kOutputDataFieldNumber = 12;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& output_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_output_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_output_data();
+  PROTOBUF_DEPRECATED void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
 
   void clear_output_result();
   OutputResultCase output_result_case() const;
@@ -1713,7 +1713,7 @@ inline void TaskExecutionList::set_allocated_token(::std::string* token) {
 
 // TaskExecutionClosure
 
-// string output_uri = 1;
+// string output_uri = 1 [deprecated = true];
 inline bool TaskExecutionClosure::has_output_uri() const {
   return output_result_case() == kOutputUri;
 }
@@ -1840,7 +1840,7 @@ inline ::flyteidl::core::ExecutionError* TaskExecutionClosure::mutable_error() {
   return output_result_.error_;
 }
 
-// .flyteidl.core.LiteralMap output_data = 12;
+// .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
 inline bool TaskExecutionClosure::has_output_data() const {
   return output_result_case() == kOutputData;
 }

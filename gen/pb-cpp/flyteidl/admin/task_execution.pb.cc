@@ -307,36 +307,36 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001"
   "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio"
   "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022"
-  "\r\n\005token\030\002 \001(\t\"\277\004\n\024TaskExecutionClosure\022"
-  "\024\n\noutput_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.f"
-  "lyteidl.core.ExecutionErrorH\000\0220\n\013output_"
-  "data\030\014 \001(\0132\031.flyteidl.core.LiteralMapH\000\022"
-  "1\n\005phase\030\003 \001(\0162\".flyteidl.core.TaskExecu"
-  "tion.Phase\022$\n\004logs\030\004 \003(\0132\026.flyteidl.core"
-  ".TaskLog\022.\n\nstarted_at\030\005 \001(\0132\032.google.pr"
-  "otobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.goo"
-  "gle.protobuf.Duration\022.\n\ncreated_at\030\007 \001("
-  "\0132\032.google.protobuf.Timestamp\022.\n\nupdated"
-  "_at\030\010 \001(\0132\032.google.protobuf.Timestamp\022,\n"
-  "\013custom_info\030\t \001(\0132\027.google.protobuf.Str"
-  "uct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type\030\013 \001(\t\0227"
-  "\n\010metadata\030\020 \001(\0132%.flyteidl.event.TaskEx"
-  "ecutionMetadataB\017\n\routput_result\"Q\n\033Task"
-  "ExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fl"
-  "yteidl.core.TaskExecutionIdentifier\"\332\001\n\034"
-  "TaskExecutionGetDataResponse\022+\n\006inputs\030\001"
-  " \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007out"
-  "puts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022"
-  ".\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lit"
-  "eralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl"
-  ".core.LiteralMapB7Z5github.com/flyteorg/"
-  "flyteidl/gen/pb-go/flyteidl/adminb\006proto"
-  "3"
+  "\r\n\005token\030\002 \001(\t\"\307\004\n\024TaskExecutionClosure\022"
+  "\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\013"
+  "2\035.flyteidl.core.ExecutionErrorH\000\0224\n\013out"
+  "put_data\030\014 \001(\0132\031.flyteidl.core.LiteralMa"
+  "pB\002\030\001H\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.T"
+  "askExecution.Phase\022$\n\004logs\030\004 \003(\0132\026.flyte"
+  "idl.core.TaskLog\022.\n\nstarted_at\030\005 \001(\0132\032.g"
+  "oogle.protobuf.Timestamp\022+\n\010duration\030\006 \001"
+  "(\0132\031.google.protobuf.Duration\022.\n\ncreated"
+  "_at\030\007 \001(\0132\032.google.protobuf.Timestamp\022.\n"
+  "\nupdated_at\030\010 \001(\0132\032.google.protobuf.Time"
+  "stamp\022,\n\013custom_info\030\t \001(\0132\027.google.prot"
+  "obuf.Struct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type"
+  "\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even"
+  "t.TaskExecutionMetadataB\017\n\routput_result"
+  "\"Q\n\033TaskExecutionGetDataRequest\0222\n\002id\030\001 "
+  "\001(\0132&.flyteidl.core.TaskExecutionIdentif"
+  "ier\"\332\001\n\034TaskExecutionGetDataResponse\022+\n\006"
+  "inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030"
+  "\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.UrlB"
+  "lobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl."
+  "core.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031."
+  "flyteidl.core.LiteralMapB7Z5github.com/f"
+  "lyteorg/flyteidl/gen/pb-go/flyteidl/admi"
+  "nb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
-  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1761,
+  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1769,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto() {
@@ -2394,7 +2394,7 @@ const char* TaskExecutionClosure::_InternalParse(const char* begin, const char* 
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string output_uri = 1;
+      // string output_uri = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -2544,7 +2544,7 @@ const char* TaskExecutionClosure::_InternalParse(const char* begin, const char* 
         ptr += size;
         break;
       }
-      // .flyteidl.core.LiteralMap output_data = 12;
+      // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
       case 12: {
         if (static_cast<::google::protobuf::uint8>(tag) != 98) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -2604,7 +2604,7 @@ bool TaskExecutionClosure::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string output_uri = 1;
+      // string output_uri = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
@@ -2740,7 +2740,7 @@ bool TaskExecutionClosure::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.core.LiteralMap output_data = 12;
+      // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
       case 12: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (98 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -2789,7 +2789,7 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string output_uri = 1;
+  // string output_uri = 1 [deprecated = true];
   if (has_output_uri()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->output_uri().data(), static_cast<int>(this->output_uri().length()),
@@ -2870,7 +2870,7 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
       11, this->task_type(), output);
   }
 
-  // .flyteidl.core.LiteralMap output_data = 12;
+  // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
   if (has_output_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       12, HasBitSetters::output_data(this), output);
@@ -2895,7 +2895,7 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string output_uri = 1;
+  // string output_uri = 1 [deprecated = true];
   if (has_output_uri()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->output_uri().data(), static_cast<int>(this->output_uri().length()),
@@ -2984,7 +2984,7 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
         11, this->task_type(), target);
   }
 
-  // .flyteidl.core.LiteralMap output_data = 12;
+  // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
   if (has_output_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
@@ -3093,7 +3093,7 @@ size_t TaskExecutionClosure::ByteSizeLong() const {
   }
 
   switch (output_result_case()) {
-    // string output_uri = 1;
+    // string output_uri = 1 [deprecated = true];
     case kOutputUri: {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -3107,7 +3107,7 @@ size_t TaskExecutionClosure::ByteSizeLong() const {
           *output_result_.error_);
       break;
     }
-    // .flyteidl.core.LiteralMap output_data = 12;
+    // .flyteidl.core.LiteralMap output_data = 12 [deprecated = true];
     case kOutputData: {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
