@@ -112,7 +112,7 @@ metadata:
   namespace: flyte
 type: Opaque
 stringData:
-  client_secret: foobar
+  client_secret:
 ---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
@@ -328,7 +328,7 @@ data:
     task_resources:
       defaults:
         cpu: 100m
-        memory: 200Mi
+        memory: 100Mi
         storage: 5Mi
       limits:
         cpu: 2
@@ -418,39 +418,6 @@ data:
       limits:
         maxDownloadMBs: 10
 ---
-# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-scheduler-config
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-data:
-  admin.yaml: | 
-    admin:
-      clientId: flytepropeller
-      clientSecretLocation: /etc/secrets/client_secret
-      endpoint: flyteadmin:81
-      insecure: true
-    event:
-      capacity: 1000
-      rate: 500
-      type: admin
-  db.yaml: | 
-    database:
-      dbname: flyteadmin
-      host: postgres
-      port: 5432
-      username: postgres
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
----
 # Source: flyte-sandbox/charts/flyte/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -537,11 +504,8 @@ data:
     plugins:
       k8s:
         default-cpus: 100m
-        default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
-        - FLYTE_AWS_ACCESS_KEY_ID: minio
-        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-        default-memory: 200Mi
+        default-env-vars: []
+        default-memory: 100Mi
   logger.yaml: | 
     logger:
       level: 4
@@ -571,8 +535,7 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: false
-        kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        kubernetes-enabled: false
 ---
 # Source: flyte-sandbox/charts/kubernetes-dashboard/templates/configmap.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -3138,7 +3101,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0df07fb14089aac7a404f63f160a5767c02a9f321ec04a06bf30a0701e95eb8"
+        configChecksum: "b2a9bbae91ab4b8fbc8312d74fb7c7e839cd50416d4dc99cdd38b38f7950ae5"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -3426,88 +3389,6 @@ spec:
           name: datacatalog-config
         name: config-volume
 ---
-# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flytescheduler
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app.kubernetes.io/name: flytescheduler
-      app.kubernetes.io/instance: flyte
-  template:
-    metadata:
-      annotations:
-        configChecksum: "0df07fb14089aac7a404f63f160a5767c02a9f321ec04a06bf30a0701e95eb8"
-      labels: 
-        app.kubernetes.io/name: flytescheduler
-        app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
-        app.kubernetes.io/managed-by: Helm
-    spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
-      initContainers:
-      - command:
-        - flytescheduler
-        - precheck
-        - --config
-        - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
-        imagePullPolicy: "IfNotPresent"
-        name: flytescheduler-check
-        volumeMounts:
-          
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      containers:
-      - command:
-        - flytescheduler
-        - run
-        - --config
-        - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
-        imagePullPolicy: "IfNotPresent"
-        name: flytescheduler
-        resources: 
-          limits:
-            cpu: 250m
-            ephemeral-storage: 100Mi
-            memory: 500Mi
-          requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
-        volumeMounts:
-          
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      serviceAccountName: flyteadmin
-      volumes:
-        
-        - emptyDir: {}
-          name: shared-data
-        - configMap:
-            name: flyte-scheduler-config
-          name: config-volume
-        - name: auth
-          secret:
-            secretName: flyte-secret-auth
----
 # Source: flyte-sandbox/charts/flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -3528,7 +3409,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "14d151fc605003a3ee14f13fd0245299ae6bd33925020a29a7327021e5f2138"
+        configChecksum: "40bfeac0d978d87713e3917acb02d91650143941b3da33568dd3fe1261e9c66"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3597,7 +3478,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "14d151fc605003a3ee14f13fd0245299ae6bd33925020a29a7327021e5f2138"
+        configChecksum: "40bfeac0d978d87713e3917acb02d91650143941b3da33568dd3fe1261e9c66"
     spec:
       securityContext:
         fsGroup: 65534
@@ -3921,11 +3802,6 @@ spec:
     - http:
         paths:
           # This is useful only for frontend development
-          - path: /__webpack_hmr
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteconsole
-              servicePort: 80
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific
@@ -4065,7 +3941,7 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
-      host: ""
+      host: null
 ---
 # Source: flyte-sandbox/charts/kubernetes-dashboard/templates/ingress.yaml
 # Copyright 2017 The Kubernetes Authors.

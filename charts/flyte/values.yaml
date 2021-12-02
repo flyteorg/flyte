@@ -183,8 +183,6 @@ flyte:
     # -- Default regex string for searching configuration files
     configPath: /etc/flyte/config/*.yaml
 
-    client_secret: foobar
-
     # -- Configuration for service accounts for FlytePropeller
     serviceAccount:
       # -- Should a service account be created for FlytePropeller
@@ -236,6 +234,14 @@ flyte:
     tolerations: []
     # -- affinity for Flyteconsole deployment
     affinity: {}
+
+#
+# Common secret auth
+#
+
+adminOauthClientCredentials:
+  clientId: flytepropeller
+  clientSecret: foobar
 
   #
   # WEBHOOK SETTINGS
