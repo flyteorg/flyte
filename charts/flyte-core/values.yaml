@@ -62,6 +62,8 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
+  # Metric port used for collecting metric
+  metricPort: 10254
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -106,6 +108,8 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
+  # Metric port used for collecting metric
+  metricPort: 10254
 
 #
 # DATACATALOG SETTINGS
@@ -155,6 +159,8 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # Metric port used for collecting metric
+  metricPort: 10254
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -200,6 +206,8 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # Metric port used for collecting metric
+  metricPort: 10254
 
 #
 # FLYTECONSOLE SETTINGS
