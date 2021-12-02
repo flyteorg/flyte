@@ -841,11 +841,11 @@ Encapsulates the results of the Execution
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "outputs", ":ref:`ref_flyteidl.admin.LiteralMapBlob`", "", "Output URI in the case of a successful execution."
+   "outputs", ":ref:`ref_flyteidl.admin.LiteralMapBlob`", "", "**Deprecated.** Output URI in the case of a successful execution. DEPRECATED. Use GetExecutionData to fetch output data instead."
    "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information in the case of a failed execution."
    "abort_cause", ":ref:`ref_string`", "", "**Deprecated.** In the case of a user-specified abort, this will pass along the user-supplied cause."
    "abort_metadata", ":ref:`ref_flyteidl.admin.AbortMetadata`", "", "In the case of a user-specified abort, this will pass along the user and their supplied cause."
-   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Raw output data produced by this execution."
+   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead."
    "computed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Inputs computed and passed for execution. computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan"
    "phase", ":ref:`ref_flyteidl.core.WorkflowExecution.Phase`", "", "Most recent recorded phase for the execution."
    "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Reported time at which the execution began running."
@@ -1979,9 +1979,9 @@ Container for node execution details and results.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "output_uri", ":ref:`ref_string`", "", "Links to a remotely stored, serialized core.LiteralMap of node execution outputs."
+   "output_uri", ":ref:`ref_string`", "", "**Deprecated.** Links to a remotely stored, serialized core.LiteralMap of node execution outputs. DEPRECATED. Use GetNodeExecutionData to fetch output data instead."
    "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information for the Node"
-   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Raw output data produced by this node execution."
+   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead."
    "phase", ":ref:`ref_flyteidl.core.NodeExecution.Phase`", "", "The last recorded phase for this node execution."
    "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the node execution began running."
    "duration", ":ref:`ref_google.protobuf.Duration`", "", "The amount of time the node execution spent running."
@@ -2260,168 +2260,6 @@ Note: This is internal to Admin and doesn't need to be exposed to other componen
 
 
 
-.. _ref_flyteidl/admin/project_domain_attributes.proto:
-
-flyteidl/admin/project_domain_attributes.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributes:
-
-ProjectDomainAttributes
-------------------------------------------------------------------
-
-Defines a set of custom matching attributes which defines resource defaults for a project and domain.
-For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-
-
-
-.. csv-table:: ProjectDomainAttributes type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "project", ":ref:`ref_string`", "", "Unique project id for which this set of attributes will be applied."
-   "domain", ":ref:`ref_string`", "", "Unique domain id for which this set of attributes will be applied."
-   "matching_attributes", ":ref:`ref_flyteidl.admin.MatchingAttributes`", "", ""
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesDeleteRequest:
-
-ProjectDomainAttributesDeleteRequest
-------------------------------------------------------------------
-
-Request to delete a set matchable project domain attribute override.
-For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-
-
-
-.. csv-table:: ProjectDomainAttributesDeleteRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to delete. +required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesDeleteResponse:
-
-ProjectDomainAttributesDeleteResponse
-------------------------------------------------------------------
-
-Purposefully empty, may be populated in the future.
-
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesGetRequest:
-
-ProjectDomainAttributesGetRequest
-------------------------------------------------------------------
-
-Request to get an individual project domain attribute override.
-For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-
-
-
-.. csv-table:: ProjectDomainAttributesGetRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to return. +required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesGetResponse:
-
-ProjectDomainAttributesGetResponse
-------------------------------------------------------------------
-
-Response to get an individual project domain attribute override.
-For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-
-
-
-.. csv-table:: ProjectDomainAttributesGetResponse type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", ""
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesUpdateRequest:
-
-ProjectDomainAttributesUpdateRequest
-------------------------------------------------------------------
-
-Sets custom attributes for a project-domain combination.
-For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-
-
-
-.. csv-table:: ProjectDomainAttributesUpdateRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", "+required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.ProjectDomainAttributesUpdateResponse:
-
-ProjectDomainAttributesUpdateResponse
-------------------------------------------------------------------
-
-Purposefully empty, may be populated in the future.
-
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-
 .. _ref_flyteidl/admin/project.proto:
 
 flyteidl/admin/project.proto
@@ -2604,6 +2442,168 @@ The state of the project is used to control its visibility in the UI and validit
 
 
 
+.. _ref_flyteidl/admin/project_domain_attributes.proto:
+
+flyteidl/admin/project_domain_attributes.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributes:
+
+ProjectDomainAttributes
+------------------------------------------------------------------
+
+Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectDomainAttributes type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id for which this set of attributes will be applied."
+   "domain", ":ref:`ref_string`", "", "Unique domain id for which this set of attributes will be applied."
+   "matching_attributes", ":ref:`ref_flyteidl.admin.MatchingAttributes`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesDeleteRequest:
+
+ProjectDomainAttributesDeleteRequest
+------------------------------------------------------------------
+
+Request to delete a set matchable project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectDomainAttributesDeleteRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to delete. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesDeleteResponse:
+
+ProjectDomainAttributesDeleteResponse
+------------------------------------------------------------------
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesGetRequest:
+
+ProjectDomainAttributesGetRequest
+------------------------------------------------------------------
+
+Request to get an individual project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectDomainAttributesGetRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to return. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesGetResponse:
+
+ProjectDomainAttributesGetResponse
+------------------------------------------------------------------
+
+Response to get an individual project domain attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectDomainAttributesGetResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesUpdateRequest:
+
+ProjectDomainAttributesUpdateRequest
+------------------------------------------------------------------
+
+Sets custom attributes for a project-domain combination.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectDomainAttributesUpdateRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", "+required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectDomainAttributesUpdateResponse:
+
+ProjectDomainAttributesUpdateResponse
+------------------------------------------------------------------
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+
 .. _ref_flyteidl/admin/schedule.proto:
 
 flyteidl/admin/schedule.proto
@@ -2697,200 +2697,6 @@ Represents a frequency at which to run a schedule.
    "MINUTE", "0", ""
    "HOUR", "1", ""
    "DAY", "2", ""
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-
-.. _ref_flyteidl/admin/task_execution.proto:
-
-flyteidl/admin/task_execution.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecution:
-
-TaskExecution
-------------------------------------------------------------------
-
-Encapsulates all details for a single task execution entity.
-A task execution represents an instantiated task, including all inputs and additional
-metadata as well as computed results included state, outputs, and duration-based attributes.
-
-
-
-.. csv-table:: TaskExecution type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution."
-   "input_uri", ":ref:`ref_string`", "", "Path to remote data store where input blob is stored."
-   "closure", ":ref:`ref_flyteidl.admin.TaskExecutionClosure`", "", "Task execution details and results."
-   "is_parent", ":ref:`ref_bool`", "", "Whether this task spawned nodes."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionClosure:
-
-TaskExecutionClosure
-------------------------------------------------------------------
-
-Container for task execution details and results.
-
-
-
-.. csv-table:: TaskExecutionClosure type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "output_uri", ":ref:`ref_string`", "", "Path to remote data store where output blob is stored if the execution succeeded (and produced outputs)."
-   "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information for the task execution. Populated if the execution failed."
-   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Raw output data produced by this task execution."
-   "phase", ":ref:`ref_flyteidl.core.TaskExecution.Phase`", "", "The last recorded phase for this task execution."
-   "logs", ":ref:`ref_flyteidl.core.TaskLog`", "repeated", "Detailed log information output by the task execution."
-   "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution began running."
-   "duration", ":ref:`ref_google.protobuf.Duration`", "", "The amount of time the task execution spent running."
-   "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution was created."
-   "updated_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution was last updated."
-   "custom_info", ":ref:`ref_google.protobuf.Struct`", "", "Custom data specific to the task plugin."
-   "reason", ":ref:`ref_string`", "", "If there is an explanation for the most recent phase transition, the reason will capture it."
-   "task_type", ":ref:`ref_string`", "", "A predefined yet extensible Task type identifier."
-   "metadata", ":ref:`ref_flyteidl.event.TaskExecutionMetadata`", "", "Metadata around how a task was executed."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionGetDataRequest:
-
-TaskExecutionGetDataRequest
-------------------------------------------------------------------
-
-Request structure to fetch inputs and output for a task execution.
-By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
-
-
-
-.. csv-table:: TaskExecutionGetDataRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "The identifier of the task execution for which to fetch inputs and outputs. +required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionGetDataResponse:
-
-TaskExecutionGetDataResponse
-------------------------------------------------------------------
-
-Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
-
-
-
-.. csv-table:: TaskExecutionGetDataResponse type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution inputs. Deprecated: Please use full_inputs instead."
-   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution outputs. Deprecated: Please use full_outputs instead."
-   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_inputs will only be populated if they are under a configured size threshold."
-   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_outputs will only be populated if they are under a configured size threshold."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionGetRequest:
-
-TaskExecutionGetRequest
-------------------------------------------------------------------
-
-A message used to fetch a single task execution entity.
-See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-
-
-
-.. csv-table:: TaskExecutionGetRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution. +required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionList:
-
-TaskExecutionList
-------------------------------------------------------------------
-
-Response structure for a query to list of task execution entities.
-See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-
-
-
-.. csv-table:: TaskExecutionList type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "task_executions", ":ref:`ref_flyteidl.admin.TaskExecution`", "repeated", ""
-   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.TaskExecutionListRequest:
-
-TaskExecutionListRequest
-------------------------------------------------------------------
-
-Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
-See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-
-
-
-.. csv-table:: TaskExecutionListRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Indicates the node execution to filter by. +required"
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
-   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
-   "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
-   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering for returned list. +optional"
-
-
-
-
-
- <!-- end messages -->
 
  <!-- end enums -->
 
@@ -3049,6 +2855,200 @@ Represents a structure that encapsulates the user-configured specification of th
 
 
 
+.. _ref_flyteidl/admin/task_execution.proto:
+
+flyteidl/admin/task_execution.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecution:
+
+TaskExecution
+------------------------------------------------------------------
+
+Encapsulates all details for a single task execution entity.
+A task execution represents an instantiated task, including all inputs and additional
+metadata as well as computed results included state, outputs, and duration-based attributes.
+
+
+
+.. csv-table:: TaskExecution type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution."
+   "input_uri", ":ref:`ref_string`", "", "Path to remote data store where input blob is stored."
+   "closure", ":ref:`ref_flyteidl.admin.TaskExecutionClosure`", "", "Task execution details and results."
+   "is_parent", ":ref:`ref_bool`", "", "Whether this task spawned nodes."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionClosure:
+
+TaskExecutionClosure
+------------------------------------------------------------------
+
+Container for task execution details and results.
+
+
+
+.. csv-table:: TaskExecutionClosure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "output_uri", ":ref:`ref_string`", "", "**Deprecated.** Path to remote data store where output blob is stored if the execution succeeded (and produced outputs). DEPRECATED. Use GetTaskExecutionData to fetch output data instead."
+   "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information for the task execution. Populated if the execution failed."
+   "output_data", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Raw output data produced by this task execution. DEPRECATED. Use GetTaskExecutionData to fetch output data instead."
+   "phase", ":ref:`ref_flyteidl.core.TaskExecution.Phase`", "", "The last recorded phase for this task execution."
+   "logs", ":ref:`ref_flyteidl.core.TaskLog`", "repeated", "Detailed log information output by the task execution."
+   "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution began running."
+   "duration", ":ref:`ref_google.protobuf.Duration`", "", "The amount of time the task execution spent running."
+   "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution was created."
+   "updated_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the task execution was last updated."
+   "custom_info", ":ref:`ref_google.protobuf.Struct`", "", "Custom data specific to the task plugin."
+   "reason", ":ref:`ref_string`", "", "If there is an explanation for the most recent phase transition, the reason will capture it."
+   "task_type", ":ref:`ref_string`", "", "A predefined yet extensible Task type identifier."
+   "metadata", ":ref:`ref_flyteidl.event.TaskExecutionMetadata`", "", "Metadata around how a task was executed."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionGetDataRequest:
+
+TaskExecutionGetDataRequest
+------------------------------------------------------------------
+
+Request structure to fetch inputs and output for a task execution.
+By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
+
+
+
+.. csv-table:: TaskExecutionGetDataRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "The identifier of the task execution for which to fetch inputs and outputs. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionGetDataResponse:
+
+TaskExecutionGetDataResponse
+------------------------------------------------------------------
+
+Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
+
+
+
+.. csv-table:: TaskExecutionGetDataResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution inputs. Deprecated: Please use full_inputs instead."
+   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution outputs. Deprecated: Please use full_outputs instead."
+   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_inputs will only be populated if they are under a configured size threshold."
+   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_outputs will only be populated if they are under a configured size threshold."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionGetRequest:
+
+TaskExecutionGetRequest
+------------------------------------------------------------------
+
+A message used to fetch a single task execution entity.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+
+
+
+.. csv-table:: TaskExecutionGetRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionList:
+
+TaskExecutionList
+------------------------------------------------------------------
+
+Response structure for a query to list of task execution entities.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+
+
+
+.. csv-table:: TaskExecutionList type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "task_executions", ":ref:`ref_flyteidl.admin.TaskExecution`", "repeated", ""
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionListRequest:
+
+TaskExecutionListRequest
+------------------------------------------------------------------
+
+Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+
+
+
+.. csv-table:: TaskExecutionListRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Indicates the node execution to filter by. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
+   "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
+   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering for returned list. +optional"
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+
 .. _ref_flyteidl/admin/version.proto:
 
 flyteidl/admin/version.proto
@@ -3109,6 +3109,152 @@ Provides Version information for a component
    "Build", ":ref:`ref_string`", "", "Specifies the GIT sha of the build"
    "Version", ":ref:`ref_string`", "", "Version for the build, should follow a semver"
    "BuildTime", ":ref:`ref_string`", "", "Build timestamp"
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+
+.. _ref_flyteidl/admin/workflow.proto:
+
+flyteidl/admin/workflow.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.Workflow:
+
+Workflow
+------------------------------------------------------------------
+
+Represents the workflow structure stored in the Admin
+A workflow is created by ordering tasks and associating outputs to inputs
+in order to produce a directed-acyclic execution graph.
+
+
+
+.. csv-table:: Workflow type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow."
+   "closure", ":ref:`ref_flyteidl.admin.WorkflowClosure`", "", "closure encapsulates all the fields that maps to a compiled version of the workflow."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowClosure:
+
+WorkflowClosure
+------------------------------------------------------------------
+
+A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
+
+
+
+.. csv-table:: WorkflowClosure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "compiled_workflow", ":ref:`ref_flyteidl.core.CompiledWorkflowClosure`", "", "Represents the compiled representation of the workflow from the specification provided."
+   "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the workflow was created."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowCreateRequest:
+
+WorkflowCreateRequest
+------------------------------------------------------------------
+
+Represents a request structure to create a revision of a workflow.
+See :ref:`ref_flyteidl.admin.Workflow` for more details
+
+
+
+.. csv-table:: WorkflowCreateRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow. +required"
+   "spec", ":ref:`ref_flyteidl.admin.WorkflowSpec`", "", "Represents the specification for workflow. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowCreateResponse:
+
+WorkflowCreateResponse
+------------------------------------------------------------------
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowList:
+
+WorkflowList
+------------------------------------------------------------------
+
+Represents a list of workflows returned from the admin.
+See :ref:`ref_flyteidl.admin.Workflow` for more details
+
+
+
+.. csv-table:: WorkflowList type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflows", ":ref:`ref_flyteidl.admin.Workflow`", "repeated", "A list of workflows returned based on the request."
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowSpec:
+
+WorkflowSpec
+------------------------------------------------------------------
+
+Represents a structure that encapsulates the specification of the workflow.
+
+
+
+.. csv-table:: WorkflowSpec type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "template", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "Template of the task that encapsulates all the metadata of the workflow."
+   "sub_workflows", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "repeated", "Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out to Admin to see other registered workflows). In fact, subworkflows do not even need to be registered."
 
 
 
@@ -3273,152 +3419,6 @@ WorkflowAttributesUpdateResponse
 
 Purposefully empty, may be populated in the future.
 
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-
-.. _ref_flyteidl/admin/workflow.proto:
-
-flyteidl/admin/workflow.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.admin.Workflow:
-
-Workflow
-------------------------------------------------------------------
-
-Represents the workflow structure stored in the Admin
-A workflow is created by ordering tasks and associating outputs to inputs
-in order to produce a directed-acyclic execution graph.
-
-
-
-.. csv-table:: Workflow type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow."
-   "closure", ":ref:`ref_flyteidl.admin.WorkflowClosure`", "", "closure encapsulates all the fields that maps to a compiled version of the workflow."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.WorkflowClosure:
-
-WorkflowClosure
-------------------------------------------------------------------
-
-A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
-
-
-
-.. csv-table:: WorkflowClosure type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "compiled_workflow", ":ref:`ref_flyteidl.core.CompiledWorkflowClosure`", "", "Represents the compiled representation of the workflow from the specification provided."
-   "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the workflow was created."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.WorkflowCreateRequest:
-
-WorkflowCreateRequest
-------------------------------------------------------------------
-
-Represents a request structure to create a revision of a workflow.
-See :ref:`ref_flyteidl.admin.Workflow` for more details
-
-
-
-.. csv-table:: WorkflowCreateRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow. +required"
-   "spec", ":ref:`ref_flyteidl.admin.WorkflowSpec`", "", "Represents the specification for workflow. +required"
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.WorkflowCreateResponse:
-
-WorkflowCreateResponse
-------------------------------------------------------------------
-
-Purposefully empty, may be populated in the future.
-
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.WorkflowList:
-
-WorkflowList
-------------------------------------------------------------------
-
-Represents a list of workflows returned from the admin.
-See :ref:`ref_flyteidl.admin.Workflow` for more details
-
-
-
-.. csv-table:: WorkflowList type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "workflows", ":ref:`ref_flyteidl.admin.Workflow`", "repeated", "A list of workflows returned based on the request."
-   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.WorkflowSpec:
-
-WorkflowSpec
-------------------------------------------------------------------
-
-Represents a structure that encapsulates the specification of the workflow.
-
-
-
-.. csv-table:: WorkflowSpec type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "template", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "Template of the task that encapsulates all the metadata of the workflow."
-   "sub_workflows", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "repeated", "Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out to Admin to see other registered workflows). In fact, subworkflows do not even need to be registered."
 
 
 

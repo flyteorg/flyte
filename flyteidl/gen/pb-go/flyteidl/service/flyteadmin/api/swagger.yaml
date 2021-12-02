@@ -3139,7 +3139,8 @@ definitions:
     type: "object"
     properties:
       outputs:
-        description: "Output URI in the case of a successful execution."
+        description: "Output URI in the case of a successful execution.\nDEPRECATED.\
+          \ Use GetExecutionData to fetch output data instead."
         $ref: "#/definitions/adminLiteralMapBlob"
       error:
         description: "Error information in the case of a failed execution."
@@ -3153,7 +3154,8 @@ definitions:
           \ the user and their supplied cause."
         $ref: "#/definitions/adminAbortMetadata"
       output_data:
-        description: "Raw output data produced by this execution."
+        description: "Raw output data produced by this execution.\nDEPRECATED. Use\
+          \ GetExecutionData to fetch output data instead."
         $ref: "#/definitions/coreLiteralMap"
       computed_inputs:
         title: "Inputs computed and passed for execution.\ncomputed_inputs depends\
@@ -5853,12 +5855,14 @@ definitions:
       output_uri:
         type: "string"
         description: "Links to a remotely stored, serialized core.LiteralMap of node\
-          \ execution outputs."
+          \ execution outputs.\nDEPRECATED. Use GetNodeExecutionData to fetch output\
+          \ data instead."
       error:
         title: "Error information for the Node"
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output data produced by this node execution."
+        description: "Raw output data produced by this node execution.\nDEPRECATED.\
+          \ Use GetNodeExecutionData to fetch output data instead."
         $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this node execution."
@@ -10041,13 +10045,15 @@ definitions:
       output_uri:
         type: "string"
         description: "Path to remote data store where output blob is stored if the\
-          \ execution succeeded (and produced outputs)."
+          \ execution succeeded (and produced outputs).\nDEPRECATED. Use GetTaskExecutionData\
+          \ to fetch output data instead."
       error:
         description: "Error information for the task execution. Populated if the execution\
           \ failed."
         $ref: "#/definitions/coreExecutionError"
       output_data:
-        description: "Raw output data produced by this task execution."
+        description: "Raw output data produced by this task execution.\nDEPRECATED.\
+          \ Use GetTaskExecutionData to fetch output data instead."
         $ref: "#/definitions/coreLiteralMap"
       phase:
         description: "The last recorded phase for this task execution."

@@ -118,7 +118,7 @@ class AdminTaskExecutionClosure(object):
     def output_uri(self):
         """Gets the output_uri of this AdminTaskExecutionClosure.  # noqa: E501
 
-        Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).  # noqa: E501
+        Path to remote data store where output blob is stored if the execution succeeded (and produced outputs). DEPRECATED. Use GetTaskExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The output_uri of this AdminTaskExecutionClosure.  # noqa: E501
         :rtype: str
@@ -129,7 +129,7 @@ class AdminTaskExecutionClosure(object):
     def output_uri(self, output_uri):
         """Sets the output_uri of this AdminTaskExecutionClosure.
 
-        Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).  # noqa: E501
+        Path to remote data store where output blob is stored if the execution succeeded (and produced outputs). DEPRECATED. Use GetTaskExecutionData to fetch output data instead.  # noqa: E501
 
         :param output_uri: The output_uri of this AdminTaskExecutionClosure.  # noqa: E501
         :type: str
@@ -164,7 +164,7 @@ class AdminTaskExecutionClosure(object):
     def output_data(self):
         """Gets the output_data of this AdminTaskExecutionClosure.  # noqa: E501
 
-        Raw output data produced by this task execution.  # noqa: E501
+        Raw output data produced by this task execution. DEPRECATED. Use GetTaskExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The output_data of this AdminTaskExecutionClosure.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -175,7 +175,7 @@ class AdminTaskExecutionClosure(object):
     def output_data(self, output_data):
         """Sets the output_data of this AdminTaskExecutionClosure.
 
-        Raw output data produced by this task execution.  # noqa: E501
+        Raw output data produced by this task execution. DEPRECATED. Use GetTaskExecutionData to fetch output data instead.  # noqa: E501
 
         :param output_data: The output_data of this AdminTaskExecutionClosure.  # noqa: E501
         :type: CoreLiteralMap

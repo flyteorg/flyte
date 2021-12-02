@@ -6912,19 +6912,21 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>string output_uri = 1;</code>
+     * <code>string output_uri = 1 [deprecated = true];</code>
      */
-    java.lang.String getOutputUri();
+    @java.lang.Deprecated java.lang.String getOutputUri();
     /**
      * <pre>
      * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>string output_uri = 1;</code>
+     * <code>string output_uri = 1 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getOutputUriBytes();
 
     /**
@@ -6955,27 +6957,30 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    boolean hasOutputData();
+    @java.lang.Deprecated boolean hasOutputData();
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMap getOutputData();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getOutputData();
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
 
     /**
      * <pre>
@@ -7324,9 +7329,9 @@ public final class NodeExecutionOuterClass {
     private java.lang.Object outputResult_;
     public enum OutputResultCase
         implements com.google.protobuf.Internal.EnumLite {
-      OUTPUT_URI(1),
+      @java.lang.Deprecated OUTPUT_URI(1),
       ERROR(2),
-      OUTPUT_DATA(10),
+      @java.lang.Deprecated OUTPUT_DATA(10),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -7402,11 +7407,12 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>string output_uri = 1;</code>
+     * <code>string output_uri = 1 [deprecated = true];</code>
      */
-    public java.lang.String getOutputUri() {
+    @java.lang.Deprecated public java.lang.String getOutputUri() {
       java.lang.Object ref = "";
       if (outputResultCase_ == 1) {
         ref = outputResult_;
@@ -7426,11 +7432,12 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>string output_uri = 1;</code>
+     * <code>string output_uri = 1 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getOutputUriBytes() {
       java.lang.Object ref = "";
       if (outputResultCase_ == 1) {
@@ -7491,21 +7498,23 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    public boolean hasOutputData() {
+    @java.lang.Deprecated public boolean hasOutputData() {
       return outputResultCase_ == 10;
     }
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getOutputData() {
       if (outputResultCase_ == 10) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
@@ -7514,11 +7523,12 @@ public final class NodeExecutionOuterClass {
     /**
      * <pre>
      * Raw output data produced by this node execution.
+     * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+     * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
       if (outputResultCase_ == 10) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
@@ -8353,11 +8363,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>string output_uri = 1;</code>
+       * <code>string output_uri = 1 [deprecated = true];</code>
        */
-      public java.lang.String getOutputUri() {
+      @java.lang.Deprecated public java.lang.String getOutputUri() {
         java.lang.Object ref = "";
         if (outputResultCase_ == 1) {
           ref = outputResult_;
@@ -8377,11 +8388,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>string output_uri = 1;</code>
+       * <code>string output_uri = 1 [deprecated = true];</code>
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getOutputUriBytes() {
         java.lang.Object ref = "";
         if (outputResultCase_ == 1) {
@@ -8402,11 +8414,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>string output_uri = 1;</code>
+       * <code>string output_uri = 1 [deprecated = true];</code>
        */
-      public Builder setOutputUri(
+      @java.lang.Deprecated public Builder setOutputUri(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -8419,11 +8432,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>string output_uri = 1;</code>
+       * <code>string output_uri = 1 [deprecated = true];</code>
        */
-      public Builder clearOutputUri() {
+      @java.lang.Deprecated public Builder clearOutputUri() {
         if (outputResultCase_ == 1) {
           outputResultCase_ = 0;
           outputResult_ = null;
@@ -8434,11 +8448,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>string output_uri = 1;</code>
+       * <code>string output_uri = 1 [deprecated = true];</code>
        */
-      public Builder setOutputUriBytes(
+      @java.lang.Deprecated public Builder setOutputUriBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -8627,21 +8642,23 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public boolean hasOutputData() {
+      @java.lang.Deprecated public boolean hasOutputData() {
         return outputResultCase_ == 10;
       }
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getOutputData() {
         if (outputDataBuilder_ == null) {
           if (outputResultCase_ == 10) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
@@ -8657,11 +8674,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
         if (outputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -8677,11 +8695,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public Builder setOutputData(
+      @java.lang.Deprecated public Builder setOutputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
         if (outputDataBuilder_ == null) {
           outputResult_ = builderForValue.build();
@@ -8695,11 +8714,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
         if (outputDataBuilder_ == null) {
           if (outputResultCase_ == 10 &&
               outputResult_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
@@ -8721,11 +8741,12 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public Builder clearOutputData() {
+      @java.lang.Deprecated public Builder clearOutputData() {
         if (outputDataBuilder_ == null) {
           if (outputResultCase_ == 10) {
             outputResultCase_ = 0;
@@ -8744,21 +8765,23 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
         return getOutputDataFieldBuilder().getBuilder();
       }
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
         if ((outputResultCase_ == 10) && (outputDataBuilder_ != null)) {
           return outputDataBuilder_.getMessageOrBuilder();
         } else {
@@ -8771,9 +8794,10 @@ public final class NodeExecutionOuterClass {
       /**
        * <pre>
        * Raw output data produced by this node execution.
+       * DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 10;</code>
+       * <code>.flyteidl.core.LiteralMap output_data = 10 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
@@ -14695,41 +14719,41 @@ public final class NodeExecutionOuterClass {
       "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\"Z\n\021" +
       "NodeExecutionList\0226\n\017node_executions\030\001 \003" +
       "(\0132\035.flyteidl.admin.NodeExecution\022\r\n\005tok" +
-      "en\030\002 \001(\t\"\252\004\n\024NodeExecutionClosure\022\024\n\nout" +
-      "put_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.flyteid" +
-      "l.core.ExecutionErrorH\000\0220\n\013output_data\030\n" +
-      " \001(\0132\031.flyteidl.core.LiteralMapH\000\0221\n\005pha" +
-      "se\030\003 \001(\0162\".flyteidl.core.NodeExecution.P" +
-      "hase\022.\n\nstarted_at\030\004 \001(\0132\032.google.protob" +
-      "uf.Timestamp\022+\n\010duration\030\005 \001(\0132\031.google." +
-      "protobuf.Duration\022.\n\ncreated_at\030\006 \001(\0132\032." +
-      "google.protobuf.Timestamp\022.\n\nupdated_at\030" +
-      "\007 \001(\0132\032.google.protobuf.Timestamp\022F\n\026wor" +
-      "kflow_node_metadata\030\010 \001(\0132$.flyteidl.adm" +
-      "in.WorkflowNodeMetadataH\001\022>\n\022task_node_m" +
-      "etadata\030\t \001(\0132 .flyteidl.admin.TaskNodeM" +
-      "etadataH\001B\017\n\routput_resultB\021\n\017target_met" +
-      "adata\"W\n\024WorkflowNodeMetadata\022?\n\013executi" +
-      "onId\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
-      "tionIdentifier\"\200\001\n\020TaskNodeMetadata\0227\n\014c" +
-      "ache_status\030\001 \001(\0162!.flyteidl.core.Catalo" +
-      "gCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036.flyt" +
-      "eidl.core.CatalogMetadata\"\207\001\n\033DynamicWor" +
-      "kflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.flyteidl" +
-      ".core.Identifier\022A\n\021compiled_workflow\030\002 " +
-      "\001(\0132&.flyteidl.core.CompiledWorkflowClos" +
-      "ure\"Q\n\033NodeExecutionGetDataRequest\0222\n\002id" +
-      "\030\001 \001(\0132&.flyteidl.core.NodeExecutionIden" +
-      "tifier\"\241\002\n\034NodeExecutionGetDataResponse\022" +
-      "+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob" +
-      "B\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.U" +
-      "rlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flytei" +
-      "dl.core.LiteralMap\022/\n\014full_outputs\030\004 \001(\013" +
-      "2\031.flyteidl.core.LiteralMap\022E\n\020dynamic_w" +
-      "orkflow\030\020 \001(\0132+.flyteidl.admin.DynamicWo" +
-      "rkflowNodeMetadataB7Z5github.com/flyteor" +
-      "g/flyteidl/gen/pb-go/flyteidl/adminb\006pro" +
-      "to3"
+      "en\030\002 \001(\t\"\262\004\n\024NodeExecutionClosure\022\030\n\nout" +
+      "put_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.fly" +
+      "teidl.core.ExecutionErrorH\000\0224\n\013output_da" +
+      "ta\030\n \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H" +
+      "\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExe" +
+      "cution.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.googl" +
+      "e.protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031" +
+      ".google.protobuf.Duration\022.\n\ncreated_at\030" +
+      "\006 \001(\0132\032.google.protobuf.Timestamp\022.\n\nupd" +
+      "ated_at\030\007 \001(\0132\032.google.protobuf.Timestam" +
+      "p\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyt" +
+      "eidl.admin.WorkflowNodeMetadataH\001\022>\n\022tas" +
+      "k_node_metadata\030\t \001(\0132 .flyteidl.admin.T" +
+      "askNodeMetadataH\001B\017\n\routput_resultB\021\n\017ta" +
+      "rget_metadata\"W\n\024WorkflowNodeMetadata\022?\n" +
+      "\013executionId\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\"\200\001\n\020TaskNodeMetad" +
+      "ata\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.cor" +
+      "e.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001(" +
+      "\0132\036.flyteidl.core.CatalogMetadata\"\207\001\n\033Dy" +
+      "namicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031." +
+      "flyteidl.core.Identifier\022A\n\021compiled_wor" +
+      "kflow\030\002 \001(\0132&.flyteidl.core.CompiledWork" +
+      "flowClosure\"Q\n\033NodeExecutionGetDataReque" +
+      "st\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExecu" +
+      "tionIdentifier\"\241\002\n\034NodeExecutionGetDataR" +
+      "esponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin" +
+      ".UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl" +
+      ".admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132" +
+      "\031.flyteidl.core.LiteralMap\022/\n\014full_outpu" +
+      "ts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n\020d" +
+      "ynamic_workflow\030\020 \001(\0132+.flyteidl.admin.D" +
+      "ynamicWorkflowNodeMetadataB7Z5github.com" +
+      "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad" +
+      "minb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

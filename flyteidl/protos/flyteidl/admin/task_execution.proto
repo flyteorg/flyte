@@ -77,13 +77,15 @@ message TaskExecutionList {
 message TaskExecutionClosure {
     oneof output_result {
         // Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).
-        string output_uri                  = 1;
+        // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
+        string output_uri                  = 1 [deprecated = true];
 
         // Error information for the task execution. Populated if the execution failed.
         core.ExecutionError error          = 2;
 
         // Raw output data produced by this task execution.
-        core.LiteralMap output_data        = 12;
+        // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
+        core.LiteralMap output_data        = 12 [deprecated = true];
     }
 
     // The last recorded phase for this task execution.

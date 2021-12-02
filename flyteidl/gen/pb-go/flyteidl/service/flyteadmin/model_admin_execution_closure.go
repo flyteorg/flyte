@@ -14,7 +14,7 @@ import (
 )
 
 type AdminExecutionClosure struct {
-	// Output URI in the case of a successful execution.
+	// Output URI in the case of a successful execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
 	Outputs *AdminLiteralMapBlob `json:"outputs,omitempty"`
 	// Error information in the case of a failed execution.
 	Error_ *CoreExecutionError `json:"error,omitempty"`
@@ -22,7 +22,7 @@ type AdminExecutionClosure struct {
 	AbortCause string `json:"abort_cause,omitempty"`
 	// In the case of a user-specified abort, this will pass along the user and their supplied cause.
 	AbortMetadata *AdminAbortMetadata `json:"abort_metadata,omitempty"`
-	// Raw output data produced by this execution.
+	// Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	ComputedInputs *CoreLiteralMap `json:"computed_inputs,omitempty"`
 	// Most recent recorded phase for the execution.

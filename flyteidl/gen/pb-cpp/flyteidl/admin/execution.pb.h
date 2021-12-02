@@ -1566,14 +1566,14 @@ class ExecutionClosure final :
   ::flyteidl::core::WorkflowExecution_Phase phase() const;
   void set_phase(::flyteidl::core::WorkflowExecution_Phase value);
 
-  // .flyteidl.admin.LiteralMapBlob outputs = 1;
-  bool has_outputs() const;
-  void clear_outputs();
-  static const int kOutputsFieldNumber = 1;
-  const ::flyteidl::admin::LiteralMapBlob& outputs() const;
-  ::flyteidl::admin::LiteralMapBlob* release_outputs();
-  ::flyteidl::admin::LiteralMapBlob* mutable_outputs();
-  void set_allocated_outputs(::flyteidl::admin::LiteralMapBlob* outputs);
+  // .flyteidl.admin.LiteralMapBlob outputs = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_outputs() const;
+  PROTOBUF_DEPRECATED void clear_outputs();
+  PROTOBUF_DEPRECATED static const int kOutputsFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::LiteralMapBlob& outputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::LiteralMapBlob* release_outputs();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::LiteralMapBlob* mutable_outputs();
+  PROTOBUF_DEPRECATED void set_allocated_outputs(::flyteidl::admin::LiteralMapBlob* outputs);
 
   // .flyteidl.core.ExecutionError error = 2;
   bool has_error() const;
@@ -1610,14 +1610,14 @@ class ExecutionClosure final :
   ::flyteidl::admin::AbortMetadata* mutable_abort_metadata();
   void set_allocated_abort_metadata(::flyteidl::admin::AbortMetadata* abort_metadata);
 
-  // .flyteidl.core.LiteralMap output_data = 13;
-  bool has_output_data() const;
-  void clear_output_data();
-  static const int kOutputDataFieldNumber = 13;
-  const ::flyteidl::core::LiteralMap& output_data() const;
-  ::flyteidl::core::LiteralMap* release_output_data();
-  ::flyteidl::core::LiteralMap* mutable_output_data();
-  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+  // .flyteidl.core.LiteralMap output_data = 13 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_output_data() const;
+  PROTOBUF_DEPRECATED void clear_output_data();
+  PROTOBUF_DEPRECATED static const int kOutputDataFieldNumber = 13;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& output_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_output_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_output_data();
+  PROTOBUF_DEPRECATED void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
 
   void clear_output_result();
   OutputResultCase output_result_case() const;
@@ -3937,7 +3937,7 @@ inline void AbortMetadata::set_allocated_principal(::std::string* principal) {
 
 // ExecutionClosure
 
-// .flyteidl.admin.LiteralMapBlob outputs = 1;
+// .flyteidl.admin.LiteralMapBlob outputs = 1 [deprecated = true];
 inline bool ExecutionClosure::has_outputs() const {
   return output_result_case() == kOutputs;
 }
@@ -4146,7 +4146,7 @@ inline ::flyteidl::admin::AbortMetadata* ExecutionClosure::mutable_abort_metadat
   return output_result_.abort_metadata_;
 }
 
-// .flyteidl.core.LiteralMap output_data = 13;
+// .flyteidl.core.LiteralMap output_data = 13 [deprecated = true];
 inline bool ExecutionClosure::has_output_data() const {
   return output_result_case() == kOutputData;
 }
