@@ -1,13 +1,15 @@
-# [RFC Template] Title
+# [RFC] [WIP] Caching of offloaded types
 
 **Authors:**
 
-- @nickname
-- @nickname
+- @eapolinario
 
 ## 1 Executive Summary
 
 *A short paragraph or bullet list that quickly explains what you're trying to do.*
+
+
+
 
 ## 2 Motivation
 
@@ -25,9 +27,39 @@
 - *including code examples if you're proposing an interface or system contract.*
 - *linking to project briefs or wireframes that are relevant.*
 
+
+Proposal: expose a hash in the Literal object and develop machinery in the SDKs to fill in that value. For example, in flytekit we plan to use [external annotations](https://github.com/python/typing/issues/600) to annotate the offloaded objects that should be cached.
+
+But first let's take a detour to explain how values are cached both in local and remote executions.
+
+
+```python
+@task
+def foo(a: int, b: str) -> CachedPandasDataframe:
+    df = pd.Dataframe(...)
+    ...
+    return df
+
+@task(cached=True, version="1.0")
+def bar(df: pd.Dataframe) -> int:
+    ...
+    
+@workflow
+def wf(a: int, b: str):
+    df = foo(a=a, b=b)
+    # Note that the task `Bar` is marked as cached. The intent here is to make sure that
+    # we are able to 
+    # In calls to `bar` we now consider the value of `df` in the generation
+    v = bar(df=df) 
+```
+
 ## 4 Metrics & Dashboards
 
 *What are the main metrics we should be measuring? For example, when interacting with an external system, it might be the external system latency. When adding a new table, how fast would it fill up?*
+
+N/A?
+
+TODO: what's the observability provided by data catalog? Do we know about cache hits and misses?
 
 ## 5 Drawbacks
 
@@ -72,7 +104,7 @@ This document is not:
 
 **Checklist:**
 
-- [ ]  Copy template
+- [x]  Copy template
 - [ ]  Draft RFC (think of it as a wireframe)
 - [ ]  Share as WIP with folks you trust to gut-check
 - [ ]  Send pull request when comfortable
