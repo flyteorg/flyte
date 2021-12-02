@@ -15,10 +15,10 @@ import (
 
 // Container for node execution details and results.
 type AdminNodeExecutionClosure struct {
-	// Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+	// Links to a remotely stored, serialized core.LiteralMap of node execution outputs. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
-	// Raw output data produced by this node execution.
+	// Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// The last recorded phase for this node execution.
 	Phase *CoreNodeExecutionPhase `json:"phase,omitempty"`

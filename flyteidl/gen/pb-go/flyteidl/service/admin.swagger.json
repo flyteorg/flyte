@@ -3245,7 +3245,7 @@
       "properties": {
         "outputs": {
           "$ref": "#/definitions/adminLiteralMapBlob",
-          "description": "Output URI in the case of a successful execution."
+          "description": "Output URI in the case of a successful execution.\nDEPRECATED. Use GetExecutionData to fetch output data instead."
         },
         "error": {
           "$ref": "#/definitions/coreExecutionError",
@@ -3261,7 +3261,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this execution."
+          "description": "Raw output data produced by this execution.\nDEPRECATED. Use GetExecutionData to fetch output data instead."
         },
         "computed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
@@ -3947,7 +3947,7 @@
       "properties": {
         "output_uri": {
           "type": "string",
-          "description": "Links to a remotely stored, serialized core.LiteralMap of node execution outputs."
+          "description": "Links to a remotely stored, serialized core.LiteralMap of node execution outputs.\nDEPRECATED. Use GetNodeExecutionData to fetch output data instead."
         },
         "error": {
           "$ref": "#/definitions/coreExecutionError",
@@ -3955,7 +3955,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this node execution."
+          "description": "Raw output data produced by this node execution.\nDEPRECATED. Use GetNodeExecutionData to fetch output data instead."
         },
         "phase": {
           "$ref": "#/definitions/coreNodeExecutionPhase",
@@ -4390,7 +4390,7 @@
       "properties": {
         "output_uri": {
           "type": "string",
-          "description": "Path to remote data store where output blob is stored if the execution succeeded (and produced outputs)."
+          "description": "Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).\nDEPRECATED. Use GetTaskExecutionData to fetch output data instead."
         },
         "error": {
           "$ref": "#/definitions/coreExecutionError",
@@ -4398,7 +4398,7 @@
         },
         "output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this task execution."
+          "description": "Raw output data produced by this task execution.\nDEPRECATED. Use GetTaskExecutionData to fetch output data instead."
         },
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",

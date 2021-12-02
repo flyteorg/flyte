@@ -102,7 +102,7 @@ class AdminNodeExecutionClosure(object):
     def output_uri(self):
         """Gets the output_uri of this AdminNodeExecutionClosure.  # noqa: E501
 
-        Links to a remotely stored, serialized core.LiteralMap of node execution outputs.  # noqa: E501
+        Links to a remotely stored, serialized core.LiteralMap of node execution outputs. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The output_uri of this AdminNodeExecutionClosure.  # noqa: E501
         :rtype: str
@@ -113,7 +113,7 @@ class AdminNodeExecutionClosure(object):
     def output_uri(self, output_uri):
         """Sets the output_uri of this AdminNodeExecutionClosure.
 
-        Links to a remotely stored, serialized core.LiteralMap of node execution outputs.  # noqa: E501
+        Links to a remotely stored, serialized core.LiteralMap of node execution outputs. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.  # noqa: E501
 
         :param output_uri: The output_uri of this AdminNodeExecutionClosure.  # noqa: E501
         :type: str
@@ -146,7 +146,7 @@ class AdminNodeExecutionClosure(object):
     def output_data(self):
         """Gets the output_data of this AdminNodeExecutionClosure.  # noqa: E501
 
-        Raw output data produced by this node execution.  # noqa: E501
+        Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The output_data of this AdminNodeExecutionClosure.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -157,7 +157,7 @@ class AdminNodeExecutionClosure(object):
     def output_data(self, output_data):
         """Sets the output_data of this AdminNodeExecutionClosure.
 
-        Raw output data produced by this node execution.  # noqa: E501
+        Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.  # noqa: E501
 
         :param output_data: The output_data of this AdminNodeExecutionClosure.  # noqa: E501
         :type: CoreLiteralMap

@@ -15,11 +15,11 @@ import (
 
 // Container for task execution details and results.
 type AdminTaskExecutionClosure struct {
-	// Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).
+	// Path to remote data store where output blob is stored if the execution succeeded (and produced outputs). DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
 	OutputUri string `json:"output_uri,omitempty"`
 	// Error information for the task execution. Populated if the execution failed.
 	Error_ *CoreExecutionError `json:"error,omitempty"`
-	// Raw output data produced by this task execution.
+	// Raw output data produced by this task execution. DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// The last recorded phase for this task execution.
 	Phase *CoreTaskExecutionPhase `json:"phase,omitempty"`

@@ -127,13 +127,15 @@ message NodeExecutionClosure {
     // Only a node in a terminal state will have a non-empty output_result.
     oneof output_result {
         // Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
-        string output_uri                  = 1;
+        // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
+        string output_uri                  = 1 [deprecated = true];
 
         // Error information for the Node
         core.ExecutionError error          = 2;
 
         // Raw output data produced by this node execution.
-        core.LiteralMap output_data        = 10;
+        // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
+        core.LiteralMap output_data        = 10 [deprecated = true];
     }
 
     // The last recorded phase for this node execution.

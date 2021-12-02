@@ -119,7 +119,7 @@ class AdminExecutionClosure(object):
     def outputs(self):
         """Gets the outputs of this AdminExecutionClosure.  # noqa: E501
 
-        Output URI in the case of a successful execution.  # noqa: E501
+        Output URI in the case of a successful execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The outputs of this AdminExecutionClosure.  # noqa: E501
         :rtype: AdminLiteralMapBlob
@@ -130,7 +130,7 @@ class AdminExecutionClosure(object):
     def outputs(self, outputs):
         """Sets the outputs of this AdminExecutionClosure.
 
-        Output URI in the case of a successful execution.  # noqa: E501
+        Output URI in the case of a successful execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
 
         :param outputs: The outputs of this AdminExecutionClosure.  # noqa: E501
         :type: AdminLiteralMapBlob
@@ -211,7 +211,7 @@ class AdminExecutionClosure(object):
     def output_data(self):
         """Gets the output_data of this AdminExecutionClosure.  # noqa: E501
 
-        Raw output data produced by this execution.  # noqa: E501
+        Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
 
         :return: The output_data of this AdminExecutionClosure.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -222,7 +222,7 @@ class AdminExecutionClosure(object):
     def output_data(self, output_data):
         """Sets the output_data of this AdminExecutionClosure.
 
-        Raw output data produced by this execution.  # noqa: E501
+        Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
 
         :param output_data: The output_data of this AdminExecutionClosure.  # noqa: E501
         :type: CoreLiteralMap
