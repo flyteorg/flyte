@@ -234,9 +234,9 @@ data:
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
-        cpu: 1000m
-        memory: 1000Mi
-        storage: 1000Mi
+        cpu: 100m
+        memory: 200Mi
+        storage: 500Mi
       limits:
         cpu: 2
         gpu: 1
@@ -818,7 +818,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8198ec011a4d51f4ac71e64b61e9a2bacebf476da569aa6fb369fd388d7744e"
+        configChecksum: "8460843e0e0cc6562fc821514ca4cc35d04c0f1571df8099527580aa845ee20"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1137,7 +1137,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8198ec011a4d51f4ac71e64b61e9a2bacebf476da569aa6fb369fd388d7744e"
+        configChecksum: "8460843e0e0cc6562fc821514ca4cc35d04c0f1571df8099527580aa845ee20"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
