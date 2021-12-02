@@ -1,4 +1,4 @@
-# [RFC] [WIP] Caching of offloaded types
+# [RFC] Caching of offloaded types
 
 **Authors:**
 
@@ -6,36 +6,28 @@
 
 ## 1 Executive Summary
 
-*A short paragraph or bullet list that quickly explains what you're trying to do.*
-
-
-
+We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for cached objects.
 
 ## 2 Motivation
 
-*What motivates this proposal, and why is it important?*
+The behavior displayed by the cache, in some cases, does not match the users intuitions. 
 
-*Here, we aim to get comfortable articulating the value of our actions.*
+A good example of this involves pandas dataframes. As the system currently stands, we cannot honor the promise that cache keys will take into the account the value of the dataframes, because of how we represent dataframes in the backend.
+
+This RFC discusses how to extend this model to allow users to override the representation of objects used for caching purposes.
 
 ## 3 Proposed Implementation
 
-*This is the core of your proposal, and its purpose is to help you think through the problem because [writing is thinking](https://medium.learningbyshipping.com/writing-is-thinking-an-annotated-twitter-thread-2a75fe07fade).*
+We will expose a new field in [Literal](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79) objects called `hash`, which will be used to represent that literal in cache key calculations. 
 
-*Consider:*
+Each client will then define the mechanics of setting that field when it's appropriate. Specifically for flytekit, we are going to use the extensions to the typing module proposed in https://www.python.org/dev/peps/pep-0593/, more specifically [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated). 
 
-- *using diagrams to help illustrate your ideas.*
-- *including code examples if you're proposing an interface or system contract.*
-- *linking to project briefs or wireframes that are relevant.*
-
-
-Proposal: expose a hash in the Literal object and develop machinery in the SDKs to fill in that value. For example, in flytekit we plan to use [external annotations](https://github.com/python/typing/issues/600) to annotate the offloaded objects that should be cached.
-
-But first let's take a detour to explain how values are cached both in local and remote executions.
+The following example illustrates how these annotated return objects are going to look like:
 
 
 ```python
 @task
-def foo(a: int, b: str) -> CachedPandasDataframe:
+def foo(a: int, b: str) -> Annotated[pd.DataFrame, HashMethod(hash_pandas_dataframe_function) :
     df = pd.Dataframe(...)
     ...
     return df
@@ -47,29 +39,84 @@ def bar(df: pd.Dataframe) -> int:
 @workflow
 def wf(a: int, b: str):
     df = foo(a=a, b=b)
-    # Note that the task `Bar` is marked as cached. The intent here is to make sure that
-    # we are able to 
-    # In calls to `bar` we now consider the value of `df` in the generation
+    # Note that:
+    #   1. the return type of `foo` wraps around a pandas datataframe and adds some metadata to it.
+    #   2. the task `bar` is marked as cached and since the dataframe returned by `foo` overrides its hash
+    #      we will check the cache using the dataframe's hash as opposed to the literal representation.
     v = bar(df=df) 
 ```
 
-## 4 Metrics & Dashboards
+It's worth noting that this is a strictly opt-in feature, controlled at the level of Type Transformers. In other words, annotating types for which Type Transformers are not marked as opted in will be a no-op.
 
-*What are the main metrics we should be measuring? For example, when interacting with an external system, it might be the external system latency. When adding a new table, how fast would it fill up?*
+In the backend, during the construction of the cache key, prior to calling data catalog, in case the `hash` field is set, we will use it to represent the literal, otherwise we will keep [the current behavior](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79).
+
+### Adding the hash to FlyteIDL
+
+The ``Literal`` will contain a new field of type string:
+
+```protobuf
+// A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
+message Literal {
+    oneof value {
+        // A simple value.
+        Scalar scalar = 1;
+
+        // A collection of literals to allow nesting.
+        LiteralCollection collection = 2;
+
+        // A map of strings to literals.
+        LiteralMap map = 3;
+    }
+
+    // Hash to be used during cache key calculation.
+    string hash = 4;
+}
+```
+
+### Flytekit 
+
+The crux of the mechanics in flytekit revolves around how to expose enough flexibility to allow for arbitrary hash functions to be used, while at the same time providing enough information to flytekit. We propose the use of a `HashMethod` metadata object used in annotated return types. The idea being that during the process of converting from a python value to a literal we apply that hash method and set it in the literal.
+
+We'll lean on [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated) to check the types and annotations. 
+
+Since we cannot assume any hashing characteristics of the hash functions (since we are not talking about perfect hashing in the general case), the `HashMethod` will expose a simple interface, composed of a callable of type `Callable[[T], str]`. That said, we will provide plenty of examples to showcase the flexibility of this approach.
+
+### Cache key calculation
+
+As mentioned above, during the regular cache key calculation, in both the local and the remote cases, flyte takes the input literal map as part of the key. Going forward we will allow for specific literals in that map to use the overridden hash as the representation of that literal.
+
+### Other clients
+
+Although nothing prevents the adoption of this feature in other clients, flytekit-java and other clients are outside of the scope of this RFC.
+
+## 4 Metrics & Dashboards
 
 N/A?
 
-TODO: what's the observability provided by data catalog? Do we know about cache hits and misses?
-
 ## 5 Drawbacks
 
-*Are there any reasons why we should not do this? Here we aim to evaluate risk and check ourselves.*
+Although this feature does *not* impact the other aspects of how the cache works, for example,  changes to 
+the version or the signature of the task invalidate the cache entries, it still might cause confusion
+since from the perspective of a task execution we will not be able to tell if an object will have its hash
+overridden. 
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+A few options were discussed in https://github.com/flyteorg/flyte/issues/1581:
+
+**Expose a `hash` method in Type Transformers and annotate the task in case the type transformer does not contain a hash function:** The major drawbacks of this alternative are two-fold: 
+    (1) There's no way to opt-out, i.e. all objects produced by that Type Transformer will be cached.
+    (2) The UX is a bit clunky in the case of user-defined hash functions for two reasons:
+        - the return type does not contain any indication that the object is being cached, we'd have to look in the parameters set in the @task decorator
+        - The case of multiple return objects. 
+
+**Offload the hash calculation to an external system like s3:** The idea would be to rely on etags produced by the act of storing an object in s3. This turns out to be a chicken-and-egg problem as we need to produce etags in order to compare if that tag was already produced. Also, even if we were able to overcome that hurdle, handing this computation to a blackbox system like s3 risks making cache entries unrecoverable, since there is no guarantee that the algorithm s3 uses to compute etags will not change.
 
 ## 7 Potential Impact and Dependencies
+
+It might be useful to cap the size of hashes produced by client code so as to limit the size of the cache keys. Performing this capping should be done in an uniform manner, which implies that it should happen in the backend.
+
+TODO: stopped here!
 
 *Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
 
@@ -78,9 +125,13 @@ TODO: what's the observability provided by data catalog? Do we know about cache 
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
+How does this affect @dynamic tasks, subworkflows, and launchplans?
+
+What's the observability provided by data catalog?
 
 ## 9 Conclusion
+
+This feature 
 
 *Here, we briefly outline why this is the right decision to make at this time and move forward!*
 
@@ -105,7 +156,7 @@ This document is not:
 **Checklist:**
 
 - [x]  Copy template
-- [ ]  Draft RFC (think of it as a wireframe)
+- [x]  Draft RFC (think of it as a wireframe)
 - [ ]  Share as WIP with folks you trust to gut-check
 - [ ]  Send pull request when comfortable
 - [ ]  Label accordingly
