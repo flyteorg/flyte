@@ -48,6 +48,8 @@
   <span> · </span>
   <a href="https://docs.flyte.org/">Documentation</a>
   <span> · </span>
+  <a href="#roadmap">Live Roadmap</a>
+  <span> · </span>
   <a href="#features">Features</a>
   <span> · </span>
   <a href="#community--resources">Community & Resources</a>
@@ -119,6 +121,15 @@ Please maintain an alphabetical order in the following list -->
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
 - [Wolt](https://www.wolt.com)
+
+
+<html>
+<h2 id="roadmap"> 
+   🛣️  Live Roadmap
+</h2>
+</html>
+
+Live roadmap for the project can be found @[Github Live Roadmap](https://github.com/orgs/flyteorg/projects/3).
 
 <html>
 <h2 id="features"> 

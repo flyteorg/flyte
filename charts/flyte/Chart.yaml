@@ -1,9 +1,13 @@
 apiVersion: v2
-name: flyte
-description: A Helm chart for Flyte
+name: flyte-sandbox
+description: A Helm chart for Flyte Sandbox
 type: application
 version: v0.1.10 # VERSION
 dependencies:
+  - name: flyte-core
+    alias: flyte
+    version: v0.1.10 # VERSION
+    repository: file://../flyte-core # REPOSITORY
   - name: contour
     version: 4.1.2
     repository: https://charts.bitnami.com/bitnami
