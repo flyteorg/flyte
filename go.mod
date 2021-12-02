@@ -14,7 +14,7 @@ require (
 	github.com/flyteorg/flyteidl v0.21.10
 	github.com/flyteorg/flyteplugins v0.7.0
 	github.com/flyteorg/flytepropeller v0.14.11
-	github.com/flyteorg/flytestdlib v0.4.4
+	github.com/flyteorg/flytestdlib v0.4.7
 	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-jwt/jwt/v4 v4.1.0
