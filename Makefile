@@ -12,18 +12,21 @@ update_boilerplate:
 .PHONY: linux_compile
 linux_compile:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flytepropeller ./cmd/controller/main.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flytepropeller-manager ./cmd/manager/main.go
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 .PHONY: compile
 compile:
 	mkdir -p ./bin
 	go build -o bin/flytepropeller ./cmd/controller/main.go
+	go build -o bin/flytepropeller-manager ./cmd/manager/main.go
 	go build -o bin/kubectl-flyte ./cmd/kubectl-flyte/main.go && cp bin/kubectl-flyte ${GOPATH}/bin
 
 cross_compile:
 	@glide install
 	@mkdir -p ./bin/cross
 	GOOS=linux GOARCH=amd64 go build -o bin/cross/flytepropeller ./cmd/controller/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/cross/flytepropeller-manager ./cmd/manager/main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/cross/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 op_code_generate:
@@ -37,6 +40,11 @@ benchmark:
 .PHONY: server
 server:
 	@go run ./cmd/controller/main.go --alsologtostderr --propeller.kube-config=$(HOME)/.kube/config
+
+# manager starts the manager service in development mode
+.PHONY: manager
+manager:
+	@go run ./cmd/manager/main.go --alsologtostderr --propeller.kube-config=$(HOME)/.kube/config
 
 clean:
 	rm -rf bin
