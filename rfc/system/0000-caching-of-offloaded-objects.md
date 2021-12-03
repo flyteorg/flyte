@@ -6,7 +6,7 @@
 
 ## 1 Executive Summary
 
-We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for cached objects.
+We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for certain categories of objects.
 
 ## 2 Motivation
 
@@ -48,7 +48,7 @@ def wf(a: int, b: str):
 
 It's worth noting that this is a strictly opt-in feature, controlled at the level of Type Transformers. In other words, annotating types for which Type Transformers are not marked as opted in will be a no-op.
 
-In the backend, during the construction of the cache key, prior to calling data catalog, in case the `hash` field is set, we will use it to represent the literal, otherwise we will keep [the current behavior](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79).
+In the backend, during the construction of the cache key, prior to calling data catalog, in case the `hash` field is set, we will use it to represent the literal, otherwise we will keep [the current behavior](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79). A similar reasoning applies to the local executions case.
 
 ### Adding the hash to FlyteIDL
 
@@ -95,10 +95,7 @@ N/A?
 
 ## 5 Drawbacks
 
-Although this feature does *not* impact the other aspects of how the cache works, for example,  changes to 
-the version or the signature of the task invalidate the cache entries, it still might cause confusion
-since from the perspective of a task execution we will not be able to tell if an object will have its hash
-overridden. 
+Although this feature does *not* impact the other aspects of how the cache works, for example,  changes to the version or the signature of the task invalidate the cache entries, it still might cause confusion since from the perspective of a task execution we will not be able to tell if an object will have its hash overridden. 
 
 ## 6 Alternatives
 
@@ -107,21 +104,15 @@ A few options were discussed in https://github.com/flyteorg/flyte/issues/1581:
 **Expose a `hash` method in Type Transformers and annotate the task in case the type transformer does not contain a hash function:** The major drawbacks of this alternative are two-fold: 
     (1) There's no way to opt-out, i.e. all objects produced by that Type Transformer will be cached.
     (2) The UX is a bit clunky in the case of user-defined hash functions for two reasons:
-        - the return type does not contain any indication that the object is being cached, we'd have to look in the parameters set in the @task decorator
-        - The case of multiple return objects. 
+        - the return type does not contain any indication that the object is being cached, i.e. we'd have to look in the parameters set in the @task decorator
 
 **Offload the hash calculation to an external system like s3:** The idea would be to rely on etags produced by the act of storing an object in s3. This turns out to be a chicken-and-egg problem as we need to produce etags in order to compare if that tag was already produced. Also, even if we were able to overcome that hurdle, handing this computation to a blackbox system like s3 risks making cache entries unrecoverable, since there is no guarantee that the algorithm s3 uses to compute etags will not change.
+
+**Define the new hash field in the Scalar instead of the Literal**: One could argue that the hash could be "tucked away" in the [Scalar](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L55-L65) instead. At this time I couldn't find a great argument for going that route, although most of the reasoning around the use of the hash during cache key calculation still applies (adjusting the access to the hash field).
 
 ## 7 Potential Impact and Dependencies
 
 It might be useful to cap the size of hashes produced by client code so as to limit the size of the cache keys. Performing this capping should be done in an uniform manner, which implies that it should happen in the backend.
-
-TODO: stopped here!
-
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
-
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
 
 ## 8 Unresolved questions
 
@@ -131,9 +122,7 @@ What's the observability provided by data catalog?
 
 ## 9 Conclusion
 
-This feature 
-
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+Users have been requesting a cache-by-value semantics for non-Flyte objects for a long time and the proposal described in this document achieves that goal while not imposing a huge cost to components of the Flyte system.
 
 ## 10 RFC Process Guide, remove this section when done
 
