@@ -8,6 +8,7 @@ Flyte UI is a web-based user interface for Flyte. It helps interact with Flyte o
 With Flyte UI, you can:
 
 * Launch Execution
+* Launch Task
 * View Versioned Executions
 * Trigger Versioned Executions
 * Inspect Execution through Inputs, Outputs, Logs, and Graphs
@@ -21,13 +22,13 @@ With Flyte UI, you can:
 Launch Execution
 ----------------
 
-Launch an execution by clicking on the **Launch** button. Workflows and tasks are viewable after they are registered.
+Launch an execution by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
 UI should be accessible at http://localhost:8000/console.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_001.png
-    :alt: "Launch workflow" button
+    :alt: "Launch Workflow" button
 
     Launch a workflow using the "Launch Workflow" button.
 
@@ -35,7 +36,7 @@ UI should be accessible at http://localhost:8000/console.
 
 The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_implement`.
 
-After clicking on the **Launch** button, pop-up window gets displayed with inputs that the execution requires.
+After clicking on the **Launch Workflow** button, a pop-up window gets displayed with input fields that the execution requires.
 If default inputs are given, they get auto-populated.
 
 |
@@ -58,6 +59,33 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 
 |
 
+Launch Task
+-----------
+
+Launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
+UI should be accessible at http://localhost:8000/console.
+
+|
+
+.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_001.png
+    :alt: "Launch Task" button
+
+    Launch a task using the "Launch Task" button.
+
+|
+
+After clicking on the **Launch Task** button, a pop-up window gets displayed with input fields that the task requires
+and the role with which the task has to run.
+
+|
+
+.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_002.png
+    :alt: Launch form
+
+    A pop-window gets displayed after clicking on the "Launch Task" button.
+
+|
+
 View Versioned Executions
 -------------------------
 
@@ -71,6 +99,8 @@ Every registered Flyte entity is tagged with a version. All the registered versi
     Versioned executions are viewable in the UI.
 
 |
+
+Static graphs are also viewable for every registered versioned execution.
 
 Trigger Versioned Executions
 ----------------------------
