@@ -1,5 +1,4 @@
-{{- if .Values.workflow_scheduler.enabled}}
-  {{- if eq .Values.workflow_scheduler.type "native" }}
+{{- if .Values.flytescheduler.enabled}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,5 +15,4 @@ data:
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-  {{- end }}
-  {{- end }}
+{{- end }}

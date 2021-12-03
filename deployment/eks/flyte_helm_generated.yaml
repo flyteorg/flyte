@@ -27,18 +27,6 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
-# Source: flyte-core/templates/flytescheduler/sa.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flytescheduler
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flytescheduler
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-core-v0.1.10
-    app.kubernetes.io/managed-by: Helm
----
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -265,6 +253,21 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
+  scheduler.yaml: | 
+    scheduler:
+      eventScheduler:
+        region: '<AWS_REGION>'
+        scheduleNamePrefix: flyte
+        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
+        scheme: aws
+        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
+      workflowExecutor:
+        accountId: '<ACCOUNT_NUMBER>'
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
+        region: '<AWS_REGION>'
+        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
+        scheme: aws
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -777,7 +780,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fcf0dfae32fcbeb50142b91c4bfc6d9cb8d7c5bc0c18640873c5e499f46bea5"
+        configChecksum: "895d98f3bc9f174c989b1aea900196eb545d63aa9bf81bcb1784df0b0486f6f"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte

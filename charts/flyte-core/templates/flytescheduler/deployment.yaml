@@ -1,5 +1,4 @@
-{{- if .Values.workflow_scheduler.enabled}}
-  {{- if eq .Values.workflow_scheduler.type "native" }}
+{{- if .Values.flytescheduler.enabled}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -71,5 +70,4 @@ spec:
       {{- with .Values.flytescheduler.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
-    {{- end }}
-  {{- end }}
+{{- end }}
