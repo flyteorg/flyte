@@ -69,5 +69,3 @@ seed_projects:
 
 all: compile
 
-generate: download_tooling
-	@go generate ./...
