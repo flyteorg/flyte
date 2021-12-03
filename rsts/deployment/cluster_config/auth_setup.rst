@@ -217,8 +217,8 @@ Apply Configuration
                     # 3. Replace with a new Native Client ID provisioned in the custom authorization server
                     clientId: flytectl
 
-                    # This should not change
-                    redirectUri: https://localhost:53593/callback
+                    # Do not change to other callback. Switch to https when using TLS (secure: true)
+                    redirectUri: http://localhost:53593/callback
 
                     # 4. "all" is a required scope and must be configured in the custom authorization server
                     scopes:
@@ -282,6 +282,7 @@ If your organization does any automated registration, then you'll need to authen
    Flytectl's `config.yaml <https://docs.flyte.org/projects/flytectl/en/stable/#configure>`_ can be
    configured to use either PKCE (`Proof key for code exchange <https://datatracker.ietf.org/doc/html/rfc7636>`_)
    or Client Credentials (`Client Credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_) flows.
+   If you are using the internal auth server, you can obtain the client credential by ... (This is what we are trying to figure out)
 
    Update ``config.yaml`` as follows:
 
