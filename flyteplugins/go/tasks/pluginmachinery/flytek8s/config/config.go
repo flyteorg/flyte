@@ -1,4 +1,4 @@
-// This package contains configuration for the flytek8s module.
+// Package config contains configuration for the flytek8s module - which is global configuration for all Flyte K8s interactions.
 // This config is under the subsection `k8s` and registered under the Plugin config
 // All K8s based plugins can optionally use the flytek8s module and this configuration allows controlling the defaults
 // For example if for every container execution if some default Environment Variables or Annotations should be used, then they can be configured here
@@ -58,9 +58,11 @@ var (
 	K8sPluginConfigSection = config.MustRegisterSubSection(k8sPluginConfigSectionKey, &defaultK8sConfig)
 )
 
-// Top level k8s plugin config.
+// K8sPluginConfig should be used to configure per-pod defaults for the entire platform. This allows adding global defaults
+// for pods that are being launched. For example, default annotations, labels, if a finalizer should be injected,
+// if taints/tolerations should be used for certain resource types etc.
 type K8sPluginConfig struct {
-	// Boolean flag that indicates if a finalizer should be injected into every K8s resource launched
+	// InjectFinalizer is a boolean flag that indicates if a finalizer should be injected into every K8s resource launched
 	InjectFinalizer bool `json:"inject-finalizer" pflag:",Instructs the plugin to inject a finalizer on startTask and remove it on task termination."`
 
 	// -------------------------------------------------------------------------------------------------------------
@@ -128,9 +130,19 @@ type K8sPluginConfig struct {
 	CreateContainerErrorGracePeriod config2.Duration `json:"create-container-error-grace-period" pflag:"-,Time to wait for transient CreateContainerError errors to be resolved."`
 
 	// The name of the GPU resource to use when the task resource requests GPUs.
-	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:",The name of the GPU resource to use when the task resource requests GPUs."`
+	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
+
+	// DefaultPodSecurityContext provides a default pod security context that should be applied for every pod that is launched by FlytePropeller. This may not be applicable to all plugins. For
+	// downstream plugins - i.e. TensorflowOperators may not support setting this, but Spark does.
+	DefaultPodSecurityContext *v1.PodSecurityContext `json:"default-pod-security-context" pflag:"-,Optionally specify any default pod security context that should be applied to every Pod launched by FlytePropeller."`
+
+	// DefaultSecurityContext provides a default container security context that should be applied for the primary container launched and created by FlytePropeller. This may not be applicable to all plugins. For
+	//	// downstream plugins - i.e. TensorflowOperators may not support setting this, but Spark does.
+	DefaultSecurityContext *v1.SecurityContext `json:"default-security-context" pflag:"-,Optionally specify a default security context that should be applied to every container launched/created by FlytePropeller. This will not be applied to plugins that do not support it or to user supplied containers in pod tasks."`
 }
 
+// FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
+// in K8s, where the IO is managed by the FlyteCoPilot sidecar process.
 type FlyteCoPilotConfig struct {
 	// Co-pilot sidecar container name
 	NamePrefix string `json:"name" pflag:",Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)"`
@@ -153,12 +165,12 @@ type FlyteCoPilotConfig struct {
 	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
 }
 
-// Retrieves the current k8s plugin config or default.
+// GetK8sPluginConfig retrieves the current k8s plugin config or default.
 func GetK8sPluginConfig() *K8sPluginConfig {
 	return K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
 }
 
-// [FOR TESTING ONLY] Sets current value for the config.
+// SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.
 func SetK8sPluginConfig(cfg *K8sPluginConfig) error {
 	return K8sPluginConfigSection.SetConfig(cfg)
 }

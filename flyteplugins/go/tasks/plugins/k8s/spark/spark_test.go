@@ -349,7 +349,11 @@ func TestBuildResourceSpark(t *testing.T) {
 	}))
 
 	// Set Interruptible Config
+	runAsUser := int64(1000)
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultPodSecurityContext: &corev1.PodSecurityContext{
+			RunAsUser: &runAsUser,
+		},
 		InterruptibleNodeSelector: map[string]string{
 			"x/interruptible": "true",
 		},
@@ -373,6 +377,8 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
+	assert.NotNil(t, sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt)
+	assert.Equal(t, *sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt.RunAsUser, runAsUser)
 
 	//Validate Driver/Executor Spec.
 	driverCores, _ := strconv.ParseInt(dummySparkConf["spark.driver.cores"], 10, 32)

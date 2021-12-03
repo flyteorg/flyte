@@ -46,3 +46,9 @@ plugins:
       - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    default-pod-security-context:
+      runAsUser: 1000
+      runAsGroup: 3000
+      fsGroup: 2000
+    default-security-context:
+      allowPrivilegeEscalation: false
