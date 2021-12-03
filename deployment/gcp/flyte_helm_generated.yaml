@@ -348,6 +348,10 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
+  server.yaml: | 
+    scheduler:
+      metricsScope: 'flyte:'
+      profilerPort: 10254
   logger.yaml: | 
     logger:
       level: 5

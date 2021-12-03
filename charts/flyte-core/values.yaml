@@ -62,8 +62,6 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
-  # Metric port used for collecting metric
-  metricPort: 10254
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -108,8 +106,6 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
-  # Metric port used for collecting metric
-  metricPort: 10254
 
 #
 # DATACATALOG SETTINGS
@@ -159,8 +155,6 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
-  # Metric port used for collecting metric
-  metricPort: 10254
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -206,8 +200,6 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
-  # Metric port used for collecting metric
-  metricPort: 10254
 
 #
 # FLYTECONSOLE SETTINGS
@@ -359,6 +351,12 @@ configmap:
         name: staging
       - id: production
         name: production
+
+  # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
+  schedulerConfig:
+    scheduler:
+      metricsScope: 'flyte:'
+      profilerPort: 10254
 
   # -- FlyteAdmin server configuration
   adminServer:

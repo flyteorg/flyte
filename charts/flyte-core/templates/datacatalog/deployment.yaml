@@ -60,7 +60,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
-        - containerPort: {{ .Values.datacatalog.metricPort }}
+        - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
         resources: {{ toYaml .Values.datacatalog.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config

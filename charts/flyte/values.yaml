@@ -357,6 +357,12 @@ flyte:
         - id: production
           name: production
 
+    # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
+    schedulerConfig:
+      scheduler:
+        metricsScope: 'flyte:'
+        profilerPort: 10254
+
     # -- FlyteAdmin server configuration
     adminServer:
       # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
