@@ -312,7 +312,7 @@ type SignedURL struct {
 }
 
 //go:generate enumer -type=InlineEventDataPolicy -trimprefix=InlineEventDataPolicy
-type InlineEventDataPolicy = int
+type InlineEventDataPolicy int
 
 const (
 	// InlineEventDataPolicyOffload specifies that inline execution event data (e.g. outputs) should be offloaded to the
