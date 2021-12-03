@@ -39,15 +39,13 @@ jobs:
         with:
           fetch-depth: "0"
 
+      - name: yq - portable yaml processor
+        uses: mikefarah/yq@v4.15.1
+
       - name: Get Latest Version of component
         id: set_version
         run: |
-          if [ ${{ matrix.component }} = "flytescheduler" ]; then
-             VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flyteadmin/releases/latest" | jq -r .tag_name)
-          else
-             VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/${{ matrix.component }}/releases/latest" | jq -r .tag_name)
-          fi
-          echo ::set-output name=version::$(echo $VERSION)
+          echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyte-core/values.yaml)
         shell: bash
 
       - name: Login to GitHub Container Registry
