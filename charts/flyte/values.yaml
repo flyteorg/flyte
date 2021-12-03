@@ -239,9 +239,13 @@ flyte:
   # Common secret auth
   #
 
-  adminOauthClientCredentials:
-    clientId: flytepropeller
-    clientSecret: foobar
+  #
+  # Common secret auth for propeller & scheduler
+  #
+
+  secrets:
+    adminOauthClientCredentials:
+      clientSecret: foobar
 
   #
   # WEBHOOK SETTINGS

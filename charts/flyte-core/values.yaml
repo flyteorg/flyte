@@ -235,12 +235,12 @@ flyteconsole:
   affinity: {}
 
 #
-# Common secret auth
+# Common secret auth for propeller & scheduler
 #
 
-adminOauthClientCredentials:
-  clientId: flytepropeller
-  clientSecret: foobar
+secrets:
+  adminOauthClientCredentials:
+    clientSecret: foobar
 
 #
 # WEBHOOK SETTINGS
