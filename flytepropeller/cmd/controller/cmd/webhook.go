@@ -17,6 +17,7 @@ import (
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/signals"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flytepropeller/pkg/webhook"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/profutils"
@@ -105,7 +106,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 
 	fmt.Println(string(raw))
 
-	kubeClient, kubecfg, err := getKubeConfig(ctx, propellerCfg)
+	kubeClient, kubecfg, err := utils.GetKubeConfig(ctx, propellerCfg)
 	if err != nil {
 		return err
 	}

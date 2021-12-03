@@ -31,24 +31,22 @@ import (
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/kubernetes/scheme"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/record"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
-	flyteScheme "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/scheme"
 	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
 	lister "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
+	leader "github.com/flyteorg/flytepropeller/pkg/leaderelection"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 const resourceLevelMonitorCycleDuration = 5 * time.Second
@@ -287,23 +285,6 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 	}
 }
 
-func newK8sEventRecorder(ctx context.Context, kubeclientset kubernetes.Interface, publishK8sEvents bool) (record.EventRecorder, error) {
-	// Create event broadcaster
-	// Add FlyteWorkflow controller types to the default Kubernetes Scheme so Events can be
-	// logged for FlyteWorkflow Controller types.
-	err := flyteScheme.AddToScheme(scheme.Scheme)
-	if err != nil {
-		return nil, err
-	}
-	logger.Info(ctx, "Creating event broadcaster")
-	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(logger.InfofNoCtx)
-	if publishK8sEvents {
-		eventBroadcaster.StartRecordingToSink(&typedcorev1.EventSinkImpl{Interface: kubeclientset.CoreV1().Events("")})
-	}
-	return eventBroadcaster.NewRecorder(scheme.Scheme, corev1.EventSource{Component: controllerAgentName}), nil
-}
-
 func getAdminClient(ctx context.Context) (client service.AdminServiceClient, err error) {
 	cfg := admin.GetConfig(ctx)
 	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
@@ -351,7 +332,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		return nil, errors.Wrapf(err, "failed to initialize WF GC")
 	}
 
-	eventRecorder, err := newK8sEventRecorder(ctx, kubeclientset, cfg.PublishK8sEvents)
+	eventRecorder, err := utils.NewK8sEventRecorder(ctx, kubeclientset, controllerAgentName, cfg.PublishK8sEvents)
 	if err != nil {
 		logger.Errorf(ctx, "failed to event recorder %v", err)
 		return nil, errors.Wrapf(err, "failed to initialize resource lock.")
@@ -363,7 +344,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		numWorkers: cfg.Workers,
 	}
 
-	lock, err := newResourceLock(kubeclientset.CoreV1(), kubeclientset.CoordinationV1(), eventRecorder, cfg.LeaderElection)
+	lock, err := leader.NewResourceLock(kubeclientset.CoreV1(), kubeclientset.CoordinationV1(), eventRecorder, cfg.LeaderElection)
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize resource lock.")
 		return nil, errors.Wrapf(err, "failed to initialize resource lock.")
@@ -371,7 +352,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	if lock != nil {
 		logger.Infof(ctx, "Creating leader elector for the controller.")
-		controller.leaderElector, err = newLeaderElector(lock, cfg.LeaderElection, controller.onStartedLeading, func() {
+		controller.leaderElector, err = leader.NewLeaderElector(lock, cfg.LeaderElection, controller.onStartedLeading, func() {
 			logger.Fatal(ctx, "Lost leader state. Shutting down.")
 		})
 

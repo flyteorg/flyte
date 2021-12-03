@@ -28,7 +28,7 @@ const (
 )
 
 // NewResourceLock creates a new config map resource lock for use in a leader election loop
-func newResourceLock(corev1 v1.CoreV1Interface, coordinationV1 v12.CoordinationV1Interface, eventRecorder record.EventRecorder, options config.LeaderElectionConfig) (
+func NewResourceLock(corev1 v1.CoreV1Interface, coordinationV1 v12.CoordinationV1Interface, eventRecorder record.EventRecorder, options config.LeaderElectionConfig) (
 	resourcelock.Interface, error) {
 
 	if !options.Enabled {
@@ -66,7 +66,7 @@ func getUniqueLeaderID() string {
 	return fmt.Sprintf("%v_%v", id, rand.String(10))
 }
 
-func newLeaderElector(lock resourcelock.Interface, cfg config.LeaderElectionConfig,
+func NewLeaderElector(lock resourcelock.Interface, cfg config.LeaderElectionConfig,
 	leaderFn func(ctx context.Context), leaderStoppedFn func()) (*leaderelection.LeaderElector, error) {
 	return leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
 		Lock:          lock,
