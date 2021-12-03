@@ -220,6 +220,9 @@ func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *c
 	if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot, container, iFace, taskContainer.DataConfig); err != nil {
 		return nil, err
 	}
+	if container.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
+		container.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
+	}
 	return container, nil
 }
 

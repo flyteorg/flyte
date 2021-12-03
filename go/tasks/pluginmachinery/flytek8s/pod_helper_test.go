@@ -477,6 +477,22 @@ func TestToK8sPod(t *testing.T) {
 		assert.Equal(t, 1, len(p.NodeSelector))
 		assert.Equal(t, "myScheduler", p.SchedulerName)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
+		assert.Nil(t, p.SecurityContext)
+	})
+
+	t.Run("default-pod-sec-ctx", func(t *testing.T) {
+		v := int64(1000)
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			DefaultPodSecurityContext: &v1.PodSecurityContext{
+				RunAsGroup: &v,
+			},
+		}))
+
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.NotNil(t, p.SecurityContext)
+		assert.Equal(t, *p.SecurityContext.RunAsGroup, v)
 	})
 }
 

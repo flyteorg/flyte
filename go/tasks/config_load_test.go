@@ -77,6 +77,16 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, map[string]string{"x/interruptible": "true"}, k8sConfig.InterruptibleNodeSelector)
 		assert.Equal(t, "x/flyte", k8sConfig.InterruptibleTolerations[0].Key)
 		assert.Equal(t, "interruptible", k8sConfig.InterruptibleTolerations[0].Value)
+		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext)
+		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext.FSGroup)
+		assert.Equal(t, *k8sConfig.DefaultPodSecurityContext.FSGroup, int64(2000))
+		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext.RunAsGroup)
+		assert.Equal(t, *k8sConfig.DefaultPodSecurityContext.RunAsGroup, int64(3000))
+		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext.RunAsUser)
+		assert.Equal(t, *k8sConfig.DefaultPodSecurityContext.RunAsUser, int64(1000))
+		assert.NotNil(t, k8sConfig.DefaultSecurityContext)
+		assert.NotNil(t, k8sConfig.DefaultSecurityContext.AllowPrivilegeEscalation)
+		assert.False(t, *k8sConfig.DefaultSecurityContext.AllowPrivilegeEscalation)
 	})
 
 	t.Run("logs-config-test", func(t *testing.T) {

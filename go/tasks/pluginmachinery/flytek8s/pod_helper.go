@@ -23,6 +23,7 @@ const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
 const SIGKILL = 137
 
+// ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
 func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	// Determine node selector terms to add to node affinity
 	var nodeSelectorRequirement v1.NodeSelectorRequirement
@@ -58,13 +59,13 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	}
 }
 
-// Updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
+// UpdatePod updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
 func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	resourceRequirements []v1.ResourceRequirements, podSpec *v1.PodSpec) {
 	UpdatePodWithInterruptibleFlag(taskExecutionMetadata, resourceRequirements, podSpec, false)
 }
 
-// Updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
+// UpdatePodWithInterruptibleFlag updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
 func UpdatePodWithInterruptibleFlag(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	resourceRequirements []v1.ResourceRequirements, podSpec *v1.PodSpec, omitInterruptible bool) {
 	isInterruptible := !omitInterruptible && taskExecutionMetadata.IsInterruptible()
@@ -87,12 +88,18 @@ func UpdatePodWithInterruptibleFlag(taskExecutionMetadata pluginsCore.TaskExecut
 	if podSpec.Affinity == nil && config.GetK8sPluginConfig().DefaultAffinity != nil {
 		podSpec.Affinity = config.GetK8sPluginConfig().DefaultAffinity.DeepCopy()
 	}
+	if podSpec.SecurityContext == nil && config.GetK8sPluginConfig().DefaultPodSecurityContext != nil {
+		podSpec.SecurityContext = config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy()
+	}
 	ApplyInterruptibleNodeAffinity(isInterruptible, podSpec)
 }
 
+// ToK8sPodSpec constructs a pod spec from the given TaskTemplate
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error) {
 	return ToK8sPodSpecWithInterruptible(ctx, tCtx, false)
 }
+
+// ToK8sPodSpecWithInterruptible constructs a pod spec from the gien TaskTemplate and optionally add (interruptible instance) support.
 func ToK8sPodSpecWithInterruptible(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, omitInterruptible bool) (*v1.PodSpec, error) {
 	task, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -154,6 +161,10 @@ func BuildIdentityPod() *v1.Pod {
 	}
 }
 
+// DemystifyPending is one the core functions, that helps FlytePropeller determine if a pending pod is indeed pending,
+// or it is actually stuck in a un-reparable state. In such a case the pod should be marked as dead and the task should
+// be retried. This has to be handled sadly, as K8s is still largely designed for long running services that should
+// recover from failures, but Flyte pods are completely automated and should either run or fail
 // Important considerations.
 // Pending Status in Pod could be for various reasons and sometimes could signal a problem
 // Case I: Pending because the Image pull is failing and it is backing off
@@ -308,6 +319,9 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	return pluginsCore.PhaseInfoSuccess(&info), nil
 }
 
+// DeterminePrimaryContainerPhase as the name suggests, given all the containers, will return a pluginsCore.PhaseInfo object
+// corresponding to the phase of the primaryContainer which is identified using the provided name.
+// This is useful in case of sidecars or pod jobs, where Flyte will monitor successful exit of a single container.
 func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
 	for _, s := range statuses {
 		if s.Name == primaryContainerName {
@@ -330,6 +344,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }
 
+// ConvertPodFailureToError retruns a legible error message and code from a failed v1.PodStatus field
 func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 	code = "UnknownError"
 	message = "Pod failed. No message received from kubernetes."

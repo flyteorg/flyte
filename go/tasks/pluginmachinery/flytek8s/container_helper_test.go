@@ -7,14 +7,16 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/stretchr/testify/mock"
-	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 var zeroQuantity = resource.MustParse("0")
@@ -369,6 +371,13 @@ func TestToK8sContainer(t *testing.T) {
 		TaskExecMetadata: &mockTaskExecMetadata,
 	}
 
+	cfg := config.GetK8sPluginConfig()
+	allow := false
+	cfg.DefaultSecurityContext = &v1.SecurityContext{
+		AllowPrivilegeEscalation: &allow,
+	}
+	assert.NoError(t, config.SetK8sPluginConfig(cfg))
+
 	container, err := ToK8sContainer(context.TODO(), taskContainer, nil, templateParameters)
 	assert.NoError(t, err)
 	assert.Equal(t, container.Image, "myimage")
@@ -390,6 +399,8 @@ func TestToK8sContainer(t *testing.T) {
 	}, container.Env)
 	errs := validation.IsDNS1123Label(container.Name)
 	assert.Nil(t, errs)
+	assert.NotNil(t, container.SecurityContext)
+	assert.False(t, *container.SecurityContext.AllowPrivilegeEscalation)
 }
 
 func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements) template.Parameters {

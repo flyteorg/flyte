@@ -99,20 +99,22 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 	driverSpec := sparkOp.DriverSpec{
 		SparkPodSpec: sparkOp.SparkPodSpec{
-			Annotations: annotations,
-			Labels:      labels,
-			EnvVars:     sparkEnvVars,
-			Image:       &container.Image,
+			Annotations:      annotations,
+			Labels:           labels,
+			EnvVars:          sparkEnvVars,
+			Image:            &container.Image,
+			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 		},
 		ServiceAccount: &serviceAccountName,
 	}
 
 	executorSpec := sparkOp.ExecutorSpec{
 		SparkPodSpec: sparkOp.SparkPodSpec{
-			Annotations: annotations,
-			Labels:      labels,
-			Image:       &container.Image,
-			EnvVars:     sparkEnvVars,
+			Annotations:      annotations,
+			Labels:           labels,
+			Image:            &container.Image,
+			EnvVars:          sparkEnvVars,
+			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 		},
 	}
 

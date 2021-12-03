@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Lyft. All rights reserved.
  */
 
-// AWS-specific logic to handle execution and monitoring of batch jobs.
+// Package aws contains AWS-specific logic to handle execution and monitoring of batch jobs.
 package aws
 
 import (
@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	EnvSharedCredFilePath                  = "AWS_SHARED_CREDENTIALS_FILE"
+	EnvSharedCredFilePath                  = "AWS_SHARED_CREDENTIALS_FILE" // #nosec
 	EnvAwsProfile                          = "AWS_PROFILE"
 	ErrEmptyCredentials   errors.ErrorCode = "EMPTY_CREDS"
 	ErrUnknownHost        errors.ErrorCode = "UNKNOWN_HOST"
@@ -37,7 +37,7 @@ var single = singleton{
 	lock: sync.RWMutex{},
 }
 
-// A generic AWS Client that can be used for all AWS Client libraries.
+// Client is a generic AWS Client that can be used for all AWS Client libraries.
 type Client interface {
 	GetSession() *session.Session
 	GetSdkConfig() *aws.Config
