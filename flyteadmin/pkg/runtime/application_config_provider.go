@@ -22,7 +22,7 @@ const remoteData = "remoteData"
 const notifications = "notifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
-
+const metricPort = 10254
 const postgres = "postgres"
 
 const KB = 1024
@@ -36,7 +36,7 @@ var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfigSe
 	ExtraOptions: "sslmode=disable",
 })
 var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{
-	ProfilerPort:          10254,
+	ProfilerPort:          metricPort,
 	MetricsScope:          "flyte:",
 	MetadataStoragePrefix: []string{"metadata", "admin"},
 	EventVersion:          2,
@@ -45,7 +45,7 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 })
 
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{
-	ProfilerPort: config.Port{Port: 10253},
+	ProfilerPort: config.Port{Port: metricPort},
 	EventSchedulerConfig: interfaces.EventSchedulerConfig{
 		Scheme:               common.Local,
 		FlyteSchedulerConfig: &interfaces.FlyteSchedulerConfig{},
