@@ -43,8 +43,10 @@ sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${VERSION} # FLYTECONSOLE_TAG," ./cha
 sed -i "s,repository:[^P]*# FLYTECONSOLE_IMAGE,repository: cr.flyte.org/flyteorg/flyteconsole-release # FLYTECONSOLE_IMAGE," ./charts/flyte/values.yaml
 sed -i "s,repository:[^P]*# FLYTECONSOLE_IMAGE,repository: cr.flyte.org/flyteorg/flyteconsole-release # FLYTECONSOLE_IMAGE," ./charts/flyte-core/values.yaml
 
-
 sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${VERSION} # FLYTEPROPELLER_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${VERSION} # FLYTEPROPELLER_TAG," ./charts/flyte-core/values.yaml
 sed -i "s,repository:[^P]*# FLYTEPROPELLER_IMAGE,repository: cr.flyte.org/flyteorg/flytepropeller-release # FLYTEPROPELLER_IMAGE," ./charts/flyte/values.yaml
 sed -i "s,repository:[^P]*# FLYTEPROPELLER_IMAGE,repository: cr.flyte.org/flyteorg/flytepropeller-release # FLYTEPROPELLER_IMAGE," ./charts/flyte-core/values.yaml
+
+sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot-release:${VERSION} # FLYTECOPILOT_IMAGE," ./charts/flyte/values.yaml
+sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot-release:${VERSION} # FLYTECOPILOT_IMAGE," ./charts/flyte-core/values.yaml

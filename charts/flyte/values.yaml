@@ -466,7 +466,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+            image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15 # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
