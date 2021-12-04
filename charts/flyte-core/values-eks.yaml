@@ -54,8 +54,7 @@ flyteadmin:
 # FLYTESCHEDULER
 #
 
-flytescheduler:
-  enabled: false
+flytescheduler: {}
 
 #
 # DATACATALOG

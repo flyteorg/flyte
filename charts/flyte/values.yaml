@@ -583,7 +583,8 @@ flyte:
   # this module, you will not have scheduled launchplans / workflows.
   # Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows
   workflow_scheduler:
-    enabled: false
+    enabled: true
+    type: native
 
   # -- **Optional Component**
   # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of

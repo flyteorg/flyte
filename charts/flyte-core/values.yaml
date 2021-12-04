@@ -68,7 +68,6 @@ flyteadmin:
 #
 
 flytescheduler:
-  enabled: true
   image:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler

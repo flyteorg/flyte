@@ -129,7 +129,8 @@ flyteconsole:
 # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
-  enabled: false
+  enabled: true
+  type: native
 
 # --
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
