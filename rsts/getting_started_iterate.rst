@@ -215,7 +215,7 @@ Modify Code and Test Locally
   🎉 Congratulations! You have now:
 
   1. Run a Flyte workflow locally,
-  2. Started a Flyte sanbox cluster,
+  2. Started a Flyte sandbox cluster,
   3. Run a Flyte workflow on a cluster,
   4. Iterated on a Flyte workflow.
 
