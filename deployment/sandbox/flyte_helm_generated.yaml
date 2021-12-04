@@ -49,6 +49,18 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-sandbox/charts/flyte/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -3168,7 +3180,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3184,7 +3196,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3197,7 +3209,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -3207,7 +3219,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3230,7 +3242,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -3469,7 +3481,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -3484,7 +3496,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.43"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -3504,7 +3516,7 @@ spec:
             name: config-volume
           - name: auth
             mountPath: /etc/secrets/
-      serviceAccountName: flyteadmin
+      serviceAccountName: flytescheduler
       volumes:
         
         - emptyDir: {}
@@ -3896,7 +3908,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.43"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.61"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
@@ -4069,6 +4081,16 @@ spec:
               serviceName: flyteadmin
               servicePort: 81
           - path: /flyteidl.service.IdentityService/*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /grpc.health.v1.Health
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 81
+          - path: /grpc.health.v1.Health/*
             pathType: ImplementationSpecific
             backend:
               serviceName: flyteadmin

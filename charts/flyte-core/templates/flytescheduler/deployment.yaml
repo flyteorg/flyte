@@ -54,7 +54,7 @@ spec:
             name: config-volume
           - name: auth
             mountPath: /etc/secrets/
-      serviceAccountName: {{ template "flyteadmin.name" . }}
+      serviceAccountName: {{ template "flytescheduler.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
           name: shared-data
