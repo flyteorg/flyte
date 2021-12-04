@@ -30,6 +30,16 @@
   backend:
     serviceName: flyteadmin
     servicePort: 81
+- path: /grpc.health.v1.Health
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /grpc.health.v1.Health/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
   {{- end }}
   {{- if .Values.common.ingress.enabled }}
 apiVersion: networking.k8s.io/v1beta1
