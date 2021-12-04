@@ -1,4 +1,4 @@
-# flyte-sandbox
+# flyte
 
 ![Version: v0.1.10](https://img.shields.io/badge/Version-v0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
@@ -137,7 +137,7 @@ helm install gateway bitnami/contour -n flyte
 | flyte.flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyte.flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyte.flyteadmin.image.tag | string | `"v0.6.43"` | Docker image tag |
+| flyte.flyteadmin.image.tag | string | `"v0.6.61"` | Docker image tag |
 | flyte.flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyte.flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyte.flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -175,12 +175,12 @@ helm install gateway bitnami/contour -n flyte
 | flyte.flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flyte.flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flyte.flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
-| flyte.flytescheduler | object | `{"affinity":{},"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"v0.6.43"},"nodeSelector":{},"podAnnotations":{},"resources":{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"secrets":{},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTESCHEDULER SETTINGS |
+| flyte.flytescheduler | object | `{"affinity":{},"configPath":"/etc/flyte/config/*.yaml","image":{"pullPolicy":"IfNotPresent","repository":"cr.flyte.org/flyteorg/flytescheduler","tag":"v0.6.61"},"nodeSelector":{},"podAnnotations":{},"resources":{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}},"secrets":{},"serviceAccount":{"annotations":{},"create":true,"imagePullSecrets":{}},"tolerations":[]}` |  FLYTESCHEDULER SETTINGS |
 | flyte.flytescheduler.affinity | object | `{}` | affinity for Flytescheduler deployment |
 | flyte.flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyte.flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flyte.flytescheduler.image.tag | string | `"v0.6.43"` | Docker image tag |
+| flyte.flytescheduler.image.tag | string | `"v0.6.61"` | Docker image tag |
 | flyte.flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flyte.flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flyte.flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
