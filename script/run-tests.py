@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import os
 import json
 import sys
 import time
@@ -179,6 +179,10 @@ if __name__ == "__main__":
     priorities = sys.argv[2].split(',')
 
     results = run(flytesnacks_release_tag, priorities)
+
+    for result in results:
+        if result["status"] == "failing":
+            os._exit(1)
 
     # Write a json object in its own line describing the result of this run to stdout
     print(f"Result of run:\n{json.dumps(results)}")
