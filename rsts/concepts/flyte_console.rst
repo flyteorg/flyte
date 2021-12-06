@@ -7,23 +7,23 @@ Flyte UI is a web-based user interface for Flyte. It helps interact with Flyte o
 
 With Flyte UI, you can:
 
-* Launch Workflow
-* Launch Task
+* Launch Workflows
+* Launch Tasks
 * View Versioned Tasks and Workflows
 * Trigger Versioned Tasks and Workflows
-* Inspect Execution through Inputs, Outputs, Logs, and Graphs
-* Clone Execution
-* Relaunch Execution
-* Recover Execution
+* Inspect Executions through Inputs, Outputs, Logs, and Graphs
+* Clone Executions
+* Relaunch Executions
+* Recover Executions
 
 .. note::
     `Flyte Console <https://github.com/flyteorg/flyteconsole>`__ hosts the Flyte user interface code.
 
-Launch Workflow
----------------
+Launching Workflows
+-------------------
 
 Launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
-UI should be accessible at http://localhost:8000/console.
+The UI should be accessible at http://localhost:8000/console.
 
 |
 
@@ -36,15 +36,15 @@ UI should be accessible at http://localhost:8000/console.
 
 The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_implement`.
 
-After clicking on the **Launch Workflow** button, a pop-up window gets displayed with input fields that the execution requires.
-If default inputs are given, they get auto-populated.
+After clicking on the **Launch Workflow** button, a pop-up window is displayed with input fields that the execution requires.
+If the default inputs are given, they will be auto-populated.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_002.png
     :alt: Launch form
 
-    A pop-window gets displayed after clicking on the "Launch Workflow" button.
+    A pop-window is displayed after clicking on the "Launch Workflow" button.
 
 |
 
@@ -59,11 +59,11 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 
 |
 
-Launch Task
------------
+Launching Tasks
+---------------
 
 Launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
-UI should be accessible at http://localhost:8000/console.
+The UI should be accessible at http://localhost:8000/console.
 
 |
 
@@ -74,7 +74,7 @@ UI should be accessible at http://localhost:8000/console.
 
 |
 
-After clicking on the **Launch Task** button, a pop-up window gets displayed with input fields that the task requires
+After clicking on the **Launch Task** button, a pop-up window is displayed with input fields that the task requires
 and the role with which the task has to run.
 
 |
@@ -82,12 +82,12 @@ and the role with which the task has to run.
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_002.png
     :alt: Launch form
 
-    A pop-window gets displayed after clicking on the "Launch Task" button.
+    A pop-window is displayed after clicking on the "Launch Task" button.
 
 |
 
-View Versioned Tasks and Workflows
-----------------------------------
+Viewing Versioned Tasks and Workflows
+-------------------------------------
 
 Every registered Flyte entity is tagged with a version. All the registered versions of workflows and tasks are viewable in the UI.
 
@@ -96,12 +96,12 @@ Every registered Flyte entity is tagged with a version. All the registered versi
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/versioned_executions.png
     :alt: Versioned executions
 
-    Versioned workflows are viewable in the UI.
+    View versioned workflows in the UI.
 
 |
 
-Trigger Versioned Tasks and Workflows
--------------------------------------
+Triggering Versioned Tasks and Workflows
+----------------------------------------
 
 Every registered Flyte entity is versioned and can be triggered anytime.
 
@@ -114,8 +114,8 @@ Every registered Flyte entity is versioned and can be triggered anytime.
 
 |
 
-Inspect Executions
-------------------
+Inspecting Executions
+---------------------
 
 Executions can be inspected through the UI. Inputs and Outputs can be viewed for every node and execution.
 
@@ -124,14 +124,14 @@ Executions can be inspected through the UI. Inputs and Outputs can be viewed for
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_001.png
     :alt: Node's inputs and outputs
 
-    Every execution node's inputs and outputs are viewable.
+    View every execution node's inputs and outputs.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_002.png
     :alt: Execution's inputs and outputs
 
-    Every execution's inputs and outputs are viewable.
+    View every execution's inputs and outputs.
 
 |
 
@@ -142,7 +142,7 @@ Logs are accessible as well.
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_003.png
     :alt: Logs
 
-    Kubernetes logs are viewable.
+    View Kubernetes logs.
 
 |
 
@@ -171,19 +171,19 @@ Graph view showcases a static DAG.
 
 |
 
-Clone Execution
-----------------
+Cloning Executions
+------------------
 
 An execution in the RUNNING state can be cloned.
 
-Click on the kebab menu on the top right corner of the UI.
+Click on the ellipsis on the top right corner of the UI.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/clone_execution_001.png
     :alt: Clone execution
 
-    Step 1: Click on the kebab menu.
+    Step 1: Click on the ellipsis.
 
 |
 
@@ -198,10 +198,10 @@ Click on the **Clone Execution** button.
 
 |
 
-Relaunch Execution
-------------------
+Relaunching Executions
+----------------------
 
-**Relaunch** button allows you to relaunch an already terminated execution with pre-populated inputs.
+The **Relaunch** button allows you to relaunch a terminated execution with pre-populated inputs.
 This option can be helpful to try out a new version of a Flyte entity.
 
 |
@@ -215,11 +215,11 @@ This option can be helpful to try out a new version of a Flyte entity.
 
 On clicking the relaunch button, a pop-up window is displayed, allowing you to modify the version and inputs.
 
-Recover Execution
------------------
+Recovering Executions
+---------------------
 
 Recovery mode allows you to recover an individual execution by copying all successful node executions and running from the failed nodes.
-A **Recover** button is available to recover a failed execution.
+The **Recover** button is able to recover a failed execution.
 
 |
 
