@@ -50,6 +50,8 @@
   <span> · </span>
   <a href="#roadmap">Live Roadmap</a>
   <span> · </span>
+  <a href="#rfc">RFC's & Proposals</a>
+  <span> · </span>
   <a href="#features">Features</a>
   <span> · </span>
   <a href="#community--resources">Community & Resources</a>
@@ -211,17 +213,20 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
 | Repo                                                         | Language      | Purpose                                        | Status           |
 | ------------------------------------------------------------ | ------------- | ---------------------------------------------- | ---------------- |
 | [flyte](https://github.com/flyteorg/flyte)                   | Kustomize,RST | deployment, documentation, issues              | Production-grade |
-| [flyteidl](https://github.com/flyteorg/flyteidl)             | Protobuf      | interface definitions                          | Production-grade |
+| [flyteidl](https://github.com/flyteorg/flyteidl)             | Protobuf      | gRPC/REST API, Workflow language spec          | Production-grade |
 | [flytepropeller](https://github.com/flyteorg/flytepropeller) | Go            | execution engine                               | Production-grade |
 | [flyteadmin](https://github.com/flyteorg/flyteadmin)         | Go            | control plane                                  | Production-grade |
 | [flytekit](https://github.com/flyteorg/flytekit)             | Python        | python SDK and tools                           | Production-grade |
-| [flyteconsole](https://github.com/flyteorg/flyteconsole)     | Typescript    | admin console                                  | Production-grade |
+| [flyteconsole](https://github.com/flyteorg/flyteconsole)     | Typescript    | Flyte UI                                       | Production-grade |
 | [datacatalog](https://github.com/flyteorg/datacatalog)       | Go            | manage input & output artifacts                | Production-grade |
-| [flyteplugins](https://github.com/flyteorg/flyteplugins)     | Go            | flyte plugins                                  | Production-grade |
+| [flyteplugins](https://github.com/flyteorg/flyteplugins)     | Go            | Flyte Backend plugins                          | Production-grade |
+| [flytecopilot](https://github.com/flyteorg/flytecopilot)     | Go            | Sidecar to manage input/output for sdk-less    | Production-grade |
 | [flytestdlib](https://github.com/flyteorg/flytestdlib)       | Go            | standard library                               | Production-grade |
-| [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Incubating       |
+| [flytesnacks](https://github.com/flyteorg/flytesnacks)       | Python        | examples, tips, and tricks                     | Maintained       |
 | [flytekit-java](https://github.com/flyteorg/flytekit-java)   | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
-| [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Incomplete       |
+| [flytectl](https://github.com/flyteorg/flytectl)             | Go            | A standalone Flyte CLI                         | Production-grade |
+| [homebrew-tap](https://github.com/flyteorg/homebrew-tap)     | Ruby          | Tap for downloadable flyte tools (cli etc)     | Production-grade |
+| [bazel-rules](https://github.com/flyteorg/bazelrules_flyte)  | skylark/py    | Use Bazel to build Flyte workflows and tasks   | Incubating       |
 
 </details>
 
@@ -247,6 +252,24 @@ We run a suite of tests (defined in https://github.com/flyteorg/flytesnacks/blob
 
 </center>
 </details>
+
+<html>
+<h2 id="rfc"> 
+   🛣️  RFC's (Request for Commments) & Proposals
+</h2>
+</html>
+
+Flyte is a Community Driven and Community Owned Software. It is managed using
+a steering committee and encourages collaboration. The community has a long
+roadmap for Flyte, but they know that, there might be some other interesting
+ideas, extensions or additions that you may want to propose. This is done
+usually starting with a 
+- [Github Issue](https://github.com/flyteorg/flyte/issues) - We maintain issues for all repos in the main flyte repo.
+- Writing down your proposal using a [Documented RFC process](rfc/.)
+- For small changes RFCs are not required, but for larger changes, RFC's are
+  encouraged. Ofcourse drop into the Slack channel and talk to the community,
+if you want to test the waters, before proposing.
+
 
 <html>
 <h2 id="community--resources"> 
