@@ -15,22 +15,5 @@ git clone https://github.com/flyteorg/flyte.git "${OUT}"
 
 pushd ${OUT}
 
-if [ ! -z "$IMAGE" ]; 
-then
-  kind load docker-image ${IMAGE}
-  if [ "${IMAGE_NAME}" == "flytepropeller" ]
-  then
-    sed -i.bak -e "s_${IMAGE_NAME}:.*_${IMAGE}_g" "${OUT}"/kustomize/base/propeller/deployment.yaml
-  fi
-
-  if [ "${IMAGE_NAME}" == "flyteadmin" ]
-  then
-    sed -i.bak -e "s_${IMAGE_NAME}:.*_${IMAGE}_g" "${OUT}"/kustomize/base/admindeployment/deployment.yaml
-  fi
-fi
-
-make kustomize
-# launch flyte end2end
-kubectl apply -f "${OUT}/deployment/test/flyte_generated.yaml"
 make end2end_execute
 popd
