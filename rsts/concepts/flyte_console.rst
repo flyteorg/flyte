@@ -7,10 +7,10 @@ Flyte UI is a web-based user interface for Flyte. It helps interact with Flyte o
 
 With Flyte UI, you can:
 
-* Launch Execution
+* Launch Workflow
 * Launch Task
-* View Versioned Executions
-* Trigger Versioned Executions
+* View Versioned Tasks and Workflows
+* Trigger Versioned Tasks and Workflows
 * Inspect Execution through Inputs, Outputs, Logs, and Graphs
 * Clone Execution
 * Relaunch Execution
@@ -19,10 +19,10 @@ With Flyte UI, you can:
 .. note::
     `Flyte Console <https://github.com/flyteorg/flyteconsole>`__ hosts the Flyte user interface code.
 
-Launch Execution
-----------------
+Launch Workflow
+---------------
 
-Launch an execution by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
+Launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
 UI should be accessible at http://localhost:8000/console.
 
 |
@@ -86,8 +86,8 @@ and the role with which the task has to run.
 
 |
 
-View Versioned Executions
--------------------------
+View Versioned Tasks and Workflows
+----------------------------------
 
 Every registered Flyte entity is tagged with a version. All the registered versions of workflows and tasks are viewable in the UI.
 
@@ -96,23 +96,21 @@ Every registered Flyte entity is tagged with a version. All the registered versi
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/versioned_executions.png
     :alt: Versioned executions
 
-    Versioned executions are viewable in the UI.
+    Versioned workflows are viewable in the UI.
 
 |
 
-Static graphs are also viewable for every registered versioned execution.
+Trigger Versioned Tasks and Workflows
+-------------------------------------
 
-Trigger Versioned Executions
-----------------------------
-
-Every registered workflow is versioned and can be triggered anytime.
+Every registered Flyte entity is versioned and can be triggered anytime.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/trigger_versioned_executions.png
     :alt: Trigger versioned execution
 
-    Trigger versioned executions.
+    Trigger versioned workflows.
 
 |
 
@@ -137,7 +135,7 @@ Executions can be inspected through the UI. Inputs and Outputs can be viewed for
 
 |
 
-Logs should be accessible as well.
+Logs are accessible as well.
 
 |
 
@@ -148,9 +146,9 @@ Logs should be accessible as well.
 
 |
 
-Every execution has two views: Node and Graph.
+Every execution has two views: Nodes and Graph.
 
-A node will encapsulate an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
+A node encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
 More about nodes can be found in :std:ref:`divedeep-nodes`.
 
 |
@@ -162,7 +160,7 @@ More about nodes can be found in :std:ref:`divedeep-nodes`.
 
 |
 
-Graph view showcases the DAG.
+Graph view showcases a static DAG.
 
 |
 
@@ -196,14 +194,15 @@ Click on the **Clone Execution** button.
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/clone_execution_002.png
     :alt: Clone execution
 
-    Step 2: Clone execution.
+    Step 2: "Clone execution" button.
 
 |
 
 Relaunch Execution
 ------------------
 
-**Relaunch** button allows you to relaunch an execution with pre-populated inputs.
+**Relaunch** button allows you to relaunch an already terminated execution with pre-populated inputs.
+This option can be helpful to try out a new version of a Flyte entity.
 
 |
 
@@ -214,13 +213,13 @@ Relaunch Execution
 
 |
 
-A pop-up window gets displayed and it allows you to modify the version and inputs.
+On clicking the relaunch button, a pop-up window is displayed, allowing you to modify the version and inputs.
 
 Recover Execution
 -----------------
 
 Recovery mode allows you to recover an individual execution by copying all successful node executions and running from the failed nodes.
-A **Recover** button is available to recover an execution.
+A **Recover** button is available to recover a failed execution.
 
 |
 
