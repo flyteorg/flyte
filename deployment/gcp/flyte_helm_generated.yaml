@@ -333,7 +333,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: '{{ .Values.secrets.adminOauthClientCredentials.clientId }}'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -367,7 +367,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: '{{ .Values.secrets.adminOauthClientCredentials.clientId }}'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -1211,7 +1211,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e8d05167bb25745084970666f09b34b71d15ceed25742a6ce53565dac314ca6"
+        configChecksum: "697a4b52076be85576571f890c54234f9ef7b8550baa1be61d1821a00689f75"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1287,7 +1287,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "e8d05167bb25745084970666f09b34b71d15ceed25742a6ce53565dac314ca6"
+        configChecksum: "697a4b52076be85576571f890c54234f9ef7b8550baa1be61d1821a00689f75"
     spec:
       securityContext:
         fsGroup: 65534
