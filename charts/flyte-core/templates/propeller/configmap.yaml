@@ -7,38 +7,38 @@ metadata:
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
 {{- with .Values.configmap.admin }}
-  admin.yaml: | {{ toYaml . | nindent 4 }}
+  admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.catalog }}
-  catalog.yaml: | {{ toYaml . | nindent 4 }}
+  catalog.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.catalog_cache }}
-  catalog_cache.yaml: | {{ toYaml . | nindent 4 }}
+  catalog_cache.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.copilot }}
-  copilot.yaml: | {{ toYaml . | nindent 4 }}
+  copilot.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.core }}
   core.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.enabled_plugins }}
-  enabled_plugins.yaml: | {{ toYaml . | nindent 4 }}
+  enabled_plugins.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.k8s }}
-  k8s.yaml: | {{ toYaml . | nindent 4 }}
+  k8s.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.logger }}
-  logger.yaml: | {{ toYaml . | nindent 4 }}
+  logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.qubole }}
-  qubole.yaml: | {{ toYaml . | nindent 4 }}
+  qubole.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.resource_manager }}
-  resource_manager.yaml: | {{ toYaml . | nindent 4 }}
+  resource_manager.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- if .Values.sparkoperator.enabled }}
 {{- with .Values.sparkoperator.plugin_config }}
-  spark.yaml: | {{ toYaml . | nindent 4 }}
+  spark.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}

@@ -11,7 +11,7 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   {{- with .Values.flytescheduler.serviceAccount.imagePullSecrets }}
-imagePullSecrets: {{ toYaml . | nindent 2 }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
   {{- end }}
   {{- end }}
 
