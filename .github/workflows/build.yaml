@@ -43,3 +43,13 @@ jobs:
         env:
           GO111MODULE: "on"
         run: make install && make lint
+
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+      - name: Go generate and diff
+        run: DELTA_CHECK=true make generate
