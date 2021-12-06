@@ -326,6 +326,7 @@ configmap:
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
   enabled: true
+  type: aws
   config:
     scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
