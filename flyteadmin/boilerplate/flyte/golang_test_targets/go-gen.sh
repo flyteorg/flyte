@@ -2,7 +2,7 @@
 
 set -ex
 
-echo "Generating pflags"
+echo "Running go generate"
 go generate ./...
 
 # This section is used by GitHub workflow to ensure that the generation step was run
