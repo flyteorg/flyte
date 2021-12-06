@@ -78,9 +78,14 @@ jobs:
         run: |
           make setup
           flytectl config init
-      - name: Register Examples
-        run: |
-          flytectl register files -p flytesnacks -d development ./download-artifact/**/*
+      - name: Register examples
+        uses: unionai/flyte-register-action@v0.0.2
+        with:
+          flytesnacks: false
+          proto: ./download-artifact/**/*
+          project: flytesnacks
+          version: "latest"
+          domain: development
 
   # Download artifacts again and push them to the release only if this is not a pull request
   release:
