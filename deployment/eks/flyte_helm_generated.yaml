@@ -27,6 +27,18 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
+# Source: flyte-core/templates/flytescheduler/sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -253,21 +265,6 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
-  scheduler.yaml: | 
-    scheduler:
-      eventScheduler:
-        region: '<AWS_REGION>'
-        scheduleNamePrefix: flyte
-        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
-        scheme: aws
-        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
-      workflowExecutor:
-        accountId: '<ACCOUNT_NUMBER>'
-        reconnectAttempts: 10
-        reconnectDelaySeconds: 30
-        region: '<AWS_REGION>'
-        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
-        scheme: aws
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -327,6 +324,40 @@ data:
       limits:
         maxDownloadMBs: 10
 ---
+# Source: flyte-core/templates/flytescheduler/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-scheduler-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  admin.yaml: | 
+    admin:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<RDS_HOST>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
+  logger.yaml: | 
+    logger:
+      level: 5
+      show-source: true
+---
 # Source: flyte-core/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -358,7 +389,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -780,7 +811,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "895d98f3bc9f174c989b1aea900196eb545d63aa9bf81bcb1784df0b0486f6f"
+        configChecksum: "fcf0dfae32fcbeb50142b91c4bfc6d9cb8d7c5bc0c18640873c5e499f46bea5"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1063,6 +1094,92 @@ spec:
                 app.kubernetes.io/name: datacatalog
             topologyKey: kubernetes.io/hostname
 ---
+# Source: flyte-core/templates/flytescheduler/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flytescheduler
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "fcf0dfae32fcbeb50142b91c4bfc6d9cb8d7c5bc0c18640873c5e499f46bea5"
+      labels: 
+        app.kubernetes.io/name: flytescheduler
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-core-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
+      initContainers:
+      - command:
+        - flytescheduler
+        - precheck
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
+        imagePullPolicy: "IfNotPresent"
+        name: flytescheduler-check
+        volumeMounts:
+          - mountPath: /etc/db
+            name: db-pass
+          - mountPath: /etc/flyte/config
+            name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - /etc/flyte/config/*.yaml
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
+        imagePullPolicy: "IfNotPresent"
+        name: flytescheduler
+        resources: 
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+          - mountPath: /etc/db
+            name: db-pass
+          - mountPath: /etc/flyte/config
+            name: config-volume
+          - name: auth
+            mountPath: /etc/secrets/
+      serviceAccountName: flytescheduler
+      volumes:
+        - name: db-pass
+          secret:
+            secretName: db-pass
+        - emptyDir: {}
+          name: shared-data
+        - configMap:
+            name: flyte-scheduler-config
+          name: config-volume
+        - name: auth
+          secret:
+            secretName: flyte-propeller-auth
+---
 # Source: flyte-core/templates/propeller/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1083,7 +1200,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "23136617e9cba3c5334077255e96282c1b247fb6d86b96de33c2ed2fdfec9c3"
+        configChecksum: "88227f5382435c7f420a19be89657233fd63b3188ae55095a0d1b3128359ca2"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1159,7 +1276,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "23136617e9cba3c5334077255e96282c1b247fb6d86b96de33c2ed2fdfec9c3"
+        configChecksum: "88227f5382435c7f420a19be89657233fd63b3188ae55095a0d1b3128359ca2"
     spec:
       securityContext:
         fsGroup: 65534
