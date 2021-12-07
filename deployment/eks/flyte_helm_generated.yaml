@@ -900,6 +900,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 250m
@@ -1062,6 +1063,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 500m

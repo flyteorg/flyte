@@ -356,6 +356,7 @@ flyte:
         - id: production
           name: production
 
+
     # -- FlyteAdmin server configuration
     adminServer:
       # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).

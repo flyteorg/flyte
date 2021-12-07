@@ -111,6 +111,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         resources: {{ toYaml .Values.flyteadmin.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /srv/flyte
