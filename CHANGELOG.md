@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.33.0](http://github.com/lyft/flyteconsole/compare/v0.32.0...v0.33.0) (2021-12-07)
+
+
+### Features
+
+* add advanced launch options to execution details ([#242](http://github.com/lyft/flyteconsole/issues/242)) ([711600d](http://github.com/lyft/flyteconsole/commit/711600d3eefe67451362d7c7454e2b8b4ea39d76))
+
 # [0.32.0](http://github.com/lyft/flyteconsole/compare/v0.31.4...v0.32.0) (2021-12-07)
 
 
