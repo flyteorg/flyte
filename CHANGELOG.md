@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.1](http://github.com/lyft/flyteconsole/compare/v0.33.0...v0.33.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* performance issue related to search ([#250](http://github.com/lyft/flyteconsole/issues/250)) ([210a3ff](http://github.com/lyft/flyteconsole/commit/210a3ff49e220f8ed8268a21dfd030e9dc6d175b))
+
 # [0.33.0](http://github.com/lyft/flyteconsole/compare/v0.32.0...v0.33.0) (2021-12-07)
 
 
