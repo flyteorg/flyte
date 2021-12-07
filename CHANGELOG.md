@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](http://github.com/lyft/flyteconsole/compare/v0.31.4...v0.32.0) (2021-12-07)
+
+
+### Features
+
+* update workflow search UX ([#245](http://github.com/lyft/flyteconsole/issues/245)) ([d1ab6bf](http://github.com/lyft/flyteconsole/commit/d1ab6bfdf750a1127f106cf3c77f3cebca94f53e))
+
 ## [0.31.4](http://github.com/lyft/flyteconsole/compare/v0.31.3...v0.31.4) (2021-11-25)
 
 
