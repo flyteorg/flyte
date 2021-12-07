@@ -1,11 +1,15 @@
-name: Functional test
+name: Functional test for sandbox image
 
 on:
   pull_request:
     paths:
       - docker/**
       - charts/**
-      - .github/workflows/sandbox.yml
+
+defaults:
+  run:
+    # https://github.com/actions/runner/issues/241#issuecomment-577360161
+    shell: 'script -q -e -c "bash {0}"'
 
 jobs:
   run-tests:
@@ -17,13 +21,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - uses: whoan/docker-build-with-cache-action@v5
+      - uses: whoan/docker-build-with-cache-action@v5.11.0
         with:
           image_name: flyteorg/flyte-sandbox
           image_tag: dind
           registry: ghcr.io
-          build_extra_args: --target=dind --compress=true
-          build_args: "FLYTE_TEST=local"
+          build_extra_args: --target=dind --compress=true --build-arg=FLYTE_TEST=local
           context: ./
           dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: false
@@ -44,12 +47,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install flytekit
           pip freeze
-      # TODO: add a badge for when test is running
-      - name: Run tests
-        id: run-tests
+      - name: End2End
         env:
-          PRIORITIES: "P0"
+          KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
         run: |
-          latest_version=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
-          run_tests_output=$(./script/run-tests.py $latest_version $PRIORITIES)
-          echo "$run_tests_output"
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          # launch flyte end2end
+          make end2end_execute
+

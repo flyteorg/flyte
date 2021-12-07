@@ -51,6 +51,7 @@ COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
 # Copy flyte chart
 COPY charts/flyte/ /flyteorg/share/flyte
+COPY charts/flyte-core/ /flyteorg/share/flyte-core
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
