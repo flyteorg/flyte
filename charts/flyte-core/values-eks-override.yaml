@@ -1,6 +1,6 @@
 # -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
-# Override eks value for using aws native scheduler
+# we support native scheduler and this is for backward compatability to older scheduler only
 workflow_scheduler:
   enabled: true
   type: aws
