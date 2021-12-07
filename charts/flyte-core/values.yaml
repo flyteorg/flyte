@@ -293,6 +293,8 @@ common:
     # host:
     tls:
       enabled: false
+      # --- Override default secret containing the tls certificate
+      # secretName:
   flyteNamespaceTemplate:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
