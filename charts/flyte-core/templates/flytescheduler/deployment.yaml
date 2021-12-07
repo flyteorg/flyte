@@ -46,6 +46,8 @@ spec:
         image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
         imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
         name: flytescheduler
+        ports:
+          - containerPort: {{ .Values.configmap.schedulerConfig.scheduler.profilerPort }}
         resources: {{ toYaml .Values.flytescheduler.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config

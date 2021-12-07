@@ -360,6 +360,10 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
+  server.yaml: | 
+    scheduler:
+      metricsScope: 'flyte:'
+      profilerPort: 10254
   logger.yaml: | 
     logger:
       level: 5
@@ -915,6 +919,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 250m
@@ -1085,6 +1090,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 500m
@@ -1173,6 +1179,8 @@ spec:
         image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
+        ports:
+          - containerPort: 10254
         resources: 
           limits:
             cpu: 250m

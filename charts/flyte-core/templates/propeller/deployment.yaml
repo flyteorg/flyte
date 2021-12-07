@@ -39,7 +39,7 @@ spec:
         imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
         name: flytepropeller
         ports:
-        - containerPort: 10254
+        - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
         resources: {{ toYaml .Values.flytepropeller.resources | nindent 10 }}
         volumeMounts:
           - name: config-volume
