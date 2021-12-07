@@ -455,7 +455,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15 # FLYTECOPILOT_IMAGE
+            image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22 # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
@@ -573,8 +573,7 @@ flyte:
   # Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows
   workflow_scheduler:
     enabled: true
-    config: {}
-    type: "native"
+    type: native
 
   # -- **Optional Component**
   # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of

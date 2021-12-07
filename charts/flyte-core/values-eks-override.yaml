@@ -1,0 +1,22 @@
+# -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+# we support native scheduler and this is for backward compatability to older scheduler only
+workflow_scheduler:
+  enabled: true
+  type: aws
+  config:
+    scheduler:
+      # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
+      eventScheduler:
+        scheme: aws
+        region: "{{ .Values.userSettings.accountRegion }}"
+        scheduleRole: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte_cron_scheduler_role"
+        targetName: "arn:aws:sqs:{{ .Values.userSettings.accountRegion }}:{{ .Values.userSettings.accountNumber }}:flyte-helm-test-cron-scheduler-queue"
+        scheduleNamePrefix: flyte
+      workflowExecutor:
+        scheme: aws
+        region: "{{ .Values.userSettings.accountRegion }}"
+        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
+        accountId: "{{ .Values.userSettings.accountNumber }}"
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30

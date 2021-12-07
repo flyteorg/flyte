@@ -68,7 +68,6 @@ flyteadmin:
 #
 
 flytescheduler:
-  enabled: true
   image:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
@@ -475,7 +474,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
