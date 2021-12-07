@@ -307,9 +307,19 @@ This guide gives an overview of how to set up the K8s Operator backend plugin in
 
 5. Upgrade the Flyte Helm release.
 
-   .. code-block:: bash
+   .. tabbed:: Sandbox
 
-      helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+        .. code-block:: bash
+
+           helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+
+   .. tabbed:: AWS/GCP
+
+        .. code-block:: bash
+
+            helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core --kubeconfig=~/.flyte/k3s/k3s.yaml
+
+
 
 6. Register the plugin example.
 
