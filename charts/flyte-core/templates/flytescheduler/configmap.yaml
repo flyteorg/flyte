@@ -8,7 +8,7 @@ metadata:
   labels: {{ include "flytescheduler.labels" . | nindent 4 }}
 data:
 {{- with .Values.configmap.admin }}
-  admin.yaml: | {{ toYaml . | nindent 4 }}
+  admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.db.admin }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
@@ -16,5 +16,5 @@ data:
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-{{- end }}
-{{- end }}
+  {{- end }}
+  {{- end }}

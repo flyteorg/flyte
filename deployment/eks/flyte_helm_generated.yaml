@@ -70,6 +70,16 @@ metadata:
 type: Opaque
 stringData:
 ---
+# Source: flyte-core/templates/common/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-secret-auth
+  namespace: flyte
+type: Opaque
+stringData:
+  client_secret: foobar
+---
 # Source: flyte-core/templates/common/secret.yaml
 apiVersion: v1
 kind: Secret
@@ -78,16 +88,6 @@ metadata:
 stringData:
   pass.txt: '<DB_PASSWORD>'
 type: Opaque
----
-# Source: flyte-core/templates/propeller/secret-auth.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-propeller-auth
-  namespace: flyte
-type: Opaque
-stringData:
-  client_secret: foobar
 ---
 # Source: flyte-core/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
@@ -338,7 +338,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -372,7 +372,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -1178,7 +1178,7 @@ spec:
           name: config-volume
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
 ---
 # Source: flyte-core/templates/propeller/deployment.yaml
 apiVersion: apps/v1
@@ -1200,7 +1200,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "88227f5382435c7f420a19be89657233fd63b3188ae55095a0d1b3128359ca2"
+        configChecksum: "1e72d494bd5435f255ec2df3735e87ee355b07567b8b380cd2e3c32429b2f9b"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1247,7 +1247,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -1276,7 +1276,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "88227f5382435c7f420a19be89657233fd63b3188ae55095a0d1b3128359ca2"
+        configChecksum: "1e72d494bd5435f255ec2df3735e87ee355b07567b8b380cd2e3c32429b2f9b"
     spec:
       securityContext:
         fsGroup: 65534
