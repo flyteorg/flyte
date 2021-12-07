@@ -5,9 +5,9 @@ Google Bigquery Plugin Setup
 
 This guide gives an overview of how to set up BigQuery in your Flyte deployment. BigQuery plugin needs Flyte deployment in GCP cloud; sandbox/AWS/Azure wouldn't work.
 
-1. Create a file named ``values-bigquery.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for BigQuery.
+1. Create a file named ``values-override.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for BigQuery.
 
-.. code-block::
+  .. code-block::
 
     configmap:
       enabled_plugins:
@@ -32,19 +32,34 @@ This guide gives an overview of how to set up BigQuery in your Flyte deployment.
 
    .. code-block:: bash
 
-      helm upgrade -n flyte -f values-bigquery.yaml flyteorg/flyte
+      helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
 
 3. Register the BigQuery plugin example.
 
    .. code-block:: bash
 
-      TODO: https://github.com/flyteorg/flyte/issues/1776
+      # make sure that you have correct flytectl config at ~/.flyte/config.yaml
+      # TODO: https://github.com/flyteorg/flyte/issues/1776
       flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-gcp-bigquery.tar.gz --archive -p flytesnacks -d development
 
-4. Lastly, fetch the launch plan, create and monitor the execution.
+4.  Lastly, fetch the launch plan, create and monitor the execution.
 
-   .. code-block:: bash
+   .. tabbed:: Flyte Console
 
-      flytectl get launchplan --project flytesnacks --domain development  <TODO: https://github.com/flyteorg/flyte/issues/1776>  --latest --execFile exec_spec.yaml
-      flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
-      flytectl get execution --project flytesnacks --domain development <execution_id>
+      * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
+      * Click on `Launch` to open up the launch form.
+      * Submit the form.
+
+   .. tabbed:: Flytectl
+
+      * Retrieve an execution form in the form of a yaml file:
+
+        .. code-block:: bash
+
+           flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain <TODO: https://github.com/flyteorg/flyte/issues/1776>  --latest --execFile exec_spec.yaml
+
+      * Launch an execution:
+
+        .. code-block:: bash
+
+           flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
