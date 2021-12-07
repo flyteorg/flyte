@@ -23,7 +23,7 @@ Launching Workflows
 -------------------
 
 Launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
-The UI should be accessible at http://localhost:8000/console.
+The UI should be accessible at http://localhost:30081/console.
 
 |
 
@@ -36,7 +36,7 @@ The UI should be accessible at http://localhost:8000/console.
 
 The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_implement`.
 
-After clicking on the **Launch Workflow** button, a pop-up window is displayed with input fields that the execution requires.
+A pop-up window appears with input fields that the execution requires on clicking the **Launch Workflow** button.
 If the default inputs are given, they will be auto-populated.
 
 |
@@ -44,7 +44,7 @@ If the default inputs are given, they will be auto-populated.
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_002.png
     :alt: Launch form
 
-    A pop-window is displayed after clicking on the "Launch Workflow" button.
+    A pop-up window appears after clicking the "Launch Workflow" button.
 
 |
 
@@ -55,7 +55,7 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_003.png
     :alt: "Terminate" button
 
-    Terminate an execution by clicking on the "Terminate" button.
+    Terminate an execution by clicking the "Terminate" button.
 
 |
 
@@ -63,26 +63,26 @@ Launching Tasks
 ---------------
 
 Launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
-The UI should be accessible at http://localhost:8000/console.
+The UI should be accessible at http://localhost:30081/console.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_001.png
     :alt: "Launch Task" button
 
-    Launch a task using the "Launch Task" button.
+    Launch a task by clicking the "Launch Task" button.
 
 |
 
-After clicking on the **Launch Task** button, a pop-up window is displayed with input fields that the task requires
-and the role with which the task has to run.
+A pop-up window appears with input fields that the task requires and the role with which the task has to run
+on clicking the **Launch Task** button.
 
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_002.png
     :alt: Launch form
 
-    A pop-window is displayed after clicking on the "Launch Task" button.
+    A pop-up window appears on clicking the "Launch Task" button.
 
 |
 
@@ -94,9 +94,9 @@ Every registered Flyte entity is tagged with a version. All the registered versi
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/versioned_executions.png
-    :alt: Versioned executions
+    :alt: Versioned workflows
 
-    View versioned workflows in the UI.
+    View versioned workflows.
 
 |
 
@@ -108,7 +108,7 @@ Every registered Flyte entity is versioned and can be triggered anytime.
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/trigger_versioned_executions.png
-    :alt: Trigger versioned execution
+    :alt: Trigger versioned workflows
 
     Trigger versioned workflows.
 
@@ -148,7 +148,7 @@ Logs are accessible as well.
 
 Every execution has two views: Nodes and Graph.
 
-A node encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
+A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
 More about nodes can be found in :std:ref:`divedeep-nodes`.
 
 |
@@ -207,13 +207,13 @@ This option can be helpful to try out a new version of a Flyte entity.
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/relaunch_execution.png
-    :alt: Relaunch execution
+    :alt: Relaunch an execution
 
     Relaunch an execution.
 
 |
 
-On clicking the relaunch button, a pop-up window is displayed, allowing you to modify the version and inputs.
+A pop-up window appears on clicking the relaunch button, allowing you to modify the version and inputs.
 
 Recovering Executions
 ---------------------
@@ -224,7 +224,7 @@ The **Recover** button is able to recover a failed execution.
 |
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/recover_execution.png
-    :alt: Recover execution
+    :alt: Recover an execution
 
     Recover an execution.
 
