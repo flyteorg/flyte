@@ -1,5 +1,5 @@
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/serviceaccount.yaml
+# Source: flyte/charts/contour/templates/contour/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour
 ---
-# Source: flyte-sandbox/charts/contour/templates/envoy/serviceaccount.yaml
+# Source: flyte/charts/contour/templates/envoy/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -25,7 +25,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: envoy
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/rbac.yaml
+# Source: flyte/charts/flyte/templates/admin/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -37,7 +37,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-sandbox/charts/flyte/templates/datacatalog/rbac.yaml
+# Source: flyte/charts/flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -49,7 +49,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/sa.yaml
+# Source: flyte/charts/flyte/templates/flytescheduler/sa.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -61,7 +61,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/rbac.yaml
+# Source: flyte/charts/flyte/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -73,7 +73,7 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
 apiVersion: v1
 kind: ServiceAccount
@@ -81,7 +81,7 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/serviceaccount.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/serviceaccount.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   name: flyte-kubernetes-dashboard
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/secret-auth.yaml
+# Source: flyte/charts/flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -116,17 +116,17 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/secret-auth.yaml
+# Source: flyte/charts/flyte/templates/common/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-propeller-auth
+  name: flyte-secret-auth
   namespace: flyte
 type: Opaque
 stringData:
   client_secret: foobar
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create an empty secret that the first propeller pod will populate
 apiVersion: v1
 kind: Secret
@@ -135,7 +135,7 @@ metadata:
   namespace: flyte
 type: Opaque
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,7 +163,7 @@ metadata:
   name: flyte-kubernetes-dashboard-certs
 type: Opaque
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
 # kubernetes-dashboard-csrf
 apiVersion: v1
 kind: Secret
@@ -177,7 +177,7 @@ metadata:
   name: kubernetes-dashboard-csrf
 type: Opaque
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/secret.yaml
 # kubernetes-dashboard-key-holder
 apiVersion: v1
 kind: Secret
@@ -191,7 +191,7 @@ metadata:
   name: kubernetes-dashboard-key-holder
 type: Opaque
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/configmap.yaml
+# Source: flyte/charts/contour/templates/contour/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -212,7 +212,7 @@ data:
       configmap-namespace: 'flyte'
     tls: {}
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/cluster_resource_configmap.yaml
+# Source: flyte/charts/flyte/templates/admin/cluster_resource_configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -244,7 +244,7 @@ data:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/configmap.yaml
+# Source: flyte/charts/flyte/templates/admin/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -369,7 +369,7 @@ data:
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
-# Source: flyte-sandbox/charts/flyte/templates/console/configmap.yaml
+# Source: flyte/charts/flyte/templates/console/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -385,7 +385,7 @@ data:
   CONFIG_DIR: /etc/flyte/config
   DISABLE_AUTH: "1"
 ---
-# Source: flyte-sandbox/charts/flyte/templates/datacatalog/configmap.yaml
+# Source: flyte/charts/flyte/templates/datacatalog/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -430,7 +430,7 @@ data:
       limits:
         maxDownloadMBs: 10
 ---
-# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/configmap.yaml
+# Source: flyte/charts/flyte/templates/flytescheduler/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -444,7 +444,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -467,7 +467,7 @@ data:
       level: 4
       show-source: true
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/configmap.yaml
+# Source: flyte/charts/flyte/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -481,7 +481,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -498,7 +498,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -590,7 +590,7 @@ data:
         kubernetes-enabled: true
         kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/configmap.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/configmap.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -617,7 +617,7 @@ metadata:
   name: kubernetes-dashboard-settings
 data:
 ---
-# Source: flyte-sandbox/charts/contour/templates/00-crds.yaml
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -855,7 +855,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-# Source: flyte-sandbox/charts/contour/templates/00-crds.yaml
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -1714,7 +1714,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-# Source: flyte-sandbox/charts/contour/templates/00-crds.yaml
+# Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -1904,7 +1904,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/crds/flyteworkflow.yaml
+# Source: flyte/charts/flyte/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -1920,7 +1920,7 @@ spec:
   scope: Namespaced
   version: v1alpha1
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/rbac.yaml
+# Source: flyte/charts/contour/templates/contour/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -2030,7 +2030,7 @@ rules:
       - get
       - update
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/rbac.yaml
+# Source: flyte/charts/flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -2060,7 +2060,7 @@ rules:
   verbs:
   - '*'
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/rbac.yaml
+# Source: flyte/charts/flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -2132,7 +2132,7 @@ rules:
   - post
   - deletecollection
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create a ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
@@ -2153,7 +2153,7 @@ rules:
       - update
       - patch
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2184,7 +2184,7 @@ rules:
     resources: ["pods", "nodes"]
     verbs: ["get", "list", "watch"]
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2334,7 +2334,7 @@ rules:
       - list
       - watch
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/rbac.yaml
+# Source: flyte/charts/contour/templates/contour/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -2353,7 +2353,7 @@ subjects:
     name: flyte-contour-contour
     namespace: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/rbac.yaml
+# Source: flyte/charts/flyte/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -2372,7 +2372,7 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/rbac.yaml
+# Source: flyte/charts/flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -2391,7 +2391,7 @@ subjects:
   name: flytepropeller
   namespace: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -2407,7 +2407,7 @@ subjects:
     name: flyte-pod-webhook
     namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrolebinding-metrics.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-metrics.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2441,7 +2441,7 @@ subjects:
     name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2475,7 +2475,7 @@ subjects:
     name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/role.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/role.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2521,7 +2521,7 @@ rules:
     resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
     verbs: ["get"]
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/rolebinding.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/rolebinding.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2555,7 +2555,7 @@ subjects:
     name: flyte-kubernetes-dashboard
     namespace: flyte
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/service.yaml
+# Source: flyte/charts/contour/templates/contour/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2579,7 +2579,7 @@ spec:
     app.kubernetes.io/component: contour
   type: ClusterIP
 ---
-# Source: flyte-sandbox/charts/contour/templates/envoy/service.yaml
+# Source: flyte/charts/contour/templates/envoy/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2618,7 +2618,7 @@ spec:
     app.kubernetes.io/component: envoy
   type: NodePort
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/service.yaml
+# Source: flyte/charts/flyte/templates/admin/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2653,7 +2653,7 @@ spec:
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/console/service.yaml
+# Source: flyte/charts/flyte/templates/console/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2674,7 +2674,7 @@ spec:
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/datacatalog/service.yaml
+# Source: flyte/charts/flyte/templates/datacatalog/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2706,7 +2706,7 @@ spec:
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Service
 apiVersion: v1
 kind: Service
@@ -2724,7 +2724,7 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/service.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/service.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2763,7 +2763,7 @@ spec:
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: kubernetes-dashboard
 ---
-# Source: flyte-sandbox/templates/minio/service.yaml
+# Source: flyte/templates/minio/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2772,7 +2772,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-sandbox-v0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: NodePort
@@ -2791,7 +2791,7 @@ spec:
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-sandbox/templates/postgres/service.yaml
+# Source: flyte/templates/postgres/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2800,7 +2800,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-sandbox-v0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -2813,7 +2813,7 @@ spec:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-sandbox/charts/contour/templates/envoy/daemonset.yaml
+# Source: flyte/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -2995,7 +2995,7 @@ spec:
             secretName: envoycert
       restartPolicy: Always
 ---
-# Source: flyte-sandbox/charts/contour/templates/contour/deployment.yaml
+# Source: flyte/charts/contour/templates/contour/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3134,7 +3134,7 @@ spec:
               - key: contour.yaml
                 path: contour.yaml
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/deployment.yaml
+# Source: flyte/charts/flyte/templates/admin/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3303,7 +3303,7 @@ spec:
           secret:
             secretName: flyte-admin-secrets
 ---
-# Source: flyte-sandbox/charts/flyte/templates/console/deployment.yaml
+# Source: flyte/charts/flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3356,7 +3356,7 @@ spec:
       - emptyDir: {}
         name: shared-data
 ---
-# Source: flyte-sandbox/charts/flyte/templates/datacatalog/deployment.yaml
+# Source: flyte/charts/flyte/templates/datacatalog/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3444,7 +3444,7 @@ spec:
           name: datacatalog-config
         name: config-volume
 ---
-# Source: flyte-sandbox/charts/flyte/templates/flytescheduler/deployment.yaml
+# Source: flyte/charts/flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3526,9 +3526,9 @@ spec:
           name: config-volume
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/deployment.yaml
+# Source: flyte/charts/flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3548,7 +3548,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "14d151fc605003a3ee14f13fd0245299ae6bd33925020a29a7327021e5f2138"
+        configChecksum: "97979ec42e91c13ff6c4c12db1522e5c84f2f795b0dd44a7b09634fa843b0b2"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3595,9 +3595,9 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
 ---
-# Source: flyte-sandbox/charts/flyte/templates/propeller/webhook.yaml
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create the actual deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -3617,7 +3617,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "14d151fc605003a3ee14f13fd0245299ae6bd33925020a29a7327021e5f2138"
+        configChecksum: "97979ec42e91c13ff6c4c12db1522e5c84f2f795b0dd44a7b09634fa843b0b2"
     spec:
       securityContext:
         fsGroup: 65534
@@ -3681,7 +3681,7 @@ spec:
           secret:
             secretName: flyte-pod-webhook
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/deployment.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/deployment.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -3778,7 +3778,7 @@ spec:
       - name: tmp-volume
         emptyDir: {}
 ---
-# Source: flyte-sandbox/templates/minio/deployment.yaml
+# Source: flyte/templates/minio/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3787,7 +3787,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-sandbox-v0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3800,7 +3800,7 @@ spec:
       labels: 
         app.kubernetes.io/name: minio
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-sandbox-v0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3833,7 +3833,7 @@ spec:
       - name: minio-storage
         emptyDir: {}
 ---
-# Source: flyte-sandbox/templates/postgres/deployment.yaml
+# Source: flyte/templates/postgres/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3842,7 +3842,7 @@ metadata:
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-sandbox-v0.1.10
+    helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -3855,7 +3855,7 @@ spec:
       labels: 
         app.kubernetes.io/name: postgres
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-sandbox-v0.1.10
+        helm.sh/chart: flyte-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
@@ -3884,7 +3884,7 @@ spec:
         - name: postgres-storage
           emptyDir: {}
 ---
-# Source: flyte-sandbox/charts/flyte/templates/admin/cronjob.yaml
+# Source: flyte/charts/flyte/templates/admin/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -3928,7 +3928,7 @@ spec:
               name: flyte-admin-config
             name: config-volume
 ---
-# Source: flyte-sandbox/charts/flyte/templates/common/ingress.yaml
+# Source: flyte/charts/flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -4097,7 +4097,7 @@ spec:
               servicePort: 81
       host: ""
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/ingress.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/ingress.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -4112,7 +4112,7 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/networkpolicy.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/networkpolicy.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -4127,7 +4127,7 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/pdb.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/pdb.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -4142,7 +4142,7 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/psp.yaml
+# Source: flyte/charts/kubernetes-dashboard/templates/psp.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -4157,7 +4157,7 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-# Source: flyte-sandbox/charts/contour/templates/certgen/serviceaccount.yaml
+# Source: flyte/charts/contour/templates/certgen/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -4173,7 +4173,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: contour-certgen
 ---
-# Source: flyte-sandbox/charts/contour/templates/certgen/rbac.yaml
+# Source: flyte/charts/contour/templates/certgen/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -4197,7 +4197,7 @@ rules:
       - create
       - update
 ---
-# Source: flyte-sandbox/charts/contour/templates/certgen/rbac.yaml
+# Source: flyte/charts/contour/templates/certgen/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -4220,7 +4220,7 @@ subjects:
   - kind: ServiceAccount
     name: flyte-contour-contour-certgen
 ---
-# Source: flyte-sandbox/charts/contour/templates/certgen/job.yaml
+# Source: flyte/charts/contour/templates/certgen/job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
