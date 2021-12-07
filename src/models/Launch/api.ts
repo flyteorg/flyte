@@ -27,7 +27,7 @@ export const getLaunchPlan = (id: Identifier, config?: RequestConfig) =>
     getAdminEntity<Admin.LaunchPlan, LaunchPlan>(
         {
             path: makeIdentifierPath(endpointPrefixes.launchPlan, id),
-            messageType: Admin.Task
+            messageType: Admin.LaunchPlan
         },
         config
     );

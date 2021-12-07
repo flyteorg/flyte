@@ -12,6 +12,10 @@ const clusterTestId = `metadata-${ExecutionMetadataLabels.cluster}`;
 const startTimeTestId = `metadata-${ExecutionMetadataLabels.time}`;
 const durationTestId = `metadata-${ExecutionMetadataLabels.duration}`;
 
+jest.mock('models/Launch/api', () => ({
+    getLaunchPlan: jest.fn(() => Promise.resolve({ spec: {} }))
+}));
+
 describe('ExecutionMetadata', () => {
     let execution: Execution;
     beforeEach(() => {

@@ -4,7 +4,10 @@ export enum ExecutionMetadataLabels {
     duration = 'Duration',
     time = 'Time',
     relatedTo = 'Related to',
-    version = 'Version'
+    version = 'Version',
+    serviceAccount = 'Service Account',
+    rawOutputPrefix = 'Raw Output Prefix',
+    parallelism = 'Parallelism'
 }
 
 export const tabs = {
