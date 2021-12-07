@@ -11,6 +11,7 @@ import {
     SearchResult,
     useSearchableListState
 } from './useSearchableListState';
+import classNames from 'classnames';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -43,13 +44,23 @@ export interface SearchableListProps<T> {
     renderContent(results: SearchResult<T>[]): JSX.Element;
 }
 
-const SearchableInput: React.FC<{
+/**
+ * Show searchable text input field.
+ * @param onClear
+ * @param onSearchChange
+ * @param placeholder
+ * @param value
+ * @param variant
+ * @constructor
+ */
+export const SearchableInput: React.FC<{
     onClear: () => void;
     onSearchChange: React.ChangeEventHandler<HTMLInputElement>;
     placeholder?: string;
     variant: SearchableListVariant;
     value?: string;
-}> = ({ onClear, onSearchChange, placeholder, value, variant }) => {
+    className?: string;
+}> = ({ onClear, onSearchChange, placeholder, value, variant, className }) => {
     const styles = useStyles();
     const startAdornment = (
         <InputAdornment position="start">
@@ -82,7 +93,13 @@ const SearchableInput: React.FC<{
     switch (variant) {
         case 'normal':
             return (
-                <div className={styles.container}>
+                <div
+                    className={
+                        className
+                            ? classNames(styles.container, className)
+                            : styles.container
+                    }
+                >
                     <TextField
                         {...baseProps}
                         margin="dense"

@@ -198,6 +198,7 @@ export type ColorSpectrumType =
     | 'gray10'
     | 'gray15'
     | 'gray20'
+    | 'gray25'
     | 'gray30'
     | 'gray40'
     | 'gray50'
@@ -1005,6 +1006,10 @@ export const COLOR_SPECTRUM: {
     gray20: {
         color: '#CACAD9',
         value: 20
+    },
+    gray25: {
+        color: '#B3B3B3',
+        value: 25
     },
     gray30: {
         color: '#ACACC0',

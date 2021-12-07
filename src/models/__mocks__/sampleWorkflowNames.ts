@@ -1,7 +1,7 @@
-import { Admin, Core } from 'flyteidl';
-import { NamedEntity, NamedEntityIdentifier } from 'models/Common/types';
+import { WorkflowListStructureItem } from 'components/Workflow/types';
+import { WorkflowId } from 'models/Workflow/types';
 
-export const sampleWorkflowIds: NamedEntityIdentifier[] = [
+export const sampleWorkflowIds: WorkflowId[] = [
     'batch_workflow.BatchTasksWorkflow',
     'failing_workflows.DivideByZeroWf',
     'failing_workflows.RetrysWf',
@@ -27,13 +27,16 @@ export const sampleWorkflowIds: NamedEntityIdentifier[] = [
     'workflows.notifications.BasicWorkflow',
     'workflows-python-python-tasks-workflow',
     'workflows.python.PythonTasksWorkflow'
-].map(name => ({ name, project: 'flytekit', domain: 'development' }));
-
-export const sampleWorkflowNames: NamedEntity[] = sampleWorkflowIds.map(id => ({
-    id,
-    resourceType: Core.ResourceType.WORKFLOW,
-    metadata: {
-        description: `A description for ${id.name}`,
-        state: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE
-    }
+].map(name => ({
+    name,
+    project: 'flytekit',
+    domain: 'development',
+    version: ''
 }));
+
+export const sampleWorkflowNames: WorkflowListStructureItem[] = sampleWorkflowIds.map(
+    id => ({
+        id,
+        description: ''
+    })
+);

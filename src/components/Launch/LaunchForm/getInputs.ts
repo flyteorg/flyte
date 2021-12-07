@@ -61,6 +61,22 @@ export function getInputsForWorkflow(
     });
 }
 
+export function getOutputsForWorkflow(launchPlan: LaunchPlan): string[] {
+    if (!launchPlan.closure) {
+        return [];
+    }
+
+    const launchPlanInputs = launchPlan.closure.expectedOutputs.variables;
+    return sortedObjectEntries(launchPlanInputs).map(value => {
+        const [name, parameter] = value;
+
+        const typeDefinition = getInputDefintionForLiteralType(parameter.type);
+        const typeLabel = formatLabelWithType(name, typeDefinition);
+
+        return typeLabel;
+    });
+}
+
 export function getInputsForTask(
     task: Task,
     initialValues: LiteralValueMap = new Map()

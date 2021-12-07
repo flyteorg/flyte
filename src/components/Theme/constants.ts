@@ -44,6 +44,8 @@ export const mutedButtonHoverColor = COLOR_SPECTRUM.gray60.color;
 
 export const errorBackgroundColor = '#FBFBFC';
 
+export const workflowLabelColor = COLOR_SPECTRUM.gray25.color;
+
 export const statusColors = {
     FAILURE: COLOR_SPECTRUM.red20.color,
     RUNNING: COLOR_SPECTRUM.blue20.color,
