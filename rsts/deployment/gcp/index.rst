@@ -440,7 +440,7 @@ Installing Flyte
 
 .. code-block:: bash
 
-   helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte
+   helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte-core
 
 
 #. Verify all the pods have come up correctly
@@ -468,7 +468,7 @@ Upgrading Flyte
 
 .. code-block:: bash
 
-  helm upgrade -n flyte -f values-gcp.yaml --create-namespace flyte .
+  helm upgrade -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte-core
 
 Connecting to Flyte
 ===================
