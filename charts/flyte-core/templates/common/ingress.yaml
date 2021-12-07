@@ -30,8 +30,18 @@
   backend:
     serviceName: flyteadmin
     servicePort: 81
-{{- end }}
-{{- if .Values.common.ingress.enabled }}
+- path: /grpc.health.v1.Health
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /grpc.health.v1.Health/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+  {{- end }}
+  {{- if .Values.common.ingress.enabled }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -170,18 +180,16 @@ spec:
           {{- if not .Values.common.ingress.separateGrpcIngress }}
           {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
-      {{- with .Values.common.ingress.host }}
-      host: {{ . }}
-      {{- end }}
+      host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
       hosts:
-        - {{ .Values.common.ingress.host }}
+        - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
 
 
-{{- if .Values.common.ingress.separateGrpcIngress }}
+  {{- if .Values.common.ingress.separateGrpcIngress }}
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -199,7 +207,8 @@ metadata:
   {{- end }}
 spec:
   rules:
-    - http:
+    - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
+      http:
         paths:
           # {{- if .Values.common.ingress.albSSLRedirect }}
           # - backend:
@@ -209,14 +218,11 @@ spec:
           #   pathType: ImplementationSpecific
           # {{- end }}
           {{- include "grpcRoutes" . | nindent 10 -}}
-      {{- with .Values.common.ingress.host }}
-      host: {{ . }}
-      {{- end }}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Release.Name }}-flyte-tls
       hosts:
-        - {{ .Values.common.ingress.host }}
+        - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
-{{- end }}
-{{- end }}
+  {{- end }}
+  {{- end }}

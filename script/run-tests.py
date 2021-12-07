@@ -180,9 +180,9 @@ if __name__ == "__main__":
 
     results = run(flytesnacks_release_tag, priorities)
 
+    # Write a json object in its own line describing the result of this run to stdout
+    print(f"Result of run:\n{json.dumps(results)}")
+
     for result in results:
         if result["status"] == "failing":
             os._exit(1)
-
-    # Write a json object in its own line describing the result of this run to stdout
-    print(f"Result of run:\n{json.dumps(results)}")

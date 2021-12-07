@@ -23,6 +23,7 @@ jobs:
           image_tag: dind
           registry: ghcr.io
           build_extra_args: --target=dind --compress=true
+          build_args: "FLYTE_TEST=local"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: false

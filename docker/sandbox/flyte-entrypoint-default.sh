@@ -23,10 +23,19 @@ fi
 
 # Deploy flyte
 echo "Deploying Flyte..."
-helm repo add flyteorg https://flyteorg.github.io/flyte
-helm repo update
-helm fetch flyteorg/flyte --version=$FLYTE_VERSION
-helm upgrade -n flyte -f /flyteorg/share/flyte/values.yaml --create-namespace flyte flyteorg/flyte --kubeconfig /etc/rancher/k3s/k3s.yaml --install --version $FLYTE_VERSION
+version=""
+charts="/flyteorg/share/flyte"
+
+if [[ $FLYTE_TEST = "release" ]]
+then
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm repo update
+  helm fetch flyteorg/flyte --version=$FLYTE_VERSION
+  version = "--version $FLYTE_VERSION"
+  charts="flyteorg/flyte"
+fi
+
+helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install $version
 
 wait-for-flyte.sh
 

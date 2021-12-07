@@ -1,3 +1,4 @@
+{{- if .Values.flyteadmin.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -110,6 +111,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         resources: {{ toYaml .Values.flyteadmin.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /srv/flyte
@@ -172,3 +174,4 @@ spec:
       {{- with .Values.flyteadmin.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}

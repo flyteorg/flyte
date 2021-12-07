@@ -68,6 +68,9 @@ COPY docker/sandbox/bashrc /root/.bashrc
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
+ARG FLYTE_TEST="release"
+ENV FLYTE_TEST "${FLYTE_TEST}"
+
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
 
@@ -96,6 +99,9 @@ COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
+
+ARG FLYTE_TEST="release"
+ENV FLYTE_TEST "${FLYTE_TEST}"
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"

@@ -1,3 +1,4 @@
+{{- if .Values.flytepropeller.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,7 +7,7 @@ metadata:
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
 {{- with .Values.configmap.admin }}
-  admin.yaml: | {{ toYaml . | nindent 4 }}
+  admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.catalog }}
   catalog.yaml: | {{ toYaml . | nindent 4 }}
@@ -47,4 +48,5 @@ data:
       target_gc_percent: 70
 {{- with .Values.configmap.task_logs }}
   task_logs.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- end }}
