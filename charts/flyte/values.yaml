@@ -183,8 +183,6 @@ flyte:
     # -- Default regex string for searching configuration files
     configPath: /etc/flyte/config/*.yaml
 
-    client_secret: foobar
-
     # -- Configuration for service accounts for FlytePropeller
     serviceAccount:
       # -- Should a service account be created for FlytePropeller
@@ -248,6 +246,7 @@ flyte:
     serviceAccount:
       # -- Should a service account be created for the webhook
       create: true
+
       # -- Annotations for ServiceAccount attached to the webhook
       annotations: {}
       # -- ImapgePullSecrets to automatically assign to the service account
@@ -440,17 +439,6 @@ flyte:
           storage: 20Mi
           gpu: 1
 
-    # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
-    admin:
-      event:
-        type: admin
-        rate: 500
-        capacity: 1000
-      admin:
-        endpoint: flyteadmin:81
-        insecure: true
-        clientId: flytepropeller
-        clientSecretLocation: /etc/secrets/client_secret
     # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
     # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
     catalog:

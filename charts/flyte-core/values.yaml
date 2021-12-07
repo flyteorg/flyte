@@ -180,7 +180,6 @@ flytepropeller:
       ephemeral-storage: 50Mi
       memory: 50Mi
   cacheSizeMbs: 0
-  client_secret: foobar
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
@@ -234,6 +233,15 @@ flyteconsole:
   tolerations: []
   # -- affinity for Flyteconsole deployment
   affinity: {}
+
+#
+# Common secret auth for propeller & scheduler
+#
+
+secrets:
+  adminOauthClientCredentials:
+    clientSecret: foobar
+    clientId: flytepropeller
 
 #
 # WEBHOOK SETTINGS
@@ -444,7 +452,7 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
-      clientId: flytepropeller
+      clientId: '{{ .Values.secrets.adminOauthClientCredentials.clientId }}'
       clientSecretLocation: /etc/secrets/client_secret
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
