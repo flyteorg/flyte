@@ -1,9 +1,0 @@
-[platform]
-url = 127.0.0.1:30081
-insecure = True
-
-[credentials]
-client_id=flytepropeller
-scopes=all
-authorization_metadata_key=flyte-authorization
-auth_mode=basic
