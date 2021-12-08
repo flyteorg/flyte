@@ -1,0 +1,143 @@
+environments:
+  - name: default
+    path: "./env.yaml" # NOTE: relative path to environment
+    variables:
+      google_project_id: <project_id>
+name: service-flyte
+modules:
+  - name: postgres
+    type: gcp-postgres
+  - name: gcs
+    type: gcp-gcs
+    bucket_name: "{parent_name}-{layer_name}"
+  - name: adminflyterole
+    type: gcp-service-account
+    explicit_name: gsa-flyteadmin
+    allowed_k8s_services:
+      - namespace: flyte
+        service_account_name: flyteadmin
+    links:
+      - gcs: [ "write" ]
+  - name: datacatalogrole
+    type: gcp-service-account
+    explicit_name: gsa-datacatalog
+    allowed_k8s_services:
+      - namespace: flyte
+        service_account_name: datacatalog
+    links:
+      - gcs: [ "write" ]
+  - name: flytepropellerrole
+    type: gcp-service-account
+    explicit_name: gsa-flytepropeller
+    allowed_k8s_services:
+      - namespace: flyte
+        service_account_name: flytepropeller
+    links:
+      - gcs: [ "write" ]
+  - name: flyteproductionrole
+    type: gcp-service-account
+    explicit_name: gsa-production
+    allowed_k8s_services:
+      - namespace: production
+        service_account_name: default
+    links:
+      - gcs: [ "write" ]
+  - name: flytestagingrole
+    type: gcp-service-account
+    explicit_name: gsa-staging
+    allowed_k8s_services:
+      - namespace: staging
+        service_account_name: default
+    links:
+      - gcs: [ "write" ]
+  - name: flytedevelopmentrole
+    type: gcp-service-account
+    explicit_name: gsa-development
+    allowed_k8s_services:
+      - namespace: development
+        service_account_name: default
+    links:
+      - gcs: [ "write" ]
+  - type: helm-chart
+    chart: "../../charts/flyte" # NOTE: relative path to chart
+    namespace: flyte
+    timeout: 600
+    create_namespace: true
+    values_file: "../../charts/flyte/values-gcp.yaml" # NOTE: relative path to values yaml
+    # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
+    values:
+      postgres:
+        enabled: false
+      db:
+        datacatalog:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
+        admin:
+          database:
+            port: 5432
+            username: "${{module.postgres.db_user}}"
+            host: "${{module.postgres.db_host}}"
+            dbname: "${{module.postgres.db_name}}"
+      common:
+        ingress:
+          albSSLRedirect: false
+          host: "{parent.domain}"
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+            nginx.ingress.kubernetes.io/app-root: /console
+        databaseSecret:
+          secretManifest:
+            stringData:
+              pass.txt: "${{module.postgres.db_password}}"
+      storage:
+        bucketName: "${{module.gcs.bucket_name}}"
+        gcs:
+          projectId: "{vars.google_project_id}"
+      flyteadmin:
+        serviceAccount:
+          create: true
+          annotations:
+            "iam.gke.io/gcp-service-account": "${{module.adminflyterole.service_account_email}}"
+      datacatalog:
+        serviceAccount:
+          create: true
+          annotations:
+            "iam.gke.io/gcp-service-account": "${{module.datacatalogrole.service_account_email}}"
+      flytepropeller:
+        serviceAccount:
+          create: true
+          annotations:
+            "iam.gke.io/gcp-service-account": "${{module.flytepropellerrole.service_account_email}}"
+      configmap:
+        core:
+          propeller:
+            rawoutput-prefix: "gs://${{module.gcs.bucket_name}}/"
+      cluster_resource_manager:
+        enabled: true
+        config:
+          cluster_resources:
+            customData:
+              - production:
+                  - gsa:
+                      value: "${{module.flyteproductionrole.service_account_email}}"
+                  - projectQuotaCpu:
+                      value: "5"
+                  - projectQuotaMemory:
+                      value: "4000Mi"
+              - staging:
+                  - gsa:
+                      value: "${{module.flytestagingrole.service_account_email}}"
+                  - projectQuotaCpu:
+                      value: "2"
+                  - projectQuotaMemory:
+                      value: "3000Mi"
+              - development:
+                  - gsa:
+                      value: "${{module.flytedevelopmentrole.service_account_email}}"
+                  - projectQuotaCpu:
+                      value: "2"
+                  - projectQuotaMemory:
+                      value: "3000Mi"

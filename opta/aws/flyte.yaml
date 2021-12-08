@@ -43,11 +43,11 @@ modules:
     links:
       - s3: ["write"]
   - type: helm-chart
-    chart: "../charts/flyte" # NOTE: relative path to chart
+    chart: "../../charts/flyte" # NOTE: relative path to chart
     namespace: flyte
     timeout: 600
     create_namespace: true
-    values_file: "../charts/flyte/values-eks.yaml" # NOTE: relative path to values yaml
+    values_file: "../../charts/flyte/values-eks.yaml" # NOTE: relative path to values yaml
     # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
     values:
       postgres:
