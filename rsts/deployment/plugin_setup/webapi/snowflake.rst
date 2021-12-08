@@ -7,9 +7,9 @@ This guide gives an overview of how to set up Snowflake in your Flyte deployment
 
 1. Add Flyte chart repo to Helm
 
-  .. code-block::
+.. code-block::
 
-     helm repo add flyteorg https://flyteorg.github.io/flyte
+ helm repo add flyteorg https://flyteorg.github.io/flyte
 
 
 2. Setup the cluster
@@ -88,44 +88,44 @@ Replace ``<JWT_TOKEN>`` with your JWT token.
 
 6. Upgrade the Flyte Helm release.
 
-   .. tabbed:: Sandbox
+.. tabbed:: Sandbox
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+       helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
 
-   .. tabbed:: AWS/GCP
+.. tabbed:: AWS/GCP
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-            helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
+        helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
 
 
 7. Register the Snowflake plugin example.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
+  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
 
 
 8.  Launch an execution
 
-   .. tabbed:: Flyte Console
+.. tabbed:: Flyte Console
 
-      * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
-      * Click on `Launch` to open up the launch form.
-      * Submit the form.
+  * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
+  * Click on `Launch` to open up the launch form.
+  * Submit the form.
 
-   .. tabbed:: Flytectl
+.. tabbed:: Flytectl
 
-      * Retrieve an execution form in the form of a yaml file:
+  * Retrieve an execution form in the form of a yaml file:
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development snowflake.workflows.example.snowflake_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/flytectl.yaml
+       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development snowflake.workflows.example.snowflake_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/flytectl.yaml
 
-      * Launch! 🚀
+  * Launch! 🚀
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
+       flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
