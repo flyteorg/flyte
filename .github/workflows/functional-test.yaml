@@ -24,7 +24,7 @@ jobs:
       - uses: whoan/docker-build-with-cache-action@v5.11.0
         with:
           image_name: flyteorg/flyte-sandbox
-          image_tag: dind
+          image_tag: local
           registry: ghcr.io
           build_extra_args: --target=dind --compress=true --build-arg=FLYTE_TEST=local
           context: ./
@@ -33,7 +33,7 @@ jobs:
       - uses: unionai/flytectl-setup-action@v0.0.1
       - name: Setup sandbox
         run: |
-          flytectl sandbox start --image ghcr.io/flyteorg/flyte-sandbox:dind --imagePullPolicy Never
+          flytectl sandbox start --image ghcr.io/flyteorg/flyte-sandbox:local --imagePullPolicy Never
           flytectl config init
       - name: Register examples
         uses: unionai/flyte-register-action@v0.0.2
