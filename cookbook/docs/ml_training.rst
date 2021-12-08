@@ -34,10 +34,10 @@ ML Training
 
     .. link-button:: auto/case_studies/ml_training/spark_horovod/index
        :type: ref
-       :text: Distributed training using Horovod
+       :text: Forecast Sales Using Rossmann Store Sales Data
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Distributed training using Horovod on Spark using the Rossman stores price estimator
+    Data-parallel distributed training using Horovod on Spark
 
 
 .. toctree::
