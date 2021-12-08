@@ -28,6 +28,20 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "redoc.name" -}}
+redoc
+{{- end -}}
+
+{{- define "redoc.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "redoc.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "redoc.labels" -}}
+{{ include "redoc.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
 
 {{- define "postgres.name" -}}
 postgres

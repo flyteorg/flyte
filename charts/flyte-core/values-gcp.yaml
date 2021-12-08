@@ -13,7 +13,6 @@ userSettings:
 #
 
 flyteadmin:
-  deployRedoc: false
   replicaCount: 1
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the flyteadmin role will be added

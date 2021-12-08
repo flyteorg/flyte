@@ -1,0 +1,41 @@
+{{- if .Values.redoc.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "redoc.name" . }}-redoc
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "redoc.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "redoc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{ include "redoc.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
+      containers:
+      - command:
+        - sh
+        - -c
+        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+        - name: PAGE_TITLE
+          value: Flyte Admin OpenAPI
+        - name: SPEC_URL
+          value: /api/v1/openapi
+        - name: PORT
+          value: "8087"
+        image: docker.io/redocly/redoc
+        imagePullPolicy: IfNotPresent
+        name: redoc
+        ports:
+        - containerPort: 8087
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: 200Mi
+{{- end }}

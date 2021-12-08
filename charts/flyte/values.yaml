@@ -61,8 +61,6 @@ flyte:
     secrets: {}
     additionalVolumes: []
     additionalVolumeMounts: []
-    # -- Deploys a Redoc container in Flyteadmin's pod
-    deployRedoc: true
 
   #
   # FLYTESCHEDULER SETTINGS
@@ -794,3 +792,7 @@ kubernetes-dashboard:
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
   enabled: false
+
+redoc:
+  # -- Deploys a Redoc container in Flyteadmin's pod
+  enabled: true
