@@ -408,34 +408,34 @@ Time for Helm
 Installing Flyte
 -----------------
 
-#. Add the flyte chart repo to helm
+1. Add the flyte chart repo to Helm
 
-  .. code-block::
+.. code-block::
 
-     helm repo add flyteorg https://flyteorg.github.io/flyte
-
-
-#. Download eks values for helm
-
-   .. tabbed:: Flyte Native scheduler
-
-      * Download eks helm values, By default it enable the flyte native scheduler:
-
-        .. code-block:: bash
-
-           curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml
-
-   .. tabbed:: AWS scheduler
-
-      * Download eks helm values for aws scheduler
-
-        .. code-block:: bash
-
-           curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml
-           curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks-override.yaml
+ helm repo add flyteorg https://flyteorg.github.io/flyte
 
 
-#. Update values
+2. Download eks values for Helm
+
+.. tabbed:: Flyte Native Scheduler
+
+  * Download eks Helm values (it enables Flyte native scheduler by default)
+
+    .. code-block:: bash
+
+       curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml
+
+.. tabbed:: AWS scheduler
+
+  * Download eks helm values for AWS Scheduler
+
+    .. code-block:: bash
+
+       curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml
+       curl -sL https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks-override.yaml
+
+
+3. Update values in the YAML file
 
 Search and replace the following
 
@@ -469,26 +469,26 @@ Search and replace the following
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
 
 
-#. Install Flyte
+4. Install Flyte
 
-   .. tabbed:: Flyte Native scheduler
+.. tabbed:: Flyte Native scheduler
 
-      * Install Flyte with flyte native scheduler:
+  * Install Flyte with Flyte native scheduler:
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           helm install -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
+       helm install -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
 
-   .. tabbed:: AWS scheduler
+.. tabbed:: AWS scheduler
 
-      * Install Flyte with flyte aws scheduler
+  * Install Flyte with Flyte AWS Scheduler
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           helm install -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
+       helm install -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
 
 
-#. Verify all the pods have come up correctly
+5. Verify if all the pods have come up correctly
 
 .. code-block:: bash
 
@@ -504,21 +504,21 @@ Uninstalling Flyte
 Upgrading Flyte
 ---------------
 
-   .. tabbed:: Flyte Native scheduler
+.. tabbed:: Flyte Native Scheduler
 
-      * Install Flyte with flyte native scheduler:
+  * Install Flyte with flyte native scheduler:
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           helm upgrade -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
+       helm upgrade -n flyte -f values-eks.yaml --create-namespace flyte flyteorg/flyte-core
 
-   .. tabbed:: AWS scheduler
+.. tabbed:: AWS Scheduler
 
-      * Install Flyte with flyte aws scheduler
+  * Install Flyte with flyte aws scheduler
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           helm upgrade -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
+       helm upgrade -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
 
 Connecting to Flyte
 ===================
