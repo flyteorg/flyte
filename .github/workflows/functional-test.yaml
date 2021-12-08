@@ -1,0 +1,60 @@
+name: Functional test for sandbox image
+
+on:
+  pull_request:
+    paths:
+      - docker/**
+      - charts/**
+
+defaults:
+  run:
+    # https://github.com/actions/runner/issues/241#issuecomment-577360161
+    shell: 'script -q -e -c "bash {0}"'
+
+jobs:
+  run-tests:
+    name: Functional test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: whoan/docker-build-with-cache-action@v5.11.0
+        with:
+          image_name: flyteorg/flyte-sandbox
+          image_tag: local
+          registry: ghcr.io
+          build_extra_args: --target=dind --compress=true --build-arg=FLYTE_TEST=local
+          context: ./
+          dockerfile: docker/sandbox/Dockerfile
+          push_image_and_stages: false
+      - uses: unionai/flytectl-setup-action@v0.0.1
+      - name: Setup sandbox
+        run: |
+          flytectl sandbox start --image ghcr.io/flyteorg/flyte-sandbox:local --imagePullPolicy Never
+          flytectl config init
+      - name: Register examples
+        uses: unionai/flyte-register-action@v0.0.2
+        with:
+          flytesnacks: true
+          project: flytesnacks
+          version: "latest"
+          domain: development
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flytekit
+          pip freeze
+      - name: End2End
+        env:
+          KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          # launch flyte end2end
+          make end2end_execute
+
