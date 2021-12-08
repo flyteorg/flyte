@@ -485,7 +485,7 @@ Search and replace the following
 
     .. code-block:: bash
 
-       helm install -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
+       helm install -n flyte -f values-eks.yaml -f values-eks-override.yaml --create-namespace flyte flyteorg/flyte-core
 
 
 5. Verify if all the pods have come up correctly
@@ -518,7 +518,7 @@ Upgrading Flyte
 
     .. code-block:: bash
 
-       helm upgrade -n flyte -f values-eks.yaml -f values-eks-override --create-namespace flyte flyteorg/flyte-core
+       helm upgrade -n flyte -f values-eks.yaml -f values-eks-override.yaml --create-namespace flyte flyteorg/flyte-core
 
 Connecting to Flyte
 ===================
