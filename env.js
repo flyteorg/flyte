@@ -23,16 +23,11 @@ const PLUGINS_MODULE = process.env.PLUGINS_MODULE;
 // If it has no protocol, it will be treated as relative to window.location.origin
 const STATUS_URL = process.env.STATUS_URL;
 
-// Disable all code related to authorization for requests to Admin.
-// This should only be used when Admin is also in unsecured mode.
-const DISABLE_AUTH = process.env.DISABLE_AUTH;
-
 module.exports = {
     ADMIN_API_URL,
     ADMIN_API_USE_SSL,
     BASE_URL,
     CORS_PROXY_PREFIX,
-    DISABLE_AUTH,
     NODE_ENV,
     PLUGINS_MODULE,
     STATUS_URL,
@@ -40,7 +35,6 @@ module.exports = {
         ADMIN_API_URL,
         BASE_URL,
         CORS_PROXY_PREFIX,
-        DISABLE_AUTH,
         NODE_ENV,
         STATUS_URL
     }

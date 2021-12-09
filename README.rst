@@ -45,7 +45,6 @@ Quickstart
    .. code:: bash
 
        export ADMIN_API_URL=http://localhost:30081
-       export DISABLE_AUTH=1
 
    .. note::
 
@@ -217,7 +216,7 @@ URL of your target FlyteAdmin API instance. These instructions will use
 
 .. note:: Hint
 
-   Ensure you don't have `ADMIN_API_URL` or `DISABLE_AUTH` set (eg, in your `/.profile`.)
+   Ensure you don't have `ADMIN_API_URL` set (eg, in your `/.profile`.)
 
 =======
 Release

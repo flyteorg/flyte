@@ -47,7 +47,7 @@ async function request(
     const finalOptions = {
         ...options,
         url: adminApiUrl(endpoint),
-        withCredentials: !toBoolean(env.DISABLE_AUTH)
+        withCredentials: true
     };
 
     try {
@@ -73,7 +73,7 @@ export async function getProtobufObject<ResponseType>(
         headers,
         method: 'get',
         responseType: 'arraybuffer',
-        withCredentials: !toBoolean(env.DISABLE_AUTH)
+        withCredentials: true
     };
 
     const { data } = await axios.request(options);

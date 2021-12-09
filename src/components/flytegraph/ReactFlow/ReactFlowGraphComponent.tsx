@@ -16,7 +16,7 @@ const ReactFlowGraphComponent = props => {
         root: data,
         nodeExecutionsById: nodeExecutionsById,
         onNodeSelectionChanged: onNodeSelectionChanged,
-        maxRenderDepth: 2
+        maxRenderDepth: 1
     } as ConvertDagProps);
 
     const backgroundStyle = getRFBackground().nested;

@@ -5,5 +5,4 @@ export interface Env extends NodeJS.ProcessEnv {
     DISABLE_ANALYTICS?: string;
     NODE_ENV?: 'development' | 'production';
     STATUS_URL?: string;
-    DISABLE_AUTH?: string;
 }
