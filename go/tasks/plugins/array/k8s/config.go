@@ -37,6 +37,9 @@ var (
 			MaxRetries:         5,
 			Workers:            10,
 		},
+		LogConfig: LogConfig{
+			Config: logs.DefaultConfig,
+		},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection(configSectionKey, defaultConfig)
@@ -76,8 +79,8 @@ func (auth Auth) GetToken() (string, error) {
 	return string(token), nil
 }
 
+// RemoteClusterConfig reads secret values from paths specified in the config to initialize a Kubernetes rest client Config.
 // TODO: Move logic to flytestdlib
-// Reads secret values from paths specified in the config to initialize a Kubernetes rest client Config.
 func RemoteClusterConfig(host string, auth Auth) (*restclient.Config, error) {
 	tokenString, err := auth.GetToken()
 	if err != nil {
@@ -106,7 +109,7 @@ func GetK8sClient(config ClusterConfig) (client.Client, error) {
 	return client.New(kubeConf, client.Options{})
 }
 
-// Defines custom config for K8s Array plugin
+// Config defines custom config for K8s Array plugin
 type Config struct {
 	DefaultScheduler     string            `json:"scheduler" pflag:",Decides the scheduler to use when launching array-pods."`
 	MaxErrorStringLength int               `json:"maxErrorLength" pflag:",Determines the maximum length of the error string returned for the array."`

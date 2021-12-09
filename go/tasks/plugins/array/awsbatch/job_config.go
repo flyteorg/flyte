@@ -12,6 +12,7 @@ import (
 const (
 	// Keep these in-sync with flyteAdmin @
 	// https://github.com/flyteorg/flyteadmin/blob/d1c61c34f62d8ee51964f47877802d070dfa9e98/pkg/manager/impl/execution_manager.go#L42-L43
+
 	PrimaryTaskQueueKey = "primary_queue"
 	DynamicTaskQueueKey = "dynamic_queue"
 	ChildTaskQueueKey   = "child_queue"

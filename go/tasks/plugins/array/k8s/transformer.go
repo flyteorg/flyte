@@ -33,7 +33,7 @@ type arrayTaskContext struct {
 	arrayInputReader io.InputReader
 }
 
-// Overrides the TaskExecutionContext from base and returns a specialized context for Array
+// InputReader overrides the TaskExecutionContext from base and returns a specialized context for Array
 func (a *arrayTaskContext) InputReader() io.InputReader {
 	return a.arrayInputReader
 }
@@ -94,8 +94,8 @@ func buildPodMapTask(task *idlCore.TaskTemplate, metadata core.TaskExecutionMeta
 	return pod, nil
 }
 
-// Note that Name is not set on the result object.
-// It's up to the caller to set the Name before creating the object in K8s.
+// FlyteArrayJobToK8sPodTemplate returns a pod template for the given task context. Note that Name is not set on the
+// result object. It's up to the caller to set the Name before creating the object in K8s.
 func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionContext, namespaceTemplate string) (
 	podTemplate v1.Pod, job *idlPlugins.ArrayJob, err error) {
 
@@ -116,6 +116,7 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		TaskExecutionContext: tCtx,
 		arrayInputReader:     array.GetInputReader(tCtx, taskTemplate),
 	}
+
 	var arrayJob *idlPlugins.ArrayJob
 	if taskTemplate.GetCustom() != nil {
 		arrayJob, err = core2.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
@@ -140,17 +141,20 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 			OwnerReferences: []metav1.OwnerReference{tCtx.TaskExecutionMetadata().GetOwnerReference()},
 		},
 	}
+
 	if taskTemplate.GetContainer() != nil {
 		podSpec, err := flytek8s.ToK8sPodSpecWithInterruptible(ctx, arrTCtx, true)
 		if err != nil {
 			return v1.Pod{}, nil, err
 		}
+
 		pod.Spec = *podSpec
 	} else if taskTemplate.GetK8SPod() != nil {
 		k8sPod, err := buildPodMapTask(taskTemplate, tCtx.TaskExecutionMetadata())
 		if err != nil {
 			return v1.Pod{}, nil, err
 		}
+
 		pod.Labels = utils.UnionMaps(pod.Labels, k8sPod.Labels)
 		pod.Annotations = utils.UnionMaps(pod.Annotations, k8sPod.Annotations)
 		pod.Spec = k8sPod.Spec
@@ -159,12 +163,14 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		if err != nil {
 			return v1.Pod{}, nil, err
 		}
+
 		templateParameters := template.Parameters{
 			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
 			Inputs:           arrTCtx.arrayInputReader,
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
 		}
+
 		err = flytek8s.AddFlyteCustomizationsToContainer(
 			ctx, templateParameters, flytek8s.ResourceCustomizationModeMergeExistingResources, &pod.Spec.Containers[containerIndex])
 		if err != nil {
