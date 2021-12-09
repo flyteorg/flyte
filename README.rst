@@ -98,6 +98,26 @@ usually not needed, so the default behavior is to run without a prefix.
 
 Sets the local endpoint for `CORS request proxying <cors-proxying_>`_.
 
+======================================
+Running from docker image as localhost
+======================================
+To run flyteconsole directly from your docker image as localhost you must set a
+few environment variables in your run command to setup the appliation.
+
+``BASE_URL="/console"`` (required)
+
+``CONFIG_DIR="/etc/flyte/config"`` (required)
+
+``DISABLE_AUTH="1"`` (optional)
+
+This example assumes building from ``v0.30.0`` on port ``8080``
+
+   .. code:: bash
+
+      docker run -p 8080:8080 -e BASE_URL="/console" -e CONFIG_DIR="/etc/flyte/config" -e DISABLE_AUTH="1" ghcr.io/flyteorg/flyteconsole:v0.30.0
+
+
+
 ===============
 Run the server
 ===============
