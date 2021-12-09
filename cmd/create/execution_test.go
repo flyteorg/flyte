@@ -19,6 +19,7 @@ import (
 func createExecutionSetup() {
 	ctx = testutils.Ctx
 	mockClient = testutils.MockClient
+	executionConfig = &ExecutionConfig{}
 	// TODO: migrate to new command context from testutils
 	cmdCtx = cmdCore.NewCommandContext(mockClient, testutils.MockOutStream)
 	sortedListLiteralType := core.Variable{
