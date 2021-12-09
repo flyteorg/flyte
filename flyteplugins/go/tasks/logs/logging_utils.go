@@ -84,7 +84,7 @@ func (t taskLogPluginWrapper) GetTaskLogs(input tasklog.Input) (logOutput tasklo
 	}, nil
 }
 
-// Internal
+// InitializeLogPlugins initializes log plugin based on config.
 func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	// Use a list to maintain order.
 	logPlugins := make([]logPlugin, 0, 2)

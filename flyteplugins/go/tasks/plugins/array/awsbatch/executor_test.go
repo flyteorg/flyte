@@ -5,6 +5,10 @@ import (
 	"reflect"
 	"testing"
 
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+
+	"github.com/flyteorg/flytestdlib/storage"
+
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -123,11 +127,21 @@ func TestExecutor_Handle(t *testing.T) {
 	tMeta.OnGetTaskExecutionID().Return(tID)
 	tMeta.OnGetOverrides().Return(overrides)
 
+	dataStore, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, promutils.NewTestScope())
+	assert.NoError(t, err)
+
+	inputReader := &mocks2.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return("/inputs.pb")
+
 	tCtx := &pluginMocks.TaskExecutionContext{}
 	tCtx.OnPluginStateReader().Return(pluginStateReader)
 	tCtx.OnPluginStateWriter().Return(pluginStateWriter)
 	tCtx.OnTaskReader().Return(tr)
 	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.OnDataStore().Return(dataStore)
+	tCtx.OnInputReader().Return(inputReader)
 
 	transition, err := e.Handle(ctx, tCtx)
 	assert.NoError(t, err)

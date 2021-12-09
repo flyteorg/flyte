@@ -202,6 +202,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: arrayCore.NewPhasesCompactArray(uint(5)),
 			},
+			IndexesToCache: bitarray.NewBitSet(5),
 		})
 
 		assert.Nil(t, err)

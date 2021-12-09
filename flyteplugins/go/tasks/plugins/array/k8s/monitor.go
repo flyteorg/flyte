@@ -71,6 +71,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		existingPhase := core.Phases[existingPhaseIdx]
 		indexStr := strconv.Itoa(childIdx)
 		podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, newState.GetIndexesToCache())
 
 		if existingPhase.IsTerminal() {
 			// If we get here it means we have already "processed" this terminal phase since we will only persist
@@ -84,7 +85,6 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			}
 			newArrayStatus.Summary.Inc(existingPhase)
 			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase))
-			originalIdx := arrayCore.CalculateOriginalIndex(childIdx, newState.GetIndexesToCache())
 
 			phaseInfo, err := FetchPodStatusAndLogs(ctx, kubeClient,
 				k8sTypes.NamespacedName{
@@ -111,9 +111,11 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			NewArrayStatus:   newArrayStatus,
 			Config:           config,
 			ChildIdx:         childIdx,
+			OriginalIndex:    originalIdx,
 			MessageCollector: &msg,
 			SubTaskIDs:       subTaskIDs,
 		}
+
 		// The first time we enter this state we will launch every subtask. On subsequent rounds, the pod
 		// has already been created so we return a Success value and continue with the Monitor step.
 		var launchResult LaunchResult
@@ -136,7 +138,6 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			return currentState, logLinks, subTaskIDs, nil
 		}
 
-		var monitorResult MonitorResult
 		monitorResult, taskLogs, err := task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox, logPlugin)
 
 		if len(taskLogs) > 0 {

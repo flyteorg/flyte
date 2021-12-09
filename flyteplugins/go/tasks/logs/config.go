@@ -5,12 +5,12 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/config"
 )
 
-//go:generate pflags LogConfig
+//go:generate pflags LogConfig --default-var=DefaultConfig
 
-// A URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
+// TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
 type TemplateURI = string
 
-// Log plugins configs
+// LogConfig encapsulates plugins' log configs
 type LogConfig struct {
 	IsCloudwatchEnabled bool `json:"cloudwatch-enabled" pflag:",Enable Cloudwatch Logging"`
 	// Deprecated: Please use CloudwatchTemplateURI
@@ -41,14 +41,19 @@ type TemplateLogPluginConfig struct {
 }
 
 var (
-	logConfigSection = config.MustRegisterSubSection("logs", &LogConfig{})
+	DefaultConfig = LogConfig{
+		IsKubernetesEnabled:   true,
+		KubernetesTemplateURI: "http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}",
+	}
+
+	logConfigSection = config.MustRegisterSubSection("logs", &DefaultConfig)
 )
 
 func GetLogConfig() *LogConfig {
 	return logConfigSection.GetConfig().(*LogConfig)
 }
 
-// This method should be used for unit testing only
+// SetLogConfig should be used for unit testing only
 func SetLogConfig(logConfig *LogConfig) error {
 	return logConfigSection.SetConfig(logConfig)
 }

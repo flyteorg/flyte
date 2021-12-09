@@ -317,7 +317,7 @@ func NewPhasesCompactArray(count uint) bitarray.CompactArray {
 	return a
 }
 
-// Compute the original index of a sub-task.
+// CalculateOriginalIndex computes the original index of a sub-task.
 func CalculateOriginalIndex(childIdx int, toCache *bitarray.BitSet) int {
 	var sum = 0
 	for i := uint(0); i < toCache.Cap(); i++ {

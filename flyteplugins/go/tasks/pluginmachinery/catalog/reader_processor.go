@@ -80,7 +80,7 @@ func (p ReaderProcessor) Process(ctx context.Context, workItem workqueue.WorkIte
 
 	wi.cached = true
 
-	logger.Debugf(ctx, "Successfully wrote to catalog. Key [%v]", wi.key)
+	logger.Debugf(ctx, "Successfully read from catalog. Key [%v]", wi.key)
 	return workqueue.WorkStatusSucceeded, nil
 }
 

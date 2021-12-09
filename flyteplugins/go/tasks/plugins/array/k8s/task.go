@@ -32,6 +32,7 @@ type Task struct {
 	NewArrayStatus   *arraystatus.ArrayStatus
 	Config           *Config
 	ChildIdx         int
+	OriginalIndex    int
 	MessageCollector *errorcollector.ErrorMessageCollector
 	SubTaskIDs       []*string
 }
@@ -103,9 +104,11 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	if t.Config.RemoteClusterConfig.Enabled {
 		podTemplate.OwnerReferences = nil
 	}
+
 	if len(podTemplate.Spec.Containers) == 0 {
 		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "No containers found in podSpec.")
 	}
+
 	containerIndex, err := getTaskContainerIndex(&podTemplate)
 	if err != nil {
 		return LaunchError, err
@@ -113,12 +116,24 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	allocationStatus, err := allocateResource(ctx, tCtx, t.Config, podName)
+	if err != nil {
+		return LaunchError, err
+	}
+
+	if allocationStatus != core.AllocationStatusGranted {
+		t.NewArrayStatus.Detailed.SetItem(t.ChildIdx, bitarray.Item(core.PhaseWaitingForResources))
+		t.NewArrayStatus.Summary.Inc(core.PhaseWaitingForResources)
+		return LaunchWaiting, nil
+	}
 
 	pod := podTemplate.DeepCopy()
 	pod.Name = podName
 	pod.Spec.Containers[containerIndex].Env = append(pod.Spec.Containers[containerIndex].Env, corev1.EnvVar{
-		Name:  FlyteK8sArrayIndexVarName,
-		Value: indexStr,
+		Name: FlyteK8sArrayIndexVarName,
+		// Use the OriginalIndex which represents the position of the subtask in the original user's map task before
+		// compacting indexes caused by catalog-cache-check.
+		Value: strconv.Itoa(t.OriginalIndex),
 	})
 
 	pod.Spec.Containers[containerIndex].Env = append(pod.Spec.Containers[containerIndex].Env, arrayJobEnvVars...)
@@ -128,19 +143,11 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	} else if taskTemplate == nil {
 		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Missing task template")
 	}
+
 	pod = ApplyPodPolicies(ctx, t.Config, pod)
 	pod = applyNodeSelectorLabels(ctx, t.Config, pod)
 	pod = applyPodTolerations(ctx, t.Config, pod)
 	pod = addPodFinalizer(pod)
-	allocationStatus, err := allocateResource(ctx, tCtx, t.Config, podName)
-	if err != nil {
-		return LaunchError, err
-	}
-	if allocationStatus != core.AllocationStatusGranted {
-		t.NewArrayStatus.Detailed.SetItem(t.ChildIdx, bitarray.Item(core.PhaseWaitingForResources))
-		t.NewArrayStatus.Summary.Inc(core.PhaseWaitingForResources)
-		return LaunchWaiting, nil
-	}
 
 	// Check for existing pods to prevent unnecessary Resource-Quota usage: https://github.com/kubernetes/kubernetes/issues/76787
 	existingPod := &corev1.Pod{}
