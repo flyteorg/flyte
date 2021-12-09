@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.34.0](http://github.com/lyft/flyteconsole/compare/v0.33.1...v0.34.0) (2021-12-09)
+
+
+### Features
+
+* Remove disable auth var ([#251](http://github.com/lyft/flyteconsole/issues/251)) ([a701c08](http://github.com/lyft/flyteconsole/commit/a701c085be4eea3f72ef3bd46694b9253aa3addf))
+
 ## [0.33.1](http://github.com/lyft/flyteconsole/compare/v0.33.0...v0.33.1) (2021-12-07)
 
 
