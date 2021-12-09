@@ -10,7 +10,7 @@ modules:
   - name: gcs
     type: gcp-gcs
     bucket_name: "{parent_name}-{layer_name}"
-  - name: adminflyterole
+  - name: adminflyteaccount
     type: gcp-service-account
     explicit_name: gsa-flyteadmin
     allowed_k8s_services:
@@ -18,7 +18,7 @@ modules:
         service_account_name: flyteadmin
     links:
       - gcs: [ "write" ]
-  - name: datacatalogrole
+  - name: datacatalogaccount
     type: gcp-service-account
     explicit_name: gsa-datacatalog
     allowed_k8s_services:
@@ -26,7 +26,15 @@ modules:
         service_account_name: datacatalog
     links:
       - gcs: [ "write" ]
-  - name: flytepropellerrole
+  - name: flytescheduleraccount
+    type: gcp-service-account
+    explicit_name: gsa-flytescheduler
+    allowed_k8s_services:
+      - namespace: flyte
+        service_account_name: flytescheduler
+    links:
+      - gcs: [ "write" ]
+  - name: flytepropelleraccount
     type: gcp-service-account
     explicit_name: gsa-flytepropeller
     allowed_k8s_services:
@@ -34,7 +42,7 @@ modules:
         service_account_name: flytepropeller
     links:
       - gcs: [ "write" ]
-  - name: flyteproductionrole
+  - name: flyteproductionaccount
     type: gcp-service-account
     explicit_name: gsa-production
     allowed_k8s_services:
@@ -42,7 +50,7 @@ modules:
         service_account_name: default
     links:
       - gcs: [ "write" ]
-  - name: flytestagingrole
+  - name: flytestagingaccount
     type: gcp-service-account
     explicit_name: gsa-staging
     allowed_k8s_services:
@@ -50,7 +58,7 @@ modules:
         service_account_name: default
     links:
       - gcs: [ "write" ]
-  - name: flytedevelopmentrole
+  - name: flytedevelopmentaccount
     type: gcp-service-account
     explicit_name: gsa-development
     allowed_k8s_services:
@@ -59,11 +67,11 @@ modules:
     links:
       - gcs: [ "write" ]
   - type: helm-chart
-    chart: "../../charts/flyte" # NOTE: relative path to chart
+    chart: "../../charts/flyte-core" # NOTE: relative path to chart
     namespace: flyte
     timeout: 600
     create_namespace: true
-    values_file: "../../charts/flyte/values-gcp.yaml" # NOTE: relative path to values yaml
+    values_file: "../../charts/flyte-core/values-gcp.yaml" # NOTE: relative path to values yaml
     # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
     values:
       postgres:
@@ -100,17 +108,22 @@ modules:
         serviceAccount:
           create: true
           annotations:
-            "iam.gke.io/gcp-service-account": "${{module.adminflyterole.service_account_email}}"
+            "iam.gke.io/gcp-service-account": "${{module.adminflyteaccount.service_account_email}}"
       datacatalog:
         serviceAccount:
           create: true
           annotations:
-            "iam.gke.io/gcp-service-account": "${{module.datacatalogrole.service_account_email}}"
+            "iam.gke.io/gcp-service-account": "${{module.datacatalogaccount.service_account_email}}"
       flytepropeller:
         serviceAccount:
           create: true
           annotations:
-            "iam.gke.io/gcp-service-account": "${{module.flytepropellerrole.service_account_email}}"
+            "iam.gke.io/gcp-service-account": "${{module.flytepropelleraccount.service_account_email}}"
+      flytescheduler:
+        serviceAccount:
+          create: true
+          annotations:
+            "iam.gke.io/gcp-service-account": "${{module.flytescheduleraccount.service_account_email}}"
       configmap:
         core:
           propeller:
@@ -122,21 +135,21 @@ modules:
             customData:
               - production:
                   - gsa:
-                      value: "${{module.flyteproductionrole.service_account_email}}"
+                      value: "${{module.flyteproductionaccount.service_account_email}}"
                   - projectQuotaCpu:
                       value: "5"
                   - projectQuotaMemory:
                       value: "4000Mi"
               - staging:
                   - gsa:
-                      value: "${{module.flytestagingrole.service_account_email}}"
+                      value: "${{module.flytestagingaccount.service_account_email}}"
                   - projectQuotaCpu:
                       value: "2"
                   - projectQuotaMemory:
                       value: "3000Mi"
               - development:
                   - gsa:
-                      value: "${{module.flytedevelopmentrole.service_account_email}}"
+                      value: "${{module.flytedevelopmentaccount.service_account_email}}"
                   - projectQuotaCpu:
                       value: "2"
                   - projectQuotaMemory:
