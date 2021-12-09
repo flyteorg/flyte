@@ -27,6 +27,7 @@ Authorize Gcloud sdk to access GCP using your credentials, setup the config for 
 and optionally set the default compute zone. `Init <https://cloud.google.com/sdk/gcloud/reference/init>`__
 
 .. code-block:: bash
+
    gcloud init
 
 
