@@ -179,6 +179,9 @@ func resolveOverrides(toBeOverridden *ExecutionConfig, project string, domain st
 	if executionConfig.TargetDomain != "" {
 		toBeOverridden.TargetDomain = executionConfig.TargetDomain
 	}
+	if executionConfig.Version != "" {
+		toBeOverridden.Version = executionConfig.Version
+	}
 	// Use the root project and domain to launch the task/workflow if target is unspecified
 	if executionConfig.TargetProject == "" {
 		toBeOverridden.TargetProject = project
