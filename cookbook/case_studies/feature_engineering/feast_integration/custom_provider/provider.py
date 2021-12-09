@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 
 class FlyteCustomProvider(LocalProvider):
-    def __init__(self, config: RepoConfig, repo_path):
+    def __init__(self, config: RepoConfig):
         super().__init__(config)
 
     def materialize_single_feature_view(
@@ -78,13 +78,17 @@ class FlyteCustomProvider(LocalProvider):
 
         # Copy parquet file to a local file
         file_source: FileSource = feature_view.batch_source
-        random_local_path = FlyteContext.current_context().file_access.get_random_local_path(file_source.path)
+        random_local_path = (
+            FlyteContext.current_context().file_access.get_random_local_path(
+                file_source.path
+            )
+        )
         FlyteContext.current_context().file_access.get_data(
             file_source.path,
             random_local_path,
             is_multipart=True,
         )
-        feature_view.batch_source=FileSource(
+        feature_view.batch_source = FileSource(
             path=random_local_path,
             event_timestamp_column=file_source.event_timestamp_column,
         )

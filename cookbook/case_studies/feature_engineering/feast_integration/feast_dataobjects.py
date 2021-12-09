@@ -29,7 +29,7 @@ class FeatureStoreConfig:
     registry_path: str
     project: str
     s3_bucket: str
-    online_store_path: str = 'online.db'
+    online_store_path: str = "online.db"
 
 
 @dataclass_json
@@ -65,7 +65,10 @@ class FeatureStore:
         fs.apply(objects)
 
         # Applying also initializes the sqlite tables in the online store
-        FlyteContext.current_context().file_access.upload(self.config.online_store_path, f"s3://{self.config.s3_bucket}/{self.config.online_store_path}")
+        FlyteContext.current_context().file_access.upload(
+            self.config.online_store_path,
+            f"s3://{self.config.s3_bucket}/{self.config.online_store_path}",
+        )
 
     def get_historical_features(
         self,
@@ -85,13 +88,19 @@ class FeatureStore:
         end_date: datetime,
         feature_views: Optional[List[str]] = None,
     ) -> None:
-        FlyteContext.current_context().file_access.download(f"s3://{self.config.s3_bucket}/{self.config.online_store_path}", self.config.online_store_path)
+        FlyteContext.current_context().file_access.download(
+            f"s3://{self.config.s3_bucket}/{self.config.online_store_path}",
+            self.config.online_store_path,
+        )
         fs = self._build_feast_feature_store()
         fs.materialize(
             start_date=start_date,
             end_date=end_date,
         )
-        FlyteContext.current_context().file_access.upload(self.config.online_store_path, f"s3://{self.config.s3_bucket}/{self.config.online_store_path}")
+        FlyteContext.current_context().file_access.upload(
+            self.config.online_store_path,
+            f"s3://{self.config.s3_bucket}/{self.config.online_store_path}",
+        )
 
     def get_online_features(
         self,
@@ -100,8 +109,13 @@ class FeatureStore:
         feature_refs: Optional[List[str]] = None,
         full_feature_names: bool = False,
     ) -> Dict[str, Any]:
-        FlyteContext.current_context().file_access.download(f"s3://{self.config.s3_bucket}/{self.config.online_store_path}", self.config.online_store_path)
+        FlyteContext.current_context().file_access.download(
+            f"s3://{self.config.s3_bucket}/{self.config.online_store_path}",
+            self.config.online_store_path,
+        )
         fs = self._build_feast_feature_store()
 
-        online_response = fs.get_online_features(features, entity_rows, feature_refs, full_feature_names)
+        online_response = fs.get_online_features(
+            features, entity_rows, feature_refs, full_feature_names
+        )
         return online_response.to_dict()

@@ -19,6 +19,7 @@ pipeline utilizing "Feast". Here is the step-by-step process:
 
 import logging
 import typing
+
 # %%
 # Let's import the libraries.
 from datetime import datetime, timedelta
@@ -28,7 +29,7 @@ import boto3
 import joblib
 import pandas as pd
 from feast import Entity, Feature, FeatureStore, FeatureView, FileSource, ValueType
-from flytekit import task, workflow, TaskMetadata
+from flytekit import task, workflow, TaskMetadata, Resources
 from flytekit.configuration import aws
 from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 from flytekit.types.file import JoblibSerializedFile
@@ -66,7 +67,7 @@ DATA_CLASS = "surgical lesion"
 @task(cache=True, cache_version="1.0")
 def create_bucket(bucket_name: str) -> str:
     client = boto3.client(
-        's3',
+        "s3",
         aws_access_key_id=aws.S3_ACCESS_KEY_ID.get(),
         aws_secret_access_key=aws.S3_SECRET_ACCESS_KEY.get(),
         use_ssl=False,
@@ -127,7 +128,7 @@ load_horse_colic_sql = SQLite3Task(
 #     hence serialization of the feature store is required. this is because FEAST registries are single files and
 #     Flyte workflows can be highly concurrent
 #
-@task(cache=True, cache_version="1.0")
+@task(cache=True, cache_version="1.0", limits=Resources(mem="400Mi"))
 def store_offline(feature_store: FeatureStore, dataframe: FlyteSchema) -> FeatureStore:
     horse_colic_entity = Entity(name="Hospital Number", value_type=ValueType.STRING)
 
@@ -158,7 +159,7 @@ def store_offline(feature_store: FeatureStore, dataframe: FlyteSchema) -> Featur
     return feature_store
 
 
-@task(cache=True, cache_version="1.0")
+@task(cache=True, cache_version="1.0", limits=Resources(mem="400Mi"))
 def load_historical_features(feature_store: FeatureStore) -> FlyteSchema:
     entity_df = pd.DataFrame.from_dict(
         {
@@ -187,7 +188,9 @@ def load_historical_features(feature_store: FeatureStore) -> FlyteSchema:
         }
     )
 
-    return feature_store.get_historical_features(entity_df=entity_df, features=FEAST_FEATURES)  # noqa
+    return feature_store.get_historical_features(
+        entity_df=entity_df, features=FEAST_FEATURES
+    )  # noqa
 
 
 # %%
@@ -223,10 +226,10 @@ def train_model(dataset: pd.DataFrame, data_class: str) -> JoblibSerializedFile:
 #
 #   One key difference between an online and offline store is that only the latest feature values are stored per entity
 #   key in an online store, unlike an offline store where all feature values are stored.
-#   Our dataset has two such entries with the same ``Hospital Number`` but different time stamps. 
+#   Our dataset has two such entries with the same ``Hospital Number`` but different time stamps.
 #   Only data point with the latest timestamp will be stored in the online store.
 #
-@task(cache=True, cache_version="1.0")
+@task(cache=True, cache_version="1.0", limits=Resources(mem="400Mi"))
 def store_online(feature_store: FeatureStore) -> FeatureStore:
     feature_store.materialize(
         start_date=datetime.utcnow() - timedelta(days=250),
@@ -254,7 +257,7 @@ def predict(model_ser: JoblibSerializedFile, features: dict) -> typing.List[str]
 # Next, we need to convert timestamp column in the underlying dataframe, otherwise its type is written as string.
 @task(cache=True, cache_version="1.0")
 def convert_timestamp_column(
-        dataframe: FlyteSchema, timestamp_column: str
+    dataframe: FlyteSchema, timestamp_column: str
 ) -> FlyteSchema:
     df = dataframe.open().all()
     df[timestamp_column] = pd.to_datetime(df[timestamp_column])
@@ -264,9 +267,15 @@ def convert_timestamp_column(
 # %%
 # The ``build_feature_store`` task is a medium to access Feast methods by building a feature store.
 @task(cache=True, cache_version="1.0")
-def build_feature_store(s3_bucket: str, registry_path: str, online_store_path: str) -> FeatureStore:
-    feature_store_config = FeatureStoreConfig(project="horsecolic", s3_bucket=s3_bucket, registry_path=registry_path,
-                                              online_store_path=online_store_path)
+def build_feature_store(
+    s3_bucket: str, registry_path: str, online_store_path: str
+) -> FeatureStore:
+    feature_store_config = FeatureStoreConfig(
+        project="horsecolic",
+        s3_bucket=s3_bucket,
+        registry_path=registry_path,
+        online_store_path=online_store_path,
+    )
     return FeatureStore(config=feature_store_config)
 
 
@@ -291,7 +300,9 @@ def retrieve_online(feature_store: FeatureStore, dataset: pd.DataFrame) -> dict:
 # the following workflow is a separate workflow that can be run indepedently to create features and store them offline
 # This can be run periodically or triggered independently
 @workflow
-def featurize(feature_store: FeatureStore, imputation_method: str = "mean") -> (FlyteSchema, FeatureStore):
+def featurize(
+    feature_store: FeatureStore, imputation_method: str = "mean"
+) -> (FlyteSchema, FeatureStore):
     # Load parquet file from sqlite task
     df = load_horse_colic_sql()
 
@@ -299,9 +310,7 @@ def featurize(feature_store: FeatureStore, imputation_method: str = "mean") -> (
     df = mean_median_imputer(dataframe=df, imputation_method=imputation_method)
 
     # Convert timestamp column from string to datetime.
-    converted_df = convert_timestamp_column(
-        dataframe=df, timestamp_column="timestamp"
-    )
+    converted_df = convert_timestamp_column(dataframe=df, timestamp_column="timestamp")
 
     return df, store_offline(feature_store=feature_store, dataframe=converted_df)
 
@@ -333,28 +342,38 @@ def trainer(df: FlyteSchema, num_features_univariate: int = 7) -> JoblibSerializ
 # we construct the following workflow, composing other workflows
 @workflow
 def feast_workflow(
-        imputation_method: str = "mean",
-        num_features_univariate: int = 7,
-        s3_bucket: str = "feast-integration",
-        registry_path: str = "registry.db",
-        online_store_path: str = "online.db",
+    imputation_method: str = "mean",
+    num_features_univariate: int = 7,
+    s3_bucket: str = "feast-integration",
+    registry_path: str = "registry.db",
+    online_store_path: str = "online.db",
 ) -> (FeatureStore, JoblibSerializedFile, typing.List[str]):
     # Create bucket if it does not already exist
     # & Build feature store
-    feature_store = build_feature_store(s3_bucket=create_bucket(bucket_name=s3_bucket), registry_path=registry_path,
-                                        online_store_path=online_store_path)
+    feature_store = build_feature_store(
+        s3_bucket=create_bucket(bucket_name=s3_bucket),
+        registry_path=registry_path,
+        online_store_path=online_store_path,
+    )
     # Feature engineering
-    df, loaded_feature_store = featurize(feature_store=feature_store, imputation_method=imputation_method)
+    df, loaded_feature_store = featurize(
+        feature_store=feature_store, imputation_method=imputation_method
+    )
 
     # Demonstrate how to load features from offline store
     historical_features = load_historical_features(feature_store=loaded_feature_store)
 
-    model = trainer(df=historical_features, num_features_univariate=num_features_univariate)
+    model = trainer(
+        df=historical_features, num_features_univariate=num_features_univariate
+    )
 
     online_feature_store = store_online(feature_store=loaded_feature_store)
 
     # Use a feature retrieved from the online store for inference
-    predictions = predict(model_ser=model, features=retrieve_online(feature_store=online_feature_store, dataset=df))  # noqa
+    predictions = predict(
+        model_ser=model,
+        features=retrieve_online(feature_store=online_feature_store, dataset=df),
+    )  # noqa
 
     return online_feature_store, model, predictions
 

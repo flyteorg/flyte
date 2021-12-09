@@ -1,4 +1,5 @@
-flytekit>=0.23.0b1
+-r ../../../common/requirements-common.in
 scikit-learn
 numpy
 feast[aws]
+proto-plus
