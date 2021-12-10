@@ -1,6 +1,6 @@
-.. _FlyteCTL_register:
+.. _flytectl_register:
 
-FlyteCTL register
+flytectl register
 -----------------
 
 Register tasks/workflows/launchplans from a list of generated serialized files.
@@ -70,7 +70,7 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
-* :doc:`FlyteCTL_register_examples` 	 - Register Flytesnacks example
-* :doc:`FlyteCTL_register_files` 	 - Register file resources
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl_register_examples` 	 - Register Flytesnacks example
+* :doc:`flytectl_register_files` 	 - Register file resources
 

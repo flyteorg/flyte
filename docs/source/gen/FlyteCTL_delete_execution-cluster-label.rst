@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_execution-cluster-label:
+.. _flytectl_delete_execution-cluster-label:
 
-FlyteCTL delete execution-cluster-label
+flytectl delete execution-cluster-label
 ---------------------------------------
 
 Delete matchable resources of execution cluster label
@@ -46,7 +46,7 @@ Usage
 
 ::
 
-  FlyteCTL delete execution-cluster-label [flags]
+  flytectl delete execution-cluster-label [flags]
 
 Options
 ~~~~~~~
@@ -104,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

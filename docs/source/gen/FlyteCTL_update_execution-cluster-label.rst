@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_execution-cluster-label:
+.. _flytectl_update_execution-cluster-label:
 
-FlyteCTL update execution-cluster-label
+flytectl update execution-cluster-label
 ---------------------------------------
 
 Update matchable resources of execution cluster label
@@ -47,7 +47,7 @@ Usage
 
 ::
 
-  FlyteCTL update execution-cluster-label [flags]
+  flytectl update execution-cluster-label [flags]
 
 Options
 ~~~~~~~
@@ -105,5 +105,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

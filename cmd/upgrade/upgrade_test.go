@@ -29,7 +29,7 @@ func TestUpgradeCommand(t *testing.T) {
 	rootCmd := &cobra.Command{
 		Long:              "FlyteCTL is CLI tool written in go to interact with flyteadmin service",
 		Short:             "FlyteCTL CLI tool",
-		Use:               "FlyteCTL",
+		Use:               "flytectl",
 		DisableAutoGenTag: true,
 	}
 	upgradeCmd := SelfUpgrade(rootCmd)

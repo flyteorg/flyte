@@ -1,9 +1,9 @@
-.. _FlyteCTL_sandbox_start:
+.. _flytectl_sandbox_start:
 
-FlyteCTL sandbox start
+flytectl sandbox start
 ----------------------
 
-Start the flyte sandbox cluster
+Start the Flyte Sandbox cluster
 
 Synopsis
 ~~~~~~~~
@@ -44,7 +44,7 @@ Usage
 
 ::
 
-  FlyteCTL sandbox start [flags]
+  flytectl sandbox start [flags]
 
 Options
 ~~~~~~~
@@ -104,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 

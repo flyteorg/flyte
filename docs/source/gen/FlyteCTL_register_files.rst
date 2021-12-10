@@ -1,6 +1,6 @@
-.. _FlyteCTL_register_files:
+.. _flytectl_register_files:
 
-FlyteCTL register files
+flytectl register files
 -----------------------
 
 Register file resources
@@ -85,7 +85,7 @@ Usage
 
 ::
 
-  FlyteCTL register files [flags]
+  flytectl register files [flags]
 
 Options
 ~~~~~~~
@@ -150,5 +150,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
+* :doc:`flytectl_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
 

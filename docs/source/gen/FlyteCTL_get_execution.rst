@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_execution:
+.. _flytectl_get_execution:
 
-FlyteCTL get execution
+flytectl get execution
 ----------------------
 
 Get execution resources
@@ -75,7 +75,7 @@ Usage
 
 ::
 
-  FlyteCTL get execution [flags]
+  flytectl get execution [flags]
 
 Options
 ~~~~~~~
@@ -137,5 +137,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

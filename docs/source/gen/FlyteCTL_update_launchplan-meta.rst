@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_launchplan-meta:
+.. _flytectl_update_launchplan-meta:
 
-FlyteCTL update launchplan-meta
+flytectl update launchplan-meta
 -------------------------------
 
 Update launch plan metadata
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  FlyteCTL update launchplan-meta [flags]
+  flytectl update launchplan-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

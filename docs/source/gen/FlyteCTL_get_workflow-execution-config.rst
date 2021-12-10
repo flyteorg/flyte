@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_workflow-execution-config:
+.. _flytectl_get_workflow-execution-config:
 
-FlyteCTL get workflow-execution-config
+flytectl get workflow-execution-config
 --------------------------------------
 
 Get matchable resources of workflow execution config
@@ -66,7 +66,7 @@ Usage
 
 ::
 
-  FlyteCTL get workflow-execution-config [flags]
+  flytectl get workflow-execution-config [flags]
 
 Options
 ~~~~~~~
@@ -123,5 +123,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

@@ -1,6 +1,6 @@
-.. _FlyteCTL_config_discover:
+.. _flytectl_config_discover:
 
-FlyteCTL config discover
+flytectl config discover
 ------------------------
 
 Searches for a config in one of the default search paths.
@@ -13,7 +13,7 @@ Searches for a config in one of the default search paths.
 
 ::
 
-  FlyteCTL config discover [flags]
+  flytectl config discover [flags]
 
 Options
 ~~~~~~~
@@ -71,5 +71,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
+* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 

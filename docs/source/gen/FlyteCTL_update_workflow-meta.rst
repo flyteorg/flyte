@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_workflow-meta:
+.. _flytectl_update_workflow-meta:
 
-FlyteCTL update workflow-meta
+flytectl update workflow-meta
 -----------------------------
 
 Update workflow metadata
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  FlyteCTL update workflow-meta [flags]
+  flytectl update workflow-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

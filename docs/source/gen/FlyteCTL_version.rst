@@ -1,6 +1,6 @@
-.. _FlyteCTL_version:
+.. _flytectl_version:
 
-FlyteCTL version
+flytectl version
 ----------------
 
 Fetch Flyte version
@@ -18,7 +18,7 @@ For FlyteCTL version, it is:
 
 ::
 
-  FlyteCTL version [flags]
+  flytectl version [flags]
 
 Options
 ~~~~~~~
@@ -74,5 +74,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
 

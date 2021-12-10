@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_cluster-resource-attribute:
+.. _flytectl_get_cluster-resource-attribute:
 
-FlyteCTL get cluster-resource-attribute
+flytectl get cluster-resource-attribute
 ---------------------------------------
 
 Get matchable resources of cluster resource attributes.
@@ -56,7 +56,7 @@ Usage
 
 ::
 
-  FlyteCTL get cluster-resource-attribute [flags]
+  flytectl get cluster-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -113,5 +113,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

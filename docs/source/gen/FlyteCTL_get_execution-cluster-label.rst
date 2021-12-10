@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_execution-cluster-label:
+.. _flytectl_get_execution-cluster-label:
 
-FlyteCTL get execution-cluster-label
+flytectl get execution-cluster-label
 ------------------------------------
 
 Get matchable resources of execution cluster label.
@@ -55,7 +55,7 @@ Usage
 
 ::
 
-  FlyteCTL get execution-cluster-label [flags]
+  flytectl get execution-cluster-label [flags]
 
 Options
 ~~~~~~~
@@ -112,5 +112,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

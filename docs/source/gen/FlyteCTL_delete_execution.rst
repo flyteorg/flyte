@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_execution:
+.. _flytectl_delete_execution:
 
-FlyteCTL delete execution
+flytectl delete execution
 -------------------------
 
 Terminate/Delete execution resources.
@@ -56,7 +56,7 @@ Usage
 
 ::
 
-  FlyteCTL delete execution [flags]
+  flytectl delete execution [flags]
 
 Options
 ~~~~~~~
@@ -113,5 +113,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

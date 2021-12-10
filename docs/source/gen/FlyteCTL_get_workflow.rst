@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_workflow:
+.. _flytectl_get_workflow:
 
-FlyteCTL get workflow
+flytectl get workflow
 ---------------------
 
 Get workflow resources
@@ -77,7 +77,7 @@ Usage
 
 ::
 
-  FlyteCTL get workflow [flags]
+  flytectl get workflow [flags]
 
 Options
 ~~~~~~~
@@ -139,5 +139,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

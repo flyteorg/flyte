@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_plugin-override:
+.. _flytectl_update_plugin-override:
 
-FlyteCTL update plugin-override
+flytectl update plugin-override
 -------------------------------
 
 Update matchable resources of plugin overrides
@@ -60,7 +60,7 @@ Usage
 
 ::
 
-  FlyteCTL update plugin-override [flags]
+  flytectl update plugin-override [flags]
 
 Options
 ~~~~~~~
@@ -118,5 +118,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

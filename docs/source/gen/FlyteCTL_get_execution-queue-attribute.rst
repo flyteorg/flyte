@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_execution-queue-attribute:
+.. _flytectl_get_execution-queue-attribute:
 
-FlyteCTL get execution-queue-attribute
+flytectl get execution-queue-attribute
 --------------------------------------
 
 Get matchable resources of execution queue attributes
@@ -58,7 +58,7 @@ Usage
 
 ::
 
-  FlyteCTL get execution-queue-attribute [flags]
+  flytectl get execution-queue-attribute [flags]
 
 Options
 ~~~~~~~
@@ -115,5 +115,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

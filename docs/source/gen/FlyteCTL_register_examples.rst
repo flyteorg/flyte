@@ -1,6 +1,6 @@
-.. _FlyteCTL_register_examples:
+.. _flytectl_register_examples:
 
-FlyteCTL register examples
+flytectl register examples
 --------------------------
 
 Register Flytesnacks example
@@ -26,7 +26,7 @@ Usage
 
 ::
 
-  FlyteCTL register examples [flags]
+  flytectl register examples [flags]
 
 Options
 ~~~~~~~
@@ -91,5 +91,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
+* :doc:`flytectl_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
 

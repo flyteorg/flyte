@@ -92,7 +92,7 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 		tearDownAndVerify(t, ``)
 	})
-	t.Run("failed get project domain attribute", func(t *testing.T) {
+	t.Run("failed to get project domain attribute", func(t *testing.T) {
 		var args []string
 		setup()
 		getExecutionClusterLabelSetup()
@@ -120,7 +120,7 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 		tearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","value":"foo"}`)
 	})
-	t.Run("failed get workflow attribute", func(t *testing.T) {
+	t.Run("failed to get workflow attribute", func(t *testing.T) {
 		var args []string
 		setup()
 		getExecutionClusterLabelSetup()

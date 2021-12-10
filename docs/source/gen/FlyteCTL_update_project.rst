@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_project:
+.. _flytectl_update_project:
 
-FlyteCTL update project
+flytectl update project
 -----------------------
 
 Update project resources
@@ -45,7 +45,7 @@ Usage
 
 ::
 
-  FlyteCTL update project [flags]
+  flytectl update project [flags]
 
 Options
 ~~~~~~~
@@ -104,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

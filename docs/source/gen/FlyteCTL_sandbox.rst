@@ -1,6 +1,6 @@
-.. _FlyteCTL_sandbox:
+.. _flytectl_sandbox:
 
-FlyteCTL sandbox
+flytectl sandbox
 ----------------
 
 Used for sandbox interactions like start/teardown/status/exec.
@@ -89,9 +89,9 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
-* :doc:`FlyteCTL_sandbox_exec` 	 - Execute non-interactive command inside the sandbox container
-* :doc:`FlyteCTL_sandbox_start` 	 - Start the flyte sandbox cluster
-* :doc:`FlyteCTL_sandbox_status` 	 - Get status of the sandbox environment.
-* :doc:`FlyteCTL_sandbox_teardown` 	 - Teardown cleans up the sandbox environment
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl_sandbox_exec` 	 - Execute non-interactive command inside the sandbox container
+* :doc:`flytectl_sandbox_start` 	 - Start the Flyte Sandbox cluster
+* :doc:`flytectl_sandbox_status` 	 - Get status of the sandbox environment.
+* :doc:`flytectl_sandbox_teardown` 	 - Teardown cleans up the sandbox environment
 

@@ -1,6 +1,6 @@
-.. _FlyteCTL_create_execution:
+.. _flytectl_create_execution:
 
-FlyteCTL create execution
+flytectl create execution
 -------------------------
 
 Create execution resources
@@ -133,7 +133,7 @@ Usage
 
 ::
 
-  FlyteCTL create execution [flags]
+  flytectl create execution [flags]
 
 Options
 ~~~~~~~
@@ -200,5 +200,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
 

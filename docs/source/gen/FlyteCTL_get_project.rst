@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_project:
+.. _flytectl_get_project:
 
-FlyteCTL get project
+flytectl get project
 --------------------
 
 Get project resources
@@ -48,7 +48,7 @@ Usage
 
 ::
 
-  FlyteCTL get project [flags]
+  flytectl get project [flags]
 
 Options
 ~~~~~~~
@@ -108,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 
