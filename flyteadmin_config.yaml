@@ -120,12 +120,12 @@ storage:
     auth-type: accesskey
     secret-key: miniostorage
     disable-ssl: true
-    endpoint: "http://localhost:9000"
+    endpoint: "http://localhost:30084"
     region: my-region
   cache:
     max_size_mbs: 10
     target_gc_percent: 100
-  container: "flyte"
+  container: "my-s3-bucket"
 queues:
   executionQueues:
     - dynamic: "gpu_dynamic"
@@ -157,13 +157,12 @@ queues:
 task_resources:
   defaults:
     cpu: 100m
-    gpu: 20m
-    memory: 1Mi
-    storage: 10M
+    memory: 200Mi
+    storage: 100M
   limits:
     cpu: 500m
-    gpu: 100m
-    memory: 1Mi
+    gpu: 1
+    memory: 300Mi
     storage: 10G
 task_type_whitelist:
   sparkonk8s:

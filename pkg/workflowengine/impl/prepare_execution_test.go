@@ -18,6 +18,9 @@ import (
 const testRole = "role"
 const testK8sServiceAccount = "sa"
 
+const testRoleSc = "roleSc"
+const testK8sServiceAccountSc = "saSc"
+
 var roleNameKey = "iam.amazonaws.com/role"
 
 func TestAddMapValues(t *testing.T) {
@@ -48,15 +51,35 @@ func TestAddMapValues(t *testing.T) {
 }
 
 func TestAddPermissions(t *testing.T) {
-	flyteWf := v1alpha1.FlyteWorkflow{}
-	addPermissions(&admin.AuthRole{
-		AssumableIamRole:         testRole,
-		KubernetesServiceAccount: testK8sServiceAccount,
-	}, roleNameKey, &flyteWf)
-	assert.EqualValues(t, flyteWf.Annotations, map[string]string{
-		roleNameKey: testRole,
+	securityCtx := &core.SecurityContext{
+		RunAs: &core.Identity{
+			IamRole:           testRoleSc,
+			K8SServiceAccount: testK8sServiceAccountSc,
+		},
+	}
+	securityCtxFromAuth := &core.SecurityContext{
+		RunAs: &core.Identity{
+			IamRole:           testRole,
+			K8SServiceAccount: testK8sServiceAccount,
+		},
+	}
+	t.Run("security ctx from auth", func(t *testing.T) {
+		flyteWf := v1alpha1.FlyteWorkflow{}
+		addPermissions(securityCtxFromAuth, roleNameKey, &flyteWf)
+		assert.EqualValues(t, flyteWf.Annotations, map[string]string{
+			roleNameKey: testRole,
+		})
+		assert.Equal(t, testK8sServiceAccount, flyteWf.ServiceAccountName)
 	})
-	assert.Equal(t, testK8sServiceAccount, flyteWf.ServiceAccountName)
+
+	t.Run("override using security ctx", func(t *testing.T) {
+		flyteWf := v1alpha1.FlyteWorkflow{}
+		addPermissions(securityCtx, roleNameKey, &flyteWf)
+		assert.EqualValues(t, flyteWf.Annotations, map[string]string{
+			roleNameKey: testRoleSc,
+		})
+		assert.Equal(t, testK8sServiceAccountSc, flyteWf.ServiceAccountName)
+	})
 }
 
 func TestAddExecutionOverrides(t *testing.T) {
@@ -156,12 +179,14 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 					MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
 				},
 			},
+			SecurityContext: &core.SecurityContext{
+				RunAs: &core.Identity{
+					IamRole:           testRoleSc,
+					K8SServiceAccount: testK8sServiceAccountSc,
+				},
+			},
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				MaxParallelism: 50,
-			},
-			Auth: &admin.AuthRole{
-				AssumableIamRole:         testRole,
-				KubernetesServiceAccount: testK8sServiceAccount,
 			},
 			RecoveryExecution: recoveryNodeExecutionID,
 			EventVersion:      1,
@@ -180,7 +205,7 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 		"customlabel": "labelval",
 	}, flyteWorkflow.Labels)
 	expectedAnnotations := map[string]string{
-		roleNameKey:        testRole,
+		roleNameKey:        testRoleSc,
 		"customannotation": "annotationval",
 	}
 	assert.EqualValues(t, expectedAnnotations, flyteWorkflow.Annotations)
@@ -191,7 +216,7 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
 		},
 	}, flyteWorkflow.ExecutionConfig.TaskPluginImpls)
-	assert.Equal(t, flyteWorkflow.ServiceAccountName, testK8sServiceAccount)
+	assert.Equal(t, flyteWorkflow.ServiceAccountName, testK8sServiceAccountSc)
 	assert.Equal(t, flyteWorkflow.ExecutionConfig.MaxParallelism, uint32(50))
 	assert.True(t, proto.Equal(recoveryNodeExecutionID, flyteWorkflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
 	assert.Equal(t, flyteWorkflow.WorkflowMeta.EventVersion, v1alpha1.EventVersion(1))

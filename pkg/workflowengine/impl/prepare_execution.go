@@ -23,20 +23,18 @@ func addMapValues(overrides map[string]string, defaultValues map[string]string) 
 	return defaultValues
 }
 
-func addPermissions(auth *admin.AuthRole, roleNameKey string, flyteWf *v1alpha1.FlyteWorkflow) {
-	// Set role permissions based on launch plan Auth values.
-	// The branched-ness of this check is due to the presence numerous deprecated fields
-	if auth == nil {
+func addPermissions(securityCtx *core.SecurityContext, roleNameKey string, flyteWf *v1alpha1.FlyteWorkflow) {
+	if securityCtx == nil || securityCtx.RunAs == nil {
 		return
 	}
-	if len(auth.AssumableIamRole) > 0 {
+	if len(securityCtx.RunAs.IamRole) > 0 {
 		if flyteWf.Annotations == nil {
 			flyteWf.Annotations = map[string]string{}
 		}
-		flyteWf.Annotations[roleNameKey] = auth.AssumableIamRole
+		flyteWf.Annotations[roleNameKey] = securityCtx.RunAs.IamRole
 	}
-	if len(auth.KubernetesServiceAccount) > 0 {
-		flyteWf.ServiceAccountName = auth.KubernetesServiceAccount
+	if len(securityCtx.RunAs.K8SServiceAccount) > 0 {
+		flyteWf.ServiceAccountName = securityCtx.RunAs.K8SServiceAccount
 	}
 }
 
@@ -117,7 +115,10 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	acceptAtWrapper := v1.NewTime(data.ExecutionParameters.AcceptedAt)
 	flyteWorkflow.AcceptedAt = &acceptAtWrapper
 
-	addPermissions(data.ExecutionParameters.Auth, data.ExecutionParameters.RoleNameKey, flyteWorkflow)
+	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
+	// have migrated over to security context
+	addPermissions(data.ExecutionParameters.SecurityContext,
+		data.ExecutionParameters.RoleNameKey, flyteWorkflow)
 
 	labels := addMapValues(data.ExecutionParameters.Labels, flyteWorkflow.Labels)
 	flyteWorkflow.Labels = labels
