@@ -121,7 +121,7 @@ spec:
         - name: auth
           mountPath: /etc/secrets/
         {{- with .Values.flyteadmin.additionalVolumeMounts -}}
-        {{ toYaml . | nindent 8 }}
+        {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
       {{- if .Values.flyteadmin.deployRedoc }}
       - command:
@@ -163,15 +163,15 @@ spec:
           secret:
             secretName: flyte-admin-secrets
         {{- with .Values.flyteadmin.additionalVolumes -}}
-        {{ toYaml . | nindent 8 }}
+        {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
       {{- with .Values.flyteadmin.nodeSelector }}
-      nodeSelector: {{ toYaml . | nindent 8 }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.flyteadmin.affinity }}
-      affinity: {{ toYaml . | nindent 8 }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.flyteadmin.tolerations }}
-      tolerations: {{ toYaml . | nindent 8 }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 {{- end }}

@@ -141,7 +141,7 @@ storage:
     region: us-east-1
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
-  {{ toYaml . | nindent 2 }}
+  {{ tpl (toYaml .) $ | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

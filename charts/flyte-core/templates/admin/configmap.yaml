@@ -10,20 +10,20 @@ data:
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.domain }}
-  domain.yaml: | {{ toYaml . | nindent 4 }}
+  domain.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.logger }}
-  logger.yaml: | {{ toYaml . | nindent 4 }}
+  logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.adminServer }}
-  server.yaml: | {{ toYaml . | nindent 4 }}
+  server.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.remoteData }}
-  remoteData.yaml: | {{ toYaml . | nindent 4 }}
+  remoteData.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
 {{- with .Values.configmap.task_resource_defaults }}
-  task_resource_defaults.yaml: | {{ toYaml . | nindent 4 }}
+  task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- if .Values.workflow_notifications.enabled }}
 {{- with .Values.workflow_notifications.config }}

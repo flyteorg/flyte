@@ -103,7 +103,7 @@ metadata:
   name: {{ template "flyte-pod-webhook.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   {{- with .Values.webhook.service.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
   selector:
@@ -142,7 +142,7 @@ metadata:
   name: {{ template "flyte-pod-webhook.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   {{- with .Values.webhook.serviceAccount.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end}}
 {{- end }}
 ---
