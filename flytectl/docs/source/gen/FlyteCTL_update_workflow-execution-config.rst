@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_workflow-execution-config:
+.. _flytectl_update_workflow-execution-config:
 
-FlyteCTL update workflow-execution-config
+flytectl update workflow-execution-config
 -----------------------------------------
 
 Update matchable resources of workflow execution config
@@ -50,7 +50,7 @@ Usage
 
 ::
 
-  FlyteCTL update workflow-execution-config [flags]
+  flytectl update workflow-execution-config [flags]
 
 Options
 ~~~~~~~
@@ -108,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

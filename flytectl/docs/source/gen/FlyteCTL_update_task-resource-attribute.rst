@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_task-resource-attribute:
+.. _flytectl_update_task-resource-attribute:
 
-FlyteCTL update task-resource-attribute
+flytectl update task-resource-attribute
 ---------------------------------------
 
 Update matchable resources of task attributes
@@ -60,7 +60,7 @@ Usage
 
 ::
 
-  FlyteCTL update task-resource-attribute [flags]
+  flytectl update task-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -118,5 +118,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

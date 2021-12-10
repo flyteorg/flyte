@@ -1,6 +1,6 @@
-.. _FlyteCTL_config_init:
+.. _flytectl_config_init:
 
-FlyteCTL config init
+flytectl config init
 --------------------
 
 Generates FlyteCTL config file in the user's home directory.
@@ -31,7 +31,7 @@ Generates FlyteCTL config with a storage provider
 
 ::
 
-  FlyteCTL config init [flags]
+  flytectl config init [flags]
 
 Options
 ~~~~~~~
@@ -92,5 +92,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
+* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 

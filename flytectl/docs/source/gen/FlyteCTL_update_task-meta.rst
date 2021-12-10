@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_task-meta:
+.. _flytectl_update_task-meta:
 
-FlyteCTL update task-meta
+flytectl update task-meta
 -------------------------
 
 Update task metadata
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  FlyteCTL update task-meta [flags]
+  flytectl update task-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

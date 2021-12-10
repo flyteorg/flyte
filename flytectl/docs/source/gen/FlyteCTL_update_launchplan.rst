@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_launchplan:
+.. _flytectl_update_launchplan:
 
-FlyteCTL update launchplan
+flytectl update launchplan
 --------------------------
 
 Update launch plan status
@@ -26,7 +26,7 @@ Usage
 
 ::
 
-  FlyteCTL update launchplan [flags]
+  flytectl update launchplan [flags]
 
 Options
 ~~~~~~~
@@ -86,5 +86,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

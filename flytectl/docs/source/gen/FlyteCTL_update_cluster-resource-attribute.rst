@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_cluster-resource-attribute:
+.. _flytectl_update_cluster-resource-attribute:
 
-FlyteCTL update cluster-resource-attribute
+flytectl update cluster-resource-attribute
 ------------------------------------------
 
 Update matchable resources of cluster attributes
@@ -54,7 +54,7 @@ Usage
 
 ::
 
-  FlyteCTL update cluster-resource-attribute [flags]
+  flytectl update cluster-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -112,5 +112,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

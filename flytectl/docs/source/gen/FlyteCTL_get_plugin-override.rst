@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_plugin-override:
+.. _flytectl_get_plugin-override:
 
-FlyteCTL get plugin-override
+flytectl get plugin-override
 ----------------------------
 
 Get matchable resources of plugin override
@@ -78,7 +78,7 @@ Usage
 
 ::
 
-  FlyteCTL get plugin-override [flags]
+  flytectl get plugin-override [flags]
 
 Options
 ~~~~~~~
@@ -135,5 +135,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

@@ -1,6 +1,6 @@
-.. _FlyteCTL_upgrade:
+.. _flytectl_upgrade:
 
-FlyteCTL upgrade
+flytectl upgrade
 ----------------
 
 Upgrade/rollback to a Flyte version
@@ -27,7 +27,7 @@ Note: Upgrade is not available on windows.
 
 ::
 
-  FlyteCTL upgrade [flags]
+  flytectl upgrade [flags]
 
 Options
 ~~~~~~~
@@ -83,5 +83,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
 

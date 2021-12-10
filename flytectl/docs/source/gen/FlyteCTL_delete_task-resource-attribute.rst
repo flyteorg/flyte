@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_task-resource-attribute:
+.. _flytectl_delete_task-resource-attribute:
 
-FlyteCTL delete task-resource-attribute
+flytectl delete task-resource-attribute
 ---------------------------------------
 
 Delete matchable resources of task attributes
@@ -51,7 +51,7 @@ Usage
 
 ::
 
-  FlyteCTL delete task-resource-attribute [flags]
+  flytectl delete task-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -109,5 +109,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

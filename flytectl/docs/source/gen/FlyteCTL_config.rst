@@ -1,6 +1,6 @@
-.. _FlyteCTL_config:
+.. _flytectl_config:
 
-FlyteCTL config
+flytectl config
 ---------------
 
 Runs various config commands, look at the help of this command to get a list of available commands..
@@ -67,8 +67,8 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
-* :doc:`FlyteCTL_config_discover` 	 - Searches for a config in one of the default search paths.
-* :doc:`FlyteCTL_config_init` 	 - Generates FlyteCTL config file in the user's home directory.
-* :doc:`FlyteCTL_config_validate` 	 - Validates the loaded config.
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl_config_discover` 	 - Searches for a config in one of the default search paths.
+* :doc:`flytectl_config_init` 	 - Generates FlyteCTL config file in the user's home directory.
+* :doc:`flytectl_config_validate` 	 - Validates the loaded config.
 

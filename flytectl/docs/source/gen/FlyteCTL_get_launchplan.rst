@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_launchplan:
+.. _flytectl_get_launchplan:
 
-FlyteCTL get launchplan
+flytectl get launchplan
 -----------------------
 
 Get launch plan resources
@@ -92,7 +92,7 @@ Usage
 
 ::
 
-  FlyteCTL get launchplan [flags]
+  flytectl get launchplan [flags]
 
 Options
 ~~~~~~~
@@ -155,5 +155,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

@@ -1,6 +1,6 @@
-.. _FlyteCTL_get_task-resource-attribute:
+.. _flytectl_get_task-resource-attribute:
 
-FlyteCTL get task-resource-attribute
+flytectl get task-resource-attribute
 ------------------------------------
 
 Get matchable resources of task attributes
@@ -60,7 +60,7 @@ Usage
 
 ::
 
-  FlyteCTL get task-resource-attribute [flags]
+  flytectl get task-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -117,5 +117,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

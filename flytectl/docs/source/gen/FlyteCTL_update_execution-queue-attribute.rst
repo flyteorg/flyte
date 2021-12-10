@@ -1,6 +1,6 @@
-.. _FlyteCTL_update_execution-queue-attribute:
+.. _flytectl_update_execution-queue-attribute:
 
-FlyteCTL update execution-queue-attribute
+flytectl update execution-queue-attribute
 -----------------------------------------
 
 Update matchable resources of execution queue attributes
@@ -58,7 +58,7 @@ Usage
 
 ::
 
-  FlyteCTL update execution-queue-attribute [flags]
+  flytectl update execution-queue-attribute [flags]
 
 Options
 ~~~~~~~
@@ -116,5 +116,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 

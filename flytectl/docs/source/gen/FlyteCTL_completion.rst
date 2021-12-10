@@ -1,6 +1,6 @@
-.. _FlyteCTL_completion:
+.. _flytectl_completion:
 
-FlyteCTL completion
+flytectl completion
 -------------------
 
 Generate completion script
@@ -51,7 +51,7 @@ PowerShell:
 
 ::
 
-  FlyteCTL completion [bash|zsh|fish|powershell]
+  flytectl completion [bash|zsh|fish|powershell]
 
 Options
 ~~~~~~~
@@ -107,5 +107,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
 

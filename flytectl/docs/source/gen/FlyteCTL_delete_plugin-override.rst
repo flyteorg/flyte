@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_plugin-override:
+.. _flytectl_delete_plugin-override:
 
-FlyteCTL delete plugin-override
+flytectl delete plugin-override
 -------------------------------
 
 Delete matchable resources of plugin overrides
@@ -50,7 +50,7 @@ Usage
 
 ::
 
-  FlyteCTL delete plugin-override [flags]
+  flytectl delete plugin-override [flags]
 
 Options
 ~~~~~~~
@@ -108,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

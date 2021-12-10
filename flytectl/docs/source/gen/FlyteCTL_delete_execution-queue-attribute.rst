@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_execution-queue-attribute:
+.. _flytectl_delete_execution-queue-attribute:
 
-FlyteCTL delete execution-queue-attribute
+flytectl delete execution-queue-attribute
 -----------------------------------------
 
 Delete matchable resources of execution queue attributes
@@ -50,7 +50,7 @@ Usage
 
 ::
 
-  FlyteCTL delete execution-queue-attribute [flags]
+  flytectl delete execution-queue-attribute [flags]
 
 Options
 ~~~~~~~
@@ -108,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

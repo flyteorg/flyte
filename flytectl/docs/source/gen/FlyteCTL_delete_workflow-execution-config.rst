@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_workflow-execution-config:
+.. _flytectl_delete_workflow-execution-config:
 
-FlyteCTL delete workflow-execution-config
+flytectl delete workflow-execution-config
 -----------------------------------------
 
 Delete matchable resources of workflow execution config
@@ -46,7 +46,7 @@ Usage
 
 ::
 
-  FlyteCTL delete workflow-execution-config [flags]
+  flytectl delete workflow-execution-config [flags]
 
 Options
 ~~~~~~~
@@ -104,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

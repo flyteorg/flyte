@@ -1,6 +1,6 @@
-.. _FlyteCTL_create:
+.. _flytectl_create:
 
-FlyteCTL create
+flytectl create
 ---------------
 
 Create various Flyte resources including tasks/workflows/launchplans/executions/project.
@@ -70,7 +70,7 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
-* :doc:`FlyteCTL_create_execution` 	 - Create execution resources
-* :doc:`FlyteCTL_create_project` 	 - Create project resources
+* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl_create_execution` 	 - Create execution resources
+* :doc:`flytectl_create_project` 	 - Create project resources
 

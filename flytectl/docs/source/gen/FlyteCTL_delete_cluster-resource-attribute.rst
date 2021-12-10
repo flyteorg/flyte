@@ -1,6 +1,6 @@
-.. _FlyteCTL_delete_cluster-resource-attribute:
+.. _flytectl_delete_cluster-resource-attribute:
 
-FlyteCTL delete cluster-resource-attribute
+flytectl delete cluster-resource-attribute
 ------------------------------------------
 
 Delete matchable resources of cluster attributes
@@ -48,7 +48,7 @@ Usage
 
 ::
 
-  FlyteCTL delete cluster-resource-attribute [flags]
+  flytectl delete cluster-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -106,5 +106,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

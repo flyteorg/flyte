@@ -1,6 +1,6 @@
-.. _FlyteCTL_sandbox_status:
+.. _flytectl_sandbox_status:
 
-FlyteCTL sandbox status
+flytectl sandbox status
 -----------------------
 
 Get status of the sandbox environment.
@@ -21,7 +21,7 @@ Usage
 
 ::
 
-  FlyteCTL sandbox status [flags]
+  flytectl sandbox status [flags]
 
 Options
 ~~~~~~~
@@ -77,5 +77,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 

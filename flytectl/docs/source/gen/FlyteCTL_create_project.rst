@@ -1,6 +1,6 @@
-.. _FlyteCTL_create_project:
+.. _flytectl_create_project:
 
-FlyteCTL create project
+flytectl create project
 -----------------------
 
 Create project resources
@@ -33,7 +33,7 @@ Create a project by definition file. Note: The name shouldn't contain any whites
 
 ::
 
-  FlyteCTL create project [flags]
+  flytectl create project [flags]
 
 Options
 ~~~~~~~
@@ -95,5 +95,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`FlyteCTL_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
 
