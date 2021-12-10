@@ -183,8 +183,6 @@ flyte:
     # -- Default regex string for searching configuration files
     configPath: /etc/flyte/config/*.yaml
 
-    client_secret: foobar
-
     # -- Configuration for service accounts for FlytePropeller
     serviceAccount:
       # -- Should a service account be created for FlytePropeller
@@ -248,6 +246,7 @@ flyte:
     serviceAccount:
       # -- Should a service account be created for the webhook
       create: true
+
       # -- Annotations for ServiceAccount attached to the webhook
       annotations: {}
       # -- ImapgePullSecrets to automatically assign to the service account
@@ -357,6 +356,7 @@ flyte:
         - id: production
           name: production
 
+
     # -- FlyteAdmin server configuration
     adminServer:
       # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
@@ -440,17 +440,6 @@ flyte:
           storage: 20Mi
           gpu: 1
 
-    # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
-    admin:
-      event:
-        type: admin
-        rate: 500
-        capacity: 1000
-      admin:
-        endpoint: flyteadmin:81
-        insecure: true
-        clientId: flytepropeller
-        clientSecretLocation: /etc/secrets/client_secret
     # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
     # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
     catalog:
@@ -466,7 +455,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15 # FLYTECOPILOT_IMAGE
+            image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22 # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
@@ -584,8 +573,7 @@ flyte:
   # Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows
   workflow_scheduler:
     enabled: true
-    config: {}
-    type: "native"
+    type: native
 
   # -- **Optional Component**
   # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of

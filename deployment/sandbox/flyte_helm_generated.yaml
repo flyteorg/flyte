@@ -116,11 +116,11 @@ metadata:
 type: Opaque
 stringData:
 ---
-# Source: flyte/charts/flyte/templates/propeller/secret-auth.yaml
+# Source: flyte/charts/flyte/templates/common/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-propeller-auth
+  name: flyte-secret-auth
   namespace: flyte
 type: Opaque
 stringData:
@@ -444,7 +444,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -458,6 +458,10 @@ data:
       host: postgres
       port: 5432
       username: postgres
+  server.yaml: | 
+    scheduler:
+      metricsScope: 'flyte:'
+      profilerPort: 10254
   logger.yaml: | 
     logger:
       level: 4
@@ -477,7 +481,7 @@ metadata:
 data:
   admin.yaml: | 
     admin:
-      clientId: flytepropeller
+      clientId: 'flytepropeller'
       clientSecretLocation: /etc/secrets/client_secret
       endpoint: flyteadmin:81
       insecure: true
@@ -494,7 +498,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -3244,6 +3248,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 250m
@@ -3416,6 +3421,7 @@ spec:
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        - containerPort: 10254
         resources: 
           limits:
             cpu: 500m
@@ -3493,6 +3499,8 @@ spec:
         image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.61"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
+        ports:
+          - containerPort: 10254
         resources: 
           limits:
             cpu: 250m
@@ -3518,7 +3526,7 @@ spec:
           name: config-volume
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
 ---
 # Source: flyte/charts/flyte/templates/propeller/deployment.yaml
 apiVersion: apps/v1
@@ -3540,7 +3548,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e281b83ce583e9badbb0841e9ed26074b4221f8c9d32f5e8996a31698998259"
+        configChecksum: "1080cb315d0afe9ecb1c516d820fd247687e7e3e035ba79913f9052a426e118"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3587,7 +3595,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
 ---
 # Source: flyte/charts/flyte/templates/propeller/webhook.yaml
 # Create the actual deployment
@@ -3609,7 +3617,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.14.13
       annotations:
-        configChecksum: "e281b83ce583e9badbb0841e9ed26074b4221f8c9d32f5e8996a31698998259"
+        configChecksum: "1080cb315d0afe9ecb1c516d820fd247687e7e3e035ba79913f9052a426e118"
     spec:
       securityContext:
         fsGroup: 65534

@@ -1,4 +1,5 @@
-
+{{- if .Values.workflow_scheduler.enabled}}
+  {{- if eq .Values.workflow_scheduler.type "native" }}
 ---
   {{- if .Values.flytescheduler.serviceAccount.create }}
 apiVersion: v1
@@ -16,3 +17,5 @@ imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
   {{- end }}
 
 ---
+{{- end }}
+{{- end }}

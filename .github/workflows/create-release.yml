@@ -46,7 +46,7 @@ jobs:
         id: set_version
         run: |
           if [ ${{ matrix.component }} = "flytecopilot" ]; then
-             echo ::set-output name=version::$(yq eval '.flyte.configmap.copilot.plugins.k8s.co-pilot.image' charts/flyte-core/values.yaml | cut -d ":" -f 2 )
+             echo ::set-output name=version::$(yq eval '.configmap.copilot.plugins.k8s.co-pilot.image' charts/flyte-core/values.yaml | cut -d ":" -f 2 )
           else
              echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyte-core/values.yaml)
           fi

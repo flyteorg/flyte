@@ -68,7 +68,6 @@ flyteadmin:
 #
 
 flytescheduler:
-  enabled: true
   image:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
@@ -180,7 +179,6 @@ flytepropeller:
       ephemeral-storage: 50Mi
       memory: 50Mi
   cacheSizeMbs: 0
-  client_secret: foobar
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
@@ -236,6 +234,15 @@ flyteconsole:
   affinity: {}
 
 #
+# Common secret auth for propeller & scheduler
+#
+
+secrets:
+  adminOauthClientCredentials:
+    clientSecret: foobar
+    clientId: flytepropeller
+
+#
 # WEBHOOK SETTINGS
 #
 
@@ -286,6 +293,8 @@ common:
     # host:
     tls:
       enabled: false
+      # --- Override default secret containing the tls certificate
+      # secretName:
   flyteNamespaceTemplate:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
@@ -351,6 +360,12 @@ configmap:
         name: staging
       - id: production
         name: production
+
+  # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
+  schedulerConfig:
+    scheduler:
+      metricsScope: 'flyte:'
+      profilerPort: 10254
 
   # -- FlyteAdmin server configuration
   adminServer:
@@ -444,7 +459,7 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
-      clientId: flytepropeller
+      clientId: '{{ .Values.secrets.adminOauthClientCredentials.clientId }}'
       clientSecretLocation: /etc/secrets/client_secret
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
@@ -461,7 +476,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.22 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration

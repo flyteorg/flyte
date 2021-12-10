@@ -36,8 +36,10 @@ data:
 {{- end }}
 {{- end }}
 {{- if .Values.workflow_scheduler.enabled }}
+  {{- if eq .Values.workflow_scheduler.type "aws" }}
 {{- with .Values.workflow_scheduler.config }}
   scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}

@@ -51,6 +51,7 @@ COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
 # Copy flyte chart
 COPY charts/flyte/ /flyteorg/share/flyte
+COPY charts/flyte-core/ /flyteorg/share/flyte-core
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
@@ -67,6 +68,9 @@ COPY docker/sandbox/bashrc /root/.bashrc
 
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
+
+ARG FLYTE_TEST="release"
+ENV FLYTE_TEST "${FLYTE_TEST}"
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -96,6 +100,9 @@ COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
+
+ARG FLYTE_TEST="release"
+ENV FLYTE_TEST "${FLYTE_TEST}"
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
