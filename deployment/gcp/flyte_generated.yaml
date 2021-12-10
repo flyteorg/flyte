@@ -13,7 +13,7 @@ kind: Namespace
 metadata:
   name: sparkoperator
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: flyteworkflows.flyte.lyft.com
@@ -26,52 +26,16 @@ spec:
     - fly
     singular: flyteworkflow
   scope: Namespaced
-  version: v1alpha1
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: pytorchjobs.kubeflow.org
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .status.conditions[-1:].type
-    name: State
-    type: string
-  - JSONPath: .metadata.creationTimestamp
-    name: Age
-    type: date
-  group: kubeflow.org
-  names:
-    kind: PyTorchJob
-    plural: pytorchjobs
-    singular: pytorchjob
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          properties:
-            pytorchReplicaSpecs:
-              properties:
-                Master:
-                  properties:
-                    replicas:
-                      maximum: 1
-                      minimum: 1
-                      type: integer
-                Worker:
-                  properties:
-                    replicas:
-                      minimum: 1
-                      type: integer
   versions:
-  - name: v1
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'FlyteWorkflow: represents one Execution Workflow object'
+        type: object
     served: true
     storage: true
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -3832,7 +3796,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -7602,6 +7566,49 @@ status:
   conditions: []
   storedVersions: []
 ---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: pytorchjobs.kubeflow.org
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.conditions[-1:].type
+    name: State
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
+  group: kubeflow.org
+  names:
+    kind: PyTorchJob
+    plural: pytorchjobs
+    singular: pytorchjob
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            pytorchReplicaSpecs:
+              properties:
+                Master:
+                  properties:
+                    replicas:
+                      maximum: 1
+                      minimum: 1
+                      type: integer
+                Worker:
+                  properties:
+                    replicas:
+                      minimum: 1
+                      type: integer
+  versions:
+  - name: v1
+    served: true
+    storage: true
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -7800,38 +7807,7 @@ rules:
   - list
   - watch
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  labels:
-    app: pytorch-operator
-    kustomize.component: pytorch-operator
-  name: pytorch-operator
-rules:
-- apiGroups:
-  - kubeflow.org
-  resources:
-  - pytorchjobs
-  - pytorchjobs/status
-  verbs:
-  - '*'
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - '*'
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - services
-  - endpoints
-  - events
-  verbs:
-  - '*'
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: sparkoperator
@@ -7913,6 +7889,37 @@ rules:
   verbs:
   - '*'
 ---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    app: pytorch-operator
+    kustomize.component: pytorch-operator
+  name: pytorch-operator
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - pytorchjobs
+  - pytorchjobs/status
+  verbs:
+  - '*'
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - events
+  verbs:
+  - '*'
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -7927,7 +7934,7 @@ subjects:
   name: flyte-pod-webhook
   namespace: flyte
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: flyteadmin-binding
@@ -7941,7 +7948,7 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: flytepropeller
@@ -7954,6 +7961,19 @@ subjects:
 - kind: ServiceAccount
   name: flytepropeller
   namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sparkoperator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sparkoperator
+subjects:
+- kind: ServiceAccount
+  name: sparkoperator
+  namespace: sparkoperator
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -7971,19 +7991,6 @@ subjects:
   name: pytorch-operator
   namespace: kubeflow
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: sparkoperator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: sparkoperator
-subjects:
-- kind: ServiceAccount
-  name: sparkoperator
-  namespace: sparkoperator
----
 apiVersion: v1
 data:
   aa_namespace.yaml: |
@@ -7996,7 +8003,7 @@ data:
       - kubernetes
   ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
   ad_spark-role.yaml: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
+    apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
       name: spark-role
@@ -8026,10 +8033,10 @@ data:
     metadata:
       name: spark
       namespace: {{ namespace }}
-  af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
+  af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-ccm6fbchft
+  name: clusterresource-template-4fbh4bk26k
   namespace: flyte
 ---
 apiVersion: v1
@@ -8953,7 +8960,7 @@ spec:
           name: flyte-admin-config-7g6ctk6762
         name: config-volume
       - configMap:
-          name: clusterresource-template-ccm6fbchft
+          name: clusterresource-template-4fbh4bk26k
         name: resource-templates
       - name: db-pass
         secret:
@@ -9314,7 +9321,7 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-ccm6fbchft
+              name: clusterresource-template-4fbh4bk26k
             name: resource-templates
           - configMap:
               name: flyte-admin-config-7g6ctk6762

@@ -9,40 +9,46 @@ metadata:
   name: sparkoperator
   namespace: sparkoperator
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: sparkoperator
 rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["*"]
-- apiGroups: [""]
-  resources: ["services", "configmaps", "secrets"]
-  verbs: ["create", "get", "delete"]
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["create", "get", "delete"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get"]
-- apiGroups: ["batch"]
-  resources: ["jobs"]
-  verbs: ["create", "get", "update", "delete", "list", "watch"]
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["create", "update", "patch"]
-- apiGroups: ["apiextensions.k8s.io"]
-  resources: ["customresourcedefinitions"]
-  verbs: ["create", "get", "update", "delete"]
-- apiGroups: ["admissionregistration.k8s.io"]
-  resources: ["mutatingwebhookconfigurations"]
-  verbs: ["create", "get", "update", "delete"]
-- apiGroups: ["sparkoperator.k8s.io"]
-  resources: ["sparkapplications", "scheduledsparkapplications", "sparkapplications/status", "scheduledsparkapplications/status"]
-  verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["services", "configmaps", "secrets"]
+    verbs: ["create", "get", "delete"]
+  - apiGroups: ["extensions"]
+    resources: ["ingresses"]
+    verbs: ["create", "get", "delete"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "update", "delete", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["create", "get", "update", "delete"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations"]
+    verbs: ["create", "get", "update", "delete"]
+  - apiGroups: ["sparkoperator.k8s.io"]
+    resources:
+      [
+        "sparkapplications",
+        "scheduledsparkapplications",
+        "sparkapplications/status",
+        "scheduledsparkapplications/status",
+      ]
+    verbs: ["*"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: sparkoperator

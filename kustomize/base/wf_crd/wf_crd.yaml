@@ -1,4 +1,4 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
@@ -6,8 +6,6 @@ metadata:
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: flyte.lyft.com
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
   # either Namespaced or Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
@@ -18,5 +16,14 @@ spec:
     kind: FlyteWorkflow
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - fly
+      - fly
   scope: Namespaced
+  # version names to use for REST API: /apis/<group>/<version>
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: "FlyteWorkflow: represents one Execution Workflow object"
+          type: object
+      served: true
+      storage: true

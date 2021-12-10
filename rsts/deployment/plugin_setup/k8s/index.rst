@@ -235,7 +235,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                    limits.cpu: {{ projectQuotaCpu }}
                    limits.memory: {{ projectQuotaMemory }}
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
+           - apiVersion: rbac.authorization.k8s.io/v1
              kind: Role
              metadata:
                  name: spark-role
@@ -265,7 +265,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                name: spark
                namespace: {{ namespace }}
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
+           - apiVersion: rbac.authorization.k8s.io/v1
              kind: RoleBinding
              metadata:
                  name: spark-role-binding

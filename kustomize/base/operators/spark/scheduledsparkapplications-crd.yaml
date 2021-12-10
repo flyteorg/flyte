@@ -1,6 +1,5 @@
-
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -14,7 +13,7 @@ spec:
     listKind: ScheduledSparkApplicationList
     plural: scheduledsparkapplications
     shortNames:
-    - scheduledsparkapp
+      - scheduledsparkapp
     singular: scheduledsparkapplication
   scope: Namespaced
   subresources:
@@ -95,8 +94,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchFields:
@@ -111,8 +110,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                     type: object
@@ -120,8 +119,8 @@ spec:
                                     format: int32
                                     type: integer
                                 required:
-                                - preference
-                                - weight
+                                  - preference
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -141,8 +140,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchFields:
@@ -157,14 +156,14 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                     type: object
                                   type: array
                               required:
-                              - nodeSelectorTerms
+                                - nodeSelectorTerms
                               type: object
                           type: object
                         podAffinity:
@@ -188,8 +187,8 @@ spec:
                                                     type: string
                                                   type: array
                                               required:
-                                              - key
-                                              - operator
+                                                - key
+                                                - operator
                                               type: object
                                             type: array
                                           matchLabels:
@@ -204,14 +203,14 @@ spec:
                                       topologyKey:
                                         type: string
                                     required:
-                                    - topologyKey
+                                      - topologyKey
                                     type: object
                                   weight:
                                     format: int32
                                     type: integer
                                 required:
-                                - podAffinityTerm
-                                - weight
+                                  - podAffinityTerm
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -231,8 +230,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchLabels:
@@ -247,7 +246,7 @@ spec:
                                   topologyKey:
                                     type: string
                                 required:
-                                - topologyKey
+                                  - topologyKey
                                 type: object
                               type: array
                           type: object
@@ -272,8 +271,8 @@ spec:
                                                     type: string
                                                   type: array
                                               required:
-                                              - key
-                                              - operator
+                                                - key
+                                                - operator
                                               type: object
                                             type: array
                                           matchLabels:
@@ -288,14 +287,14 @@ spec:
                                       topologyKey:
                                         type: string
                                     required:
-                                    - topologyKey
+                                      - topologyKey
                                     type: object
                                   weight:
                                     format: int32
                                     type: integer
                                 required:
-                                - podAffinityTerm
-                                - weight
+                                  - podAffinityTerm
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -315,8 +314,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchLabels:
@@ -331,7 +330,7 @@ spec:
                                   topologyKey:
                                     type: string
                                 required:
-                                - topologyKey
+                                  - topologyKey
                                 type: object
                               type: array
                           type: object
@@ -348,8 +347,8 @@ spec:
                           path:
                             type: string
                         required:
-                        - name
-                        - path
+                          - name
+                          - path
                         type: object
                       type: array
                     coreLimit:
@@ -398,7 +397,7 @@ spec:
                                   optional:
                                     type: boolean
                                 required:
-                                - key
+                                  - key
                                 type: object
                               fieldRef:
                                 properties:
@@ -407,7 +406,7 @@ spec:
                                   fieldPath:
                                     type: string
                                 required:
-                                - fieldPath
+                                  - fieldPath
                                 type: object
                               resourceFieldRef:
                                 properties:
@@ -418,7 +417,7 @@ spec:
                                   resource:
                                     type: string
                                 required:
-                                - resource
+                                  - resource
                                 type: object
                               secretKeyRef:
                                 properties:
@@ -429,11 +428,11 @@ spec:
                                   optional:
                                     type: boolean
                                 required:
-                                - key
+                                  - key
                                 type: object
                             type: object
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     envFrom:
@@ -465,8 +464,8 @@ spec:
                           name:
                             type: string
                         required:
-                        - key
-                        - name
+                          - key
+                          - name
                         type: object
                       type: object
                     envVars:
@@ -481,8 +480,8 @@ spec:
                           format: int64
                           type: integer
                       required:
-                      - name
-                      - quantity
+                        - name
+                        - quantity
                       type: object
                     hostNetwork:
                       type: boolean
@@ -517,7 +516,7 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                     fieldRef:
                                       properties:
@@ -526,7 +525,7 @@ spec:
                                         fieldPath:
                                           type: string
                                       required:
-                                      - fieldPath
+                                        - fieldPath
                                       type: object
                                     resourceFieldRef:
                                       properties:
@@ -537,7 +536,7 @@ spec:
                                         resource:
                                           type: string
                                       required:
-                                      - resource
+                                        - resource
                                       type: object
                                     secretKeyRef:
                                       properties:
@@ -548,11 +547,11 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                   type: object
                               required:
-                              - name
+                                - name
                               type: object
                             type: array
                           envFrom:
@@ -603,21 +602,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -625,11 +624,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                               preStop:
@@ -653,21 +652,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -675,11 +674,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                             type: object
@@ -707,21 +706,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -738,11 +737,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -766,13 +765,13 @@ spec:
                                 protocol:
                                   type: string
                               required:
-                              - containerPort
-                              - protocol
+                                - containerPort
+                                - protocol
                               type: object
                             type: array
                             x-kubernetes-list-map-keys:
-                            - containerPort
-                            - protocol
+                              - containerPort
+                              - protocol
                             x-kubernetes-list-type: map
                           readinessProbe:
                             properties:
@@ -798,21 +797,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -829,11 +828,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -909,8 +908,8 @@ spec:
                                 name:
                                   type: string
                               required:
-                              - devicePath
-                              - name
+                                - devicePath
+                                - name
                               type: object
                             type: array
                           volumeMounts:
@@ -927,14 +926,14 @@ spec:
                                 subPath:
                                   type: string
                               required:
-                              - mountPath
-                              - name
+                                - mountPath
+                                - name
                               type: object
                             type: array
                           workingDir:
                             type: string
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     javaOptions:
@@ -966,21 +965,21 @@ spec:
                                       value:
                                         type: string
                                     required:
-                                    - name
-                                    - value
+                                      - name
+                                      - value
                                     type: object
                                   type: array
                                 path:
                                   type: string
                                 port:
                                   anyOf:
-                                  - type: integer
-                                  - type: string
+                                    - type: integer
+                                    - type: string
                                   x-kubernetes-int-or-string: true
                                 scheme:
                                   type: string
                               required:
-                              - port
+                                - port
                               type: object
                             tcpSocket:
                               properties:
@@ -988,11 +987,11 @@ spec:
                                   type: string
                                 port:
                                   anyOf:
-                                  - type: integer
-                                  - type: string
+                                    - type: integer
+                                    - type: string
                                   x-kubernetes-int-or-string: true
                               required:
-                              - port
+                                - port
                               type: object
                           type: object
                         preStop:
@@ -1016,21 +1015,21 @@ spec:
                                       value:
                                         type: string
                                     required:
-                                    - name
-                                    - value
+                                      - name
+                                      - value
                                     type: object
                                   type: array
                                 path:
                                   type: string
                                 port:
                                   anyOf:
-                                  - type: integer
-                                  - type: string
+                                    - type: integer
+                                    - type: string
                                   x-kubernetes-int-or-string: true
                                 scheme:
                                   type: string
                               required:
-                              - port
+                                - port
                               type: object
                             tcpSocket:
                               properties:
@@ -1038,11 +1037,11 @@ spec:
                                   type: string
                                 port:
                                   anyOf:
-                                  - type: integer
-                                  - type: string
+                                    - type: integer
+                                    - type: string
                                   x-kubernetes-int-or-string: true
                               required:
-                              - port
+                                - port
                               type: object
                           type: object
                       type: object
@@ -1069,9 +1068,9 @@ spec:
                           secretType:
                             type: string
                         required:
-                        - name
-                        - path
-                        - secretType
+                          - name
+                          - path
+                          - secretType
                         type: object
                       type: array
                     securityContext:
@@ -1111,8 +1110,8 @@ spec:
                               value:
                                 type: string
                             required:
-                            - name
-                            - value
+                              - name
+                              - value
                             type: object
                           type: array
                       type: object
@@ -1147,7 +1146,7 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                     fieldRef:
                                       properties:
@@ -1156,7 +1155,7 @@ spec:
                                         fieldPath:
                                           type: string
                                       required:
-                                      - fieldPath
+                                        - fieldPath
                                       type: object
                                     resourceFieldRef:
                                       properties:
@@ -1167,7 +1166,7 @@ spec:
                                         resource:
                                           type: string
                                       required:
-                                      - resource
+                                        - resource
                                       type: object
                                     secretKeyRef:
                                       properties:
@@ -1178,11 +1177,11 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                   type: object
                               required:
-                              - name
+                                - name
                               type: object
                             type: array
                           envFrom:
@@ -1233,21 +1232,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -1255,11 +1254,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                               preStop:
@@ -1283,21 +1282,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -1305,11 +1304,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                             type: object
@@ -1337,21 +1336,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -1368,11 +1367,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -1396,13 +1395,13 @@ spec:
                                 protocol:
                                   type: string
                               required:
-                              - containerPort
-                              - protocol
+                                - containerPort
+                                - protocol
                               type: object
                             type: array
                             x-kubernetes-list-map-keys:
-                            - containerPort
-                            - protocol
+                              - containerPort
+                              - protocol
                             x-kubernetes-list-type: map
                           readinessProbe:
                             properties:
@@ -1428,21 +1427,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -1459,11 +1458,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -1539,8 +1538,8 @@ spec:
                                 name:
                                   type: string
                               required:
-                              - devicePath
-                              - name
+                                - devicePath
+                                - name
                               type: object
                             type: array
                           volumeMounts:
@@ -1557,14 +1556,14 @@ spec:
                                 subPath:
                                   type: string
                               required:
-                              - mountPath
-                              - name
+                                - mountPath
+                                - name
                               type: object
                             type: array
                           workingDir:
                             type: string
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     terminationGracePeriodSeconds:
@@ -1600,8 +1599,8 @@ spec:
                           subPath:
                             type: string
                         required:
-                        - mountPath
-                        - name
+                          - mountPath
+                          - name
                         type: object
                       type: array
                   type: object
@@ -1628,8 +1627,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchFields:
@@ -1644,8 +1643,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                     type: object
@@ -1653,8 +1652,8 @@ spec:
                                     format: int32
                                     type: integer
                                 required:
-                                - preference
-                                - weight
+                                  - preference
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -1674,8 +1673,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchFields:
@@ -1690,14 +1689,14 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                     type: object
                                   type: array
                               required:
-                              - nodeSelectorTerms
+                                - nodeSelectorTerms
                               type: object
                           type: object
                         podAffinity:
@@ -1721,8 +1720,8 @@ spec:
                                                     type: string
                                                   type: array
                                               required:
-                                              - key
-                                              - operator
+                                                - key
+                                                - operator
                                               type: object
                                             type: array
                                           matchLabels:
@@ -1737,14 +1736,14 @@ spec:
                                       topologyKey:
                                         type: string
                                     required:
-                                    - topologyKey
+                                      - topologyKey
                                     type: object
                                   weight:
                                     format: int32
                                     type: integer
                                 required:
-                                - podAffinityTerm
-                                - weight
+                                  - podAffinityTerm
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -1764,8 +1763,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchLabels:
@@ -1780,7 +1779,7 @@ spec:
                                   topologyKey:
                                     type: string
                                 required:
-                                - topologyKey
+                                  - topologyKey
                                 type: object
                               type: array
                           type: object
@@ -1805,8 +1804,8 @@ spec:
                                                     type: string
                                                   type: array
                                               required:
-                                              - key
-                                              - operator
+                                                - key
+                                                - operator
                                               type: object
                                             type: array
                                           matchLabels:
@@ -1821,14 +1820,14 @@ spec:
                                       topologyKey:
                                         type: string
                                     required:
-                                    - topologyKey
+                                      - topologyKey
                                     type: object
                                   weight:
                                     format: int32
                                     type: integer
                                 required:
-                                - podAffinityTerm
-                                - weight
+                                  - podAffinityTerm
+                                  - weight
                                 type: object
                               type: array
                             requiredDuringSchedulingIgnoredDuringExecution:
@@ -1848,8 +1847,8 @@ spec:
                                                 type: string
                                               type: array
                                           required:
-                                          - key
-                                          - operator
+                                            - key
+                                            - operator
                                           type: object
                                         type: array
                                       matchLabels:
@@ -1864,7 +1863,7 @@ spec:
                                   topologyKey:
                                     type: string
                                 required:
-                                - topologyKey
+                                  - topologyKey
                                 type: object
                               type: array
                           type: object
@@ -1881,8 +1880,8 @@ spec:
                           path:
                             type: string
                         required:
-                        - name
-                        - path
+                          - name
+                          - path
                         type: object
                       type: array
                     coreLimit:
@@ -1933,7 +1932,7 @@ spec:
                                   optional:
                                     type: boolean
                                 required:
-                                - key
+                                  - key
                                 type: object
                               fieldRef:
                                 properties:
@@ -1942,7 +1941,7 @@ spec:
                                   fieldPath:
                                     type: string
                                 required:
-                                - fieldPath
+                                  - fieldPath
                                 type: object
                               resourceFieldRef:
                                 properties:
@@ -1953,7 +1952,7 @@ spec:
                                   resource:
                                     type: string
                                 required:
-                                - resource
+                                  - resource
                                 type: object
                               secretKeyRef:
                                 properties:
@@ -1964,11 +1963,11 @@ spec:
                                   optional:
                                     type: boolean
                                 required:
-                                - key
+                                  - key
                                 type: object
                             type: object
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     envFrom:
@@ -2000,8 +1999,8 @@ spec:
                           name:
                             type: string
                         required:
-                        - key
-                        - name
+                          - key
+                          - name
                         type: object
                       type: object
                     envVars:
@@ -2016,8 +2015,8 @@ spec:
                           format: int64
                           type: integer
                       required:
-                      - name
-                      - quantity
+                        - name
+                        - quantity
                       type: object
                     hostNetwork:
                       type: boolean
@@ -2052,7 +2051,7 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                     fieldRef:
                                       properties:
@@ -2061,7 +2060,7 @@ spec:
                                         fieldPath:
                                           type: string
                                       required:
-                                      - fieldPath
+                                        - fieldPath
                                       type: object
                                     resourceFieldRef:
                                       properties:
@@ -2072,7 +2071,7 @@ spec:
                                         resource:
                                           type: string
                                       required:
-                                      - resource
+                                        - resource
                                       type: object
                                     secretKeyRef:
                                       properties:
@@ -2083,11 +2082,11 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                   type: object
                               required:
-                              - name
+                                - name
                               type: object
                             type: array
                           envFrom:
@@ -2138,21 +2137,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -2160,11 +2159,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                               preStop:
@@ -2188,21 +2187,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -2210,11 +2209,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                             type: object
@@ -2242,21 +2241,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -2273,11 +2272,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -2301,13 +2300,13 @@ spec:
                                 protocol:
                                   type: string
                               required:
-                              - containerPort
-                              - protocol
+                                - containerPort
+                                - protocol
                               type: object
                             type: array
                             x-kubernetes-list-map-keys:
-                            - containerPort
-                            - protocol
+                              - containerPort
+                              - protocol
                             x-kubernetes-list-type: map
                           readinessProbe:
                             properties:
@@ -2333,21 +2332,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -2364,11 +2363,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -2444,8 +2443,8 @@ spec:
                                 name:
                                   type: string
                               required:
-                              - devicePath
-                              - name
+                                - devicePath
+                                - name
                               type: object
                             type: array
                           volumeMounts:
@@ -2462,14 +2461,14 @@ spec:
                                 subPath:
                                   type: string
                               required:
-                              - mountPath
-                              - name
+                                - mountPath
+                                - name
                               type: object
                             type: array
                           workingDir:
                             type: string
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     instances:
@@ -2502,9 +2501,9 @@ spec:
                           secretType:
                             type: string
                         required:
-                        - name
-                        - path
-                        - secretType
+                          - name
+                          - path
+                          - secretType
                         type: object
                       type: array
                     securityContext:
@@ -2544,8 +2543,8 @@ spec:
                               value:
                                 type: string
                             required:
-                            - name
-                            - value
+                              - name
+                              - value
                             type: object
                           type: array
                       type: object
@@ -2578,7 +2577,7 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                     fieldRef:
                                       properties:
@@ -2587,7 +2586,7 @@ spec:
                                         fieldPath:
                                           type: string
                                       required:
-                                      - fieldPath
+                                        - fieldPath
                                       type: object
                                     resourceFieldRef:
                                       properties:
@@ -2598,7 +2597,7 @@ spec:
                                         resource:
                                           type: string
                                       required:
-                                      - resource
+                                        - resource
                                       type: object
                                     secretKeyRef:
                                       properties:
@@ -2609,11 +2608,11 @@ spec:
                                         optional:
                                           type: boolean
                                       required:
-                                      - key
+                                        - key
                                       type: object
                                   type: object
                               required:
-                              - name
+                                - name
                               type: object
                             type: array
                           envFrom:
@@ -2664,21 +2663,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -2686,11 +2685,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                               preStop:
@@ -2714,21 +2713,21 @@ spec:
                                             value:
                                               type: string
                                           required:
-                                          - name
-                                          - value
+                                            - name
+                                            - value
                                           type: object
                                         type: array
                                       path:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                       scheme:
                                         type: string
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                   tcpSocket:
                                     properties:
@@ -2736,11 +2735,11 @@ spec:
                                         type: string
                                       port:
                                         anyOf:
-                                        - type: integer
-                                        - type: string
+                                          - type: integer
+                                          - type: string
                                         x-kubernetes-int-or-string: true
                                     required:
-                                    - port
+                                      - port
                                     type: object
                                 type: object
                             type: object
@@ -2768,21 +2767,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -2799,11 +2798,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -2827,13 +2826,13 @@ spec:
                                 protocol:
                                   type: string
                               required:
-                              - containerPort
-                              - protocol
+                                - containerPort
+                                - protocol
                               type: object
                             type: array
                             x-kubernetes-list-map-keys:
-                            - containerPort
-                            - protocol
+                              - containerPort
+                              - protocol
                             x-kubernetes-list-type: map
                           readinessProbe:
                             properties:
@@ -2859,21 +2858,21 @@ spec:
                                         value:
                                           type: string
                                       required:
-                                      - name
-                                      - value
+                                        - name
+                                        - value
                                       type: object
                                     type: array
                                   path:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                   scheme:
                                     type: string
                                 required:
-                                - port
+                                  - port
                                 type: object
                               initialDelaySeconds:
                                 format: int32
@@ -2890,11 +2889,11 @@ spec:
                                     type: string
                                   port:
                                     anyOf:
-                                    - type: integer
-                                    - type: string
+                                      - type: integer
+                                      - type: string
                                     x-kubernetes-int-or-string: true
                                 required:
-                                - port
+                                  - port
                                 type: object
                               timeoutSeconds:
                                 format: int32
@@ -2970,8 +2969,8 @@ spec:
                                 name:
                                   type: string
                               required:
-                              - devicePath
-                              - name
+                                - devicePath
+                                - name
                               type: object
                             type: array
                           volumeMounts:
@@ -2988,14 +2987,14 @@ spec:
                                 subPath:
                                   type: string
                               required:
-                              - mountPath
-                              - name
+                                - mountPath
+                                - name
                               type: object
                             type: array
                           workingDir:
                             type: string
                         required:
-                        - name
+                          - name
                         type: object
                       type: array
                     terminationGracePeriodSeconds:
@@ -3031,8 +3030,8 @@ spec:
                           subPath:
                             type: string
                         required:
-                        - mountPath
-                        - name
+                          - mountPath
+                          - name
                         type: object
                       type: array
                   type: object
@@ -3061,8 +3060,8 @@ spec:
                   type: string
                 mode:
                   enum:
-                  - cluster
-                  - client
+                    - cluster
+                    - client
                   type: string
                 monitoring:
                   properties:
@@ -3088,11 +3087,11 @@ spec:
                           minimum: 1024
                           type: integer
                       required:
-                      - jmxExporterJar
+                        - jmxExporterJar
                       type: object
                   required:
-                  - exposeDriverMetrics
-                  - exposeExecutorMetrics
+                    - exposeDriverMetrics
+                    - exposeExecutorMetrics
                   type: object
                 nodeSelector:
                   additionalProperties:
@@ -3100,8 +3099,8 @@ spec:
                   type: object
                 pythonVersion:
                   enum:
-                  - "2"
-                  - "3"
+                    - "2"
+                    - "3"
                   type: string
                 restartPolicy:
                   properties:
@@ -3123,9 +3122,9 @@ spec:
                       type: integer
                     type:
                       enum:
-                      - Never
-                      - Always
-                      - OnFailure
+                        - Never
+                        - Always
+                        - OnFailure
                       type: string
                   type: object
                 retryInterval:
@@ -3146,10 +3145,10 @@ spec:
                   type: integer
                 type:
                   enum:
-                  - Java
-                  - Python
-                  - Scala
-                  - R
+                    - Java
+                    - Python
+                    - Scala
+                    - R
                   type: string
                 volumes:
                   items:
@@ -3166,7 +3165,7 @@ spec:
                           volumeID:
                             type: string
                         required:
-                        - volumeID
+                          - volumeID
                         type: object
                       azureDisk:
                         properties:
@@ -3183,8 +3182,8 @@ spec:
                           readOnly:
                             type: boolean
                         required:
-                        - diskName
-                        - diskURI
+                          - diskName
+                          - diskURI
                         type: object
                       azureFile:
                         properties:
@@ -3195,8 +3194,8 @@ spec:
                           shareName:
                             type: string
                         required:
-                        - secretName
-                        - shareName
+                          - secretName
+                          - shareName
                         type: object
                       cephfs:
                         properties:
@@ -3218,7 +3217,7 @@ spec:
                           user:
                             type: string
                         required:
-                        - monitors
+                          - monitors
                         type: object
                       cinder:
                         properties:
@@ -3234,7 +3233,7 @@ spec:
                           volumeID:
                             type: string
                         required:
-                        - volumeID
+                          - volumeID
                         type: object
                       configMap:
                         properties:
@@ -3252,8 +3251,8 @@ spec:
                                 path:
                                   type: string
                               required:
-                              - key
-                              - path
+                                - key
+                                - path
                               type: object
                             type: array
                           name:
@@ -3276,7 +3275,7 @@ spec:
                                     fieldPath:
                                       type: string
                                   required:
-                                  - fieldPath
+                                    - fieldPath
                                   type: object
                                 mode:
                                   format: int32
@@ -3292,10 +3291,10 @@ spec:
                                     resource:
                                       type: string
                                   required:
-                                  - resource
+                                    - resource
                                   type: object
                               required:
-                              - path
+                                - path
                               type: object
                             type: array
                         type: object
@@ -3342,7 +3341,7 @@ spec:
                                 type: string
                             type: object
                         required:
-                        - driver
+                          - driver
                         type: object
                       flocker:
                         properties:
@@ -3363,7 +3362,7 @@ spec:
                           readOnly:
                             type: boolean
                         required:
-                        - pdName
+                          - pdName
                         type: object
                       gitRepo:
                         properties:
@@ -3374,7 +3373,7 @@ spec:
                           revision:
                             type: string
                         required:
-                        - repository
+                          - repository
                         type: object
                       glusterfs:
                         properties:
@@ -3385,8 +3384,8 @@ spec:
                           readOnly:
                             type: boolean
                         required:
-                        - endpoints
-                        - path
+                          - endpoints
+                          - path
                         type: object
                       hostPath:
                         properties:
@@ -3395,7 +3394,7 @@ spec:
                           type:
                             type: string
                         required:
-                        - path
+                          - path
                         type: object
                       iscsi:
                         properties:
@@ -3428,9 +3427,9 @@ spec:
                           targetPortal:
                             type: string
                         required:
-                        - iqn
-                        - lun
-                        - targetPortal
+                          - iqn
+                          - lun
+                          - targetPortal
                         type: object
                       name:
                         type: string
@@ -3443,8 +3442,8 @@ spec:
                           server:
                             type: string
                         required:
-                        - path
-                        - server
+                          - path
+                          - server
                         type: object
                       persistentVolumeClaim:
                         properties:
@@ -3453,7 +3452,7 @@ spec:
                           readOnly:
                             type: boolean
                         required:
-                        - claimName
+                          - claimName
                         type: object
                       photonPersistentDisk:
                         properties:
@@ -3462,7 +3461,7 @@ spec:
                           pdID:
                             type: string
                         required:
-                        - pdID
+                          - pdID
                         type: object
                       portworxVolume:
                         properties:
@@ -3473,7 +3472,7 @@ spec:
                           volumeID:
                             type: string
                         required:
-                        - volumeID
+                          - volumeID
                         type: object
                       projected:
                         properties:
@@ -3496,8 +3495,8 @@ spec:
                                           path:
                                             type: string
                                         required:
-                                        - key
-                                        - path
+                                          - key
+                                          - path
                                         type: object
                                       type: array
                                     name:
@@ -3517,7 +3516,7 @@ spec:
                                               fieldPath:
                                                 type: string
                                             required:
-                                            - fieldPath
+                                              - fieldPath
                                             type: object
                                           mode:
                                             format: int32
@@ -3533,10 +3532,10 @@ spec:
                                               resource:
                                                 type: string
                                             required:
-                                            - resource
+                                              - resource
                                             type: object
                                         required:
-                                        - path
+                                          - path
                                         type: object
                                       type: array
                                   type: object
@@ -3553,8 +3552,8 @@ spec:
                                           path:
                                             type: string
                                         required:
-                                        - key
-                                        - path
+                                          - key
+                                          - path
                                         type: object
                                       type: array
                                     name:
@@ -3572,12 +3571,12 @@ spec:
                                     path:
                                       type: string
                                   required:
-                                  - path
+                                    - path
                                   type: object
                               type: object
                             type: array
                         required:
-                        - sources
+                          - sources
                         type: object
                       quobyte:
                         properties:
@@ -3592,8 +3591,8 @@ spec:
                           volume:
                             type: string
                         required:
-                        - registry
-                        - volume
+                          - registry
+                          - volume
                         type: object
                       rbd:
                         properties:
@@ -3619,8 +3618,8 @@ spec:
                           user:
                             type: string
                         required:
-                        - image
-                        - monitors
+                          - image
+                          - monitors
                         type: object
                       scaleIO:
                         properties:
@@ -3648,9 +3647,9 @@ spec:
                           volumeName:
                             type: string
                         required:
-                        - gateway
-                        - secretRef
-                        - system
+                          - gateway
+                          - secretRef
+                          - system
                         type: object
                       secret:
                         properties:
@@ -3668,8 +3667,8 @@ spec:
                                 path:
                                   type: string
                               required:
-                              - key
-                              - path
+                                - key
+                                - path
                               type: object
                             type: array
                           optional:
@@ -3704,21 +3703,21 @@ spec:
                           volumePath:
                             type: string
                         required:
-                        - volumePath
+                          - volumePath
                         type: object
                     required:
-                    - name
+                      - name
                     type: object
                   type: array
               required:
-              - driver
-              - executor
-              - sparkVersion
-              - type
+                - driver
+                - executor
+                - sparkVersion
+                - type
               type: object
           required:
-          - schedule
-          - template
+            - schedule
+            - template
           type: object
         status:
           properties:
@@ -3746,14 +3745,14 @@ spec:
               type: string
           type: object
       required:
-      - metadata
-      - spec
+        - metadata
+        - spec
       type: object
   version: v1beta2
   versions:
-  - name: v1beta2
-    served: true
-    storage: true
+    - name: v1beta2
+      served: true
+      storage: true
 status:
   acceptedNames:
     kind: ""
