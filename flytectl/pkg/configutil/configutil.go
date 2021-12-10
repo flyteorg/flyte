@@ -65,17 +65,17 @@ func GetSandboxTemplate() string {
 	return AdminConfigTemplate + StorageConfigTemplate
 }
 
-// GetAWSCloudTemplate return aws flyte config with storage config
+// GetAWSCloudTemplate return aws Flyte config with storage config
 func GetAWSCloudTemplate() string {
 	return AdminConfigTemplate + StorageS3ConfigTemplate
 }
 
-// GetGoogleCloudTemplate return google flyte config with storage config
+// GetGoogleCloudTemplate return google Flyte config with storage config
 func GetGoogleCloudTemplate() string {
 	return AdminConfigTemplate + StorageGCSConfigTemplate
 }
 
-// SetupConfig download the flyte sandbox config
+// SetupConfig download the Flyte sandbox config
 func SetupConfig(filename, templateStr string, templateSpec ConfigTemplateSpec) error {
 	tmpl := template.New("config")
 	tmpl, err := tmpl.Parse(templateStr)
@@ -90,7 +90,7 @@ func SetupConfig(filename, templateStr string, templateSpec ConfigTemplateSpec) 
 	return tmpl.Execute(file, templateSpec)
 }
 
-// ConfigCleanup will remove the sandbox config from flyte dir
+// ConfigCleanup will remove the sandbox config from Flyte dir
 func ConfigCleanup() error {
 	err := os.Remove(FlytectlConfig)
 	if err != nil {

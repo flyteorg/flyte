@@ -1,25 +1,24 @@
-.. _flytectl_get_workflow-execution-config:
+.. _FlyteCTL_get_workflow-execution-config:
 
-flytectl get workflow-execution-config
+FlyteCTL get workflow-execution-config
 --------------------------------------
 
-Gets matchable resources of workflow execution config
+Get matchable resources of workflow execution config
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves workflow execution config for given project and domain combination or additionally with workflow name.
+Retrieves workflow execution config for the given project and domain combination or additionally with workflow name.
 
-Retrieves workflow execution config for project and domain
-Here the command get workflow execution config for project flytectldemo and development domain.
+For project flytectldemo and development domain, it is:
 
 ::
 
  flytectl get workflow-execution-config -p flytectldemo -d development 
 
-eg : output from the command
+e.g., output from the command
 
 .. code-block:: json
 
@@ -29,14 +28,14 @@ eg : output from the command
 	"max_parallelism": 5
  }
 
-Retrieves workflow execution config for project and domain and workflow
-Here the command get workflow execution config for project flytectldemo ,development domain and workflow core.control_flow.run_merge_sort.merge_sort
+Retrieves workflow execution config for the project, domain and workflow.
+For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 
 ::
 
  flytectl get workflow-execution-config -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-eg : output from the command
+e.g., output from the command
 
 .. code-block:: json
 
@@ -47,9 +46,9 @@ eg : output from the command
 	"max_parallelism": 5
  }
 
-Writing the workflow execution config to a file. If there are no workflow execution config, command would return an error.
-Here the command gets workflow execution config and writes the config file to wec.yaml
-eg:  content of wec.yaml
+Writing the workflow execution config to a file. If there are no workflow execution config, the command would return an error.
+Here, the config file is written to wec.yaml,
+e.g., content of wec.yaml:
 
 ::
 
@@ -67,7 +66,7 @@ Usage
 
 ::
 
-  flytectl get workflow-execution-config [flags]
+  FlyteCTL get workflow-execution-config [flags]
 
 Options
 ~~~~~~~
@@ -124,5 +123,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

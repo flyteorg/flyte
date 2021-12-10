@@ -11,16 +11,16 @@ import (
 )
 
 const (
-	workflowExecutionConfigShort = "Updates matchable resources of workflow execution config"
+	workflowExecutionConfigShort = "Update matchable resources of workflow execution config"
 	workflowExecutionConfigLong  = `
 Updates workflow execution config for given project and domain combination or additionally with workflow name.
 
 Updating the workflow execution config is only available from a generated file. See the get section for generating this file.
-Also this will completely overwrite any existing custom project and domain and workflow combination execution config.
-Would be preferable to do get and generate an config file if there is an existing execution config already set and then update it to have new values
-Refer to get workflow-execution-config section on how to generate this file
-Here the command updates takes the input for workflow execution config from the config file wec.yaml
-eg:  content of wec.yaml
+This will completely overwrite any existing custom project and domain and workflow combination execution config.
+It is preferable to do get and generate a config file if there is an existing execution config already set and then update it to have new values.
+Refer to get workflow-execution-config section on how to generate this file.
+It takes input for workflow execution config from the config file wec.yaml,
+e.g., content of wec.yaml:
 
 .. code-block:: yaml
 
@@ -32,9 +32,9 @@ eg:  content of wec.yaml
 
  flytectl update workflow-execution-config --attrFile wec.yaml
 
-Updating workflow execution config for project and domain and workflow combination. This will take precedence over any other
+Updates workflow execution config for project, domain and workflow combination. This will take precedence over any other
 execution config defined at project domain level.
-Update the workflow execution config for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo, development domain
+For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
 
 .. code-block:: yaml
 

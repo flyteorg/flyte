@@ -1,15 +1,15 @@
-.. _flytectl:
+.. _FlyteCTL:
 
-flytectl
+FlyteCTL
 --------
 
-flyetcl CLI tool
+FlyteCTL CLI tool
 
 Synopsis
 ~~~~~~~~
 
 
-flytectl is CLI tool written in go to interact with flyteadmin service
+FlyteCTL is CLI tool written in go to interact with Flyteadmin service
 
 Options
 ~~~~~~~
@@ -33,7 +33,7 @@ Options
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
   -c, --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
-  -h, --help                                       help for flytectl
+  -h, --help                                       help for FlyteCTL
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -59,14 +59,14 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_completion` 	 - Generate completion script
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
-* :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
-* :doc:`flytectl_upgrade` 	 - Used for upgrade/rollback flyte version
-* :doc:`flytectl_version` 	 - Used for fetching flyte version
+* :doc:`FlyteCTL_completion` 	 - Generate completion script
+* :doc:`FlyteCTL_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
+* :doc:`FlyteCTL_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
+* :doc:`FlyteCTL_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
+* :doc:`FlyteCTL_upgrade` 	 - Upgrade/rollback to a Flyte version
+* :doc:`FlyteCTL_version` 	 - Fetch Flyte version
 

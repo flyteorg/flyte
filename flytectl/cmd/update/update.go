@@ -16,14 +16,14 @@ import (
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
 	updateUse     = "update"
-	updateShort   = `Used for updating flyte resources eg: project.`
+	updateShort   = `Update Flyte resources e.g., project.`
 	updatecmdLong = `
-Currently this command only provides subcommands to update project.
-Takes input project which need to be archived or unarchived. Name of the project to be updated is mandatory field.
-Example update project to activate it.
+Currently, this command only provides subcommands to update project.
+Takes input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
+To update a project:
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activateProject
 `
 )
 

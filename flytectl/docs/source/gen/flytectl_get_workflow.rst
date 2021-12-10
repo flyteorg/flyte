@@ -1,72 +1,72 @@
-.. _flytectl_get_workflow:
+.. _FlyteCTL_get_workflow:
 
-flytectl get workflow
+FlyteCTL get workflow
 ---------------------
 
-Gets workflow resources
+Get workflow resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves all the workflows within project and domain.(workflow,workflows can be used interchangeably in these commands)
+Retrieve all the workflows within project and domain (workflow,workflows can be used interchangeably in these commands):
 ::
 
  flytectl get workflow -p flytesnacks -d development
 
-Retrieves workflow by name within project and domain.
+Retrieve workflow by name within project and domain:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet
 
-Retrieves latest version of workflow by name within project and domain.
+Retrieve latest version of workflow by name within project and domain:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet --latest
 
-Retrieves particular version of workflow by name within project and domain.
+Retrieve particular version of workflow by name within project and domain:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet --version v2
 
-Retrieves all the workflows with filters.
+Retrieve all the workflows with filters:
 ::
  
-  bin/flytectl get workflow -p flytesnacks -d development  --filter.fieldSelector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
+  flytectl get workflow -p flytesnacks -d development  --filter.fieldSelector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
  
-Retrieve specific workflow with filters.
+Retrieve specific workflow with filters:
 ::
  
-  bin/flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="workflow.version=v1"
+  flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="workflow.version=v1"
   
-Retrieves all the workflows with limit and sorting.
+Retrieve all the workflows with limit and sorting:
 ::
   
-  bin/flytectl get -p flytesnacks -d development workflow  --filter.sortBy=created_at --filter.limit=1 --filter.asc
+  flytectl get -p flytesnacks -d development workflow  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the workflow within project and domain in yaml format.
+Retrieve all the workflows within project and domain in yaml format:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development -o yaml
 
-Retrieves all the workflow within project and domain in json format.
+Retrieve all the workflow within project and domain in json format:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development -o json
 
-Visualize the graph for a workflow within project and domain in dot format.
+Visualize the graph for a workflow within project and domain in dot format:
 
 ::
 
  flytectl get workflow -p flytesnacks -d development  core.flyte_basics.basic_workflow.my_wf --latest -o dot
 
-Visualize the graph for a workflow within project and domain in a dot content render.
+Visualize the graph for a workflow within project and domain in a dot content render:
 
 ::
 
@@ -77,7 +77,7 @@ Usage
 
 ::
 
-  flytectl get workflow [flags]
+  FlyteCTL get workflow [flags]
 
 Options
 ~~~~~~~
@@ -139,5 +139,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

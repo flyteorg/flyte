@@ -1,20 +1,20 @@
-.. _flytectl_update_execution-cluster-label:
+.. _FlyteCTL_update_execution-cluster-label:
 
-flytectl update execution-cluster-label
+FlyteCTL update execution-cluster-label
 ---------------------------------------
 
-Updates matchable resources of execution cluster label
+Update matchable resources of execution cluster label
 
 Synopsis
 ~~~~~~~~
 
 
 
-Updates execution cluster label for given project and domain combination or additionally with workflow name.
+Updates execution cluster label for the given project and domain combination or additionally with workflow name.
 
-Updating to the execution cluster label is only available from a generated file. See the get section for generating this file.
-Here the command updates takes the input for execution cluster label from the config file ecl.yaml
-eg:  content of ecl.yaml
+Updating to the execution cluster label is only available from a generated file. See the get section to generate this file.
+It takes input for execution cluster label from the config file ecl.yaml
+e.g., content of ecl.yaml:
 
 .. code-block:: yaml
 
@@ -26,9 +26,9 @@ eg:  content of ecl.yaml
 
  flytectl update execution-cluster-label --attrFile ecl.yaml
 
-Updating execution cluster label for project and domain and workflow combination. This will take precedence over any other
+Updates execution cluster label for project, domain and workflow combination. This will take precedence over any other
 execution cluster label defined at project domain level.
-Update the execution cluster label for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo, development domain
+For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
 
 .. code-block:: yaml
 
@@ -47,7 +47,7 @@ Usage
 
 ::
 
-  flytectl update execution-cluster-label [flags]
+  FlyteCTL update execution-cluster-label [flags]
 
 Options
 ~~~~~~~
@@ -105,5 +105,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 

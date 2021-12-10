@@ -1,37 +1,37 @@
-.. _flytectl_config_init:
+.. _FlyteCTL_config_init:
 
-flytectl config init
+FlyteCTL config init
 --------------------
 
-Generates flytectl config file in the user's home directory.
+Generates FlyteCTL config file in the user's home directory.
 
 Synopsis
 ~~~~~~~~
 
 
-Creates a flytectl config file in flyte directory i.e ~/.flyte
+Creates a FlyteCTL config file in Flyte directory i.e ~/.flyte
 	
-Generate sandbox config. Flyte Sandbox is a fully standalone minimal environment for running Flyte. Read more about sandbox https://docs.flyte.org/en/latest/deployment/sandbox.html
+Generates sandbox config. Flyte Sandbox is a fully standalone minimal environment for running Flyte. Read more about sandbox https://docs.flyte.org/en/latest/deployment/sandbox.html
 
 ::
 
- bin/flytectl configuration config 
+ flytectl configuration config 
 
-Generate remote cluster config. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
+Generates remote cluster config. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
 	
 ::
 
- bin/flytectl configuration config --host=flyte.myexample.com
+ flytectl configuration config --host=flyte.myexample.com
 	
-Generate flytectl config with a storage provider
+Generates FlyteCTL config with a storage provider
 ::
 
- bin/flytectl configuration config --host=flyte.myexample.com --storage
+ flytectl configuration config --host=flyte.myexample.com --storage
 
 
 ::
 
-  flytectl config init [flags]
+  FlyteCTL config init [flags]
 
 Options
 ~~~~~~~
@@ -92,5 +92,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
+* :doc:`FlyteCTL_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 

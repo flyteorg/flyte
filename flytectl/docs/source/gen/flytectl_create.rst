@@ -1,19 +1,19 @@
-.. _flytectl_create:
+.. _FlyteCTL_create:
 
-flytectl create
+FlyteCTL create
 ---------------
 
-Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
+Create various Flyte resources including tasks/workflows/launchplans/executions/project.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Example create.
+Create Flyte resource; if a project:
 ::
 
- bin/flytectl create project --file project.yaml 
+ flytectl create project --file project.yaml 
 
 
 Options
@@ -70,7 +70,7 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_create_execution` 	 - Create execution resources
-* :doc:`flytectl_create_project` 	 - Create project resources
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`FlyteCTL_create_execution` 	 - Create execution resources
+* :doc:`FlyteCTL_create_project` 	 - Create project resources
 

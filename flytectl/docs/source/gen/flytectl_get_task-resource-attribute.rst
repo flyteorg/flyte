@@ -1,34 +1,34 @@
-.. _flytectl_get_task-resource-attribute:
+.. _FlyteCTL_get_task-resource-attribute:
 
-flytectl get task-resource-attribute
+FlyteCTL get task-resource-attribute
 ------------------------------------
 
-Gets matchable resources of task attributes
+Get matchable resources of task attributes
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve task resource attributes for the given project and domain.
-Here, the command gets the task resource attributes for the project flytectldemo and development domain.
+Retrieves task resource attributes for the given project and domain.
+For project flytectldemo and development domain, it is:
 ::
 
  flytectl get task-resource-attribute -p flytectldemo -d development 
 
-e.g. : output from the command
+e.g., output from the command:
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","workflow":"","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"450Mi"}}
 
-Retrieve task resource attributes for the given project, domain, and workflow.
-Here, the command gets task resource attributes for the project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort'.
+Retrieves task resource attributes for the given project, domain, and workflow.
+For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 ::
 
  flytectl get task-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-e.g. : output from the command
+e.g., output from the command:
 
 .. code-block:: json
 
@@ -36,8 +36,8 @@ e.g. : output from the command
 
 
 Write the task resource attributes to a file. If there are no task resource attributes, a file would be populated with the basic data.
-Here the command gets task resource attributes and writes the config file to tra.yaml
-e.g. :  content of tra.yaml
+Here, the config file is written to tra.yaml,
+e.g., content of tra.yaml:
 
 ::
 
@@ -60,7 +60,7 @@ Usage
 
 ::
 
-  flytectl get task-resource-attribute [flags]
+  FlyteCTL get task-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -117,5 +117,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

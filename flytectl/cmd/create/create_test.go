@@ -27,7 +27,7 @@ var tearDownAndVerify = testutils.TearDownAndVerify
 func TestCreateCommand(t *testing.T) {
 	createCommand := RemoteCreateCommand()
 	assert.Equal(t, createCommand.Use, "create")
-	assert.Equal(t, createCommand.Short, "Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.")
+	assert.Equal(t, createCommand.Short, "Create various Flyte resources including tasks/workflows/launchplans/executions/project.")
 	assert.Equal(t, len(createCommand.Commands()), 2)
 	cmdNouns := createCommand.Commands()
 	// Sort by Use value.

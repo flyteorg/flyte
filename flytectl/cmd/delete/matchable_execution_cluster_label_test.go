@@ -40,10 +40,10 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 		deleteExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
 		u.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything).Return(fmt.Errorf("failed to delte project domain attributes"))
+			mock.Anything).Return(fmt.Errorf("failed to delete project domain attributes"))
 		err = deleteExecutionClusterLabel(ctx, args, cmdCtx)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("failed to delte project domain attributes"), err)
+		assert.Equal(t, fmt.Errorf("failed to delete project domain attributes"), err)
 		u.DeleterExt.AssertCalled(t, "DeleteProjectDomainAttributes",
 			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})

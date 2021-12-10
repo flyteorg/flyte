@@ -1,32 +1,32 @@
-.. _flytectl_register_examples:
+.. _FlyteCTL_register_examples:
 
-flytectl register examples
+FlyteCTL register examples
 --------------------------
 
-Registers flytesnack example
+Register Flytesnacks example
 
 Synopsis
 ~~~~~~~~
 
 
 
-Registers all latest flytesnacks example
+Register all latest Flytesnacks examples:
 ::
 
- bin/flytectl register examples  -d development  -p flytesnacks 
+ flytectl register examples  -d development  -p flytesnacks 
 
-Registers specific release of flytesnacks example
+Register specific release of Flytesnacks examples:
 ::
 
- bin/flytectl register examples  -d development  -p flytesnacks --version v0.2.176
+ flytectl register examples  -d development  -p flytesnacks --version v0.2.176
 	
-Note: register command automatically override the version with release version	
+Note: The register command automatically override the version with release version	
 Usage
 
 
 ::
 
-  flytectl register examples [flags]
+  FlyteCTL register examples [flags]
 
 Options
 ~~~~~~~
@@ -91,5 +91,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
+* :doc:`FlyteCTL_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
 

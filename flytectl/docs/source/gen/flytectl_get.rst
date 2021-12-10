@@ -1,16 +1,16 @@
-.. _flytectl_get:
+.. _FlyteCTL_get:
 
-flytectl get
+FlyteCTL get
 ------------
 
-Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Example get projects.
+For project, it is:
 ::
 
  flytectl get project
@@ -70,16 +70,16 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_get_cluster-resource-attribute` 	 - Gets matchable resources of cluster resource attributes.
-* :doc:`flytectl_get_execution` 	 - Gets execution resources
-* :doc:`flytectl_get_execution-cluster-label` 	 - Gets matchable resources of execution cluster label.
-* :doc:`flytectl_get_execution-queue-attribute` 	 - Gets matchable resources of execution queue attributes
-* :doc:`flytectl_get_launchplan` 	 - Gets launch plan resources
-* :doc:`flytectl_get_plugin-override` 	 - Gets matchable resources of plugin override
-* :doc:`flytectl_get_project` 	 - Gets project resources
-* :doc:`flytectl_get_task` 	 - Gets task resources
-* :doc:`flytectl_get_task-resource-attribute` 	 - Gets matchable resources of task attributes
-* :doc:`flytectl_get_workflow` 	 - Gets workflow resources
-* :doc:`flytectl_get_workflow-execution-config` 	 - Gets matchable resources of workflow execution config
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`FlyteCTL_get_cluster-resource-attribute` 	 - Get matchable resources of cluster resource attributes.
+* :doc:`FlyteCTL_get_execution` 	 - Get execution resources
+* :doc:`FlyteCTL_get_execution-cluster-label` 	 - Get matchable resources of execution cluster label.
+* :doc:`FlyteCTL_get_execution-queue-attribute` 	 - Get matchable resources of execution queue attributes
+* :doc:`FlyteCTL_get_launchplan` 	 - Get launch plan resources
+* :doc:`FlyteCTL_get_plugin-override` 	 - Get matchable resources of plugin override
+* :doc:`FlyteCTL_get_project` 	 - Get project resources
+* :doc:`FlyteCTL_get_task` 	 - Get task resources
+* :doc:`FlyteCTL_get_task-resource-attribute` 	 - Get matchable resources of task attributes
+* :doc:`FlyteCTL_get_workflow` 	 - Get workflow resources
+* :doc:`FlyteCTL_get_workflow-execution-config` 	 - Get matchable resources of workflow execution config
 

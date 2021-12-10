@@ -11,37 +11,36 @@ import (
 )
 
 const (
-	executionClusterLabelShort = "Gets matchable resources of execution cluster label."
+	executionClusterLabelShort = "Get matchable resources of execution cluster label."
 	executionClusterLabelLong  = `
-// Retrieves the execution cluster label for a given project and domain, combination or additionally with workflow name.
+Retrieves the execution cluster label for a given project and domain, combination or additionally with workflow name.
 
-Retrieve the execution cluster label for the given project and domain.
-Here the command get execution cluster label for project flytectldemo and development domain.
+For project flytectldemo and development domain, it is:
 ::
 
  flytectl get execution-cluster-label -p flytectldemo -d development 
 
-e.g. : output from the command
+e.g., output from the command
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","value":"foo"}
 
 Retrieve the execution cluster label for the given project, domain and workflow.
-Here, the command gets the execution cluster label for the project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort'.
+For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 ::
 
  flytectl get execution-cluster-label -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-eg : output from the command
+e.g., output from the command
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","value":"foo"}
 
-Writes the execution cluster label to a file. If there is no execution cluster label, command throws an error.
-Here, the command gets the execution cluster label and writes the config file to ecl.yaml file.
-eg:  content of ecl.yaml
+Write the execution cluster label to a file. If there is no execution cluster label, the command throws an error.
+Here, the config file is written to ecl.yaml,
+e.g., content of ecl.yaml:
 
 ::
 

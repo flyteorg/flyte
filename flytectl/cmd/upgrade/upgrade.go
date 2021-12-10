@@ -25,21 +25,21 @@ type Goos string
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
-	upgradeCmdShort = `Used for upgrade/rollback flyte version`
+	upgradeCmdShort = `Upgrade/rollback to a Flyte version`
 	upgradeCmdLong  = `
-Upgrade flytectl
+For FlyteCTL, it is:
 ::
 
- bin/flytectl upgrade
+ flytectl upgrade
 	
-Note: Please use upgrade with sudo, Without sudo it will cause permission issue
+Note: Please use upgrade with sudo. Without sudo it will cause permission issue.
 	
-Rollback flytectl binary
+Rollback flytectl binary:
 ::
 
- bin/flytectl upgrade rollback
+ flytectl upgrade rollback
 
-Note: Upgrade is not available on windows
+Note: Upgrade is not available on windows.
 `
 	rollBackSubCommand = "rollback"
 )

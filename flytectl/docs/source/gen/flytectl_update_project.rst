@@ -1,51 +1,51 @@
-.. _flytectl_update_project:
+.. _FlyteCTL_update_project:
 
-flytectl update project
+FlyteCTL update project
 -----------------------
 
-Updates project resources
+Update project resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Updates the project according the flags passed. Allows you to archive or activate a project.
-Activates project named flytesnacks.
+Updates the project according to the flags passed. Allows you to archive or activate a project.
+Activate project flytesnacks:
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activateProject
 
-Archives project named flytesnacks.
-
-::
-
- bin/flytectl update project -p flytesnacks --archiveProject
-
-Incorrect usage when passing both archive and activate.
+Archive project flytesnacks:
 
 ::
 
- bin/flytectl update project flytesnacks --archiveProject --activateProject
+ flytectl update project -p flytesnacks --archiveProject
 
-Incorrect usage when passing unknown-project.
-
-::
-
- bin/flytectl update project unknown-project --archiveProject
-
-Incorrect usage when passing valid project using -p option.
+Incorrect usage when passing both archive and activate:
 
 ::
 
- bin/flytectl update project unknown-project --archiveProject -p known-project
+ flytectl update project flytesnacks --archiveProject --activateProject
+
+Incorrect usage when passing unknown-project:
+
+::
+
+ flytectl update project unknown-project --archiveProject
+
+Incorrect usage when passing valid project using -p option:
+
+::
+
+ flytectl update project unknown-project --archiveProject -p known-project
 
 Usage
 
 
 ::
 
-  flytectl update project [flags]
+  FlyteCTL update project [flags]
 
 Options
 ~~~~~~~
@@ -104,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 

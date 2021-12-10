@@ -1,26 +1,26 @@
-.. _flytectl_update_workflow-meta:
+.. _FlyteCTL_update_workflow-meta:
 
-flytectl update workflow-meta
+FlyteCTL update workflow-meta
 -----------------------------
 
-Updates workflow metadata
+Update workflow metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Following command updates the description on the workflow.
+Updates the description on the workflow:
 ::
 
  flytectl update workflow -p flytectldemo -d development core.advanced.run_merge_sort.merge_sort --description "Mergesort workflow example"
 
-Archiving workflow named entity would cause this to disapper from flyteconsole UI.
+Archiving workflow named entity would cause this to disapper from flyteconsole UI:
 ::
 
  flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
 
-Activating workflow named entity
+Activate workflow named entity:
 ::
 
  flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  flytectl update workflow-meta [flags]
+  FlyteCTL update workflow-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 

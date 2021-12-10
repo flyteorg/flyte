@@ -1,26 +1,26 @@
-.. _flytectl_update_task-meta:
+.. _FlyteCTL_update_task-meta:
 
-flytectl update task-meta
+FlyteCTL update task-meta
 -------------------------
 
-Updates task metadata
+Update task metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Following command updates the description on the task.
+Updates the description on the task:
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --description "Merge sort example"
 
-Archiving task named entity is not supported and would throw an error.
+Archiving task named entity is not supported and would throw an error:
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --archive
 
-Activating task named entity would be a noop as archiving is not possible.
+Activating task named entity would be a noop since archiving is not possible:
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --activate
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  flytectl update task-meta [flags]
+  FlyteCTL update task-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 

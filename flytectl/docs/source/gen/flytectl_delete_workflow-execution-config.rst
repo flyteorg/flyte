@@ -1,28 +1,27 @@
-.. _flytectl_delete_workflow-execution-config:
+.. _FlyteCTL_delete_workflow-execution-config:
 
-flytectl delete workflow-execution-config
+FlyteCTL delete workflow-execution-config
 -----------------------------------------
 
-Deletes matchable resources of workflow execution config
+Delete matchable resources of workflow execution config
 
 Synopsis
 ~~~~~~~~
 
 
 
-Deletes workflow execution config for given project and domain combination or additionally with workflow name.
+Deletes workflow execution config for the given project and domain combination or additionally with workflow name.
 
-Deletes workflow execution config label for project and domain
-Here the command delete workflow execution config for project flytectldemo and development domain.
+For project flytectldemo and development domain, it is:
 ::
 
  flytectl delete workflow-execution-config -p flytectldemo -d development 
 
 
-Deletes workflow execution config using config file which was used for creating it.
-Here the command deletes workflow execution config from the config file wec.yaml
-Max_parallelism is optional in the file as its unread during the delete command but can be kept as the same file can be used for get, update or delete 
-eg:  content of wec.yaml which will use the project domain and workflow name for deleting the resource
+Deletes workflow execution config using config file which was used to create it.
+Here, the config file is written to wec.yaml.
+Max_parallelism is optional in the file as it is unread during the delete command but can be kept since the same file can be used for get, update or delete commands.
+e.g., content of wec.yaml:
 
 ::
 
@@ -35,8 +34,8 @@ eg:  content of wec.yaml which will use the project domain and workflow name for
     project: flytectldemo
     max_parallelism: 5
 
-Deletes workflow execution config for a workflow
-Here the command deletes workflow execution config for a workflow core.control_flow.run_merge_sort.merge_sort
+Deletes workflow execution config for a workflow.
+For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 
 ::
 
@@ -47,7 +46,7 @@ Usage
 
 ::
 
-  flytectl delete workflow-execution-config [flags]
+  FlyteCTL delete workflow-execution-config [flags]
 
 Options
 ~~~~~~~
@@ -105,5 +104,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

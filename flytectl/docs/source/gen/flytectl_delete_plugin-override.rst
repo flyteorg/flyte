@@ -1,29 +1,27 @@
-.. _flytectl_delete_plugin-override:
+.. _FlyteCTL_delete_plugin-override:
 
-flytectl delete plugin-override
+FlyteCTL delete plugin-override
 -------------------------------
 
-Deletes matchable resources of plugin overrides
+Delete matchable resources of plugin overrides
 
 Synopsis
 ~~~~~~~~
 
 
 
-Deletes plugin override for given project and domain combination or additionally with workflow name.
+Deletes plugin override for the given project and domain combination or additionally with workflow name.
 
-Deletes plugin override for project and domain
-Here the command deletes plugin override for project flytectldemo and development domain.
+For project flytectldemo and development domain, it is:
 ::
 
  flytectl delete plugin-override -p flytectldemo -d development 
 
 
-Deletes plugin override using config file which was used for creating it.
-Here the command deletes plugin overrides from the config file po.yaml
-Overrides are optional in the file as they are unread during the delete command but can be kept as the same file can be used for get, update or delete 
-eg:  content of po.yaml which will use the project domain and workflow name for deleting the resource
-
+Deletes plugin override using config file which was used to create it.
+Here, the config file is written to po.yaml.
+Overrides are optional in the file as they are unread during the delete command but can be kept since the same file can be used for get, update or delete commands. 
+e.g., content of po.yaml:
 ::
 
  flytectl delete plugin-override --attrFile po.yaml
@@ -40,8 +38,8 @@ eg:  content of po.yaml which will use the project domain and workflow name for 
            - plugin_override2
          missing_plugin_behavior: 1 # Behavior when no specified plugin_id has an associated handler. 0 : FAIL , 1: DEFAULT
 
-Deletes plugin override for a workflow
-Here the command deletes the plugin override for a workflow core.control_flow.run_merge_sort.merge_sort
+Deletes plugin override for a workflow.
+For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 
 ::
 
@@ -52,7 +50,7 @@ Usage
 
 ::
 
-  flytectl delete plugin-override [flags]
+  FlyteCTL delete plugin-override [flags]
 
 Options
 ~~~~~~~
@@ -110,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

@@ -1,6 +1,6 @@
-.. _flytectl_config_validate:
+.. _FlyteCTL_config_validate:
 
-flytectl config validate
+FlyteCTL config validate
 ------------------------
 
 Validates the loaded config.
@@ -13,7 +13,7 @@ Validates the loaded config.
 
 ::
 
-  flytectl config validate [flags]
+  FlyteCTL config validate [flags]
 
 Options
 ~~~~~~~
@@ -73,5 +73,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
+* :doc:`FlyteCTL_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 

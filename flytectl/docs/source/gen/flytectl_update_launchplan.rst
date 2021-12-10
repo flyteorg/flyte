@@ -1,21 +1,21 @@
-.. _flytectl_update_launchplan:
+.. _FlyteCTL_update_launchplan:
 
-flytectl update launchplan
+FlyteCTL update launchplan
 --------------------------
 
-Updates launch plan status
+Update launch plan status
 
 Synopsis
 ~~~~~~~~
 
 
 
-Activating launchplan activates the scheduled job associated with it
+Activating launch plan activates the scheduled job associated with it:
 ::
 
  flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --activate
 
-Archiving launchplan deschedules any scheduled job associated with it
+Archiving launch plan deschedules any scheduled job associated with it:
 ::
 
  flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --archive
@@ -26,7 +26,7 @@ Usage
 
 ::
 
-  flytectl update launchplan [flags]
+  FlyteCTL update launchplan [flags]
 
 Options
 ~~~~~~~
@@ -86,5 +86,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 
