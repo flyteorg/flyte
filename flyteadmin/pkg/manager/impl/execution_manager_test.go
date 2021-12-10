@@ -3382,29 +3382,72 @@ func TestResolvePermissions(t *testing.T) {
 	assumableIamRole := "role"
 	k8sServiceAccount := "sa"
 
-	t.Run("use request values", func(t *testing.T) {
-		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+	assumableIamRoleLp := "roleLp"
+	k8sServiceAccountLp := "saLp"
+
+	assumableIamRoleSc := "roleSc"
+	k8sServiceAccountSc := "saSc"
+
+	t.Run("backward compat use request values from auth", func(t *testing.T) {
+		execRequest := admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{
 				AuthRole: &admin.AuthRole{
 					AssumableIamRole:         assumableIamRole,
 					KubernetesServiceAccount: k8sServiceAccount,
 				},
 			},
-		}, &admin.LaunchPlan{
+		}
+		lp := &admin.LaunchPlan{
 			Spec: &admin.LaunchPlanSpec{
 				AuthRole: &admin.AuthRole{
 					AssumableIamRole:         "lp role",
 					KubernetesServiceAccount: "k8s sa",
 				},
 			},
-		})
-		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
-		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+		}
+		authRole := resolveAuthRole(execRequest, lp)
+		sc := resolveSecurityCtx(context.TODO(), execRequest, lp, authRole)
+		assert.Equal(t, assumableIamRole, authRole.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, authRole.KubernetesServiceAccount)
+		assert.Equal(t, &core.SecurityContext{
+			RunAs: &core.Identity{
+				IamRole:           assumableIamRole,
+				K8SServiceAccount: k8sServiceAccount,
+			}}, sc)
+	})
+	t.Run("use request values security context", func(t *testing.T) {
+		execRequest := admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           assumableIamRoleSc,
+						K8SServiceAccount: k8sServiceAccountSc,
+					},
+				},
+			},
+		}
+		lp := &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           assumableIamRoleSc,
+						K8SServiceAccount: k8sServiceAccountSc,
+					},
+				},
+			},
+		}
+		authRole := resolveAuthRole(execRequest, lp)
+		sc := resolveSecurityCtx(context.TODO(), execRequest, lp, authRole)
+		assert.Equal(t, "", authRole.AssumableIamRole)
+		assert.Equal(t, "", authRole.KubernetesServiceAccount)
+		assert.Equal(t, assumableIamRoleSc, sc.RunAs.IamRole)
+		assert.Equal(t, k8sServiceAccountSc, sc.RunAs.K8SServiceAccount)
 	})
 	t.Run("prefer lp auth role over auth", func(t *testing.T) {
-		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+		execRequest := admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{},
-		}, &admin.LaunchPlan{
+		}
+		lp := &admin.LaunchPlan{
 			Spec: &admin.LaunchPlanSpec{
 				AuthRole: &admin.AuthRole{
 					AssumableIamRole:         assumableIamRole,
@@ -3415,14 +3458,59 @@ func TestResolvePermissions(t *testing.T) {
 					KubernetesServiceAccount: "k8s sa",
 				},
 			},
-		})
-		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
-		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+		}
+		authRole := resolveAuthRole(execRequest, lp)
+		sc := resolveSecurityCtx(context.TODO(), execRequest, lp, authRole)
+		assert.Equal(t, assumableIamRole, authRole.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, authRole.KubernetesServiceAccount)
+		assert.Equal(t, &core.SecurityContext{
+			RunAs: &core.Identity{
+				IamRole:           assumableIamRole,
+				K8SServiceAccount: k8sServiceAccount,
+			},
+		}, sc)
+	})
+	t.Run("prefer security context over auth context", func(t *testing.T) {
+		execRequest := admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{
+				AuthRole: &admin.AuthRole{
+					AssumableIamRole:         assumableIamRole,
+					KubernetesServiceAccount: k8sServiceAccount,
+				},
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           assumableIamRoleSc,
+						K8SServiceAccount: k8sServiceAccountSc,
+					},
+				},
+			},
+		}
+		lp := &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				AuthRole: &admin.AuthRole{
+					AssumableIamRole:         assumableIamRole,
+					KubernetesServiceAccount: k8sServiceAccount,
+				},
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           assumableIamRoleSc,
+						K8SServiceAccount: k8sServiceAccountSc,
+					},
+				},
+			},
+		}
+		authRole := resolveAuthRole(execRequest, lp)
+		sc := resolveSecurityCtx(context.TODO(), execRequest, lp, authRole)
+		assert.Equal(t, assumableIamRole, authRole.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, authRole.KubernetesServiceAccount)
+		assert.Equal(t, assumableIamRoleSc, sc.RunAs.IamRole)
+		assert.Equal(t, k8sServiceAccountSc, sc.RunAs.K8SServiceAccount)
 	})
 	t.Run("prefer lp auth over role", func(t *testing.T) {
-		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+		execRequest := admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{},
-		}, &admin.LaunchPlan{
+		}
+		lp := &admin.LaunchPlan{
 			Spec: &admin.LaunchPlanSpec{
 				Auth: &admin.Auth{
 					AssumableIamRole:         assumableIamRole,
@@ -3430,9 +3518,32 @@ func TestResolvePermissions(t *testing.T) {
 				},
 				Role: "old role",
 			},
+		}
+		authRole := resolveAuthRole(execRequest, lp)
+		sc := resolveSecurityCtx(context.TODO(), execRequest, lp, authRole)
+		assert.Equal(t, assumableIamRole, authRole.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, authRole.KubernetesServiceAccount)
+		assert.Equal(t, &core.SecurityContext{
+			RunAs: &core.Identity{
+				IamRole:           assumableIamRole,
+				K8SServiceAccount: k8sServiceAccount,
+			},
+		}, sc)
+	})
+	t.Run("prefer lp auth over role", func(t *testing.T) {
+		authRole := resolveAuthRole(admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{},
+		}, &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				Auth: &admin.Auth{
+					AssumableIamRole:         assumableIamRoleLp,
+					KubernetesServiceAccount: k8sServiceAccountLp,
+				},
+				Role: "old role",
+			},
 		})
-		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
-		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+		assert.Equal(t, assumableIamRoleLp, authRole.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccountLp, authRole.KubernetesServiceAccount)
 	})
 }
 
