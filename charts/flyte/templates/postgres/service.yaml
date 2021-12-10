@@ -6,7 +6,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "postgres.labels" . | nindent 4 }}
   {{- with .Values.postgres.service.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
   {{- with .Values.postgres.service.type}}

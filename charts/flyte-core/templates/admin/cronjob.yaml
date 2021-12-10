@@ -13,7 +13,7 @@ spec:
       template:
         {{- with .Values.flyteadmin.podAnnotations }}
         metadata:
-          annotations: {{ toYaml . | nindent 12 }}
+          annotations: {{ tpl (toYaml .) $ | nindent 12 }}
         {{- end }}
         spec:
           containers:

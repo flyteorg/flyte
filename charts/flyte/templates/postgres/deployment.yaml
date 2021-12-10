@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       {{- with .Values.postgres.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       labels: {{ include "postgres.labels" . | nindent 8 }}
     spec:
@@ -36,12 +36,12 @@ spec:
         - name: postgres-storage
           emptyDir: {}
       {{- with .Values.postgres.nodeSelector }}
-      nodeSelector: {{ toYaml . | nindent 8 }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.postgres.affinity }}
-      affinity: {{ toYaml . | nindent 8 }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.postgres.tolerations }}
-      tolerations: {{ toYaml . | nindent 8 }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 {{- end }}

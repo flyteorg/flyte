@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       {{- with .Values.redis.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       labels: {{ include "redis.labels" . | nindent 8 }}
     spec:
@@ -59,12 +59,12 @@ spec:
       - emptyDir: {}
         name: redis-data
       {{- with .Values.redis.nodeSelector }}
-      nodeSelector: {{ toYaml . | nindent 8 }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.redis.affinity }}
-      affinity: {{ toYaml . | nindent 8 }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.redis.tolerations }}
-      tolerations: {{ toYaml . | nindent 8 }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 {{- end }}

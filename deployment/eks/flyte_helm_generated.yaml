@@ -463,8 +463,8 @@ data:
     propeller:
       resourcemanager:
         redis:
-          hostKey: '{{ .Values.userSettings.redisHostKey }}'
-          hostPath: '{{ .Values.userSettings.redisHostUrl }}'
+          hostKey: '<REDIS_HOST_KEY>'
+          hostPath: '<REDIS_HOST_URL>'
         resourceMaxQuota: 10000
         type: redis
   storage.yaml: | 
@@ -1208,7 +1208,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1e72d494bd5435f255ec2df3735e87ee355b07567b8b380cd2e3c32429b2f9b"
+        configChecksum: "8f1f41461263aacbc1dccf45c3047fbdf810c7e5209b26f2aeba12dc96e8813"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1284,7 +1284,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.15.17
       annotations:
-        configChecksum: "1e72d494bd5435f255ec2df3735e87ee355b07567b8b380cd2e3c32429b2f9b"
+        configChecksum: "8f1f41461263aacbc1dccf45c3047fbdf810c7e5209b26f2aeba12dc96e8813"
     spec:
       securityContext:
         fsGroup: 65534

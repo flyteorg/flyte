@@ -6,7 +6,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteconsole.labels" . | nindent 4 }}
   {{- with .Values.flyteconsole.service.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
   {{- with .Values.flyteconsole.service.type}}

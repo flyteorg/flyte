@@ -17,7 +17,7 @@ data:
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.logger }}
-  logger.yaml: | {{ toYaml . | nindent 4 }}
+  logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
   {{- end }}
   {{- end }}

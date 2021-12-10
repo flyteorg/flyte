@@ -10,10 +10,10 @@ data:
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.logger }}
-  logger.yaml: | {{ toYaml . | nindent 4 }}
+  logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.datacatalogServer }}
-  server.yaml: | {{ toYaml . | nindent 4 }}
+  server.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
 {{- end }}
