@@ -1,6 +1,6 @@
-.. _flytectl_create_project:
+.. _FlyteCTL_create_project:
 
-flytectl create project
+FlyteCTL create project
 -----------------------
 
 Create project resources
@@ -10,16 +10,16 @@ Synopsis
 
 
 
-Create the projects.(project,projects can be used interchangeably in these commands)
+Create projects.(project/projects can be used interchangeably in these commands)
 
 ::
 
- bin/flytectl create project --name flytesnacks --id flytesnacks --description "flytesnacks description"  --labels app=flyte
+ flytectl create project --name flytesnacks --id flytesnacks --description "flytesnacks description"  --labels app=flyte
 
-Create Project by definition file. Note: The name shouldn't contain any whitespace characters'
+Create a project by definition file. Note: The name shouldn't contain any whitespace characters.
 ::
 
- bin/flytectl create project --file project.yaml 
+ flytectl create project --file project.yaml 
 
 .. code-block:: yaml
 
@@ -33,7 +33,7 @@ Create Project by definition file. Note: The name shouldn't contain any whitespa
 
 ::
 
-  flytectl create project [flags]
+  FlyteCTL create project [flags]
 
 Options
 ~~~~~~~
@@ -95,5 +95,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
 

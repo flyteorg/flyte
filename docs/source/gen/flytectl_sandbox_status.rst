@@ -1,28 +1,27 @@
-.. _flytectl_sandbox_status:
+.. _FlyteCTL_sandbox_status:
 
-flytectl sandbox status
+FlyteCTL sandbox status
 -----------------------
 
-Get the status of the sandbox environment.
+Get status of the sandbox environment.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Status will retrieve the status of the Sandbox environment. Currently FlyteSandbox runs as a local docker container.
-This will return the docker status for this container
+Retrieve the status of the Sandbox environment. Currently, Flyte Sandbox runs as a local Docker container.
 
 Usage
 ::
 
- bin/flytectl sandbox status 
+ flytectl sandbox status 
 
 
 
 ::
 
-  flytectl sandbox status [flags]
+  FlyteCTL sandbox status [flags]
 
 Options
 ~~~~~~~
@@ -78,5 +77,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`FlyteCTL_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
 

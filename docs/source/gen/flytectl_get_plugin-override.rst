@@ -1,23 +1,23 @@
-.. _flytectl_get_plugin-override:
+.. _FlyteCTL_get_plugin-override:
 
-flytectl get plugin-override
+FlyteCTL get plugin-override
 ----------------------------
 
-Gets matchable resources of plugin override
+Get matchable resources of plugin override
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve the plugin overrides for the given project and domain.
-Here, the command gets the plugin overrides for the project flytectldemo and development domain.
+Retrieves the plugin override for the given project and domain.
+For project flytectldemo and development domain, it is:
 
 ::
 
  flytectl get plugin-override -p flytectldemo -d development 
 
-e.g. : output from the command
+e.g., output from the command
 
 .. code-block:: json
 
@@ -31,14 +31,14 @@ e.g. : output from the command
 	}]
  }
 
-Retrieves the plugin overrides for project, domain and workflow
-Here the command gets the plugin overrides for project flytectldemo, development domain and workflow core.control_flow.run_merge_sort.merge_sort
+Retrieves the plugin override for the given project, domain and workflow.
+For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 
 ::
 
  flytectl get plugin-override -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-e.g. : output from the command
+e.g., output from the command:
 
 .. code-block:: json
 
@@ -53,9 +53,9 @@ e.g. : output from the command
 	}]
  }
 
-Writing the plugin overrides to a file. If there are no plugin overrides, command would return an error.
-Here the command gets plugin overrides and writes the config file to po.yaml
-eg:  content of po.yaml
+Write plugin overrides to a file. If there are no plugin overrides, the command returns an error.
+Here, the config file is written to po.yaml,
+e.g., content of po.yaml:
 
 ::
 
@@ -78,7 +78,7 @@ Usage
 
 ::
 
-  flytectl get plugin-override [flags]
+  FlyteCTL get plugin-override [flags]
 
 Options
 ~~~~~~~
@@ -135,5 +135,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

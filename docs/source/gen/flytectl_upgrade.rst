@@ -1,33 +1,33 @@
-.. _flytectl_upgrade:
+.. _FlyteCTL_upgrade:
 
-flytectl upgrade
+FlyteCTL upgrade
 ----------------
 
-Used for upgrade/rollback flyte version
+Upgrade/rollback to a Flyte version
 
 Synopsis
 ~~~~~~~~
 
 
 
-Upgrade flytectl
+For FlyteCTL, it is:
 ::
 
- bin/flytectl upgrade
+ flytectl upgrade
 	
-Note: Please use upgrade with sudo, Without sudo it will cause permission issue
+Note: Please use upgrade with sudo. Without sudo it will cause permission issue.
 	
-Rollback flytectl binary
+Rollback flytectl binary:
 ::
 
- bin/flytectl upgrade rollback
+ flytectl upgrade rollback
 
-Note: Upgrade is not available on windows
+Note: Upgrade is not available on windows.
 
 
 ::
 
-  flytectl upgrade [flags]
+  FlyteCTL upgrade [flags]
 
 Options
 ~~~~~~~
@@ -83,5 +83,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
 

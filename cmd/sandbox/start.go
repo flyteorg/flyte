@@ -32,32 +32,32 @@ import (
 const (
 	startShort = "Start the flyte sandbox cluster"
 	startLong  = `
-The Flyte Sandbox is a fully standalone minimal environment for running Flyte. provides a simplified way of running flyte-sandbox as a single Docker container running locally.  
+The Flyte Sandbox is a fully standalone minimal environment for running Flyte. It provides a simplified way of running Flyte sandbox as a single Docker container locally.  
 
-Start sandbox cluster without any source code
+Start sandbox cluster without any source code:
 ::
 
  flytectl sandbox start
 	
-Mount your source code repository inside sandbox 
+Mount your source code repository inside sandbox:
 ::
 
  flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
-Run specific version of flyte. flytectl sandbox only support flyte version available in Github release https://github.com/flyteorg/flyte/tags
+Run specific version of Flyte. FlyteCTL sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
 ::
 
  flytectl sandbox start  --version=v0.14.0
 
-Note: Flytectl sandbox is only supported for Flyte versions > v0.10.0
+Note: FlyteCTL sandbox is only supported for Flyte versions > v0.10.0
 
-Specify a Flyte Sandbox compliant image with the registry. This is useful, in case you want to use an image from your registry.
+Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
 
   flytectl sandbox start --image docker.io/my-override:latest
 
 	
-Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never
+Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
 
  flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always

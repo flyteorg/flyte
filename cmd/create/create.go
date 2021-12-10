@@ -6,18 +6,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Long descriptions are whitespace sensitive when generating docs using sphinx.
+// Long descriptions are whitespace sensitive when generating docs using Sphinx.
 const (
-	createCmdShort = `Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.`
+	createCmdShort = `Create various Flyte resources including tasks/workflows/launchplans/executions/project.`
 	createCmdLong  = `
-Example create.
+Create Flyte resource; if a project:
 ::
 
- bin/flytectl create project --file project.yaml 
+ flytectl create project --file project.yaml 
 `
 )
 
-// RemoteCreateCommand will return create flyte resource commands
+// RemoteCreateCommand will return create Flyte resource commands
 func RemoteCreateCommand() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:   "create",

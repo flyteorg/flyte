@@ -1,54 +1,54 @@
-.. _flytectl_get_project:
+.. _FlyteCTL_get_project:
 
-flytectl get project
+FlyteCTL get project
 --------------------
 
-Gets project resources
+Get project resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves all the projects.(project,projects can be used interchangeably in these commands)
+Retrieve all the projects. (project,projects can be used interchangeably in these commands):
 ::
 
- bin/flytectl get project
+ flytectl get project
 
-Retrieves project by name
+Retrieve project by name:
 
 ::
 
- bin/flytectl get project flytesnacks
+ flytectl get project flytesnacks
 
-Retrieves all the projects with filters.
-::
- 
-  bin/flytectl get project --filter.fieldSelector="project.name=flytesnacks"
- 
-Retrieves all the projects with limit and sorting.
+Retrieve all the projects with filters:
 ::
  
-  bin/flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
+  flytectl get project --filter.fieldSelector="project.name=flytesnacks"
+ 
+Retrieve all the projects with limit and sorting:
+::
+ 
+  flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the projects in yaml format
+Retrieve all the projects in yaml format:
 
 ::
 
- bin/flytectl get project -o yaml
+ flytectl get project -o yaml
 
-Retrieves all the projects in json format
+Retrieve all the projects in json format:
 
 ::
 
- bin/flytectl get project -o json
+ flytectl get project -o json
 
 Usage
 
 
 ::
 
-  flytectl get project [flags]
+  FlyteCTL get project [flags]
 
 Options
 ~~~~~~~
@@ -108,5 +108,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

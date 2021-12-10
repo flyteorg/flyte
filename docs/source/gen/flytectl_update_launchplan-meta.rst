@@ -1,26 +1,26 @@
-.. _flytectl_update_launchplan-meta:
+.. _FlyteCTL_update_launchplan-meta:
 
-flytectl update launchplan-meta
+FlyteCTL update launchplan-meta
 -------------------------------
 
-Updates launch plan metadata
+Update launch plan metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Following command updates the description on the launchplan.
+Update the description on the launch plan:
 ::
 
  flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --description "Mergesort example"
 
-Archiving launchplan named entity is not supported and would throw an error.
+Archiving launch plan named entity is not supported and would throw an error:
 ::
 
  flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
 
-Activating launchplan named entity would be a noop.
+Activating launch plan named entity would be a noop:
 ::
 
  flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
@@ -30,7 +30,7 @@ Usage
 
 ::
 
-  flytectl update launchplan-meta [flags]
+  FlyteCTL update launchplan-meta [flags]
 
 Options
 ~~~~~~~
@@ -90,5 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
+* :doc:`FlyteCTL_update` 	 - Update Flyte resources e.g., project.
 

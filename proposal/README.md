@@ -5,8 +5,8 @@ FlyteAdmin. We will start with gRPC endpoint as the client is easily generated a
 more SDK's in different languages we should support a common way of interacting with the API. This does no mean that some SDK's may provide native ways of interacting with the Admin API (for e.g.
 flytekit), but the intention is that we will eventually replace **flytekit/flyte-cli** with flytectl exclusively.
 
-We also recommend that the design of flytectl is careful and it could helps us with delivering user features faster without having to rely on the UI. flytectl with follow standard oauth2 for
-authentication already supported by flyteAdmin. Moreover, flytectl should be readily available on almost any platform - OSX, Linux and Windows. We will strive to keep it relatively lean and fast.
+We also recommend that the design of FlyteCTL is careful and it could helps us with delivering user features faster without having to rely on the UI. FlyteCTL with follow standard oauth2 for
+authentication already supported by flyteAdmin. Moreover, FlyteCTL should be readily available on almost any platform - OSX, Linux and Windows. We will strive to keep it relatively lean and fast.
 
 # Why One CLI?
 
@@ -24,7 +24,7 @@ As we build multiple SDK's they need a native way of interacting with the API. H
 - kubectl is a stellar example of a cli done well
 
 ## Generating Swagger code
-We started exploring this (flytetools)[https://github.com/lyft/flytetools#tools] has some work. We also got approached by the swagger code gen maintainer to see if they can help.
+We started exploring this (Flytetools)[https://github.com/lyft/flytetools#tools] has some work. We also got approached by the swagger code gen maintainer to see if they can help.
 
 # API
 
@@ -41,7 +41,7 @@ $ flytectl [options]
 ```
 
 ### base options
-- *endpoint* endpoint where flyteadmin is available
+- *endpoint* endpoint where Flyteadmin is available
 - *insecure* use if Oauth is not available
 - optional *project* project for which we need to retrieve details
 - optional *domain* domain for which we need to retrieve details
@@ -51,7 +51,7 @@ $ flytectl [options]
 returns the version of the CLI, version of Admin service and version of the Platform that is deployed
 
 ### configure
-Allows configuring flytectl for your own usage (low pri). Needed for especially storing Auth tokens.
+Allows configuring FlyteCTL for your own usage (low pri). Needed for especially storing Auth tokens.
 
 ### get/delete
 Get retrieves a list of resources that is qualified by a further sub-command. for example

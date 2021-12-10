@@ -1,24 +1,24 @@
-.. _flytectl_version:
+.. _FlyteCTL_version:
 
-flytectl version
+FlyteCTL version
 ----------------
 
-Used for fetching flyte version
+Fetch Flyte version
 
 Synopsis
 ~~~~~~~~
 
 
 
-Example version.
+For FlyteCTL version, it is:
 ::
 
- bin/flytectl version
+ flytectl version
 
 
 ::
 
-  flytectl version [flags]
+  FlyteCTL version [flags]
 
 Options
 ~~~~~~~
@@ -74,5 +74,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
 

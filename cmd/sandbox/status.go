@@ -10,15 +10,14 @@ import (
 )
 
 const (
-	statusShort = "Get the status of the sandbox environment."
+	statusShort = "Get status of the sandbox environment."
 	statusLong  = `
-Status will retrieve the status of the Sandbox environment. Currently FlyteSandbox runs as a local docker container.
-This will return the docker status for this container
+Retrieve the status of the Sandbox environment. Currently, Flyte Sandbox runs as a local Docker container.
 
 Usage
 ::
 
- bin/flytectl sandbox status 
+ flytectl sandbox status 
 
 `
 )

@@ -10,16 +10,16 @@ import (
 )
 
 const (
-	pluginOverrideShort = "Updates matchable resources of plugin overrides"
+	pluginOverrideShort = "Update matchable resources of plugin overrides"
 	pluginOverrideLong  = `
 Updates plugin overrides for given project and domain combination or additionally with workflow name.
 
 Updating to the plugin override is only available from a generated file. See the get section for generating this file.
-Also this will completely overwrite any existing plugins overrides on custom project and domain and workflow combination.
-Would be preferable to do get and generate an plugin override file if there is an existing override already set and then update it to have new values
+This will completely overwrite any existing plugins overrides on custom project, domain and workflow combination.
+It is preferable to do get and generate a plugin override file if there is an existing override already set and then update it to have new values.
 Refer to get plugin-override section on how to generate this file
-Here the command updates takes the input for plugin overrides from the config file po.yaml
-eg:  content of po.yaml
+It takes input for plugin overrides from the config file po.yaml,
+e.g., content of po.yaml:
 
 .. code-block:: yaml
 
@@ -36,9 +36,9 @@ eg:  content of po.yaml
 
  flytectl update plugin-override --attrFile po.yaml
 
-Updating plugin override for project and domain and workflow combination. This will take precedence over any other
+Updates plugin override for project, domain and workflow combination. This will take precedence over any other
 plugin overrides defined at project domain level.
-Update the plugin overrides for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo , development domain
+For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
 
 .. code-block:: yaml
 

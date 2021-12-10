@@ -11,10 +11,10 @@ import (
 const (
 	execShort = "Execute non-interactive command inside the sandbox container"
 	execLong  = `
-Execute command will run non-interactive command inside the sandbox container and return immediately with the output.By default flytectl exec in /root directory inside the sandbox container
+Runs non-interactive command inside the Sandbox container and immediately returns the output. By default, flytectl exec is present in /root directory inside the Sandbox container.
 
 ::
- bin/flytectl sandbox exec -- ls -al 
+ flytectl sandbox exec -- ls -al 
 
 Usage`
 )

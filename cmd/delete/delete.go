@@ -13,14 +13,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Long descriptions are whitespace sensitive when generating docs using sphinx.
+// Long descriptions are whitespace sensitive when generating docs using Sphinx.
 const (
-	deleteCmdShort = `Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.`
+	deleteCmdShort = `Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.`
 	deleteCmdLong  = `
-Example Delete executions.
+Delete a resource; if an execution:
 ::
 
- bin/flytectl delete execution kxd1i72850  -d development  -p flytesnacks
+ flytectl delete execution kxd1i72850  -d development  -p flytesnacks
 `
 )
 

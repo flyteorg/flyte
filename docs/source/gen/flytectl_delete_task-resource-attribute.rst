@@ -1,28 +1,27 @@
-.. _flytectl_delete_task-resource-attribute:
+.. _FlyteCTL_delete_task-resource-attribute:
 
-flytectl delete task-resource-attribute
+FlyteCTL delete task-resource-attribute
 ---------------------------------------
 
-Deletes matchable resources of task attributes
+Delete matchable resources of task attributes
 
 Synopsis
 ~~~~~~~~
 
 
 
-Deletes task  resource attributes for given project,domain combination or additionally with workflow name.
+Deletes task resource attributes for the given project and domain combination, or additionally with workflow name.
 
-Deletes task resource attribute for project and domain
-Here the command delete task resource attributes for  project flytectldemo and development domain.
+For project flytectldemo and development domain, it is:
 ::
 
  flytectl delete task-resource-attribute -p flytectldemo -d development 
 
 
-Deletes task resource attribute using config file which was used for creating it.
-Here the command deletes task resource attributes from the config file tra.yaml
-defaults/limits are optional in the file as they are unread during the delete command but can be kept as the same file can be used for get, update or delete 
-eg:  content of tra.yaml which will use the project domain and workflow name for deleting the resource
+Deletes task resource attribute using config file which was used to create it.
+Here, the config file is written to tra.yaml.
+The defaults/limits are optional in the file as they are unread during the delete command but can be kept since the same file can be used for get, update or delete commands.
+e.g., content of tra.yaml:
 
 ::
 
@@ -40,8 +39,8 @@ eg:  content of tra.yaml which will use the project domain and workflow name for
       cpu: "2"
       memory: "450Mi"
 
-Deletes task resource attribute for a workflow
-Here the command deletes task resource attributes for a workflow core.control_flow.run_merge_sort.merge_sort
+Deletes task resource attribute for a workflow.
+For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
 
 ::
 
@@ -52,7 +51,7 @@ Usage
 
 ::
 
-  flytectl delete task-resource-attribute [flags]
+  FlyteCTL delete task-resource-attribute [flags]
 
 Options
 ~~~~~~~
@@ -110,5 +109,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
 

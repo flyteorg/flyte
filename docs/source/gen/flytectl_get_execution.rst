@@ -1,81 +1,81 @@
-.. _flytectl_get_execution:
+.. _FlyteCTL_get_execution:
 
-flytectl get execution
+FlyteCTL get execution
 ----------------------
 
-Gets execution resources
+Get execution resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve all executions within the project and domain (execution, executions can be used interchangeably).
+Retrieve all executions within the project and domain (execution, executions can be used interchangeably):
 ::
 
- bin/flytectl get execution -p flytesnacks -d development
+ flytectl get execution -p flytesnacks -d development
 
-Retrieves executions by name within the project and domain.
+Retrieve executions by name within the project and domain:
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r
 
-Retrieves all the executions with filters.
+Retrieve all the executions with filters:
 ::
  
-  bin/flytectl get execution -p flytesnacks -d development --filter.fieldSelector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
+ flytectl get execution -p flytesnacks -d development --filter.fieldSelector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
 
  
-Retrieve executions as per the specified limit and sorting parameters.
+Retrieve executions as per the specified limit and sorting parameters:
 ::
   
-   bin/flytectl get execution -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
+ flytectl get execution -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
    
 
-Retrieve executions within the project and domain in YAML format.
+Retrieve executions within the project and domain in YAML format:
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development -o yaml
+ flytectl get execution -p flytesnacks -d development -o yaml
 
-Retrieve executions within the project and domain in JSON format.
+Retrieve executions within the project and domain in JSON format:
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development -o json
+ flytectl get execution -p flytesnacks -d development -o json
 
 
 Get more details of the execution using the --details flag, which shows node and task executions. The default view is a tree view, and the TABLE view format is not supported on this view.
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
 
 Fetch execution details in YAML format. In this view, only node details are available. For task, send the --nodeID flag.
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
 
 Fetch task executions on a specific node using the --nodeID flag. Use the nodeID attribute given by the node details view.
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodeID n0
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodeID n0
 
 Task execution view is also available in YAML/JSON format. The following example showcases YAML, where the output also contains input and output data of each node.
 
 ::
 
- bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0 -o yaml
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0 -o yaml
 
 Usage
 
 
 ::
 
-  flytectl get execution [flags]
+  FlyteCTL get execution [flags]
 
 Options
 ~~~~~~~
@@ -137,5 +137,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

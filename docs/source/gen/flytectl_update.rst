@@ -1,21 +1,21 @@
-.. _flytectl_update:
+.. _FlyteCTL_update:
 
-flytectl update
+FlyteCTL update
 ---------------
 
-Used for updating flyte resources eg: project.
+Update Flyte resources e.g., project.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Currently this command only provides subcommands to update project.
-Takes input project which need to be archived or unarchived. Name of the project to be updated is mandatory field.
-Example update project to activate it.
+Currently, this command only provides subcommands to update project.
+Takes input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
+To update a project:
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activateProject
 
 
 Options
@@ -72,16 +72,16 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_update_cluster-resource-attribute` 	 - Updates matchable resources of cluster attributes
-* :doc:`flytectl_update_execution-cluster-label` 	 - Updates matchable resources of execution cluster label
-* :doc:`flytectl_update_execution-queue-attribute` 	 - Updates matchable resources of execution queue attributes
-* :doc:`flytectl_update_launchplan` 	 - Updates launch plan status
-* :doc:`flytectl_update_launchplan-meta` 	 - Updates launch plan metadata
-* :doc:`flytectl_update_plugin-override` 	 - Updates matchable resources of plugin overrides
-* :doc:`flytectl_update_project` 	 - Updates project resources
-* :doc:`flytectl_update_task-meta` 	 - Updates task metadata
-* :doc:`flytectl_update_task-resource-attribute` 	 - Updates matchable resources of task attributes
-* :doc:`flytectl_update_workflow-execution-config` 	 - Updates matchable resources of workflow execution config
-* :doc:`flytectl_update_workflow-meta` 	 - Updates workflow metadata
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
+* :doc:`FlyteCTL_update_cluster-resource-attribute` 	 - Update matchable resources of cluster attributes
+* :doc:`FlyteCTL_update_execution-cluster-label` 	 - Update matchable resources of execution cluster label
+* :doc:`FlyteCTL_update_execution-queue-attribute` 	 - Update matchable resources of execution queue attributes
+* :doc:`FlyteCTL_update_launchplan` 	 - Update launch plan status
+* :doc:`FlyteCTL_update_launchplan-meta` 	 - Update launch plan metadata
+* :doc:`FlyteCTL_update_plugin-override` 	 - Update matchable resources of plugin overrides
+* :doc:`FlyteCTL_update_project` 	 - Update project resources
+* :doc:`FlyteCTL_update_task-meta` 	 - Update task metadata
+* :doc:`FlyteCTL_update_task-resource-attribute` 	 - Update matchable resources of task attributes
+* :doc:`FlyteCTL_update_workflow-execution-config` 	 - Update matchable resources of workflow execution config
+* :doc:`FlyteCTL_update_workflow-meta` 	 - Update workflow metadata
 

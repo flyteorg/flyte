@@ -1,6 +1,6 @@
-.. _flytectl_completion:
+.. _FlyteCTL_completion:
 
-flytectl completion
+FlyteCTL completion
 -------------------
 
 Generate completion script
@@ -24,7 +24,7 @@ Bash:
 Zsh:
 
   # If shell completion is not already enabled in your environment,
-  # you will need to enable it.  You can execute the following once:
+  # you will need to enable it. You can execute the following once:
 
   $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
@@ -51,7 +51,7 @@ PowerShell:
 
 ::
 
-  flytectl completion [bash|zsh|fish|powershell]
+  FlyteCTL completion [bash|zsh|fish|powershell]
 
 Options
 ~~~~~~~
@@ -107,5 +107,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`FlyteCTL` 	 - FlyteCTL CLI tool
 

@@ -9,12 +9,12 @@ import (
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
-	registerCmdShort = "Registers tasks/workflows/launchplans from list of generated serialized files."
+	registerCmdShort = "Register tasks/workflows/launchplans from a list of generated serialized files."
 	registercmdLong  = `
 Takes input files as serialized versions of the tasks/workflows/launchplans and registers them with flyteadmin.
-Currently these input files are protobuf files generated as output from flytekit serialize.
-Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1
-If the entities are already registered with flyte for the same version then registration would fail.
+Currently, these input files are protobuf files generated as output from Flytekit serialize.
+Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1.
+If the entities are already registered with Flyte for the same version, the registration would fail.
 `
 )
 

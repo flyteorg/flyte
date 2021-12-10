@@ -1,6 +1,6 @@
-.. _flytectl_create_execution:
+.. _FlyteCTL_create_execution:
 
-flytectl create execution
+FlyteCTL create execution
 -------------------------
 
 Create execution resources
@@ -10,22 +10,22 @@ Synopsis
 
 
 
-Create the executions for given workflow/task in a project and domain.
+Creates executions for a given workflow/task in a project and domain.
 
-There are three steps in generating an execution.
+There are three steps in generating an execution:
 
 - Generate the execution spec file using the get command.
 - Update the inputs for the execution if needed.
 - Run the execution by passing in the generated yaml file.
 
-The spec file should be generated first and then run the execution using the spec file.
-You can reference the flytectl get task for more details
+The spec file should be generated first and then, the execution should be run using the spec file.
+You can reference the FlyteCTL get task for more details.
 
 ::
 
  flytectl get tasks -d development -p flytectldemo core.advanced.run_merge_sort.merge  --version v2 --execFile execution_spec.yaml
 
-The generated file would look similar to this
+The generated file would look similar to this:
 
 .. code-block:: yaml
 
@@ -62,35 +62,35 @@ The generated file can be modified to change the input values.
 	 task: core.advanced.run_merge_sort.merge
 	 version: "v2"
 
-And then can be passed through the command line.
-Notice the source and target domain/projects can be different.
-The root project and domain flags of -p and -d should point to task/launch plans project/domain.
+It can then be passed through the command line.
+Notice that the source and target domain/projects can be different.
+The root project and domain flags of -p and -d should point to the task/launch plans project/domain.
 
 ::
 
  flytectl create execution --execFile execution_spec.yaml -p flytectldemo -d development --targetProject flytesnacks
 
-Also an execution can be relaunched by passing in current execution id.
+Also, an execution can be relaunched by passing in the current execution id.
 
 ::
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytectldemo -d development
 
-An execution can be recovered, that is recreated from the last known failure point for a previously-run workflow execution.
+An execution can be recovered, i.e., recreated from the last known failure point for previously-run workflow execution.
 See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
 
 ::
 
  flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytectldemo -d development
 
-Generic data types are also supported for execution in similar way.Following is sample of how the inputs need to be specified while creating the execution.
-As usual the spec file should be generated first and then run the execution using the spec file.
+Generic data types are also supported for execution in a similar manner. Following is a sample of how the inputs need to be specified while creating the execution.
+The spec file should be generated first and then, the execution should be run using the spec file.
 
 ::
 
  flytectl get task -d development -p flytectldemo  core.type_system.custom_objects.add --execFile adddatanum.yaml
 
-The generated file would look similar to this. Here you can see empty values dumped for generic data type x and y. 
+The generated file would look similar to this. Here, empty values have been dumped for generic data type x and y. 
 
 ::
 
@@ -133,7 +133,7 @@ Usage
 
 ::
 
-  flytectl create execution [flags]
+  FlyteCTL create execution [flags]
 
 Options
 ~~~~~~~
@@ -200,5 +200,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
 

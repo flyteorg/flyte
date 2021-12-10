@@ -1,69 +1,69 @@
-.. _flytectl_get_launchplan:
+.. _FlyteCTL_get_launchplan:
 
-flytectl get launchplan
+FlyteCTL get launchplan
 -----------------------
 
-Gets launch plan resources
+Get launch plan resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve all launch plans within the project and domain (launchplan, launchplans can be used interchangeably).
+Retrieve all launch plans within the project and domain (launch plan, launch plans can be used interchangeably):
 ::
 
  flytectl get launchplan -p flytesnacks -d development
 
- Retrieve a launch plan by name within the project and domain.
+ Retrieve a launch plan by name within the project and domain:
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
 
-Retrieve the latest version of the task by name within the project and domain.
+Retrieve the latest version of the task by name within the project and domain:
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --latest
 
-Retrieves a particular version of the launch plan by name within the project and domain.
+Retrieve a particular version of the launch plan by name within the project and domain:
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --version v2
 
-Retrieves all the launch plans with filters.
+Retrieve all the launch plans with filters:
 ::
  
-  bin/flytectl get launchplan -p flytesnacks -d development --filter.fieldSelector="name=core.basic.lp.go_greet"
+  flytectl get launchplan -p flytesnacks -d development --filter.fieldSelector="name=core.basic.lp.go_greet"
  
-Retrieves launch plans entity search across all versions with filters.
+Retrieve launch plans entity search across all versions with filters:
 ::
  
-  bin/flytectl get launchplan -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="version=v1"
+  flytectl get launchplan -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="version=v1"
  
  
-Retrieves all the launch plans with limit and sorting.
+Retrieve all the launch plans with limit and sorting:
 ::
  
-  bin/flytectl get launchplan -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
+  flytectl get launchplan -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
  
 
-Retrieves all launch plans within the project and domain in YAML format.
+Retrieve all launch plans within the project and domain in YAML format:
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development -o yaml
 
-Retrieves all launch plans the within the project and domain in JSON format.
+Retrieve all launch plans the within the project and domain in JSON format:
 
 ::
 
  flytectl get launchplan -p flytesnacks -d development -o json
 
-Retrieve a launch plan within the project and domain as per a version and generate the execution spec file; the file can be used to launch the execution using the 'create execution' command.
+Retrieve a launch plan within the project and domain as per a version and generate the execution spec file; the file can be used to launch the execution using the 'create execution' command:
 
 ::
 
@@ -92,7 +92,7 @@ Usage
 
 ::
 
-  flytectl get launchplan [flags]
+  FlyteCTL get launchplan [flags]
 
 Options
 ~~~~~~~
@@ -155,5 +155,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 

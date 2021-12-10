@@ -1,71 +1,71 @@
-.. _flytectl_get_task:
+.. _FlyteCTL_get_task:
 
-flytectl get task
+FlyteCTL get task
 -----------------
 
-Gets task resources
+Get task resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves all the task within project and domain.(task,tasks can be used interchangeably in these commands)
+Retrieve all the tasks within project and domain(task,tasks can be used interchangeably in these commands):
 ::
 
- bin/flytectl get task -p flytesnacks -d development
+ flytectl get task -p flytesnacks -d development
 
-Retrieves task by name within project and domain.
+Retrieve task by name within project and domain:
 
 ::
 
- bin/flytectl task -p flytesnacks -d development core.basic.lp.greet
+ flytectl task -p flytesnacks -d development core.basic.lp.greet
 
-Retrieves latest version of task by name within project and domain.
+Retrieve latest version of task by name within project and domain:
 
 ::
 
  flytectl get task -p flytesnacks -d development  core.basic.lp.greet --latest
 
-Retrieves particular version of task by name within project and domain.
+Retrieve particular version of task by name within project and domain:
 
 ::
 
  flytectl get task -p flytesnacks -d development  core.basic.lp.greet --version v2
 
-Retrieves all the tasks with filters.
+Retrieve all the tasks with filters:
 ::
   
-  bin/flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
+  flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
  
-Retrieve a specific task with filters.
+Retrieve a specific task with filters:
 ::
  
-  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
+  flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
   
-Retrieves all the task with limit and sorting.
+Retrieve all the tasks with limit and sorting:
 ::
    
-  bin/flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
+  flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the tasks within project and domain in yaml format.
+Retrieve all the tasks within project and domain in yaml format:
 ::
 
- bin/flytectl get task -p flytesnacks -d development -o yaml
+ flytectl get task -p flytesnacks -d development -o yaml
 
-Retrieves all the tasks within project and domain in json format.
-
-::
-
- bin/flytectl get task -p flytesnacks -d development -o json
-
-Retrieves a tasks within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution.
+Retrieve all the tasks within project and domain in json format:
 
 ::
 
- bin/flytectl get tasks -d development -p flytesnacks core.advanced.run_merge_sort.merge --execFile execution_spec.yaml --version v2
+ flytectl get task -p flytesnacks -d development -o json
 
-The generated file would look similar to this
+Retrieve tasks within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution:
+
+::
+
+ flytectl get tasks -d development -p flytesnacks core.advanced.run_merge_sort.merge --execFile execution_spec.yaml --version v2
+
+The generated file would look similar to this:
 
 .. code-block:: yaml
 
@@ -88,7 +88,7 @@ Usage
 
 ::
 
-  flytectl get task [flags]
+  FlyteCTL get task [flags]
 
 Options
 ~~~~~~~
@@ -151,5 +151,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`FlyteCTL_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
 
