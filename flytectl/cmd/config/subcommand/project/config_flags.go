@@ -54,5 +54,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultConfig.Filter.SortBy, fmt.Sprintf("%v%v", prefix, "filter.sortBy"), DefaultConfig.Filter.SortBy, "Specifies which field to sort results ")
 	cmdFlags.Int32Var(&DefaultConfig.Filter.Limit, fmt.Sprintf("%v%v", prefix, "filter.limit"), DefaultConfig.Filter.Limit, "Specifies the limit")
 	cmdFlags.BoolVar(&DefaultConfig.Filter.Asc, fmt.Sprintf("%v%v", prefix, "filter.asc"), DefaultConfig.Filter.Asc, "Specifies the sorting order. By default flytectl sort result in descending order")
+	cmdFlags.Int32Var(&DefaultConfig.Filter.Page, fmt.Sprintf("%v%v", prefix, "filter.page"), DefaultConfig.Filter.Page, "Specifies the page number,  in case there are multiple pages of results")
 	return cmdFlags
 }

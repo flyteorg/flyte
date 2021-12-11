@@ -183,4 +183,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_filter.page", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("filter.page", testValue)
+			if vInt32, err := cmdFlags.GetInt32("filter.page"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.Filter.Page)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

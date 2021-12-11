@@ -30,13 +30,18 @@ Retrieve project by name:
 
 Retrieve all the projects with filters:
 ::
- 
+
   flytectl get project --filter.fieldSelector="project.name=flytesnacks"
- 
+
 Retrieve all the projects with limit and sorting:
 ::
- 
+
   flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
+
+Retrieves all the projects on other pages.
+::
+
+  flytectl get project --filter.limit=10 --filter.page=2
 
 Retrieve all the projects in yaml format:
 

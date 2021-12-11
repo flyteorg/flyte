@@ -47,11 +47,13 @@ func TestProjectListRequestFunc(t *testing.T) {
 	config.GetConfig().Domain = domain
 	filter := Filters{
 		Limit:  100,
+		Page:   2,
 		SortBy: "created_at",
 	}
 	request, err := BuildProjectListRequest(filter)
 	expectedResponse := &admin.ProjectListRequest{
 		Limit:   100,
+		Token:   "100",
 		Filters: "",
 		SortBy: &admin.Sort{
 			Key:       "created_at",
@@ -80,6 +82,7 @@ func TestListRequestWithNameFunc(t *testing.T) {
 	filter := Filters{
 		Limit:  100,
 		SortBy: "created_at",
+		Page:   1,
 	}
 	request, err := BuildResourceListRequestWithName(filter, project, domain, name)
 	expectedResponse := &admin.ResourceListRequest{
