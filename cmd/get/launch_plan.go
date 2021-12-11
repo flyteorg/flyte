@@ -42,20 +42,24 @@ Retrieve a particular version of the launch plan by name within the project and 
 
 Retrieve all the launch plans with filters:
 ::
- 
+
   flytectl get launchplan -p flytesnacks -d development --filter.fieldSelector="name=core.basic.lp.go_greet"
- 
+
 Retrieve launch plans entity search across all versions with filters:
 ::
- 
+
   flytectl get launchplan -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="version=v1"
- 
- 
+
+
 Retrieve all the launch plans with limit and sorting:
 ::
- 
+
   flytectl get launchplan -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
- 
+
+Retrieves all the launch plans on other pages.
+::
+
+  flytectl get -p flytesnacks -d development launchplan --filter.limit=10 --filter.page=2
 
 Retrieve all launch plans within the project and domain in YAML format:
 

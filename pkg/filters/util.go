@@ -1,6 +1,8 @@
 package filters
 
 import (
+	"strconv"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
@@ -11,6 +13,7 @@ func BuildResourceListRequestWithName(c Filters, project, domain, name string) (
 	}
 	request := &admin.ResourceListRequest{
 		Limit:   uint32(c.Limit),
+		Token:   getToken(c),
 		Filters: fieldSelector,
 		Id: &admin.NamedEntityIdentifier{
 			Project: project,
@@ -33,6 +36,7 @@ func BuildProjectListRequest(c Filters) (*admin.ProjectListRequest, error) {
 	}
 	request := &admin.ProjectListRequest{
 		Limit:   uint32(c.Limit),
+		Token:   getToken(c),
 		Filters: fieldSelector,
 		SortBy:  buildSortingRequest(c),
 	}
@@ -51,4 +55,12 @@ func buildSortingRequest(c Filters) *admin.Sort {
 		}
 	}
 	return nil
+}
+
+func getToken(c Filters) string {
+	token := int(c.Page-1) * int(c.Limit)
+	if token <= 0 {
+		return ""
+	}
+	return strconv.Itoa(token)
 }
