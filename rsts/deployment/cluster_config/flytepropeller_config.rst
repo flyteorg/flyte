@@ -215,7 +215,7 @@ Command for external authentication token generation
 
 .. code-block:: yaml
 
-  null
+  []
   
 
 config.Duration
@@ -634,12 +634,12 @@ k8s (`config.K8sPluginConfig`_)
     cpu: 500m
     default-input-path: /var/flyte/inputs
     default-output-path: /var/flyte/outputs
-    image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+    image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
     input-vol-name: flyte-inputs
     memory: 128Mi
     name: flyte-copilot-
     output-vol-name: flyte-outputs
-    start-timeout: 1m0s
+    start-timeout: 1m40s
     storage: ""
   create-container-error-grace-period: 3m0s
   default-annotations:
@@ -650,6 +650,8 @@ k8s (`config.K8sPluginConfig`_)
   default-labels: null
   default-memory: 1Gi
   default-node-selector: null
+  default-pod-security-context: null
+  default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
   gpu-resource-name: nvidia.com/gpu
@@ -1582,12 +1584,12 @@ Co-Pilot Configuration
   cpu: 500m
   default-input-path: /var/flyte/inputs
   default-output-path: /var/flyte/outputs
-  image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
   input-vol-name: flyte-inputs
   memory: 128Mi
   name: flyte-copilot-
   output-vol-name: flyte-outputs
-  start-timeout: 1m0s
+  start-timeout: 1m40s
   storage: ""
   
 
@@ -1616,13 +1618,31 @@ create-container-error-grace-period (`config.Duration`_)
 gpu-resource-name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The name of the GPU resource to use when the task resource requests GPUs.
-
 **Default Value**: 
 
 .. code-block:: yaml
 
   nvidia.com/gpu
+  
+
+default-pod-security-context (v1.PodSecurityContext)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-security-context (v1.SecurityContext)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.FlyteCoPilotConfig
@@ -1649,7 +1669,7 @@ Flyte co-pilot Docker Image FQN
 
 .. code-block:: yaml
 
-  cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  cr.flyte.org/flyteorg/flytecopilot:v0.0.15
   
 
 default-input-path (string)
@@ -1707,7 +1727,7 @@ start-timeout (`config.Duration`_)
 
 .. code-block:: yaml
 
-  1m0s
+  1m40s
   
 
 cpu (string)
@@ -2963,6 +2983,78 @@ Configures execution event behavior.
 
   fallback-to-output-reference: false
   raw-output-policy: reference
+  
+
+include-shard-key-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified shard key label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-shard-key-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+include-project-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified project label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-project-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified project label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+include-domain-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified domain label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-domain-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
   
 
 admin-launcher (`launchplan.AdminConfig`_)

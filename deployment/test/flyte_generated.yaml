@@ -637,7 +637,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.16
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.19
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -655,7 +655,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/datacatalog:v0.3.16
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.19
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -716,7 +716,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.15.17
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.16.4
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -743,7 +743,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.15.17
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.16.4
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -791,7 +791,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.53
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.64
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -846,7 +846,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.53
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.64
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -862,7 +862,7 @@ spec:
         - seed-projects
         - flytetester
         - flytesnacks
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.53
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.64
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -876,7 +876,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.53
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.64
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -896,7 +896,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.53
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.64
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -960,7 +960,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: cr.flyte.org/flyteorg/flytepropeller:v0.15.17
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.16.4
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:

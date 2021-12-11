@@ -165,7 +165,7 @@ This can done in multiple ways
          max_parallelism=30,
        )
 
-#. Specify for an execution. For any specific execution the max-parallelism can be overriden. This can be done using flytectl (and soon flyteconsole). Refer to :std:doc:`gen/flytectl_create_execution`
+#. Specify for an execution. For any specific execution the max-parallelism can be overriden. This can be done using flytectl (and soon flyteconsole). Refer to :std:ref:`flyteCtl docs <flytectl:flytectl_create_execution>`
 
 
 
