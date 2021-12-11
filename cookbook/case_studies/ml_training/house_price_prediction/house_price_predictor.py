@@ -18,13 +18,15 @@ Predicting House Price in a Region with XGBoost
 # First, import all the required libraries.
 import typing
 
+import os
+import flytekit
 import joblib
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
-from flytekit import Resources, dynamic, task, workflow
-from flytekit.types.file import FlyteFile
+from flytekit import Resources, task, workflow
+from flytekit.types.file import JoblibSerializedFile
 from typing import Tuple
 
 # %%
@@ -164,11 +166,8 @@ def generate_and_split_data(number_of_houses: int, seed: int) -> dataset:
 # Task: Training the XGBoost Model
 # =================================
 # Serialize the XGBoost model using joblib and store the model in a dat file.
-model_file = typing.NamedTuple("Model", model=FlyteFile[typing.TypeVar("joblib.dat")])
-
-
 @task(cache_version="1.0", cache=True, limits=Resources(mem="600Mi"))
-def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> model_file:
+def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> JoblibSerializedFile:
 
     # Fetch the input and output data from train dataset
     x = train[train.columns[1:]]
@@ -181,9 +180,10 @@ def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> model_file:
     m = XGBRegressor()
     m.fit(x, y, eval_set=[(eval_x, eval_y)])
 
-    fname = "model-" + loc + ".joblib.dat"
+    working_dir = flytekit.current_context().working_directory
+    fname = os.path.join(working_dir, f"model-{loc}.joblib.dat")
     joblib.dump(m, fname)
-    return fname
+    return JoblibSerializedFile(path=fname)
 
 
 # %%
@@ -193,7 +193,7 @@ def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> model_file:
 @task(cache_version="1.0", cache=True, limits=Resources(mem="600Mi"))
 def predict(
     test: pd.DataFrame,
-    model_ser: FlyteFile[typing.TypeVar("joblib.dat")],
+    model_ser: JoblibSerializedFile,
 ) -> typing.List[float]:
 
     # Load model
@@ -232,7 +232,7 @@ def house_price_predictor_trainer(
     )
 
     # Generate predictions
-    predictions = predict(model_ser=model.model, test=split_data_vals.test_data)
+    predictions = predict(model_ser=model, test=split_data_vals.test_data)
 
     return predictions
 

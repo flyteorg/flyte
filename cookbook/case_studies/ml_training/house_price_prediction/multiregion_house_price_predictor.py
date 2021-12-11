@@ -11,10 +11,8 @@ In this example, you'll use the house price prediction model for one region to e
 # First, import all the required libraries.
 import typing
 
-import flytekit
 import pandas as pd
-from flytekit import Resources, dynamic, task, workflow
-from flytekit.types.file import FlyteFile
+from flytekit import Resources, dynamic, workflow
 
 try:
     from .house_price_predictor import (
