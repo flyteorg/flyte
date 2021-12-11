@@ -24,6 +24,9 @@ See the flytekit [0.25.0 release notes](https://github.com/flyteorg/flytekit/rel
 
 ## System
 * Various stability fixes.
+* New docker image tags!
+
+  In addition to component-specific versions released from each of the flyte repositories (e.g. flytepropeller:v0.16.5), new images will be re-tagged and pushed that match the flyte release version (e.g. the upcoming flytepropeller-release:v0.18.2). This makes it easier to make sure all your deployments are on the same version to ensure best compatibility.
 * Helm changes
     * [flyte-core](https://artifacthub.io/packages/helm/flyte/flyte-core) helm chart has reached release preview and can be leveraged to install your cloud(AWS/GCP) deployments of flyte.
     * Going forward flyte-core will install flyte native scheduler, For AWS backword compatibility you need to define `workflow_schedule.type` to `aws`. (https://github.com/flyteorg/flyte/pull/1896)
