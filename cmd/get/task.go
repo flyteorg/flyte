@@ -54,7 +54,7 @@ Retrieve all the tasks with limit and sorting:
 
   flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the task on other pages.
+Retrieve tasks present in other pages by specifying the limit and page number:
 ::
 
   flytectl get -p flytesnacks -d development task --filter.limit=10 --filter.page=2

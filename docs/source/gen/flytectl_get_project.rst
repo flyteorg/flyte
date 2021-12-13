@@ -23,13 +23,18 @@ Retrieve project by name:
 
 Retrieve all the projects with filters:
 ::
- 
+
   flytectl get project --filter.fieldSelector="project.name=flytesnacks"
- 
+
 Retrieve all the projects with limit and sorting:
 ::
- 
+
   flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
+
+Retrieve projects present in other pages by specifying the limit and page number:
+::
+
+  flytectl get project --filter.limit=10 --filter.page=2
 
 Retrieve all the projects in yaml format:
 
@@ -58,6 +63,7 @@ Options
       --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
       --filter.fieldSelector string   Specifies the Field selector
       --filter.limit int32            Specifies the limit (default 100)
+      --filter.page int32             Specifies the page number,  in case there are multiple pages of results (default 1)
       --filter.sortBy string          Specifies which field to sort results  (default "created_at")
   -h, --help                          help for project
 
