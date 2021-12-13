@@ -27,7 +27,7 @@ Workflow structure is flexible because:
 At execution time, node executions will be triggered as soon as their inputs are available.
 
 **Workflow nodes are naturally run in parallel when possible**.
-For example, when a workflow has five independent nodes, i.e., when nodes do not consume outputs produced by other nodes,
+For example, when a workflow has five independent nodes, i.e., when the five nodes do not consume outputs produced by other nodes,
 then Flyte runs the nodes in parallel as per the data and resource constraints.
 
 Flyte-specific Structure
