@@ -56,7 +56,7 @@ Retrieve all the launch plans with limit and sorting:
 
   flytectl get launchplan -p flytesnacks -d development --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the launch plans on other pages.
+Retrieve launch plans present in other pages by specifying the limit and page number:
 ::
 
   flytectl get -p flytesnacks -d development launchplan --filter.limit=10 --filter.page=2

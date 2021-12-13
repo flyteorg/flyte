@@ -35,18 +35,23 @@ Retrieve particular version of task by name within project and domain:
 
 Retrieve all the tasks with filters:
 ::
-  
-  flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
- 
+
+  flytectl get task -p flytesnacks -d development --filter.fieldSelector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1"
+
 Retrieve a specific task with filters:
 ::
- 
-  flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
-  
+
+  flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.fieldSelector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z"
+
 Retrieve all the tasks with limit and sorting:
 ::
-   
+
   flytectl get -p flytesnacks -d development task  --filter.sortBy=created_at --filter.limit=1 --filter.asc
+
+Retrieve tasks present in other pages by specifying the limit and page number:
+::
+
+  flytectl get -p flytesnacks -d development task --filter.limit=10 --filter.page=2
 
 Retrieve all the tasks within project and domain in yaml format:
 ::
@@ -99,6 +104,7 @@ Options
       --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
       --filter.fieldSelector string   Specifies the Field selector
       --filter.limit int32            Specifies the limit (default 100)
+      --filter.page int32             Specifies the page number,  in case there are multiple pages of results (default 1)
       --filter.sortBy string          Specifies which field to sort results  (default "created_at")
   -h, --help                          help for task
       --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case

@@ -56,7 +56,7 @@ Retrieve all the workflows with limit and sorting:
 
   flytectl get -p flytesnacks -d development workflow  --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the workflows on other pages.
+Retrieve workflows present in other pages by specifying the limit and page number:
 ::
 
   flytectl get -p flytesnacks -d development workflow --filter.limit=10 --filter.page 2

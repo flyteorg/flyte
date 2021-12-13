@@ -38,7 +38,7 @@ Retrieve all the projects with limit and sorting:
 
   flytectl get project --filter.sortBy=created_at --filter.limit=1 --filter.asc
 
-Retrieves all the projects on other pages.
+Retrieve projects present in other pages by specifying the limit and page number:
 ::
 
   flytectl get project --filter.limit=10 --filter.page=2

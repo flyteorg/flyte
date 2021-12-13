@@ -35,18 +35,23 @@ Retrieve particular version of workflow by name within project and domain:
 
 Retrieve all the workflows with filters:
 ::
- 
+
   flytectl get workflow -p flytesnacks -d development  --filter.fieldSelector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
- 
+
 Retrieve specific workflow with filters:
 ::
- 
+
   flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.fieldSelector="workflow.version=v1"
-  
+
 Retrieve all the workflows with limit and sorting:
 ::
-  
+
   flytectl get -p flytesnacks -d development workflow  --filter.sortBy=created_at --filter.limit=1 --filter.asc
+
+Retrieve workflows present in other pages by specifying the limit and page number:
+::
+
+  flytectl get -p flytesnacks -d development workflow --filter.limit=10 --filter.page 2
 
 Retrieve all the workflows within project and domain in yaml format:
 
@@ -87,6 +92,7 @@ Options
       --filter.asc                    Specifies the sorting order. By default flytectl sort result in descending order
       --filter.fieldSelector string   Specifies the Field selector
       --filter.limit int32            Specifies the limit (default 100)
+      --filter.page int32             Specifies the page number,  in case there are multiple pages of results (default 1)
       --filter.sortBy string          Specifies which field to sort results  (default "created_at")
   -h, --help                          help for workflow
       --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case
