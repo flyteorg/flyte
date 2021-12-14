@@ -10,13 +10,42 @@ We propose a way to override the default behavior of [caching task executions](h
 
 ## 2 Motivation
 
-The behavior displayed by the cache, in some cases, does not match the users intuitions. 
+The behavior displayed by the cache, in some cases, does not match the users intuitions. For example, this code makes use of pandas dataframes:
 
-A good example of this involves pandas dataframes. As the system currently stands, we cannot honor the promise that cache keys will take into the account the value of the dataframes, because of how we represent dataframes in the backend.
+```python
+@task
+def foo(a: int, b: str) -> pd.DataFrame:
+    df = pd.Dataframe(...)
+    ...
+    return df
+
+@task(cached=True, version="1.0")
+def bar(df: pd.Dataframe) -> int:
+    ...
+    
+@workflow
+def wf(a: int, b: str):
+    df = foo(a=a, b=b) 
+    v = bar(df=df)
+```
+
+As the system currently stands, calls to `bar` will never be cached. We cannot honor the promise that cache keys will take into the account the value of the dataframes, because of how we represent dataframes in the backend.
 
 This RFC discusses how to extend this model to allow users to override the representation of objects used for caching purposes.
 
 ## 3 Proposed Implementation
+
+First we're going to enumerate the problems tackled in this proposal and discuss an implementation for each one. Namely:
+  1. how to model cache-by-value semantics for non-Flyte objects?
+  2. how to signal to users the mismatch in expectations when a cached task expects one of its inputs to have the hash overridden?
+
+### Problem 1: Cache-by-value semantics for non-Flyte objects
+
+For a certain category of objects, for example pandas dataframes, in order to pass data around in a performant way, Flyte writes the actual data to an object in the configured blob store and uses the path to this random object as part of the representation of the object. In other words, from the perspective of the backend, for all intents and purposes we offer cache-by-reference semantics for these objects. 
+
+So how to offer a cache-by-value semantics for the case of offloaded objects? We're going to expose a way for users to override the hash of objects and use that hash as part of the caching computation.
+
+#### Exposing a hash in Literals
 
 We will expose a new field in [Literal](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79) objects called `hash`, which will be used to represent that literal in cache key calculations. 
 
@@ -50,7 +79,7 @@ It's worth noting that this is a strictly opt-in feature, controlled at the leve
 
 In the backend, during the construction of the cache key, prior to calling data catalog, in case the `hash` field is set, we will use it to represent the literal, otherwise we will keep [the current behavior](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79). A similar reasoning applies to the local executions case.
 
-### Adding the hash to FlyteIDL
+#### Adding the hash to FlyteIDL
 
 The ``Literal`` will contain a new field of type string:
 
@@ -73,7 +102,7 @@ message Literal {
 }
 ```
 
-### Flytekit 
+#### Flytekit 
 
 The crux of the mechanics in flytekit revolves around how to expose enough flexibility to allow for arbitrary hash functions to be used, while at the same time providing enough information to flytekit. We propose the use of a `HashMethod` metadata object used in annotated return types. The idea being that during the process of converting from a python value to a literal we apply that hash method and set it in the literal.
 
@@ -81,11 +110,11 @@ We'll lean on [`typing.Annotated`](https://docs.python.org/3/library/typing.html
 
 Since we cannot assume any hashing characteristics of the hash functions (since we are not talking about perfect hashing in the general case), the `HashMethod` will expose a simple interface, composed of a callable of type `Callable[[T], str]`. That said, we will provide plenty of examples to showcase the flexibility of this approach.
 
-### Cache key calculation
+#### Cache key calculation
 
 As mentioned above, during the regular cache key calculation, in both the local and the remote cases, flyte takes the input literal map as part of the key. Going forward we will allow for specific literals in that map to use the overridden hash as the representation of that literal.
 
-### Other clients
+#### Other clients
 
 Although nothing prevents the adoption of this feature in other clients, flytekit-java and other clients are outside of the scope of this RFC.
 
