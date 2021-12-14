@@ -181,12 +181,20 @@ Deployment
 We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with deploying the sandbox
 Flyte configuration on your remote cluster.
 
-#. The Flyte sandbox can be deployed with a single command ::
 
-    kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
+#. The Flyte sandbox can be deployed via a helm chart. From the root dir of the flyte repo run ::
 
-#. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows::
+    helm repo add flyte https://flyteorg.github.io/flyte
+    helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte
 
-    kubectl port-forward --address 0.0.0.0 svc/envoy 30081:80 -n projectcontour
+#. For customisations instructions, see ``/charts/flyte/README.md`` in the flyte repo.
 
-#. Open console http://localhost:30081/console.
+#. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows ::
+
+    kubectl port-forward --address 0.0.0.0 svc/flyte-contour-envoy 30090:80 -n flyte
+
+#. Open console http://localhost:30090/console.
+
+#. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
+
+    flytectl config init --host='localhost:30090'
