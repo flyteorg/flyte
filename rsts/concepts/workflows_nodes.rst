@@ -41,8 +41,8 @@ In addition, a failure handler will catch and process execution failures.
 Versioning
 ----------
 
-Like :ref:`tasks <divedeep-tasks>`, workflows are versioned. Registered workflows are also immutable, meaning that an instance of a
-workflow defined by project, domain, name and version cannot be updated.
+Like :ref:`tasks <divedeep-tasks>`, workflows are versioned. Registered workflows are immutable, i.e., an instance of a
+workflow defined by project, domain, name and version can't be updated.
 Tasks referenced in a workflow version are themselves immutable and are tied to specific tasks' versions.
 
 Executions
