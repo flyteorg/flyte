@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.35.0](http://github.com/lyft/flyteconsole/compare/v0.34.0...v0.35.0) (2021-12-15)
+
+
+### Features
+
+* integrate analytics ([#244](http://github.com/lyft/flyteconsole/issues/244)) ([2726b07](http://github.com/lyft/flyteconsole/commit/2726b07a012a8a12b35752fbe714e1a148f630f7))
+
 # [0.34.0](http://github.com/lyft/flyteconsole/compare/v0.33.1...v0.34.0) (2021-12-09)
 
 
