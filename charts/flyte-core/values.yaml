@@ -49,6 +49,8 @@ flyteadmin:
     annotations: {}
     # -- ImapgePullSecrets to automatically assign to the service account
     imagePullSecrets: {}
+    # -- Should a ClusterRole be created for Flyteadmin
+    createClusterRole: true
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- nodeSelector for Flyteadmin deployment
@@ -364,7 +366,7 @@ configmap:
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
   schedulerConfig:
     scheduler:
-      metricsScope: 'flyte:'
+      metricsScope: "flyte:"
       profilerPort: 10254
 
   # -- FlyteAdmin server configuration
@@ -459,7 +461,7 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
-      clientId: '{{ .Values.secrets.adminOauthClientCredentials.clientId }}'
+      clientId: "{{ .Values.secrets.adminOauthClientCredentials.clientId }}"
       clientSecretLocation: /etc/secrets/client_secret
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
