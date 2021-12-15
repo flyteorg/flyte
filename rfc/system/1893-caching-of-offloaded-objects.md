@@ -118,6 +118,45 @@ As mentioned above, during the regular cache key calculation, flyte takes the in
 
 Although nothing prevents the adoption of this feature in other clients, flytekit-java and other clients are outside of the scope of this RFC.
 
+### Problem 2: Bubbling up caching information
+
+A natural question to ask is in what ways we can help users in the process of authoring and visualizing workflows that use these hash-annotated objects? 
+
+First of all, we're going to augment the [`LiteralType` metadata](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/types.proto#L91) with a `hashable` field. Setting this field will indicate that for that type we expect the hash to be overridden in case that type is used as an input in a cacheable task.
+
+#### At registration time
+
+*For the purposes of this discussion, every time we mention cached tasks in this section we are assuming that we're talking about tasks where the cache bit is set to True and that at least one of the input types is hashable.*
+
+During the registration phase we will be able to detect cases where cached tasks inputs do not set the `hashable` field, even though they should in most cases. For example, by doing this we're able to catch the following case:
+
+```python
+@task
+def foo(a: int, b: str) -> pd.DataFrame:
+    df = pd.Dataframe(...)
+    ...
+    return df
+
+@task(cached=True, version="1.0")
+def bar(df: pd.Dataframe) -> int:
+    ...
+    
+@workflow
+def wf(a: int, b: str):
+    df = foo(a=a, b=b)
+    # At registration time we will be able to signal to the user that calls to the task `bar` will never be cached, since that even though the hashable bit is set,
+    # the upstream task is not returning a hash-annotated object.
+    v = bar(df=df) 
+    ...
+```
+
+Whenever we detect such cases, we'll raise a warning at registration time, telling the user that it's very likely that they forgot to annotate the return type of `foo`. It's worth noting that we are able to tach this case, but in the general case, users will have to decide if such warnings are valid.
+
+#### During cache hits
+
+We're going to augment the [metadata](https://github.com/flyteorg/flyteidl/blob/989fe6e4f51eed3a5a68b8f563244bd38b765f4c/protos/flyteidl/admin/node_execution.proto#L175) returned by flytepropeller to indicate that the hash was used. We'll investigate ways to display this information in flyteconsole in the case of cached tasks.
+
+
 ## 4 Metrics & Dashboards
 
 N/A?
