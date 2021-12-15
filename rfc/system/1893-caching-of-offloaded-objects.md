@@ -112,7 +112,7 @@ Since we cannot assume any hashing characteristics of the hash functions (since 
 
 #### Cache key calculation
 
-As mentioned above, during the regular cache key calculation, in both the local and the remote cases, flyte takes the input literal map as part of the key. Going forward we will allow for specific literals in that map to use the overridden hash as the representation of that literal.
+As mentioned above, during the regular cache key calculation, flyte takes the input literal map as part of the key to generate a tag, which is then associated with the artifact (i.e. the task output). Going forward we will associate multiple tags, with and without the hashes, so that lookups still work transparently for both references and hash-annotated values.
 
 #### Other clients
 
