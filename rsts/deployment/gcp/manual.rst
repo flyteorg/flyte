@@ -128,6 +128,8 @@ Development
    * storage.buckets.get
    * storage.objects.create
    * storage.objects.delete
+   * storage.objects.update
+   * storage.objects.get
 * Create a new role FlyteAdminRole with following permissions
    * storage.buckets.get
    * storage.objects.create
