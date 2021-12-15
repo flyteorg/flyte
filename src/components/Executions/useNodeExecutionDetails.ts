@@ -1,5 +1,3 @@
-
-   
 import { log } from 'common/log';
 import { QueryType } from 'components/data/types';
 import { fetchTaskTemplate } from 'components/Task/taskQueries';
@@ -73,7 +71,7 @@ function createBranchNodeExecutionDetails(
 ): NodeExecutionDetails {
     return {
         displayId: node.id,
-        displayName: "branchNode",
+        displayName: 'branchNode',
         displayType: NodeExecutionDisplayType.BranchNode
     };
 }

@@ -1,9 +1,10 @@
 import { Dialog, DialogContent } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import * as React from 'react';
 import { ClosableDialogTitle } from 'components/common/ClosableDialogTitle';
 import { useVersion } from 'components/hooks/useVersion';
-import * as React from 'react';
+import { env } from 'common/env';
 
 const { version: platformVersion } = require('../../../package.json');
 
@@ -72,6 +73,8 @@ export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({
               )
             : null;
 
+    const { DISABLE_GA } = env;
+
     return (
         <Dialog
             PaperProps={{ className: styles.dialog }}
@@ -106,6 +109,16 @@ export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({
                         target="_blank"
                     >
                         {adminVersion}
+                    </Link>
+                </div>
+                <div className={styles.versionWrapper}>
+                    <span>Google Analytics</span>
+                    <Link
+                        href={`https://github.com/flyteorg/flyteconsole#google-analytics`}
+                        className={styles.version}
+                        target="_blank"
+                    >
+                        {DISABLE_GA === 'false' ? 'Active' : 'Inactive'}
                     </Link>
                 </div>
                 <div className={styles.link}>Documentation Link:</div>
