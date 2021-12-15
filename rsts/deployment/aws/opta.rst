@@ -100,11 +100,8 @@ module) with encryption and principle of least privilege RBAC access like the SQ
 
 Secure IAM Roles for Data and Control Planes
 ********************************************
-
-
-Flyte Deployment via Helm
-*************************
-Flyte deployment contains around 50 Kubernetes resources.
+The aws-iam-role module in ``flyte.yaml`` creates IAM roles for the data and control planes of the Flyte service. You can read more about it
+`here <https://docs.opta.dev/reference/aws/service_modules/aws-iam-role/>`__.
 
 Additional Setup
 ----------------
