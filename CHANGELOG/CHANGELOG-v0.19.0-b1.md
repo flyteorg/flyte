@@ -1,3 +1,3 @@
-# 0.19.0b1 Release ChangeLog
+# 0.19.0-b1 Release ChangeLog
 
 * Make ClusterRole creation optional
