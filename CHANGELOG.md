@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.36.0](http://github.com/lyft/flyteconsole/compare/v0.35.0...v0.36.0) (2021-12-15)
+
+
+### Features
+
+* update node list view and add executions bar chart ([#252](http://github.com/lyft/flyteconsole/issues/252)) ([cca633e](http://github.com/lyft/flyteconsole/commit/cca633e1b597b5a4d22ba30f19d75eaf6fa3a1ff))
+
 # [0.35.0](http://github.com/lyft/flyteconsole/compare/v0.34.0...v0.35.0) (2021-12-15)
 
 
