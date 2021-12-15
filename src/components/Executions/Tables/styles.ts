@@ -138,8 +138,12 @@ export const useColumnStyles = makeStyles((theme: Theme) => ({
             marginLeft: theme.spacing(nameColumnLeftMarginGridWidth)
         }
     },
+    columnNodeId: {
+        flexBasis: nodeExecutionsTableColumnWidths.nodeId
+    },
     columnType: {
-        flexBasis: nodeExecutionsTableColumnWidths.type
+        flexBasis: nodeExecutionsTableColumnWidths.type,
+        textTransform: 'capitalize'
     },
     columnStatus: {
         display: 'flex',

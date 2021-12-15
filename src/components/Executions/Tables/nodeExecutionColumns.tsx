@@ -31,28 +31,25 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     const detailsQuery = useNodeExecutionDetails(execution);
     const commonStyles = useCommonStyles();
     const styles = useColumnStyles();
-    const nodeId = execution.id.nodeId;
 
     const isSelected =
         state.selectedExecution != null &&
         isEqual(execution.id, state.selectedExecution);
 
-    const renderReadableName = ({
-        displayId,
-        displayName
-    }: NodeExecutionDetails) => {
+    const renderReadableName = ({ displayName }: NodeExecutionDetails) => {
+        const truncatedName = displayName?.split('.').pop() || '';
         const readableName = isSelected ? (
             <Typography
                 variant="body1"
                 className={styles.selectedExecutionName}
             >
-                {displayId || nodeId}
+                {truncatedName}
             </Typography>
         ) : (
             <SelectNodeExecutionLink
                 className={commonStyles.primaryLink}
                 execution={execution}
-                linkText={displayId || nodeId}
+                linkText={truncatedName || ''}
                 state={state}
             />
         );
@@ -75,12 +72,24 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     );
 };
 
+const NodeExecutionDisplayId: React.FC<NodeExecutionCellRendererData> = ({
+    execution
+}) => {
+    const detailsQuery = useNodeExecutionDetails(execution);
+    const extractDisplayId = ({ displayId }: NodeExecutionDetails) =>
+        displayId || execution.id.nodeId;
+    return <WaitForQuery query={detailsQuery}>{extractDisplayId}</WaitForQuery>;
+};
+
 const NodeExecutionDisplayType: React.FC<NodeExecutionCellRendererData> = ({
     execution
 }) => {
     const detailsQuery = useNodeExecutionDetails(execution);
-    const extractDisplayType = ({ displayType }: NodeExecutionDetails) =>
-        displayType;
+    const extractDisplayType = ({ displayType }: NodeExecutionDetails) => (
+        <Typography color="textSecondary">
+            {displayType || execution.id.nodeId}
+        </Typography>
+    );
     return (
         <WaitForQuery query={detailsQuery}>{extractDisplayType}</WaitForQuery>
     );
@@ -108,7 +117,19 @@ export function generateColumns(
             cellRenderer: props => <NodeExecutionName {...props} />,
             className: styles.columnName,
             key: 'name',
-            label: 'node'
+            label: 'task name'
+        },
+        {
+            cellRenderer: props => <NodeExecutionDisplayId {...props} />,
+            className: styles.columnNodeId,
+            key: 'nodeId',
+            label: 'node id'
+        },
+        {
+            cellRenderer: props => <NodeExecutionDisplayType {...props} />,
+            className: styles.columnType,
+            key: 'type',
+            label: 'type'
         },
         {
             cellRenderer: ({
@@ -132,12 +153,6 @@ export function generateColumns(
             className: styles.columnStatus,
             key: 'phase',
             label: 'status'
-        },
-        {
-            cellRenderer: props => <NodeExecutionDisplayType {...props} />,
-            className: styles.columnType,
-            key: 'type',
-            label: 'type'
         },
         {
             cellRenderer: ({ execution: { closure } }) => {

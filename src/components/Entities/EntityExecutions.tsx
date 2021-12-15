@@ -45,7 +45,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
 
     const baseFilters = React.useMemo(
         () => executionFilterGenerator[resourceType](id),
-        [id]
+        [id, resourceType]
     );
 
     const executions = useWorkflowExecutions(

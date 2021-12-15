@@ -11,6 +11,7 @@ export const nodeExecutionsTableColumnWidths = {
     duration: 100,
     logs: 225,
     type: 144,
+    nodeId: 144,
     name: 380,
     phase: 150,
     startedAt: 200

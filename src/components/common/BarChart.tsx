@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         '&:last-child': {
             marginRight: 0
@@ -35,7 +36,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     itemBar: {
         borderRadius: 2,
-        flex: 1,
         marginRight: theme.spacing(0.25),
         minHeight: theme.spacing(0.75),
         cursor: 'pointer',

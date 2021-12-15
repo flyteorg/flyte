@@ -63,9 +63,13 @@ describe('NodeExecutionsTable', () => {
     const shouldUpdateFn = (nodeExecutions: NodeExecution[]) =>
         nodeExecutions.some(ne => !nodeExecutionIsTerminal(ne));
 
-    const selectNode = async (container: HTMLElement, nodeId: string) => {
+    const selectNode = async (
+        container: HTMLElement,
+        truncatedName: string,
+        nodeId: string
+    ) => {
         const nodeNameAnchor = await waitFor(() =>
-            getByText(container, nodeId)
+            getByText(container, truncatedName)
         );
         fireEvent.click(nodeNameAnchor);
         // Wait for Details Panel to render and then for the nodeId header
@@ -500,10 +504,13 @@ describe('NodeExecutionsTable', () => {
         it('should render updated state if selected nodeExecution object changes', async () => {
             nodeExecution.closure.phase = NodeExecutionPhase.RUNNING;
             updateNodeExecutions([nodeExecution]);
+            const truncatedName =
+                fixture.tasks.python.id.name.split('.').pop() || '';
             // Render table, click first node
             const { container } = renderTable();
             const detailsPanel = await selectNode(
                 container,
+                truncatedName,
                 nodeExecution.id.nodeId
             );
             expect(getByText(detailsPanel, 'Running')).toBeInTheDocument();
@@ -535,8 +542,14 @@ describe('NodeExecutionsTable', () => {
                     dynamicTaskNameEl,
                     'listitem'
                 );
-                await expandParentNode(dynamicRowEl);
-                await selectNode(container, childNodeExecution.id.nodeId);
+                const parentNodeEl = await expandParentNode(dynamicRowEl);
+                const truncatedName =
+                    fixture.tasks.python.id.name.split('.').pop() || '';
+                await selectNode(
+                    parentNodeEl[0],
+                    truncatedName,
+                    childNodeExecution.id.nodeId
+                );
 
                 // Wait for Details Panel to render and then for the nodeId header
                 const detailsPanel = await waitFor(() =>

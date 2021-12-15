@@ -9,10 +9,8 @@ import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/
 import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
 import { SortDirection } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
-import { Execution, WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { Execution } from 'models/Execution/types';
 import { executionSortFields } from 'models/Execution/constants';
-import { Routes } from 'routes/routes';
-import { history } from 'routes/history';
 import { executionFilterGenerator } from './generators';
 import {
     getWorkflowExecutionPhaseConstants,
@@ -36,7 +34,10 @@ export interface EntityExecutionsBarChartProps {
     chartIds: string[];
 }
 
-const getExecutionTimeData = (executions: Execution[], fillSize = 100) => {
+export const getExecutionTimeData = (
+    executions: Execution[],
+    fillSize = 100
+) => {
     const newExecutions = [...executions].reverse().map(execution => {
         const duration = getWorkflowExecutionTimingMS(execution)?.duration || 1;
         return {
@@ -66,14 +67,14 @@ const getExecutionTimeData = (executions: Execution[], fillSize = 100) => {
     }
     return new Array(fillSize - newExecutions.length)
         .fill(0)
-        .map(_ => ({
+        .map(() => ({
             value: 1,
             color: '#e5e5e5'
         }))
         .concat(newExecutions);
 };
 
-const getStartExecutionTime = (executions: Execution[]) => {
+export const getStartExecutionTime = (executions: Execution[]) => {
     if (executions.length === 0) {
         return '';
     }
