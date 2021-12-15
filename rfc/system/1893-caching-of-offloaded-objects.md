@@ -37,13 +37,13 @@ This RFC discusses how to extend this model to allow users to override the repre
 
 First we're going to enumerate the problems tackled in this proposal and discuss an implementation for each one. Namely:
   1. how to model cache-by-value semantics for non-Flyte objects?
-  2. how to signal to users the mismatch in expectations when a cached task expects one of its inputs to have the hash overridden?
+  2. how to signal to users that a cached tasks contain hashable objects?
 
 ### Problem 1: Cache-by-value semantics for non-Flyte objects
 
 For a certain category of objects, for example pandas dataframes, in order to pass data around in a performant way, Flyte writes the actual data to an object in the configured blob store and uses the path to this random object as part of the representation of the object. In other words, from the perspective of the backend, for all intents and purposes we offer cache-by-reference semantics for these objects. 
 
-So how to offer a cache-by-value semantics for the case of offloaded objects? We're going to expose a way for users to override the hash of objects and use that hash as part of the caching computation.
+So how to offer a cache-by-value semantics for the case of these offloaded objects? We're going to expose a way for users to override the hash of objects and use that hash as part of the caching computation.
 
 #### Exposing a hash in Literals
 
@@ -106,7 +106,7 @@ message Literal {
 
 The crux of the mechanics in flytekit revolves around how to expose enough flexibility to allow for arbitrary hash functions to be used, while at the same time providing enough information to flytekit. We propose the use of a `HashMethod` metadata object used in annotated return types. The idea being that during the process of converting from a python value to a literal we apply that hash method and set it in the literal.
 
-We'll lean on [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated) to check the types and annotations. 
+We'll lean on [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated) to annotate types with `HashMethod` objects.
 
 Since we cannot assume any hashing characteristics of the hash functions (since we are not talking about perfect hashing in the general case), the `HashMethod` will expose a simple interface, composed of a callable of type `Callable[[T], str]`. That said, we will provide plenty of examples to showcase the flexibility of this approach.
 
@@ -126,9 +126,9 @@ First of all, we're going to augment the [`LiteralType` metadata](https://github
 
 #### At registration time
 
-*For the purposes of this discussion, every time we mention cached tasks in this section we are assuming that we're talking about tasks where the cache bit is set to True and that at least one of the input types is hashable.*
+During the registration phase we will be able to detect cases where cached tasks[^1] inputs do not set the `hashable` field, even though they should in most cases. For example, by doing this we're able to catch the following case:
 
-During the registration phase we will be able to detect cases where cached tasks inputs do not set the `hashable` field, even though they should in most cases. For example, by doing this we're able to catch the following case:
+[^1]: For the purposes of this discussion, every time we mention cached tasks in this section we are assuming that we're talking about tasks where the cache bit is set to True and that at least one of the input types is hashable.
 
 ```python
 @task
