@@ -128,6 +128,8 @@ Development
    * storage.buckets.get
    * storage.objects.create
    * storage.objects.delete
+   * storage.objects.update
+   * storage.objects.get
 * Create a new role FlyteAdminRole with following permissions
    * storage.buckets.get
    * storage.objects.create
@@ -416,7 +418,7 @@ Installing Flyte
 
 .. code-block:: bash
 
-   curl https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte/values-gcp.yaml >values-gcp.yaml
+   curl https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-gcp.yaml >values-gcp.yaml
 
 #. Update values
 
