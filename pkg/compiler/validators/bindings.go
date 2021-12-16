@@ -15,12 +15,17 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 	expectedType *flyte.LiteralType, errs errors.CompileErrors) (
 	resolvedType *flyte.LiteralType, upstreamNodes []c.NodeID, ok bool) {
 
-	switch binding.GetValue().(type) {
+	switch val := binding.GetValue().(type) {
 	case *flyte.BindingData_Collection:
+		if val.Collection == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
 		if expectedType.GetCollectionType() != nil {
-			allNodeIds := make([]c.NodeID, 0, len(binding.GetMap().GetBindings()))
+			allNodeIds := make([]c.NodeID, 0, len(val.Collection.GetBindings()))
 			var subType *flyte.LiteralType
-			for _, v := range binding.GetCollection().GetBindings() {
+			for _, v := range val.Collection.GetBindings() {
 				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope()); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
@@ -34,12 +39,17 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			}, allNodeIds, !errs.HasErrors()
 		}
 
-		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), binding.GetCollection().String()))
+		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Collection.String()))
 	case *flyte.BindingData_Map:
+		if val.Map == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
 		if expectedType.GetMapValueType() != nil {
-			allNodeIds := make([]c.NodeID, 0, len(binding.GetMap().GetBindings()))
+			allNodeIds := make([]c.NodeID, 0, len(val.Map.GetBindings()))
 			var subType *flyte.LiteralType
-			for _, v := range binding.GetMap().GetBindings() {
+			for _, v := range val.Map.GetBindings() {
 				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope()); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
@@ -53,12 +63,17 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			}, allNodeIds, !errs.HasErrors()
 		}
 
-		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), binding.GetMap().String()))
+		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Map.String()))
 	case *flyte.BindingData_Promise:
-		if upNode, found := validateNodeID(w, binding.GetPromise().NodeId, errs.NewScope()); found {
-			v, err := typing.ParseVarName(binding.GetPromise().GetVar())
+		if val.Promise == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		if upNode, found := validateNodeID(w, val.Promise.NodeId, errs.NewScope()); found {
+			v, err := typing.ParseVarName(val.Promise.GetVar())
 			if err != nil {
-				errs.Collect(errors.NewSyntaxError(nodeID, binding.GetPromise().GetVar(), err))
+				errs.Collect(errors.NewSyntaxError(nodeID, val.Promise.GetVar(), err))
 				return nil, nil, !errs.HasErrors()
 			}
 
@@ -67,32 +82,37 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, param.Type.String(), expectedType.String()))
+						errs.Collect(errors.NewMismatchingTypesErr(nodeID, val.Promise.Var, param.Type.String(), expectedType.String()))
 					} else {
 						sourceType = cType
 					}
 				}
 
 				if AreTypesCastable(sourceType, expectedType) {
-					binding.GetPromise().NodeId = upNode.GetId()
-					return param.GetType(), []c.NodeID{binding.GetPromise().NodeId}, true
+					val.Promise.NodeId = upNode.GetId()
+					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, sourceType.String(), expectedType.String()))
+				errs.Collect(errors.NewMismatchingTypesErr(nodeID, val.Promise.Var, sourceType.String(), expectedType.String()))
 			}
 		}
 
 		errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
 	case *flyte.BindingData_Scalar:
-		literalType := literalTypeForScalar(binding.GetScalar())
+		if val.Scalar == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		literalType := literalTypeForScalar(val.Scalar)
 		if literalType == nil {
-			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(binding.GetScalar().GetValue()).String()))
+			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if !AreTypesCastable(literalType, expectedType) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
 		}
 
 		if expectedType.GetEnumType() != nil {
-			v := binding.GetScalar().GetPrimitive().GetStringValue()
+			v := val.Scalar.GetPrimitive().GetStringValue()
 			// Let us assert that the bound value is a correct enum Value
 			found := false
 			for _, ev := range expectedType.GetEnumType().Values {
@@ -108,7 +128,12 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 
 		return literalType, []c.NodeID{}, !errs.HasErrors()
 	default:
-		errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(binding.GetValue()).String()))
+		bindingType := ""
+		if val != nil {
+			bindingType = reflect.TypeOf(val).String()
+		}
+
+		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), bindingType))
 	}
 
 	return nil, nil, !errs.HasErrors()
