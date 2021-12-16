@@ -220,7 +220,7 @@ spec:
           {{- include "grpcRoutes" . | nindent 10 -}}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
-    - secretName: {{ .Release.Name }}-flyte-tls
+    - secretName: {{ .Values.common.ingress.tls.secretName | default (printf "%s-flyte-tls" .Release.Name) }}
       hosts:
         - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
