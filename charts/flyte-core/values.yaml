@@ -599,6 +599,25 @@ workflow_notifications:
   enabled: false
   config: {}
 
+# -- **Optional Component**
+# External events are used to send events (unprocessed, as Admin see them) to
+# an SNS topic (or gcp equivalent)
+# The config is here as an example only - if not enabled, it won't be used.
+external_events:
+  enabled: false # this is the helm enable
+  config:
+    externalEvents:
+      enable: true # This is an application level flag
+      type: aws
+      aws:
+        region: us-east-2
+      eventsPublisher:
+        # Make sure this is not a fifo queue. Admin does not yet support
+        # writing to fifo sns topics.
+        topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
+        eventTypes:
+          - all # Or workflow, node, task. Or "*"
+
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:

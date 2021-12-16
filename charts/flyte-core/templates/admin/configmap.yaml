@@ -30,6 +30,11 @@ data:
   notifications.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
+{{- if .Values.external_events.enabled }}
+{{- with .Values.external_events.config }}
+  external_events.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- end }}
 {{- if .Values.cluster_resource_manager.enabled }}
 {{- with .Values.cluster_resource_manager.config }}
   cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
