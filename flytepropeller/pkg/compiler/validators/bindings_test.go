@@ -264,4 +264,61 @@ func TestValidateBindings(t *testing.T) {
 			assert.NoError(t, compileErrors)
 		}
 	})
+
+	t.Run("Nil Binding Value", func(t *testing.T) {
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+		n.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+		})
+
+		n2 := &mocks.NodeBuilder{}
+		n2.OnGetId().Return("node2")
+		n2.OnGetOutputAliases().Return(nil)
+		n2.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"n2_out": {
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+					},
+				},
+			},
+		})
+
+		wf := &mocks.WorkflowBuilder{}
+		wf.OnGetNode("n2").Return(n2, true)
+		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: &core.BindingData{
+					Value: nil, // Error case, the SDK should not produce an empty Value
+				},
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.True(t, compileErrors.HasErrors())
+		assert.Equal(t, 1, len(compileErrors.Errors().List()))
+		t.Log(compileErrors.Error())
+	})
 }
