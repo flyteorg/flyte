@@ -117,6 +117,7 @@ Please maintain an alphabetical order in the following list -->
 - [LatchBio](https://www.latch.bio/)
 - [Lyft](https://www.lyft.com/)
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
+- [MethaneSAT](https://www.methanesat.org/)
 - [RunX.dev](https://runx.dev/)
 - [Spotify](https://www.spotify.com/)
 - [Striveworks](https://striveworks.us/)
