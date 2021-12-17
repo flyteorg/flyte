@@ -59,8 +59,8 @@ Almost any action can be implemented and introduced into Flyte as a "Plugin".
 - Tasks that call web services
 
 Flyte ships with some defaults; for example, running a simple Python function does not need any hosted service. Flyte knows how to
-execute these kinds of tasks on Kubernetes. It turns out these are the vast majority of tasks in ML, and Flyte is deftly adept at 
-handling an enormous scale on Kubernetes; this is achieved by implementing a unique scheduler on top of Kubernetes.
+execute these kinds of tasks on Kubernetes. It turns out these are the vast majority of tasks in ML, and Flyte is adept at 
+handling enormous scale on Kubernetes; this is achieved by implementing a unique scheduler on top of Kubernetes.
 
 Types
 ^^^^^
