@@ -66,5 +66,6 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
 
     tasks
     workflows_nodes
+    nodes
     launchplans_schedules
     executions
