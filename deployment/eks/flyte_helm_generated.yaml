@@ -462,11 +462,7 @@ data:
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
-        redis:
-          hostKey: '<REDIS_HOST_KEY>'
-          hostPath: '<REDIS_HOST_URL>'
-        resourceMaxQuota: 10000
-        type: redis
+        type: noop
   storage.yaml: | 
     storage:
       type: s3
@@ -1208,7 +1204,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "37d4895ee7356850d0dfdbd10f38c723865aa6e4c4b6ed1eb2a4a279dbabbc4"
+        configChecksum: "b9c5ac29b41e88ca6bf2ff18b602f38f9d617b48eb2f885f07f79636c1bf1a2"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1284,7 +1280,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.4
       annotations:
-        configChecksum: "37d4895ee7356850d0dfdbd10f38c723865aa6e4c4b6ed1eb2a4a279dbabbc4"
+        configChecksum: "b9c5ac29b41e88ca6bf2ff18b602f38f9d617b48eb2f885f07f79636c1bf1a2"
     spec:
       securityContext:
         fsGroup: 65534
@@ -1402,8 +1398,7 @@ metadata:
   name: flyte-core
   namespace: flyte
   annotations: 
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
-      { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
     alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -1540,8 +1535,7 @@ metadata:
   name: flyte-core-grpc
   namespace: flyte
   annotations:
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
-      { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
     alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
