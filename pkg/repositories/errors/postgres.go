@@ -7,15 +7,19 @@
 package errors
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"reflect"
 
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
+	"github.com/jackc/pgconn"
 	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
 )
 
 // Postgres error codes
@@ -27,7 +31,7 @@ const (
 // Error message format strings
 const (
 	unexpectedType            = "unexpected error type for: %v"
-	uniqueConstraintViolation = "value with matching %s already exists (%s)"
+	uniqueConstraintViolation = "value with matching already exists (%s)"
 	defaultPgError            = "failed database operation with %s"
 	unsupportedTableOperation = "cannot query with specified table attributes: %s"
 )
@@ -45,33 +49,40 @@ type postgresErrorTransformer struct {
 	metrics postgresErrorTransformerMetrics
 }
 
-func (p *postgresErrorTransformer) fromGormError(err error) errors.FlyteAdminError {
+func (p *postgresErrorTransformer) fromGormError(err error) flyteAdminErrors.FlyteAdminError {
 	switch err.Error() {
 	case gorm.ErrRecordNotFound.Error():
 		p.metrics.NotFound.Inc()
-		return errors.NewFlyteAdminErrorf(codes.NotFound, "entry not found")
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "entry not found")
 		// If we want to intercept other gorm errors, add additional case statements here.
 	default:
 		p.metrics.GormError.Inc()
-		return errors.NewFlyteAdminErrorf(codes.Internal, unexpectedType, err)
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, unexpectedType, err)
 	}
 }
 
-func (p *postgresErrorTransformer) ToFlyteAdminError(err error) errors.FlyteAdminError {
-	pqError, ok := err.(*pq.Error)
+func (p *postgresErrorTransformer) ToFlyteAdminError(err error) flyteAdminErrors.FlyteAdminError {
+	if unwrappedErr := errors.Unwrap(err); unwrappedErr != nil {
+		err = unwrappedErr
+	}
+
+	pqError, ok := err.(*pgconn.PgError)
 	if !ok {
+		logger.Debugf(context.Background(), "Unable to cast to pgconn.PgError. Error type: [%v]",
+			reflect.TypeOf(err))
 		return p.fromGormError(err)
 	}
+
 	switch pqError.Code {
 	case uniqueConstraintViolationCode:
 		p.metrics.AlreadyExistsError.Inc()
-		return errors.NewFlyteAdminErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Constraint, pqError.Message)
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Message)
 	case undefinedTable:
 		p.metrics.UndefinedTable.Inc()
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
 	default:
 		p.metrics.PostgresError.Inc()
-		return errors.NewFlyteAdminError(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Message))
+		return flyteAdminErrors.NewFlyteAdminError(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Message))
 	}
 }
 

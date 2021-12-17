@@ -34,7 +34,6 @@ type Execution struct {
 	// Prefixed with Execution to avoid clashes with gorm.Model UpdatedAt
 	ExecutionUpdatedAt *time.Time
 	Duration           time.Duration
-	ExecutionEvents    []ExecutionEvent
 	// In the case of an aborted execution this string may be non-empty.
 	// It should be ignored for any other value of phase other than aborted.
 	AbortCause string `valid:"length(0|255)"`
@@ -42,8 +41,6 @@ type Execution struct {
 	Mode int32
 	// The "parent" execution (if there is one) that is related to this execution.
 	SourceExecutionID uint
-	// Descendant execution related to this execution.
-	DescendantExecution *Execution
 	// The parent node execution if this was launched by a node
 	ParentNodeExecutionID uint
 	// Cluster where execution was triggered

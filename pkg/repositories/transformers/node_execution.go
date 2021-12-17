@@ -24,7 +24,7 @@ import (
 
 type ToNodeExecutionModelInput struct {
 	Request                      *admin.NodeExecutionEventRequest
-	ParentTaskExecutionID        uint
+	ParentTaskExecutionID        *uint
 	ParentID                     *uint
 	DynamicWorkflowRemoteClosure string
 	InlineEventDataPolicy        interfaces.InlineEventDataPolicy

@@ -183,6 +183,7 @@ func TestAddTerminalState_Error(t *testing.T) {
 }
 
 func TestCreateNodeExecutionModel(t *testing.T) {
+	parentTaskExecID := uint(8)
 	nodeExecutionModel, err := CreateNodeExecutionModel(context.TODO(), ToNodeExecutionModelInput{
 		Request: &admin.NodeExecutionEventRequest{
 			Event: &event.NodeExecutionEvent{
@@ -207,7 +208,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 				},
 			},
 		},
-		ParentTaskExecutionID: 8,
+		ParentTaskExecutionID: &parentTaskExecID,
 	})
 	assert.Nil(t, err)
 
@@ -234,7 +235,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		NodeExecutionCreatedAt: &occurredAt,
 		NodeExecutionUpdatedAt: &occurredAt,
 		NodeExecutionMetadata:  []byte{},
-		ParentTaskExecutionID:  8,
+		ParentTaskExecutionID:  &parentTaskExecID,
 	}, nodeExecutionModel)
 }
 

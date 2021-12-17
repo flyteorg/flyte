@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const innerJoinTableAlias = "entities"
@@ -24,7 +24,7 @@ var resourceTypeToTableName = map[core.ResourceType]string{
 	core.ResourceType_TASK:        taskTableName,
 }
 
-var joinString = "RIGHT JOIN ? AS entities ON named_entity_metadata.resource_type = %d AND " +
+var joinString = "RIGHT JOIN (?) AS entities ON named_entity_metadata.resource_type = %d AND " +
 	"named_entity_metadata.project = entities.project AND named_entity_metadata.domain = entities.domain AND " +
 	"named_entity_metadata.name = entities.name"
 
@@ -41,7 +41,7 @@ func getSubQueryJoin(db *gorm.DB, tableName string, input interfaces.ListNamedEn
 		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
 	}
 
-	return db.Joins(fmt.Sprintf(joinString, input.ResourceType), tx.SubQuery())
+	return db.Joins(fmt.Sprintf(joinString, input.ResourceType), tx)
 }
 
 var leftJoinWorkflowNameToMetadata = fmt.Sprintf(
@@ -121,7 +121,7 @@ func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) 
 			Domain:       input.Domain,
 			Name:         input.Name,
 		},
-	}).Assign(input.NamedEntityMetadataFields).FirstOrCreate(&metadata)
+	}).Assign(input.NamedEntityMetadataFields).Omit("id").FirstOrCreate(&metadata)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)

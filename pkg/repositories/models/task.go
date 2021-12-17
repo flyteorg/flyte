@@ -5,8 +5,8 @@ package models
 
 // Task primary key
 type TaskKey struct {
-	Project string `gorm:"primary_key;index:task_project_domain_name_idx,task_project_domain_idx" valid:"length(0|255)"`
-	Domain  string `gorm:"primary_key;index:task_project_domain_name_idx,task_project_domain_idx" valid:"length(0|255)"`
+	Project string `gorm:"primary_key;index:task_project_domain_name_idx;index:task_project_domain_idx" valid:"length(0|255)"`
+	Domain  string `gorm:"primary_key;index:task_project_domain_name_idx;index:task_project_domain_idx" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;index:task_project_domain_name_idx" valid:"length(0|255)"`
 	Version string `gorm:"primary_key" valid:"length(0|255)"`
 }

@@ -3,8 +3,8 @@ package config
 import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	schedulerModels "github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/jinzhu/gorm"
-	gormigrate "gopkg.in/gormigrate.v1"
+	gormigrate "github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
 )
 
 var Migrations = []*gormigrate.Migration{
@@ -12,10 +12,10 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-05-22-projects",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Project{}).Error
+			return tx.AutoMigrate(&models.Project{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("projects").Error
+			return tx.Migrator().DropTable("projects")
 		},
 	},
 	// Create Task
@@ -25,30 +25,30 @@ var Migrations = []*gormigrate.Migration{
 			// The gormigrate library recommends that we copy the actual struct into here for record-keeping but after
 			// some internal discussion we've decided that that's not necessary. Just a history of what we've touched
 			// when should be sufficient.
-			return tx.AutoMigrate(&models.Task{}).Error
+			return tx.AutoMigrate(&models.Task{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("tasks").Error
+			return tx.Migrator().DropTable("tasks")
 		},
 	},
 	// Create Workflow
 	{
 		ID: "2018-05-23-workflows",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Workflow{}).Error
+			return tx.AutoMigrate(&models.Workflow{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("workflows").Error
+			return tx.Migrator().DropTable("workflows")
 		},
 	},
 	// Create Launch Plan table
 	{
 		ID: "2019-05-23-lp",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.LaunchPlan{}).Error
+			return tx.AutoMigrate(&models.LaunchPlan{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("launch_plans").Error
+			return tx.Migrator().DropTable("launch_plans")
 		},
 	},
 
@@ -56,20 +56,20 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-05-23-executions",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}).Error
+			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("executions").Error
+			return tx.Migrator().DropTable("executions")
 		},
 	},
 	// Create executions events table
 	{
 		ID: "2019-01-29-executions-events",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.ExecutionEvent{}).Error
+			return tx.AutoMigrate(&models.ExecutionEvent{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("executions_events").Error
+			return tx.Migrator().DropTable("executions_events")
 		},
 	},
 
@@ -77,30 +77,30 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-04-17-node-executions",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&NodeExecution{}).Error
+			return tx.AutoMigrate(&NodeExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("node_executions").Error
+			return tx.Migrator().DropTable("node_executions")
 		},
 	},
 	// Create node executions events table
 	{
 		ID: "2019-01-29-node-executions-events",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NodeExecutionEvent{}).Error
+			return tx.AutoMigrate(&models.NodeExecutionEvent{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("node_executions_events").Error
+			return tx.Migrator().DropTable("node_executions_events")
 		},
 	},
 	// Create task executions table
 	{
 		ID: "2019-03-16-task-executions",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&TaskExecution{}).Error
+			return tx.AutoMigrate(&TaskExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("task_executions").Error
+			return tx.Migrator().DropTable("task_executions")
 		},
 	},
 	// Update node executions with null parent values
@@ -114,7 +114,7 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-09-27-executions",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}).Error
+			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS cluster").Error
@@ -124,7 +124,7 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-10-09-project-description",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Project{}).Error
+			return tx.AutoMigrate(&models.Project{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Exec("ALTER TABLE projects DROP COLUMN IF EXISTS description").Error
@@ -134,7 +134,7 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-10-15-offload-inputs",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}).Error
+			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsURI, DROP COLUMN IF EXISTS UserInputsURI").Error
@@ -144,27 +144,27 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2019-11-05-named-entity-metadata",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NamedEntityMetadata{}).Error
+			return tx.AutoMigrate(&models.NamedEntityMetadata{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("named_entity_metadata").Error
+			return tx.Migrator().DropTable("named_entity_metadata")
 		},
 	},
 	// Add ProjectAttributes with custom resource attributes.
 	{
 		ID: "2020-01-10-resource",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Resource{}).Error
+			return tx.AutoMigrate(&models.Resource{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("resources").Error
+			return tx.Migrator().DropTable("resources")
 		},
 	},
 	// Add Type to Task model.
 	{
 		ID: "2020-03-17-task-type",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Task{}).Error
+			return tx.AutoMigrate(&models.Task{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Exec("ALTER TABLE tasks DROP COLUMN IF EXISTS type").Error
@@ -174,10 +174,10 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2020-04-03-named-entity-state",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NamedEntityMetadata{}).Error
+			return tx.AutoMigrate(&models.NamedEntityMetadata{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Table("named_entity_metadata").DropColumn("state").Error
+			return tx.Table("named_entity_metadata").Migrator().DropColumn(&models.NamedEntityMetadata{}, "state")
 		},
 	},
 	// Set default state value for workflow model
@@ -204,20 +204,29 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2020-04-29-executions",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}, &models.NodeExecution{}).Error
+			return tx.AutoMigrate(&models.Execution{}, &models.NodeExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			if err := tx.Model(&models.Execution{}).DropColumn("error_code").DropColumn("error_kind").Error; err != nil {
+			if err := tx.Model(&models.Execution{}).Migrator().DropColumn(&models.Execution{}, "error_code"); err != nil {
 				return err
 			}
-			return tx.Model(&models.NodeExecution{}).DropColumn("error_code").DropColumn("error_kind").Error
+			if err := tx.Model(&models.Execution{}).Migrator().DropColumn(&models.Execution{}, "error_kind"); err != nil {
+				return err
+			}
+			if err := tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "error_code"); err != nil {
+				return err
+			}
+			if err := tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "error_kind"); err != nil {
+				return err
+			}
+			return nil
 		},
 	},
 	// Add TaskID to Execution model.
 	{
 		ID: "2020-04-14-task-type",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}).Error
+			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS task_id").Error
@@ -228,55 +237,49 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2020-07-27-cachestatus",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NodeExecution{}).Error
+			return tx.AutoMigrate(&models.NodeExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.NodeExecution{}).DropColumn("cache_status").Error
+			return tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "cache_status")
 		},
 	},
 	{
 		ID: "2020-07-31-node-execution",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NodeExecution{}).Error
+			return tx.AutoMigrate(&models.NodeExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.NodeExecution{}).DropColumn("parent_id").DropColumn("node_execution_metadata").Error
-		},
-	},
-	{
-		ID: "2020-08-13-node-execution",
-		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NodeExecution{}).Error
-		},
-		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.NodeExecution{}).DropColumn("parent_id").DropColumn("node_execution_metadata").Error
+			if err := tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "parent_id"); err != nil {
+				return err
+			}
+			return tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "node_execution_metadata")
 		},
 	},
 	{
 		ID: "2020-08-17-labels-addition",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Project{}).Error
+			return tx.AutoMigrate(&models.Project{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.Project{}).DropColumn("labels").Error
+			return tx.Model(&models.Project{}).Migrator().DropColumn(&models.Project{}, "labels")
 		},
 	},
 	{
 		ID: "2020-09-01-task-exec-idx",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&TaskExecution{}).Error
+			return tx.AutoMigrate(&TaskExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&TaskExecution{}).RemoveIndex("idx_task_executions_exec").Error
+			return tx.Model(&TaskExecution{}).Migrator().DropIndex(&TaskExecution{}, "idx_task_executions_exec")
 		},
 	},
 	{
 		ID: "2020-11-03-project-state-addition",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Project{}).Error
+			return tx.AutoMigrate(&models.Project{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.Project{}).DropColumn("state").Error
+			return tx.Model(&models.Project{}).Migrator().DropColumn(&models.Project{}, "state")
 		},
 	},
 	{
@@ -291,39 +294,39 @@ var Migrations = []*gormigrate.Migration{
 	{
 		ID: "2021-01-22-execution-user",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Execution{}).Error
+			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.Execution{}).DropColumn("user").Error
+			return tx.Model(&models.Execution{}).Migrator().DropColumn(&models.Execution{}, "user")
 		},
 	},
 	{
 		ID: "2021-04-19-node-execution_dynamic-workflow",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.NodeExecution{}).Error
+			return tx.AutoMigrate(&models.NodeExecution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.NodeExecution{}).DropColumn("dynamic_workflow_remote_closure_reference").Error
+			return tx.Model(&models.NodeExecution{}).Migrator().DropColumn(&models.NodeExecution{}, "dynamic_workflow_remote_closure_reference")
 		},
 	},
 
 	{
 		ID: "2021-07-22-schedulable_entities",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&schedulerModels.SchedulableEntity{}).Error
+			return tx.AutoMigrate(&schedulerModels.SchedulableEntity{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("schedulable_entities").Error
+			return tx.Migrator().DropTable(&schedulerModels.SchedulableEntity{}, "schedulable_entities")
 		},
 	},
 
 	{
 		ID: "2021-08-05-schedulable_entities_snapshot",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&schedulerModels.ScheduleEntitiesSnapshot{}).Error
+			return tx.AutoMigrate(&schedulerModels.ScheduleEntitiesSnapshot{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("schedulable_entities_snapshot").Error
+			return tx.Migrator().DropTable(&schedulerModels.ScheduleEntitiesSnapshot{}, "schedulable_entities_snapshot")
 		},
 	},
 }

@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"database/sql/driver"
 	"testing"
 
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
@@ -48,8 +49,7 @@ func getMockLaunchPlanResponseFromDb(expected models.LaunchPlan) map[string]inte
 	launchPlan["spec"] = expected.Spec
 	launchPlan["workflow_id"] = expected.WorkflowID
 	launchPlan["closure"] = expected.Closure
-	launchPlan["inactive"] = expected.State
-	launchPlan["executions"] = expected.Executions
+	launchPlan["state"] = expected.State
 	return launchPlan
 }
 
@@ -75,9 +75,7 @@ func TestGetLaunchPlan(t *testing.T) {
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "launch_plans"  WHERE "launch_plans"."deleted_at" IS NULL AND ` +
-			`(("launch_plans"."project" = project) AND ("launch_plans"."domain" = domain) AND ` +
-			`("launch_plans"."name" = name) AND ("launch_plans"."version" = XYZ)) LIMIT 1`).WithReply(launchPlans)
+		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 LIMIT 1`).WithReply(launchPlans)
 	output, err := launchPlanRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
@@ -96,13 +94,15 @@ func TestSetInactiveLaunchPlan(t *testing.T) {
 	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	mockDb := GlobalMock.NewMock()
-
+	updated := false
 	mockDb.WithQuery(
-		`UPDATE "launch_plans" SET "closure" = ?, "domain" = ?, "id" = ?, "name" = ?, "project" = ?, ` +
-			`"state" = ?, "updated_at" = ?, "version" = ?  WHERE "launch_plans"."deleted_at" IS NULL AND ` +
-			`"launch_plans"."project" = ? AND "launch_plans"."domain" = ? AND "launch_plans"."name" = ? AND ` +
-			`"launch_plans"."version" = ?`)
+		`UPDATE "launch_plans" SET "id"=$1,"updated_at"=$2,"project"=$3,"domain"=$4,"name"=$5,"version"=$6,"closure"=$7,"state"=$8 WHERE "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			updated = true
+		},
+	)
 
 	err := launchPlanRepo.Update(context.Background(), models.LaunchPlan{
 		BaseModel: models.BaseModel{
@@ -118,7 +118,7 @@ func TestSetInactiveLaunchPlan(t *testing.T) {
 		State:   &inactive,
 	})
 	assert.NoError(t, err)
-	assert.True(t, mockDb.Triggered)
+	assert.True(t, updated)
 }
 
 func TestSetActiveLaunchPlan(t *testing.T) {
@@ -127,11 +127,13 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	mockQuery := GlobalMock.NewMock()
+	updated := false
 	mockQuery.WithQuery(
-		`UPDATE "launch_plans" ` +
-			`SET "closure" = ?, "domain" = ?, "id" = ?, "name" = ?, "project" = ?, "state" = ?, "version" = ?  ` +
-			`WHERE "launch_plans"."deleted_at" IS NULL AND "launch_plans"."project" = ? AND ` +
-			`"launch_plans"."domain" = ? AND "launch_plans"."name" = ? AND "launch_plans"."version" = ?`)
+		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "project" = $8 AND "domain" = $9 AND "name" = $10 AND "version" = $11`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			updated = true
+		},
+	)
 
 	err := launchPlanRepo.SetActive(context.Background(), models.LaunchPlan{
 		BaseModel: models.BaseModel{
@@ -159,18 +161,22 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 		State:   &inactive,
 	})
 	assert.NoError(t, err)
-	assert.True(t, mockQuery.Triggered)
+	assert.True(t, updated)
 }
 
 func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	mockQuery := GlobalMock.NewMock()
+	updated := false
 	mockQuery.WithQuery(
-		`UPDATE "launch_plans" SET "closure" = ?, "domain" = ?, "id" = ?, "name" = ?, "project" = ?, "state" = ?, ` +
-			`"version" = ?  WHERE "launch_plans"."deleted_at" IS NULL AND "launch_plans"."project" = ? AND ` +
-			`"launch_plans"."domain" = ? AND "launch_plans"."name" = ? AND "launch_plans"."version" = ?`)
+		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "project" = $8 AND "domain" = $9 AND "name" = $10 AND "version" = $11`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			updated = true
+		},
+	)
 	err := launchPlanRepo.SetActive(context.Background(), models.LaunchPlan{
 		BaseModel: models.BaseModel{
 			ID: 1,
@@ -185,7 +191,7 @@ func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 		State:   &active,
 	}, nil)
 	assert.NoError(t, err)
-	assert.True(t, mockQuery.Triggered)
+	assert.True(t, updated)
 }
 
 func TestListLaunchPlans(t *testing.T) {
@@ -258,9 +264,7 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "launch_plans".* FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id ` +
-			`WHERE "launch_plans"."deleted_at" IS NULL AND ((launch_plans.project = project) ` +
-			`AND (launch_plans.domain = domain) AND (launch_plans.name = name)) LIMIT 2 OFFSET 1`).WithReply(launchPlans)
+		`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 LIMIT 2 OFFSET 1`).WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -305,8 +309,9 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 	launchPlans = append(launchPlans, launchPlan)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	// Only match on queries that append the name filter
-	GlobalMock.NewMock().WithQuery(`version = ABC`).WithReply(launchPlans[0:1])
+	GlobalMock.NewMock().WithQuery(`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.version = $4 LIMIT 20`).WithReply(launchPlans[0:1])
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -398,14 +403,8 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 	// HACK: gorm orders the filters on join clauses non-deterministically. Ordering of filters doesn't affect
 	// correctness, but because the mocket library only pattern matches on substrings, both variations of the (valid)
 	// SQL that gorm produces are checked below.
-	query := `SELECT "launch_plans".* FROM "launch_plans" inner join workflows on ` +
-		`launch_plans.workflow_id = workflows.id WHERE "launch_plans"."deleted_at" IS NULL AND ` +
-		`((launch_plans.project = project) AND (launch_plans.domain = domain) AND (launch_plans.name = name) AND ` +
-		`(workflows.deleted_at = foo)) LIMIT 20 OFFSET 0`
-	alternateQuery := `SELECT "launch_plans".* FROM "launch_plans" inner join workflows on ` +
-		`launch_plans.workflow_id = workflows.id WHERE "launch_plans"."deleted_at" IS NULL AND ` +
-		`((workflows.deleted_at = foo) AND (launch_plans.project = project) AND (launch_plans.domain = domain) AND ` +
-		`(launch_plans.name = name)) LIMIT 20 OFFSET 0`
+	query := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND (workflows.deleted_at = $4) LIMIT 20`
+	alternateQuery := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND (workflows.deleted_at = $4) LIMIT 20`
 	GlobalMock.NewMock().WithQuery(query).WithReply(launchPlans)
 	GlobalMock.NewMock().WithQuery(alternateQuery).WithReply(launchPlans)
 

@@ -2,13 +2,14 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const workflowTableName = "workflows"
@@ -16,13 +17,13 @@ const workflowTableName = "workflows"
 // Implementation of WorkflowRepoInterface.
 type WorkflowRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer flyteAdminDbErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&input)
+	tx := r.db.Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -42,16 +43,16 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 		},
 	}).Take(&workflow)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
-		return models.Workflow{}, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), &core.Identifier{
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return models.Workflow{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), &core.Identifier{
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
 		})
+	} else if tx.Error != nil {
+		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return workflow, nil
 }
@@ -122,7 +123,7 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 
 // Returns an instance of WorkflowRepoInterface
 func NewWorkflowRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.WorkflowRepoInterface {
+	db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransformer, scope promutils.Scope) interfaces.WorkflowRepoInterface {
 	metrics := newMetrics(scope)
 	return &WorkflowRepo{
 		db:               db,

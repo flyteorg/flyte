@@ -27,6 +27,7 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
+	gormLogger "gorm.io/gorm/logger"
 )
 
 type AdminService struct {
@@ -73,9 +74,13 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	}()
 
 	dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
+	dbLogLevel := gormLogger.Silent
+	if dbConfigValues.Debug {
+		dbLogLevel = gormLogger.Info
+	}
 	dbConfig := repositoryConfig.DbConfig{
 		BaseConfig: repositoryConfig.BaseConfig{
-			IsDebug: dbConfigValues.Debug,
+			LogLevel: dbLogLevel,
 		},
 		Host:         dbConfigValues.Host,
 		Port:         dbConfigValues.Port,

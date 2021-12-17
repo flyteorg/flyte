@@ -8,15 +8,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
-
-	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytestdlib/logger"
+	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
+
+
 )
 
 var workflowExecutionID = &core.WorkflowExecutionIdentifier{
@@ -156,8 +158,21 @@ func populateWorkflowExecutionsForTestingOnly() {
 		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2),
 		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2),
 	}
-	db := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
-	defer db.Close()
+	db, err := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	ctx := context.Background()
+	if err != nil {
+		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		logger.Fatal(ctx, err)
+	}
+
+	defer func(deferCtx context.Context) {
+		if err = sqlDB.Close(); err != nil {
+			logger.Fatal(deferCtx, err)
+		}
+	}(ctx)
 
 	// Insert dummy launch plans;
 	db.Exec(`INSERT INTO launch_plans ("id", "project", "domain", "name", "version", "spec", "closure") ` +

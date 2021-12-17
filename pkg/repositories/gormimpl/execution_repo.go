@@ -2,29 +2,29 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+
+	"gorm.io/gorm"
 )
 
 // Implementation of ExecutionInterface.
 type ExecutionRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&input)
+	tx := r.db.Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -43,15 +43,15 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 		},
 	}).Take(&execution)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
-		return models.Execution{}, errors.GetMissingEntityError("execution", &core.Identifier{
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return models.Execution{}, adminErrors.GetMissingEntityError("execution", &core.Identifier{
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
 		})
+	} else if tx.Error != nil {
+		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return execution, nil
 }
@@ -125,12 +125,12 @@ func (r *ExecutionRepo) Exists(ctx context.Context, input interfaces.Identifier)
 	if tx.Error != nil {
 		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
-	return !tx.RecordNotFound(), nil
+	return true, nil
 }
 
 // Returns an instance of ExecutionRepoInterface
 func NewExecutionRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.ExecutionRepoInterface {
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ExecutionRepoInterface {
 	metrics := newMetrics(scope)
 	return &ExecutionRepo{
 		db:               db,

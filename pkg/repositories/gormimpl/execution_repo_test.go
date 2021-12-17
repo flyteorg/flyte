@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"database/sql/driver"
 	"testing"
 	"time"
 
@@ -42,13 +43,22 @@ func TestCreateExecution(t *testing.T) {
 }
 
 func TestUpdateExecution(t *testing.T) {
-	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-	executionQuery := GlobalMock.NewMock()
-	executionQuery.WithQuery(`UPDATE "executions" SET "closure" = ?, "duration" = ?, "execution_created_at" = ?, ` +
-		`"execution_domain" = ?, "execution_name" = ?, "execution_project" = ?, "execution_updated_at" = ?, ` +
-		`"launch_plan_id" = ?, "phase" = ?, "spec" = ?, "started_at" = ?, "updated_at" = ?, "workflow_id" = ?  ` +
-		`WHERE "executions"."deleted_at" IS NULL`)
+	GlobalMock.Logging = true
+	updated := false
+
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(`UPDATE "executions" SET "updated_at"=$1,"execution_project"=$2,` +
+		`"execution_domain"=$3,"execution_name"=$4,"launch_plan_id"=$5,"workflow_id"=$6,"phase"=$7,"closure"=$8,` +
+		`"spec"=$9,"started_at"=$10,"execution_created_at"=$11,"execution_updated_at"=$12,"duration"=$13 WHERE "` +
+		`execution_project" = $14 AND "execution_domain" = $15 AND "execution_name" = $16`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			updated = true
+		},
+	)
+
+	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	//	`WHERE "executions"."deleted_at" IS NULL`)
 	err := executionRepo.Update(context.Background(),
 		models.Execution{
 			ExecutionKey: models.ExecutionKey{
@@ -67,7 +77,7 @@ func TestUpdateExecution(t *testing.T) {
 			Duration:           time.Hour,
 		})
 	assert.NoError(t, err)
-	assert.True(t, executionQuery.Triggered)
+	assert.True(t, updated)
 }
 
 func getMockExecutionResponseFromDb(expected models.Execution) map[string]interface{} {
@@ -115,10 +125,11 @@ func TestGetExecution(t *testing.T) {
 	executions = append(executions, execution)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
-		`(("executions"."execution_project" = project) AND ("executions"."execution_domain" = domain) AND ` +
-		`("executions"."execution_name" = 1)) LIMIT 1`).WithReply(executions)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE "executions"."execution_project" = $1 AND "executions"."execution_domain" = $2 AND "executions"."execution_name" = $3 LIMIT 1`).WithReply(executions)
+
 	output, err := executionRepo.Get(context.Background(), interfaces.Identifier{
 		Project: "project",
 		Domain:  "domain",
@@ -202,7 +213,7 @@ func TestListExecutions_Filters(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
-	GlobalMock.NewMock().WithQuery(`name = 1`).WithReply(executions[0:1])
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 AND (executions.workflow_id = $4) LIMIT 20`).WithReply(executions[0:1])
 
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -296,12 +307,10 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 	executions = append(executions, execution)
 
 	GlobalMock := mocket.Catcher.Reset()
-	query := `SELECT "executions".* FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id ` +
-		`INNER JOIN tasks ON executions.task_id = tasks.id WHERE "executions"."deleted_at" IS NULL AND ` +
-		`((executions.execution_project = project) AND (executions.execution_domain = domain) AND ` +
-		`(executions.execution_name = 1) AND (workflows.name = workflow_name) AND (tasks.name = task_name)) ` +
-		`LIMIT 20 OFFSET 0`
-	GlobalMock.NewMock().WithQuery(query).WithReply(executions)
+	GlobalMock.Logging = true
+
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(`SELECT "executions"."id","executions"."created_at","executions"."updated_at","executions"."deleted_at","executions"."execution_project","executions"."execution_domain","executions"."execution_name","executions"."launch_plan_id","executions"."workflow_id","executions"."task_id","executions"."phase","executions"."closure","executions"."spec","executions"."started_at","executions"."execution_created_at","executions"."execution_updated_at","executions"."duration","executions"."abort_cause","executions"."mode","executions"."source_execution_id","executions"."parent_node_execution_id","executions"."cluster","executions"."inputs_uri","executions"."user_inputs_uri","executions"."error_kind","executions"."error_code","executions"."user" FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id INNER JOIN tasks ON executions.task_id = tasks.id WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 AND (workflows.name = $4) AND tasks.name = $5 LIMIT`).WithReply(executions)
 
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -358,10 +367,11 @@ func TestExecutionExists(t *testing.T) {
 	executions = append(executions, execution)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT id FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
-		`(("executions"."execution_project" = project) AND ("executions"."execution_domain" = domain) AND ` +
-		`("executions"."execution_name" = 1)) LIMIT 1`).WithReply(executions)
+	GlobalMock.NewMock().WithQuery(`SELECT "id" FROM "executions" WHERE "executions"."execution_project" = $1 AND "executions"."execution_domain" = $2 AND "executions"."execution_name" = $3 LIMIT 1`).WithReply(executions)
+
 	exists, err := executionRepo.Exists(context.Background(), interfaces.Identifier{
 		Project: "project",
 		Domain:  "domain",

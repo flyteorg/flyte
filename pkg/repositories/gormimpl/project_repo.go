@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -9,22 +10,22 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 type ProjectRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer flyteAdminDbErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&project)
+	tx := r.db.Omit("id").Create(&project)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -39,7 +40,7 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project
 		Identifier: projectID,
 	}).Take(&project)
 	timer.Stop()
-	if tx.RecordNotFound() {
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
 	}
 
@@ -85,7 +86,7 @@ func (r *ProjectRepo) List(ctx context.Context, input interfaces.ListResourceInp
 	return projects, nil
 }
 
-func NewProjectRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
+func NewProjectRepo(db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransformer,
 	scope promutils.Scope) interfaces.ProjectRepoInterface {
 	metrics := newMetrics(scope)
 	return &ProjectRepo{

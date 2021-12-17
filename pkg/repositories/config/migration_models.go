@@ -45,11 +45,10 @@ type NodeExecution struct {
 	// Prefixed with NodeExecution to avoid clashes with gorm.Model UpdatedAt
 	NodeExecutionUpdatedAt *time.Time
 	Duration               time.Duration
-	NodeExecutionEvents    []models.NodeExecutionEvent
 	// The task execution (if any) which launched this node execution.
 	ParentTaskExecutionID uint `sql:"default:null" gorm:"index"`
 	// The workflow execution (if any) which this node execution launched
-	LaunchedExecution models.Execution `gorm:"foreignkey:ParentNodeExecutionID"`
+	LaunchedExecution models.Execution `gorm:"foreignKey:ParentNodeExecutionID;references:ID"`
 	// In the case of dynamic workflow nodes, the remote closure is uploaded to the path specified here.
 	DynamicWorkflowRemoteClosureReference string
 }
@@ -83,5 +82,5 @@ type TaskExecution struct {
 	TaskExecutionUpdatedAt *time.Time
 	Duration               time.Duration
 	// The child node executions (if any) launched by this task execution.
-	ChildNodeExecution []NodeExecution `gorm:"foreignkey:ParentTaskExecutionID"`
+	ChildNodeExecution []NodeExecution `gorm:"foreignkey:ParentTaskExecutionID;references:ID"`
 }

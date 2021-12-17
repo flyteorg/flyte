@@ -1,6 +1,10 @@
 package config
 
-import "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+import (
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+
+	gormLogger "gorm.io/gorm/logger"
+)
 
 // Database config. Contains values necessary to open a database connection.
 type DbConfig struct {
@@ -14,9 +18,13 @@ type DbConfig struct {
 }
 
 func NewDbConfig(dbConfigValues interfaces.DbConfig) DbConfig {
+	dbLogLevel := gormLogger.Silent
+	if dbConfigValues.Debug {
+		dbLogLevel = gormLogger.Info
+	}
 	return DbConfig{
 		BaseConfig: BaseConfig{
-			IsDebug: dbConfigValues.Debug,
+			LogLevel: dbLogLevel,
 		},
 		Host:         dbConfigValues.Host,
 		Port:         dbConfigValues.Port,
