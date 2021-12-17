@@ -43,7 +43,10 @@ func GetRepository(repoType RepoConfig, dbConfig config.DbConfig, scope promutil
 	switch repoType {
 	case POSTGRES:
 		postgresScope := scope.NewSubScope("postgres")
-		db := config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfig, postgresScope))
+		db, err := config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfig, postgresScope))
+		if err != nil {
+			panic(err)
+		}
 		return NewPostgresRepo(
 			db,
 			errors.NewPostgresErrorTransformer(postgresScope.NewSubScope("errors")),

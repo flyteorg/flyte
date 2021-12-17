@@ -24,8 +24,9 @@ func TestCreateProject(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	query := GlobalMock.NewMock()
+	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","name","description","labels","state") VALUES (?,?,?,?,?,?,?,?)`)
+		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`)
 
 	activeState := int32(admin.Project_ACTIVE)
 	err := projectRepo.Create(context.Background(), models.Project{
@@ -53,8 +54,8 @@ func TestGetProject(t *testing.T) {
 	assert.EqualError(t, err, "project [project_id] not found")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ` +
-		`(("projects"."identifier" = project_id)) LIMIT 1`).WithReply(
+	GlobalMock.Logging = true
+	query.WithQuery(`SELECT * FROM "projects" WHERE "projects"."identifier" = $1 LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -99,7 +100,7 @@ func TestListProjects(t *testing.T) {
 		Limit:         1,
 		InlineFilters: []common.InlineFilter{filter},
 		SortParameter: alphabeticalSortParam,
-	}, `SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ((name = foo)) ORDER BY identifier asc LIMIT 1 OFFSET 0`, t)
+	}, `SELECT * FROM "projects" WHERE name = $1 ORDER BY identifier asc LIMIT 1`, t)
 }
 
 func TestListProjects_NoFilters(t *testing.T) {
@@ -107,14 +108,14 @@ func TestListProjects_NoFilters(t *testing.T) {
 		Offset:        0,
 		Limit:         1,
 		SortParameter: alphabeticalSortParam,
-	}, `SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ((state != 1)) ORDER BY identifier asc LIMIT 1 OFFSET 0`, t)
+	}, `SELECT * FROM "projects" WHERE state != $1 ORDER BY identifier asc`, t)
 }
 
 func TestListProjects_NoLimit(t *testing.T) {
 	testListProjects(interfaces.ListResourceInput{
 		Offset:        0,
 		SortParameter: alphabeticalSortParam,
-	}, `SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ((state != 1)) ORDER BY identifier asc OFFSET 0`, t)
+	}, `SELECT * FROM "projects" WHERE state != $1 ORDER BY identifier asc`, t)
 }
 
 func TestUpdateProject(t *testing.T) {
@@ -122,7 +123,8 @@ func TestUpdateProject(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`UPDATE "projects" SET "description" = ?, "identifier" = ?, "name" = ?, "state" = ?, "updated_at" = ?  WHERE "projects"."deleted_at" IS NULL AND "projects"."identifier" = ?`)
+	GlobalMock.Logging = true
+	query.WithQuery(`UPDATE "projects" SET "updated_at"=$1,"identifier"=$2,"name"=$3,"description"=$4,"state"=$5 WHERE "identifier" = $6`)
 
 	activeState := int32(admin.Project_ACTIVE)
 	err := projectRepo.UpdateProject(context.Background(), models.Project{

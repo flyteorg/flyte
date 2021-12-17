@@ -54,8 +54,7 @@ func TestGetWorkflow(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`(("workflows"."project" = project) AND ("workflows"."domain" = domain) AND ` +
-			`("workflows"."name" = name) AND ("workflows"."version" = XYZ))`).WithReply(workflows)
+		`SELECT * FROM "workflows" WHERE "workflows"."project" = $1 AND "workflows"."domain" = $2 AND "workflows"."name" = $3 AND "workflows"."version" = $4 LIMIT 1`).WithReply(workflows)
 	output, err := workflowRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
@@ -150,7 +149,7 @@ func TestListWorkflows_Filters(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
-	GlobalMock.NewMock().WithQuery(`version = ABC`).WithReply(workflows[0:1])
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "workflows" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 LIMIT 20`).WithReply(workflows[0:1])
 
 	collection, err := workflowRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{

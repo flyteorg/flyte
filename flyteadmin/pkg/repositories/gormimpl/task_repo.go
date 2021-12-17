@@ -2,27 +2,28 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // Implementation of TaskRepoInterface.
 type TaskRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer flyteAdminDbErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *TaskRepo) Create(ctx context.Context, input models.Task) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&input)
+	tx := r.db.Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -42,8 +43,8 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 		},
 	}).Take(&task)
 	timer.Stop()
-	if tx.RecordNotFound() {
-		return models.Task{}, errors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
@@ -125,7 +126,7 @@ func (r *TaskRepo) ListTaskIdentifiers(ctx context.Context, input interfaces.Lis
 
 // Returns an instance of TaskRepoInterface
 func NewTaskRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.TaskRepoInterface {
+	db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransformer, scope promutils.Scope) interfaces.TaskRepoInterface {
 	metrics := newMetrics(scope)
 	return &TaskRepo{
 		db:               db,

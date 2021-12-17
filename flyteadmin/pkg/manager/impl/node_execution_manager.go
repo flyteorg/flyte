@@ -102,13 +102,13 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 		return fmt.Errorf("failed to get existing execution id: [%+v]", executionID)
 	}
 
-	var parentTaskExecutionID uint
+	var parentTaskExecutionID *uint
 	if request.Event.ParentTaskMetadata != nil {
 		taskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.Event.ParentTaskMetadata.Id)
 		if err != nil {
 			return err
 		}
-		parentTaskExecutionID = taskExecutionModel.ID
+		parentTaskExecutionID = &taskExecutionModel.ID
 	}
 	var parentID *uint
 	if request.Event.ParentNodeMetadata != nil {

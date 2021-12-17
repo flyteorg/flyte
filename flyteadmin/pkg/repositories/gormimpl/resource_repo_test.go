@@ -20,9 +20,9 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	query := GlobalMock.NewMock()
+	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain",` +
-			`"workflow","launch_plan","resource_type","priority","attributes") VALUES (?,?,?,?,?,?,?,?,?,?)`)
+		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "id"`)
 
 	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
 		Project:      "project",
@@ -39,7 +39,7 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 func TestGetWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-
+	GlobalMock.Logging = true
 	response := make(map[string]interface{})
 	response["project"] = "project"
 	response["domain"] = "domain"
@@ -48,10 +48,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources"  WHERE "resources"."deleted_at" IS NULL AND` +
-		` ((resource_type = resource AND domain = domain AND project IN (,project)` +
-		` AND workflow IN (,workflow) AND launch_plan IN ())) ORDER BY` +
-		` priority desc,"resources"."id" ASC LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = $2 AND project IN ($3,$4) AND workflow IN ($5,$6) AND launch_plan IN ($7) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -68,7 +65,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 func TestProjectDomainAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-
+	GlobalMock.Logging = true
 	response := make(map[string]interface{})
 	response[project] = project
 	response[domain] = domain
@@ -76,10 +73,7 @@ func TestProjectDomainAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources"  WHERE "resources"."deleted_at" IS NULL AND` +
-		` ((resource_type = resource AND domain = domain AND project IN (,project)` +
-		` AND workflow IN () AND launch_plan IN ())) ORDER BY` +
-		` priority desc,"resources"."id" ASC LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = $2 AND project IN ($3,$4) AND workflow IN ($5) AND launch_plan IN ($6) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -96,7 +90,7 @@ func TestProjectDomainAttributes(t *testing.T) {
 func TestGetRawWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-
+	GlobalMock.Logging = true
 	response := make(map[string]interface{})
 	response[project] = project
 	response[domain] = domain
@@ -106,9 +100,7 @@ func TestGetRawWorkflowAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources"  WHERE "resources"."deleted_at" IS NULL AND (("resources"."project" = project) AND ` +
-		`("resources"."domain" = domain) AND ("resources"."workflow" = workflow) AND ` +
-		`("resources"."launch_plan" = launch_plan) AND ("resources"."resource_type" = resource)) ORDER BY "resources"."id" ASC LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."workflow" = $3 AND "resources"."launch_plan" = $4 AND "resources"."resource_type" = $5 ORDER BY "resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -126,12 +118,10 @@ func TestGetRawWorkflowAttributes(t *testing.T) {
 func TestDeleteWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-
+	GlobalMock.Logging = true
 	query := GlobalMock.NewMock()
 	fakeResponse := query.WithQuery(
-		`DELETE FROM "resources"  WHERE ("resources"."project" = ?) AND ` +
-			`("resources"."domain" = ?) AND ("resources"."workflow" = ?) AND ` +
-			`("resources"."launch_plan" = ?) AND ("resources"."resource_type" = ?)`)
+		`DELETE FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."workflow" = $3 AND "resources"."launch_plan" = $4 AND "resources"."resource_type" = $5`)
 
 	err := resourceRepo.Delete(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", LaunchPlan: "launch_plan", ResourceType: "resource"})
 	assert.Nil(t, err)
@@ -153,8 +143,7 @@ func TestListAll(t *testing.T) {
 	response["launch_plan"] = "launch_plan"
 	response["attributes"] = []byte("attrs")
 
-	fakeResponse := query.WithQuery(`SELECT * FROM "resources"  WHERE "resources"."deleted_at" IS NULL AND ` +
-		`(("resources"."resource_type" = resource)) ORDER BY priority desc`).WithReply(
+	fakeResponse := query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."resource_type" = $1 ORDER BY priority desc`).WithReply(
 		[]map[string]interface{}{response})
 	output, err := resourceRepo.ListAll(context.Background(), "resource")
 	assert.Nil(t, err)

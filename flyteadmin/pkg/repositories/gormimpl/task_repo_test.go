@@ -64,8 +64,7 @@ func TestGetTask(t *testing.T) {
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tasks"  WHERE "tasks"."deleted_at" IS NULL AND (("tasks"."project" = project) ` +
-			`AND ("tasks"."domain" = domain) AND ("tasks"."name" = name) AND ("tasks"."version" = XYZ)) LIMIT 1`).
+		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 LIMIT 1`).
 		WithReply(tasks)
 	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
@@ -162,8 +161,9 @@ func TestListTasks_Filters(t *testing.T) {
 	tasks = append(tasks, task)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	// Only match on queries that append the name filter
-	GlobalMock.NewMock().WithQuery(`version = ABC`).WithReply(tasks[0:1])
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "tasks" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 LIMIT 20`).WithReply(tasks[0:1])
 
 	collection, err := taskRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -191,6 +191,7 @@ func TestListTasks_Order(t *testing.T) {
 	tasks := make([]map[string]interface{}, 0)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	// Only match on queries that include ordering by project
 	mockQuery := GlobalMock.NewMock()
 	mockQuery.WithQuery(`project desc`)

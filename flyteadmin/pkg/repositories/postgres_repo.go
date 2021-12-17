@@ -7,7 +7,7 @@ import (
 	schedulerGormImpl "github.com/flyteorg/flyteadmin/scheduler/repositories/gormimpl"
 	schedulerInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type PostgresRepo struct {

@@ -2,21 +2,22 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
 
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 )
 
 type ResourceRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer flyteAdminDbErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
@@ -51,14 +52,14 @@ func validateCreateOrUpdateResourceInput(project, domain, workflow, launchPlan, 
 
 func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource) error {
 	if !validateCreateOrUpdateResourceInput(input.Project, input.Domain, input.Workflow, input.LaunchPlan, input.ResourceType) {
-		return errors.GetInvalidInputError(fmt.Sprintf("%v", input))
+		return flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", input))
 	}
 	if input.Priority == 0 {
-		return errors.GetInvalidInputError(fmt.Sprintf("invalid priority %v", input))
+		return flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("invalid priority %v", input))
 	}
 	timer := r.metrics.GetDuration.Start()
 	var record models.Resource
-	tx := r.db.FirstOrCreate(&record, models.Resource{
+	tx := r.db.Omit("id").FirstOrCreate(&record, models.Resource{
 		Project:      input.Project,
 		Domain:       input.Domain,
 		Workflow:     input.Workflow,
@@ -83,7 +84,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 
 func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
 	if !validateCreateOrUpdateResourceInput(ID.Project, ID.Domain, ID.Workflow, ID.LaunchPlan, ID.ResourceType) {
-		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(errors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var resources []models.Resource
 	timer := r.metrics.GetDuration.Start()
@@ -108,19 +109,18 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
-	if tx.Error != nil {
-		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() || len(resources) == 0 {
+	if (tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound)) || len(resources) == 0 {
 		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
 			"Resource [%+v] not found", ID)
+	} else if tx.Error != nil {
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return resources[0], nil
 }
 
 func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
 	if ID.Domain == "" || ID.ResourceType == "" {
-		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(errors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var model models.Resource
 	timer := r.metrics.GetDuration.Start()
@@ -132,12 +132,12 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 		ResourceType: ID.ResourceType,
 	}).First(&model)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
 			"%v", ID)
+	} else if tx.Error != nil {
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return model, nil
 }
@@ -166,16 +166,16 @@ func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) err
 			ResourceType: ID.ResourceType,
 		}).Unscoped().Delete(models.Resource{})
 	})
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "%v", ID)
+	} else if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return nil
 }
 
-func NewResourceRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
+func NewResourceRepo(db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransformer,
 	scope promutils.Scope) interfaces.ResourceRepoInterface {
 	metrics := newMetrics(scope)
 	return &ResourceRepo{

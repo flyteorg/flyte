@@ -4,26 +4,28 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"errors"
+
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // SchedulableEntityRepo Implementation of SchedulableEntityRepoInterface.
 type SchedulableEntityRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *SchedulableEntityRepo) Create(ctx context.Context, input models.SchedulableEntity) error {
 	timer := r.metrics.GetDuration.Start()
 	var record models.SchedulableEntity
-	tx := r.db.FirstOrCreate(&record, input)
+	tx := r.db.Omit("id").FirstOrCreate(&record, input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -46,7 +48,7 @@ func (r *SchedulableEntityRepo) Activate(ctx context.Context, input models.Sched
 	timer.Stop()
 
 	if tx.Error != nil {
-		if tx.RecordNotFound() {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			// Not found and hence create one
 			return r.Create(ctx, input)
 		}
@@ -71,7 +73,7 @@ func (r *SchedulableEntityRepo) GetAll(ctx context.Context) ([]models.Schedulabl
 	timer.Stop()
 
 	if tx.Error != nil {
-		if tx.RecordNotFound() {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return nil,
 				fmt.Errorf("no active schedulable entities found")
 		}
@@ -95,9 +97,9 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 	timer.Stop()
 
 	if tx.Error != nil {
-		if tx.RecordNotFound() {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return models.SchedulableEntity{},
-				errors.GetMissingEntityError("schedulable entity", &core.Identifier{
+				adminErrors.GetMissingEntityError("schedulable entity", &core.Identifier{
 					Project: ID.Project,
 					Domain:  ID.Domain,
 					Name:    ID.Name,
@@ -123,8 +125,8 @@ func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityK
 	}).Update("active", activate)
 	timer.Stop()
 	if tx.Error != nil {
-		if tx.RecordNotFound() {
-			return errors.GetMissingEntityError("schedulable entity", &core.Identifier{
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+			return adminErrors.GetMissingEntityError("schedulable entity", &core.Identifier{
 				Project: ID.Project,
 				Domain:  ID.Domain,
 				Name:    ID.Name,
@@ -138,7 +140,7 @@ func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityK
 
 // NewSchedulableEntityRepo Returns an instance of SchedulableEntityRepoInterface
 func NewSchedulableEntityRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.SchedulableEntityRepoInterface {
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.SchedulableEntityRepoInterface {
 	metrics := newMetrics(scope)
 	return &SchedulableEntityRepo{
 		db:               db,

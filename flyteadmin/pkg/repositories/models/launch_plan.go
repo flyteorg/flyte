@@ -27,8 +27,7 @@ type LaunchPlan struct {
 	WorkflowID uint   `gorm:"index"`
 	Closure    []byte `gorm:"not null"`
 	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
-	State      *int32 `gorm:"default:0"`
-	Executions []Execution
+	State *int32 `gorm:"default:0"`
 	// Hash of the launch plan
 	Digest       []byte
 	ScheduleType LaunchPlanScheduleType

@@ -4,29 +4,28 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
-	"github.com/qor/validations"
+
+	"gorm.io/driver/postgres"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const Postgres = "postgres"
 
 // Generic interface for providing a config necessary to open a database connection.
 type DbConnectionConfigProvider interface {
-	// Returns the database type. For instance PostgreSQL or MySQL.
-	GetType() string
-	// Returns arguments specific for the database type necessary to open a database connection.
-	GetArgs() string
-	// Enables verbose logging.
-	WithDebugModeEnabled()
-	// Disables verbose logging.
-	WithDebugModeDisabled()
-	// Returns whether verbose logging is enabled or not.
-	IsDebug() bool
+	// Returns database dialector
+	GetDialector() gorm.Dialector
+
+	GetDBConfig() DbConfig
+
+	GetDSN() string
 }
 
 type BaseConfig struct {
-	IsDebug bool
+	LogLevel                                 logger.LogLevel `json:"log_level"`
+	DisableForeignKeyConstraintWhenMigrating bool
 }
 
 // PostgreSQL implementation for DbConnectionConfigProvider.
@@ -47,7 +46,7 @@ func (p *PostgresConfigProvider) GetType() string {
 	return Postgres
 }
 
-func (p *PostgresConfigProvider) GetArgs() string {
+func (p *PostgresConfigProvider) GetDSN() string {
 	if p.config.Password == "" {
 		// Switch for development
 		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
@@ -57,26 +56,23 @@ func (p *PostgresConfigProvider) GetArgs() string {
 		p.config.Host, p.config.Port, p.config.DbName, p.config.User, p.config.Password, p.config.ExtraOptions)
 }
 
-func (p *PostgresConfigProvider) WithDebugModeEnabled() {
-	p.config.IsDebug = true
+func (p *PostgresConfigProvider) GetDialector() gorm.Dialector {
+	return postgres.Open(p.GetDSN())
 }
 
-func (p *PostgresConfigProvider) WithDebugModeDisabled() {
-	p.config.IsDebug = false
-}
-
-func (p *PostgresConfigProvider) IsDebug() bool {
-	return p.config.IsDebug
+func (p *PostgresConfigProvider) GetDBConfig() DbConfig {
+	return p.config
 }
 
 // Opens a connection to the database specified in the config.
 // You must call CloseDbConnection at the end of your session!
-func OpenDbConnection(config DbConnectionConfigProvider) *gorm.DB {
-	db, err := gorm.Open(config.GetType(), config.GetArgs())
+func OpenDbConnection(config DbConnectionConfigProvider) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(config.GetDSN()), &gorm.Config{
+		Logger:                                   logger.Default.LogMode(config.GetDBConfig().LogLevel),
+		DisableForeignKeyConstraintWhenMigrating: config.GetDBConfig().DisableForeignKeyConstraintWhenMigrating,
+	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	db.LogMode(config.IsDebug())
-	validations.RegisterCallbacks(db)
-	return db
+	return db, nil
 }

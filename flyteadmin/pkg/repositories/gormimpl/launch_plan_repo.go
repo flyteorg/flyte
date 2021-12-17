@@ -2,16 +2,17 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const launchPlanTableName = "launch_plans"
@@ -23,14 +24,14 @@ type launchPlanMetrics struct {
 // Implementation of LaunchPlanRepoInterface.
 type LaunchPlanRepo struct {
 	db                *gorm.DB
-	errorTransformer  errors.ErrorTransformer
+	errorTransformer  adminErrors.ErrorTransformer
 	metrics           gormMetrics
 	launchPlanMetrics launchPlanMetrics
 }
 
 func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&input)
+	tx := r.db.Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -60,17 +61,17 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 		},
 	}).Take(&launchPlan)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.LaunchPlan{},
-			errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), &core.Identifier{
+			adminErrors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), &core.Identifier{
 				Project: input.Project,
 				Domain:  input.Domain,
 				Name:    input.Name,
 				Version: input.Version,
 			})
+	} else if tx.Error != nil {
+		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return launchPlan, nil
 }
@@ -179,7 +180,7 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 
 // Returns an instance of LaunchPlanRepoInterface
 func NewLaunchPlanRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.LaunchPlanRepoInterface {
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.LaunchPlanRepoInterface {
 	metrics := newMetrics(scope)
 	launchPlanMetrics := launchPlanMetrics{
 		SetActiveDuration: scope.MustNewStopWatch(

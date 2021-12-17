@@ -2,28 +2,29 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // Implementation of NodeExecutionInterface.
 type NodeExecutionRepo struct {
 	db               *gorm.DB
-	errorTransformer errors.ErrorTransformer
+	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
 func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeExecution) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&execution)
+	tx := r.db.Omit("id").Create(&execution)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -45,12 +46,10 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			errors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
+			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
 				NodeId: input.NodeExecutionIdentifier.NodeId,
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
@@ -58,7 +57,10 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
 				},
 			})
+	} else if tx.Error != nil {
+		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
+
 	return nodeExecution, nil
 }
 
@@ -159,12 +161,12 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 	if tx.Error != nil {
 		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
-	return !tx.RecordNotFound(), nil
+	return true, nil
 }
 
 // Returns an instance of NodeExecutionRepoInterface
 func NewNodeExecutionRepo(
-	db *gorm.DB, errorTransformer errors.ErrorTransformer,
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer,
 	scope promutils.Scope) interfaces.NodeExecutionRepoInterface {
 	metrics := newMetrics(scope)
 	return &NodeExecutionRepo{

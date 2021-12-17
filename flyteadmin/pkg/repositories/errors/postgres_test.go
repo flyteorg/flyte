@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
+	flyteAdminError "github.com/flyteorg/flyteadmin/pkg/errors"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 
-	flyteAdminError "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/lib/pq"
+	"github.com/jackc/pgconn"
 	"github.com/magiconair/properties/assert"
 	"google.golang.org/grpc/codes"
 )
@@ -20,19 +20,18 @@ func TestToFlyteAdminError_InvalidPqError(t *testing.T) {
 }
 
 func TestToFlyteAdminError_UniqueConstraintViolation(t *testing.T) {
-	err := &pq.Error{
-		Code:       "23505",
-		Constraint: "constraint",
-		Message:    "message",
+	err := &pgconn.PgError{
+		Code:    "23505",
+		Message: "message",
 	}
 	transformedErr := NewPostgresErrorTransformer(mockScope.NewTestScope()).ToFlyteAdminError(err)
 	assert.Equal(t, codes.AlreadyExists, transformedErr.(flyteAdminError.FlyteAdminError).Code())
-	assert.Equal(t, "value with matching constraint already exists (message)",
+	assert.Equal(t, "value with matching already exists (message)",
 		transformedErr.(flyteAdminError.FlyteAdminError).Error())
 }
 
 func TestToFlyteAdminError_UnrecognizedPostgresError(t *testing.T) {
-	err := &pq.Error{
+	err := &pgconn.PgError{
 		Code:    "foo",
 		Message: "message",
 	}
