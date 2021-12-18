@@ -13,46 +13,38 @@ A Helm chart for Flyte Sandbox
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.0.6 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
-### Flyte INSTALLATION:
+### SANDBOX INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
-- Fetch chart dependencies ``
-- Install Flyte:
+- Install Flyte sandbox:
 
 ```bash
 helm repo add flyte https://flyteorg.github.io/flyte
-helm install -n flyte -f values-eks.yaml --create-namespace flyte flyte/flyte-core
+helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte
 ```
 
-Customize your installation by changing settings in `values-eks.yaml`.
+Customize your installation by changing settings in a new file `values-sandbox.yaml`.
 You can use the helm diff plugin to review any value changes you've made to your values:
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
-helm diff upgrade -f values-eks.yaml flyte flyte/flyte-core
+helm diff upgrade -f values-sandbox.yaml flyte .
 ```
 
 Then apply your changes:
 ```bash
-helm upgrade -f values-eks.yaml flyte flyte/flyte-core
-```
-
-Install ingress controller (By default Flyte helm chart have contour ingress resource)
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install gateway bitnami/contour -n flyte
+helm upgrade -f values-sandbox.yaml flyte .
 ```
 
 #### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-eks . -n flyte -f values-eks.yaml > flyte_generated_eks.yaml`
-- Deploy the manifest `kubectl apply -f flyte_generated_eks.yaml`
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
 
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
-- Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
+- If running on minikube, get flyte host using `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
 
 ### CONFIGURATION NOTES:
 - The docker images, their tags and other default parameters are configured in `values.yaml` file.
 - Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
-- The configuration in `values-sandbox.yaml` is ready for installation in minikube. But `values-eks.yaml` should be edited before installation: s3 bucket, RDS hosts, iam roles, secrets and etc need to be modified.
 
 ## Values
 
