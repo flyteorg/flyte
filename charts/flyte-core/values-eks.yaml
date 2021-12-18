@@ -269,11 +269,13 @@ configmap:
     # -- resource manager configuration
     propeller:
       resourcemanager:
-        type: redis
-        resourceMaxQuota: 10000
-        redis:
-          hostPath: "{{ .Values.userSettings.redisHostUrl }}"
-          hostKey: "{{ .Values.userSettings.redisHostKey }}"
+        type: noop
+        # Note: By default resource manager is disable for propeller, Please use `type: redis` to enaable
+        # type: redis
+        # resourceMaxQuota: 10000
+        # redis:
+        #   hostPath: "{{ .Values.userSettings.redisHostUrl }}"
+        #   hostKey: "{{ .Values.userSettings.redisHostKey }}"
 
 
   enabled_plugins:
