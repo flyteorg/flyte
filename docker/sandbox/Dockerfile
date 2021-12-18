@@ -87,7 +87,7 @@ EXPOSE 30081 30082 30084 30087
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
 
 
-FROM docker:20.10.8-dind AS dind
+FROM docker:20.10.11-dind AS dind
 
 # Install dependencies
 RUN apk add --no-cache bash git make tini curl jq
