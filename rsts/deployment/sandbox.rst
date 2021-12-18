@@ -191,10 +191,29 @@ Flyte configuration on your remote cluster.
 
 #. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows ::
 
-    kubectl port-forward --address 0.0.0.0 svc/flyte-contour-envoy 30090:80 -n flyte
+    kubectl port-forward --address 0.0.0.0 svc/flyte-contour-envoy 30081:80 -n flyte
 
-#. Open console http://localhost:30090/console.
+#. Open console http://localhost:30081/console.
 
 #. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
 
-    flytectl config init --host='localhost:30090'
+    flytectl config init --host='localhost:30081' --insecure
+
+#. Open minio console http://localhost:30087, Your minio username is `minio` and password is `miniostorage`
+
+#. Open Kubernetes dashboard http://localhost:30082
+
+#. You can port-forward to connect postgres, as follows ::
+
+    kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
+
+#. Now use these cedentials for postgress
+
+  .. code-block::
+
+      dbname: flyteadmin
+      host: 127.0.0.1
+      port: 5432
+      username: postgres
+
+
