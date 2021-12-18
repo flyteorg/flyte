@@ -31,7 +31,7 @@ imagesize==1.2.0
     # via sphinx
 jinja2==3.0.1
     # via sphinx
-lxml==4.6.3
+lxml==4.6.5
     # via sphinx-material
 markupsafe==2.0.1
     # via jinja2
