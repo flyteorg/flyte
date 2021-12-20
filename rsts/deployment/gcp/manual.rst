@@ -431,6 +431,38 @@ Installing Flyte
    <BUCKETNAME> of the GCS bucket created
    <HOSTNAME> to the flyte FQDN (e.g. flyte.example.org)
 
+#. Configure flyte project and domain (Optional)
+
+
+You can configure projects in flyte, By default flyte create 3 projects i.e. flytesnacks, flytetester, flyteexample
+
+.. code-block::
+
+   # you can define the number of projects as per your need 
+   flyteadmin:
+    initialProjects:
+       - flytesnacks
+       - flytetester
+       - flyteexamples
+
+You can also configure domain per project by defining domain config, By default flyte creates 3 domain per project i.e development, staging and production 
+
+.. code-block::
+
+   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
+   configmap 
+     domain:
+       domains:
+         - id: development
+           name: development
+         - id: staging
+           name: staging
+         - id: production
+           name: production
+   
+Flyte will create namespace based of above config, Flyte will create 3 namespaces for each project because we have 3 domian that means per project-domain on namespace. 
+
+
 #. Update helm dependencies
 
 .. code-block:: bash

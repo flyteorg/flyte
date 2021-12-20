@@ -469,7 +469,38 @@ Search and replace the following
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
 
 
-4. Install Flyte
+4. Configure flyte project and domain (Optional)
+
+
+You can configure projects in flyte, By default flyte create 3 projects i.e. flytesnacks, flytetester, flyteexample
+
+.. code-block::
+
+   # you can define the number of projects as per your need 
+   flyteadmin:
+    initialProjects:
+       - flytesnacks
+       - flytetester
+       - flyteexamples
+
+You can also configure domain per project by defining domain config, By default flyte creates 3 domain per project i.e development, staging and production 
+
+.. code-block::
+
+   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
+   configmap 
+     domain:
+       domains:
+         - id: development
+           name: development
+         - id: staging
+           name: staging
+         - id: production
+           name: production
+   
+Flyte will create namespace based of above config, Flyte will create 3 namespaces for each project because we have 3 domian that means per project-domain on namespace. 
+
+5. Install Flyte
 
 .. tabbed:: Flyte Native scheduler
 
@@ -488,7 +519,7 @@ Search and replace the following
        helm install -n flyte -f values-eks.yaml -f values-eks-override.yaml --create-namespace flyte flyteorg/flyte-core
 
 
-5. Verify if all the pods have come up correctly
+6. Verify if all the pods have come up correctly
 
 .. code-block:: bash
 
