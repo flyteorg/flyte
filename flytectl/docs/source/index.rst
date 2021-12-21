@@ -1,7 +1,7 @@
 .. flytectl doc
 
 ######################
-``Flytectl`` Reference
+Flytectl Reference
 ######################
 
 Overview
@@ -59,7 +59,7 @@ Flytectl configuration
         admin:
           # For GRPC endpoints you might want to use dns:///flyte.myexample.com
           endpoint: dns:///localhost:30081
-          insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+          insecure: true # Set to false to enable TLS/SSL connection (not recommended except on local sandbox deployment)
           authType: Pkce # authType: Pkce # if using authentication or just drop this.
         storage:
           connection:
