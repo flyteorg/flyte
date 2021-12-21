@@ -67,7 +67,7 @@ Cluster Config
        :text: External Events
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    How to set up Flyte to emit events to third-parties
+    How to set up Flyte to emit events to third-parties.
 
     ---
 
@@ -112,3 +112,4 @@ Cluster Config
     notifications
     performance
     swagger
+    eventing
