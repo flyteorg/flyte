@@ -54,6 +54,3 @@ golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
 
-.PHONY: generate
-generate: download_tooling
-	@go generate ./...

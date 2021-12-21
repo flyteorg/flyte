@@ -36,11 +36,12 @@ func getRawOutputNodeEv() *event.NodeExecutionEvent {
 }
 
 func TestRecordNodeEvent_Success_ReferenceOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordNodeEventCb = func(ctx context.Context, event *event.NodeExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.MatchedBy(func(event *event.NodeExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceNodeEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	mockStore := &storage.DataStore{
 		ComposedProtobufStore: &storageMocks.ComposedProtobufStore{},
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
@@ -50,16 +51,17 @@ func TestRecordNodeEvent_Success_ReferenceOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordNodeEvent(context.TODO(), getReferenceNodeEv(), referenceEventConfig)
+	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), referenceEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordNodeEvent_Success_InlineOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordNodeEventCb = func(ctx context.Context, event *event.NodeExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.MatchedBy(func(event *event.NodeExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getRawOutputNodeEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -76,16 +78,17 @@ func TestRecordNodeEvent_Success_InlineOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordNodeEvent(context.TODO(), getReferenceNodeEv(), inlineEventConfig)
+	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordNodeEvent_Failure_FetchInlineOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordNodeEventCb = func(ctx context.Context, event *event.NodeExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.MatchedBy(func(event *event.NodeExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceNodeEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -99,19 +102,19 @@ func TestRecordNodeEvent_Failure_FetchInlineOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordNodeEvent(context.TODO(), getReferenceNodeEv(), inlineEventConfig)
+	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordNodeEvent_Failure_FallbackReference_Retry(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordNodeEventCb = func(ctx context.Context, event *event.NodeExecutionEvent) error {
-		if event.GetOutputData() != nil {
-			return status.Error(codes.ResourceExhausted, "message too large")
-		}
-		assert.True(t, proto.Equal(event, getReferenceNodeEv()))
-		return nil
-	}
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.MatchedBy(func(event *event.NodeExecutionEvent) bool {
+		return event.GetOutputData() != nil
+	})).Return(status.Error(codes.ResourceExhausted, "message too large"))
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.MatchedBy(func(event *event.NodeExecutionEvent) bool {
+		return event.GetOutputData() == nil && proto.Equal(event, getReferenceNodeEv())
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -128,15 +131,14 @@ func TestRecordNodeEvent_Failure_FallbackReference_Retry(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordNodeEvent(context.TODO(), getReferenceNodeEv(), inlineEventConfigFallback)
+	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), inlineEventConfigFallback)
 	assert.NoError(t, err)
 }
 
 func TestRecordNodeEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordNodeEventCb = func(ctx context.Context, event *event.NodeExecutionEvent) error {
-		return errors.New("foo")
-	}
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordNodeEventMatch(ctx, mock.Anything).Return(errors.New("foo"))
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -153,6 +155,6 @@ func TestRecordNodeEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordNodeEvent(context.TODO(), getReferenceNodeEv(), inlineEventConfigFallback)
+	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), inlineEventConfigFallback)
 	assert.EqualError(t, err, "foo")
 }

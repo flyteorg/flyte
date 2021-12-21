@@ -6,10 +6,11 @@ package events
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	netUrl "net/url"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"

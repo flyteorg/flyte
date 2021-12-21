@@ -36,11 +36,12 @@ func getRawOutputWorkflowEv() *event.WorkflowExecutionEvent {
 }
 
 func TestRecordWorkflowEvent_Success_ReferenceOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.MatchedBy(func(event *event.WorkflowExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	mockStore := &storage.DataStore{
 		ComposedProtobufStore: &storageMocks.ComposedProtobufStore{},
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
@@ -50,16 +51,17 @@ func TestRecordWorkflowEvent_Success_ReferenceOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), referenceEventConfig)
+	err := recorder.RecordWorkflowEvent(ctx, getReferenceWorkflowEv(), referenceEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordWorkflowEvent_Success_InlineOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.MatchedBy(func(event *event.WorkflowExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getRawOutputWorkflowEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -76,16 +78,17 @@ func TestRecordWorkflowEvent_Success_InlineOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfig)
+	err := recorder.RecordWorkflowEvent(ctx, getReferenceWorkflowEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordWorkflowEvent_Failure_FetchInlineOutputs(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.MatchedBy(func(event *event.WorkflowExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
-		return nil
-	}
+		return true
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -99,19 +102,19 @@ func TestRecordWorkflowEvent_Failure_FetchInlineOutputs(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfig)
+	err := recorder.RecordWorkflowEvent(ctx, getReferenceWorkflowEv(), inlineEventConfig)
 	assert.NoError(t, err)
 }
 
 func TestRecordWorkflowEvent_Failure_FallbackReference_Retry(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
-		if event.GetOutputData() != nil {
-			return status.Error(codes.ResourceExhausted, "message too large")
-		}
-		assert.True(t, proto.Equal(event, getReferenceWorkflowEv()))
-		return nil
-	}
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.MatchedBy(func(event *event.WorkflowExecutionEvent) bool {
+		return event.GetOutputData() != nil
+	})).Return(status.Error(codes.ResourceExhausted, "message too large"))
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.MatchedBy(func(event *event.WorkflowExecutionEvent) bool {
+		return event.GetOutputData() == nil && proto.Equal(event, getReferenceWorkflowEv())
+	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
@@ -128,15 +131,14 @@ func TestRecordWorkflowEvent_Failure_FallbackReference_Retry(t *testing.T) {
 		eventRecorder: &eventRecorder,
 		store:         mockStore,
 	}
-	err := recorder.RecordWorkflowEvent(context.TODO(), getReferenceWorkflowEv(), inlineEventConfigFallback)
+	err := recorder.RecordWorkflowEvent(ctx, getReferenceWorkflowEv(), inlineEventConfigFallback)
 	assert.NoError(t, err)
 }
 
 func TestRecordWorkflowEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
-	eventRecorder := mocks.MockRecorder{}
-	eventRecorder.RecordWorkflowEventCb = func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
-		return errors.New("foo")
-	}
+	ctx := context.TODO()
+	eventRecorder := mocks.EventRecorder{}
+	eventRecorder.OnRecordWorkflowEventMatch(ctx, mock.Anything).Return(errors.New("foo"))
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
