@@ -139,7 +139,7 @@ Build & Deploy Your Application to the Cluster
 
    .. prompt:: bash (venv)$
 
-      pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
+      pyflyte --pkgs flyte.workflows package --image "myapp:v1"
 
 #. Upload this package to the Flyte backend. We refer to this as ``registration``. The version here ``v1`` does not have to match the version
    used in the commands above. It's generally recommended to match the versions to make it easier to track.
