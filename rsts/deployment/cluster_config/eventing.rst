@@ -6,6 +6,14 @@ Platform Events
 
 Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the Flyte Propeller to Flyte Admin. Administrators can configure Flyte Admin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-cluster-config-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
 
+Use cases
+=========
+The external events flow can be useful for tracking data lineage and integrating with existing systems within your organization.
+
+Supported Implementations
+=========================
+Event egress can be configured to work with **AWS** using `SQS <https://aws.amazon.com/sqs/>`_ and `SNS <https://aws.amazon.com/sns/>`_ or **GCP** `Cloud Pub/Sub <https://cloud.google.com/pubsub>`_.
+
 *************
 Configuration
 *************
@@ -42,3 +50,6 @@ The events emitted will be base64 encoded binary representation of the following
 Which of these three events is being sent can be distinguished by the subject line of the message, which will be one of the three strings above.
 
 Note that these message wrap the underlying event messages :std:doc:`found here <flyteidl:protos/docs/event/event>`.
+
+.. note::
+   The message format may eventually change to an enriched and distinct message type in future releases.
