@@ -78,29 +78,32 @@ Install flytectl
 
 #. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run this getting started against a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a flyte cluster.
 
-   .. tabbed:: Start a new sandbox cluster
+   .. tabs::
+       .. group-tab:: Flyte Sandbox
 
-     .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
+          .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
 
-     Here '.' represents current directory and assuming you have changed into ``myflyteapp`` — the git-cloned directory you created.
+          Here '.' represents current directory and assuming you have changed into ``myflyteapp`` — the git-cloned directory you created.
 
-     .. prompt:: bash $
+          .. prompt:: bash $
 
-        flytectl sandbox start --source .
+             flytectl sandbox start --source .
 
-     Setup flytectl sandbox config
+          Setup flytectl sandbox config
 
-     .. prompt:: bash $
+          .. prompt:: bash $
 
-        flytectl config init
+             flytectl config init
 
-     **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
+          **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
 
-   .. tabbed:: Connect to an existing Flyte cluster
+       .. group-tab:: Remote Flyte Cluster
 
-     .. prompt:: bash $
+          Setup flytectl remote cluster config
 
-         flytectl config init --host={FLYTEADMIN_URL} --storage
+          .. prompt:: bash $
+
+              flytectl config init --host={FLYTEADMIN_URL} --storage
 
 
 Build & Deploy Your Application to the Cluster
