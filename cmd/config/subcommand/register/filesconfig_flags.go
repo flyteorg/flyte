@@ -50,7 +50,8 @@ func (FilesConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg FilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("FilesConfig", pflag.ExitOnError)
-	cmdFlags.StringVar(&DefaultFilesConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), DefaultFilesConfig.Version, "version of the entity to be registered with flyte.")
+	cmdFlags.StringVar(&DefaultFilesConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), DefaultFilesConfig.Version, "version of the entity to be registered with flyte which are un-versioned after serialization.")
+	cmdFlags.BoolVar(&DefaultFilesConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), DefaultFilesConfig.Force, "force use of version number on entities registered with flyte.")
 	cmdFlags.BoolVar(&DefaultFilesConfig.ContinueOnError, fmt.Sprintf("%v%v", prefix, "continueOnError"), DefaultFilesConfig.ContinueOnError, "continue on error when registering files.")
 	cmdFlags.BoolVar(&DefaultFilesConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), DefaultFilesConfig.Archive, "pass in archive file either an http link or local path.")
 	cmdFlags.StringVar(&DefaultFilesConfig.AssumableIamRole, fmt.Sprintf("%v%v", prefix, "assumableIamRole"), DefaultFilesConfig.AssumableIamRole, " custom assumable iam auth role to register launch plans with.")
