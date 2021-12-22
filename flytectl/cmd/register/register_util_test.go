@@ -478,7 +478,7 @@ func TestRegister(t *testing.T) {
 		setup()
 		registerFilesSetup()
 		node := &admin.NodeExecution{}
-		err := register(ctx, node, cmdCtx, rconfig.DefaultFilesConfig.DryRun, rconfig.DefaultFilesConfig.Version)
+		err := register(ctx, node, cmdCtx, rconfig.DefaultFilesConfig.DryRun)
 		assert.NotNil(t, err)
 	})
 }
@@ -488,7 +488,7 @@ func TestHydrateNode(t *testing.T) {
 		setup()
 		registerFilesSetup()
 		node := &core.Node{}
-		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version)
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
 		assert.NotNil(t, err)
 	})
 

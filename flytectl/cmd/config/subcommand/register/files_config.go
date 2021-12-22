@@ -11,7 +11,8 @@ var (
 
 // FilesConfig containing flags used for registration
 type FilesConfig struct {
-	Version              string `json:"version" pflag:",version of the entity to be registered with flyte."`
+	Version              string `json:"version" pflag:",version of the entity to be registered with flyte which are un-versioned after serialization."`
+	Force                bool   `json:"force" pflag:",force use of version number on entities registered with flyte."`
 	ContinueOnError      bool   `json:"continueOnError" pflag:",continue on error when registering files."`
 	Archive              bool   `json:"archive" pflag:",pass in archive file either an http link or local path."`
 	AssumableIamRole     string `json:"assumableIamRole" pflag:", custom assumable iam auth role to register launch plans with."`

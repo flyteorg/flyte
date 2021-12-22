@@ -97,7 +97,7 @@ func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (
 
 }
 
-func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext, dryRun bool, version string) error {
+func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext, dryRun bool) error {
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
@@ -112,7 +112,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         launchPlan.Id.Name,
-					Version:      version,
+					Version:      launchPlan.Id.Version,
 				},
 				Spec: launchPlan.Spec,
 			})
@@ -130,7 +130,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         workflowSpec.Template.Id.Name,
-					Version:      version,
+					Version:      workflowSpec.Template.Id.Version,
 				},
 				Spec: workflowSpec,
 			})
@@ -148,7 +148,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
 					Name:         taskSpec.Template.Id.Name,
-					Version:      version,
+					Version:      taskSpec.Template.Id.Version,
 				},
 				Spec: taskSpec,
 			})
@@ -158,33 +158,33 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 	}
 }
 
-func hydrateNode(node *core.Node, version string) error {
+func hydrateNode(node *core.Node, version string, force bool) error {
 	targetNode := node.Target
 	switch v := targetNode.(type) {
 	case *core.Node_TaskNode:
 		taskNodeWrapper := targetNode.(*core.Node_TaskNode)
 		taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
-		hydrateIdentifier(taskNodeReference.ReferenceId, version)
+		hydrateIdentifier(taskNodeReference.ReferenceId, version, force)
 	case *core.Node_WorkflowNode:
 		workflowNodeWrapper := targetNode.(*core.Node_WorkflowNode)
 		switch workflowNodeWrapper.WorkflowNode.Reference.(type) {
 		case *core.WorkflowNode_SubWorkflowRef:
 			subWorkflowNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_SubWorkflowRef)
-			hydrateIdentifier(subWorkflowNodeReference.SubWorkflowRef, version)
+			hydrateIdentifier(subWorkflowNodeReference.SubWorkflowRef, version, force)
 		case *core.WorkflowNode_LaunchplanRef:
 			launchPlanNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_LaunchplanRef)
-			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef, version)
+			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef, version, force)
 		default:
 			return fmt.Errorf("unknown type %T", workflowNodeWrapper.WorkflowNode.Reference)
 		}
 	case *core.Node_BranchNode:
 		branchNodeWrapper := targetNode.(*core.Node_BranchNode)
-		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode, version); err != nil {
+		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode, version, force); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
 		if len(branchNodeWrapper.BranchNode.IfElse.Other) > 0 {
 			for _, ifBlock := range branchNodeWrapper.BranchNode.IfElse.Other {
-				if err := hydrateNode(ifBlock.ThenNode, version); err != nil {
+				if err := hydrateNode(ifBlock.ThenNode, version, force); err != nil {
 					return fmt.Errorf("failed to hydrateNode")
 				}
 			}
@@ -192,7 +192,7 @@ func hydrateNode(node *core.Node, version string) error {
 		switch branchNodeWrapper.BranchNode.IfElse.Default.(type) {
 		case *core.IfElseBlock_ElseNode:
 			elseNodeReference := branchNodeWrapper.BranchNode.IfElse.Default.(*core.IfElseBlock_ElseNode)
-			if err := hydrateNode(elseNodeReference.ElseNode, version); err != nil {
+			if err := hydrateNode(elseNodeReference.ElseNode, version, force); err != nil {
 				return fmt.Errorf("failed to hydrateNode")
 			}
 
@@ -207,14 +207,14 @@ func hydrateNode(node *core.Node, version string) error {
 	return nil
 }
 
-func hydrateIdentifier(identifier *core.Identifier, version string) {
+func hydrateIdentifier(identifier *core.Identifier, version string, force bool) {
 	if identifier.Project == "" || identifier.Project == registrationProjectPattern {
 		identifier.Project = config.GetConfig().Project
 	}
 	if identifier.Domain == "" || identifier.Domain == registrationDomainPattern {
 		identifier.Domain = config.GetConfig().Domain
 	}
-	if identifier.Version == "" || identifier.Version == registrationVersionPattern {
+	if force || identifier.Version == "" || identifier.Version == registrationVersionPattern {
 		identifier.Version = version
 	}
 }
@@ -315,29 +315,30 @@ func hydrateSpec(message proto.Message, sourceCode string, config rconfig.FilesC
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
-		hydrateIdentifier(launchPlan.Spec.WorkflowId, config.Version)
+		hydrateIdentifier(launchPlan.Id, config.Version, config.Force)
+		hydrateIdentifier(launchPlan.Spec.WorkflowId, config.Version, config.Force)
 		if err := hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.Spec); err != nil {
 			return err
 		}
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		for _, Noderef := range workflowSpec.Template.Nodes {
-			if err := hydrateNode(Noderef, config.Version); err != nil {
+			if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
 				return err
 			}
 		}
-		hydrateIdentifier(workflowSpec.Template.Id, config.Version)
+		hydrateIdentifier(workflowSpec.Template.Id, config.Version, config.Force)
 		for _, subWorkflow := range workflowSpec.SubWorkflows {
 			for _, Noderef := range subWorkflow.Nodes {
-				if err := hydrateNode(Noderef, config.Version); err != nil {
+				if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
 					return err
 				}
 			}
-			hydrateIdentifier(subWorkflow.Id, config.Version)
+			hydrateIdentifier(subWorkflow.Id, config.Version, config.Force)
 		}
 	case *admin.TaskSpec:
 		taskSpec := message.(*admin.TaskSpec)
-		hydrateIdentifier(taskSpec.Template.Id, config.Version)
+		hydrateIdentifier(taskSpec.Template.Id, config.Version, config.Force)
 		// In case of fast serialize input proto also have on additional variable to substitute i.e destination bucket for source code
 		if err := hydrateTaskSpec(taskSpec, sourceCode, config.SourceUploadPath, config.Version); err != nil {
 			return err
@@ -465,7 +466,7 @@ func registerFile(ctx context.Context, fileName, sourceCode string, registerResu
 
 	logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
 
-	if err := register(ctx, spec, cmdCtx, config.DryRun, config.Version); err != nil {
+	if err := register(ctx, spec, cmdCtx, config.DryRun); err != nil {
 		// If error is AlreadyExists then dont consider this to be an error but just a warning state
 		if grpcError := status.Code(err); grpcError == codes.AlreadyExists {
 			registerResult = Result{Name: fileName, Status: "Success", Info: fmt.Sprintf("%v", grpcError.String())}
