@@ -96,6 +96,7 @@ datacatalog:
 
 flytepropeller:
   replicaCount: 2
+  manager: false
   serviceAccount:
     # -- If the service account is created by you, make this false
     create: true
@@ -249,6 +250,15 @@ configmap:
         storage: 2000Mi
 
   core:
+    # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config).
+    manager:
+      pod-application: "flytepropeller"
+      pod-template-container-name: "flytepropeller"
+      pod-template-name: "flytepropeller-template"
+      scan-interval: 10s
+      shard:
+        type: Hash
+        pod-count: 3
     propeller:
       rawoutput-prefix: "s3://{{ .Values.userSettings.bucketName }}/"
       workers: 40

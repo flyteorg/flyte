@@ -82,6 +82,7 @@ datacatalog:
 
 flytepropeller:
   replicaCount: 1
+  manager: false
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
     # you can change the name of this role
@@ -254,6 +255,15 @@ configmap:
       template: "{{ domain }}"
 
   core:
+    # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config).
+    manager:
+      pod-application: "flytepropeller"
+      pod-template-container-name: "flytepropeller"
+      pod-template-name: "flytepropeller-template"
+      scan-interval: 10s
+      shard:
+        type: Hash
+        pod-count: 3
     propeller:
       rawoutput-prefix: "gs://{{ .Values.userSettings.bucketName }}/"
       workers: 40
