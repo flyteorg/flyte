@@ -60,5 +60,8 @@ helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher
 
 wait-for-flyte.sh
 
+# With flytectl sandbox --source flag, we mount the root volume to user source dir that will create helm & k8s specific directory. It cause issue while doing fast register 
+rm -rf /root/.cache /root/.kube /root/.config
+
 # Monitor running processes. Exit when the first process exits.
 monitor ${DOCKERD_PID} ${K3S_PID}
