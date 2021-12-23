@@ -86,7 +86,7 @@ Core Concepts
 
     .. link-button:: divedeep-execution-timeline
         :type: ref
-        :text: Understand how an Execution progresses
+        :text: Life of an Execution
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     This section explains how an **Execution** progresses through the FlytePropeller execution engine and the timeline.
@@ -95,19 +95,10 @@ Core Concepts
 
     .. link-button:: divedeep-data-management
         :type: ref
-        :text: Understand how Flyte manages data flow between tasks
+        :text: How Flyte manages Data?
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     This section explains what is metadata, how large amounts of raw-data is handled and how data flows between tasks.
-
-    ---
-
-    .. link-button:: ui
-        :type: ref
-        :text: Walkthrough for Flyte UI
-        :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    This section provides a quick overview of the FlyteConsole.
 
     ---
 
