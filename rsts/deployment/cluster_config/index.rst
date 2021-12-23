@@ -87,16 +87,6 @@ Cluster Config
     ^^^^^^^^^^^^
     Tweaks to improve performance of the core Flyte engine
 
-    ---
-
-    .. link-button:: deployment-cluster-config-swagger
-       :type: ref
-       :text: Swagger
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Swagger Open API Schema UI
-
-
 .. toctree::
     :maxdepth: 1
     :name: Cluster Config
@@ -106,9 +96,9 @@ Cluster Config
     auth_migration
     auth_appendix
     general
+    customizable_resources
     flyteadmin_config
     flytepropeller_config
     monitoring
     notifications
     performance
-    swagger

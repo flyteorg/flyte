@@ -23,7 +23,6 @@
    concepts/basics
    concepts/control_plane
    concepts/architecture
-   concepts/flyte_console
 
 .. toctree::
    :caption: Deployment

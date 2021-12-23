@@ -22,7 +22,7 @@ For every task that receives and input - Flyte passes it an `Inputs Metadata` ob
 complex, large objects are offloaded and the `Metadata` simply stores a reference to this object. In the above example `m,n` are inlined while
 `o` and the output `pd.DataFrame` are offloaded to an object store and reference is captured in the metadata.
 
-Flytekit TypeTransformers make it possible to use these objects as if they are available locally - providing a feeling of persistent file handles. But, the Flyte only deals with
+Flytekit TypeTransformers make it possible to use these objects as if they are available locally - providing a feeling of persistent file handles. But, Flyte backend only deals with
 the references.
 
 Thus, primitive data types and references to large objects is called the Metadata - `Meta input` or `meta output` and the actual large object is called the `Raw data`.
@@ -35,9 +35,7 @@ Raw Data Prefix
 Every task can read/write its own data-files, but if users decide to use Flytefile, or any natively supported types like pandas.DataFrame, then Flyte will automatically offload and download the
 data from configured object store paths. These paths are completely customizable per `LaunchPlan` or per `Execution`.
 
-- To configure the default Raw output path (prefix in an object store like S3/GCS), you can configure it during registration as shown in :std:ref:`flytectl_register_files`. The argument ``--outputLocationPrefix`` allows you to set
-the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
-
+- To configure the default Raw output path (prefix in an object store like S3/GCS), you can configure it during registration as shown in :std:ref:`flytectl_register_files`. The argument ``--outputLocationPrefix`` allows you to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
 - To override the RawOutput path (prefix in an object store like S3/GCS), users can specify an alternate location when invoking a Flyte execution as shown in this screenshot of the LaunchForm in FlyteConsole
 
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/launch_raw_output.png
@@ -68,7 +66,7 @@ For each variable a corresponding :std:ref:`ref_flyteidl.core.literaltype` is cr
 
 The converted representation is as follows
 
-.. code-block:: json
+.. code-block::
 
     interface {
     inputs {
@@ -107,7 +105,7 @@ The converted representation is as follows
 
 
 **Runtime**
-A runtime, the data is passed through Flyte using :std:ref:`ref_flyteidl.core.literal`s and the values are set. For Files, the corresponding Literal is called LiteralBlob - :std:ref:`ref_flyteidl.core.blob`, which stands for a
+At runtime, the data is passed through Flyte using :std:ref:`ref_flyteidl.core.literal`  and the values are set. For Files, the corresponding Literal is called LiteralBlob - :std:ref:`ref_flyteidl.core.blob`, which stands for a
 binary large object. Many different objects can be mapped to the underlying `Blob` or `Struct` types. For example and Image is a Blob, as pandas.DataFrame is a Blob of type parquet etc.
 
 

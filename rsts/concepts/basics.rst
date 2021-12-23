@@ -46,6 +46,15 @@ Core Concepts
 
     ---
 
+    .. link-button:: concepts-schedules
+       :type: ref
+       :text: Scheduling your LaunchPlans
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    **Scheduling** is critical to data and ML jobs and Flyte provides a native Cron style scheduler.
+
+    ---
+
     .. link-button:: divedeep-registration
         :type: ref
         :text: Registration
@@ -66,12 +75,21 @@ Core Concepts
 
     ---
 
+    .. link-button:: divedeep-state-machine
+        :type: ref
+        :text: State Machine for an execution
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    This section explains the states an **Execution** progresses through.
+
+    ---
+
     .. link-button:: divedeep-execution-timeline
         :type: ref
         :text: Understand how an Execution progresses
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section explains how an **Execution** progresses through the FlytePropeller execution engine.
+    This section explains how an **Execution** progresses through the FlytePropeller execution engine and the timeline.
 
     ---
 
@@ -81,6 +99,33 @@ Core Concepts
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     This section explains what is metadata, how large amounts of raw-data is handled and how data flows between tasks.
+
+    ---
+
+    .. link-button:: ui
+        :type: ref
+        :text: Walkthrough for Flyte UI
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    This section provides a quick overview of the FlyteConsole.
+
+    ---
+
+    .. link-button:: ui
+        :type: ref
+        :text: Walkthrough for Flyte UI
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    This section provides a quick overview of the FlyteConsole.
+
+    ---
+
+    .. link-button:: divedeep-catalog
+        :type: ref
+        :text: Platform-wide memoization/caching in Flyte
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    This section provides a deeper dive into what is memoization and the mechanics of memoization in Flyte.
 
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
@@ -96,4 +141,11 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     tasks
     workflows_nodes
     launchplans_schedules
+    registration
     executions
+    state_machine
+    execution_timeline
+    data_management
+    flyte_console
+    catalog
+

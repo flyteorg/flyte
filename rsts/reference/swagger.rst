@@ -1,8 +1,8 @@
-.. _deployment-cluster-config-swagger:
+.. _reference-swagger:
 
-##########
-Swagger UI
-##########
+################################
+Flyte API playground: Swagger
+################################
 
 Flyte services expose gRPC services for efficient/low latency communication across services as well as for external clients (flytectl, flyteconsole, flytekit Remote and flyte-cli,... etc.).
 

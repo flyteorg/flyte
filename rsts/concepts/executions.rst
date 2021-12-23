@@ -14,14 +14,3 @@ Typical flow using flytectl
 * This executable Workflow is then launched on Kubernetes with an execution record in the database.
 
 .. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_execution_overview.svg?sanitize=true
-
-.. toctree::
-  :caption: Execution Details
-  :maxdepth: 1
-
-  state_machine
-  execution_timeline
-  observability
-  dynamic_spec
-  catalog
-  customizable_resources

@@ -50,6 +50,6 @@ Control Plane
 
     projects
     domains
-    registration
     admin
     console
+    dynamic_spec

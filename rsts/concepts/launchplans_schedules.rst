@@ -6,7 +6,7 @@ Launch plans are used to execute workflows. A workflow can have many launch plan
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
 
-In addition to templatizing inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch
+In addition to templatized inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch
 plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
 optional notifications. Refer to the :ref:`deployment-cluster-config-notifications` for a deep dive into available notifications.
 
