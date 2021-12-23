@@ -40,13 +40,82 @@ the destination directory for all the raw data produced. Flyte will create rando
 
 - To override the RawOutput path (prefix in an object store like S3/GCS), users can specify an alternate location when invoking a Flyte execution as shown in this screenshot of the LaunchForm in FlyteConsole
 
-.. image:: 
+.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/launch_raw_output.png
 
 Metadata
 ~~~~~~~~~
+Metadata in Flyte is critical to allow passing of data between tasks. It allows for performing in-memory computations for branches or passing partial outputs from a task to another task or composing outputs from multiple tasks into one input for a task.
+Thus metadata is restrictred. Each individual metaoutput / input cannot be larger than 1MB. Thus if you have `List[int]` then they cannot be larger than 1MB alongwith any other input entities. In cases when you desire to pass large lists or strings between tasks, it is better to use a file abstraction.
+
+LiteralType & Literals
+~~~~~~~~~~~~~~~~~~~~~~~
+**Serialization time**
+When a task is declared with inputs and outputs, Flyte extracts the interface for this task and converts it to an internal representation called a :std:ref:`ref_flyteidl.core.typedinterface`.
+For each variable a corresponding :std:ref:`ref_flyteidl.core.literaltype` is created. Thus as an example the following python function's interface is transformed as follows,
+
+.. code-block:: python
+
+    @task
+    def my_task(a: int, b: str) -> FlyteFile:
+        """
+        Description of my function
+        :param a: My input Integer
+        :param b: My input string
+        :return: My output File
+        """
+        ...
+
+
+The converted representation is as follows
+
+.. code-block:: json
+
+    interface {
+    inputs {
+      variables {
+        key: "a"
+        value {
+          type {
+            simple: INTEGER
+          }
+          description: "My input Integer"
+        }
+      }
+      variables {
+        key: "b"
+        value {
+          type {
+            simple: STRING
+          }
+          description: "My input string"
+        }
+      }
+    }
+    outputs {
+      variables {
+        key: "o0"
+        value {
+          type {
+            blob {
+            }
+          }
+          description: "My output File"
+        }
+      }
+    }
+  }
+
+
+**Runtime**
+A runtime, the data is passed through Flyte using :std:ref:`ref_flyteidl.core.literal`s and the values are set. For Files, the corresponding Literal is called LiteralBlob - :std:ref:`ref_flyteidl.core.blob`, which stands for a
+binary large object. Many different objects can be mapped to the underlying `Blob` or `Struct` types. For example and Image is a Blob, as pandas.DataFrame is a Blob of type parquet etc.
+
 
 Data Movement
 ==============
+Flyte is first and foremost a DataFlow Engine. It enables movement of data and provides an abstraction to enable movement of data between different languages. One implementation of Flyte is the current workflow engine.
+the workflow Engine is responsible to move data from a previous task to the next task. As explained above, it only deals with the Metadata and not the actual Raw data.
+The illustration below explains how data flows from the engine to the task and how that is transferred between tasks. The medium to transfer the data can change, and will change in the future. We could use faster metadata stores to speed up data  movement or exploit locality.
 
 Between Flytepropeller and Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,4 +125,12 @@ Between Flytepropeller and Tasks
 
 Between Tasks
 ~~~~~~~~~~~~~~
+
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_data_transfer.png
+
+
+Bringing in your own Datastores for RawData
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Flytekit has a pluggable data persistence layer as explained in :std:ref:`data.extend:extend data persistence layer`. This is driven by the protocol.
+For example it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://`` to change how data is stored and accessed.
+But, for Metadata, the data should be accessible to Flyte control plane. This is also pluggable and by default supports all major blob stores and uses an interface defined in flytestdlib `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage>`_.
