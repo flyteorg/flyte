@@ -4,7 +4,7 @@
 Executions
 ##########
 
-Typical flow using flyte-cli
+Typical flow using flytectl
 -----------------------------
 * When you request an execution of a Workflow using the UI, Flyte CLI or other stateless systems, the system first calls the
   getLaunchPlan endpoint and retrieves a Launch Plan matching the name for a version. The Launch Plan definition includes the definitions of all the input variables declared for the Workflow.

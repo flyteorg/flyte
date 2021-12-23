@@ -28,10 +28,19 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-general
        :type: ref
-       :text: General Flyte Configuration
+       :text: Configuration of Custom K8s resources, Resource quotas etc
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    General configuration options are covered here.
+    This section covers how you can use Flyte's cluster-resource-controller to control your specific kubernetes resources, administer project/domain specific resource quotas, so that you can limit number of cpus/gpus/mem per tenant etc.
+
+    ---
+
+    .. link-button:: deployment-customizable-resources
+       :type: ref
+       :text: Create new configurations for specific combinations of user projects, domains and workflows that override default values.
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    This section covers how you can create new default configuration or override certain values for specific tenants through Flyte API's
 
     ---
 
@@ -49,7 +58,7 @@ Cluster Config
        :text: Flyte Propeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Propeller configuration specification are covered here.
+    Detailed list of all Flyte Propeller configuration options and their default values can be found here.
 
     ---
 
