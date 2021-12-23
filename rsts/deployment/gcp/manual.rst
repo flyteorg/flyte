@@ -433,8 +433,7 @@ Installing Flyte
 
 #. Configure flyte project and domain (Optional)
 
-
-You can configure projects in flyte, By default flyte create 3 projects i.e. flytesnacks, flytetester, flyteexample
+Please update the helm values for restricting number of projects, By default flyte create 3 projects i.e. flytesnacks, flytetester, flyteexample.
 
 .. code-block::
 
@@ -445,7 +444,7 @@ You can configure projects in flyte, By default flyte create 3 projects i.e. fly
        - flytetester
        - flyteexamples
 
-You can also configure domain per project by defining domain config, By default flyte creates 3 domain per project i.e development, staging and production 
+Please update helm values for restricting number of domain, By default flyte creates 3 domain per project i.e development, staging and production
 
 .. code-block::
 
@@ -459,8 +458,28 @@ You can also configure domain per project by defining domain config, By default 
            name: staging
          - id: production
            name: production
+   # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
    
-Flyte will create namespace based of above config, Flyte will create 3 namespaces for each project because we have 3 domian that means per project-domain on namespace. 
+   # Only update the  cluster resource manager if you are using the flyte resource manager, It will create the required resource in project-domain namespace. 
+   cluster_resource_manager:
+     enabled: true
+     config:
+       cluster_resources:
+          customData:
+            - development:
+                - projectQuotaCpu:
+                  value: "5"
+                - projectQuotaMemory:
+                  value: "4000Mi"
+                - defaultIamRole:
+                  value: "gsa-development@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
+            - staging:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "gsa-development@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
 
 
 #. Update helm dependencies
