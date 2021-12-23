@@ -315,14 +315,19 @@ Ask us anything Flyte, weekly on Wednesdays:
 
 ### Conferences
 
+2019  
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
 - Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)
 - re:invent 2019 - Implementing ML workflows with Kubernetes and Amazon Sagemaker [video](https://youtu.be/G-wzIQQJKaE)
 - Cloud-native machine learning at Lyft with AWS Batch and Amazon EKS [video](https://youtu.be/n_rRb8u1GSM)
+
+2020  
 - OSS + ELC NA 2020 [splash](https://ossna2020.sched.com/event/313cec91aa38a430a25f9571039874b8)
 - Datacouncil [video](https://www.youtube.com/watch?v=1BjXC5TZAiI) | [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 - FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)
 - [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)
+
+2021  
 - OSPOCon 2021:
   - Building and Growing an Open Source Community for an Incubating Project [video](https://www.youtube.com/watch?v=DhXlTzCDeGI&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=37)
   - Enforcing Data Quality in Data Processing and ML Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=IB3KrIk4ics&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=84)
@@ -332,6 +337,9 @@ Ask us anything Flyte, weekly on Wednesdays:
 - PyData Global 2021 - Robust, End-to-end Online Machine Learning Applications with Flytekit, Pandera and Streamlit [session](https://pydata.org/global2021/schedule/presentation/119/robust-end-to-end-online-machine-learning-applications-with-flytekit-pandera-and-streamlit/)
 - ODSC West Reconnect - Deep Dive Into Flyte [workshop](https://odsc.com/speakers/deep-dive-into-flyte/) 
 
+2022
+- DataCouncil Austin - Type-Safe Data Processing and Machine Learning Pipelines with Flyte and Pandera [session](https://www.datacouncil.ai/talks/type-safe-data-processing-and-machine-learning-pipelines-with-flyte-and-pandera?hsLang=en)  
+  
 ### Podcasts
 
 - TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
