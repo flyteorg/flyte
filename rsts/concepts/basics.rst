@@ -150,14 +150,13 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
 
     tasks
     workflows
+    nodes
     launchplans
+    schedules
     registration
     executions
-    nodes
-    schedules
     state_machine
     execution_timeline
     data_management
     flyte_console
     catalog
-
