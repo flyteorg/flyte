@@ -309,7 +309,7 @@ Ask us anything Flyte, weekly on Wednesdays:
 
 - [Flyte Monthly](https://www.getrevue.co/profile/flyte)
 
-### Conference Talks & Pod Casts
+### Conference Talks & Podcasts
 
 <details>
 
