@@ -502,6 +502,14 @@ data:
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
+    manager:
+      pod-application: flytepropeller
+      pod-template-container-name: flytepropeller
+      pod-template-name: flytepropeller-template
+      scan-interval: 10s
+      shard:
+        pod-count: 3
+        type: Hash
     propeller:
       downstream-eval-duration: 30s
       enable-admin-launcher: true
@@ -3548,7 +3556,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "cfa138e6b995a9c41f1b9e2945fc05c542920c7c2b6738fb3f3c33332f370ce"
+        configChecksum: "b5a1d64f32c91ac2307b63bae9be782cb009c426bbc335f7d56fb03429600fa"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3617,7 +3625,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.4
       annotations:
-        configChecksum: "cfa138e6b995a9c41f1b9e2945fc05c542920c7c2b6738fb3f3c33332f370ce"
+        configChecksum: "b5a1d64f32c91ac2307b63bae9be782cb009c426bbc335f7d56fb03429600fa"
     spec:
       securityContext:
         fsGroup: 65534
