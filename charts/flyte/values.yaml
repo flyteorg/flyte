@@ -162,6 +162,7 @@ flyte:
   flytepropeller:
     # -- Replicas count for Flytepropeller deployment
     replicaCount: 1
+    manager: false
     image:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
@@ -460,6 +461,15 @@ flyte:
 
     # -- Core propeller configuration
     core:
+      # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config).
+      manager:
+        pod-application: "flytepropeller"
+        pod-template-container-name: "flytepropeller"
+        pod-template-name: "flytepropeller-template"
+        scan-interval: 10s
+        shard:
+          type: Hash
+          pod-count: 3
       # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
       propeller:
         rawoutput-prefix: s3://my-s3-bucket/
