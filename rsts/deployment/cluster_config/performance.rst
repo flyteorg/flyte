@@ -200,13 +200,13 @@ The Hash Shard Strategy, denoted by "type: hash" in the configuration below, use
 
     configmap:
       core:
-    	# a configuration example using the "hash" shard type
-    	manager:
-    	  # pod and scanning configuration redacted
+        # a configuration example using the "hash" shard type
+        manager:
+          # pod and scanning configuration redacted
           # ...
-    	  shard:
-    	    type: hash     # use the "hash" shard strategy
-    	    shard-count: 4 # the total number of shards
+          shard:
+            type: hash     # use the "hash" shard strategy
+            shard-count: 4 # the total number of shards
  
 The Project and Domain Shard Strategies, denoted by "type: project" and "type: domain" respectively, use the FlyteWorkflow project and domain metadata to shard FlyteWorkflows. These Shard Strategies are configured using a "per-shard-mapping" option, which is a list of ID lists. Each element in the "per-shard-mapping" list defines a new shard and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and on that shard their must be only one ID, namely the wildcard.
 
@@ -214,34 +214,34 @@ The Project and Domain Shard Strategies, denoted by "type: project" and "type: d
 
     configmap:
       core:
-    	# a configuration example using the "project" shard type
-    	manager:
-    	  # pod and scanning configuration redacted
+        # a configuration example using the "project" shard type
+        manager:
+          # pod and scanning configuration redacted
           # ...
-    	  shard:
-    	    type: project       # use the "project" shard strategy
-    	    per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
-    	      - ids:            # the list of ids to be managed by the first shard
-    	        - flytesnacks
-    	      - ids:            # the list of ids to be managed by the second shard
-    	        - flyteexamples
-    	        - flytelabs
-    	      - ids:            # the list of ids to be managed by the third shard
-    	        - "*"           # use the wildcard to manage all ids not managed by other shards
+          shard:
+            type: project       # use the "project" shard strategy
+            per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
+              - ids:            # the list of ids to be managed by the first shard
+                - flytesnacks
+              - ids:            # the list of ids to be managed by the second shard
+                - flyteexamples
+                - flytelabs
+              - ids:            # the list of ids to be managed by the third shard
+                - "*"           # use the wildcard to manage all ids not managed by other shards
     
     configmap:
       core:
-    	# a configuration example using the "domain" shard type
-    	manager:
-    	  # pod and scanning configuration redacted
+        # a configuration example using the "domain" shard type
+        manager:
+          # pod and scanning configuration redacted
           # ...
-    	  shard:
-    	    type: domain        # use the "domain" shard strategy
-    	    per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
-    	      - ids:            # the list of ids to be managed by the first shard
-    	        - production
-    	      - ids:            # the list of ids to be managed by the second shard
-    	        - "*"           # use the wildcard to manage all ids not managed by other shards
+          shard:
+            type: domain        # use the "domain" shard strategy
+            per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
+              - ids:            # the list of ids to be managed by the first shard
+                - production
+              - ids:            # the list of ids to be managed by the second shard
+                - "*"           # use the wildcard to manage all ids not managed by other shards
  
 Multi-Cluster mode
 ===================
