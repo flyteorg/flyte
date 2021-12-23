@@ -182,12 +182,13 @@ Datacatalog is a stateless service and its replicas (in the kubernetes deploymen
 
 Scaling out FlytePropeller
 ===========================
+
 Manual scale-out
-^^^^^^^^^^^^^^^^
+----------------
 FlytePropeller can be run manually per namespace. This is not a recommended solution as it is harder to deploy, but if your organization can deploy and maintain multiple copies of FlytePropeller, you can use this.
 
 Automatic scale-out
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------
 FlytePropeller Manager is a new component introduced as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_ to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses k8s label selectors to deterministically assign FlyteWorkflow CRD responsibilites to FlytePropeller instances, effectively distributing processing load over the shards.
 
 Deployment of FlytePropeller Manager requires k8s configuration updates including a modified FlytePropeller Deployment and a new PodTemplate defining managed FlytePropeller instances. The easiest way to apply these updates is by setting the "flytepropeller.manager" value to "true" in the `helm deployment <https://docs.flyte.org/en/latest/deployment/overview.html#usage-of-helm>`_ and setting the manager config at "configmap.core.manager".
