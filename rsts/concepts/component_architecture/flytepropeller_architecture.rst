@@ -13,9 +13,9 @@ Flyte workflows are represented as a Directed Acyclic Graph (DAG) of interconnec
 
 FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a k8s controller and adheres to established k8s design principles. In this scheme, resources are periodically evaluated and the goal is transition from the observed to a requested state. In our case, workflows are the resource and they are iteratively evaluated to transition from the current state to success. During each loop, the current workflow state is established as the phase of workflow nodes and subsequent tasks, and FlytePropeller performs operations to transition this state to success. The operations may include scheduling (or rescheduling) node executions, evaluating dynamic or branch nodes, etc. These design decisions ensure FlytePropeller can scale to manage a large number of concurrent workflows without performance degradation.
 
-This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. In addition to a brief description, each component includes the exported API / interface definitions. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
+This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
 
-TODO: add image
+.. image:: https://raw.githubusercontent.com/flyteorg/flyte/e953a78abb3e31d1cad4daf6a4680642ed4cc7d0/img/architecture/flytepropeller_architecture.png
 
 Components
 ==========
