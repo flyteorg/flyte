@@ -92,6 +92,19 @@ For each task in a workflow, FlytePropeller activates the appropriate plugin bas
 The Flyte team has pre-built plugins for Hive, Spark, and AWS Batch, and more.
 To support new use-cases, developers can create their own plugins and bundle them in their FlytePropeller deployment.
 
+Component Code Architecture
+===========================
+
+.. panels::
+  :container: container-lg pb-4
+  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :body: text-center
+
+  .. link-button:: flytepropeller-architecture
+     :type: ref
+     :text: FlytePropeller
+     :classes: btn-block stretched-link
+
 Component Code References
 =========================
 
@@ -125,3 +138,10 @@ Component Code References
      :type: url
      :text: FlytePlugins
      :classes: btn-block stretched-link
+
+.. toctree::
+    :maxdepth: 1
+    :name: component code architecture
+    :hidden:
+
+    component_architecture/flytepropeller_architecture
