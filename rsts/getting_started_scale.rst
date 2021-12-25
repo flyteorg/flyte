@@ -78,68 +78,82 @@ Install flytectl
 
 #. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run this getting started against a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a flyte cluster.
 
-   .. tabbed:: Start a new sandbox cluster
+   .. tabs::
+       .. group-tab:: Flyte Sandbox
 
-     .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
+          .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
 
-     Here '.' represents current directory and assuming you have changed into ``myflyteapp`` — the git-cloned directory you created.
+          Here '.' represents current directory and assuming you have changed into ``myflyteapp`` — the git-cloned directory you created.
 
-     .. prompt:: bash $
+          .. prompt:: bash $
 
-        flytectl sandbox start --source .
+             flytectl sandbox start --source .
 
-     Setup flytectl sandbox config
+          Setup flytectl sandbox config
 
-     .. prompt:: bash $
+          .. prompt:: bash $
 
-        flytectl config init
+             flytectl config init
 
-     **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
+          **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
 
-   .. tabbed:: Connect to an existing Flyte cluster
+       .. group-tab:: Remote Flyte Cluster
 
-     .. prompt:: bash $
+          Setup flytectl remote cluster config
 
-         flytectl config init --host={FLYTEADMIN_URL} --storage
+          .. prompt:: bash $
+
+              flytectl config init --host={FLYTEADMIN_URL} --storage
 
 
 Build & Deploy Your Application to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Flyte uses Docker containers to package the workflows and tasks and sends them to the remote Flyte cluster. Thus, there is a ``Dockerfile`` already included in the cloned repo. You can build the Docker container and push the built image to a registry.
 
-   .. tabbed:: Flyte Sandbox
+   .. tabs::
+       .. group-tab:: Flyte Sandbox
 
-     Since ``flyte-sandbox`` runs locally in a Docker container, you need not push the Docker image. You can combine the build and push step by simply building the image inside the Flyte-sandbox container. This can be done using the following command:
+         Since ``flyte-sandbox`` runs locally in a Docker container, you need not push the Docker image. You can combine the build and push step by simply building the image inside the Flyte-sandbox container. This can be done using the following command:
 
-     .. prompt:: bash $
+         .. prompt:: bash $
 
-         flytectl sandbox exec -- docker build . --tag "myapp:v1"
+             flytectl sandbox exec -- docker build . --tag "myapp:v1"
 
-     .. tip::
-      #. Why are we not pushing the Docker image? Want to understand the details — refer to :ref:`deployment-sandbox`
-      #. *Recommended:* Use the bundled `./docker_build_and_tag.sh`. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in achieving GitOps style workflows.
+         .. tip::
+          #. Why are we not pushing the Docker image? Want to understand the details — refer to :ref:`deployment-sandbox`
+          #. *Recommended:* Use the bundled `./docker_build_and_tag.sh`. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in achieving GitOps style workflows.
 
-   .. tabbed:: Remote Flyte Cluster
+       .. group-tab:: Remote Flyte Cluster
 
-     If you are using a remote Flyte cluster, then you need to build your container and push it to a registry that is accessible by the Flyte Kubernetes cluster.
+         If you are using a remote Flyte cluster, then you need to build your container and push it to a registry that is accessible by the Flyte Kubernetes cluster.
 
-     .. prompt:: bash $
+         .. prompt:: bash $
 
-         docker build . --tag <registry/repo:version>
-         docker push <registry/repo:version>
+             docker build . --tag <registry/repo:version>
+             docker push <registry/repo:version>
 
-     **OR** ``flytekit-python-template`` ships with a helper `docker build script <https://github.com/flyteorg/flytekit-python-template/blob/main/docker_build_and_tag.sh>`__ which make it possible to build and image, tag it correctly and optionally use the git-SHA as the version.
-     We recommend using such a script to track versions more effectively and use a CI/CD pipeline to deploy your code.
+         **OR** ``flytekit-python-template`` ships with a helper `docker build script <https://github.com/flyteorg/flytekit-python-template/blob/main/docker_build_and_tag.sh>`__ which make it possible to build and image, tag it correctly and optionally use the git-SHA as the version.
+         We recommend using such a script to track versions more effectively and use a CI/CD pipeline to deploy your code.
 
-     .. prompt:: bash $
+         .. prompt:: bash $
 
-         ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version>]
+             ./docker_build_and_tag.sh -r <registry> -a <repo> [-v <version>]
 
 #. Next, package the workflow using the ``pyflyte`` cli bundled with Flytekit and upload it to the Flyte backend. Note that the image is the same as the one built in the previous step.
 
-   .. prompt:: bash (venv)$
+   .. tabs::
 
-      pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
+     .. group-tab:: Flyte Sandbox
+
+        .. prompt:: bash $
+
+            pyflyte --pkgs flyte.workflows package --image "myapp:v1"
+
+     .. group-tab:: Remote Flyte Cluster
+
+        .. prompt:: bash $
+
+            pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
 
 #. Upload this package to the Flyte backend. We refer to this as ``registration``. The version here ``v1`` does not have to match the version
    used in the commands above. It's generally recommended to match the versions to make it easier to track.
