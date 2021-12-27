@@ -3,7 +3,7 @@ package config
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
 var (
 	DefaultConfig = &Config{
-		Insecure: true,
+		Insecure: false,
 		Storage:  false,
 	}
 )
