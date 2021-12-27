@@ -469,25 +469,25 @@ Search and replace the following
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
 
 
-4. Configure flyte project and domain (Optional)
+4. (Optional) Configure Flyte project and domain
 
-Please update the helm values for restricting number of projects, By default flyte create 3 projects i.e. flytesnacks, flytetester, flyteexample.
+To restrict projects, update Helm values. By default, Flyte creates three projects: Flytesnacks, Flytetester, and Flyteexample.
 
 .. code-block::
 
-   # you can define the number of projects as per your need 
+   # you can define projects as per your need
    flyteadmin:
     initialProjects:
        - flytesnacks
        - flytetester
        - flyteexamples
 
-Please update helm values for restricting number of domain, By default flyte creates 3 domain per project i.e development, staging and production
+To restrict domains, update Helm values again. By default, Flyte creates three domains per project: development, staging and production.
 
 .. code-block::
 
-   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
-   configmap 
+   # -- Domain configuration for Flyte project. This enables the specified number of domains across all projects in Flyte.
+   configmap
      domain:
        domains:
          - id: development
@@ -497,8 +497,8 @@ Please update helm values for restricting number of domain, By default flyte cre
          - id: production
            name: production
    # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
-   
-   # Only update the  cluster resource manager if you are using the flyte resource manager, It will create the required resource in project-domain namespace. 
+
+   # Update Cluster resource manager only if you are using Flyte resource manager. It will create the required resource in the project-domain namespace.
    cluster_resource_manager:
      enabled: true
      config:
@@ -519,11 +519,11 @@ Please update helm values for restricting number of domain, By default flyte cre
                 - defaultIamRole:
                   value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
 
-5. Install Flyte
+1. Install Flyte
 
 .. tabbed:: Flyte Native scheduler
 
-  * Install Flyte with Flyte native scheduler:
+  * Install Flyte with Flyte native scheduler
 
     .. code-block:: bash
 
