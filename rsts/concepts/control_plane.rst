@@ -27,16 +27,6 @@ Control Plane
 
     ---
 
-    .. link-button:: divedeep-registration
-        :type: ref
-        :text: Registration
-        :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    **Registration** is the process of uploading a workflow and its task definitions to the FlyteAdmin service.
-    Registration creates an inventory of available tasks, workflows and launchplans declared per project and domain.
-
-    ---
-
     .. link-button:: divedeep-admin
         :type: ref
         :text: Flyte Admin
@@ -60,6 +50,6 @@ Control Plane
 
     projects
     domains
-    registration
     admin
     console
+    dynamic_spec

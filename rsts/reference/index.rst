@@ -50,6 +50,15 @@ API Reference
    ^^^^^^^^^^^^
    Flyte Backend REST / gRPC API specification.
 
+   ---
+
+   .. link-button:: reference-swagger
+      :type: ref
+      :text: Flyte API Swagger Playground
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   FlyteAdmin exposes a REST interface. Try out the API using an interactive environment.
+
 
 .. toctree::
    :maxdepth: 1
@@ -62,3 +71,4 @@ API Reference
    Flytekit Python <https://flytekit.readthedocs.io>
    Flytekit Java <https://github.com/spotify/flytekit-java>
    FlyteAdmin <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html>
+   swagger

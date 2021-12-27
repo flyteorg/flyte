@@ -28,10 +28,19 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-general
        :type: ref
-       :text: General Flyte Configuration
+       :text: Configuration of Custom K8s Resources, Resource Quotas
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    General configuration options are covered here.
+    How to use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific resource quotas (say, to limit the number of CPUs/GPUs/mem per tenant).
+
+    ---
+
+    .. link-button:: deployment-customizable-resources
+       :type: ref
+       :text: New Configurations for Specific Tenants
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Creating new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
 
     ---
 
@@ -40,7 +49,7 @@ Cluster Config
        :text: Flyte Admin Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Admin configuration specification are covered here.
+    All about FlyteAdmin configuration specification.
 
     ---
 
@@ -49,7 +58,7 @@ Cluster Config
        :text: Flyte Propeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Propeller configuration specification are covered here.
+    Detailed list of all Flyte Propeller configuration options and their default values.
 
     ---
 
@@ -85,17 +94,7 @@ Cluster Config
        :text: Performance
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Tweaks to improve performance of the core Flyte engine
-
-    ---
-
-    .. link-button:: deployment-cluster-config-swagger
-       :type: ref
-       :text: Swagger
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Swagger Open API Schema UI
-
+    Tweaks to improve performance of the core Flyte engine.
 
 .. toctree::
     :maxdepth: 1
@@ -106,10 +105,10 @@ Cluster Config
     auth_migration
     auth_appendix
     general
+    customizable_resources
     flyteadmin_config
     flytepropeller_config
     monitoring
     notifications
     performance
-    swagger
     eventing

@@ -1,8 +1,8 @@
-.. _divedeep-customizable-resources:
+.. _deployment-customizable-resources:
 
-#############################
-Adding customizable resources
-#############################
+##################################
+Adding New Customizable Resources
+##################################
 
 For background on customizable resources, see the :ref:`deployment-cluster-config-general`.
 As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects,

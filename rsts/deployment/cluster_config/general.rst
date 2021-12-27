@@ -159,7 +159,7 @@ Increasing specificity defines how matchable resource attributes get applied. Th
 
 #. Domain
 
-Default values for all and per-domain attributes may be specified in the FlyteAdmin config as documented in the :std:ref:`concepts/customizable_resources:adding customizable resources`.
+Default values for all and per-domain attributes may be specified in the FlyteAdmin config as documented in the :std:ref:`deployment-customizable-resources`.
 
 Example
 =======
