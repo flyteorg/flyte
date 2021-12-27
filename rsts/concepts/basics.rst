@@ -6,7 +6,7 @@ Core Concepts
 
 .. panels::
     :header: text-center
- 
+
     .. link-button:: divedeep-tasks
        :type: ref
        :text: Tasks
@@ -14,9 +14,9 @@ Core Concepts
     ^^^^^^^^^^^^
     A **Task** is any independent unit of processing. They can be pure functions or functions with side-effects.
     Each definition of a task also has associated configuration and requirements specifications.
- 
+
     ---
- 
+
     .. link-button:: divedeep-workflows
        :type: ref
        :text: Workflows
@@ -34,7 +34,7 @@ Core Concepts
     ^^^^^^^^^^^^
     A **Node** is an encapsulation of an instance of a Task and represent the unit of work, where multiple Nodes that are
     interconnected via workflows
-    
+
     ---
 
     .. link-button:: divedeep-launchplans
@@ -48,10 +48,10 @@ Core Concepts
 
     .. link-button:: concepts-schedules
        :type: ref
-       :text: Scheduling your LaunchPlans
+       :text: Scheduling Launch Plans
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Scheduling** is critical to data and ML jobs and Flyte provides a native Cron style scheduler.
+    **Scheduling** is critical to data and ML jobs; Flyte provides a native Cron-style scheduler.
 
     ---
 
@@ -60,8 +60,8 @@ Core Concepts
         :text: Registration
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Registration** is the process of uploading a workflow and its task definitions to the FlyteAdmin service.
-    Registration creates an inventory of available tasks, workflows and launchplans declared per project and domain.
+    **Registration** is the process of uploading workflow and its task definitions to the FlyteAdmin service.
+    Registration creates an inventory of available tasks, workflows and launch plans - declared per project and domain.
 
     ---
 
@@ -77,10 +77,10 @@ Core Concepts
 
     .. link-button:: divedeep-state-machine
         :type: ref
-        :text: State Machine for an execution
+        :text: State Machine for an Execution
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section explains the states an **Execution** progresses through.
+    States an **Execution** passes through.
 
     ---
 
@@ -89,34 +89,34 @@ Core Concepts
         :text: Life of an Execution
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section explains how an **Execution** progresses through the FlytePropeller execution engine and the timeline.
+    How an **Execution** progresses through the FlytePropeller execution engine and the timeline.
 
     ---
 
     .. link-button:: divedeep-data-management
         :type: ref
-        :text: How Flyte manages Data?
+        :text: How Flyte Manages Data?
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section explains what is metadata, how large amounts of raw-data is handled and how data flows between tasks.
+    What is **metadata**? How large amounts of **raw data** is handled? How data flows between tasks?
 
     ---
 
     .. link-button:: ui
         :type: ref
-        :text: Walkthrough for Flyte UI
+        :text: Flyte UI Walkthrough
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section provides a quick overview of the FlyteConsole.
+    A quick overview of the **FlyteConsole**.
 
     ---
 
     .. link-button:: divedeep-catalog
         :type: ref
-        :text: Platform-wide memoization/caching in Flyte
+        :text: Platform-wide Memoization/Caching
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section provides a deeper dive into what is memoization and the mechanics of memoization in Flyte.
+    A deeper dive into **memoization** and the mechanics of memoization in Flyte.
 
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.

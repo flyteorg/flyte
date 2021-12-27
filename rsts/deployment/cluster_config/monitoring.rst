@@ -3,17 +3,20 @@
 Monitoring
 ----------
 
-.. tip:: The Flyte core team publishes a maintains Grafana dashboards built using Prometheus data sources and can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`__.
+.. tip:: The Flyte core team publishes and maintains Grafana dashboards built using Prometheus data sources, which can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`__.
 
-Metrics for your executions
-===========================
+Metrics for Executions
+======================
 
-Flyte-Provided Metrics
-~~~~~~~~~~~~~~~~~~~~~~~
-Whenever you run a workflow, Flyte Platform automatically emits high-level metrics. These metrics follow a consistent schema and
-aim to provide visibility into aspects of the Platform which might otherwise be opaque.  These metrics will help users diagnose whether an issue is inherent to the Platform or to one's own task or workflow implementation. We will be adding to this set of metrics as we implement the capabilities to pull more data from the system, so keep checking back for new stats!
+Flyte-provided Metrics
+~~~~~~~~~~~~~~~~~~~~~~
 
-At a highlevel, workflow execution goes through the following discrete steps:
+Whenever you run a workflow, Flyte platform automatically emits high-level metrics. These metrics follow a consistent schema and aim to provide visibility into aspects of the platform which might otherwise be opaque.
+These metrics help users diagnose whether an issue is inherent to the platform or one's own task or workflow implementation.
+
+We will be adding to this set of metrics as we implement the capabilities to pull more data from the system, so keep checking back for new stats!
+
+At a high level, workflow execution goes through the following discrete steps:
 
 .. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_timeline.svg?sanitize=true
 
@@ -22,13 +25,13 @@ At a highlevel, workflow execution goes through the following discrete steps:
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
                Events                                                              Description
 ===================================  ==================================================================================================================================
-Acceptance                           Measures the time between when we receive service call to create an Execution (Unknown) and when it has moved to Queued.
-Transition Latency                   Measures the latency between two consecutive node executions, the time spent in Flyte engine.
-Queuing Latency                      Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state.
-Task Execution                       Actual time spent executing user code
+Acceptance                           Measures the time consumed from receiving a service call to creating an Execution (Unknown) and moving to QUEUED.
+Transition Latency                   Measures the latency between two consecutive node executions; the time spent in Flyte engine.
+Queuing Latency                      Measures the latency between the node moving to QUEUED and the handler reporting the executable moving to RUNNING state.
+Task Execution                       Actual time spent executing the user code.
 Repeat steps 2-4 for every task
 Transition Latency                   See #2
-Completion Latency                   Measures the time between when the WF moved to succeeding/failing state and when it finally moved to a terminal state.
+Completion Latency                   Measures the time consumed by a workflow moving from SUCCEEDING/FAILING state to TERMINAL state.
 ===================================  ==================================================================================================================================
 
 
@@ -37,19 +40,19 @@ Completion Latency                   Measures the time between when the WF moved
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                     Prefix                                     Type                                           Description
 ==========================================================  ===========  ===============================================================================================================================================================
-``propeller.all.workflow.acceptance-latency-ms``            Timer (ms)   Measures the time between when we receive service call to create an Execution (Unknown) and when it has moved to Queued.
-``propeller.all.node.queueing-latency-ms``                  Timer (ms)   Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state.
-``propeller.all.node.transition-latency-ms``                Timer (ms)   Measures the latency between two consecutive node executions, the time spent in Flyte engine.
-``propeller.all.workflow.completion-latency-ms``            Timer (ms)   Measures the time between when the WF moved to succeeding/failing state and when it finally moved to a terminal state.
-``propeller.all.node.success-duration-ms``                  Timer (ms)   Actual time spent executing user code (when the node ends with success phase).
-``propeller.all.node.success-duration-ms-count``            Counter      Count of how many times a node success was reported.
-``propeller.all.node.failure-duration-ms``                  Timer (ms)   Actual time spent executing user code (when the node ends with failure phase).
-``propeller.all.node.failure-duration-ms-count``            Counter      Count of how many times a node failure was reported.
+``propeller.all.workflow.acceptance-latency-ms``            Timer (ms)   Measures the time consumed from receiving a service call to creating an Execution (Unknown) and moving to QUEUED.
+``propeller.all.node.queueing-latency-ms``                  Timer (ms)   Measures the latency between the node moving to QUEUED and the handler reporting the executable moving to RUNNING state.
+``propeller.all.node.transition-latency-ms``                Timer (ms)   Measures the latency between two consecutive node executions; the time spent in Flyte engine.
+``propeller.all.workflow.completion-latency-ms``            Timer (ms)   Measures the time consumed by a workflow moving from SUCCEEDING/FAILING state to TERMINAL state.
+``propeller.all.node.success-duration-ms``                  Timer (ms)   Actual time spent executing user code (when the node ends with SUCCESS state).
+``propeller.all.node.success-duration-ms-count``            Counter      The number of times a node success has been reported.
+``propeller.all.node.failure-duration-ms``                  Timer (ms)   Actual time spent executing user code (when the node ends with FAILURE state).
+``propeller.all.node.failure-duration-ms-count``            Counter      The number of times a node failure has been reported.
 
 ==========================================================  ===========  ===============================================================================================================================================================
 
-All the above stats are automatically tagged with the following fields for further scoping.  This includes user-produced stats.  Users
-can also provide additional tags (or override tags) for custom stats.
+All the above stats are automatically tagged with the following fields for further scoping. This includes user-produced stats.
+Users can also provide additional tags (or override tags) for custom stats.
 
 .. _task_stats_tags:
 
@@ -58,34 +61,37 @@ can also provide additional tags (or override tags) for custom stats.
 --------------------------------------------------------------------------------------------------
       Tag                                                 Description
 ===============  =================================================================================
-wf               This is the name of the workflow that was executing when this metric was emitted.
+wf               Name of the workflow that was executing when this metric was emitted.
                  ``{{project}}:{{domain}}:{{workflow_name}}``
 ===============  =================================================================================
 
 User Stats With Flyte
 ~~~~~~~~~~~~~~~~~~~~~~
-The workflow parameters object that the SDK injects into the various tasks has a statsd handle that users should call
-to emit stats related to their workflows not captured by the default metrics. The usual caveats around cardinality apply of course.
 
-.. todo: Reference to flytekit task stats
+The workflow parameters object that the SDK injects into various tasks has a ``statsd`` handle that users should call
+to emit stats of their workflows not captured by the default metrics. The usual caveats around cardinality apply, of course.
 
-Users are encouraged to avoid creating their own stats handlers.  These can pollute the general namespace if not done
-correctly, and also can accidentally interfere with production stats of live services, causing pages and wreaking
-havoc in general.  In fact, if you're using any libraries that emit stats, it's best to turn them off if possible.
+.. todo: Reference to Flytekit task stats
+
+Users are encouraged to avoid creating their own stats handlers.
+If not done correctly, these can pollute the general namespace and accidentally interfere with the production stats of live services, causing pages and wreaking havoc.
+If you're using any libraries that emit stats, it's best to turn them off if possible.
 
 
-Use published dashboards for Monitoring your Flyte deployment
-==============================================================
+Use Published Dashboards to Monitor Flyte Deployment
+====================================================
 
-Flyte Backend is  written in Golang and exposes stats using Prometheus. The Stats themselves are labeled with the Workflow, Task, Project & Domain wherever appropriate.
+Flyte Backend is written in Golang and exposes stats using Prometheus. The stats are labeled with workflow, task, project & domain, wherever appropriate.
 
-The dashboards are divided into primarily 2 types:
+The dashboards are divided into two types:
 
-- User facing dashboards. These are dashboards that can be used to triage/investigate/observe performance and characterisitics of Workflows and tasks.
-  The User facing dashboard is published under Grafana marketplace ID `13980 <https://grafana.com/grafana/dashboards/13980>`_
+- **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
+  The user-facing dashboard is published under Grafana marketplace ID `13980 <https://grafana.com/grafana/dashboards/13980>`__.
 
-- System Dashboards. These dashboards are useful for the system maintainer to maintain their Flyte deployments. These are further divided into
-        - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`_
-        - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`_
+- **System Dashboards**: Dashboards that are useful for the system maintainer to maintain their Flyte deployments. These are further divided into:
+        - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`__
+        - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
 
-These are basic dashboards and do no include all the metrics that are exposed by Flyte. Please help us improve the dashboards by contributing to them. Refer to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.
+The abovementioned are basic dashboards and do no include all the metrics exposed by Flyte.
+Please help us improve the dashboards by contributing to them 🙏.
+Refer to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.

@@ -22,25 +22,25 @@ Cluster Config
        :text: Auth Migration Guide
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Migration guide to help you move to Admin's own authorization server.
+    Migration guide to move to Admin's own authorization server.
 
     ---
 
     .. link-button:: deployment-cluster-config-general
        :type: ref
-       :text: Configuration of Custom K8s resources, Resource quotas etc
+       :text: Configuration of Custom K8s Resources, Resource Quotas
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section covers how you can use Flyte's cluster-resource-controller to control your specific kubernetes resources, administer project/domain specific resource quotas, so that you can limit number of cpus/gpus/mem per tenant etc.
+    How to use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific resource quotas (say, to limit the number of CPUs/GPUs/mem per tenant).
 
     ---
 
     .. link-button:: deployment-customizable-resources
        :type: ref
-       :text: Create new configurations for specific combinations of user projects, domains and workflows that override default values.
+       :text: New Configurations for Specific Tenants
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section covers how you can create new default configuration or override certain values for specific tenants through Flyte API's
+    Creating new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
 
     ---
 
@@ -49,7 +49,7 @@ Cluster Config
        :text: Flyte Admin Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Flyte Admin configuration specification are covered here.
+    All about FlyteAdmin configuration specification.
 
     ---
 
@@ -58,7 +58,7 @@ Cluster Config
        :text: Flyte Propeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Detailed list of all Flyte Propeller configuration options and their default values can be found here.
+    Detailed list of all Flyte Propeller configuration options and their default values.
 
     ---
 
@@ -85,7 +85,7 @@ Cluster Config
        :text: Performance
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Tweaks to improve performance of the core Flyte engine
+    Tweaks to improve performance of the core Flyte engine.
 
 .. toctree::
     :maxdepth: 1

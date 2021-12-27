@@ -54,7 +54,7 @@ API Reference
 
    .. link-button:: reference-swagger
       :type: ref
-      :text: Flyte API Swagger playground
+      :text: Flyte API Swagger Playground
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
    FlyteAdmin exposes a REST interface. Try out the API using an interactive environment.

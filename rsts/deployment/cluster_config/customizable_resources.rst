@@ -1,7 +1,7 @@
 .. _deployment-customizable-resources:
 
 ##################################
-Adding new customizable resources
+Adding New Customizable Resources
 ##################################
 
 For background on customizable resources, see the :ref:`deployment-cluster-config-general`.

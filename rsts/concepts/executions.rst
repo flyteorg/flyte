@@ -4,13 +4,15 @@
 Executions
 ##########
 
-Typical flow using flytectl
------------------------------
-* When you request an execution of a Workflow using the UI, Flyte CLI or other stateless systems, the system first calls the
-  getLaunchPlan endpoint and retrieves a Launch Plan matching the name for a version. The Launch Plan definition includes the definitions of all the input variables declared for the Workflow.
-* The user-side component then ensures that all required inputs are supplied and requests the FlyteAdmin service for an execution
-* The Flyte Admin service validates the inputs, making sure that they are all specified and, if required, within the declared bounds.
-* Flyte Admin then fetches the previously validated and compiled workflow closure and translates it to an executable format with all of the inputs.
-* This executable Workflow is then launched on Kubernetes with an execution record in the database.
+Typical Flow Using FlyteCTL
+---------------------------
+
+* When an execution of a workflow is triggered using UI/FlyteCTL/other stateless systems, the system first calls the
+  ``getLaunchPlan`` endpoint and retrieves a launch plan matching the given version.
+  The launch plan definition includes definitions of all input variables declared for the workflow.
+* The user-side component then ensures that all required inputs are supplied and requests the FlyteAdmin service for an execution.
+* The FlyteAdmin service validates the inputs, making sure that they are all specified and, if required, within the declared bounds.
+* FlyteAdmin then fetches the previously validated and compiled workflow closure and translates it to an executable format with all the inputs.
+* This executable workflow is launched on Kubernetes with an execution record in the database.
 
 .. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_execution_overview.svg?sanitize=true
