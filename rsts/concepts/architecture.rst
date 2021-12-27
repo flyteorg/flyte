@@ -105,6 +105,8 @@ Component Code Architecture
      :text: FlytePropeller
      :classes: btn-block stretched-link
 
+  ---
+
   .. link-button:: native-scheduler-architecture
      :type: ref
      :text: Flyte Native Scheduler
@@ -144,12 +146,13 @@ Component Code References
      :text: FlytePlugins
      :classes: btn-block stretched-link
 
+  ---
+
   .. link-button:: https://pkg.go.dev/github.com/flyteorg/flyteadmin/scheduler
      :type: url
      :text: Flyte Native Scheduler
      :classes: btn-block stretched-link
 
-  ---
 
 .. toctree::
     :maxdepth: 1
