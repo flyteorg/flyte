@@ -56,8 +56,24 @@ func TestSetupConfigFunc(t *testing.T) {
 	assert.Nil(t, initFlytectlConfig(ctx, yes))
 	assert.Nil(t, initFlytectlConfig(ctx, yes))
 	assert.Nil(t, initFlytectlConfig(ctx, no))
-	initConfig.DefaultConfig.Host = "test"
+	initConfig.DefaultConfig.Host = "flyte.org"
+	assert.Nil(t, initFlytectlConfig(ctx, no))
+	initConfig.DefaultConfig.Host = "localhost:30081"
 	assert.Nil(t, initFlytectlConfig(ctx, no))
 	initConfig.DefaultConfig.Storage = true
 	assert.NotNil(t, initFlytectlConfig(ctx, yes))
+}
+
+func TestTrimFunc(t *testing.T) {
+	assert.Equal(t, trim("dns://localhost"), "localhost")
+	assert.Equal(t, trim("http://localhost"), "localhost")
+	assert.Equal(t, trim("https://localhost"), "localhost")
+}
+
+func TestValidateEndpointName(t *testing.T) {
+	assert.Equal(t, validateEndpointName("127.0.0.1"), true)
+	assert.Equal(t, validateEndpointName("127.0.0.1.0"), false)
+	assert.Equal(t, validateEndpointName("localhost"), true)
+	assert.Equal(t, validateEndpointName("flyte.org"), true)
+	assert.Equal(t, validateEndpointName("flyte"), false)
 }

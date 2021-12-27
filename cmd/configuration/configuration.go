@@ -2,9 +2,12 @@ package configuration
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -31,18 +34,24 @@ Generates sandbox config. Flyte Sandbox is a fully standalone minimal environmen
 
 ::
 
- flytectl configuration config 
+ flytectl config init  
 
-Generates remote cluster config. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
+Generates remote cluster config, By default connection is secure. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
 	
 ::
 
- flytectl configuration config --host=flyte.myexample.com
-	
+ flytectl config init --host=flyte.myexample.com
+
+Generates remote cluster config with insecure connection
+
+::
+
+ flytectl config init --host=flyte.myexample.com --insecure 
+
 Generates FlyteCTL config with a storage provider
 ::
 
- flytectl configuration config --host=flyte.myexample.com --storage
+ flytectl config init --host=flyte.myexample.com --storage
 `
 )
 
@@ -50,6 +59,8 @@ var prompt = promptui.Select{
 	Label: "Select Storage Provider",
 	Items: []string{"S3", "GCS"},
 }
+
+var endpointPrefix = [3]string{"dns://", "http://", "https://"}
 
 // CreateConfigCommand will return configuration command
 func CreateConfigCommand() *cobra.Command {
@@ -77,12 +88,18 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 
 	templateValues := configutil.ConfigTemplateSpec{
 		Host:     "dns:///localhost:30081",
-		Insecure: initConfig.DefaultConfig.Insecure,
+		Insecure: true,
 	}
 	templateStr := configutil.GetSandboxTemplate()
 
 	if len(initConfig.DefaultConfig.Host) > 0 {
-		templateValues.Host = fmt.Sprintf("dns:///%v", initConfig.DefaultConfig.Host)
+		trimHost := trim(initConfig.DefaultConfig.Host)
+		host := strings.Split(trimHost, ":")
+		if !validateEndpointName(host[0]) {
+			return errors.New("Please use a valid endpoint")
+		}
+		templateValues.Host = fmt.Sprintf("dns://%s", trimHost)
+		templateValues.Insecure = initConfig.DefaultConfig.Insecure
 		templateStr = configutil.AdminConfigTemplate
 		if initConfig.DefaultConfig.Storage {
 			templateStr = configutil.GetAWSCloudTemplate()
@@ -113,4 +130,24 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 	}
 	fmt.Printf("Init flytectl config file at [%s]", configutil.ConfigFile)
 	return nil
+}
+
+func trim(hostname string) string {
+	for _, prefix := range endpointPrefix {
+		hostname = strings.TrimPrefix(hostname, prefix)
+	}
+	return hostname
+
+}
+
+func validateEndpointName(domain string) bool {
+	RegExp := regexp.MustCompile(`^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z
+ ]{2,3})$`)
+	if RegExp.MatchString(domain) || domain == "localhost" {
+		return true
+	}
+	if net.ParseIP(domain) == nil {
+		return false
+	}
+	return true
 }
