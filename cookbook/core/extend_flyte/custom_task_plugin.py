@@ -105,7 +105,8 @@ class WaitForObjectStoreFile(PythonTask):
 #   This construct does not need a plugin
 #
 # We will try to cover an example of Config objects in a subsequent tutorial
-#
+
+# %%
 # Actual Usage
 # ^^^^^^^^^^^^^
 
