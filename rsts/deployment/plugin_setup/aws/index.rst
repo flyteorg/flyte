@@ -25,6 +25,15 @@ AWS Plugins Setup
     ^^^^^^^^^^^^
     Guide to setting up the AWS Athena Plugin.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-aws-sagemaker
+       :type: ref
+       :text: AWS Sagemaker
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the AWS Sagemaker Plugin.
+
 .. toctree::
     :maxdepth: 1
     :name: AWS plugin Setup
@@ -32,3 +41,4 @@ AWS Plugins Setup
 
     batch
     athena
+    sagemaker

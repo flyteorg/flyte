@@ -83,11 +83,12 @@ The workflow can be run locally, simply by running it as a Python script; note t
 
    python flyte/workflows/example.py
 
-.. dropdown:: Expected output
 
-   .. prompt:: text
+Expected output:
 
-      Running my_wf() hello world
+.. prompt:: text
+
+  Running my_wf() hello world
 
 .. admonition:: Recap
 

@@ -186,7 +186,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
    1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. https://flyte.mycompany.io/).
    2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
    3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
-   4. Create 2 apps (for fltyectl and flytepropeller) to enable these clients to communicate with the service.
+   4. Create 2 apps (for flytectl and flytepropeller) to enable these clients to communicate with the service.
       Flytectl should be created as a `native client`.
       FlytePropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
 
@@ -233,44 +233,84 @@ Apply Configuration
                     # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
                     clientId: 0oakkheteNjCMERst5d6
 
-#. Store flyte propeller's `client_secret` in a k8s secret as follows:
+.. tabbed:: Helm
 
-   .. prompt:: bash
+      Add flytepropeller client ID and client secret provided by the OAuth2 Authorization Server above to your `values.yaml`:
 
-      kubectl edit secret -n flyte flyte-propeller-auth
+      .. code-block:: yaml
 
-   Add a new key under `stringData`:
+         secrets:
+           adminOauthClientCredentials:
+               enabled: true
+               # Replace with the client_secret provided by the OAuth2 Authorization Server above.
+               clientSecret: <client_secret>
+               # Replace with the client_id provided by the OAuth2 Authorization Server above.
+               clientId: <client_id>
 
-   .. code-block:: yaml
+      Alternatively you can instruct helm not to create and manage the kubernetes secret containing your client secret:
 
-      stringData:
-        client_secret: <client_secret> from the previous step
-      data:
-        ...
+      .. code-block:: yaml
 
-   Save and close your editor.
+         secrets:
+           adminOauthClientCredentials:
+               enabled: false
+               # Replace with the client_id provided by the OAuth2 Authorization Server above.
+               clientId: <client_id>
 
-#. Edit FlytePropeller config to add `client_id` and configure auth as follows:
+      In that case you have to create the secret yourself:
 
-   .. prompt:: bash
+      .. code-block:: yaml
 
-      kubectl edit configmap -n flyte flyte-propeller-config
+         apiVersion: v1
+         kind: Secret
+         metadata:
+           name: flyte-secret-auth
+           namespace: flyte
+         type: Opaque
+         stringData:
+           # Replace with the client_secret provided by the OAuth2 Authorization Server above.
+           client_secret: <client_secret>
 
-   Follow the inline comments to make the necessary changes:
+.. tabbed:: Kustomize
 
-   .. code-block:: yaml
+   #. Store flyte propeller's `client_secret` in a k8s secret as follows:
 
-      admin:
-          # 1. Replace with the client_id provided by the OAuth2 Authorization Server above.
-          clientId: flytepropeller
+      .. prompt:: bash
 
-   Close the editor
+         kubectl edit secret -n flyte flyte-secret-auth
 
-#. Restart `flytepropeller` for the changes to take effect:
+      Add a new key under `stringData`:
 
-   .. prompt:: bash
+      .. code-block:: yaml
 
-      kubectl rollout restart deployment/flytepropeller -n flyte
+         stringData:
+           client_secret: <client_secret> from the previous step
+         data:
+           ...
+
+      Save and close your editor.
+
+   #. Edit FlytePropeller config to add `client_id` and configure auth as follows:
+
+      .. prompt:: bash
+
+         kubectl edit configmap -n flyte flyte-propeller-config
+
+      Follow the inline comments to make the necessary changes:
+
+      .. code-block:: yaml
+
+         admin:
+             # 1. Replace with the client_id provided by the OAuth2 Authorization Server above.
+             clientId: flytepropeller
+
+      Close the editor
+
+   #. Restart `flytepropeller` for the changes to take effect:
+
+      .. prompt:: bash
+
+         kubectl rollout restart deployment/flytepropeller -n flyte
 
 Continuous Integration - CI
 ---------------------------

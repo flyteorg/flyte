@@ -67,7 +67,7 @@ This guide gives an overview of how to set up Snowflake in your Flyte deployment
 
 .. code-block:: bash
 
-    kubectl edit secret -n flyte flyte-propeller-auth
+    kubectl edit secret -n flyte flyte-secret-auth
 
 The configuration will look as follows:
 

@@ -32,7 +32,7 @@ spec:
             secretName: db-pass
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
       initContainers:
       - command:
         - flytescheduler

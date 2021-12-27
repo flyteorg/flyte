@@ -22,7 +22,7 @@ Cluster Config
        :text: Auth Migration Guide
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Migration guide to move to Admin's own authorization server.
+    Migration guide to help you move to Admin's own authorization server.
 
     ---
 
@@ -71,6 +71,15 @@ Cluster Config
 
     ---
 
+    .. link-button:: deployment-cluster-config-eventing
+       :type: ref
+       :text: External Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    How to set up Flyte to emit events to third-parties.
+
+    ---
+
     .. link-button:: deployment-cluster-config-monitoring
        :type: ref
        :text: Monitoring
@@ -102,3 +111,4 @@ Cluster Config
     monitoring
     notifications
     performance
+    eventing

@@ -32,7 +32,7 @@ spec:
             name: flyte-propeller-config
         - name: auth
           secret:
-            secretName: flyte-propeller-auth
+            secretName: flyte-secret-auth
       containers:
         - name: flytepropeller
           image: flytepropeller:v0.7.1
