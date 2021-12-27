@@ -458,7 +458,6 @@ To restrict domains, update Helm values again. By default, Flyte creates three d
            name: staging
          - id: production
            name: production
-   # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 
    # Update Cluster resource manager only if you are using Flyte resource manager. It will create the required resource in the project-domain namespace.
    cluster_resource_manager:
@@ -479,8 +478,14 @@ To restrict domains, update Helm values again. By default, Flyte creates three d
                 - projectQuotaMemory:
                   value: "3000Mi"
                 - defaultIamRole:
-                  value: "gsa-development@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
-
+                  value: "gsa-staging@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
+            - production:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "gsa-production@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
 
 #. Update helm dependencies
 
