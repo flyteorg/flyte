@@ -431,6 +431,62 @@ Installing Flyte
    <BUCKETNAME> of the GCS bucket created
    <HOSTNAME> to the flyte FQDN (e.g. flyte.example.org)
 
+#. (Optional) Configure Flyte project and domain
+
+To restrict projects, update Helm values. By default, Flyte creates three projects: Flytesnacks, Flytetester, and Flyteexample.
+
+.. code-block::
+
+   # you can define the number of projects as per your need
+   flyteadmin:
+    initialProjects:
+       - flytesnacks
+       - flytetester
+       - flyteexamples
+
+To restrict domains, update Helm values again. By default, Flyte creates three domains per project: development, staging and production.
+
+.. code-block::
+
+   # -- Domain configuration for Flyte project. This enables the specified number of domains across all projects in Flyte.
+   configmap
+     domain:
+       domains:
+         - id: development
+           name: development
+         - id: staging
+           name: staging
+         - id: production
+           name: production
+
+   # Update Cluster resource manager only if you are using Flyte resource manager. It will create the required resource in the project-domain namespace.
+   cluster_resource_manager:
+     enabled: true
+     config:
+       cluster_resources:
+          customData:
+            - development:
+                - projectQuotaCpu:
+                  value: "5"
+                - projectQuotaMemory:
+                  value: "4000Mi"
+                - defaultIamRole:
+                  value: "gsa-development@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
+            - staging:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "gsa-staging@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
+            - production:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "gsa-production@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com"
+
 #. Update helm dependencies
 
 .. code-block:: bash
@@ -445,14 +501,14 @@ Installing Flyte
    helm install -n flyte -f values-gcp.yaml --create-namespace flyte flyteorg/flyte-core
 
 
-#. Verify all the pods have come up correctly
+#. Verify if all the pods have come up correctly
 
 .. code-block:: bash
 
    kubectl get pods -n flyte
 
 
-# Get the ingress IP to be used for updating the zone and getting the name server records for DNS
+# Get the ingress IP to update the zone and fetch name server records for DNS
 
 .. code-block:: bash
 

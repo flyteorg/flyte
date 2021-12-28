@@ -469,11 +469,67 @@ Search and replace the following
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
 
 
-4. Install Flyte
+4. (Optional) Configure Flyte project and domain
+
+To restrict projects, update Helm values. By default, Flyte creates three projects: Flytesnacks, Flytetester, and Flyteexample.
+
+.. code-block::
+
+   # you can define projects as per your need
+   flyteadmin:
+    initialProjects:
+       - flytesnacks
+       - flytetester
+       - flyteexamples
+
+To restrict domains, update Helm values again. By default, Flyte creates three domains per project: development, staging and production.
+
+.. code-block::
+
+   # -- Domain configuration for Flyte project. This enables the specified number of domains across all projects in Flyte.
+   configmap
+     domain:
+       domains:
+         - id: development
+           name: development
+         - id: staging
+           name: staging
+         - id: production
+           name: production
+
+   # Update Cluster resource manager only if you are using Flyte resource manager. It will create the required resource in the project-domain namespace.
+   cluster_resource_manager:
+     enabled: true
+     config:
+       cluster_resources:
+          customData:
+            - development:
+                - projectQuotaCpu:
+                  value: "5"
+                - projectQuotaMemory:
+                  value: "4000Mi"
+                - defaultIamRole:
+                  value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+            - staging:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+            - production:
+                - projectQuotaCpu:
+                  value: "2"
+                - projectQuotaMemory:
+                  value: "3000Mi"
+                - defaultIamRole:
+                  value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+
+1. Install Flyte
 
 .. tabbed:: Flyte Native scheduler
 
-  * Install Flyte with Flyte native scheduler:
+  * Install Flyte with Flyte native scheduler
 
     .. code-block:: bash
 
@@ -488,7 +544,7 @@ Search and replace the following
        helm install -n flyte -f values-eks.yaml -f values-eks-override.yaml --create-namespace flyte flyteorg/flyte-core
 
 
-5. Verify if all the pods have come up correctly
+6. Verify if all the pods have come up correctly
 
 .. code-block:: bash
 
