@@ -42,26 +42,7 @@ Core Concepts
        :text: Launch Plans
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated with different schedules.
-
-    ---
-
-    .. link-button:: concepts-schedules
-       :type: ref
-       :text: Scheduling Launch Plans
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    **Scheduling** is critical to data and ML jobs; Flyte provides a native Cron-style scheduler.
-
-    ---
-
-    .. link-button:: divedeep-registration
-        :type: ref
-        :text: Registration
-        :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    **Registration** is the process of uploading workflow and its task definitions to the FlyteAdmin service.
-    Registration creates an inventory of available tasks, workflows and launch plans - declared per project and domain.
+    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated different schedules.
 
     ---
 
@@ -149,10 +130,8 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     :hidden:
 
     tasks
-    workflows
-    nodes
-    launchplans
-    schedules
+    workflows_nodes
+    launchplans_schedules
     registration
     executions
     state_machine
