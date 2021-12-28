@@ -19,6 +19,12 @@ monitor() {
 
 # Start docker daemon
 echo "Starting Docker daemon..."
+# Remove docker PID if exist, Used for restart
+if [ -f "/var/run/docker.pid" ]
+then
+    rm /var/log/dockerd.log
+fi
+
 dockerd &> /var/log/dockerd.log &
 DOCKERD_PID=$!
 timeout 600 sh -c "until docker info &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for dockerd to start"; exit 1 )
