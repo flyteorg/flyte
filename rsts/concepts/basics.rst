@@ -149,8 +149,8 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     :hidden:
 
     tasks
-    workflows_nodes
-    launchplans_schedules
+    workflows
+    launchplans
     registration
     executions
     nodes
