@@ -1,15 +1,23 @@
 {{- if .Values.flytepropeller.enabled }}
-{{- if not .Values.flytepropeller.manager }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "flytepropeller.name" . }}
   namespace: {{ template "flyte.namespace" . }}
+  {{- if .Values.flytepropeller.manager }}
+  name: {{ template "flytepropeller-manager.name" . }}
+  labels: {{ include "flytepropeller-manager.labels" . | nindent 4 }}
+  {{- else }}
+  name: {{ template "flytepropeller.name" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.flytepropeller.replicaCount }}
   selector:
+    {{- if .Values.flytepropeller.manager }}
+    matchLabels: {{ include "flytepropeller-manager.selectorLabels" . | nindent 6 }}
+    {{- else }}
     matchLabels: {{ include "flytepropeller.selectorLabels" . | nindent 6 }}
+    {{- end }}
   template:
     metadata:
       annotations:
@@ -17,7 +25,11 @@ spec:
         {{- with .Values.flytepropeller.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- if .Values.flytepropeller.manager }}
+      labels: {{ include "flytepropeller-manager.labels" . | nindent 8 }}
+      {{- else }}
       labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+      {{- end }}
     spec:
       securityContext:
         fsGroup: 65534
@@ -25,7 +37,13 @@ spec:
         fsGroupChangePolicy: "Always"
       containers:
       - command:
+        {{- if .Values.flytepropeller.manager }}
+        - flytepropeller-manager
+        - --manager.pod-template-namespace
+        - {{ template "flyte.namespace" . }}
+        {{- else }}
         - flytepropeller
+        {{- end }}
         - --config
         - {{ .Values.flytepropeller.configPath }}
         {{- with .Values.flytepropeller.extraArgs }}
@@ -36,9 +54,19 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        {{- if .Values.flytepropeller.manager }}
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        {{- end }}
         image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
         imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
+        {{- if .Values.flytepropeller.manager }}
+        name: flytepropeller-manager
+        {{- else }}
         name: flytepropeller
+        {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
         resources: {{ toYaml .Values.flytepropeller.resources | nindent 10 }}
@@ -64,5 +92,4 @@ spec:
       {{- with .Values.flytepropeller.tolerations }}
       tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
-{{- end }}
 {{- end }}

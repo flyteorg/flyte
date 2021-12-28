@@ -1073,8 +1073,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flytepropeller
   namespace: flyte
+  name: flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
