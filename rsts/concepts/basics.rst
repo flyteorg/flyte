@@ -42,7 +42,7 @@ Core Concepts
        :text: Launch Plans
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated different schedules.
+    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated with different schedules.
 
     ---
 

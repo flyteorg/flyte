@@ -4,6 +4,8 @@
 Executions
 ##########
 
+During registration, Flyte validates the workflow structure and saves the workflow. The registration process updates the workflow graph. 
+
 Typical Flow Using FlyteCTL
 ---------------------------
 
