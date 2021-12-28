@@ -44,11 +44,3 @@ Versioning
 Like :ref:`tasks <divedeep-tasks>`, workflows are versioned. Registered workflows are immutable, i.e., an instance of a
 workflow defined by project, domain, name and version can't be updated.
 Tasks referenced in a workflow version are themselves immutable and are tied to specific tasks' versions.
-
-Executions
-----------
-
-A workflow can only be executed through a :ref:`launch plan <divedeep-launchplans>`.
-A workflow can be launched many times with a variety of launch plans and inputs. Workflows that consume inputs and produce
-outputs can take advantage of :std:ref:`User Guide <cookbook:sphx_glr_auto_core_flyte_basics_task_cache.py>` to cache
-intermediate inputs and outputs and speed-up subsequent executions.
