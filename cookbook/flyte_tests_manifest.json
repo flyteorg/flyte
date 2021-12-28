@@ -31,6 +31,14 @@
         "exit_message": ""
     }
   },{
+    "name": "integrations-kftensorflow",
+    "priority": "P1",
+    "path": "integrations/kubernetes/kftensorflow",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
     "name": "integrations-pod",
     "priority": "P1",
     "path": "integrations/kubernetes/pod",
