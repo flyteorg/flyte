@@ -38,4 +38,3 @@ Default inputs behave much like default workflow inputs. As their name implies, 
 Fixed Inputs
 ^^^^^^^^^^^^
 Fixed inputs cannot be overridden. If a workflow is executed with a launch plan and dynamic inputs that attempt to redefine the launch plan's fixed inputs, the execution creation request *will fail*.
-
