@@ -134,6 +134,8 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     launchplans_schedules
     registration
     executions
+    nodes
+    schedules
     state_machine
     execution_timeline
     data_management
