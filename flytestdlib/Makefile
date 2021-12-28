@@ -24,8 +24,6 @@ compile:
 	mkdir -p ./bin
 	go build -o pflags ./cli/pflags/main.go && mv ./pflags ./bin
 
-gen-config: download_tooling
-	@go generate ./...
 
 .PHONY: test_unit_codecov
 test_unit_codecov:
