@@ -65,6 +65,25 @@ Core Concepts
 
     ---
 
+    .. link-button:: concepts-schedules
+       :type: ref
+       :text: Scheduling Launch Plans
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    **Scheduling** is critical to data and ML jobs; Flyte provides a native Cron-style scheduler.
+
+    ---
+
+    .. link-button:: divedeep-registration
+        :type: ref
+        :text: Registration
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    **Registration** is the process of uploading workflow and its task definitions to the FlyteAdmin service.
+    Registration creates an inventory of available tasks, workflows and launch plans - declared per project and domain.
+
+    ---
+
     .. link-button:: divedeep-executions
         :type: ref
         :text: Executions

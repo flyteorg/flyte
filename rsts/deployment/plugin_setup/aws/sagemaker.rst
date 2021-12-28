@@ -1,20 +1,21 @@
-.. _deployment-plugin-setup-aws-athena:
+.. _deployment-plugin-setup-aws-sagemaker:
 
-Athena Plugin Setup
--------------------
+Sagemaker Plugin Setup
+----------------------
 
-This guide gives an overview of how to set up Athena in your Flyte deployment. Athena plugin needs Flyte deployment in AWS cloud; sandbox/GCP/Azure wouldn't work.
+This guide gives an overview of how to set up Sagemaker in your Flyte deployment. Sagemaker plugin needs Flyte deployment in AWS cloud; sandbox/GCP/Azure wouldn't work.
 
 1. Setup the AWS Flyte cluster
 
 .. tabbed:: AWS cluster setup
 
   * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__
+  * You have your `AWS role set up correctly for SageMaker <https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-roles.html>`_
+  * `AWS SageMaker k8s operator <https://github.com/aws/amazon-sagemaker-operator-for-k8s>`_ is installed in your k8s cluster
   * Make sure you have correct kubeconfig and selected the correct kubernetes context
   * make sure you have the correct FlyteCTL config at ~/.flyte/config.yaml
 
-
-2. Create a file named ``values-override.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for Athena.
+2. Create a file named ``values-override.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for Sagemaker.
 
 .. code-block::
 
@@ -24,19 +25,18 @@ This guide gives an overview of how to set up Athena in your Flyte deployment. A
         tasks:
           # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
           task-plugins:
-            # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+            # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config).
             # plugins
             enabled-plugins:
               - container
               - sidecar
               - k8s-array
-              - athena
+              - sagemaker_training
+              - sagemaker_hyperparameter_tuning
             default-for-task-types:
               container: container
               sidecar: sidecar
               container_array: k8s-array
-              athena: athena
-
 
 3. Upgrade the Flyte Helm release.
 
@@ -45,11 +45,11 @@ This guide gives an overview of how to set up Athena in your Flyte deployment. A
   helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
 
 
-4. Register the Athena plugin example.
+4. Register the Sagemaker plugin example.
 
 .. code-block:: bash
 
-  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development
+  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.3.0/snacks-cookbook-integrations-aws-sagemaker_training.tar.gz --archive -p flytesnacks -d development
 
 
 5. Launch an execution
@@ -66,8 +66,7 @@ This guide gives an overview of how to set up Athena in your Flyte deployment. A
 
     .. code-block:: bash
 
-       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development athena.athena.full_hive_demo_wf  --latest --execFile exec_spec.yaml
-
+       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development sagemaker_training.sagemaker_custom_training.mnist_trainer --latest --execFile exec_spec.yaml
 
   * Launch! 🚀
 

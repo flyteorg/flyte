@@ -8427,7 +8427,7 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-propeller-auth
+  name: flyte-secret-auth
   namespace: flyte
 stringData:
   client_secret: foobar
@@ -9058,7 +9058,7 @@ spec:
         name: config-volume
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9130,7 +9130,7 @@ spec:
           secretName: db-pass-bthd2588cc
       - name: auth
         secret:
-          secretName: flyte-propeller-auth
+          secretName: flyte-secret-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
