@@ -122,6 +122,14 @@ Troubles with ``make start`` command in flytesnacks
   - Prune the images and volumes.
   - Given there's less than 10% free disk space, Kubernetes, by default, throws the disk pressure error.
 
+
+Troubles with flytectl command within proxy setting
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- flytectl uses GRPC api's of the flyteadmin to administer flyte resources and in case of proxy settings it uses an additional CONNECT handshake at GRPC layer to perfrom the same. Additonal info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__
+
+- On windows environment it has been noticed that NO_PROXY variable doesn't work for bypassing the proxy settings. GRPC issue reported `here <https://github.com/grpc/grpc/issues/9989>`__ provides additional details though it doesn't seem to have been tested on windows yet.Inorder to get around this issue unset both the HTTP_PROXY and HTTPS_PROXY variables.
+
 .. NOTE::
 
       More coming soon. Stay tuned 👀
