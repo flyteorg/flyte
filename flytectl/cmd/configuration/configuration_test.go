@@ -65,15 +65,20 @@ func TestSetupConfigFunc(t *testing.T) {
 }
 
 func TestTrimFunc(t *testing.T) {
-	assert.Equal(t, trim("dns://localhost"), "localhost")
-	assert.Equal(t, trim("http://localhost"), "localhost")
-	assert.Equal(t, trim("https://localhost"), "localhost")
+	assert.Equal(t, trimEndpoint("dns://localhost"), "localhost")
+	assert.Equal(t, trimEndpoint("http://localhost"), "localhost")
+	assert.Equal(t, trimEndpoint("https://localhost"), "localhost")
 }
 
 func TestValidateEndpointName(t *testing.T) {
-	assert.Equal(t, validateEndpointName("127.0.0.1"), true)
-	assert.Equal(t, validateEndpointName("127.0.0.1.0"), false)
-	assert.Equal(t, validateEndpointName("localhost"), true)
-	assert.Equal(t, validateEndpointName("flyte.org"), true)
-	assert.Equal(t, validateEndpointName("flyte"), false)
+	assert.Equal(t, true, validateEndpointName("8093405779.ap-northeast-2.elb.amazonaws.com:81"))
+	assert.Equal(t, true, validateEndpointName("8093405779.ap-northeast-2.elb.amazonaws.com"))
+	assert.Equal(t, false, validateEndpointName("8093405779.ap-northeast-2.elb.amazonaws.com:81/console"))
+	assert.Equal(t, true, validateEndpointName("localhost"))
+	assert.Equal(t, true, validateEndpointName("127.0.0.1"))
+	assert.Equal(t, true, validateEndpointName("127.0.0.1:30086"))
+	assert.Equal(t, true, validateEndpointName("112.11.1.1"))
+	assert.Equal(t, true, validateEndpointName("112.11.1.1:8080"))
+	assert.Equal(t, false, validateEndpointName("112.11.1.1:8080/console"))
+	assert.Equal(t, false, validateEndpointName("flyte"))
 }

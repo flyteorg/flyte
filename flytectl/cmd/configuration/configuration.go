@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -20,8 +18,8 @@ import (
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/manifoldco/promptui"
-
 	"github.com/spf13/cobra"
 )
 
@@ -93,9 +91,8 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 	templateStr := configutil.GetSandboxTemplate()
 
 	if len(initConfig.DefaultConfig.Host) > 0 {
-		trimHost := trim(initConfig.DefaultConfig.Host)
-		host := strings.Split(trimHost, ":")
-		if !validateEndpointName(host[0]) {
+		trimHost := trimEndpoint(initConfig.DefaultConfig.Host)
+		if !validateEndpointName(trimHost) {
 			return errors.New("Please use a valid endpoint")
 		}
 		templateValues.Host = fmt.Sprintf("dns://%s", trimHost)
@@ -132,7 +129,7 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 	return nil
 }
 
-func trim(hostname string) string {
+func trimEndpoint(hostname string) string {
 	for _, prefix := range endpointPrefix {
 		hostname = strings.TrimPrefix(hostname, prefix)
 	}
@@ -140,14 +137,28 @@ func trim(hostname string) string {
 
 }
 
-func validateEndpointName(domain string) bool {
-	RegExp := regexp.MustCompile(`^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z
- ]{2,3})$`)
-	if RegExp.MatchString(domain) || domain == "localhost" {
+func validateEndpointName(endPoint string) bool {
+	var validate = false
+	if endPoint == "localhost" {
 		return true
 	}
-	if net.ParseIP(domain) == nil {
+	if err := is.URL.Validate(endPoint); err != nil {
 		return false
 	}
-	return true
+	endPointParts := strings.Split(endPoint, ":")
+	if len(endPointParts) <= 2 && len(endPointParts) > 0 {
+		if err := is.DNSName.Validate(endPointParts[0]); !errors.Is(err, is.ErrDNSName) && err == nil {
+			validate = true
+		}
+		if err := is.IP.Validate(endPointParts[0]); !errors.Is(err, is.ErrIP) && err == nil {
+			validate = true
+		}
+		if len(endPointParts) == 2 {
+			if err := is.Port.Validate(endPointParts[1]); err != nil {
+				return false
+			}
+		}
+	}
+
+	return validate
 }
