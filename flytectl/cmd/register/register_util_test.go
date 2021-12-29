@@ -544,7 +544,7 @@ func TestHydrateTaskSpec(t *testing.T) {
 			},
 		},
 	}
-	err = hydrateTaskSpec(task, "sourcey", rconfig.DefaultFilesConfig.SourceUploadPath, rconfig.DefaultFilesConfig.Version)
+	err = hydrateTaskSpec(task, "sourcey", rconfig.DefaultFilesConfig.SourceUploadPath, rconfig.DefaultFilesConfig.Version, "")
 	assert.NoError(t, err)
 	var hydratedPodSpec = v1.PodSpec{}
 	err = utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &hydratedPodSpec)

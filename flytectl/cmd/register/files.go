@@ -72,19 +72,25 @@ Override IamRole during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -i "arn:aws:iam::123456789:role/dummy"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --assumableIamRole "arn:aws:iam::123456789:role/dummy"
 
 Override Kubernetes service account during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -k "kubernetes-service-account"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --k8sServiceAccount "kubernetes-service-account"
 
 Override Output location prefix during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -l "s3://dummy/prefix"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --outputLocationPrefix "s3://dummy/prefix"
+
+Override Destination dir of source code in container during registration:
+
+::
+
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --destinationDirectory "/root" 
 	
 Usage
 `

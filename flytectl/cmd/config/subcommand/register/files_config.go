@@ -20,5 +20,6 @@ type FilesConfig struct {
 	K8ServiceAccount     string `json:"k8ServiceAccount" pflag:", deprecated. Please use --K8sServiceAccount"`
 	OutputLocationPrefix string `json:"outputLocationPrefix" pflag:", custom output location prefix for offloaded types (files/schemas)."`
 	SourceUploadPath     string `json:"sourceUploadPath" pflag:", Location for source code in storage."`
+	DestinationDirectory string `json:"destinationDirectory" pflag:", Location of source code in container."`
 	DryRun               bool   `json:"dryRun" pflag:",execute command without making any modifications."`
 }
