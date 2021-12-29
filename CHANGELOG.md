@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.37.0](http://github.com/lyft/flyteconsole/compare/v0.36.0...v0.37.0) (2021-12-29)
+
+
+### Features
+
+* Add support for securityContext in launch form. ([#253](http://github.com/lyft/flyteconsole/issues/253)) ([af1818b](http://github.com/lyft/flyteconsole/commit/af1818b3c92211b12dd0f91fdbafac73b1c190f1))
+
 # [0.36.0](http://github.com/lyft/flyteconsole/compare/v0.35.0...v0.36.0) (2021-12-15)
 
 
