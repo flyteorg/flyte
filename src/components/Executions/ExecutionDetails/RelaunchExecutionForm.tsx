@@ -39,9 +39,12 @@ function useRelaunchWorkflowFormState({
                         disableAll,
                         maxParallelism,
                         labels,
-                        annotations
+                        annotations,
+                        authRole,
+                        securityContext
                     }
                 } = execution;
+
                 const workflow = await apiContext.getWorkflow(workflowId);
                 const inputDefinitions = getWorkflowInputs(workflow);
                 const values = await fetchAndMapExecutionInputValues(
@@ -51,6 +54,7 @@ function useRelaunchWorkflowFormState({
                     },
                     apiContext
                 );
+
                 return {
                     values,
                     launchPlan,
@@ -58,7 +62,9 @@ function useRelaunchWorkflowFormState({
                     disableAll,
                     maxParallelism,
                     labels,
-                    annotations
+                    annotations,
+                    authRole,
+                    securityContext
                 };
             }
         },
@@ -119,6 +125,7 @@ const RelaunchWorkflowForm: React.FC<RelaunchExecutionFormProps> = props => {
     const {
         closure: { workflowId }
     } = props.execution;
+
     return (
         <WaitForData {...initialParameters}>
             {initialParameters.state.matches(fetchStates.LOADED) ? (

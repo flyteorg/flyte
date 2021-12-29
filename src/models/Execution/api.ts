@@ -94,6 +94,7 @@ export const getExecutionData = (
 export interface CreateWorkflowExecutionArguments {
     annotations?: Admin.IAnnotations | null;
     authRole?: Admin.IAuthRole;
+    securityContext?: Core.ISecurityContext;
     domain: string;
     disableAll?: boolean | null;
     labels?: Admin.ILabels | null;
@@ -110,6 +111,7 @@ export const createWorkflowExecution = (
     {
         annotations,
         authRole,
+        securityContext,
         domain,
         disableAll,
         labels,
@@ -131,15 +133,26 @@ export const createWorkflowExecution = (
         labels,
         annotations
     };
+
     if (authRole?.assumableIamRole || authRole?.kubernetesServiceAccount) {
         spec.authRole = authRole;
     }
+
+    if (
+        securityContext?.runAs?.iamRole ||
+        securityContext?.runAs?.k8sServiceAccount
+    ) {
+        spec.securityContext = securityContext;
+    }
+
     if (disableAll) {
         spec.disableAll = disableAll;
     }
+
     if (maxParallelism !== undefined) {
         spec.maxParallelism = maxParallelism;
     }
+
     return postAdminEntity<
         Admin.IExecutionCreateRequest,
         Admin.ExecutionCreateResponse

@@ -55,11 +55,13 @@ export interface WorkflowInitialLaunchParameters
     launchPlan?: Identifier;
     workflowId?: WorkflowId;
     authRole?: Admin.IAuthRole;
+    securityContext?: Core.ISecurityContext;
     disableAll?: boolean | null;
     maxParallelism?: number | null;
     labels?: Admin.ILabels | null;
     annotations?: Admin.IAnnotations | null;
 }
+
 export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
     workflowId: NamedEntityIdentifier;
     initialParameters?: WorkflowInitialLaunchParameters;
@@ -69,6 +71,7 @@ export interface TaskInitialLaunchParameters
     extends BaseInitialLaunchParameters {
     taskId?: Identifier;
     authRole?: Admin.IAuthRole;
+    securityContext?: Core.ISecurityContext;
 }
 export interface LaunchTaskFormProps extends BaseLaunchFormProps {
     taskId: NamedEntityIdentifier;
@@ -86,8 +89,14 @@ export interface LaunchFormInputsRef {
     getValues(): Record<string, Core.ILiteral>;
     validate(): boolean;
 }
+
+export interface LaunchRoles {
+    authRole?: Admin.IAuthRole;
+    securityContext?: Core.ISecurityContext;
+}
+
 export interface LaunchRoleInputRef {
-    getValue(): Admin.IAuthRole;
+    getValue(): LaunchRoles;
     validate(): boolean;
 }
 export interface LaunchAdvancedOptionsRef {
@@ -204,6 +213,20 @@ export interface ParsedInput
     > {
     /** Provides an initial value for the input, which can be changed by the user. */
     initialValue?: Core.ILiteral;
+}
+
+export enum AuthRoleTypes {
+    k8 = 'k8',
+    IAM = 'IAM'
+}
+
+export interface AuthRoleMeta {
+    helperText: string;
+    inputLabel: string;
+    label: string;
+    value: RoleTypeValue;
+    validate?: any;
+    error?: any;
 }
 
 export type RoleTypeValue = keyof Admin.IAuthRole;

@@ -122,13 +122,14 @@ async function submit(
         throw new Error('Unexpected empty role input ref');
     }
 
-    const authRole = roleInputRef.current.getValue();
+    const { authRole, securityContext } = roleInputRef.current?.getValue();
     const literals = formInputsRef.current.getValues();
     const launchPlanId = taskVersion;
     const { domain, project } = taskVersion;
 
     const response = await createWorkflowExecution({
         authRole,
+        securityContext,
         domain,
         launchPlanId,
         project,

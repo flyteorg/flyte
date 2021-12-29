@@ -33,6 +33,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
         service,
         workflowSourceSelectorState
     } = useLaunchWorkflowFormState(props);
+
     const styles = useStyles();
     const baseState = state as BaseInterpretedLaunchState;
     const baseService = service as BaseLaunchService;
@@ -64,9 +65,6 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
             LaunchState.FAILED_LOADING_LAUNCH_PLANS
         ].some(state.matches);
 
-    // TODO: We removed all loading indicators here. Decide if we want skeletons
-    // instead.
-    // https://github.com/lyft/flyte/issues/666
     return (
         <>
             <LaunchFormHeader title={state.context.sourceId?.name} />
@@ -119,8 +117,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         {isEnterInputsState(baseState) ? (
                             <LaunchRoleInput
                                 initialValue={
-                                    selectedLaunchPlan?.data.spec.authRole ||
-                                    state.context.defaultAuthRole
+                                    state.context.defaultAuthRole ||
+                                    selectedLaunchPlan?.data.spec
+                                        .securityContext ||
+                                    selectedLaunchPlan?.data.spec.authRole
                                 }
                                 ref={roleInputRef}
                                 showErrors={state.context.showErrors}

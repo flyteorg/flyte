@@ -23,11 +23,11 @@ import {
     LaunchAdvancedOptionsRef,
     LaunchWorkflowFormProps,
     LaunchWorkflowFormState,
-    ParsedInput
+    ParsedInput,
+    LaunchRoles
 } from './types';
 import { useWorkflowSourceSelectorState } from './useWorkflowSourceSelectorState';
 import { getUnsupportedRequiredInputs } from './utils';
-import { correctInputErrors } from './constants';
 
 async function loadLaunchPlans(
     { listLaunchPlans }: APIContextValue,
@@ -171,14 +171,11 @@ async function submit(
     if (formInputsRef.current === null) {
         throw new Error('Unexpected empty form inputs ref');
     }
-    // if (roleInputRef.current === null) {
-    //     throw new Error('Unexpected empty role input ref');
-    // }
-    // if (advancedOptionsRef.current === null) {
-    //     throw new Error('Unexpected empty advanced options ref');
-    // }
 
-    const authRole = roleInputRef.current?.getValue();
+    const {
+        authRole,
+        securityContext
+    } = roleInputRef.current?.getValue() as LaunchRoles;
     const literals = formInputsRef.current.getValues();
     const { disableAll, labels, annotations, maxParallelism } =
         advancedOptionsRef.current?.getValues() || {};
@@ -188,6 +185,7 @@ async function submit(
     const response = await createWorkflowExecution({
         annotations,
         authRole,
+        securityContext,
         disableAll,
         maxParallelism,
         domain,
@@ -264,7 +262,8 @@ export function useLaunchWorkflowFormState({
         disableAll,
         maxParallelism,
         labels,
-        annotations
+        annotations,
+        securityContext
     } = initialParameters;
 
     const apiContext = useAPIContext();
@@ -292,6 +291,7 @@ export function useLaunchWorkflowFormState({
         services,
         context: {
             defaultAuthRole,
+            securityContext,
             defaultInputValues,
             preferredLaunchPlanId,
             preferredWorkflowId,

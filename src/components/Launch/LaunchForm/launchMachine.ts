@@ -82,6 +82,7 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
     maxParallelism?: number | null;
     labels?: Admin.ILabels | null;
     annotations?: Admin.IAnnotations | null;
+    securityContext?: Core.ISecurityContext | null;
 }
 
 export interface TaskLaunchContext extends BaseLaunchContext {

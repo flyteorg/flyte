@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InputChangeHandler } from './types';
+import { AuthRoleTypes, InputChangeHandler } from './types';
 
 export function makeSwitchChangeHandler(onChange: InputChangeHandler) {
     return ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -7,11 +7,15 @@ export function makeSwitchChangeHandler(onChange: InputChangeHandler) {
     };
 }
 
-type StringChangeHandler = (value: string) => void;
+type StringChangeHandler = (
+    value: string,
+    roleType: AuthRoleTypes | null
+) => void;
 export function makeStringChangeHandler(
-    onChange: InputChangeHandler | StringChangeHandler
+    onChange: StringChangeHandler | InputChangeHandler,
+    roleType: AuthRoleTypes | null = null
 ) {
     return ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-        onChange(value);
+        onChange(value, roleType);
     };
 }

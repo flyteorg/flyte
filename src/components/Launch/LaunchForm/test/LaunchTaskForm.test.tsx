@@ -29,15 +29,19 @@ import { createMockTaskClosure } from 'models/__mocks__/taskData';
 import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
 import {
+    AuthRoleStrings,
     cannotLaunchTaskString,
     formStrings,
     inputsDescription,
     requiredInputSuffix,
-    roleTypes,
     taskNoInputsString
 } from '../constants';
 import { LaunchForm } from '../LaunchForm';
-import { LaunchFormProps, TaskInitialLaunchParameters } from '../types';
+import {
+    AuthRoleTypes,
+    LaunchFormProps,
+    TaskInitialLaunchParameters
+} from '../types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
 import {
     createMockInputsInterface,
@@ -81,6 +85,26 @@ describe('LaunchForm: Task', () => {
             variables
         );
         return task;
+    };
+
+    const renderInitialLaunchParams = () => {
+        const initialValues = {
+            iam: 'test_IAM_value',
+            k8: 'test_K8_value'
+        };
+        const initialParameters: TaskInitialLaunchParameters = {
+            authRole: {
+                assumableIamRole: initialValues.iam,
+                kubernetesServiceAccount: initialValues.k8
+            },
+            securityContext: {
+                runAs: {
+                    iamRole: initialValues.iam,
+                    k8sServiceAccount: initialValues.k8
+                }
+            }
+        };
+        return { initialValues, initialParameters };
     };
 
     const createMocks = () => {
@@ -163,13 +187,16 @@ describe('LaunchForm: Task', () => {
             }),
             { target: { value: '1.5' } }
         );
-        fireEvent.click(getByLabelText(container, roleTypes.iamRole.label));
-        const roleInput = await waitFor(() =>
-            getByLabelText(container, roleTypes.iamRole.inputLabel, {
-                exact: false
-            })
+        fireEvent.change(
+            getByLabelText(
+                container,
+                AuthRoleStrings[AuthRoleTypes.IAM].inputLabel,
+                {
+                    exact: false
+                }
+            ),
+            { target: { value: iamRoleString } }
         );
-        fireEvent.change(roleInput, { target: { value: iamRoleString } });
     };
 
     describe('With No Inputs', () => {
@@ -398,234 +425,73 @@ describe('LaunchForm: Task', () => {
         });
 
         describe('Auth Role', () => {
-            it('should require a value', async () => {
-                const { container, getByLabelText } = renderForm();
-                const roleInput = await waitFor(() =>
-                    getByLabelText(roleTypes.iamRole.inputLabel, {
-                        exact: false
-                    })
-                );
-
-                fireEvent.click(getSubmitButton(container));
-                await waitFor(() => expect(roleInput).toBeInvalid());
+            describe('should show correct label/helper text', () => {
+                it('for IAM', async () => {
+                    const { getByText, getByLabelText } = renderForm();
+                    await waitFor(() =>
+                        getByLabelText(
+                            AuthRoleStrings[AuthRoleTypes.IAM].inputLabel,
+                            {
+                                exact: false
+                            }
+                        )
+                    );
+                    expect(
+                        getByText(AuthRoleStrings[AuthRoleTypes.IAM].helperText)
+                    ).toBeInTheDocument();
+                });
+                it('for K8', async () => {
+                    const { getByText, getByLabelText } = renderForm();
+                    await waitFor(() =>
+                        getByLabelText(
+                            AuthRoleStrings[AuthRoleTypes.k8].inputLabel,
+                            {
+                                exact: false
+                            }
+                        )
+                    );
+                    expect(
+                        getByText(AuthRoleStrings[AuthRoleTypes.k8].helperText)
+                    ).toBeInTheDocument();
+                });
             });
-
-            Object.entries(roleTypes).forEach(
-                ([key, { label, inputLabel, helperText, value }]) => {
-                    describe(`for role type ${key}`, () => {
-                        it('should show correct label and helper text', async () => {
-                            const { getByLabelText, getByText } = renderForm();
-                            const roleRadioSelector = await waitFor(() =>
-                                getByLabelText(label)
-                            );
-                            fireEvent.click(roleRadioSelector);
-                            await waitFor(() =>
-                                getByLabelText(inputLabel, { exact: false })
-                            );
-                            expect(getByText(helperText)).toBeInTheDocument();
-                        });
-
-                        it('should preserve role value when changing task version', async () => {
-                            const { getByLabelText, getByTitle } = renderForm();
-
-                            // We expect both the radio selection and text value to be preserved
-                            const roleRadioSelector = await waitFor(() =>
-                                getByLabelText(label)
-                            );
-                            fireEvent.click(roleRadioSelector);
-
-                            expect(roleRadioSelector).toBeChecked();
-
-                            const roleInput = await waitFor(() =>
-                                getByLabelText(inputLabel, {
-                                    exact: false
-                                })
-                            );
-                            fireEvent.change(roleInput, {
-                                target: { value: 'roleInputStringValue' }
-                            });
-
-                            // Click the expander for the task version, select the second item
-                            const taskVersionDiv = getByTitle(
-                                formStrings.taskVersion
-                            );
-                            const expander = getByRole(
-                                taskVersionDiv,
-                                'button'
-                            );
-                            fireEvent.click(expander);
-                            const items = await waitFor(() =>
-                                getAllByRole(taskVersionDiv, 'menuitem')
-                            );
-                            fireEvent.click(items[1]);
-                            await waitFor(() => getByTitle(formStrings.inputs));
-
-                            expect(getByLabelText(label)).toBeChecked();
-                            expect(
-                                getByLabelText(inputLabel, {
-                                    exact: false
-                                })
-                            ).toHaveValue('roleInputStringValue');
-                        });
-
-                        it(`should use initial values when provided`, async () => {
-                            const initialParameters: TaskInitialLaunchParameters = {
-                                authRole: {
-                                    [value]: 'roleStringValue'
-                                }
-                            };
-                            const { getByLabelText } = renderForm({
-                                initialParameters
-                            });
-                            await waitFor(() =>
-                                expect(getByLabelText(label)).toBeChecked()
-                            );
-                            await waitFor(() =>
-                                expect(
-                                    getByLabelText(inputLabel, { exact: false })
-                                ).toHaveValue('roleStringValue')
-                            );
-                        });
-
-                        it(`should prefer cached values over initial values when changing task versions`, async () => {
-                            const initialRoleTypeValue = Object.values(
-                                roleTypes
-                            ).find(rt => rt.value !== value)?.value;
-                            // Set the role and string initial values to something different than what we will input
-                            const initialParameters: TaskInitialLaunchParameters = {
-                                authRole: {
-                                    [initialRoleTypeValue!]: 'initialRoleStringValue'
-                                }
-                            };
-                            const { getByLabelText, getByTitle } = renderForm({
-                                initialParameters
-                            });
-
-                            // We expect both the radio selection and text value to be preserved
-                            const roleRadioSelector = await waitFor(() =>
-                                getByLabelText(label)
-                            );
-                            fireEvent.click(roleRadioSelector);
-
-                            expect(roleRadioSelector).toBeChecked();
-
-                            const roleInput = await waitFor(() =>
-                                getByLabelText(inputLabel, {
-                                    exact: false
-                                })
-                            );
-                            fireEvent.change(roleInput, {
-                                target: { value: 'roleInputStringValue' }
-                            });
-
-                            // Click the expander for the task version, select the second item
-                            const taskVersionDiv = getByTitle(
-                                formStrings.taskVersion
-                            );
-                            const expander = getByRole(
-                                taskVersionDiv,
-                                'button'
-                            );
-                            fireEvent.click(expander);
-                            const items = await waitFor(() =>
-                                getAllByRole(taskVersionDiv, 'menuitem')
-                            );
-                            fireEvent.click(items[1]);
-                            await waitFor(() => getByTitle(formStrings.inputs));
-
-                            expect(getByLabelText(label)).toBeChecked();
-                            expect(
-                                getByLabelText(inputLabel, {
-                                    exact: false
-                                })
-                            ).toHaveValue('roleInputStringValue');
-                        });
-                    });
-                }
-            );
-
-            it('should correctly construct an IAM role', async () => {
-                const { container, getByLabelText } = renderForm();
-                const { label, inputLabel, value } = roleTypes.iamRole;
-                const radioSelector = await waitFor(() =>
-                    getByLabelText(label)
-                );
-                await fillInputs(container);
-                fireEvent.click(radioSelector);
-                const input = await waitFor(() =>
-                    getByLabelText(inputLabel, { exact: false })
-                );
-                fireEvent.change(input, { target: { value: iamRoleString } });
-
-                fireEvent.click(getSubmitButton(container));
-                await waitFor(() =>
-                    expect(mockCreateWorkflowExecution).toHaveBeenCalledWith(
-                        expect.objectContaining({
-                            authRole: { [value]: iamRoleString }
-                        })
-                    )
-                );
-            });
-
-            it('should correctly construct a k8s service account role', async () => {
-                const { container, getByLabelText } = renderForm();
+            describe('should use initial values when provided', () => {
                 const {
-                    label,
-                    inputLabel,
-                    value
-                } = roleTypes.k8sServiceAccount;
-                const radioSelector = await waitFor(() =>
-                    getByLabelText(label)
-                );
-                await fillInputs(container);
-                fireEvent.click(radioSelector);
-                const input = await waitFor(() =>
-                    getByLabelText(inputLabel, { exact: false })
-                );
-                fireEvent.change(input, {
-                    target: { value: k8sServiceAccountString }
+                    initialValues,
+                    initialParameters
+                } = renderInitialLaunchParams();
+
+                it('for IAM', async () => {
+                    const { getByLabelText } = renderForm({
+                        initialParameters
+                    });
+                    await waitFor(() =>
+                        expect(
+                            getByLabelText(
+                                AuthRoleStrings[AuthRoleTypes.IAM].inputLabel,
+                                { exact: false }
+                            )
+                        ).toHaveValue(initialValues.iam)
+                    );
                 });
 
-                fireEvent.click(getSubmitButton(container));
-                await waitFor(() =>
-                    expect(mockCreateWorkflowExecution).toHaveBeenCalledWith(
-                        expect.objectContaining({
-                            authRole: { [value]: k8sServiceAccountString }
-                        })
-                    )
-                );
+                it('for K8', async () => {
+                    const { getByLabelText } = renderForm({
+                        initialParameters
+                    });
+                    await waitFor(() =>
+                        expect(
+                            getByLabelText(
+                                AuthRoleStrings[AuthRoleTypes.k8].inputLabel,
+                                { exact: false }
+                            )
+                        ).toHaveValue(initialValues.k8)
+                    );
+                });
             });
         });
 
         describe('Input Values', () => {
-            it('Should send false for untouched toggles', async () => {
-                let inputs: Core.ILiteralMap = {};
-                mockCreateWorkflowExecution.mockImplementation(
-                    ({
-                        inputs: passedInputs
-                    }: CreateWorkflowExecutionArguments) => {
-                        inputs = passedInputs;
-                        return pendingPromise();
-                    }
-                );
-
-                const { container, getByTitle } = renderForm();
-                await waitFor(() => getByTitle(formStrings.inputs));
-                await fillInputs(container);
-
-                fireEvent.click(getSubmitButton(container));
-                await waitFor(() =>
-                    expect(mockCreateWorkflowExecution).toHaveBeenCalled()
-                );
-
-                expect(inputs.literals).toBeDefined();
-                const value = get(
-                    inputs.literals,
-                    `${booleanInputName}.scalar.primitive.boolean`
-                );
-                expect(value).toBe(false);
-            });
-
             it('should decorate all inputs with required labels', async () => {
                 const { getByTitle, queryAllByText } = renderForm();
                 await waitFor(() => getByTitle(formStrings.inputs));
