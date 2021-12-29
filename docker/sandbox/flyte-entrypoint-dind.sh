@@ -60,5 +60,10 @@ helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher
 
 wait-for-flyte.sh
 
+# With flytectl sandbox --source flag, we mount the root volume to user source dir that will create helm & k8s cache specific directory.
+# In Linux, These file belongs to root user that is different then current user
+# In this case during fast serialization, Pyflyte will through error because of permission denied
+rm -rf /root/.cache /root/.kube /root/.config
+
 # Monitor running processes. Exit when the first process exits.
 monitor ${DOCKERD_PID} ${K3S_PID}
