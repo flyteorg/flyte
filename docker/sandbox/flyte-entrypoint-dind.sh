@@ -22,7 +22,7 @@ echo "Starting Docker daemon..."
 # Remove docker PID if exist, Used for restart
 if [ -f "/var/run/docker.pid" ]
 then
-    rm /var/log/dockerd.log
+  rm /var/run/docker.pid
 fi
 
 dockerd &> /var/log/dockerd.log &
@@ -66,7 +66,9 @@ helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher
 
 wait-for-flyte.sh
 
-# With flytectl sandbox --source flag, we mount the root volume to user source dir that will create helm & k8s specific directory. It cause issue while doing fast register 
+# With flytectl sandbox --source flag, we mount the root volume to user source dir that will create helm & k8s cache specific directory.
+# In Linux, These file belongs to root user that is different then current user
+# In this case during fast serialization, Pyflyte will through error because of permission denied
 rm -rf /root/.cache /root/.kube /root/.config
 
 # Monitor running processes. Exit when the first process exits.
