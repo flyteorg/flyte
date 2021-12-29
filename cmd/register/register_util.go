@@ -45,6 +45,7 @@ const registrationVersionPattern = "{{ registration.version }}"
 
 // Additional variable define in fast serialized proto that needs to be replace in registration time
 const registrationRemotePackagePattern = "{{ .remote_package_path }}"
+const registrationDestDirPattern = "{{ .dest_dir }}"
 
 // All supported extensions for compress
 var supportedExtensions = []string{".tar", ".tgz", ".tar.gz"}
@@ -219,15 +220,21 @@ func hydrateIdentifier(identifier *core.Identifier, version string, force bool) 
 	}
 }
 
-func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string, sourceUploadPath string, version string) error {
+func hydrateTaskSpec(task *admin.TaskSpec, sourceCode, sourceUploadPath, version, destinationDir string) error {
 	if task.Template.GetContainer() != nil {
 		for k := range task.Template.GetContainer().Args {
-			if task.Template.GetContainer().Args[k] == "" || task.Template.GetContainer().Args[k] == registrationRemotePackagePattern {
+			if task.Template.GetContainer().Args[k] == registrationRemotePackagePattern {
 				remotePath, err := getRemoteStoragePath(context.Background(), Client, sourceUploadPath, sourceCode, version)
 				if err != nil {
 					return err
 				}
 				task.Template.GetContainer().Args[k] = string(remotePath)
+			}
+			if task.Template.GetContainer().Args[k] == registrationDestDirPattern {
+				task.Template.GetContainer().Args[k] = "."
+				if len(destinationDir) > 0 {
+					task.Template.GetContainer().Args[k] = destinationDir
+				}
 			}
 		}
 	} else if task.Template.GetK8SPod() != nil && task.Template.GetK8SPod().PodSpec != nil {
@@ -244,6 +251,12 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string, sourceUploadPath s
 						return err
 					}
 					podSpec.Containers[containerIdx].Args[argIdx] = string(remotePath)
+				}
+				if arg == registrationDestDirPattern {
+					podSpec.Containers[containerIdx].Args[argIdx] = "."
+					if len(destinationDir) > 0 {
+						podSpec.Containers[containerIdx].Args[argIdx] = destinationDir
+					}
 				}
 			}
 		}
@@ -340,7 +353,7 @@ func hydrateSpec(message proto.Message, sourceCode string, config rconfig.FilesC
 		taskSpec := message.(*admin.TaskSpec)
 		hydrateIdentifier(taskSpec.Template.Id, config.Version, config.Force)
 		// In case of fast serialize input proto also have on additional variable to substitute i.e destination bucket for source code
-		if err := hydrateTaskSpec(taskSpec, sourceCode, config.SourceUploadPath, config.Version); err != nil {
+		if err := hydrateTaskSpec(taskSpec, sourceCode, config.SourceUploadPath, config.Version, config.DestinationDirectory); err != nil {
 			return err
 		}
 
