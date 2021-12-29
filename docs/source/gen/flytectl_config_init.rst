@@ -15,18 +15,24 @@ Generates sandbox config. Flyte Sandbox is a fully standalone minimal environmen
 
 ::
 
- flytectl configuration config 
+ flytectl config init  
 
-Generates remote cluster config. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
+Generates remote cluster config, By default connection is secure. Read more about the remote deployment https://docs.flyte.org/en/latest/deployment/index.html
 	
 ::
 
- flytectl configuration config --host=flyte.myexample.com
-	
+ flytectl config init --host=flyte.myexample.com
+
+Generates remote cluster config with insecure connection
+
+::
+
+ flytectl config init --host=flyte.myexample.com --insecure 
+
 Generates FlyteCTL config with a storage provider
 ::
 
- flytectl configuration config --host=flyte.myexample.com --storage
+ flytectl config init --host=flyte.myexample.com --storage
 
 
 ::
@@ -40,7 +46,7 @@ Options
 
   -h, --help          help for init
       --host string   Endpoint of flyte admin
-      --insecure      Enable insecure mode (default true)
+      --insecure      Enable insecure mode
       --storage       Enable storage provider config
 
 Options inherited from parent commands
