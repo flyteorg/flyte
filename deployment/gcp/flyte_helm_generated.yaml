@@ -408,10 +408,6 @@ data:
       pod-application: flytepropeller
       pod-template-container-name: flytepropeller
       pod-template-name: flytepropeller-template
-      scan-interval: 10s
-      shard:
-        pod-count: 3
-        type: Hash
     propeller:
       downstream-eval-duration: 30s
       enable-admin-launcher: true
@@ -1239,7 +1235,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ed0bbf1f76a88669c0a5f9fa595d011312b9d3f16d2edda3c76b2edbc180031"
+        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1315,7 +1311,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.4
       annotations:
-        configChecksum: "ed0bbf1f76a88669c0a5f9fa595d011312b9d3f16d2edda3c76b2edbc180031"
+        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
     spec:
       securityContext:
         fsGroup: 65534
