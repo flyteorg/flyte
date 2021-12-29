@@ -14,6 +14,7 @@ require (
 	github.com/flyteorg/flyteidl v0.21.5
 	github.com/flyteorg/flytestdlib v0.4.0
 	github.com/ghodss/yaml v1.0.0
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v37 v37.0.0
