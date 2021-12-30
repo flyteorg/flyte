@@ -75,6 +75,21 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flytepropeller-manager.name" -}}
+flytepropeller-manager
+{{- end -}}
+
+{{- define "flytepropeller-manager.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flytepropeller-manager.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "flytepropeller-manager.labels" -}}
+{{ include "flytepropeller-manager.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
 {{- define "flyte-pod-webhook.name" -}}
 flyte-pod-webhook
 {{- end -}}

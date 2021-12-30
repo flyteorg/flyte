@@ -82,6 +82,7 @@ datacatalog:
 
 flytepropeller:
   replicaCount: 1
+  manager: false
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
     # you can change the name of this role

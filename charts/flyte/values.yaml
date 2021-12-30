@@ -16,7 +16,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v0.6.64 # FLYTEADMIN_TAG
+      tag: v0.6.69 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteadmin deployment
@@ -73,7 +73,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v0.6.64 # FLYTESCHEDULER_TAG
+      tag: v0.6.69 # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -162,6 +162,7 @@ flyte:
   flytepropeller:
     # -- Replicas count for Flytepropeller deployment
     replicaCount: 1
+    manager: false
     image:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
