@@ -46,7 +46,7 @@ func (c StopWatch) Start(ctx context.Context) Timer {
 }
 
 // Observes specified duration between the start and end time. The data point will be labeled with values from context.
-// See labeled.SetMetricsKeys for information about to configure that.
+// See labeled.SetMetricsKeys for information about how to configure that.
 func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
 	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
 	if err != nil {
@@ -69,7 +69,7 @@ func (c StopWatch) Time(ctx context.Context, f func()) {
 }
 
 // Creates a new labeled stopwatch. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys
-// for information about to configure that.
+// for information about how to configure that.
 func NewStopWatch(name, description string, scale time.Duration, scope promutils.Scope, opts ...MetricOption) StopWatch {
 	if len(metricKeys) == 0 {
 		panic(ErrNeverSet)
