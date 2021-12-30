@@ -17,7 +17,7 @@ type Gauge struct {
 }
 
 // Inc increments the gauge by 1. Use Add to increment by arbitrary values. The data point will be
-// labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
+// labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Inc(ctx context.Context) {
 	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
 	if err != nil {
@@ -31,7 +31,7 @@ func (g Gauge) Inc(ctx context.Context) {
 }
 
 // Add adds the given value to the Gauge. (The value can be negative, resulting in a decrease of the Gauge.)
-// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
+// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Add(ctx context.Context, v float64) {
 	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
 	if err != nil {
@@ -45,7 +45,7 @@ func (g Gauge) Add(ctx context.Context, v float64) {
 }
 
 // Set sets the Gauge to an arbitrary value.
-// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
+// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Set(ctx context.Context, v float64) {
 	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
 	if err != nil {
@@ -59,7 +59,7 @@ func (g Gauge) Set(ctx context.Context, v float64) {
 }
 
 // Dec decrements the level by 1. Use Sub to decrement by arbitrary values. The data point will be
-// labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
+// labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Dec(ctx context.Context) {
 	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
 	if err != nil {
@@ -73,7 +73,7 @@ func (g Gauge) Dec(ctx context.Context) {
 }
 
 // Sub adds the given value to the Gauge. The value can be negative, resulting in an increase of the Gauge.
-// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
+// The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Sub(ctx context.Context, v float64) {
 	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
 	if err != nil {
@@ -101,7 +101,7 @@ func (g Gauge) SetToCurrentTime(ctx context.Context) {
 
 // Creates a new labeled gauge. Label keys must be set before instantiating. If the unlabeled option is given,
 // this object will also instantiate and emit another gauge with the given name with an _unlabeled suffix.
-// See labeled.SetMetricsKeys for information about to configure that.
+// See labeled.SetMetricsKeys for information about how to configure that.
 func NewGauge(name, description string, scope promutils.Scope, opts ...MetricOption) Gauge {
 	if len(metricKeys) == 0 {
 		panic(ErrNeverSet)
