@@ -40,6 +40,7 @@ type Config struct {
 	Endpoint              config.URL      `json:"endpoint" pflag:",For admin types, specify where the uri of the service is located."`
 	UseInsecureConnection bool            `json:"insecure" pflag:",Use insecure connection."`
 	InsecureSkipVerify    bool            `json:"insecureSkipVerify" pflag:",InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'"`
+	CACertFilePath        string          `json:"caCertFilePath" pflag:",Use specified certificate file to verify the admin server peer."`
 	MaxBackoffDelay       config.Duration `json:"maxBackoffDelay" pflag:",Max delay for grpc backoff"`
 	PerRetryTimeout       config.Duration `json:"perRetryTimeout" pflag:",gRPC per retry timeout"`
 	MaxRetries            int             `json:"maxRetries" pflag:",Max number of gRPC retries"`

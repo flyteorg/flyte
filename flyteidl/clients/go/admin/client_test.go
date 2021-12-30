@@ -76,12 +76,40 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
+		once = sync.Once{}
 		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
 		assert.NotNil(t, clientSet.AdminClient())
 		assert.NotNil(t, clientSet.HealthServiceClient())
+	})
+	t.Run("legal-from-config-with-cacerts", func(t *testing.T) {
+		once = sync.Once{}
+		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem"}, nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, clientSet)
+		assert.NotNil(t, clientSet.AuthMetadataClient())
+		assert.NotNil(t, clientSet.AdminClient())
+	})
+	t.Run("legal-from-config-with-invalid-cacerts", func(t *testing.T) {
+		once = sync.Once{}
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("The code did not panic")
+			}
+		}()
+		newAdminServiceConfig := &Config{
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: false,
+			CACertFilePath:        "testdata/non-existent.pem",
+			PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
+		}
+
+		assert.NoError(t, SetConfig(newAdminServiceConfig))
+		clientSet, err := initializeClients(ctx, newAdminServiceConfig, nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, clientSet)
 	})
 }
 
