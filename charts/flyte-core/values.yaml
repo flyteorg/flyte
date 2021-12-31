@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.64 # FLYTEADMIN_TAG
+    tag: v0.6.69 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -74,7 +74,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.64 # FLYTESCHEDULER_TAG
+    tag: v0.6.69 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -163,6 +163,7 @@ datacatalog:
 
 flytepropeller:
   enabled: true
+  manager: false
   # -- Replicas count for Flytepropeller deployment
   replicaCount: 1
   image:
@@ -487,6 +488,11 @@ configmap:
 
   # -- Core propeller configuration
   core:
+    # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config).
+    manager:
+      pod-application: "flytepropeller"
+      pod-template-container-name: "flytepropeller"
+      pod-template-name: "flytepropeller-template"
     # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
