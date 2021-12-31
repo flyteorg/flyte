@@ -4,7 +4,7 @@
 Versions
 ##########
 One of the most important features and reasons for certain design decisions in Flyte is the need for Machine Learning and Data practitioners to experiment.
-When users are experimenting, they usually work in isolation and try multiple iterations. Unlike traditional software, it is necessary for the users to be able to change versions and sometimes conduct multiple experiments concurrently. This may happen when different data scientists are iterating on the same workflow/pipeline concurrently.
+When users are experimenting, they usually work in isolation and try multiple iterations. Unlike traditional software, it is necessary for the users conduct multiple experiments concurrently with different environments/algorithms etc. This may happen when different data scientists are iterating on the same workflow/pipeline concurrently.
 The cost of creating independent infrastructure for each version is enormous and not desirable. Also it is desirable to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infra team, while users can use this infrastructure independently. This also improves the cost of operation, as
 it is possible to reuse the same infrastructure for more teams.
 
