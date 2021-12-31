@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -18,6 +19,7 @@ const (
 	ExecutionNotFound                ErrorCode = "ExecutionNotFound"
 	ResourceExhausted                ErrorCode = "ResourceExhausted"
 	InvalidArgument                  ErrorCode = "InvalidArgument"
+	TooLarge                         ErrorCode = "TooLarge"
 	EventSinkError                   ErrorCode = "EventSinkError"
 	EventAlreadyInTerminalStateError ErrorCode = "EventAlreadyInTerminalStateError"
 )
@@ -78,6 +80,10 @@ func WrapError(err error) error {
 	case codes.NotFound:
 		return wrapf(ExecutionNotFound, err, "The execution that the event belongs to does not exist")
 	case codes.ResourceExhausted:
+		if strings.Contains(statusErr.Message(), "message larger than max") {
+			return wrapf(TooLarge, err, "Event message exceeds maximum gRPC size limit")
+		}
+
 		return wrapf(ResourceExhausted, err, "Events are sent too often, exceeded the rate limit")
 	case codes.InvalidArgument:
 		return wrapf(InvalidArgument, err, "Invalid fields for event message")
@@ -113,6 +119,11 @@ func IsNotFound(err error) bool {
 // Checks if the error is of type EventError and the ErrorCode is of type ResourceExhausted
 func IsResourceExhausted(err error) bool {
 	return errors.Is(err, &EventError{Code: ResourceExhausted})
+}
+
+// Checks if the error is of type EventError and the ErrorCode is of type TooLarge
+func IsTooLarge(err error) bool {
+	return errors.Is(err, &EventError{Code: TooLarge})
 }
 
 // Checks if the error is of type EventError and the ErrorCode is of type EventAlreadyInTerminalStateError
