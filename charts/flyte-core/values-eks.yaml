@@ -96,6 +96,7 @@ datacatalog:
 
 flytepropeller:
   replicaCount: 2
+  manager: false
   serviceAccount:
     # -- If the service account is created by you, make this false
     create: true
