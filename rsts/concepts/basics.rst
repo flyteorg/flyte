@@ -125,7 +125,7 @@ Core Concepts
         :text: Workflow & Task Versioning
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    This section provides a deeper dive into one of Flyte's most important features - Versioning of workflows and tasks.
+    A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
 
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.

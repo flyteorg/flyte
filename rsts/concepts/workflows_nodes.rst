@@ -43,7 +43,9 @@ Versioning
 
 Like :ref:`tasks <divedeep-tasks>`, workflows are versioned. Registered workflows are immutable, i.e., an instance of a
 workflow defined by project, domain, name and version can't be updated.
-Tasks referenced in a workflow version are themselves immutable and are tied to specific tasks' versions.
+Tasks referenced in a workflow version are themselves immutable and are tied to specific versions.
+
+For a background on versioning, refer to the :ref:`versioning <divedeep-versioning>` section.
 
 Executions
 ----------
