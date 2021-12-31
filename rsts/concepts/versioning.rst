@@ -26,6 +26,45 @@ Versioning is needed to:
 - Execute multiple experiments in production, which may use different training or data processing algorithms
 - Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy
 
+Operational benefits of completely versioned workflows / pipelines
+-------------------------------------------------------------------
+Since the entire workflow in Flyte is completely versioned and all tasks and entities are immutable, it is possible to completely change
+the structure of a workflow between versions, without worrying about consequences for the pipelines in production. This hermetic property makes it extremely
+easy to manage and deploy new workflow versions. This is especially important for workflows that are long-running. Flyte guarantees, that if a workflow execution is in progress
+and even if a new workflow version has been activated the execution using the old version, will continue unhindered.
+
+The astute may question, but what if, I had a bug in the previous version and I want to just fix the bug and run all previous executions.
+Before we understand how Flyte tackles this, let us analyze the problem further - fixing a bug will need a code change and it is possible
+that the bug may actually affect the structure of the workflow. Simply fixing the bug in the task may not solve the problem.
+
+Flyte solves the above problem using 2 properties
+1. Since the workflow is completely versioned, changing the structure has no impact on an existing execution and workflow state will not be corrupted.
+2. Flyte provides a concept of memoization. As long as the tasks have not changed and their behaviour has not changed, it is possible to move them around and their previous outputs will be recovered, without having to rerun these tasks. And if the workflow changes were simply in a task this strategy will still work.
+
+Let us take an example to of a workflow
+
+.. mermaid::
+
+    graph TD;
+       A-->B;
+       B-->C;
+       C-->D;
+
+In the above graph, let us assume that task `C` fails. Then it is possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run `A,B,...` as long as all are marked as `cache=True`
+
+But, let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``
+
+.. mermaid::
+
+    graph TD;
+       A-->B;
+       B-->B1;
+       B1-->D;
+       B1-->C;
+       C-->D;
+
+The same ``cache=True`` will handle this complicated situation as well.
+
 Why Versioning Is Hard?
 -----------------------
 
