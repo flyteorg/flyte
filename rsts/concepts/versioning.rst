@@ -26,7 +26,7 @@ Versioning is needed to:
 - Execute multiple experiments in production, which may use different training or data processing algorithms
 - Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy
 
-Operational benefits of completely versioned workflows / pipelines
+Operational Benefits of Completely Versioned Workflows / Pipelines
 -------------------------------------------------------------------
 Since the entire workflow in Flyte is completely versioned and all tasks and entities are immutable, it is possible to completely change
 the structure of a workflow between versions, without worrying about consequences for the pipelines in production. This hermetic property makes it extremely
@@ -37,11 +37,12 @@ The astute may question, but what if, I had a bug in the previous version and I 
 Before we understand how Flyte tackles this, let us analyze the problem further - fixing a bug will need a code change and it is possible
 that the bug may actually affect the structure of the workflow. Simply fixing the bug in the task may not solve the problem.
 
-Flyte solves the above problem using 2 properties
-1. Since the workflow is completely versioned, changing the structure has no impact on an existing execution and workflow state will not be corrupted.
-2. Flyte provides a concept of memoization. As long as the tasks have not changed and their behaviour has not changed, it is possible to move them around and their previous outputs will be recovered, without having to rerun these tasks. And if the workflow changes were simply in a task this strategy will still work.
+Flyte solves the above problem using 2 properties:
 
-Let us take an example to of a workflow
+1. Since the workflow is completely versioned, changing the structure has no impact on an existing execution, and the workflow state will not be corrupted.
+2. Flyte provides a concept of memoization. As long as the tasks have not changed and their behavior has not changed, it is possible to move them around and their previous outputs will be recovered, without having to rerun these tasks. And if the workflow changes were simply in a task this strategy will still work.
+
+Let us take an example of a workflow:
 
 .. mermaid::
 
@@ -50,9 +51,9 @@ Let us take an example to of a workflow
        B-->C;
        C-->D;
 
-In the above graph, let us assume that task `C` fails. Then it is possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run `A,B,...` as long as all are marked as `cache=True`
+In the above graph, let us assume that task `C` fails. It is then possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run `A,B,...` as long as all are marked as `cache=True`
 
-But, let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``
+But let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``:
 
 .. mermaid::
 
@@ -65,7 +66,7 @@ But, let us consider that the only solution to fix the bug is to change the grap
 
 The same ``cache=True`` will handle this complicated situation as well.
 
-Why Versioning Is Hard?
+Why Is Versioning Hard?
 -----------------------
 
 Git has become the defacto-standard in version control for code. Git makes it extremely easy to work on branches, merge them, and revert unwanted changes.
@@ -75,14 +76,14 @@ How Is Versioning Tied to Reproducibility?
 ------------------------------------------
 
 Reproducibility is possible without explicit versioning within the workflow system.
-To reproduce a past experiment, users need to identify the source code, resurrect any dependencies that this code may have used (for example, TensorFlow 1.x instead of TensorFlow 2.x, or specific Python libraries).
+To reproduce a past experiment, users need to identify the source code, and resurrect any dependencies that this code may have used (for example, TensorFlow 1.x instead of TensorFlow 2.x, or specific Python libraries).
 It is also necessary to instantiate any infrastructure that the previous version may have used and, if not already recorded, ensure that the previously used dataset (say) can be reconstructed.
-
 From the first principles, if reproducibility is considered to be one of the most important concerns, then one would capture all these variables and provide them in an easy-to-use method.
-This is how Flyte was exactly conceived. Every task is versioned, and Flyte captures its dependency set precisely. For external tasks, it is highly encouraged to use
-memoization so that the constructed dataset is cached on Flyte side, and hence, one can comfortably guarantee reproducible behavior from external systems.
+
+This is exactly how Flyte was conceived. Every task is versioned, and Flyte precisely captures its dependency set. For external tasks, it is highly encouraged to use
+memoization so that the constructed dataset is cached on the Flyte side, and hence, one can comfortably guarantee reproducible behavior from the external systems.
 Moreover, every piece of code is registered with the version of the code that was used to create the instance.
-Hence, users can easily construct the lineage for all the parts of the workflow.
+Users can therefore easily construct the lineage for all the parts of the workflow.
 
 What Is the Cost of Versioning & Reproducibility?
 -------------------------------------------------
