@@ -67,9 +67,9 @@ solution). The following pages will help you effectively deploy and manage an en
     Flyte comes with a lot of things you can configure. These pages will walk you through the various components.
 
     ---
-    .. link-button:: devops-ideal-flow
+    .. link-button:: ideal-flow
        :type: ref
-       :text: Ideal Flow for DevOps
+       :text: How to Streamline Your Flyte Workflows
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     An example use case leveraging DevOps practices to run Flyte pipelines.
@@ -87,4 +87,4 @@ solution). The following pages will help you effectively deploy and manage an en
     sandbox
     plugin_setup/index
     security/security
-    devops
+    ideal_flow
