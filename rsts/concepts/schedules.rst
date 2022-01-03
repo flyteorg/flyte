@@ -10,7 +10,7 @@ At most, only one launch plan version for a given {Project, Domain, Name} combin
 
 Cron Expression
 ---------------
-Cron expression strings use `this syntax <https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format>`_. They are validated at launch plan registration time.
+Cron expression strings use :ref:`this <cron_expression_table>` syntax. They are validated at launch plan registration time.
 
 .. _rate_unit:
 
