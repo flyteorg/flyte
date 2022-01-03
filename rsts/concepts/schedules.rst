@@ -10,7 +10,7 @@ At most, only one launch plan version for a given {Project, Domain, Name} combin
 
 Cron Expression
 ---------------
-Cron expression strings use the `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`__. They are validated at launch plan registration time.
+Cron expression strings use `this syntax <https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format>`_. They are validated at launch plan registration time.
 
 .. _rate_unit:
 
@@ -18,6 +18,8 @@ Format
 ---------------
 
 A cron expression represents a set of times, with the help of 5 space-separated fields.
+
+.. _cron_expression_table:
 
 +--------------+------------+-----------------+----------------------------+
 | Field name   | Mandatory? | Allowed values  | Allowed special characters |
@@ -57,7 +59,7 @@ The string field of the schedule should be populated. `Here`_ is an example.
 
 Cron schedules
 ----------------
-An incorrect cron schedule expression leads to a failure in triggering the schedule. `Here <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#cron-schedules>`_ is an example of a cron schedule.
+An incorrect cron schedule expression leads to a failure in triggering the schedule. :ref:`Here <cron_expression_table>` is a table that shows the format of a cron expression.
 
 Below is another example:
 
@@ -76,7 +78,7 @@ Below is another example:
 
 Fixed rate schedules
 ----------------------
-Instead of cron schedules, `fixed rate schedules <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#fixed-rate-intervals>`_ can be used.
+Instead of cron schedules, fixed rate schedules can be used.
 
 You can specify the duration in the schedule using `timedelta`, that supports `minutes`, `hours`, `days` and `weeks`.
 
