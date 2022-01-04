@@ -13,11 +13,20 @@ message EventErrorAlreadyInTerminalState {
     string current_phase = 1;
 }
 
+// Indicates an event was rejected because it came from a different cluster than 
+// is on record as running the execution.
+message EventErrorIncompatibleCluster {
+    // The cluster which has been recorded as processing the execution.
+    // +required
+    string cluster = 1;
+}
+
 // Indicates why a sent event was not used to update execution.
 message EventFailureReason {
     // +required
     oneof reason {
         EventErrorAlreadyInTerminalState already_in_terminal_state = 1;
+        EventErrorIncompatibleCluster incompatible_cluster = 2;
     }
 }
 

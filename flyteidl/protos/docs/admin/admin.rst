@@ -634,6 +634,28 @@ for further state transitions).
 
 
 
+.. _ref_flyteidl.admin.EventErrorIncompatibleCluster:
+
+EventErrorIncompatibleCluster
+------------------------------------------------------------------
+
+Indicates an event was rejected because it came from a different cluster than 
+is on record as running the execution.
+
+
+
+.. csv-table:: EventErrorIncompatibleCluster type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "cluster", ":ref:`ref_string`", "", "The cluster which has been recorded as processing the execution. +required"
+
+
+
+
+
+
+
 .. _ref_flyteidl.admin.EventFailureReason:
 
 EventFailureReason
@@ -648,6 +670,7 @@ Indicates why a sent event was not used to update execution.
    :widths: auto
 
    "already_in_terminal_state", ":ref:`ref_flyteidl.admin.EventErrorAlreadyInTerminalState`", "", ""
+   "incompatible_cluster", ":ref:`ref_flyteidl.admin.EventErrorIncompatibleCluster`", "", ""
 
 
 
