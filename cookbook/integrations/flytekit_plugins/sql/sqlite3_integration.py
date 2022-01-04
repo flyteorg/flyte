@@ -6,8 +6,8 @@ Sqlite3
 
 The following example shows how you can write SQLite3 queries using the SQLite3Task, which is bundled as part of the
 core flytekit. Since SQL Queries are portable across workflows and Flyte installations (as long as the data exists),
-this task will always run with a pre-built container, specifically the [flytekit container](https://github.com/flyteorg/flytekit/blob/v0.19.0/Dockerfile.py38) itself.
-and thus users are not required to build a container for SQLite3. You can simply implement the task - register and
+this task will always run with a pre-built container, specifically the `flytekit container <https://github.com/flyteorg/flytekit/blob/v0.19.0/Dockerfile.py38>`__
+itself. Therefore, users are not required to build a container for SQLite3. You can simply implement the task - register and
 execute it immediately.
 
 In some cases local execution is not possible - e.g. Snowflake. But for SQLlite3 local execution is also supported.
