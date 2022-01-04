@@ -22,7 +22,7 @@ Cluster Config
        :text: Auth Migration Guide
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Migration guide to help you move to Admin's own authorization server.
+    Migration guide to move to Admin's own authorization server.
 
     ---
 

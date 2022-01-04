@@ -3,6 +3,7 @@
 ##########
 Executions
 ##########
+**Executions** are instances of workflows, nodes or tasks created in the system as a result of a user-requested execution or a scheduled execution.
 
 Typical Flow Using FlyteCTL
 ---------------------------

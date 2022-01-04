@@ -121,12 +121,11 @@ Core Concepts
     ---
 
     .. link-button:: divedeep-versioning
-        :type: ref
-        :text: Workflow & Task Versioning
-        :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
-
+         :type: ref
+         :text: Workflow & Task Versioning
+         :classes: btn-block stretched-link
+     ^^^^^^^^^^^^
+     A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
 
@@ -139,8 +138,10 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     :hidden:
 
     tasks
-    workflows_nodes
-    launchplans_schedules
+    workflows
+    nodes
+    launchplans
+    schedules
     registration
     executions
     state_machine
@@ -149,4 +150,3 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     flyte_console
     catalog
     versioning
-

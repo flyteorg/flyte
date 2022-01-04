@@ -37,7 +37,7 @@ The Admin API is broken up into entities:
 - Workflows
 
 Each API entity has an entity manager in FlyteAdmin responsible for implementing business logic for the entity.
-Entity managers handle full validation for creating, update and getting requests and
+Entity managers handle full validation of creating, updating and getting requests and
 data persistence in the backing store (see the :ref:`divedeep-admin-repository` section).
 
 
