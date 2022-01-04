@@ -493,6 +493,36 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, 0, len(r.Finalizers))
 		assert.False(t, HasCompletedLabel(r))
 	})
+	t.Run("failOnIncompatibleClusterError", func(t *testing.T) {
+		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+			Status: v1alpha1.WorkflowStatus{
+				Phase:          v1alpha1.WorkflowPhaseRunning,
+				FailedAttempts: 0,
+			},
+		}))
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			return workflowErrors.Wrapf(workflowErrors.EventRecordingError, "",
+				&eventErrors.EventError{
+					Code:    eventErrors.EventIncompatibleCusterError,
+					Cause:   nil,
+					Message: "The execution is recorded as running on a different cluster",
+				}, "failed to transition phase")
+		}
+		assert.NoError(t, p.Handle(ctx, namespace, name))
+
+		r, err := s.Get(ctx, namespace, name)
+		assert.NoError(t, err)
+		assert.Equal(t, v1alpha1.WorkflowPhaseFailing, r.GetExecutionStatus().GetPhase())
+		assert.Equal(t, 0, len(r.Finalizers))
+		assert.False(t, HasCompletedLabel(r))
+	})
 }
 
 func TestPropeller_Handle_TurboMode(t *testing.T) {

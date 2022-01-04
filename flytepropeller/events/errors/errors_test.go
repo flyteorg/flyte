@@ -44,6 +44,14 @@ func isUnknownError(err error) bool {
 
 // Test that we wrap the gRPC error to our correct one
 func TestWrapErrors(t *testing.T) {
+	incompatibleClusterErr, _ := status.New(codes.FailedPrecondition, "incompat").WithDetails(&admin.EventFailureReason{
+		Reason: &admin.EventFailureReason_IncompatibleCluster{
+			IncompatibleCluster: &admin.EventErrorIncompatibleCluster{
+				Cluster: "c1",
+			},
+		},
+	})
+
 	tests := []struct {
 		name         string
 		inputError   error
@@ -55,6 +63,7 @@ func TestWrapErrors(t *testing.T) {
 		{"uncaughtError", status.Error(codes.Unknown, "Unknown Err"), isEventError},
 		{"uncaughtError", fmt.Errorf("Random err"), isUnknownError},
 		{"errorWithReason", createTestErrorWithReason(), IsEventAlreadyInTerminalStateError},
+		{"incompatibleCluster", incompatibleClusterErr.Err(), IsEventIncompatibleClusterError},
 	}
 
 	for _, test := range tests {

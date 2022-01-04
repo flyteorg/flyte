@@ -129,9 +129,8 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 			}()
 			err = p.workflowExecutor.HandleFlyteWorkflow(ctx, mutableW)
 		}()
-
 		if err != nil {
-			logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]. Is nill [%v]",
+			logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]",
 				err, reflect.TypeOf(err))
 			p.metrics.SystemError.Inc(ctx)
 			return nil, err
@@ -245,6 +244,27 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 			})
 			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
 				logger.Errorf(ctx, "Failed to record an ExecutionNotFound workflow as failed, reason: %s. Retrying...", e)
+				return e
+			}
+			return nil
+		}
+
+		// Incompatible cluster means that another cluster has been designated to handle this workflow execution.
+		// We should early abort in this case, since any events originating from this cluster for this execution will
+		// be rejected.
+		if err != nil && eventsErr.IsEventIncompatibleClusterError(err) {
+			t.Stop()
+			logger.Errorf(ctx, "No longer designated to process workflow, failing: %s", err)
+
+			// We set the workflow status to failing to abort any active tasks in the next round.
+			mutableW := w.DeepCopy()
+			mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow execution cluster reassigned, aborting", &core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    string(eventsErr.EventIncompatibleCusterError),
+				Message: fmt.Sprintf("Workflow execution cluster reassigned: %v", err),
+			})
+			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+				logger.Errorf(ctx, "Failed to record an EventIncompatibleClusterError workflow as failed, reason: %s. Retrying...", e)
 				return e
 			}
 			return nil

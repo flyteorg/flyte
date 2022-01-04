@@ -22,6 +22,7 @@ const (
 	TooLarge                         ErrorCode = "TooLarge"
 	EventSinkError                   ErrorCode = "EventSinkError"
 	EventAlreadyInTerminalStateError ErrorCode = "EventAlreadyInTerminalStateError"
+	EventIncompatibleCusterError     ErrorCode = "EventIncompatibleClusterError"
 )
 
 type EventError struct {
@@ -67,6 +68,8 @@ func WrapError(err error) error {
 				case *admin.EventFailureReason_AlreadyInTerminalState:
 					phase := reason.AlreadyInTerminalState.GetCurrentPhase()
 					return wrapf(EventAlreadyInTerminalStateError, err, fmt.Sprintf("conflicting events; destination: %v", phase))
+				case *admin.EventFailureReason_IncompatibleCluster:
+					return wrapf(EventIncompatibleCusterError, err, fmt.Sprintf("conflicting execution cluster; expected: %v", reason.IncompatibleCluster.Cluster))
 				default:
 					logger.Warnf(context.Background(), "found unexpected type in details of grpc status: %v", reason)
 				}
@@ -129,4 +132,9 @@ func IsTooLarge(err error) bool {
 // Checks if the error is of type EventError and the ErrorCode is of type EventAlreadyInTerminalStateError
 func IsEventAlreadyInTerminalStateError(err error) bool {
 	return errors.Is(err, &EventError{Code: EventAlreadyInTerminalStateError})
+}
+
+// IsEventIncompatibleClusterError checks if the error is of type EventError and the ErrorCode is of type EventIncompatibleCusterError
+func IsEventIncompatibleClusterError(err error) bool {
+	return errors.Is(err, &EventError{Code: EventIncompatibleCusterError})
 }

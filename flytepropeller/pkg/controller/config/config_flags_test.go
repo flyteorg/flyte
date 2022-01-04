@@ -813,4 +813,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cluster-id", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cluster-id", testValue)
+			if vString, err := cmdFlags.GetString("cluster-id"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ClusterID)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
