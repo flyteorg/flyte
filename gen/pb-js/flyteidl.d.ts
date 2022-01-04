@@ -7807,11 +7807,66 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an EventErrorIncompatibleCluster. */
+        interface IEventErrorIncompatibleCluster {
+
+            /** EventErrorIncompatibleCluster cluster */
+            cluster?: (string|null);
+        }
+
+        /** Represents an EventErrorIncompatibleCluster. */
+        class EventErrorIncompatibleCluster implements IEventErrorIncompatibleCluster {
+
+            /**
+             * Constructs a new EventErrorIncompatibleCluster.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IEventErrorIncompatibleCluster);
+
+            /** EventErrorIncompatibleCluster cluster. */
+            public cluster: string;
+
+            /**
+             * Creates a new EventErrorIncompatibleCluster instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EventErrorIncompatibleCluster instance
+             */
+            public static create(properties?: flyteidl.admin.IEventErrorIncompatibleCluster): flyteidl.admin.EventErrorIncompatibleCluster;
+
+            /**
+             * Encodes the specified EventErrorIncompatibleCluster message. Does not implicitly {@link flyteidl.admin.EventErrorIncompatibleCluster.verify|verify} messages.
+             * @param message EventErrorIncompatibleCluster message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IEventErrorIncompatibleCluster, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EventErrorIncompatibleCluster message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EventErrorIncompatibleCluster
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.EventErrorIncompatibleCluster;
+
+            /**
+             * Verifies an EventErrorIncompatibleCluster message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an EventFailureReason. */
         interface IEventFailureReason {
 
             /** EventFailureReason alreadyInTerminalState */
             alreadyInTerminalState?: (flyteidl.admin.IEventErrorAlreadyInTerminalState|null);
+
+            /** EventFailureReason incompatibleCluster */
+            incompatibleCluster?: (flyteidl.admin.IEventErrorIncompatibleCluster|null);
         }
 
         /** Represents an EventFailureReason. */
@@ -7826,8 +7881,11 @@ export namespace flyteidl {
             /** EventFailureReason alreadyInTerminalState. */
             public alreadyInTerminalState?: (flyteidl.admin.IEventErrorAlreadyInTerminalState|null);
 
+            /** EventFailureReason incompatibleCluster. */
+            public incompatibleCluster?: (flyteidl.admin.IEventErrorIncompatibleCluster|null);
+
             /** EventFailureReason reason. */
-            public reason?: "alreadyInTerminalState";
+            public reason?: ("alreadyInTerminalState"|"incompatibleCluster");
 
             /**
              * Creates a new EventFailureReason instance using the specified properties.
