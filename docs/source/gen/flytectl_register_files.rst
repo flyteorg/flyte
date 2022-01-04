@@ -66,19 +66,25 @@ Override IamRole during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -i "arn:aws:iam::123456789:role/dummy"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --assumableIamRole "arn:aws:iam::123456789:role/dummy"
 
 Override Kubernetes service account during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -k "kubernetes-service-account"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --k8sServiceAccount "kubernetes-service-account"
 
 Override Output location prefix during registration:
 
 ::
 
- flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 -l "s3://dummy/prefix"
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --outputLocationPrefix "s3://dummy/prefix"
+
+Override Destination dir of source code in container during registration:
+
+::
+
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --destinationDirectory "/root" 
 	
 Usage
 
@@ -95,6 +101,7 @@ Options
       --archive                       pass in archive file either an http link or local path.
       --assumableIamRole string        custom assumable iam auth role to register launch plans with.
       --continueOnError               continue on error when registering files.
+      --destinationDirectory string    Location of source code in container.
       --dryRun                        execute command without making any modifications.
       --force                         force use of version number on entities registered with flyte.
   -h, --help                          help for files
@@ -111,8 +118,10 @@ Options inherited from parent commands
 
       --admin.authorizationHeader string           Custom metadata header to pass JWT
       --admin.authorizationServerUrl string        This is the URL to your IdP's authorization server. It'll default to Endpoint
+      --admin.caCertFilePath string                Use specified certificate file to verify the admin server peer.
       --admin.clientId string                      Client ID (default "flytepropeller")
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
+      --admin.command strings                      Command for external authentication token generation
       --admin.endpoint string                      For admin types,  specify where the uri of the service is located.
       --admin.insecure                             Use insecure connection.
       --admin.insecureSkipVerify                   InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
