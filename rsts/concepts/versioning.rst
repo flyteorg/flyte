@@ -1,5 +1,3 @@
-:orphan:
-
 .. _divedeep-versioning:
 
 Versions

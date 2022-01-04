@@ -118,6 +118,14 @@ Core Concepts
     ^^^^^^^^^^^^
     A deeper dive into **memoization** and the mechanics of memoization in Flyte.
 
+    ---
+
+   .. link-button:: divedeep-versioning
+         :type: ref
+         :text: Workflow & Task Versioning
+         :classes: btn-block stretched-link
+     ^^^^^^^^^^^^
+     A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
 
@@ -141,3 +149,4 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     data_management
     flyte_console
     catalog
+    versioning
