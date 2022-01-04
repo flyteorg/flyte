@@ -114,7 +114,7 @@ To delete a specific workflow
 ```
 
 To delete all completed workflows - they have to be either success/failed with a special isCompleted label set on them.
-The Label is set `here <https://github.com/flyteorg/flytepropeller/blob/master/pkg/controller/controller.go#L247>`
+The Label is set [here](https://github.com/flyteorg/flytepropeller/blob/master/pkg/controller/controller.go#L247)
 
 ```
    $ kubectl-flyte delete --namespace flytekit-development --all-completed
@@ -122,7 +122,7 @@ The Label is set `here <https://github.com/flyteorg/flytepropeller/blob/master/p
 
 Running propeller locally
 -------------------------
-use the config.yaml in root found `here <https://github.com/flyteorg/flytepropeller/blob/master/config.yaml>`. Cd into
+use the config.yaml in root found [here](https://github.com/flyteorg/flytepropeller/blob/master/config.yaml). Cd into
 this folder and then run
 
 ```
