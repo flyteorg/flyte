@@ -3,12 +3,12 @@
 Kubernetes Spark Jobs
 =====================
 
-Flyte can execute Spark jobs natively on a Kubernetes Cluster, which manages a virtual cluster's lifecycle, spin-up, and tear down. 
+Flyte can execute Spark jobs natively on a Kubernetes Cluster, which manages a virtual cluster's lifecycle, spin-up, and tear down.
 It leverages the open-sourced `Spark On K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`__
 and can be enabled without signing up for any service. This is like running a ``transient spark cluster``—a type of cluster spun up for a specific Spark job and torn down after completion.
 These clusters are better for production workloads but have an extra cost of setup and teardown.
 
-In Flyte/K8s, the cost is amortized because pods are faster to create than a machine, but the penalty of downloading Docker images may affect the performance. 
+In Flyte/K8s, the cost is amortized because pods are faster to create than a machine, but the penalty of downloading Docker images may affect the performance.
 Also, remember that starting a pod is not as fast as running a process.
 
 Flytekit makes it possible to write PySpark code natively as a task and the
@@ -25,7 +25,7 @@ hands-on tutorial for writing PySpark tasks.
 Why Use K8s Spark?
 ------------------
 
-Managing Python dependencies is hard. Flyte makes it easy to version and manage dependencies using containers. 
+Managing Python dependencies is hard. Flyte makes it easy to version and manage dependencies using containers.
 The K8s Spark plugin brings all the benefits of containerization to Spark without needing to manage special Spark clusters.
 
 **Pros:**
@@ -44,7 +44,7 @@ Step 1: Deploy Spark Plugin in the Flyte Backend
 -------------------------------------------------
 
 Flyte Spark uses the `Spark On K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`__ and a custom built `Flyte Spark Plugin <https://pkg.go.dev/github.com/flyteorg/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark>`__.
-This is a backend plugin which has to be enabled in your deployment; you can follow the steps mentioned in the :ref:`enable-backend-plugins` section.
+This is a backend plugin which has to be enabled in your deployment; you can follow the steps mentioned in the :ref:`flyte:deployment-plugin-setup-k8s` section.
 
 .. todo: Update to show Helm deployment
 
@@ -57,10 +57,11 @@ You can optionally configure the plugin as per the `backend config structure <ht
 Spark Service Accounts
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Spark needs a special service account (with associated role and role bindings) to create executor pods. 
+Spark needs a special service account (with associated role and role bindings) to create executor pods.
 If you use IAM for Service accounts or GCP Workload identity, you need to update the service account to include this.
 
-You can use ``Flyte cluster resource manager`` to manage creating the spark service account per namespace. For this, you need to add the cluster resource templates as shown `here <https://github.com/flyteorg/flyte/tree/376f61acc37d885d17aa6b4d003db502c4cb6bcf/kustomize/overlays/eks/flyte/config/clusterresource-templates>`__: refer to the ``*spark*.yaml`` files.
+You can use ``Flyte cluster resource manager`` to manage creating the spark service account per namespace.
+For this, you need to add the cluster resource templates as shown `here <https://github.com/flyteorg/flyte/tree/376f61acc37d885d17aa6b4d003db502c4cb6bcf/kustomize/overlays/eks/flyte/config/clusterresource-templates>`__ (refer to the ``*spark*.yaml`` files).
 
 Step 2: Environment Setup
 -------------------------
@@ -83,78 +84,18 @@ How to Build Your Dockerfile for Spark on K8s
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Using Spark on K8s is extremely easy and provides full versioning using the custom-built Spark container. The built container can also execute regular Spark tasks.
-For Spark, the image must contain Spark dependencies and the correct entry point for the Spark driver/executors. 
+For Spark, the image must contain Spark dependencies and the correct entry point for the Spark driver/executors.
 This can be achieved using the `flytekit_install_spark.sh <https://github.com/lyft/flytekit/blob/67b00ef6173c77a940dbe612baa9b76408ef1448/scripts/flytekit_install_spark3.sh>`__ script provided as part of the Dockerfile included here.
 
-.. code-block:: docker
+.. literalinclude:: ../../../../../integrations/kubernetes/k8s_spark/Dockerfile
     :linenos:
     :emphasize-lines: 26-38
-
-    FROM ubuntu:focal
-    LABEL org.opencontainers.image.source https://github.com/flyteorg/flytesnacks
-    
-    WORKDIR /root
-    ENV VENV /opt/venv
-    ENV LANG C.UTF-8
-    ENV LC_ALL C.UTF-8
-    ENV PYTHONPATH /root
-    ENV DEBIAN_FRONTEND=noninteractive
-    
-    # Install Python3 and other basics
-    RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-essential libssl-dev python3-pip curl
-    
-    # Install AWS CLI to run on AWS (for GCS install GSutil). This will be removed
-    # in future versions to make it completely portable
-    RUN pip3 install awscli
-    
-    ENV VENV /opt/venv
-    # Virtual environment
-    RUN python3 -m venv ${VENV}
-    ENV PATH="${VENV}/bin:$PATH"
-    
-    # Install Python dependencies
-    COPY kubernetes/k8s_spark/requirements.txt /root
-    RUN pip install -r /root/requirements.txt
-    
-    RUN flytekit_install_spark3.sh
-    # Adding Tini support for the spark pods
-    RUN wget  https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
-        cp tini /sbin/tini && cp tini /usr/bin/tini && \
-        chmod a+x /sbin/tini && chmod a+x /usr/bin/tini
-    
-    # Setup Spark environment
-    ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-    ENV SPARK_HOME /opt/spark
-    ENV SPARK_VERSION 3.0.1
-    ENV PYSPARK_PYTHON ${VENV}/bin/python3
-    ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
-    
-    # Copy the makefile targets to expose on the container. This makes it easier to register.
-    COPY in_container.mk /root/Makefile
-    COPY kubernetes/k8s_spark/sandbox.config /root
-    
-    # Copy the actual code
-    COPY kubernetes/k8s_spark/ /root/k8s_spark
-    
-    # This tag is supplied by the build script and will be used to determine the version
-    # when registering tasks, workflows, and launch plans
-    ARG tag
-    ENV FLYTE_INTERNAL_IMAGE $tag
-    
-    # Copy over the helper script that the SDK relies on
-    RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/
-    RUN chmod a+x /usr/local/bin/flytekit_venv
-    
-    # For spark we want to use the default entrypoint which is part of the
-    # distribution, also enable the virtualenv for this image. 
-    # Note this relies on the VENV variable we've set in this image.
-    ENTRYPOINT ["/usr/local/bin/flytekit_venv", "/opt/entrypoint.sh"]
-
+    :language: docker
 
 Step 3: Optionally, Setup Visibility
 -------------------------------------
 
-Every time a Spark job is run, you can get a Spark application UI link to monitor the Job. 
+Every time a Spark job is run, you can get a Spark application UI link to monitor the Job.
 And for historical executions, you can use the SparkHistory Server to retrieve the archived Spark execution history.
 Also, Flyte can create explicit links to the Spark driver logs and the individual Spark executor logs.
 

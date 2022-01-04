@@ -13,8 +13,7 @@ Task is a fundamental building block and an extension point of Flyte, which enca
 A task in Flytekit can be of two types:
 
 #. A task that has a Python function associated with it. The execution of the task is equivalent to the execution of this function
-#. A task that does not have a Python function, e.g., an SQL query or some other portable task like Sagemaker prebuilt 
-   algorithms, or something that just invokes an API 
+#. A task that does not have a Python function, e.g., an SQL query or some other portable task like Sagemaker prebuilt algorithms, or something that just invokes an API
 
 Flyte has multiple plugins for tasks, either a backend plugin (`Athena <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-aws-athena/flytekitplugins/athena/task.py>`__).
 
@@ -53,17 +52,20 @@ def square(n: int) -> int:
 #   In case of multiple outputs, each output will be numbered in the order
 #   starting with 0, e.g., -> ``out0, out1, out2, ...``.
 #
-# You can execute a Flyte task as any normal function. 
+# You can execute a Flyte task as any normal function.
 if __name__ == "__main__":
     print(square(n=10))
 
 # %%
+# .. _single_task_execution:
+#
 # Single Task Execution
 # =====================
-# Tasks are the atomic units of execution in Flyte. 
-# Although workflows are traditionally composed of multiple tasks with dependencies defined by shared inputs and outputs, 
-# it can be helpful to execute a single task during the process of iterating on its definition. 
-# It can be tedious to write a new workflow definition every time you want to execute a single task under development 
+#
+# Tasks are the atomic units of execution in Flyte.
+# Although workflows are traditionally composed of multiple tasks with dependencies defined by shared inputs and outputs,
+# it can be helpful to execute a single task during the process of iterating on its definition.
+# It can be tedious to write a new workflow definition every time you want to execute a single task under development
 # but "single task executions" can be used to iterate on task logic easily.
 #
 # You can launch a task on Flyte console by inputting an IAM role or a Kubernetes service account.
@@ -71,7 +73,7 @@ if __name__ == "__main__":
 # Alternatively, you can use ``flytectl`` to launch the task. Run the following commands in the ``cookbook`` directory.
 #
 # .. note::
-#   This example is building a Docker image and pushing it only for sandbox 
+#   This example is building a Docker image and pushing it only for sandbox
 #   (for non-sandbox, you will have to push the image to a Docker registry).
 #
 # Build a Docker image to package the task.

@@ -1,32 +1,39 @@
 Kubeflow TensorFlow
 ===================
 
-TensorFlow operator is helpful to run distributed TensorFlow training jobs on Flyte. It is a wrapper around Kubeflow's TensorFlow operator.
+TensorFlow operator is useful to natively run distributed TensorFlow training jobs on Flyte.
+It is a wrapper built around `Kubeflow's TensorFlow operator <https://www.kubeflow.org/docs/components/training/tftraining/>`__.
 
 Installation
 ------------
 
-To install the Flytekit plugin, run the following command:
+To install the Kubeflow TensorFlow plugin, run the following command:
 
 .. code-block:: bash
 
     pip install flytekitplugins-kftensorflow
 
-To enable the plugin, follow the instructions outlined in the :std:ref:`flyte:deployment-plugin-setup-k8s-tensorflow-operator` guide.
+To enable the plugin in the backend, follow instructions outlined in the :std:ref:`flyte:deployment-plugin-setup-k8s` guide.
 
-GPU to CPU?
------------
+Code
+----
 
-**GPU support has been enabled in the code by default**. If you want to test your code on a CPU, make the following changes:
+We will write an example that does distributed training using the Kubeflow TensorFlow operator.
+Before that, let's look at the compute setup and Dockerfile.
 
-* You can disable GPU support by replacing ``FROM tensorflow/tensorflow:latest-gpu`` with ``FROM tensorflow/tensorflow:latest`` in the Dockerfile.
-* In a non-sandbox environment, if GPU support has to be disabled, modify the ``gpu_request`` and ``gpu_limit`` variables.
+GPU to CPU
+^^^^^^^^^^
+
+**GPU support has been enabled in the code by default**. If you want to test your code on a CPU, incorporate the following changes:
+
+* Replace ``FROM tensorflow/tensorflow:latest-gpu`` with ``FROM tensorflow/tensorflow:latest`` in the Dockerfile
+* Remove the ``gpu`` parameter from the ``Resources`` definition in the example
 
 Dockerfile
-----------
+^^^^^^^^^^
 
-Here's how the Dockerfile has been composed. It uses the TensorFlow-GPU image.
+The example uses TensorFlow-GPU image.
 
 .. literalinclude:: ../../../../../integrations/kubernetes/kftensorflow/Dockerfile
-    :emphasize-lines: 1
+    :emphasize-lines: 1-3
     :language: docker

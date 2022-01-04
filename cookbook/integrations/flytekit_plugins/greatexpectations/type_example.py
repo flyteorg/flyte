@@ -2,9 +2,9 @@
 Type Example
 ------------
 
-``GreatExpectationsType`` when accompanied with data can be used for data validation. 
+``GreatExpectationsType`` when accompanied with data can be used for data validation.
 It essentially is the type we attach to the data we want to validate.
-In this example, we'll implement a simple task, followed by Great Expectations data validation on ``FlyteFile``, ``FlyteSchema``, and finally, 
+In this example, we'll implement a simple task, followed by Great Expectations data validation on ``FlyteFile``, ``FlyteSchema``, and finally,
 the :py:class:`RuntimeBatchRequest <great_expectations.core.batch.RuntimeBatchRequest>`. The following video is a demo of the Great Expectations type example.
 
 .. youtube:: pDFTt_g76Wc

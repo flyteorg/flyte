@@ -1,4 +1,7 @@
 """
+
+.. _pytorch_single_node_and_gpu:
+
 Single Node, Single GPU Training
 --------------------------------
 

@@ -1,22 +1,31 @@
 """
 Map Tasks
-----------
+---------
 
-A map task lets you run a task over a list of inputs within a single workflow node. This means you can run thousands
-of instances of that task without creating a node for every instance, providing valuable performance gains. Furthermore
-you can run map tasks on alternate execution back-ends, such as `AWS Batch <https://aws.amazon.com/batch/>`__ which is
-a provisioned services that can scale to great sizes.
+A map task lets you run a pod task or a regular task over a list of inputs within a single workflow node.
+This means you can run thousands of instances of the task without creating a node for every instance, providing valuable performance gains!
 
+Some use cases of map tasks include:
+
+* Several inputs must run through the same code logic
+* Multiple data batches need to be processed in parallel
+* Hyperparameter optimization
+
+Let's look at an example now!
 """
 
+# %%
+# First, we import the libraries.
 import typing
 
-from flytekit import TaskMetadata, map_task, task, workflow
+from flytekit import Resources, map_task, task, workflow
 
 
 # %%
-# Note that this is the single task that we'll use in our map task. It can only accept one input and produce one output
-# although this may expand in the future.
+# Next, we define a task that we will use in our map task.
+#
+# .. note::
+#   A map task can only accept one input and produce one output.
 @task
 def a_mappable_task(a: int) -> str:
     inc = a + 2
@@ -24,6 +33,8 @@ def a_mappable_task(a: int) -> str:
     return stringified
 
 
+# %%
+# We also define a task to reduce the mapped output to a string.
 @task
 def coalesce(b: typing.List[str]) -> str:
     coalesced = "".join(b)
@@ -31,16 +42,28 @@ def coalesce(b: typing.List[str]) -> str:
 
 
 # %%
-# To use a map task in your workflow, use the :py:func:`flytekit:flytekit.core.map_task` function and pass in an individual
-# task to be repeated across a collection of inputs. In this case the type of a, ``typing.List[int]`` is a list of the
-# input type defined for ``a_mappable_task``.
+# We send ``a_mappable_task`` to be repeated across a collection of inputs to the :py:func:`~flytekit:flytekit.map_task` function.
+# In our example, ``a`` of type ``typing.List[int]`` is the input.
+# The task ``a_mappable_task`` is run for each element in the list.
+#
+# ``with_overrides`` is useful to set resources for individual map task.
 @workflow
 def my_map_workflow(a: typing.List[int]) -> str:
-    mapped_out = map_task(a_mappable_task, metadata=TaskMetadata(retries=1))(a=a)
+    mapped_out = map_task(a_mappable_task)(a=a).with_overrides(
+        requests=Resources(mem="300Mi"),
+        limits=Resources(mem="500Mi"),
+        retries=1,
+    )
     coalesced = coalesce(b=mapped_out)
     return coalesced
 
 
+# %%
+# Lastly, we can run the workflow locally!
 if __name__ == "__main__":
     result = my_map_workflow(a=[1, 2, 3, 4, 5])
     print(f"{result}")
+
+# %%
+# Map tasks can run on alternate execution backends, such as `AWS Batch <https://aws.amazon.com/batch/>`__,
+# which is a provisioned service that can scale to great sizes.

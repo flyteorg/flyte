@@ -2,18 +2,16 @@
 .. _advanced_custom_types:
 
 Writing Custom Flyte Types
----------------------------
+--------------------------
 
-Flyte is a strongly typed framework for authoring tasks and workflows. But, there are situations when the existing set
-of types do not directly work. This is true with any programming language. This is when the languages support higher
-level concepts to describe User specific objects - like classes in python/java/c++, struct in C/golang, etc
+Flyte is a strongly-typed framework for authoring tasks and workflows. But there are situations when the existing set
+of types do not directly work. In fact, this is true with any programming language!
 
-Flytekit allows modeling user classes similarly. The idea is to make an interface that is more productive for the
-usecase, but write a transformer that transforms the user defined type to one of the generic constructs in Flyte's
-Type system.
+Just like a programming language enabling higher-level concepts to describe user-specific objects - like classes in Python/Java/C++, struct in C/Golang, etc.,
+Flytekit allows modeling user classes. The idea is to make an interface that is more productive for the
+use case, but write a transformer that transforms the user-defined type to one of the generic constructs in Flyte's type system.
 
-In this example, we will try to model an example user defined set and show how it can be integrated seamlessly with
-Flytekit's typing engine.
+This example will try to model an example user-defined dataset and show how it can be integrated seamlessly with Flytekit's typing engine.
 
 The video below will walk you through the example.
 
@@ -21,23 +19,35 @@ The video below will walk you through the example.
 
 
 """
+
+# %%
+# First, we import the dependencies.
 import os
 import tempfile
 import typing
-
-# %%
-# FlyteContext is used only to access a random local directory
 from typing import Type
 
-# %%
-# Defined type here represents a list of Files on the disk. We will refer to it as ``MyDataset``
-from flytekit import FlyteContext, task, workflow, BlobType, Blob, BlobMetadata, Literal, Scalar, LiteralType
+from flytekit import (
+    Blob,
+    BlobMetadata,
+    BlobType,
+    FlyteContext,
+    Literal,
+    LiteralType,
+    Scalar,
+    task,
+    workflow,
+)
 from flytekit.extend import TypeEngine, TypeTransformer
 
-
+# %%
+# .. note::
+#   ``FlyteContext`` is used to access a random local directory.
+#
+# Defined type here represents a list of files on the disk. We will refer to it as ``MyDataset``.
 class MyDataset(object):
     """
-    Dataset here is a set of files that exist together. In Flyte this maps to a Multi-part blob or a directory
+    MyDataset is a collection of files. In Flyte, this maps to a multi-part blob or directory
     """
 
     def __init__(self, base_dir: str = None):
@@ -65,15 +75,15 @@ class MyDataset(object):
 
 
 # %%
-# ``MyDataset`` represents a set of files locally, but, when a workflow consists of multiple steps, we want the data to
+# ``MyDataset`` represents a set of files locally, but when a workflow consists of multiple steps, we want the data to
 # flow between the different steps. To achieve this, it is necessary to explain how the data will be transformed to
 # Flyte's remote references. To do this, we create a new instance of
-# :py:class:`flytekit.extend.TypeTransformer`, for the type ``MyDataset`` as follows
+# :py:class:`~flytekit:flytekit.extend.TypeTransformer`, for the type ``MyDataset`` as follows:
 #
 # .. note::
 #
-#   The TypeTransformer is a Generic abstract base class. The Generic type argument here refers to the actual object
-#   that we want to work with. In this case, it is the ``MyDataset`` object
+#   The `TypeTransformer` is a Generic abstract base class. The `Generic` type argument refers to the actual object
+#   that we want to work with. In this case, it is the ``MyDataset`` object.
 class MyDatasetTransformer(TypeTransformer[MyDataset]):
     _TYPE_INFO = BlobType(
         format="binary", dimensionality=BlobType.BlobDimensionality.MULTIPART
@@ -86,8 +96,8 @@ class MyDatasetTransformer(TypeTransformer[MyDataset]):
 
     def get_literal_type(self, t: Type[MyDataset]) -> LiteralType:
         """
-        This is useful to tell the Flytekit type system that ``MyDataset`` actually refers to what corresponding type
-        In this example, we say its of format binary (do not try to introspect) and there are more than one files in it
+        This is useful to tell the Flytekit type system that ``MyDataset`` actually refers to what corresponding type.
+        In this example, we say its of format binary (do not try to introspect) and there is more than one file in it.
         """
         return LiteralType(blob=self._TYPE_INFO)
 
@@ -99,12 +109,12 @@ class MyDatasetTransformer(TypeTransformer[MyDataset]):
         expected: LiteralType,
     ) -> Literal:
         """
-        This method is used to convert from given python type object ``MyDataset`` to the Literal representation
+        This method is used to convert from the given python type object ``MyDataset`` to the Literal representation.
         """
-        # Step 1: lets upload all the data into a remote place recommended by Flyte
+        # Step 1: let's upload all the data into a remote place recommended by Flyte
         remote_dir = ctx.file_access.get_random_remote_directory()
         ctx.file_access.upload_directory(python_val.base_dir, remote_dir)
-        # Step 2: lets return a pointer to this remote_dir in the form of a literal
+        # Step 2: let's return a pointer to this remote_dir in the form of a Literal
         return Literal(
             scalar=Scalar(
                 blob=Blob(uri=remote_dir, metadata=BlobMetadata(type=self._TYPE_INFO))
@@ -115,25 +125,23 @@ class MyDatasetTransformer(TypeTransformer[MyDataset]):
         self, ctx: FlyteContext, lv: Literal, expected_python_type: Type[MyDataset]
     ) -> MyDataset:
         """
-        In this function we want to be able to re-hydrate the custom object from Flyte Literal value
+        In this method, we want to be able to re-hydrate the custom object from Flyte Literal value.
         """
-        # Step 1: lets download remote data locally
+        # Step 1: let's download remote data locally
         local_dir = ctx.file_access.get_random_local_directory()
         ctx.file_access.download_directory(lv.scalar.blob.uri, local_dir)
-        # Step 2: create the MyDataset object
+        # Step 2: create the ``MyDataset`` object
         return MyDataset(base_dir=local_dir)
 
 
 # %%
-# Before we can use MyDataset in our tasks, we need to let flytekit know that ``MyDataset`` should be considered as a
-# valid type. This is done using the :py:func:`flytekit.extend.TypeEngine.register` function.
+# Before we can use MyDataset in our tasks, we need to let Flytekit know that ``MyDataset`` should be considered as a valid type.
+# This is done using :py:class:`~flytekit:flytekit.extend.TypeEngine`'s ``register`` method.
 TypeEngine.register(MyDatasetTransformer())
 
 
 # %%
-# Now the new type should be ready to use. Let us write an example generator and consumer for this new datatype
-
-
+# The new type should be ready to use! Let us write an example generator and consumer for this new datatype.
 @task
 def generate() -> MyDataset:
     d = MyDataset()
@@ -161,8 +169,6 @@ def wf() -> str:
 
 
 # %%
-# We can run this workflow locally and test it. Remember even when you run it locally, flytekit will excercise the
-# entire path
-
+# We can run this workflow locally and test it. Even when you run it locally, Flytekit will exercise the entire path.
 if __name__ == "__main__":
     print(wf())

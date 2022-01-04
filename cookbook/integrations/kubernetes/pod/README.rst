@@ -1,25 +1,26 @@
-
 Kubernetes Pods
-================
+===============
 
-By default Flyte tasks - ``@task`` are essentially single functions that are loaded in one container. But, often times there is a need to run a job, with more than one containers. For example,
+Flyte tasks (Python functions decorated with :py:func:`@task <flytekit:flytekit.task>`) are essentially single functions loaded in one container.
+But often, there is a need to run a job with more than one container, in cases such as:
 
-  - a special Hyper-parameter optimizer with state stored in a redis db
-  - simulating a service locally
-  - run a sidecar to fetch or orchestrate data, handle additional logging or monitoring
-  - run a pod with it's complete set of possibilities- mounting volumes etc
+- A special hyper-parameter optimizer with state stored in a Redis DB
+- Simulating a service locally
+- Running a sidecar to fetch or orchestrate data to handle additional logging and monitoring
+- Running a pod with its complete set of possibilities: mounting volumes, etc.
 
-In this case, a regular task is not enough. For such a case, users can simply use a kubernetes pod abstraction provided by Flyte to execute multiple containers.
-This can be done by using ``Pod`` task_config can be leveraged to fully customize the pod spec used to run your task.
+Flyte provides a simplified interface to implement Kubernetes pod abstraction to execute multiple containers.
+This is done using ``Pod`` task_config, which enables customization of the pod spec used to run the task.
 
 .. note::
 
-    Flyte will automatically take care of pod tasks. Typically a K8s pod will not exit, if the pod contains any sidecars (containers that do not exit automatically). No additional code is required.
+    Typically, a Kubernetes pod will not exit if the pod contains any sidecars (containers that do not exit automatically).
+    No additional code is required to handle this as Flyte automatically takes care of pod tasks.
 
 Installation
 ------------
 
-To use the flytekit pod plugin simply run the following:
+To use the Flytekit pod plugin, run the following command:
 
 .. prompt:: bash
 

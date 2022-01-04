@@ -259,6 +259,7 @@ Table of Contents
    Containerization <auto/core/containerization/index>
    Remote Access <auto/remote_access/index>
    Configuring Production Features <auto/deployment/index>
+   Scheduling Workflows <auto/core/scheduled_workflows/index>
    integrations
    Extending flyte <auto/core/extend_flyte/index>
    contribute

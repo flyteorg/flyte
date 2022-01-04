@@ -2,8 +2,8 @@
 Task Example
 ------------
 
-``GreatExpectationsTask`` can be used to define data validation within the task. 
-In this example, we'll implement a simple task, followed by Great Expectations data validation on ``FlyteFile``, ``FlyteSchema``, and finally, 
+``GreatExpectationsTask`` can be used to define data validation within the task.
+In this example, we'll implement a simple task, followed by Great Expectations data validation on ``FlyteFile``, ``FlyteSchema``, and finally,
 the :py:class:`RuntimeBatchRequest <great_expectations.core.batch.RuntimeBatchRequest>`.
 
 The following video shows the inner workings of the Great Expectations plugin, plus a demo of the task example.

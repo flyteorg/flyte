@@ -13,7 +13,7 @@ of distributing your training workload. Note, however, that this tutorial will o
 settings.
 
 For training on a single node and gpu see
-:ref:`this tutorial <sphx_glr_auto_case_studies_ml_training_mnist_classifier_pytorch_single_node.py>`, and for more
+:ref:`this tutorial <pytorch_single_node_and_gpu>`, and for more
 information on distributed training, check out the
 `pytorch documentation <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`__.
 
@@ -35,7 +35,7 @@ from flytekit import Resources, task, workflow
 from flytekit.types.file import PythonPickledFile
 # %%
 # We'll re-use certain classes and functions from the
-# :ref:`single node and gpu tutorial <sphx_glr_auto_case_studies_ml_training_mnist_classifier_pytorch_single_node.py>`
+# :ref:`single node and gpu tutorial <pytorch_single_node_and_gpu>`
 # such as the ``Net`` model architecture, ``Hyperparameters``, and ``log_test_predictions``.
 from mnist_classifier.pytorch_single_node_and_gpu import Net, Hyperparameters, log_test_predictions
 from torch import distributed as dist
@@ -324,10 +324,10 @@ def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
 # =====================
 #
 # Next we define the flyte task that kicks off the distributed training process. Here we call the
-# pytorch :ref:`multiprocessing <pytorch:torch.multiprocessing.spawn>` function to initiate a process on each
+# pytorch :py:func:`multiprocessing <pytorch:torch.multiprocessing.spawn>` function to initiate a process on each
 # available GPU. Since we're parallelizing the data, each process will contain a copy of the model and pytorch
 # will handle syncing the weights across all processes on ``optimizer.step()`` calls.
-# 
+#
 # See `here <https://pytorch.org/tutorials/beginner/dist_overview.html>`_ to read more about pytorch distributed
 # training.
 

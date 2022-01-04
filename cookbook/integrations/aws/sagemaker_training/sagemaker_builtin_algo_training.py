@@ -89,8 +89,8 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
 
 
 # %%
-# `Single task Execution <https://lyft.github.io/flyte/user/features/single_task_execution.html?highlight=single%20task%20execution>`_ can be used
-# to execute just the task without needing to create a workflow.  To trigger an execution, you will need to provide:
+# :ref:`single_task_execution` can be used to execute just the task without needing to create a workflow.
+# To trigger an execution, you will need to provide:
 #
 # Project (flyteexamples): project where the execution will be created under
 # Domain (development): domain where the execution will be created, under the project

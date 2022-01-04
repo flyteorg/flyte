@@ -76,10 +76,12 @@ from flytekitplugins.spark import Spark
 
 
 # %%
-# Spark Task Sample 
-# ^^^^^^^^^^^^^^^^^^
-# This example shows how a spark task can be written simply by adding a ``@task(task_config=Spark(...)...)`` decorator.
-# Refer to :py:class:`flytekitplugins.spark.Spark` class to understand the various configuration options.
+# Spark Task Sample
+# ^^^^^^^^^^^^^^^^^
+#
+# This example shows how a Spark task can be written simply by adding a ``@task(task_config=Spark(...)...)`` decorator.
+# Refer to `Spark <https://github.com/flyteorg/flytekit/blob/9e156bb0cf3d1441c7d1727729e8f9b4bbc3f168/plugins/flytekit-spark/flytekitplugins/spark/task.py#L18-L36>`__
+# class to understand the various configuration options.
 @task(
     task_config=Spark(
         # this configuration is applied to the spark cluster

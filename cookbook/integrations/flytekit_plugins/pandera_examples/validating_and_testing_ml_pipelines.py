@@ -103,13 +103,14 @@ import flytekitplugins.pandera
 # In practice, we'd want to do a little data exploration to first to get a sense of the distribution of variables.
 # A useful resource for this is the `Kaggle <https://www.kaggle.com/ronitf/heart-disease-uci>`__ version of this dataset,
 # which has been slightly preprocessed to be model-ready.
-# 
+#
 # .. Note::
 #    We'll be using the data provided by the UCI data repository since we want to work with a dataset that
 #    requires some preprocessing to be model-ready.
 #
 # Once we've gotten a rough sense of the statistical properties of the data, we can encode that domain knowledge into
 # a pandera schema:
+
 
 class RawData(pa.SchemaModel):
     age: Series[int] = pa.Field(in_range={"min_value": 0, "max_value": 200})
@@ -129,7 +130,7 @@ class RawData(pa.SchemaModel):
         isin=[
             0,  # normal
             1,  # having ST-T wave abnormality
-            2,  # showing probable or definite left ventricular hypertrophy by Estes' criteria  
+            2,  # showing probable or definite left ventricular hypertrophy by Estes' criteria
         ]
     )
     thalach: Series[int] = pa.Field(in_range={"min_value": 0, "max_value": 300})
@@ -165,6 +166,7 @@ class RawData(pa.SchemaModel):
 #
 # Now we're ready to write our first Flyte task:
 
+
 @task
 def fetch_raw_data() -> DataFrame[RawData]:
     data_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
@@ -175,6 +177,7 @@ def fetch_raw_data() -> DataFrame[RawData]:
         .dropna(subset=["ca", "thal"])
         .astype({"ca": float, "thal": float})
     )
+
 
 # %%
 # This function fetches the raw data from ``data_url`` and cleaning up invalid values such as ``"?"``, dropping records
@@ -194,6 +197,7 @@ def fetch_raw_data() -> DataFrame[RawData]:
 #
 # Here we can use inheritence to define a ``ParsedData`` schema by overriding just the ``target`` attribute:
 
+
 class ParsedData(RawData):
     target: Series[int] = pa.Field(isin=[0, 1])
 
@@ -201,6 +205,7 @@ class ParsedData(RawData):
 @task
 def parse_raw_data(raw_data: DataFrame[RawData]) -> DataFrame[ParsedData]:
     return raw_data.assign(target=lambda _: (_.target > 0).astype(int))
+
 
 # %%
 # As we can see the ``parse_raw_data`` function takes in a dataframe of type ``DataFrame[RawData]`` and outputs another
@@ -212,22 +217,24 @@ def parse_raw_data(raw_data: DataFrame[RawData]) -> DataFrame[ParsedData]:
 # Splitting the Data
 # ^^^^^^^^^^^^^^^^^^
 #
-# Now it's time to split the data into a training set and a test set. Here we'll showcase the utility of
-# :ref:`named outputs <_sphx_glr_auto_core_flyte_basics_named_outputs.py>` combined with pandera schemas.
+# Now it's time to split the data into a training and test set. Here we'll showcase the utility of
+# :ref:`named outputs <sphx_glr_auto_core_flyte_basics_named_outputs.py>` combined with pandera schemas.
 
 import typing
 
 DataSplits = typing.NamedTuple(
-    "DataSplits",
-    training_set=DataFrame[ParsedData],
-    test_set=DataFrame[ParsedData]
+    "DataSplits", training_set=DataFrame[ParsedData], test_set=DataFrame[ParsedData]
 )
 
+
 @task
-def split_data(parsed_data: DataFrame[ParsedData], test_size: float, random_state: int) -> DataSplits:
+def split_data(
+    parsed_data: DataFrame[ParsedData], test_size: float, random_state: int
+) -> DataSplits:
     training_set = parsed_data.sample(frac=test_size, random_state=random_state)
     test_set = parsed_data[~parsed_data.index.isin(training_set.index)]
     return training_set, test_set
+
 
 # %%
 # As we can see above, we're defining a ``DataSplits`` named tuple consisting of a ``training_set`` key and ``test_set``
@@ -239,6 +246,7 @@ def split_data(parsed_data: DataFrame[ParsedData], test_size: float, random_stat
 #
 # Next we'll train a ``RandomForestClassifier`` to predict the absence/presence of heart disease:
 
+
 def get_features_and_target(dataset):
     """Helper function for separating feature and target data."""
     X = dataset[[x for x in dataset if x != "target"]]
@@ -247,13 +255,16 @@ def get_features_and_target(dataset):
 
 
 @task
-def train_model(training_set: DataFrame[ParsedData], random_state: int) -> JoblibSerializedFile:
+def train_model(
+    training_set: DataFrame[ParsedData], random_state: int
+) -> JoblibSerializedFile:
     model = RandomForestClassifier(n_estimators=100, random_state=random_state)
     X, y = get_features_and_target(training_set)
     model.fit(X, y)
     model_fp = "/tmp/model.joblib"
     joblib.dump(model, model_fp)
     return JoblibSerializedFile(path=model_fp)
+
 
 # %%
 # This task serializes the model with joblib and returns a ``JoblibSerializedFile`` type, which is understood and
@@ -265,22 +276,29 @@ def train_model(training_set: DataFrame[ParsedData], random_state: int) -> Jobli
 #
 # Next we assess the accuracy score of the model on the test set:
 
+
 @task
-def evaluate_model(model: JoblibSerializedFile, test_set: DataFrame[ParsedData]) -> float:
+def evaluate_model(
+    model: JoblibSerializedFile, test_set: DataFrame[ParsedData]
+) -> float:
     with open(model, "rb") as f:
         model = joblib.load(f)
     X, y = get_features_and_target(test_set)
     preds = model.predict(X)
     return accuracy_score(y, preds)
 
+
 # %%
 # Finally, we put all of the pieces together in a Flyte workflow:
+
 
 @workflow
 def pipeline(data_random_state: int, model_random_state: int) -> float:
     raw_data = fetch_raw_data()
     parsed_data = parse_raw_data(raw_data=raw_data)
-    training_set, test_set = split_data(parsed_data=parsed_data, test_size=0.2, random_state=data_random_state)
+    training_set, test_set = split_data(
+        parsed_data=parsed_data, test_size=0.2, random_state=data_random_state
+    )
     model = train_model(training_set=training_set, random_state=model_random_state)
     return evaluate_model(model=model, test_set=test_set)
 
@@ -312,7 +330,7 @@ if __name__ == "__main__":
     @given(
         PositiveExamples.strategy(size=5),
         NegativeExamples.strategy(size=5),
-        st.integers(min_value=0, max_value=2**32)
+        st.integers(min_value=0, max_value=2 ** 32),
     )
     @hypothesis.settings(
         deadline=1000,
@@ -329,7 +347,6 @@ if __name__ == "__main__":
         preds = model.predict(X)
         for pred in preds:
             assert pred in {0, 1}
-
 
     def run_test_suite():
         test_train_model()

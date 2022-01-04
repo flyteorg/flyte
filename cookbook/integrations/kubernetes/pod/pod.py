@@ -2,28 +2,32 @@
 Pod Example
 -----------
 
-Pod tasks can be used anytime you need to bring up multiple containers within a single task. They expose a fully
-modifable kubernetes `pod spec
-<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#podspec-v1-core>`_ you can use to customize
-your task execution runtime.
+Pod tasks can be used whenever multiple containers need to spin up within a single task.
+They expose a fully modifiable Kubernetes `pod spec <https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#podspec-v1-core>`__ which can be used to customize the task execution runtime.
 
-All you need to do to use Pod tasks are:
-1. define a pod spec, and 
-2. specify the primary container name.
-The primary container is the driver for the flyte task execution for example, producing inputs and outputs.
+All we need to do to use pod tasks is:
+
+1. Define a pod spec
+2. Specify the name of the primary container
+
+`The primary container is the driver for Flyte task execution, for example, producing inputs and outputs.`
+
+Pod tasks accept arguments that ordinary container tasks usually accept, such as resource specifications, etc.
+However, these are only applied to the primary container.
+To customize other containers brought up during the execution, we can define a full-fledged pod spec.
+This is done using the `Kubernetes Python client library <https://github.com/kubernetes-client/python>`__,
+specifically with the
+`V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_pod_spec.py>`__.
 """
 
-
 # %%
-# Pod tasks accept all the same arguments that ordinary container tasks accept, such as resource specifications.
-# However, these are only applied to the primary container. To customize other containers brought up during execution
-# we define a fully-fledged pod spec. This is done using the
-# `kubernetes python client library <https://github.com/kubernetes-client/python>`__
-# specifically with the
-# `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_pod_spec.py>`__.
+# Simple Pod Task
+# ===============
 #
-# In this example, we define a simple pod spec in which a shared volume is mounted in both the primary and secondary
-# containers. The secondary writes a file that the primary waits on before completing.
+# In this example, let's define a simple pod spec in which a shared volume is mounted in both primary and secondary containers.
+# The secondary writes a file that the primary waits on before completing.
+#
+# First, we import the necessary libraries and define the shared data path.
 import os
 import time
 from typing import List
@@ -41,13 +45,14 @@ from kubernetes.client.models import (
 
 _SHARED_DATA_PATH = "/data/message.txt"
 
-
+# %%
+# We define a simple pod spec with two containers.
 def generate_pod_spec_for_task():
 
-    # Primary containers do not require us to specify an image, the default image built for flyte tasks will get used.
+    # primary containers do not require us to specify an image, the default image built for Flyte tasks will get used
     primary_container = V1Container(name="primary")
 
-    # Note: for non-primary containers we must specify an image.
+    # NOTE: for non-primary containers, we must specify the image
     secondary_container = V1Container(
         name="secondary",
         image="alpine",
@@ -84,15 +89,15 @@ def generate_pod_spec_for_task():
 
 
 # %%
-# Although Pod tasks for the most part allow you to customize kubernetes container attributes, you can still use flyte directives to specify resources and even the image. The default image built for
-# flyte tasks will be used unless you specify the `container_image` task attribute.
+# Although pod tasks for the most part allow us to customize Kubernetes container attributes, we can still use Flyte directives to specify resources and even the image.
+# The default image built for Flyte tasks will be used unless ``container_image`` task attribute is specified.
 @task(
     task_config=Pod(
         pod_spec=generate_pod_spec_for_task(), primary_container_name="primary"
     ),
 )
 def my_pod_task() -> str:
-    # The code defined in this task will get injected into the primary container.
+    # the code defined in this task will get injected into the primary container.
     while not os.path.isfile(_SHARED_DATA_PATH):
         time.sleep(5)
 
@@ -107,9 +112,11 @@ def PodWorkflow() -> str:
 
 
 # %%
-# To use a pod task as part of a map task in your workflow, use the :py:func:`flytekit:flytekit.core.map_task` function
-# and pass in the pod task definition. This will run your pod task across a collection of inputs.
-
+# Pod Task in Map Task
+# ====================
+#
+# To use pod task as part of map task, we send pod task definition to :py:func:`~flytekit:flytekit.map_task`.
+# This will run pod task across a collection of inputs.
 from flytekit import map_task, TaskMetadata
 
 
@@ -148,11 +155,13 @@ def coalesce(b: List[str]) -> str:
 
 @workflow
 def my_map_workflow(a: List[int]) -> str:
-    mapped_out = map_task(my_pod_map_task, metadata=TaskMetadata(retries=1))(stringify=a)
+    mapped_out = map_task(my_pod_map_task, metadata=TaskMetadata(retries=1))(
+        stringify=a
+    )
     coalesced = coalesce(b=mapped_out)
     return coalesced
 
-
+# %%
+# Since pod tasks cannot be run locally, we use the ``pass`` keyword to skip running the tasks.
 if __name__ == "__main__":
     pass
-

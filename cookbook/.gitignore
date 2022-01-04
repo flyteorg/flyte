@@ -12,3 +12,4 @@ auto_*/
 docs/auto/*
 docs/_rsts/
 .hypothesis
+.config/
