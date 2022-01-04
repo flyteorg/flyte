@@ -97,6 +97,7 @@ Below is an example with duration in `days`.
 	    # We omit the ``kickoff_time_input_arg`` from the FixedRate schedule invocation
 	    schedule=FixedRate(duration=timedelta(days=1)),
 	    fixed_inputs={"name": "you"},
+
 )
 
 
