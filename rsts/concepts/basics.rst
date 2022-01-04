@@ -120,7 +120,7 @@ Core Concepts
 
     ---
 
-   .. link-button:: divedeep-versioning
+    .. link-button:: divedeep-versioning
          :type: ref
          :text: Workflow & Task Versioning
          :classes: btn-block stretched-link
