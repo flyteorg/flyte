@@ -40,17 +40,17 @@ clusters:
       extension:
         audience: foo
         other: bar
-  name: foo-cluster
+  name: default
 contexts:
 - context:
-    cluster: foo-cluster
-    user: foo-user
+    cluster: default
+    user: default
     namespace: bar
-  name: foo-context
-current-context: foo-context
+  name: default
+current-context: default
 kind: Config
 users:
-- name: foo-user
+- name: default
   user:
     exec:
       apiVersion: client.authentication.k8s.io/v1alpha1

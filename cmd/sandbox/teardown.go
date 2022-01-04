@@ -12,6 +12,8 @@ import (
 	"github.com/enescakir/emoji"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytectl/pkg/k8s"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -48,6 +50,14 @@ func tearDownSandbox(ctx context.Context, cli docker.Docker) error {
 	if err := configutil.ConfigCleanup(); err != nil {
 		fmt.Printf("Config cleanup failed. Which Failed due to %v \n ", err)
 	}
+	if err := removeSandboxKubeContext(); err != nil {
+		fmt.Printf("Kubecontext cleanup failed. Which Failed due to %v \n ", err)
+	}
 	fmt.Printf("%v %v Sandbox cluster is removed successfully. \n", emoji.Broom, emoji.Broom)
 	return nil
+}
+
+func removeSandboxKubeContext() error {
+	localConfigAccess := clientcmd.NewDefaultPathOptions()
+	return k8s.RemoveKubeContext(localConfigAccess, sandboxContextName)
 }
