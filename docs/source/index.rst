@@ -48,7 +48,7 @@ on command-line. The following configuration is useful to setup.
 Basic Configuration
 --------------------
 
-For full list of configurable options available can be found by running ``flytectl --help`` and can be alternately be found `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__
+The full list of available configurable options can be found by running ``flytectl --help``, or alternately `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__
 
 .. NOTE::
 
