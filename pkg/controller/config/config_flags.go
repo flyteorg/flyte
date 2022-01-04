@@ -101,5 +101,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "exclude-project-label"), []string{}, "Exclude the specified project label from the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "include-domain-label"), []string{}, "Include the specified domain label in the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "exclude-domain-label"), []string{}, "Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster-id"), defaultConfig.ClusterID, "Unique cluster id running this flytepropeller instance with which to annotate execution events")
 	return cmdFlags
 }

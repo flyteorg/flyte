@@ -76,7 +76,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	status v1alpha1.ExecutableNodeStatus,
 	eventVersion v1alpha1.EventVersion,
 	parentInfo executors.ImmutableParentInfo,
-	node v1alpha1.ExecutableNode) (*event.NodeExecutionEvent, error) {
+	node v1alpha1.ExecutableNode, clusterID string) (*event.NodeExecutionEvent, error) {
 	if info.GetPhase() == handler.EPhaseNotReady {
 		return nil, nil
 	}
@@ -106,6 +106,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 				OutputURI: outputsFile,
 			}),
 			OccurredAt: occurredTime,
+			ProducerId: clusterID,
 		}
 	} else {
 		nev = &event.NodeExecutionEvent{
@@ -113,6 +114,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			Phase:      phase,
 			InputUri:   inputPath,
 			OccurredAt: occurredTime,
+			ProducerId: clusterID,
 		}
 	}
 
