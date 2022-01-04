@@ -53,7 +53,6 @@ modules:
       userSettings:
         rdsHost: "${{module.postgres.db_host}}"
         accountRegion: "{vars.region}"
-        # TODO: Use a hard-coded bucket
         bucketName: "{parent_name}-{layer_name}"
         logGroup: /eks/opta-staging/cluster
         dbUser: "${{module.postgres.db_user}}"
