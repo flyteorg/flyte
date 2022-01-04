@@ -106,6 +106,76 @@ var _ interface {
 	ErrorName() string
 } = EventErrorAlreadyInTerminalStateValidationError{}
 
+// Validate checks the field values on EventErrorIncompatibleCluster with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EventErrorIncompatibleCluster) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Cluster
+
+	return nil
+}
+
+// EventErrorIncompatibleClusterValidationError is the validation error
+// returned by EventErrorIncompatibleCluster.Validate if the designated
+// constraints aren't met.
+type EventErrorIncompatibleClusterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EventErrorIncompatibleClusterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EventErrorIncompatibleClusterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EventErrorIncompatibleClusterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EventErrorIncompatibleClusterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EventErrorIncompatibleClusterValidationError) ErrorName() string {
+	return "EventErrorIncompatibleClusterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EventErrorIncompatibleClusterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEventErrorIncompatibleCluster.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EventErrorIncompatibleClusterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EventErrorIncompatibleClusterValidationError{}
+
 // Validate checks the field values on EventFailureReason with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -122,6 +192,18 @@ func (m *EventFailureReason) Validate() error {
 			if err := v.Validate(); err != nil {
 				return EventFailureReasonValidationError{
 					field:  "AlreadyInTerminalState",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *EventFailureReason_IncompatibleCluster:
+
+		if v, ok := interface{}(m.GetIncompatibleCluster()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EventFailureReasonValidationError{
+					field:  "IncompatibleCluster",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
