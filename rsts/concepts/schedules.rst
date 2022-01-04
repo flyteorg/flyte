@@ -74,7 +74,8 @@ Below is another example:
         schedule="@hourly", # Following schedule runs every hour at beginning of the hour
         kickoff_time_input_arg="kickoff_time",
     ),
-)
+	
+	)
 
 
 Fixed rate schedules
