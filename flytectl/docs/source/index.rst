@@ -48,7 +48,11 @@ on command-line. The following configuration is useful to setup.
 Basic Configuration
 --------------------
 
-Flytectl configuration
+For full list of configurable options available can be found by running ``flytectl --help`` and can be alternately be found `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__
+
+.. NOTE::
+
+    Currently, the Project ``-p``, Domain ``-d``, and Output ``-o`` flags cannot be used in config file
 
 .. tabbed:: Local Flyte Sandbox
 
@@ -141,6 +145,7 @@ Flytectl configuration
    :hidden:
 
    Install and Configure <self>
+   gen/flytectl
    verbs
    nouns
    contribute
