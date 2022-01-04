@@ -9,6 +9,13 @@ Flyte provides an easy-to-use interface to utilize SQLAlchemy to connect to vari
 This task will run with a pre-built container, and thus users needn't build one.
 You can simply implement the task, then register and execute it immediately.
 
+First, install the Flyte Sqlalchemy plugin:
+
+.. prompt:: bash $
+
+    pip install flytekitplugins-sqlalchemy
+
+
 .. note::
     This example works locally only. For remote, you need to input a valid URI.
 """
