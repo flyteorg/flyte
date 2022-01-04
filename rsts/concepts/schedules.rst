@@ -76,6 +76,7 @@ Below is another example:
     ),
 )
 
+
 Fixed rate schedules
 ----------------------
 Instead of cron schedules, fixed rate schedules can be used.
