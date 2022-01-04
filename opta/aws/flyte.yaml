@@ -50,8 +50,15 @@ modules:
     values_file: "../../charts/flyte-core/values-eks.yaml" # NOTE: relative path to values yaml
     # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
     values:
-      postgres:
-        enabled: false
+      userSettings:
+        rdsHost: "${{module.postgres.db_host}}"
+        accountRegion: "{vars.region}"
+        # TODO: Use a hard-coded bucket
+        bucketName: "{parent_name}-{layer_name}"
+        logGroup: /eks/opta-staging/cluster
+        dbUser: "${{module.postgres.db_user}}"
+        dbname: "${{module.postgres.db_name}}"
+        dbPassword: "${{module.postgres.db_password}}"
       db:
         datacatalog:
           database:

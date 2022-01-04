@@ -74,6 +74,13 @@ modules:
     values_file: "../../charts/flyte-core/values-gcp.yaml" # NOTE: relative path to values yaml
     # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
     values:
+      userSettings:
+        bucketName: "${{module.gcs.bucket_name}}"
+        hostName: "{parent.domain}"
+        dbHost: "${{module.postgres.db_host}}"
+        dbUser: "${{module.postgres.db_user}}"
+        dbname: "${{module.postgres.db_name}}"
+        dbPassword: "${{module.postgres.db_password}}"
       postgres:
         enabled: false
       db:
