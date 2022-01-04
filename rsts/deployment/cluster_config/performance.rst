@@ -170,14 +170,6 @@ This can done in multiple ways
 
 
 
-Manual Scale out FlytePropeller
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FlytePropeller can be run manually per namespace. This is not a recommended solution as it is harder to deploy, but if your organization can deploy and maintain multiple copies of FlytePropeller, you can use this.
-
-Automatic scale-out: coming soon
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-An automatic horizontal scaling FlytePropeller deployment is being explored as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_. In brief, the solution introduces an additional component, namely FlytePropeller Manager, which acts as a home-grown k8s ReplicaSet. The Manager is responsible for a collection of FlytePropeller instances, ensuring liveness and proper distributed configuration. Each FlyteWorkflow is deterministically processed by a single FlytePropeller instance to ensure correctness. Currently, we are beginning with a simple consistent hashing implementation, where FlyteWorkflow processing responsibilities are distributed over FlytePropeller instances by assigned key ranges -- enabling use of the k8s label selector paradigm. For more in depth explanation, these approaches are explored more thoroughly in the aforementioned document.
-
 Scaling out FlyteAdmin
 =======================
 FlyteAdmin is a stateless service. Often time before needing to scale FlyteAdmin, you need to scale the backing database. Check out the FlyteAdmin Dashboard to see signs of latency degredation and increase the size of backing postgres instance.
@@ -190,10 +182,68 @@ Datacatalog is a stateless service and its replicas (in the kubernetes deploymen
 
 Scaling out FlytePropeller
 ===========================
-FlytePropeller can be sharded to work on a specific namespace of use consistent hashing to allow workflows to be handled by different instances.
 
-.. caution:: Coming soon!
+Manual scale-out
+----------------
+FlytePropeller can be run manually per namespace. This is not a recommended solution as it is harder to deploy, but if your organization can deploy and maintain multiple copies of FlytePropeller, you can use this.
 
+Automatic scale-out
+-------------------
+FlytePropeller Manager is a new component introduced as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_ to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses k8s label selectors to deterministically assign FlyteWorkflow CRD responsibilites to FlytePropeller instances, effectively distributing processing load over the shards.
+
+Deployment of FlytePropeller Manager requires k8s configuration updates including a modified FlytePropeller Deployment and a new PodTemplate defining managed FlytePropeller instances. The easiest way to apply these updates is by setting the "flytepropeller.manager" value to "true" in the `helm deployment <https://docs.flyte.org/en/latest/deployment/overview.html#usage-of-helm>`_ and setting the manager config at "configmap.core.manager".
+
+Flyte provides a variety of Shard Strategies to configure how FlyteWorkflows are sharded among managed FlytePropeller instances. These include hash, which uses consitent hashing to load-balance evaluation over shards, and project / domain, which map the respective IDs to specific managed FlytePropeller instances. Below we include examples of helm configurations for each of the existing Shard Strategies.
+
+The Hash Shard Strategy, denoted by "type: hash" in the configuration below, uses consistent hashing to evenly distribute FlyteWorkflows over managed FlytePropeller instances. This configuration requires a "shard-count" variable which defines the number of managed FlytePropeller instances.
+
+.. code-block:: yaml
+
+    configmap:
+      core:
+        # a configuration example using the "hash" shard type
+        manager:
+          # pod and scanning configuration redacted
+          # ...
+          shard:
+            type: hash     # use the "hash" shard strategy
+            shard-count: 4 # the total number of shards
+ 
+The Project and Domain Shard Strategies, denoted by "type: project" and "type: domain" respectively, use the FlyteWorkflow project and domain metadata to shard FlyteWorkflows. These Shard Strategies are configured using a "per-shard-mapping" option, which is a list of ID lists. Each element in the "per-shard-mapping" list defines a new shard and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and on that shard their must be only one ID, namely the wildcard.
+
+.. code-block:: yaml
+
+    configmap:
+      core:
+        # a configuration example using the "project" shard type
+        manager:
+          # pod and scanning configuration redacted
+          # ...
+          shard:
+            type: project       # use the "project" shard strategy
+            per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
+              - ids:            # the list of ids to be managed by the first shard
+                - flytesnacks
+              - ids:            # the list of ids to be managed by the second shard
+                - flyteexamples
+                - flytelabs
+              - ids:            # the list of ids to be managed by the third shard
+                - "*"           # use the wildcard to manage all ids not managed by other shards
+    
+    configmap:
+      core:
+        # a configuration example using the "domain" shard type
+        manager:
+          # pod and scanning configuration redacted
+          # ...
+          shard:
+            type: domain        # use the "domain" shard strategy
+            per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
+              - ids:            # the list of ids to be managed by the first shard
+                - production
+              - ids:            # the list of ids to be managed by the second shard
+                - "*"           # use the wildcard to manage all ids not managed by other shards
+ 
 Multi-Cluster mode
 ===================
 In our experience at Lyft, we saw that the Kubernetes cluster would have problems before FlytePropeller or FlyteAdmin would have impact. Thus Flyte supports adding multiple dataplane clusters by default. Each dataplane cluster, has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
