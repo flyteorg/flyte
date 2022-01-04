@@ -27,6 +27,7 @@ import (
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/util"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -70,6 +71,8 @@ Usage
 	sandboxSupportedVersion = "v0.10.0"
 	diskPressureTaint       = "node.kubernetes.io/disk-pressure"
 	taintEffect             = "NoSchedule"
+	sandboxContextName      = "flyte-sandbox"
+	sandboxDockerContext    = "default"
 )
 
 type ExecResult struct {
@@ -104,12 +107,27 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 		if err != nil {
 			return err
 		}
+		if err = updateLocalKubeContext(); err != nil {
+			return err
+		}
+
 		if err := watchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
 			return err
 		}
 		util.PrintSandboxMessage()
 	}
 	return nil
+}
+
+func updateLocalKubeContext() error {
+	localConfigAccess := clientcmd.NewDefaultPathOptions()
+
+	dockerConfigAccess := &clientcmd.PathOptions{
+		GlobalFile:   docker.Kubeconfig,
+		LoadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
+	}
+
+	return k8s.CopyKubeContext(dockerConfigAccess, localConfigAccess, sandboxDockerContext, sandboxContextName)
 }
 
 func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
