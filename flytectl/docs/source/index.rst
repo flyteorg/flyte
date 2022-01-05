@@ -145,7 +145,7 @@ The full list of available configurable options can be found by running ``flytec
    :hidden:
 
    Install and Configure <self>
-   gen/flytectl
+   CLI Entrypoint <gen/flytectl>
    verbs
    nouns
    contribute
