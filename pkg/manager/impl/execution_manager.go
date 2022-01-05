@@ -1177,7 +1177,8 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 	}
 
 	wfExecPhase := core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])
-	if wfExecPhase == request.Event.Phase {
+	// Subsequent queued events announcing a cluster reassignment are permitted.
+	if wfExecPhase == request.Event.Phase && request.Event.Phase != core.WorkflowExecution_QUEUED {
 		logger.Debugf(ctx, "This phase %s was already recorded for workflow execution %v",
 			wfExecPhase.String(), request.Event.ExecutionId)
 		return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
@@ -1188,6 +1189,11 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		curPhase := wfExecPhase.String()
 		errorMsg := fmt.Sprintf("Invalid phase change from %s to %s for workflow execution %v", curPhase, request.Event.Phase.String(), request.Event.ExecutionId)
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
+	} else if wfExecPhase == core.WorkflowExecution_RUNNING && request.Event.Phase == core.WorkflowExecution_QUEUED {
+		// Cannot go back in time from RUNNING -> QUEUED
+		return nil, errors.NewFlyteAdminErrorf(codes.FailedPrecondition,
+			"Cannot go from %s to %s for workflow execution %v",
+			wfExecPhase.String(), request.Event.Phase.String(), request.Event.ExecutionId)
 	}
 
 	err = transformers.UpdateExecutionModelState(ctx, executionModel, request, m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy, m.storageClient)

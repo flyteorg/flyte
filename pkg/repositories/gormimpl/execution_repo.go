@@ -110,24 +110,6 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}, nil
 }
 
-func (r *ExecutionRepo) Exists(ctx context.Context, input interfaces.Identifier) (bool, error) {
-	var execution models.Execution
-	timer := r.metrics.ExistsDuration.Start()
-	// Only select the id field (uint) to check for existence.
-	tx := r.db.Select(ID).Where(&models.Execution{
-		ExecutionKey: models.ExecutionKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-		},
-	}).Take(&execution)
-	timer.Stop()
-	if tx.Error != nil {
-		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return true, nil
-}
-
 // Returns an instance of ExecutionRepoInterface
 func NewExecutionRepo(
 	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ExecutionRepoInterface {

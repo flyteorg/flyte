@@ -6,6 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteadmin/pkg/common"
+
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/storage"
@@ -580,4 +585,129 @@ func TestFromExecutionModels(t *testing.T) {
 		Spec:    spec,
 		Closure: &closure,
 	}, executions[0]))
+}
+
+func TestUpdateModelState_WithClusterInformation(t *testing.T) {
+	createdAt := time.Date(2018, 10, 29, 16, 0, 0, 0, time.UTC)
+	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	existingClosure := admin.ExecutionClosure{
+		ComputedInputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {},
+			},
+		},
+		Phase:     core.WorkflowExecution_UNDEFINED,
+		CreatedAt: createdAtProto,
+	}
+	spec := testutils.GetExecutionRequest().Spec
+	specBytes, _ := proto.Marshal(spec)
+	existingClosureBytes, _ := proto.Marshal(&existingClosure)
+	startedAt := time.Now()
+	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
+	testCluster := "C1"
+	altCluster := "C2"
+	executionModel.Cluster = testCluster
+	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
+	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	t.Run("update", func(t *testing.T) {
+		executionModel.Cluster = altCluster
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_QUEUED,
+				OccurredAt: occurredAtProto,
+				ProducerId: testCluster,
+			},
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.NoError(t, err)
+		assert.Equal(t, testCluster, executionModel.Cluster)
+		executionModel.Cluster = testCluster
+	})
+	t.Run("do not update", func(t *testing.T) {
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_RUNNING,
+				OccurredAt: occurredAtProto,
+				ProducerId: altCluster,
+			},
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.FailedPrecondition)
+	})
+	t.Run("matches recorded", func(t *testing.T) {
+		executionModel.Cluster = testCluster
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_RUNNING,
+				OccurredAt: occurredAtProto,
+				ProducerId: testCluster,
+			},
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.NoError(t, err)
+	})
+	t.Run("default cluster value", func(t *testing.T) {
+		executionModel.Cluster = testCluster
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+			Event: &event.WorkflowExecutionEvent{
+				Phase:      core.WorkflowExecution_RUNNING,
+				OccurredAt: occurredAtProto,
+				ProducerId: common.DefaultProducerID,
+			},
+		}, interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.NoError(t, err)
+	})
+}
+
+func TestReassignCluster(t *testing.T) {
+	oldCluster := "old_cluster"
+	newCluster := "new_cluster"
+
+	workflowExecutionID := core.WorkflowExecutionIdentifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+	}
+
+	t.Run("happy case", func(t *testing.T) {
+		spec := testutils.GetExecutionRequest().Spec
+		spec.Metadata = &admin.ExecutionMetadata{
+			SystemMetadata: &admin.SystemMetadata{
+				ExecutionCluster: oldCluster,
+			},
+		}
+		specBytes, _ := proto.Marshal(spec)
+		executionModel := models.Execution{
+			Spec:    specBytes,
+			Cluster: oldCluster,
+		}
+		err := reassignCluster(context.TODO(), newCluster, &workflowExecutionID, &executionModel)
+		assert.NoError(t, err)
+		assert.Equal(t, newCluster, executionModel.Cluster)
+
+		var updatedSpec admin.ExecutionSpec
+		err = proto.Unmarshal(executionModel.Spec, &updatedSpec)
+		assert.NoError(t, err)
+		assert.Equal(t, newCluster, updatedSpec.Metadata.SystemMetadata.ExecutionCluster)
+	})
+	t.Run("happy case - initialize cluster", func(t *testing.T) {
+		spec := testutils.GetExecutionRequest().Spec
+		specBytes, _ := proto.Marshal(spec)
+		executionModel := models.Execution{
+			Spec: specBytes,
+		}
+		err := reassignCluster(context.TODO(), newCluster, &workflowExecutionID, &executionModel)
+		assert.NoError(t, err)
+		assert.Equal(t, newCluster, executionModel.Cluster)
+
+		var updatedSpec admin.ExecutionSpec
+		err = proto.Unmarshal(executionModel.Spec, &updatedSpec)
+		assert.NoError(t, err)
+		assert.Equal(t, newCluster, updatedSpec.Metadata.SystemMetadata.ExecutionCluster)
+	})
+	t.Run("invalid existing spec", func(t *testing.T) {
+		executionModel := models.Execution{
+			Spec:    []byte("I'm invalid"),
+			Cluster: oldCluster,
+		}
+		err := reassignCluster(context.TODO(), newCluster, &workflowExecutionID, &executionModel)
+		assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
+	})
 }

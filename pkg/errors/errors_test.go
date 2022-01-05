@@ -27,3 +27,19 @@ func TestGrpcStatusError(t *testing.T) {
 	_, ok = details.GetReason().(*admin.EventFailureReason_AlreadyInTerminalState)
 	assert.True(t, ok)
 }
+
+func TestNewIncompatibleClusterError(t *testing.T) {
+	errorMsg := "foo"
+	cluster := "C1"
+	statusErr := NewIncompatibleClusterError(context.Background(), errorMsg, cluster)
+	assert.NotNil(t, statusErr)
+	s, ok := status.FromError(statusErr)
+	assert.True(t, ok)
+	assert.Equal(t, codes.FailedPrecondition, s.Code())
+	assert.Equal(t, errorMsg, s.Message())
+
+	details, ok := s.Details()[0].(*admin.EventFailureReason)
+	assert.True(t, ok)
+	_, ok = details.GetReason().(*admin.EventFailureReason_IncompatibleCluster)
+	assert.True(t, ok)
+}
