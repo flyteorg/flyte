@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.1](http://github.com/lyft/flyteconsole/compare/v0.37.0...v0.37.1) (2022-01-05)
+
+
+### Bug Fixes
+
+* Fixed missing Authrole values on ExecutionMetaDataExtra ([#255](http://github.com/lyft/flyteconsole/issues/255)) ([71af238](http://github.com/lyft/flyteconsole/commit/71af238e7fe9b9e0c698627865c807ff981fbaac))
+
 # [0.37.0](http://github.com/lyft/flyteconsole/compare/v0.36.0...v0.37.0) (2021-12-29)
 
 
