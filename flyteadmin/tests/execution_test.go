@@ -8,17 +8,15 @@ import (
 	"testing"
 	"time"
 
+	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytestdlib/logger"
-	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
-
-
 )
 
 var workflowExecutionID = &core.WorkflowExecutionIdentifier{

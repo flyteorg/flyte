@@ -18,7 +18,6 @@ type MockExecutionRepo struct {
 	updateFunction UpdateExecutionFunc
 	getFunction    GetExecutionFunc
 	listFunction   ListExecutionFunc
-	ExistsFunction func(ctx context.Context, input interfaces.Identifier) (bool, error)
 }
 
 func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution) error {
@@ -68,13 +67,6 @@ func (r *MockExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 
 func (r *MockExecutionRepo) SetListCallback(listFunction ListExecutionFunc) {
 	r.listFunction = listFunction
-}
-
-func (r *MockExecutionRepo) Exists(ctx context.Context, input interfaces.Identifier) (bool, error) {
-	if r.ExistsFunction != nil {
-		return r.ExistsFunction(ctx, input)
-	}
-	return true, nil
 }
 
 func NewMockExecutionRepo() interfaces.ExecutionRepoInterface {

@@ -75,6 +75,7 @@ func addGetWorkflowExecutionCallback(repository repositories.RepositoryInterface
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
 				},
+				Cluster: "propeller",
 			}, nil
 		},
 	)
@@ -299,6 +300,7 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "expected error")
+	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
@@ -327,6 +329,7 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 
 func TestCreateTaskEvent_CreateDatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
+	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
@@ -345,6 +348,7 @@ func TestCreateTaskEvent_CreateDatabaseError(t *testing.T) {
 
 func TestCreateTaskEvent_UpdateDatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
+	addGetWorkflowExecutionCallback(repository)
 	addGetNodeExecutionCallback(repository)
 
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
@@ -385,6 +389,7 @@ func TestCreateTaskEvent_UpdateDatabaseError(t *testing.T) {
 
 func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
+	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			return models.TaskExecution{

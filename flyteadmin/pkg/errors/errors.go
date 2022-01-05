@@ -91,3 +91,18 @@ func NewAlreadyInTerminalStateError(ctx context.Context, errorMsg string, curPha
 	}
 	return statusErr
 }
+
+func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster string) FlyteAdminError {
+	statusErr, transformationErr := NewFlyteAdminError(codes.FailedPrecondition, errorMsg).WithDetails(&admin.EventFailureReason{
+		Reason: &admin.EventFailureReason_IncompatibleCluster{
+			IncompatibleCluster: &admin.EventErrorIncompatibleCluster{
+				Cluster: curCluster,
+			},
+		},
+	})
+	if transformationErr != nil {
+		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)
+	}
+	return statusErr
+}

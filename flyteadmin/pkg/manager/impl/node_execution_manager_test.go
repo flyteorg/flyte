@@ -103,6 +103,7 @@ func addGetExecutionCallback(t *testing.T, repository repositories.RepositoryInt
 					Domain:  "domain",
 					Name:    "name",
 				},
+				Cluster: "propeller",
 			}, nil
 		})
 }
@@ -225,26 +226,19 @@ func TestCreateNodeEvent_MissingExecution(t *testing.T) {
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "expected error")
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
+			return models.NodeExecution{}, expectedErr
 		})
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).ExistsFunction =
-		func(ctx context.Context, input interfaces.Identifier) (bool, error) {
-			return false, expectedErr
-		}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+			return models.Execution{}, expectedErr
+		})
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		return models.Execution{}, expectedErr
+	})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
-	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\""+
-		" domain:\"domain\" name:\"name\" ] with err: expected error")
-	assert.Nil(t, resp)
-
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).ExistsFunction =
-		func(ctx context.Context, input interfaces.Identifier) (bool, error) {
-			return false, nil
-		}
-	nodeExecManager = NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
-	resp, err = nodeExecManager.CreateNodeEvent(context.Background(), request)
-	assert.EqualError(t, err, "failed to get existing execution id: [project:\"project\""+
-		" domain:\"domain\" name:\"name\" ]")
+	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error")
 	assert.Nil(t, resp)
 }
 

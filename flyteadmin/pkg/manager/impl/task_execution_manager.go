@@ -130,6 +130,10 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		return nil, err
 	}
 
+	if err := validation.ValidateClusterForExecutionID(ctx, m.db, request.Event.ParentNodeExecutionId.ExecutionId, request.Event.ProducerId); err != nil {
+		return nil, err
+	}
+
 	// Get the parent node execution, if none found a MissingEntityError will be returned
 	nodeExecutionID := request.Event.ParentNodeExecutionId
 	taskExecutionID := core.TaskExecutionIdentifier{
