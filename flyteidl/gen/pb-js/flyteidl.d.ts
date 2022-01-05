@@ -3308,7 +3308,8 @@ export namespace flyteidl {
                 FAILING = 5,
                 FAILED = 6,
                 ABORTED = 7,
-                TIMED_OUT = 8
+                TIMED_OUT = 8,
+                ABORTING = 9
             }
         }
 
