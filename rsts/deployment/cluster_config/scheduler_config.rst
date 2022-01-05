@@ -79,6 +79,18 @@ InsecureSkipVerify controls whether a client verifies the server's certificate c
   "false"
   
 
+caCertFilePath (string)
+--------------------------------------------------------------------------------
+
+Use specified certificate file to verify the admin server peer.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 maxBackoffDelay (`config.Duration`_)
 --------------------------------------------------------------------------------
 
