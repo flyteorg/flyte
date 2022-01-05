@@ -80,15 +80,6 @@ Cluster Config
 
     ---
 
-    .. link-button:: flytelusterresource-config-specification
-       :type: ref
-       :text: Flyte Cluster Resource Configuration
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Flyte Cluster Resource configuration specification are covered here.
-
-    ---
-
     .. link-button:: deployment-cluster-config-notifications
        :type: ref
        :text: Notifications
@@ -133,8 +124,10 @@ Cluster Config
     auth_appendix
     general
     customizable_resources
+    datacatalog_config
     flyteadmin_config
     flytepropeller_config
+    flytescheduler_config
     monitoring
     notifications
     performance
