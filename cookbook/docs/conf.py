@@ -356,7 +356,7 @@ sphinx_gallery_conf = {
     "filename_pattern": "/run_",
     "capture_repr": (),
     "image_scrapers": image_scrapers,
-    "default_thumb_file": "flyte_mark_offset_pink.png",
+    "default_thumb_file": "_static/code-example-icon.png",
     "thumbnail_size": (350, 350),
     # Support for binder
     # 'binder': {'org': 'sphinx-gallery',
