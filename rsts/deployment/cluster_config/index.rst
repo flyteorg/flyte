@@ -95,6 +95,15 @@ Cluster Config
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Tweaks to improve performance of the core Flyte engine.
+    
+    ---
+
+    .. link-button:: deployment-cluster-config-eventing
+       :type: ref
+       :text: Platform Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Tweaks to improve performance of the core Flyte engine.
 
 .. toctree::
     :maxdepth: 1
