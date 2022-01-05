@@ -32,10 +32,10 @@ spec:
         - containerPort: 8080
         {{- if .Values.flyteconsole.ga.enabled }}
         env:
-          - name: ENABLE_GA
-            value: {{ .Values.flyteconsole.ga.enabled }}
-          - name: GA_TRACKING_ID
-            value: {{ .Values.flyteconsole.ga.tracking_id }}
+        - name: ENABLE_GA
+          value: {{ .Values.flyteconsole.ga.enabled }}
+        - name: GA_TRACKING_ID
+          value: {{ .Values.flyteconsole.ga.tracking_id }}
         {{- end }}
         resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
         volumeMounts:

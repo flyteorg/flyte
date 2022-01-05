@@ -3347,10 +3347,10 @@ spec:
         ports:
         - containerPort: 8080
         env:
-          - name: ENABLE_GA
-            value: true
-          - name: GA_TRACKING_ID
-            value: G-0QW4DJWJ20
+        - name: ENABLE_GA
+          value: true
+        - name: GA_TRACKING_ID
+          value: G-0QW4DJWJ20
         resources: 
           limits:
             cpu: 500m
