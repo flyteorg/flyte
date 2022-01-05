@@ -99,12 +99,13 @@ enum WorkflowExecution_Phase {
   WorkflowExecution_Phase_FAILED = 6,
   WorkflowExecution_Phase_ABORTED = 7,
   WorkflowExecution_Phase_TIMED_OUT = 8,
+  WorkflowExecution_Phase_ABORTING = 9,
   WorkflowExecution_Phase_WorkflowExecution_Phase_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   WorkflowExecution_Phase_WorkflowExecution_Phase_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool WorkflowExecution_Phase_IsValid(int value);
 const WorkflowExecution_Phase WorkflowExecution_Phase_Phase_MIN = WorkflowExecution_Phase_UNDEFINED;
-const WorkflowExecution_Phase WorkflowExecution_Phase_Phase_MAX = WorkflowExecution_Phase_TIMED_OUT;
+const WorkflowExecution_Phase WorkflowExecution_Phase_Phase_MAX = WorkflowExecution_Phase_ABORTING;
 const int WorkflowExecution_Phase_Phase_ARRAYSIZE = WorkflowExecution_Phase_Phase_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* WorkflowExecution_Phase_descriptor();
@@ -355,6 +356,8 @@ class WorkflowExecution final :
     WorkflowExecution_Phase_ABORTED;
   static const Phase TIMED_OUT =
     WorkflowExecution_Phase_TIMED_OUT;
+  static const Phase ABORTING =
+    WorkflowExecution_Phase_ABORTING;
   static inline bool Phase_IsValid(int value) {
     return WorkflowExecution_Phase_IsValid(value);
   }
