@@ -6,8 +6,10 @@ export enum ExecutionMetadataLabels {
     relatedTo = 'Related to',
     version = 'Version',
     serviceAccount = 'Service Account',
+    iam = 'IAM Role',
     rawOutputPrefix = 'Raw Output Prefix',
-    parallelism = 'Parallelism'
+    parallelism = 'Parallelism',
+    securityContextDefault = 'default'
 }
 
 export const tabs = {
