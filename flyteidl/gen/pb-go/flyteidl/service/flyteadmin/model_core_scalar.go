@@ -17,4 +17,5 @@ type CoreScalar struct {
 	NoneType *CoreVoid `json:"none_type,omitempty"`
 	Error_ *CoreError `json:"error,omitempty"`
 	Generic *ProtobufStruct `json:"generic,omitempty"`
+	StructuredDataset *CoreStructuredDataset `json:"structured_dataset,omitempty"`
 }

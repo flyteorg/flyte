@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fcore_2fliterals_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[18]
+  static const ::google::protobuf::internal::ParseTable schema[20]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -108,6 +108,12 @@ extern ScalarDefaultTypeInternal _Scalar_default_instance_;
 class Schema;
 class SchemaDefaultTypeInternal;
 extern SchemaDefaultTypeInternal _Schema_default_instance_;
+class StructuredDataset;
+class StructuredDatasetDefaultTypeInternal;
+extern StructuredDatasetDefaultTypeInternal _StructuredDataset_default_instance_;
+class StructuredDatasetMetadata;
+class StructuredDatasetMetadataDefaultTypeInternal;
+extern StructuredDatasetMetadataDefaultTypeInternal _StructuredDatasetMetadata_default_instance_;
 class Void;
 class VoidDefaultTypeInternal;
 extern VoidDefaultTypeInternal _Void_default_instance_;
@@ -132,6 +138,8 @@ template<> ::flyteidl::core::Primitive* Arena::CreateMaybeMessage<::flyteidl::co
 template<> ::flyteidl::core::RetryStrategy* Arena::CreateMaybeMessage<::flyteidl::core::RetryStrategy>(Arena*);
 template<> ::flyteidl::core::Scalar* Arena::CreateMaybeMessage<::flyteidl::core::Scalar>(Arena*);
 template<> ::flyteidl::core::Schema* Arena::CreateMaybeMessage<::flyteidl::core::Schema>(Arena*);
+template<> ::flyteidl::core::StructuredDataset* Arena::CreateMaybeMessage<::flyteidl::core::StructuredDataset>(Arena*);
+template<> ::flyteidl::core::StructuredDatasetMetadata* Arena::CreateMaybeMessage<::flyteidl::core::StructuredDatasetMetadata>(Arena*);
 template<> ::flyteidl::core::Void* Arena::CreateMaybeMessage<::flyteidl::core::Void>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -954,6 +962,251 @@ class Schema final :
 };
 // -------------------------------------------------------------------
 
+class StructuredDatasetMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.StructuredDatasetMetadata) */ {
+ public:
+  StructuredDatasetMetadata();
+  virtual ~StructuredDatasetMetadata();
+
+  StructuredDatasetMetadata(const StructuredDatasetMetadata& from);
+
+  inline StructuredDatasetMetadata& operator=(const StructuredDatasetMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  StructuredDatasetMetadata(StructuredDatasetMetadata&& from) noexcept
+    : StructuredDatasetMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline StructuredDatasetMetadata& operator=(StructuredDatasetMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const StructuredDatasetMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const StructuredDatasetMetadata* internal_default_instance() {
+    return reinterpret_cast<const StructuredDatasetMetadata*>(
+               &_StructuredDatasetMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(StructuredDatasetMetadata* other);
+  friend void swap(StructuredDatasetMetadata& a, StructuredDatasetMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline StructuredDatasetMetadata* New() const final {
+    return CreateMaybeMessage<StructuredDatasetMetadata>(nullptr);
+  }
+
+  StructuredDatasetMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<StructuredDatasetMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const StructuredDatasetMetadata& from);
+  void MergeFrom(const StructuredDatasetMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(StructuredDatasetMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.StructuredDatasetType structured_dataset_type = 1;
+  bool has_structured_dataset_type() const;
+  void clear_structured_dataset_type();
+  static const int kStructuredDatasetTypeFieldNumber = 1;
+  const ::flyteidl::core::StructuredDatasetType& structured_dataset_type() const;
+  ::flyteidl::core::StructuredDatasetType* release_structured_dataset_type();
+  ::flyteidl::core::StructuredDatasetType* mutable_structured_dataset_type();
+  void set_allocated_structured_dataset_type(::flyteidl::core::StructuredDatasetType* structured_dataset_type);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.StructuredDatasetMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::StructuredDatasetType* structured_dataset_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fliterals_2eproto;
+};
+// -------------------------------------------------------------------
+
+class StructuredDataset final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.StructuredDataset) */ {
+ public:
+  StructuredDataset();
+  virtual ~StructuredDataset();
+
+  StructuredDataset(const StructuredDataset& from);
+
+  inline StructuredDataset& operator=(const StructuredDataset& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  StructuredDataset(StructuredDataset&& from) noexcept
+    : StructuredDataset() {
+    *this = ::std::move(from);
+  }
+
+  inline StructuredDataset& operator=(StructuredDataset&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const StructuredDataset& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const StructuredDataset* internal_default_instance() {
+    return reinterpret_cast<const StructuredDataset*>(
+               &_StructuredDataset_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(StructuredDataset* other);
+  friend void swap(StructuredDataset& a, StructuredDataset& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline StructuredDataset* New() const final {
+    return CreateMaybeMessage<StructuredDataset>(nullptr);
+  }
+
+  StructuredDataset* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<StructuredDataset>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const StructuredDataset& from);
+  void MergeFrom(const StructuredDataset& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(StructuredDataset* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string uri = 1;
+  void clear_uri();
+  static const int kUriFieldNumber = 1;
+  const ::std::string& uri() const;
+  void set_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_uri(::std::string&& value);
+  #endif
+  void set_uri(const char* value);
+  void set_uri(const char* value, size_t size);
+  ::std::string* mutable_uri();
+  ::std::string* release_uri();
+  void set_allocated_uri(::std::string* uri);
+
+  // .flyteidl.core.StructuredDatasetMetadata metadata = 2;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 2;
+  const ::flyteidl::core::StructuredDatasetMetadata& metadata() const;
+  ::flyteidl::core::StructuredDatasetMetadata* release_metadata();
+  ::flyteidl::core::StructuredDatasetMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::core::StructuredDatasetMetadata* metadata);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.StructuredDataset)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr uri_;
+  ::flyteidl::core::StructuredDatasetMetadata* metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fliterals_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Scalar final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.Scalar) */ {
  public:
@@ -994,6 +1247,7 @@ class Scalar final :
     kNoneType = 5,
     kError = 6,
     kGeneric = 7,
+    kStructuredDataset = 8,
     VALUE_NOT_SET = 0,
   };
 
@@ -1003,7 +1257,7 @@ class Scalar final :
                &_Scalar_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    8;
 
   void Swap(Scalar* other);
   friend void swap(Scalar& a, Scalar& b) {
@@ -1123,6 +1377,15 @@ class Scalar final :
   ::google::protobuf::Struct* mutable_generic();
   void set_allocated_generic(::google::protobuf::Struct* generic);
 
+  // .flyteidl.core.StructuredDataset structured_dataset = 8;
+  bool has_structured_dataset() const;
+  void clear_structured_dataset();
+  static const int kStructuredDatasetFieldNumber = 8;
+  const ::flyteidl::core::StructuredDataset& structured_dataset() const;
+  ::flyteidl::core::StructuredDataset* release_structured_dataset();
+  ::flyteidl::core::StructuredDataset* mutable_structured_dataset();
+  void set_allocated_structured_dataset(::flyteidl::core::StructuredDataset* structured_dataset);
+
   void clear_value();
   ValueCase value_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.Scalar)
@@ -1135,6 +1398,7 @@ class Scalar final :
   void set_has_none_type();
   void set_has_error();
   void set_has_generic();
+  void set_has_structured_dataset();
 
   inline bool has_value() const;
   inline void clear_has_value();
@@ -1149,6 +1413,7 @@ class Scalar final :
     ::flyteidl::core::Void* none_type_;
     ::flyteidl::core::Error* error_;
     ::google::protobuf::Struct* generic_;
+    ::flyteidl::core::StructuredDataset* structured_dataset_;
   } value_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1202,7 +1467,7 @@ class Literal final :
                &_Literal_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    9;
 
   void Swap(Literal* other);
   friend void swap(Literal& a, Literal& b) {
@@ -1350,7 +1615,7 @@ class LiteralCollection final :
                &_LiteralCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    10;
 
   void Swap(LiteralCollection* other);
   friend void swap(LiteralCollection& a, LiteralCollection& b) {
@@ -1492,7 +1757,7 @@ class LiteralMap final :
                &_LiteralMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   void Swap(LiteralMap* other);
   friend void swap(LiteralMap& a, LiteralMap& b) {
@@ -1613,7 +1878,7 @@ class BindingDataCollection final :
                &_BindingDataCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    13;
 
   void Swap(BindingDataCollection* other);
   friend void swap(BindingDataCollection& a, BindingDataCollection& b) {
@@ -1755,7 +2020,7 @@ class BindingDataMap final :
                &_BindingDataMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    15;
 
   void Swap(BindingDataMap* other);
   friend void swap(BindingDataMap& a, BindingDataMap& b) {
@@ -1884,7 +2149,7 @@ class BindingData final :
                &_BindingData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    16;
 
   void Swap(BindingData* other);
   friend void swap(BindingData& a, BindingData& b) {
@@ -2043,7 +2308,7 @@ class Binding final :
                &_Binding_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    17;
 
   void Swap(Binding* other);
   friend void swap(Binding& a, Binding& b) {
@@ -2173,7 +2438,7 @@ class KeyValuePair final :
                &_KeyValuePair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   void Swap(KeyValuePair* other);
   friend void swap(KeyValuePair& a, KeyValuePair& b) {
@@ -2308,7 +2573,7 @@ class RetryStrategy final :
                &_RetryStrategy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   void Swap(RetryStrategy* other);
   friend void swap(RetryStrategy& a, RetryStrategy& b) {
@@ -3024,6 +3289,163 @@ inline void Schema::set_allocated_type(::flyteidl::core::SchemaType* type) {
 
 // -------------------------------------------------------------------
 
+// StructuredDatasetMetadata
+
+// .flyteidl.core.StructuredDatasetType structured_dataset_type = 1;
+inline bool StructuredDatasetMetadata::has_structured_dataset_type() const {
+  return this != internal_default_instance() && structured_dataset_type_ != nullptr;
+}
+inline const ::flyteidl::core::StructuredDatasetType& StructuredDatasetMetadata::structured_dataset_type() const {
+  const ::flyteidl::core::StructuredDatasetType* p = structured_dataset_type_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.StructuredDatasetMetadata.structured_dataset_type)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::StructuredDatasetType*>(
+      &::flyteidl::core::_StructuredDatasetType_default_instance_);
+}
+inline ::flyteidl::core::StructuredDatasetType* StructuredDatasetMetadata::release_structured_dataset_type() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.StructuredDatasetMetadata.structured_dataset_type)
+  
+  ::flyteidl::core::StructuredDatasetType* temp = structured_dataset_type_;
+  structured_dataset_type_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::StructuredDatasetType* StructuredDatasetMetadata::mutable_structured_dataset_type() {
+  
+  if (structured_dataset_type_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::StructuredDatasetType>(GetArenaNoVirtual());
+    structured_dataset_type_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.StructuredDatasetMetadata.structured_dataset_type)
+  return structured_dataset_type_;
+}
+inline void StructuredDatasetMetadata::set_allocated_structured_dataset_type(::flyteidl::core::StructuredDatasetType* structured_dataset_type) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(structured_dataset_type_);
+  }
+  if (structured_dataset_type) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      structured_dataset_type = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, structured_dataset_type, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  structured_dataset_type_ = structured_dataset_type;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.StructuredDatasetMetadata.structured_dataset_type)
+}
+
+// -------------------------------------------------------------------
+
+// StructuredDataset
+
+// string uri = 1;
+inline void StructuredDataset::clear_uri() {
+  uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& StructuredDataset::uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.StructuredDataset.uri)
+  return uri_.GetNoArena();
+}
+inline void StructuredDataset::set_uri(const ::std::string& value) {
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.StructuredDataset.uri)
+}
+#if LANG_CXX11
+inline void StructuredDataset::set_uri(::std::string&& value) {
+  
+  uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.StructuredDataset.uri)
+}
+#endif
+inline void StructuredDataset::set_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.StructuredDataset.uri)
+}
+inline void StructuredDataset::set_uri(const char* value, size_t size) {
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.StructuredDataset.uri)
+}
+inline ::std::string* StructuredDataset::mutable_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.StructuredDataset.uri)
+  return uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* StructuredDataset::release_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.StructuredDataset.uri)
+  
+  return uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void StructuredDataset::set_allocated_uri(::std::string* uri) {
+  if (uri != nullptr) {
+    
+  } else {
+    
+  }
+  uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.StructuredDataset.uri)
+}
+
+// .flyteidl.core.StructuredDatasetMetadata metadata = 2;
+inline bool StructuredDataset::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void StructuredDataset::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::core::StructuredDatasetMetadata& StructuredDataset::metadata() const {
+  const ::flyteidl::core::StructuredDatasetMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.StructuredDataset.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::StructuredDatasetMetadata*>(
+      &::flyteidl::core::_StructuredDatasetMetadata_default_instance_);
+}
+inline ::flyteidl::core::StructuredDatasetMetadata* StructuredDataset::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.StructuredDataset.metadata)
+  
+  ::flyteidl::core::StructuredDatasetMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::StructuredDatasetMetadata* StructuredDataset::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::StructuredDatasetMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.StructuredDataset.metadata)
+  return metadata_;
+}
+inline void StructuredDataset::set_allocated_metadata(::flyteidl::core::StructuredDatasetMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.StructuredDataset.metadata)
+}
+
+// -------------------------------------------------------------------
+
 // Scalar
 
 // .flyteidl.core.Primitive primitive = 1;
@@ -3299,6 +3721,47 @@ inline ::google::protobuf::Struct* Scalar::mutable_generic() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.Scalar.generic)
   return value_.generic_;
+}
+
+// .flyteidl.core.StructuredDataset structured_dataset = 8;
+inline bool Scalar::has_structured_dataset() const {
+  return value_case() == kStructuredDataset;
+}
+inline void Scalar::set_has_structured_dataset() {
+  _oneof_case_[0] = kStructuredDataset;
+}
+inline void Scalar::clear_structured_dataset() {
+  if (has_structured_dataset()) {
+    delete value_.structured_dataset_;
+    clear_has_value();
+  }
+}
+inline ::flyteidl::core::StructuredDataset* Scalar::release_structured_dataset() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Scalar.structured_dataset)
+  if (has_structured_dataset()) {
+    clear_has_value();
+      ::flyteidl::core::StructuredDataset* temp = value_.structured_dataset_;
+    value_.structured_dataset_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::StructuredDataset& Scalar::structured_dataset() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Scalar.structured_dataset)
+  return has_structured_dataset()
+      ? *value_.structured_dataset_
+      : *reinterpret_cast< ::flyteidl::core::StructuredDataset*>(&::flyteidl::core::_StructuredDataset_default_instance_);
+}
+inline ::flyteidl::core::StructuredDataset* Scalar::mutable_structured_dataset() {
+  if (!has_structured_dataset()) {
+    clear_value();
+    set_has_structured_dataset();
+    value_.structured_dataset_ = CreateMaybeMessage< ::flyteidl::core::StructuredDataset >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Scalar.structured_dataset)
+  return value_.structured_dataset_;
 }
 
 inline bool Scalar::has_value() const {
@@ -3972,6 +4435,10 @@ inline void RetryStrategy::set_retries(::google::protobuf::uint32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
