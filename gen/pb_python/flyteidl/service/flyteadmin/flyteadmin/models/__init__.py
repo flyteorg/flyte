@@ -189,6 +189,9 @@ from flyteadmin.models.core_secret import CoreSecret
 from flyteadmin.models.core_security_context import CoreSecurityContext
 from flyteadmin.models.core_simple_type import CoreSimpleType
 from flyteadmin.models.core_sql import CoreSql
+from flyteadmin.models.core_structured_dataset import CoreStructuredDataset
+from flyteadmin.models.core_structured_dataset_metadata import CoreStructuredDatasetMetadata
+from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType
 from flyteadmin.models.core_task_execution_identifier import CoreTaskExecutionIdentifier
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase
 from flyteadmin.models.core_task_log import CoreTaskLog
@@ -243,6 +246,7 @@ from flyteadmin.models.schema_type_schema_column import SchemaTypeSchemaColumn
 from flyteadmin.models.secret_mount_type import SecretMountType
 from flyteadmin.models.sort_direction import SortDirection
 from flyteadmin.models.sql_dialect import SqlDialect
+from flyteadmin.models.structured_dataset_type_dataset_column import StructuredDatasetTypeDatasetColumn
 from flyteadmin.models.task_execution_metadata_instance_class import TaskExecutionMetadataInstanceClass
 from flyteadmin.models.task_log_message_format import TaskLogMessageFormat
 from flyteadmin.models.workflow_metadata_on_failure_policy import WorkflowMetadataOnFailurePolicy

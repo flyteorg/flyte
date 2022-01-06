@@ -3086,6 +3086,19 @@
       "default": "UNDEFINED",
       "description": "The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid\nexpensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.\nWe support the following dialect: ansi, hive."
     },
+    "StructuredDatasetTypeDatasetColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name within the schema type for the column."
+        },
+        "literal_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The column type."
+        }
+      }
+    },
     "TaskExecutionMetadataInstanceClass": {
       "type": "string",
       "enum": [
@@ -5433,6 +5446,10 @@
           "$ref": "#/definitions/coreEnumType",
           "description": "Defines an enum with pre-defined string values."
         },
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "title": "Generalized schema support"
+        },
         "metadata": {
           "$ref": "#/definitions/protobufStruct",
           "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
@@ -5780,6 +5797,9 @@
         },
         "generic": {
           "$ref": "#/definitions/protobufStruct"
+        },
+        "structured_dataset": {
+          "$ref": "#/definitions/coreStructuredDataset"
         }
       }
     },
@@ -5871,6 +5891,52 @@
         }
       },
       "description": "Sql represents a generic sql workload with a statement and dialect."
+    },
+    "coreStructuredDataset": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the data is.\nShould start with the storage location (e.g. s3://, gs://, bq://, etc.)"
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreStructuredDatasetMetadata"
+        }
+      }
+    },
+    "coreStructuredDatasetMetadata": {
+      "type": "object",
+      "properties": {
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "description": "Bundle the type information along with the literal.\nThis is here because StructuredDatasets can often be more defined at run time than at compile time.\nThat is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,\nwithout any column information, but at run time, you might have that column information.\nflytekit python will copy this type information into the literal, from the type information, if not provided by\nthe various plugins (encoders).\nSince this field is run time generated, it's not used for any type checking."
+        }
+      }
+    },
+    "coreStructuredDatasetType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        },
+        "format": {
+          "type": "string",
+          "description": "This is the storage format, the format of the bits at rest\nparquet, feather, csv, etc.\nFor two types to be compatible, the format will need to be an exact match."
+        },
+        "external_schema_type": {
+          "type": "string",
+          "description": "This is a string representing the type that the bytes in external_schema_bytes are formatted in.\nThis is an optional field that will not be used for type checking."
+        },
+        "external_schema_bytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
     },
     "coreTaskExecutionIdentifier": {
       "type": "object",
