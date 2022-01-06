@@ -97,7 +97,7 @@ Component Code Architecture
 
 .. panels::
   :container: container-lg pb-4
-  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :column: col-lg-12 p-2
   :body: text-center
 
   .. link-button:: flytepropeller-architecture
@@ -117,7 +117,7 @@ Component Code References
 
 .. panels::
   :container: container-lg pb-4
-  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :column: col-lg-12 p-2
   :body: text-center
 
   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin

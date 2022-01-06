@@ -6,6 +6,7 @@ Control Plane
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: divedeep-projects
         :type: ref

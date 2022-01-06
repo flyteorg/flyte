@@ -6,6 +6,7 @@ API Reference
 
 .. panels::
    :header: text-center
+   :column: col-lg-12 p-2
 
    .. link-button:: https://flytectl.readthedocs.io
       :type: url

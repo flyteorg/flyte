@@ -14,6 +14,7 @@ solution). The following pages will help you effectively deploy and manage an en
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: deployment-overview
        :type: ref

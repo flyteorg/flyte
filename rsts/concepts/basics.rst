@@ -6,6 +6,7 @@ Core Concepts
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: divedeep-tasks
        :type: ref
@@ -121,11 +122,11 @@ Core Concepts
     ---
 
     .. link-button:: divedeep-versioning
-         :type: ref
-         :text: Workflow & Task Versioning
-         :classes: btn-block stretched-link
-     ^^^^^^^^^^^^
-     A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
+        :type: ref
+        :text: Workflow & Task Versioning
+        :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
 
