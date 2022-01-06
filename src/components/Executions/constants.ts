@@ -25,6 +25,11 @@ export const workflowExecutionPhaseConstants: {
         text: 'Aborted',
         textColor: negativeTextColor
     },
+    [WorkflowExecutionPhase.ABORTING]: {
+        badgeColor: statusColors.SKIPPED,
+        text: 'Aborting',
+        textColor: negativeTextColor
+    },
     [WorkflowExecutionPhase.FAILING]: {
         badgeColor: statusColors.FAILURE,
         text: 'Failing',
