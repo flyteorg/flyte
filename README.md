@@ -238,18 +238,18 @@ We run a suite of tests (defined in https://github.com/flyteorg/flytesnacks/blob
 <details>
 <center>
 
-| workflow group                  | nightly |
-| ------------------------------- | ---------- |
-| core                            | ![core](https://byob.yarr.is/unionai/gh-badges/nightly/core) |
-| integrations-hive               | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-hive) |
-| integrations-k8s-spark          | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-k8s-spark) |
-| integrations-kfpytorch          | ![integrations-kfpytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-kfpytorch) |
-| integrations-pod                | ![integrations-pod](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pod) |
-| integrations-pandera_examples   | ![integrations-pandera_examples](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pandera_examples) |
-| integrations-papermilltasks     | ![integrations-papermilltasks](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-papermilltasks) |
-| integrations-greatexpectations  | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-greatexpectations) |
-| integrations-sagemaker-pytorch  | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-pytorch) |
-| integrations-sagemaker-training | ![integrations-sagemaker-training](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-training) |
+| workflow group                  | nightly                                                                                                            | v0.18.2                                                                                                            |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| core                            | ![core](https://byob.yarr.is/unionai/gh-badges/nightly/core)                                                       | ![core](https://byob.yarr.is/unionai/gh-badges/v0.18.2/core)                                                       |
+| integrations-hive               | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-hive)                              | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-hive)                              |
+| integrations-k8s-spark          | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-k8s-spark)                   | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-k8s-spark)                   |
+| integrations-kfpytorch          | ![integrations-kfpytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-kfpytorch)                   | ![integrations-kfpytorch](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-kfpytorch)                   |
+| integrations-pod                | ![integrations-pod](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pod)                               | ![integrations-pod](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-pod)                               |
+| integrations-pandera_examples   | ![integrations-pandera_examples](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-pandera_examples)     | ![integrations-pandera_examples](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-pandera_examples)     |
+| integrations-papermilltasks     | ![integrations-papermilltasks](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-papermilltasks)         | ![integrations-papermilltasks](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-papermilltasks)         |
+| integrations-greatexpectations  | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-greatexpectations)   | ![integrations-greatexpectations](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-greatexpectations)   |
+| integrations-sagemaker-pytorch  | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-pytorch)   | ![integrations-sagemaker-pytorch](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-sagemaker-pytorch)   |
+| integrations-sagemaker-training | ![integrations-sagemaker-training](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-sagemaker-training) | ![integrations-sagemaker-training](https://byob.yarr.is/unionai/gh-badges/v0.18.2/integrations-sagemaker-training) |
 
 </center>
 </details>
