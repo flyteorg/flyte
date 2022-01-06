@@ -21,6 +21,7 @@ from flyteadmin.models.core_enum_type import CoreEnumType  # noqa: F401,E501
 from flyteadmin.models.core_literal_type import CoreLiteralType  # noqa: F401,E501
 from flyteadmin.models.core_schema_type import CoreSchemaType  # noqa: F401,E501
 from flyteadmin.models.core_simple_type import CoreSimpleType  # noqa: F401,E501
+from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -44,6 +45,7 @@ class CoreLiteralType(object):
         'map_value_type': 'CoreLiteralType',
         'blob': 'CoreBlobType',
         'enum_type': 'CoreEnumType',
+        'structured_dataset_type': 'CoreStructuredDatasetType',
         'metadata': 'ProtobufStruct'
     }
 
@@ -54,10 +56,11 @@ class CoreLiteralType(object):
         'map_value_type': 'map_value_type',
         'blob': 'blob',
         'enum_type': 'enum_type',
+        'structured_dataset_type': 'structured_dataset_type',
         'metadata': 'metadata'
     }
 
-    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, metadata=None):  # noqa: E501
+    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, metadata=None):  # noqa: E501
         """CoreLiteralType - a model defined in Swagger"""  # noqa: E501
 
         self._simple = None
@@ -66,6 +69,7 @@ class CoreLiteralType(object):
         self._map_value_type = None
         self._blob = None
         self._enum_type = None
+        self._structured_dataset_type = None
         self._metadata = None
         self.discriminator = None
 
@@ -81,6 +85,8 @@ class CoreLiteralType(object):
             self.blob = blob
         if enum_type is not None:
             self.enum_type = enum_type
+        if structured_dataset_type is not None:
+            self.structured_dataset_type = structured_dataset_type
         if metadata is not None:
             self.metadata = metadata
 
@@ -221,6 +227,27 @@ class CoreLiteralType(object):
         """
 
         self._enum_type = enum_type
+
+    @property
+    def structured_dataset_type(self):
+        """Gets the structured_dataset_type of this CoreLiteralType.  # noqa: E501
+
+
+        :return: The structured_dataset_type of this CoreLiteralType.  # noqa: E501
+        :rtype: CoreStructuredDatasetType
+        """
+        return self._structured_dataset_type
+
+    @structured_dataset_type.setter
+    def structured_dataset_type(self, structured_dataset_type):
+        """Sets the structured_dataset_type of this CoreLiteralType.
+
+
+        :param structured_dataset_type: The structured_dataset_type of this CoreLiteralType.  # noqa: E501
+        :type: CoreStructuredDatasetType
+        """
+
+        self._structured_dataset_type = structured_dataset_type
 
     @property
     def metadata(self):
