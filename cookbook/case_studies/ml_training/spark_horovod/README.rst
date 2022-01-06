@@ -1,6 +1,6 @@
 .. _spark_horovod:
 
-Forecast Sales Using Rossmann Store Sales Data Using Horovod and Spark
+Forecasting Rossman Store Sales with Horovod and Spark
 ----------------------------------------------------------------------
 
 The problem statement we will be looking at is forecasting sales using `rossmann store sales <https://www.kaggle.com/c/rossmann-store-sales>`__ data.
@@ -50,6 +50,9 @@ Since we use the Keras deep learning library, here’s how we install the releva
 
 The installation includes enabling MPI and TensorFlow environments.
 
+
+.. _flyte-and-spark:
+
 Flyte and Spark
 ^^^^^^^^^^^^^^^
 
@@ -67,7 +70,7 @@ To install the Spark plugin on Flyte, we use the following command:
     :alt: Flyte-Spark plugin
 
     Flyte-Spark plugin
-
+The plugin requires configuring the Flyte backend as well. Refer to :ref:`Kubernetes Spark Jobs <plugins-spark-k8s>` for setup instructions.
 In a nutshell, here’s how Horovod-Spark-Flyte can be beneficial:
 Horovod provides the distributed framework, Spark enables extracting, preprocessing, and partitioning data,
 Flyte can stitch the former two pieces together, e.g., by connecting the data output of a Spark transform to a training system using Horovod while ensuring high utilization of GPUs!
