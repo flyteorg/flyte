@@ -95,6 +95,11 @@ modules:
           create: true
           annotations:
             eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      flytescheduler:
+        serviceAccount:
+          create: true
+          annotations:
+            "eks.amazonaws.com/role-arn": "${{module.adminflyterole.role_arn}}"
       workflow_scheduler:
         enabled: true
         config:
