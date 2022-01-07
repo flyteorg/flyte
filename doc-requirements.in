@@ -11,3 +11,5 @@ sphinx-panels
 sphinxcontrib-mermaid
 sphinxcontrib-yt
 sphinx-tabs
+sphinx-comments
+

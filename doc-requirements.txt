@@ -66,6 +66,7 @@ sphinx==4.1.2
     #   furo
     #   sphinx-autoapi
     #   sphinx-code-include
+    #   sphinx-comments
     #   sphinx-copybutton
     #   sphinx-fontawesome
     #   sphinx-issues
@@ -77,6 +78,8 @@ sphinx==4.1.2
 sphinx-autoapi==1.8.4
     # via -r doc-requirements.in
 sphinx-code-include==1.1.1
+    # via -r doc-requirements.in
+sphinx-comments==0.0.3
     # via -r doc-requirements.in
 sphinx-copybutton==0.4.0
     # via -r doc-requirements.in
