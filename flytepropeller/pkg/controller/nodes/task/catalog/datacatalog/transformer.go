@@ -199,18 +199,24 @@ func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier)
 	}
 }
 
-// Returns the Source TaskExecutionIdentifier from the catalog metadata
+// GetSourceFromMetadata returns the Source TaskExecutionIdentifier from the catalog metadata
 // For all the information not available it returns Unknown. This is because as of July-2020 Catalog does not have all
 // the information. After the first deployment of this code, it will have this and the "unknown's" can be phased out
-func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentID core.Identifier) *core.TaskExecutionIdentifier {
+func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentID core.Identifier) (*core.TaskExecutionIdentifier, error) {
 	if datasetMd == nil || datasetMd.KeyMap == nil {
 		datasetMd = &datacatalog.Metadata{KeyMap: map[string]string{}}
 	}
 	if artifactMd == nil || artifactMd.KeyMap == nil {
 		artifactMd = &datacatalog.Metadata{KeyMap: map[string]string{}}
 	}
+
 	// Jul-06-2020 DataCatalog stores only wfExecutionKey & taskVersionKey So we will default the project / domain to the current dataset's project domain
-	attempt, _ := strconv.Atoi(GetOrDefault(artifactMd.KeyMap, execTaskAttemptKey, "0"))
+	val := GetOrDefault(artifactMd.KeyMap, execTaskAttemptKey, "0")
+	attempt, err := strconv.ParseUint(val, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
+	}
+
 	return &core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: currentID.ResourceType,
@@ -228,7 +234,7 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 				Name:    GetOrDefault(artifactMd.KeyMap, execNameKey, "unknown"),
 			},
 		},
-	}
+	}, nil
 }
 
 // Given the Catalog Information (returned from a Catalog call), returns the CatalogMetadata that is populated in the event.
