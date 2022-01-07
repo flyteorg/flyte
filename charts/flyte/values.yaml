@@ -235,6 +235,9 @@ flyte:
     tolerations: []
     # -- affinity for Flyteconsole deployment
     affinity: {}
+    ga:
+      enabled: true
+      tracking_id: "G-0QW4DJWJ20"
 
   #
   # WEBHOOK SETTINGS

@@ -235,6 +235,10 @@ flyteconsole:
   tolerations: []
   # -- affinity for Flyteconsole deployment
   affinity: {}
+  # Enable Google Analytics
+  ga:
+    enabled: false
+    tracking_id: "G-0QW4DJWJ20"
 
 #
 # Common secret auth for propeller & scheduler
