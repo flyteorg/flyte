@@ -1,7 +1,7 @@
 .. _divedeep:
 
 #############
-Core Concepts
+Concepts
 #############
 
 .. panels::

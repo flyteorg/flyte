@@ -7,9 +7,9 @@ Security Overview
 Here we cover security aspects of running your flyte deployments. In the current state we will be covering the user
 which is used for running the flyte services and we will go through why we do this and not run them as root user
 
-#################
+*****************
 Why non-root user
-#################
+*****************
 Flyte uses docker for container packaging and by default its containers run as root. This gives full
 permissions on the system but may not be suitable for production deployments where a security breach could comprise your
 application deployments.
