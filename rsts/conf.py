@@ -238,10 +238,7 @@ mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 
 # sphinx_comments config
 comments_config = {
-   "utterances": {
-      "repo": "github-org/github-repo",
-      "optional": "config",
-   }
+    "hypothesis": True
 }
 
 # Makes it so that only the command is copied, not the output
