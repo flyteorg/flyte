@@ -145,6 +145,7 @@ Table of Contents
 
 .. panels::
    :header: text-center
+   :column: col-lg-12 p-2
 
    .. link-button:: auto/core/flyte_basics/index
       :type: ref
@@ -202,7 +203,7 @@ Table of Contents
 
    .. link-button:: auto/deployment/index
       :type: ref
-      :text: 🚢  Configuring Production Features
+      :text: 🚢  Production Config
       :classes: btn-block stretched-link
    ^^^^^^^^^^
    Ship and configure your machine learning pipelines on a production Flyte installation.
@@ -258,7 +259,7 @@ Table of Contents
    Testing <auto/testing/index>
    Containerization <auto/core/containerization/index>
    Remote Access <auto/remote_access/index>
-   Configuring Production Features <auto/deployment/index>
+   Production Config <auto/deployment/index>
    Scheduling Workflows <auto/core/scheduled_workflows/index>
    integrations
    Extending flyte <auto/core/extend_flyte/index>

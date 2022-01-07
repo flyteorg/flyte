@@ -14,6 +14,7 @@ documenting and contributing samples easy. If this is your first time running th
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: ml_training
        :type: ref

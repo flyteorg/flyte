@@ -9,6 +9,7 @@ It is the process of transforming raw data into features that better represent t
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: auto/case_studies/feature_engineering/eda/index
        :type: ref

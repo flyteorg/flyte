@@ -15,6 +15,7 @@ Flytekit functionality. These plugins can be anything and for comparison can be 
 
 .. panels::
    :header: text-center
+   :column: col-lg-12 p-2
 
    .. link-button:: auto/integrations/flytekit_plugins/sql/index
       :type: ref
@@ -82,6 +83,7 @@ orchestrated by Flyte itself, within its provisioned kubernetes clusters.
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: auto/integrations/kubernetes/pod/index
        :type: ref
@@ -139,6 +141,7 @@ the Flyte task that use the respective plugin.
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: auto/integrations/aws/sagemaker_training/index
        :type: ref
@@ -212,6 +215,7 @@ Because Flyte uses executable docker containers as the smallest unit of compute,
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: raw_container
        :type: ref
@@ -229,6 +233,7 @@ The :ref:`community <community>` would love to help you with your own ideas of b
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: https://flytekit.readthedocs.io
        :type: url

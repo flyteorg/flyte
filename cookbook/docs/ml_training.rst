@@ -4,6 +4,7 @@ ML Training
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: auto/case_studies/ml_training/pima_diabetes/index
        :type: ref
