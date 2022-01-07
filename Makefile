@@ -9,7 +9,7 @@ update_boilerplate:
 	@boilerplate/update.sh
 
 .PHONY: kustomize
-kustomize: 
+kustomize:
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
 .PHONY: helm
