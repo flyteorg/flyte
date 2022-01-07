@@ -3,6 +3,7 @@ package datacatalog
 import (
 	"context"
 	"crypto/x509"
+	"fmt"
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -124,7 +125,13 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		// TODO should we look through all the tags to find the relevant one?
 		relevantTag = artifact.GetTags()[0]
 	}
-	md := EventCatalogMetadata(dataset.GetId(), relevantTag, GetSourceFromMetadata(dataset.GetMetadata(), artifact.GetMetadata(), key.Identifier))
+
+	source, err := GetSourceFromMetadata(dataset.GetMetadata(), artifact.GetMetadata(), key.Identifier)
+	if err != nil {
+		return catalog.Entry{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
+	}
+
+	md := EventCatalogMetadata(dataset.GetId(), relevantTag, source)
 
 	outputs, err := GenerateTaskOutputsFromArtifact(key.Identifier, key.TypedInterface, artifact)
 	if err != nil {
