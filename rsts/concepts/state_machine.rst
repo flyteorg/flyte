@@ -17,10 +17,27 @@ The following sections explain the various observable (and some hidden) states f
 Workflow States
 ===============
 
-.. image:: https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBBYm9ydGVkIDogT24gc3lzdGVtIGVycm9ycyBtb3JlIHRoYW4gdGhyZXNob2xkXG4gICAgWypdIC0tPiBSZWFkeVxuICAgIFJlYWR5IC0tPiBSdW5uaW5nIDogV3JpdGUgaW5wdXRzIHRvIHdvcmtmbG93XG4gICAgUnVubmluZyAtLT4gUnVubmluZyA6IE9uIHN5c3RlbSBlcnJvclxuICAgIFJ1bm5pbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBhbGwgTm9kZXMgU3VjY2Vzc1xuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRlZCA6IE9uIHN1Y2Nlc3NmdWwgZXZlbnQgc2VuZCB0byBBZG1pblxuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBzeXN0ZW0gZXJyb3JcbiAgICBSZWFkeSAtLT4gRmFpbGluZyA6IE9uIHByZWNvbmRpdGlvbiBmYWlsdXJlXG4gICAgUnVubmluZyAtLT4gRmFpbGluZyA6IE9uIGFueSBOb2RlIEZhaWx1cmVcbiAgICBSZWFkeSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgUnVubmluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgU3VjY2VlZGluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG5cbiAgICBGYWlsaW5nIC0tPiBIYW5kbGVGYWlsdXJlTm9kZSA6IElmIEZhaWx1cmUgbm9kZSBleGlzdHNcbiAgICBGYWlsaW5nIC0tPiBBYm9ydGVkIDogT24gdXNlciBpbml0aWF0ZWQgYWJvcnRcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gRmFpbGVkIDogT24gY29tcGxldGluZyBmYWlsdXJlIG5vZGVcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgRmFpbGluZyAtLT4gRmFpbGVkIDogT24gc3VjY2Vzc2Z1bCBzZW5kIG9mIEZhaWx1cmUgbm9kZVxuICAgICIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ
-    :alt: The state diagram illustrates the various states through which a workflow transitions. This is the core finite state machine (FSM) of a workflow.
+.. mermaid::
 
-The state diagram above illustrates the various states through which a workflow transitions. This is the core finite state machine of a workflow.
+   flowchart TD
+     Queued -->|On system errors more than threshold| Aborted
+     Queued --> Ready
+     Ready--> |Write inputs to workflow| Running
+     Running--> |On system error| Running
+     Running--> |On all Nodes Success| Succeeding
+     Succeeding--> |On successful event send to Admin| Succeeded
+     Succeeding--> |On system error| Succeeding
+     Ready--> |On precondition failure| Failing
+     Running--> |On any Node Failure| Failing
+     Ready--> |On user initiated abort| Aborting
+     Running--> |On user initiated abort| Aborting
+     Succeeding--> |On user initiated abort| Aborting
+     Failing--> |If Failure node exists| HandleFailureNode
+     Failing--> |On user initiated abort| Aborting
+     HandleFailureNode--> |On completing failure node| Failed
+     HandleFailureNode--> |On user initiated abort| Aborting
+     Failing--> |On successful send of Failure node| Failed
+     Aborting--> |On successful event send to Admin| Aborted
 
 A workflow always starts in the Ready state and ends either in Failed, Succeeded, or Aborted state.
 Any system error within a state causes a retry on that state. These retries are capped by **system retries** which will eventually lead to an Aborted state if the failure continues.
