@@ -12,6 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 OUT="${DIR}/tmp"
 rm -rf ${OUT}
 git clone https://github.com/flyteorg/flyte.git "${OUT}"
+
 pushd ${OUT}
 
 make end2end_execute
