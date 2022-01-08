@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "Flyte Tutorial"
+project = "Flytesnacks"
 copyright = "2021, Flyte"
 author = "Flyte"
 
@@ -222,7 +222,7 @@ html_context = {
 # a list of builtin themes.
 #
 html_theme = "furo"
-html_title = "Flyte Docs"
+html_title = "Flyte"
 
 html_theme_options = {
     "light_css_variables": {
