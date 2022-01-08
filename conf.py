@@ -104,7 +104,8 @@ pygments_dark_style = "native"
 # a list of builtin themes.
 #
 html_theme = "furo"
-html_title = "Flyte Docs"
+html_title = "Flyte"
+html_favicon = "docs/images/flyte_circle_gradient_1_4x4.png"
 html_logo = "docs/images/flyte_circle_gradient_1_4x4.png"
 
 html_theme_options = {
