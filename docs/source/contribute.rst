@@ -1,5 +1,5 @@
 ###########################
-FlyteCTL Contribution Guide
+Contributing Guide
 ###########################
 
 First off, thank you for thinking about contributing! 
