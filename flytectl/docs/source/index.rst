@@ -1,8 +1,8 @@
 .. flytectl doc
 
-######################
-Flytectl Reference
-######################
+####################################################
+Flytectl: The Official Flyte Command-line Interface
+####################################################
 
 Overview
 =========
@@ -139,12 +139,15 @@ The full list of available configurable options can be found by running ``flytec
    |book| API Reference <https://docs.flyte.org/en/latest/reference/index.html>
    |hands-helping| Community <https://docs.flyte.org/en/latest/community/index.html>
 
+
+.. NOTE: the caption text is important for the sphinx theme to correctly render the nav header
+.. https://github.com/flyteorg/furo
 .. toctree::
    :maxdepth: -1
    :caption: Flytectl
    :hidden:
 
-   Install and Configure <self>
+   Flytectl <self>
    CLI Entrypoint <gen/flytectl>
    verbs
    nouns
