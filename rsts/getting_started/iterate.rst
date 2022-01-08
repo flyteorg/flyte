@@ -1,39 +1,7 @@
 .. _gettingstarted_iterate:
 
-Getting Started: Iterate
-------------------------
-
-.. raw:: html
-  
-    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
-
-.. div:: getting-started-panels
-
-   .. panels::
-      :body: text-justify
-      :container: container-xs
-      :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
-
-      ---
-      .. link-button:: gettingstarted_implement
-         :type: ref
-         :text: 1. Implement
-         :classes: btn-outline-primary btn-block stretched-link
-      ---
-      .. link-button:: gettingstarted_scale
-         :type: ref
-         :text: 2. Scale
-         :classes: btn-outline-primary btn-block stretched-link
-      ---
-      .. link-button:: gettingstarted_iterate
-         :type: ref
-         :text: 3. Iterate
-         :classes: btn-primary btn-block stretched-link
-
-
 Iterate on Your Ideas
-=====================
-
+------------------------
 
 Modify Code and Test Locally
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -224,10 +192,3 @@ Next Steps: User Guide
 ========================
 
 To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
-
-.. toctree::
-   :maxdepth: -1
-   :caption: Getting Started
-   :hidden:
-
-   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>

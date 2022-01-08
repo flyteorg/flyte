@@ -106,7 +106,7 @@ exclude_patterns = [u"_build", "Thumbs.db", ".DS_Store"]
 html_favicon = "images/flyte_circle_gradient_1_4x4.png"
 html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_theme = "furo"
-html_title = "Flyte Docs"
+html_title = "Flyte"
 
 templates_path = ["_templates"]
 

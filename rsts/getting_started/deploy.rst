@@ -1,38 +1,8 @@
-.. _gettingstarted_scale:
-
-Getting Started: Scale
-----------------------
-
-.. raw:: html
-  
-    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
-
-.. div:: getting-started-panels
-
-   .. panels::
-      :body: text-justify
-      :container: container-xs
-      :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
-
-      ---
-      .. link-button:: gettingstarted_implement
-         :type: ref
-         :text: 1. Implement
-         :classes: btn-outline-primary btn-block stretched-link
-      ---
-      .. link-button:: gettingstarted_scale
-         :type: ref
-         :text: 2. Scale
-         :classes: btn-primary btn-block stretched-link
-      ---
-      .. link-button:: gettingstarted_iterate
-         :type: ref
-         :text: 3. Iterate
-         :classes: btn-block stretched-link
+.. _gettingstarted_deploy:
 
 
-Scale by Deploying Your Workflows into the Cloud
-=================================================
+Deploy to the Cloud
+--------------------------------
 
 .. _getting-started-build-deploy:
 
@@ -210,11 +180,3 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 .. admonition:: Recap
 
   .. rubric:: 🎉  You have successfully packaged your workflow and tasks and pushed them to a Flyte cluster. Let's learn how to iterate.
-
-.. toctree::
-   :maxdepth: -1
-   :caption: Getting Started
-   :hidden:
-
-   Iterate "fast"er<getting_started_iterate>
-   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
