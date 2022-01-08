@@ -1,6 +1,6 @@
 .. flyteidl documentation master file, created by
 
-``FlyteIDL``: Flyte's Core Language Specification
+FlyteIDL: Flyte's Core Language Specification
 ===================================================
 
 ``FlyteIDL`` contains the core language specification of Flyte, using `Google's Protocol Buffers <https://developers.google.com/protocol-buffers>`_. The Specification contains
@@ -24,10 +24,13 @@ This specification is used to generate client stubs for `FlyteKit <https://flyte
    |book| API Reference <https://docs.flyte.org/en/latest/reference/index.html>
    |hands-helping| Community <https://docs.flyte.org/en/latest/community/index.html>
 
+.. NOTE: the caption text is important for the sphinx theme to correctly render the nav header
+.. https://github.com/flyteorg/furo
 .. toctree::
    :maxdepth: -1
    :caption: FlyteIDL
    :hidden:
 
-   README
+   Flyte IDL <self>
    protos/index
+   Contributing Guide <README>
