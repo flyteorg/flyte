@@ -169,6 +169,12 @@ Apply Configuration
 
       kubectl rollout restart deployment/flyteadmin -n flyte
 
+#. Restart `flytepropeller` for the changes to take effect:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytepropeller -n flyte
+
 OAuth2 Authorization Server
 ---------------------------
 
