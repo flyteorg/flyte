@@ -1,4 +1,4 @@
-.. _scheduler-config-specification:
+.. _flytescheduler-config-specification:
 
 #########################################
 Flyte Scheduler Configuration

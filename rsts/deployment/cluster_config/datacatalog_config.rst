@@ -1,4 +1,4 @@
-.. _datacatalog-config-specification:
+.. _flytedatacatalog-config-specification:
 
 #########################################
 Flyte Datacatalog Configuration

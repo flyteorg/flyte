@@ -25,7 +25,8 @@ mv main $GOBIN/scheduler && rm -rf ../flyteadmin
 output_config () {
 CONFIG_NAME=$1
 COMPONENT=$2
-OUTPUT_PATH=${OUTPUT_DIR}/${COMPONENT}_config.rst
+COMMAND=$3
+OUTPUT_PATH=${OUTPUT_DIR}/${COMMAND}_config.rst
 
 if [ -z "$CONFIG_NAME" ]; then
   log_err "output_config CONFIG_NAME value not specified in arg1"
@@ -44,10 +45,10 @@ Flyte $CONFIG_NAME Configuration
 #########################################
 " > "${OUTPUT_PATH}"
 
-$GOBIN/$COMPONENT config docs >> "${OUTPUT_PATH}"
+$GOBIN/$COMMAND config docs >> "${OUTPUT_PATH}"
 }
 
-output_config "Admin" flyteadmin
-output_config "Propeller" flytepropeller
-output_config "Datacatalog" datacatalog
-output_config "Scheduler" scheduler
+output_config "Admin" flyteadmin flyteadmin
+output_config "Propeller" flytepropeller flytepropeller
+output_config "Datacatalog" flytedatacatalog datacatalog
+output_config "Scheduler" flytescheduler scheduler

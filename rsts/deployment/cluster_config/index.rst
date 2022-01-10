@@ -71,7 +71,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: flyteschdeuler-config-specification
+    .. link-button:: flytescheduler-config-specification
        :type: ref
        :text: Flyte Scheduler Configuration
        :classes: btn-block stretched-link
@@ -127,7 +127,7 @@ Cluster Config
     datacatalog_config
     flyteadmin_config
     flytepropeller_config
-    flytescheduler_config
+    scheduler_config
     monitoring
     notifications
     performance
