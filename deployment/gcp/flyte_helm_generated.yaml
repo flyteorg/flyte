@@ -315,6 +315,8 @@ data:
       grpcServerReflection: true
       httpPort: 8080
     datacatalog:
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
       metrics-scope: datacatalog
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
@@ -1048,7 +1050,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fdad9da823ad6d23758d4bba59359605322f07064c0e52b1a51b2ac6fbae27b"
+        configChecksum: "43487b221efc7b181835ab2a929d3d464bf182da8e4e204f8f0e4ac43798b3e"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
