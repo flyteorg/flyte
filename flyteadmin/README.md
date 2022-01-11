@@ -24,6 +24,11 @@ Flyte Admin has a few useful make targets for linting and testing. Please use th
 minor bugs and linting errors.
 
 ```
+  # Please make sure you have all the dependencies installed:
+  $ make install
+  
+  # In case you are only missing goimports:
+  $ go install golang.org/x/tools/cmd/goimports@latest
   $ make goimports
 ```
 
