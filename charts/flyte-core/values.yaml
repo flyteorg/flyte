@@ -441,6 +441,8 @@ configmap:
       storage-prefix: metadata/datacatalog
       metrics-scope: datacatalog
       profiler-port: 10254
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
     application:
       grpcPort: 8089
       httpPort: 8080
