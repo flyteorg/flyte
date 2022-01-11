@@ -63,6 +63,18 @@ InsecureSkipVerify controls whether a client verifies the server's certificate c
   "false"
   
 
+caCertFilePath (string)
+--------------------------------------------------------------------------------
+
+Use specified certificate file to verify the admin server peer.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 maxBackoffDelay (`config.Duration`_)
 --------------------------------------------------------------------------------
 
@@ -3055,6 +3067,18 @@ Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector
 .. code-block:: yaml
 
   []
+  
+
+cluster-id (string)
+--------------------------------------------------------------------------------
+
+Unique cluster id running this flytepropeller instance with which to annotate execution events
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  propeller
   
 
 admin-launcher (`launchplan.AdminConfig`_)
