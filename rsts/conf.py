@@ -258,3 +258,7 @@ issues_commit_uri = "https://github.com/flyteorg/flyte/commit/{commit}"
 # See issues :issue:`12,13`
 # See :issue:`sloria/konch#45`.
 # See PR :pr:`58`
+
+
+def setup(app):
+    app.add_js_file("rate-the-docs.min.js")
