@@ -82,7 +82,7 @@ sphinx-copybutton==0.4.0
     # via -r doc-requirements.in
 sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
-sphinx-issues==2.0.0
+sphinx-issues==3.0.1
     # via -r doc-requirements.in
 sphinx-panels==0.6.0
     # via -r doc-requirements.in
