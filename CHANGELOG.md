@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](http://github.com/lyft/flyteconsole/compare/v0.38.0...v0.39.0) (2022-01-11)
+
+
+### Features
+
+* load 100 executions on each filter ([#257](http://github.com/lyft/flyteconsole/issues/257)) ([1a0c3ce](http://github.com/lyft/flyteconsole/commit/1a0c3cecbcde382bb0386e46249708d284f2c188))
+
 # [0.38.0](http://github.com/lyft/flyteconsole/compare/v0.37.1...v0.38.0) (2022-01-06)
 
 
