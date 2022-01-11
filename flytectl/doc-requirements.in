@@ -1,4 +1,4 @@
-git+git://github.com/flyteorg/furo@main
+git+https://github.com/flyteorg/furo@main
 sphinx
 sphinx-prompt
 sphinx-material
