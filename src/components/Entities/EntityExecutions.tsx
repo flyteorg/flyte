@@ -52,7 +52,8 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
         { domain, project },
         {
             sort,
-            filter: [...baseFilters, ...filtersState.appliedFilters]
+            filter: [...baseFilters, ...filtersState.appliedFilters],
+            limit: 100
         }
     );
 
