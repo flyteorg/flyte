@@ -48,6 +48,12 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 				Schema: scalar.GetSchema().Type,
 			},
 		}
+	case *core.Scalar_StructuredDataset:
+		literalType = &core.LiteralType{
+			Type: &core.LiteralType_StructuredDatasetType{
+				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType,
+			},
+		}
 	case *core.Scalar_NoneType:
 		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
 	case *core.Scalar_Error:
