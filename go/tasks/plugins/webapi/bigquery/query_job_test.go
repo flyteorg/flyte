@@ -69,10 +69,11 @@ func TestGetJobConfigurationQuery(t *testing.T) {
 		})
 
 		jobConfigurationQuery, err := getJobConfigurationQuery(&config, inputs)
+		useLegacySQL := false
 
 		assert.NoError(t, err)
 		assert.Equal(t, "NAMED", jobConfigurationQuery.ParameterMode)
-
+		assert.Equal(t, &useLegacySQL, jobConfigurationQuery.UseLegacySql)
 		assert.Equal(t, 1, len(jobConfigurationQuery.QueryParameters))
 		assert.Equal(t, bigquery.QueryParameter{
 			Name:           "integer",

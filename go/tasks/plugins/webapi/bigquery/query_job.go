@@ -161,6 +161,9 @@ func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.Liter
 		return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unable build query parameters [%v]", err.Error())
 	}
 
+	// BigQuery supports query parameters to help prevent SQL injection when queries are constructed using user input.
+	// This feature is only available with standard SQL syntax. For more detail: https://cloud.google.com/bigquery/docs/parameterized-queries
+	useLegacySQL := false
 	return &bigquery.JobConfigurationQuery{
 		AllowLargeResults:                  custom.AllowLargeResults,
 		Clustering:                         custom.Clustering,
@@ -178,7 +181,7 @@ func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.Liter
 		SchemaUpdateOptions:                custom.SchemaUpdateOptions,
 		TableDefinitions:                   custom.TableDefinitions,
 		TimePartitioning:                   custom.TimePartitioning,
-		UseLegacySql:                       custom.UseLegacySQL,
+		UseLegacySql:                       &useLegacySQL,
 		UseQueryCache:                      custom.UseQueryCache,
 		UserDefinedFunctionResources:       custom.UserDefinedFunctionResources,
 		WriteDisposition:                   custom.WriteDisposition,

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/google"
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -105,6 +105,7 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 		return nil, nil, err
 	}
 
+	job.Configuration.Query.Query = taskTemplate.GetSql().Statement
 	job.Configuration.Labels = taskCtx.TaskExecutionMetadata().GetLabels()
 
 	resp, err := client.Jobs.Insert(job.JobReference.ProjectId, job).Do()
@@ -456,7 +457,8 @@ func (p Plugin) newBigQueryClient(ctx context.Context, identity google.Identity)
 		options = append(options,
 			option.WithEndpoint(p.cfg.bigQueryEndpoint),
 			option.WithTokenSource(oauth2.StaticTokenSource(&oauth2.Token{})))
-	} else {
+	} else if p.cfg.GoogleTokenSource.Type != "default" {
+
 		tokenSource, err := p.googleTokenSource.GetTokenSource(ctx, identity)
 
 		if err != nil {
@@ -464,6 +466,8 @@ func (p Plugin) newBigQueryClient(ctx context.Context, identity google.Identity)
 		}
 
 		options = append(options, option.WithTokenSource(tokenSource))
+	} else {
+		logger.Infof(ctx, "BigQuery client read $GOOGLE_APPLICATION_CREDENTIALS by default")
 	}
 
 	return bigquery.NewService(ctx, options...)
