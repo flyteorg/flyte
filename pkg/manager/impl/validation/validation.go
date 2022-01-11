@@ -29,7 +29,7 @@ func ValidateEmptyStringField(field, fieldName string) error {
 	return nil
 }
 
-// Validates that a string field does not exceed a certain character count
+// ValidateMaxLengthStringField Validates that a string field does not exceed a certain character count
 func ValidateMaxLengthStringField(field string, fieldName string, limit int) error {
 	if len(field) > limit {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s cannot exceed %d characters", fieldName, limit)
@@ -37,7 +37,7 @@ func ValidateMaxLengthStringField(field string, fieldName string, limit int) err
 	return nil
 }
 
-// Validates that a map field does not exceed a certain amount of entries
+// ValidateMaxMapLengthField Validates that a map field does not exceed a certain amount of entries
 func ValidateMaxMapLengthField(m map[string]string, fieldName string, limit int) error {
 	if len(m) > limit {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s map cannot exceed %d entries", fieldName, limit)
@@ -91,7 +91,7 @@ func ValidateIdentifierFieldsSet(id *core.Identifier) error {
 	return nil
 }
 
-// Validates that all required fields for an identifier are present.
+// ValidateIdentifier Validates that all required fields for an identifier are present.
 func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
@@ -104,7 +104,7 @@ func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 	return ValidateIdentifierFieldsSet(id)
 }
 
-// Validates that all required fields for an identifier are present.
+// ValidateNamedEntityIdentifier Validates that all required fields for an identifier are present.
 func ValidateNamedEntityIdentifier(id *admin.NamedEntityIdentifier) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
@@ -199,6 +199,10 @@ func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
 			if fixedInput == nil || fixedInput.GetValue() == nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing valid literal in %s %s", fieldName, name)
 			}
+			if isDateTime(fixedInput) {
+				// Make datetime specific validations
+				return ValidateDatetime(fixedInput)
+			}
 		}
 	}
 	return nil
@@ -228,13 +232,17 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 						"Type mismatch for Parameter %s in %s has type %s, expected %s", name, fieldName,
 						defaultInput.GetVar().GetType().String(), inputType.String())
 				}
+				if defaultInput.GetVar().GetType().GetSimple() == core.SimpleType_DATETIME {
+					// Make datetime specific validations
+					return ValidateDatetime(defaultValue)
+				}
 			}
 		}
 	}
 	return nil
 }
 
-// Offsets are encoded as string tokens to enable future api pagination changes. In addition to validating that an
+// ValidateToken Offsets are encoded as string tokens to enable future api pagination changes. In addition to validating that an
 // offset is a valid integer, we assert that it is non-negative.
 func ValidateToken(token string) (int, error) {
 	if token == "" {
@@ -267,4 +275,22 @@ func ValidateOutputData(outputData *core.LiteralMap, maxSizeInBytes int64) error
 		return nil
 	}
 	return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Output data size exceeds platform configured threshold (%+v > %v)", outputSizeInBytes, maxSizeInBytes)
+}
+
+func ValidateDatetime(literal *core.Literal) error {
+	if literal == nil {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Found invalid nil datetime")
+	}
+
+	timestamp := literal.GetScalar().GetPrimitive().GetDatetime()
+
+	err := timestamp.CheckValid()
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, err.Error())
+	}
+	return nil
+}
+
+func isDateTime(input *core.Literal) bool {
+	return input.GetScalar() != nil && input.GetScalar().GetPrimitive() != nil && input.GetScalar().GetPrimitive().GetDatetime() != nil
 }
