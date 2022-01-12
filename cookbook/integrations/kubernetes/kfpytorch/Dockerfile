@@ -17,6 +17,8 @@ RUN pip install awscli
 # Install gcloud for GCP
 RUN apt-get install curl --assume-yes
 
+RUN apt-get install -y git
+
 RUN curl -sSL https://sdk.cloud.google.com | bash
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 

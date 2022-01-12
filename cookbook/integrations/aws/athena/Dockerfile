@@ -8,7 +8,7 @@ ENV LC_ALL C.UTF-8
 ENV PYTHONPATH /root
 
 # This is necessary for opencv to work
-RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg build-essential
+RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg build-essential git
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
