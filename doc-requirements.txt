@@ -23,7 +23,7 @@ docutils==0.16
     #   sphinx
     #   sphinx-panels
     #   sphinx-tabs
-furo @ git+https://github.com/pingsutw/furo@rate-the-docs
+furo @ git+https://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==3.3
     # via requests
