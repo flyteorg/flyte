@@ -1,29 +1,42 @@
-.. _flytectl_update:
+.. _flytectl_update_execution:
 
-flytectl update
----------------
+flytectl update execution
+-------------------------
 
-Update Flyte resources e.g., project.
+Update execution status
 
 Synopsis
 ~~~~~~~~
 
 
 
-Currently, this command only provides subcommands to update project.
-Takes input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
-To update a project:
+Activating an execution shows it in the cli and UI:
 ::
 
- flytectl update project -p flytesnacks --activateProject
+ flytectl update execution -p flytectldemo -d development  oeh94k9r2r --activate
 
+Archiving execution hides it from cli and UI:
+::
+
+ flytectl update execution -p flytectldemo -d development  oeh94k9r2r --archive
+
+
+Usage
+
+
+::
+
+  flytectl update execution [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for update
+      --activate   activate execution.
+      --archive    archive execution.
+      --dryRun     execute command without making any modifications.
+  -h, --help       help for execution
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,17 +87,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
-* :doc:`flytectl_update_cluster-resource-attribute` 	 - Update matchable resources of cluster attributes
-* :doc:`flytectl_update_execution` 	 - Update execution status
-* :doc:`flytectl_update_execution-cluster-label` 	 - Update matchable resources of execution cluster label
-* :doc:`flytectl_update_execution-queue-attribute` 	 - Update matchable resources of execution queue attributes
-* :doc:`flytectl_update_launchplan` 	 - Update launch plan status
-* :doc:`flytectl_update_launchplan-meta` 	 - Update launch plan metadata
-* :doc:`flytectl_update_plugin-override` 	 - Update matchable resources of plugin overrides
-* :doc:`flytectl_update_project` 	 - Update project resources
-* :doc:`flytectl_update_task-meta` 	 - Update task metadata
-* :doc:`flytectl_update_task-resource-attribute` 	 - Update matchable resources of task attributes
-* :doc:`flytectl_update_workflow-execution-config` 	 - Update matchable resources of workflow execution config
-* :doc:`flytectl_update_workflow-meta` 	 - Update workflow metadata
+* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 
