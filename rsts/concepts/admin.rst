@@ -238,7 +238,7 @@ Permitted project operations:
 Matchable resources
 +++++++++++++++++++
 
-A thorough background on :std:ref:`matchable resources <protos/docs/admin/admin:matchableresource>` explains
+A thorough background on :ref:`matchable resources <deployment-cluster-config-general>` explains
 their purpose and application logic. As a summary, these are used to override system level defaults for Kubernetes cluster
 resource management, default execution values, and more across different levels of specificity.
 
