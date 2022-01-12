@@ -1,11 +1,11 @@
-git+https://github.com/flyteorg/furo@main
+git+https://github.com/pingsutw/furo@rate-the-docs
 sphinx
 sphinx-prompt
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
 sphinxext-remoteliteralinclude
-sphinx-issues==2.0.0
+sphinx-issues
 sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
