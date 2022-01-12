@@ -2,6 +2,7 @@ package update
 
 import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
@@ -41,6 +42,8 @@ func CreateUpdateCommand() *cobra.Command {
 			Short: updateLPMetaShort, Long: updateLPMetaLong},
 		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: DefaultProjectConfig,
 			Short: projectShort, Long: projectLong},
+		"execution": {CmdFunc: updateExecutionFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: execution.UConfig,
+			Short: updateExecutionShort, Long: updateExecutionLong},
 		"task-meta": {CmdFunc: updateTaskFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
 			Short: updateTaskShort, Long: updateTaskLong},
 		"workflow-meta": {CmdFunc: updateWorkflowFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
