@@ -95,7 +95,7 @@ def merge_sort_remotely(
 # that recurse down the list.
 @workflow
 def merge_sort(
-    numbers: typing.List[int], numbers_count: int, run_local_at_count: int = 10
+    numbers: typing.List[int] = [42, 41, 89, 21, 76, 94, 90, 6, 71, 9], numbers_count: int = 10, run_local_at_count: int = 3
 ) -> typing.List[int]:
     return (
         conditional("terminal_case")

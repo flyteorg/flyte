@@ -158,7 +158,7 @@ def my_secret_workflow() -> Tuple[str, str, str, str, str]:
 # %%
 # The simplest way to test Secret accessibility is to export the secret as an environment variable. There are some
 # helper methods available to do so
-from flytekit.testing import SecretsManager
+from flytekit.extend import SecretsManager
 
 if __name__ == "__main__":
     sec = SecretsManager()
