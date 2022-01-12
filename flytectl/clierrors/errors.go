@@ -10,6 +10,9 @@ var (
 	ErrLPVersionNotPassed = "Launch plan version not passed\n" //nolint
 	ErrFailedLPUpdate     = "Launch plan %v failed to get updated due to %v\n"
 
+	ErrExecutionNotPassed    = "Execution name not passed\n"
+	ErrFailedExecutionUpdate = "Execution %v failed to get updated due to %v\n"
+
 	ErrWorkflowNotPassed    = "Workflow name not passed\n"
 	ErrFailedWorkflowUpdate = "Workflow %v failed to get updated to due to %v\n"
 
