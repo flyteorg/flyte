@@ -10610,8 +10610,12 @@ definitions:
       reason: "reason"
       metadata:
         external_resources:
-        - external_id: "external_id"
-        - external_id: "external_id"
+        - index: 0
+          external_id: "external_id"
+          retry_attempt: 6
+        - index: 0
+          external_id: "external_id"
+          retry_attempt: 6
         instance_class: {}
         resource_pool_info:
         - allocation_token: "allocation_token"
@@ -10734,8 +10738,12 @@ definitions:
           reason: "reason"
           metadata:
             external_resources:
-            - external_id: "external_id"
-            - external_id: "external_id"
+            - index: 0
+              external_id: "external_id"
+              retry_attempt: 6
+            - index: 0
+              external_id: "external_id"
+              retry_attempt: 6
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -10798,8 +10806,12 @@ definitions:
           reason: "reason"
           metadata:
             external_resources:
-            - external_id: "external_id"
-            - external_id: "external_id"
+            - index: 0
+              external_id: "external_id"
+              retry_attempt: 6
+            - index: 0
+              external_id: "external_id"
+              retry_attempt: 6
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -33438,10 +33450,27 @@ definitions:
         type: "string"
         description: "Identifier for an external resource created by this task execution,\
           \ for example Qubole query ID or presto query ids."
+      index:
+        type: "integer"
+        format: "int64"
+        description: "A unique index for the external resource with respect to all\
+          \ external resources for this task. Although the\nidentifier may change\
+          \ between task reporting events or retries, this will remain the same to\
+          \ enable aggregating\ninformation from multiple reports."
+      retry_attempt:
+        type: "integer"
+        format: "int64"
+        title: "Retry attempt number for this external resource, ie., 2 for the second\
+          \ attempt"
+      phase:
+        title: "Phase associated with the external resource"
+        $ref: "#/definitions/coreTaskExecutionPhase"
     description: "This message contains metadata about external resources produced\
       \ or used by a specific task execution."
     example:
+      index: 0
       external_id: "external_id"
+      retry_attempt: 6
   eventNodeExecutionEvent:
     type: "object"
     properties:
@@ -33623,8 +33652,12 @@ definitions:
       \ a container for these attributes across the task execution lifecycle."
     example:
       external_resources:
-      - external_id: "external_id"
-      - external_id: "external_id"
+      - index: 0
+        external_id: "external_id"
+        retry_attempt: 6
+      - index: 0
+        external_id: "external_id"
+        retry_attempt: 6
       instance_class: {}
       resource_pool_info:
       - allocation_token: "allocation_token"
@@ -37121,8 +37154,12 @@ definitions:
         reason: "reason"
         metadata:
           external_resources:
-          - external_id: "external_id"
-          - external_id: "external_id"
+          - index: 0
+            external_id: "external_id"
+            retry_attempt: 6
+          - index: 0
+            external_id: "external_id"
+            retry_attempt: 6
           instance_class: {}
           resource_pool_info:
           - allocation_token: "allocation_token"

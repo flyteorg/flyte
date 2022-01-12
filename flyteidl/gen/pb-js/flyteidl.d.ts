@@ -6472,6 +6472,15 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo externalId */
             externalId?: (string|null);
+
+            /** ExternalResourceInfo index */
+            index?: (number|null);
+
+            /** ExternalResourceInfo retryAttempt */
+            retryAttempt?: (number|null);
+
+            /** ExternalResourceInfo phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -6485,6 +6494,15 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo externalId. */
             public externalId: string;
+
+            /** ExternalResourceInfo index. */
+            public index: number;
+
+            /** ExternalResourceInfo retryAttempt. */
+            public retryAttempt: number;
+
+            /** ExternalResourceInfo phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
