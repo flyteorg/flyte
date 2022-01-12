@@ -17,7 +17,6 @@ import cv2
 import flytekit
 from flytekit import task, workflow
 from flytekit.types.file import JPEGImageFile
-from flytekit import FlyteContext
 
 # %%
 # ``JPEGImageFile`` is a pre-formatted FlyteFile type. It is equivalent to ``FlyteFile[typing.TypeVar("jpeg")]``.
@@ -33,13 +32,12 @@ from flytekit import FlyteContext
 # Files do not have a native object in Python, so we had to write one ourselves.
 # There does exist the ``os.PathLike`` protocol, but nothing implements it.
 @task
-def rotate(image_location: JPEGImageFile) -> JPEGImageFile:
+def rotate(image_location: JPEGImageFile, location: str) -> JPEGImageFile:
     """
     Download the given image, rotate it by 180 degrees
     """
     working_dir = flytekit.current_context().working_directory
     image_location.download()
-    print(image_location.path)
     img = cv2.imread(image_location.path, 0)
     if img is None:
         raise Exception("Failed to read image")
@@ -52,31 +50,31 @@ def rotate(image_location: JPEGImageFile) -> JPEGImageFile:
         f"rotated-{os.path.basename(image_location.path).rsplit('.')[0]}.jpg",
     )
     cv2.imwrite(out_path, res)
-    return JPEGImageFile(path=out_path)
+    if location:
+        return JPEGImageFile(path=out_path, remote_path=location)
+    else:
+        return JPEGImageFile(path=out_path)
 
 
 # %%
-# When image URL is sent to the task, the Flytekit engine translates it into a ``FlyteFile`` object on the local drive
-# (but doesn't download it).
-# The act of calling ``download`` method should trigger the download. 
-# ``_SpecificFormatClass``'s path enables OpenCV to read the file.
+# When image URL is sent to the task, the Flytekit engine translates it into a ``FlyteFile`` object on the local drive (but doesn't download it).
+# The act of calling ``download`` method should trigger the download, and the ``path`` attribute enables OpenCV to read the file.
 #
-# When this task finishes, Flytekit engine returns the ``FlyteFile`` instance, finds a location
-# in Flyte's object store (usually S3), uploads the file to that location and creates a Blob literal pointing to it.
+# If the ``location`` argument is specified, it will be passed to the ``remote_path`` argument of ``FlyteFile``,
+# which will use that path as the storage location instead of a random location (Flyte's object store).
 #
-# .. tip::
-#
-#   The ``rotate`` task works with ``FlyteFile``, too. However, ``JPEGImageFile`` helps attach the content information.
+# When this task finishes, the Flytekit engine returns the ``FlyteFile`` instance, uploads the file to the location, and creates a Blob literal pointing to it.
 
 # %%
-# We now define the workflow.
+# Lastly, we define the workflow. Note that there is an ``output_location`` argument specified in the workflow. This is
+# passed to the ``location`` input of the task. If present, that is, if it's not an empty string, the task attempts to upload its file to that location.
 @workflow
-def rotate_one_workflow(in_image: JPEGImageFile) -> JPEGImageFile:
-    return rotate(image_location=in_image)
+def rotate_one_workflow(in_image: JPEGImageFile, output_location: str = "") -> JPEGImageFile:
+    return rotate(image_location=in_image, location=output_location)
 
 
 # %%
-# Finally, let's execute it!
+# Finally, we can run the workflow locally.
 if __name__ == "__main__":
     default_images = [
         "https://media.sketchfab.com/models/e13940161fb64746a4f6753f76abe886/thumbnails/b7e1ba951ffb46a4ad584ba8ae400d17/e9de09ac9c7941f1924bd384e74a5e2e.jpeg",
