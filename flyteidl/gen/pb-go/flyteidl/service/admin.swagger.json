@@ -6264,6 +6264,20 @@
         "external_id": {
           "type": "string",
           "description": "Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids."
+        },
+        "index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "A unique index for the external resource with respect to all external resources for this task. Although the\nidentifier may change between task reporting events or retries, this will remain the same to enable aggregating\ninformation from multiple reports."
+        },
+        "retry_attempt": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Retry attempt number for this external resource, ie., 2 for the second attempt"
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "title": "Phase associated with the external resource"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
