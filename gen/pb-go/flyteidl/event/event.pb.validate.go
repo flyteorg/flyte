@@ -43,6 +43,8 @@ var (
 	_ = core.CatalogReservation_Status(0)
 
 	_ = core.TaskExecution_Phase(0)
+
+	_ = core.TaskExecution_Phase(0)
 )
 
 // define the regex for a UUID once up-front
@@ -936,6 +938,12 @@ func (m *ExternalResourceInfo) Validate() error {
 	}
 
 	// no validation rules for ExternalId
+
+	// no validation rules for Index
+
+	// no validation rules for RetryAttempt
+
+	// no validation rules for Phase
 
 	return nil
 }
