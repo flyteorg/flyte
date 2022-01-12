@@ -1,4 +1,4 @@
-git+https://github.com/pingsutw/furo@rate-the-docs
+git+https://github.com/flyteorg/furo@main
 sphinx
 sphinx-prompt
 sphinx-code-include
