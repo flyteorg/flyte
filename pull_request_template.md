@@ -2,9 +2,8 @@
 
 _- Make sure to use a concise title for the pull-request._
 
-_- if you want to create a new release, make sure to modify your commit message to include one
-of [commit-analyzer types](https://github.com/semantic-release/commit-analyzer#rules-matching).
-More information in [semantic-release.gitbook.io](https://semantic-release.gitbook.io/semantic-release/#commit-message-format)._
+_- Use #patch, #minor or #major in the pull-request title to bump the corresponding version. Otherwise, the patch version
+will be bumped. [More details](https://github.com/marketplace/actions/github-tag-bump)_
 
 # TL;DR
 _Please replace this text with a description of what this PR accomplishes._
