@@ -142,6 +142,31 @@ func (m *AdminService) GetExecution(
 	return response, nil
 }
 
+func (m *AdminService) UpdateExecution(
+	ctx context.Context, request *admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ExecutionUpdateResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.update.Time(func() {
+		response, err = m.ExecutionManager.UpdateExecution(ctx, *request)
+	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"UpdateExecution",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.update)
+	}
+	m.Metrics.executionEndpointMetrics.update.Success()
+	return response, nil
+}
+
 func (m *AdminService) GetExecutionData(
 	ctx context.Context, request *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
 	defer m.interceptPanic(ctx, request)
