@@ -329,4 +329,15 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Migrator().DropTable(&schedulerModels.ScheduleEntitiesSnapshot{}, "schedulable_entities_snapshot")
 		},
 	},
+
+	// Add state to execution model
+	{
+		ID: "2022-01-11-execution-state",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("execution").Migrator().DropColumn(&models.Execution{}, "state")
+		},
+	},
 }

@@ -68,8 +68,9 @@ func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) 
 
 func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error) {
+	var err error
 	// First validate input.
-	if err := ValidateListInput(input); err != nil {
+	if err = ValidateListInput(input); err != nil {
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
 	var executions []models.Execution
@@ -89,11 +90,10 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
-
 	// Apply sort ordering.
 	if input.SortParameter != nil {
 		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
