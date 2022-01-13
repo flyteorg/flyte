@@ -62,8 +62,8 @@ DATA_CLASS = "surgical lesion"
 
 
 # %%
-# This task exists just for the sandbox case, as feast needs an explicit S3 bucket and path.
-# We will create it using an S3 client. Sadly this makes the workflow not as portable.
+# This task exists just for the sandbox case, as Feast needs an explicit S3 bucket and path.
+# We will create it using an S3 client. This unfortunately makes the workflow less portable.
 @task(cache=True, cache_version="1.0")
 def create_bucket(bucket_name: str) -> str:
     client = boto3.client(
@@ -84,8 +84,8 @@ def create_bucket(bucket_name: str) -> str:
 
 # %%
 # This is the first task and represents the data source. This can be any task, that fetches data, generates, modifies
-# data ready for Feature ingestion. These can be arbitrary feature engineering tasks like data imputation, univariate
-# selection etc as well.
+# data ready for feature ingestion. These can also be arbitrary feature engineering tasks like data imputation, univariate
+# selection, etc.
 load_horse_colic_sql = SQLite3Task(
     name="sqlite3.load_horse_colic",
     query_template="select * from data",
@@ -125,7 +125,7 @@ load_horse_colic_sql = SQLite3Task(
 # .. note::
 #
 #   The returned feature store is the same mutated feature store, so be careful! This is not really immutable and
-#   hence serialization of the feature store is required. this is because FEAST registries are single files and
+#   hence serialization of the feature store is required. This is because Feast registries are single files and
 #   Flyte workflows can be highly concurrent.
 @task(cache=True, cache_version="1.0", limits=Resources(mem="400Mi"))
 def store_offline(feature_store: FeatureStore, dataframe: FlyteSchema) -> FeatureStore:
@@ -279,12 +279,12 @@ def build_feature_store(
 
 
 # %%
-# A sample method that randomly selects one datapoint from the input dataset to run predictions on
+# A sample method that randomly selects one datapoint from the input dataset to run predictions on.
 #
 # .. note::
 #
 #    Note this is not ideal and can be just embedded in the predict method. But, for introspection and demo, we are
-#    splitting it up
+#    splitting it up.
 #
 @task
 def retrieve_online(feature_store: FeatureStore, dataset: pd.DataFrame) -> dict:
@@ -296,8 +296,8 @@ def retrieve_online(feature_store: FeatureStore, dataset: pd.DataFrame) -> dict:
 
 
 # %%
-# the following workflow is a separate workflow that can be run indepedently to create features and store them offline
-# This can be run periodically or triggered independently
+# The following workflow is a separate workflow that can be run indepedently to create features and store them offline.
+# This can be run periodically or triggered independently:
 @workflow
 def featurize(
     feature_store: FeatureStore, imputation_method: str = "mean"
@@ -316,7 +316,7 @@ def featurize(
 
 # %%
 # The following workflow can be run independently to train a model, given the Dataframe, either from Feature store
-# or locally
+# or locally:
 @workflow
 def trainer(df: FlyteSchema, num_features_univariate: int = 7) -> JoblibSerializedFile:
     # Perform univariate feature selection
@@ -337,8 +337,8 @@ def trainer(df: FlyteSchema, num_features_univariate: int = 7) -> JoblibSerializ
 
 # %%
 # Finally, we define a workflow that streamlines the whole pipeline building and feature serving process.
-# To show how to compose and end to end workflow that includes featurization, training and example predictions,
-# we construct the following workflow, composing other workflows
+# To show how to compose an end to end workflow that includes featurization, training and example predictions,
+# we construct the following workflow, composing other workflows:
 @workflow
 def feast_workflow(
     imputation_method: str = "mean",
