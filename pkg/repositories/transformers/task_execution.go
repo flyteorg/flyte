@@ -257,7 +257,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	if len(request.Event.Reason) > 0 {
 		taskExecutionClosure.Reason = request.Event.Reason
 	}
-	if (existingTaskPhase == core.TaskExecution_QUEUED.String() || existingTaskPhase == core.TaskExecution_UNDEFINED.String()) && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
+	if existingTaskPhase != core.TaskExecution_RUNNING.String() && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
 		err = addTaskStartedState(request, taskExecutionModel, &taskExecutionClosure)
 		if err != nil {
 			return err
