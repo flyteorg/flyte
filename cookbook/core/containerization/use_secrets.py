@@ -32,28 +32,46 @@ The webhook is included in all overlays in the Flytekit repo. The deployment fil
 1) flyte-pod-webhook-secrets Job: This job runs ``flytepropeller webhook init-certs`` command that issues self-signed CA Certificate as well as a derived TLS certificate and its private key. It stores them into a new secret ``flyte-pod-webhook-secret``.
 2) flyte-pod-webhook Deployment: This deployment creates the Webhook pod which creates a MutatingWebhookConfiguration on startup. This serves as the registration contract with the ApiServer to know about the Webhook before it starts serving traffic.
 
-Preparations for Using Secrets
-##############################
+Secret Discovery
+----------------
+
+Flyte identifies secrets using a secret group and a secret key. 
+In a task decorator you request a secret like this: ``@task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME)])``
+Flytekit provides a shorthand for loading the requested secret inside a task: ``secret = flytekit.current_context().secrets.get(SECRET_GROUP, SECRET_NAME)``
+See the python examples further down for more details on how to request and use secrets in a task. 
+
+Flytekit relies on the following environment variables to load secrets (defined `here <https://github.com/flyteorg/flytekit/blob/master/flytekit/configuration/secrets.py>`_). When running tasks and workflows locally you should make sure to store your secrets accordingly or to modify these:
+- FLYTE_SECRETS_DEFAULT_DIR - The directory Flytekit searches for secret files, default: "/etc/secrets"
+- FLYTE_SECRETS_FILE_PREFIX - a common file prefix for Flyte secrets, default: ""
+- FLYTE_SECRETS_ENV_PREFIX - a common env var prefix for Flyte secrets, default: "_FSEC_"
+
+When running a workflow on a Flyte cluster, the configured secret manager will use the secret Group and Key to try and retrieve a secret. 
+If successful, it will make the secret available as either file or environment variable and will if necessary modify the above variables automatically so that the task can load and use the secrets.
 
 Configuring a secret management system plugin into use
 ------------------------------------------------------
 
-When a task requests a secret Flyte will, by default, look for global secrets (secrets mounted as files or environment variables on the Pod Weebhook pod) and for K8s secrets. You can, however, configure another secret manager into use by adding `secretManagerType: K8s` to 
-the [core config](https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/propeller/core.yaml#L34) of the Flyte propeller. Ath the time opf writing the two available secret manager types are `K8s` and `AWS`.
-
-
-Making secrets discoverable
----------------------------
-// Paths and names
-Global secrets need to be made available to the Pod Webhook pod either by mounting them as volumes or as environment variables. This is a good way to make secrets discoverable by tasks in all projects and domains, but as names of the secrets need 
-to be unique it can get a convoluted if you have a large number of secrets. Note that global secrets can only be injected into the task pod as environemnt variables (see examples below). Volumes should be mounted into the path `/etc/secrets/<secret group>/<secret name>`. 
-Environment variables should be named `<FLYTE_SECRETS_ENV_PREFIX>_<secret group>_<secret_name>`.
-By default FLYTE_SECRETS_ENV_PREFIX is set to "_FSEC_" (see [declaration](https://github.com/flyteorg/flytekit/blob/3b7c2639643df99d9374d8338efadfa381625b87/flytekit/configuration/secrets.py#L6)), but you can override it. 
-
-When using the K8s secret manager plugin (enabled by default), the secrets need to be available in the same namespace as the task (for example `flytesnacks-development`). K8s secrets can be mounted as both files and injected as environment variables into the task pod, so if you need to make larger files available to the task, then this might be the better option. Furthermore, this method also allows you to have separate credentials for different domains but still using the same name for the secret. The `group` of the secret request corresponds to the K8s secret name, while the `name` of the request corresponds to the key of the specific entry in the secret.    
-
+When a task requests a secret Flytepropeller will try to retrieve secrets in the following order: 1.) checking for global secrets (secrets mounted as files or environment variables on the flyte-pod-webhook pod) and 2.) checking with an additional configurable secret manager. 
 Note that the global secrets take precedence over any secret discoverable by the secret manager plugins. 
 
+The following additional secret managers are available at the time of writing: 
+- `K8s secrets <https://kubernetes.io/docs/concepts/configuration/secret/>`_ (default) - flyte-pod-webhook will try to look for a K8s secret named after the secret Group and retrieve the value for the secret Key.
+- AWS Secret Manager - flyte-pod-webhook will add the AWS Secret Manager sidecar container to a task Pod which will mount the secret.
+- `Vault Agent Injector <https://www.vaultproject.io/docs/platform/k8s/injector>`_ - flyte-pod-webhook will annotate the task Pod with the respective Vault annotations that trigger an existing Vault Agent Injector to retrieve the specified secret Key from a vault path defined as secret Group.
+
+You can configure the additional secret manager by defining `secretManagerType` to be either 'K8s', 'AWS' or 'Vault' in 
+the `core config <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/propeller/core.yaml#L34>` of the Flytepropeller.
+
+When using the K8s secret manager plugin (enabled by default), the secrets need to be available in the same namespace as the task execution
+(for example `flytesnacks-development`). K8s secrets can be mounted as either files or injected as environment variables into the task pod, 
+so if you need to make larger files available to the task, then this might be the better option. 
+Furthermore, this method also allows you to have separate credentials for different domains but still using the same name for the secret. 
+The `group` of the secret request corresponds to the K8s secret name, while the `name` of the request corresponds to the key of the specific entry in the secret.    
+
+When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster (`step-by-step tutorial <https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar>`_).
+Vault secrets can only be mounted as files and will become available under "/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME". Vault comes with `two versions <https://www.vaultproject.io/docs/secrets/kv>`_ of the key-value secret store. 
+By default the Vault secret manager will try to retrieve Version 2 secrets. You can specify the KV version by setting webhook.vaultSecretManager.kvVersion in the configmap. Note that the version number needs to be an explicit string (e.g. "1").
+You can also configure the Vault role under which Flyte will try to read the secret by setting webhook.vaultSecretManager.role (default: "flyte").
 
 
 How to Use Secrets Injection in a Task
