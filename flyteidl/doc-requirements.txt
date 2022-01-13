@@ -25,6 +25,7 @@ docutils==0.17.1
     # via
     #   recommonmark
     #   sphinx
+    #   sphinx-panels
 furo @ git+https://github.com/flyteorg/furo.git@main
     # via -r doc-requirements.in
 idna==3.3
@@ -72,6 +73,7 @@ sphinx==4.3.2
     #   sphinx-copybutton
     #   sphinx-fontawesome
     #   sphinx-material
+    #   sphinx-panels
     #   sphinx-prompt
 sphinx-code-include==1.1.1
     # via -r doc-requirements.in
@@ -82,6 +84,8 @@ sphinx-fontawesome==0.0.6
 sphinx-markdown-tables==0.0.15
     # via -r doc-requirements.in
 sphinx-material==0.0.35
+    # via -r doc-requirements.in
+sphinx-panels==0.6.0
     # via -r doc-requirements.in
 sphinx-prompt==1.5.0
     # via -r doc-requirements.in

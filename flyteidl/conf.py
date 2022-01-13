@@ -51,6 +51,7 @@ extensions = [
     "recommonmark",
     "sphinx_markdown_tables",
     "sphinx_fontawesome",
+    "sphinx_panels",
 ]
 
 # build the templated autosummary files
