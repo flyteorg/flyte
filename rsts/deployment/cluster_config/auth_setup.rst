@@ -401,6 +401,23 @@ If your organization does any automated registration, then you'll need to authen
        # rolling out the requirement.
        export FLYTE_PLATFORM_AUTH=True
 
+.. _auth-troubleshooting:
+
+***************
+Troubleshooting
+***************
+
+* Seeing error message when authenticating through ``flytectl``
+
+If you have application authentication turned on in addition to the browser, and are seeing an error that looks like
+
+.. code-block:: json
+
+    {"json":{"src":"auth_flow_orchestrator.go:123"},"level":"fatal","msg":"Couldn't start the callback http server on host %v due to %vlocalhost:53593listen tcp: lookup localhost on 68.105.28.11:53: no such host","ts":"2022-01-07T16:49:31-05:00"}
+
+It may be because ``/etc/hosts`` file is missing an alias for ``localhost``. Add an entry pointed to ``127.0.0.1``.
+
+
 .. _auth-references:
 
 **********

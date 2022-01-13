@@ -76,6 +76,15 @@ solution). The following pages will help you effectively deploy and manage an en
     An example use case leveraging DevOps practices to run Flyte pipelines.
 
 
+    ---
+    .. link-button:: deployment-troubleshooting
+       :type: ref
+       :text: Troubleshooting
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Troubleshooting
+
+
 .. toctree::
     :maxdepth: 1
     :name: deployment breakdown toc
@@ -89,3 +98,4 @@ solution). The following pages will help you effectively deploy and manage an en
     plugin_setup/index
     security/security
     ideal_flow
+    troubleshooting
