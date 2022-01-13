@@ -17,8 +17,6 @@ RUN sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/downlo
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
 
-RUN apt-get install -y git
-
 # Install gcloud for GCP
 RUN apt-get install curl --assume-yes
 

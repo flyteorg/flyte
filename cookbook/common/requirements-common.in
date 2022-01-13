@@ -1,3 +1,3 @@
-git+https://github.com/flyteorg/flytekit.git@legacy-removal
+flytekit>=0.25.0b3
 wheel
 matplotlib

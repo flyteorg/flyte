@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: "Provide the list"
         id: create-list
-        run: echo "::set-output name=packages::$(find cookbook/core -mindepth 1 -maxdepth 1 -type f -name Dockerfile -exec dirname '{}' \; | sort | jq --raw-input . | jq --slurp . | jq -c .)"
+        run: echo "::set-output name=packages::$(find cookbook -mindepth 1 -maxdepth 5 -type f -name Dockerfile -exec dirname '{}' \; | sort | jq --raw-input . | jq --slurp . | jq -c .)"
     outputs:
       packages: "${{ steps.create-list.outputs.packages }}"
   # Use matrix strategy to run serialize for all directories in parallel. This also uploads the examples as artifacts
@@ -36,7 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ "list"]
     strategy:
-      fail-fast: false
       matrix:
         directory: "${{ fromJson(needs.list.outputs.packages) }}"
     steps:

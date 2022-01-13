@@ -9,7 +9,7 @@ ENV PYTHONPATH /root
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Python3 and other basics
-RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-essential libssl-dev python3-pip curl git
+RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-essential libssl-dev python3-pip curl
 
 # Install AWS CLI to run on AWS (for GCS install GSutil). This will be removed
 # in future versions to make it completely portable

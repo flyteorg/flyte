@@ -27,7 +27,6 @@ RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.lis
     && apt-get update && apt-get install --no-install-recommends -y gcc g++
 RUN echo 'installing make' \
     && apt-get install make
-RUN apt-get install -y git
 
 ENV VENV /opt/venv
 # Virtual environment
