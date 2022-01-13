@@ -1,4 +1,4 @@
-package sidecar
+package pod
 
 import (
 	"context"
@@ -32,7 +32,7 @@ import (
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
 
-var resourceRequirements = &v1.ResourceRequirements{
+var sidecarResourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
 		v1.ResourceCPU:              resource.MustParse("2048m"),
 		v1.ResourceEphemeralStorage: resource.MustParse("100M"),
@@ -51,11 +51,12 @@ func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
 		panic(err)
 	}
 	return &core.TaskTemplate{
+		Type:   sidecarTaskType,
 		Custom: &structObj,
 	}
 }
 
-func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.TaskExecutionMetadata {
+func dummySidecarTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -96,7 +97,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 
 func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
-	dummyTaskMetadata := dummyContainerTaskMetadata(resources)
+	dummyTaskMetadata := dummySidecarTaskMetadata(resources)
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
 	inputReader.OnGetInputPath().Return("test-data-reference")
@@ -198,6 +199,7 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
+		Type:            sidecarTaskType,
 		TaskTypeVersion: 2,
 		Config: map[string]string{
 			primaryContainerKey: "primary container",
@@ -239,9 +241,9 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		GpuResourceName:      ResourceNvidiaGPU,
 	}))
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
-	res, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	res, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "primary container",
@@ -282,6 +284,7 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 
 func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
 	task := core.TaskTemplate{
+		Type:            sidecarTaskType,
 		TaskTypeVersion: 2,
 		Config: map[string]string{
 			primaryContainerKey: "primary container",
@@ -300,9 +303,9 @@ func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
 		},
 	}
 
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
-	_, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	_, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 }
 
@@ -320,6 +323,7 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
+		Type:            sidecarTaskType,
 		Custom:          structObj,
 		TaskTypeVersion: 1,
 		Config: map[string]string{
@@ -348,9 +352,9 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
-	res, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	res, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "primary container",
@@ -401,6 +405,7 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
+		Type:            sidecarTaskType,
 		Custom:          structObj,
 		TaskTypeVersion: 1,
 	}
@@ -413,16 +418,16 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
-	_, err = handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	_, err = p.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config needs to be non-empty and include missing [primary_container_name] key")
 
 	task.Config = map[string]string{
 		"foo": "bar",
 	}
-	taskCtx = getDummySidecarTaskContext(&task, resourceRequirements)
-	_, err = handler.BuildResource(context.TODO(), taskCtx)
+	taskCtx = getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	_, err = p.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config missing [primary_container_name] key in [map[foo:bar]]")
 
 }
@@ -441,6 +446,7 @@ func TestBuildSidecarResource(t *testing.T) {
 		t.Fatal(err)
 	}
 	task := core.TaskTemplate{
+		Type:   sidecarTaskType,
 		Custom: &sidecarCustom,
 	}
 
@@ -465,9 +471,9 @@ func TestBuildSidecarResource(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
-	res, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	res, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "a container",
@@ -522,9 +528,9 @@ func TestBuildSidecarReosurceMissingAnnotationsAndLabels(t *testing.T) {
 
 	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(task, resourceRequirements)
-	resp, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+	resp, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.NoError(t, err)
 	assert.EqualValues(t, map[string]string{}, resp.GetLabels())
 	assert.EqualValues(t, map[string]string{"primary_container_name": "PrimaryContainer"}, resp.GetAnnotations())
@@ -544,9 +550,9 @@ func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
 
 	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(task, resourceRequirements)
-	_, err := handler.BuildResource(context.TODO(), taskCtx)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+	_, err := p.BuildResource(context.TODO(), taskCtx)
 	assert.True(t, errors.Is(err, errors2.Errorf("BadTaskSpecification", "")))
 }
 
@@ -580,9 +586,9 @@ func TestGetTaskSidecarStatus(t *testing.T) {
 		res.SetAnnotations(map[string]string{
 			primaryContainerKey: "PrimaryContainer",
 		})
-		handler := &sidecarResourceHandler{}
-		taskCtx := getDummySidecarTaskContext(task, resourceRequirements)
-		phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
+		p := &plugin{defaultPodBuilder, podBuilders}
+		taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+		phaseInfo, err := p.GetTaskPhase(context.TODO(), taskCtx, res)
 		assert.Nil(t, err)
 		assert.Equal(t, expectedTaskPhase, phaseInfo.Phase(),
 			"Expected [%v] got [%v] instead, for podPhase [%v]", expectedTaskPhase, phaseInfo.Phase(), podPhase)
@@ -608,9 +614,9 @@ func TestDemystifiedSidecarStatus_PrimaryFailed(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		primaryContainerKey: "Primary",
 	})
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, resourceRequirements)
-	phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := p.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 }
@@ -634,9 +640,9 @@ func TestDemystifiedSidecarStatus_PrimarySucceeded(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		primaryContainerKey: "Primary",
 	})
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, resourceRequirements)
-	phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := p.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 }
@@ -660,9 +666,9 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		primaryContainerKey: "Primary",
 	})
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, resourceRequirements)
-	phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := p.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
@@ -681,15 +687,15 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		primaryContainerKey: "Primary",
 	})
-	handler := &sidecarResourceHandler{}
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, resourceRequirements)
-	phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
+	p := &plugin{defaultPodBuilder, podBuilders}
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := p.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 }
 
 func TestGetProperties(t *testing.T) {
-	handler := &sidecarResourceHandler{}
+	p := &plugin{defaultPodBuilder, podBuilders}
 	expected := k8s.PluginProperties{}
-	assert.Equal(t, expected, handler.GetProperties())
+	assert.Equal(t, expected, p.GetProperties())
 }
