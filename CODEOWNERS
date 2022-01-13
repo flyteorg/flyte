@@ -1,0 +1,8 @@
+# See: https://help.github.com/articles/about-codeowners/
+# Each line is a file pattern followed by one or more owners. It is setup in next pattern:
+# Folder[/file_name] owner1 owner2 
+
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence. 
+
+* @flyteorg/fe-engineers
