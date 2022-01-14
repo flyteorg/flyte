@@ -71,7 +71,7 @@ def wandb_setup():
 
 
 # %%
-# Re-using the Network from the Single GPU Example
+# Re-Using the Network From the Single GPU Example
 # ================================================
 #
 # We'll use the same neural network architecture as the one we define in the
@@ -328,12 +328,11 @@ def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
 # available GPU. Since we're parallelizing the data, each process will contain a copy of the model and pytorch
 # will handle syncing the weights across all processes on ``optimizer.step()`` calls.
 #
-# See `here <https://pytorch.org/tutorials/beginner/dist_overview.html>`_ to read more about pytorch distributed
-# training.
+# Read more about pytorch distributed training `here <https://pytorch.org/tutorials/beginner/dist_overview.html>`_.
 
 
 # %%
-# Set memory, gpu and storage depending on whether we are trying to register against sandbox or not...
+# Set memory, gpu and storage depending on whether we are trying to register against sandbox or not:
 if os.getenv("SANDBOX") != "":
     mem = "100Mi"
     gpu = "0"
@@ -385,7 +384,7 @@ def pytorch_training_wf(hp: Hyperparameters = Hyperparameters(epochs=10, batch_s
 # =========================
 #
 # It is possible to run the model locally with almost no modifications (as long as the code takes care of resolving
-# if the code is distributed or not). This is how we can do it:
+# if the code is distributed or not). This is how to do it:
 if __name__ == "__main__":
     model, accuracies = pytorch_training_wf(hp=Hyperparameters(epochs=10, batch_size=128))
     print(f"Model: {model}, Accuracies: {accuracies}")
@@ -397,4 +396,4 @@ if __name__ == "__main__":
 # You can refer to the complete ``wandb`` report `here <https://wandb.ai/niels-bantilan/mnist-single-node-multi-gpu/reports/Pytorch-Single-node-Multi-GPU-Report--Vmlldzo5Mjk4Nzk>`__.
 #
 # .. tip::
-#   A lot more customizations can be done to the report according to your requirement!
+#   Many more customizations can be done to the report according to your requirements!
