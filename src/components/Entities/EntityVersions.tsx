@@ -47,7 +47,6 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
 }) => {
     const { domain, project, resourceType, name } = id;
     const styles = useStyles();
-    const filtersState = useWorkflowExecutionFiltersState();
     const sort = {
         key: executionSortFields.createdAt,
         direction: SortDirection.DESCENDING
@@ -62,7 +61,7 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
         { domain, project },
         {
             sort,
-            filter: [...baseFilters, ...filtersState.appliedFilters],
+            filter: baseFilters,
             limit: versionView ? 100 : WorkflowVersionsTablePageSize
         }
     );
@@ -77,11 +76,6 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
             )
         );
     }, [project, domain, name, versions]);
-
-    /** Don't render component until finish fetching user profile */
-    if (filtersState.filters[4].status !== 'LOADED') {
-        return null;
-    }
 
     return (
         <>
