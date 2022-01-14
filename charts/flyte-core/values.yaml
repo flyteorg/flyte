@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.69 # FLYTEADMIN_TAG
+    tag: v0.6.75 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -74,7 +74,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.69 # FLYTESCHEDULER_TAG
+    tag: v0.6.75 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -169,7 +169,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v0.16.4 # FLYTEPROPELLER_TAG
+    tag: v0.16.13 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -213,7 +213,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v0.34.0 # FLYTECONSOLE_TAG
+    tag: v0.38.0 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -235,6 +235,10 @@ flyteconsole:
   tolerations: []
   # -- affinity for Flyteconsole deployment
   affinity: {}
+  # Enable Google Analytics
+  ga:
+    enabled: false
+    tracking_id: "G-0QW4DJWJ20"
 
 #
 # Common secret auth for propeller & scheduler
@@ -437,6 +441,8 @@ configmap:
       storage-prefix: metadata/datacatalog
       metrics-scope: datacatalog
       profiler-port: 10254
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
     application:
       grpcPort: 8089
       httpPort: 8080

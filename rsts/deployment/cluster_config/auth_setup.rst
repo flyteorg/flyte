@@ -169,6 +169,19 @@ Apply Configuration
 
       kubectl rollout restart deployment/flyteadmin -n flyte
 
+#. Restart `flytepropeller` to start using authenticated requests:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytepropeller -n flyte
+
+.. note::
+
+   **Congratulations!**
+
+   It should now be possible to go to flyte UI (https://<your domain>/console) and be prompted for authentication. Flytectl should automatically pickup the change and start prompting for authentication as well.
+   If you want to use an external OAuth2 provider for App authentication, please continue reading into the next section.
+
 OAuth2 Authorization Server
 ---------------------------
 

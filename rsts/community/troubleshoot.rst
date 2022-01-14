@@ -130,6 +130,22 @@ Troubles with flytectl command within proxy setting
 
 - On windows environment it has been noticed that NO_PROXY variable doesn't work for bypassing the proxy settings. GRPC issue reported `here <https://github.com/grpc/grpc/issues/9989>`__ provides additional details though it doesn't seem to have been tested on windows yet.Inorder to get around this issue unset both the HTTP_PROXY and HTTPS_PROXY variables.
 
+Troubles with flytectl command with cloudfare DNS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- flytectl throws permission error with cloudfare DNS endpoint
+- Cloudflare instance by default would proxy the requests and would filter out grpc.
+- You have two options either enable grpc in the network tab or turn off the proxy.
+
+Troubles with flytectl command with auth enabled
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- flytectl uses OpenID connect if auth is enabled in the flyte environment.
+- It opens an http server port on localhost:53593 and has a callback endpoint for the OpendID connect server to call into for the response.
+- If the callback server call fails, then please check if flytectl failed in running the server.
+- Verify if you have an entry for localhost in your /etc/hosts file
+- It could also mean that the call back took longer and flytectl deadline expired on the wait which defaults to 15 secs.
+
 .. NOTE::
 
       More coming soon. Stay tuned 👀

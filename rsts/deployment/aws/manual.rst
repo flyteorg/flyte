@@ -24,43 +24,43 @@ AWS Permissioning
 =================
 Start off by creating a series of roles. These roles control Flyte's access to the AWS account. Since this is a setup guide, we'll be making liberal use of the default policies that AWS IAM comes with, which may be too broad - please consult with your infrastructure team if necessary.
 
-EKS cluster role
+EKS Cluster Role
 ----------------
 First create a role for the EKS cluster. This is the role that the Kubernetes platform itself will use to monitor, scale, and create ASGs, run the etcd store, and the K8s API server, etc.
 
-* Navigate to your AWS console and choose the IAM Roles page
+* Navigate to your AWS console and choose the IAM Roles page.
 * Under the EKS service, select EKS-Cluster.
 * Ensure that the ``AmazonEKSClusterPolicy`` is selected.
-* Create this role without any permission boundary. Advanced users can try to restrict the permissions for there usecases.
-* Choose any tags that would help in you tracking this role based on your devops rules
-* Choose a good name for your cluster role which is easier to search eg: <ClusterName-EKS-Cluster-Role>
+* Create this role without any permission boundary. Advanced users can try to restrict the permissions for their usecases.
+* Choose any tags that would help in you tracking this role based on your devops rules.
+* Choose a good name for your cluster role which is easier to search eg: <ClusterName-EKS-Cluster-Role>.
 
-Refer the following AWS docs for the details
+Refer the following AWS docs for the details:
 https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
 
-EKS node IAM role
+EKS Node IAM Role
 -----------------
 Next create a role for your compute nodes to use. This is the role that will be given to the nodes that actually run user pods (including Flyte pods).
 
-* Navigate to your AWS console and choose IAM role service
-* Choose EC2 as service while choosing the use case
-* Choose the following policies as mentioned in the linked AWS doc
+* Navigate to your AWS console and choose IAM role service.
+* Choose EC2 as service while choosing the use case.
+* Choose the following policies as mentioned in the linked AWS doc:
 
   * AmazonEKSWorkerNodePolicy allows EKS nodes to connect to EKS clusters.
   * AmazonEC2ContainerRegistryReadOnly if using Amazon ECR for container registry.
-  * AmazonEKS_CNI_Policy which allows pod and node networking within your VPC. You need this even though it's marked
+  * AmazonEKS_CNI_Policy which allows pod and node networking within your VPC. You need this even though it is marked
     as optional in the AWS guide linked below.
 
-* Create this role without any permission boundary. Advanced users can try to restrict the permissions for there usecases.
-* Choose any tags that would help in you tracking this role based on your devops rules
-* Choose a good name for your node role which is easier to search eg: <ClusterName-EKS-Node-Role>
+* Create this role without any permission boundary. Advanced users can try to restrict the permissions for their usecases.
+* Choose any tags that would help in you tracking this role based on your devops rules.
+* Choose a good name for your node role which is easier to search eg: <ClusterName-EKS-Node-Role>.
 
-Refer the following AWS docs for the details
+Refer the following AWS docs for the details:
 https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
 
 Flyte System Role
 -----------------
-Next create a role for the Flyte platform. When pods run, they shouldn't run with the node role created above, they should assume a separate role with permissions suitable for that pod's containers. This role will be used for Flyte's own API servers and associated agents.
+Next create a role for the Flyte platform. When pods run, they shouldn't run with the node role created above; they should assume a separate role with permissions suitable for that pod's containers. This role will be used for Flyte's own API servers and associated agents.
 
 Create a role ``iam-role-flyte`` from the IAM console. Select "AWS service" again for the type, and EC2 for the use case.
 Attach the ``AmazonS3FullAccess`` policy for now. S3 access can be tweaked later to narrow down the scope.
@@ -71,24 +71,24 @@ Finally create a role for Flyte users.  This is the role that user pods will end
 
 Create a role ``flyte-user-role`` from the IAM console. Select "AWS service" again for the type, and EC2 for the use case. Also add the ``AmazonS3FullAccess`` policy for now.
 
-Create EKS cluster
-==================
-Create an EKS cluster from AWS console.
+Create an EKS Cluster
+=====================
+Create an EKS cluster from the AWS console:
 
 * Pick a good name for your cluster eg : <Name-EKS-Cluster>
 * Pick Kubernetes version >= 1.19
-* Choose the EKS cluster role <ClusterName-EKS-Cluster-Role>, created in previous steps
-* Keep secrets encryption off
-* Use the same VPC where you intend to deploy your RDS instance. Keep the default VPC if none created and choose RDS to use the default aswell
-* Use the subnets for all the supported AZ's in that VPC
-* Choose the security group that you which to use for this cluster and the RDS instance (use default if using default VPC)
-* Provide public access to your cluster or depending on your devops settings
-* Choose default version of the network addons
+* Choose the EKS cluster role <ClusterName-EKS-Cluster-Role>, created in previous steps.
+* Keep secrets encryption off.
+* Use the same VPC where you intend to deploy your RDS instance. Keep the default VPC if none were created and choose RDS to use the default as well.
+* Use the subnets for all supported AZ's in that VPC.
+* Choose the security group to use for this cluster and the RDS instance (use default if using default VPC).
+* Provide public access to your cluster, or otherwise according to your devops settings.
+* Choose default version of the network add-ons.
 * You can choose to enable the control plane logging to CloudWatch.
 
-Connect to EKS cluster
-======================
-* Use your AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context
+Connect to an EKS Cluster
+=========================
+* Use your AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context:
 
   .. code-block::
 
@@ -96,7 +96,7 @@ Connect to EKS cluster
        export AWS_SECRET_ACCESS_KEY=<YOUR-AWS-SECRET-ACCESS-KEY>
        exportAWS_SESSION_TOKEN=<YOUR-AWS-SESSION-TOKEN>
 
-* Switch to EKS cluster context <Name-EKS-Cluster>
+* Switch to the EKS cluster context <Name-EKS-Cluster>
 
   .. code-block::
 
@@ -116,9 +116,9 @@ Connect to EKS cluster
    $ kubectl get pods
    No resources found in default namespace.
 
-OIDC Provider for EKS cluster
-=============================
-Create the OIDC provider to be used for the EKS cluster and associate a trust relationship with the EKS cluster role <ClusterName-EKS-Cluster-Role>
+OIDC Provider for the EKS Cluster
+=================================
+Create the OIDC provider to be used for the EKS cluster and associate a trust relationship with the EKS cluster role <ClusterName-EKS-Cluster-Role>:
 
 * EKS cluster created should have a URL created and hence the following command would return the provider
 
@@ -132,17 +132,17 @@ Example output:
 
   https://oidc.eks.<REGION>.amazonaws.com/id/<UUID-OIDC>
 
-* The following command creates the oidc provider using the address provided by the cluster
+* The following command creates the OIDC provider using the address provided by the cluster:
 
 .. code-block::
 
   eksctl utils associate-iam-oidc-provider --cluster <Name-EKS-Cluster> --approve
 
-Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) for additional reference
+Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) for additional reference.
 
 * Verify the OIDC provider is created by navigating to https://console.aws.amazon.com/iamv2/home?#/identity_providers and confirming that a new provider entry has been created with the same <UUID-OIDC> issuer as the cluster's.
 
-* Next we need to add a trust relationship between this OIDC provider and the two Flyte roles.
+* Next we need to add a trust relationship between this OIDC provider and the two Flyte roles:
    * Navigate to the newly created `OIDC Providers <https://console.aws.amazon.com/iamv2/home?#/identity_providers>`__ with <UUID-OIDC> and copy the ARN.
    * Navigate to `IAM Roles <https://console.aws.amazon.com/iam/home#/roles>`__ and select the ``iam-role-flyte`` role.
    * Under the Trust relationships tab, hit the Edit button.
@@ -178,26 +178,26 @@ Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide
      ]
    }
 
-Create EKS node group
-=====================
+Create an EKS Node Group
+========================
 
-The initial EKS cluster wont have any instances configured to operate the cluster. Create a node group which provides resources for the kubernetes cluster.
+The initial EKS cluster will not have any instances configured to operate the cluster. Create a node group which provides resources for the kubernetes cluster:
 
 * Go to your EKS cluster navigate to the Configuration -> Compute tab.
-* Provide a good enough name <Name-EKS-Node-Group>
-* Use the EKS node IAM role <ClusterName-EKS-Node-Role> created in the above steps
+* Provide a suitable name <Name-EKS-Node-Group>
+* Use the EKS node IAM role <ClusterName-EKS-Node-Role> created in the above steps.
 * Use without any launch template, kuebernetes labels,taints or tags.
-* Choose the default Amazon EC2 AMI (AL2_x86_64)
-* Capacity type on demand, Instance type and size can be chosen based on your devops requirements. Keep default if in doubt
-* Create a node group with 5/10/5 instance min, max, desired
+* Choose the default Amazon EC2 AMI (AL2_x86_64).
+* Capacity type on demand, Instance type and size can be chosen based on your devops requirements. Keep the default if in doubt.
+* Create a node group with 5/10/5 instance min, max, desired.
 * Use the default subnets selected which would be chosen based on your EKS cluster accessible subnets.
-* Disallow remote access to the nodes(If needed provide the ssh access key pair to use from your account)
+* Disallow remote access to the nodes (If needed provide the ssh access key pair to use from your account).
 
-Create RDS database
-===================
-Next create a relational database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
+Create an RDS Database
+======================
+Next, create a relational database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
 
-* Navigate to `RDS <https://console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database
+* Navigate to `RDS <https://console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database.
 * Leave the Template as Production.
 * Change the default cluster identifier to ``flyteadmin``.
 * Set the master username to ``flyteadmin``.
@@ -213,13 +213,13 @@ Next create a relational database. This database will be used by both the primar
 
 Leave all the other settings as is and hit Create.
 
-Check connectivity to RDS database from EKS cluster
-===================================================
+Check Connectivity to the RDS Database From the EKS Cluster
+===========================================================
 * Get the <RDS-HOST-NAME> by navigating to the database cluster and copying the writer instance endpoint.
 
-We will use pgsql-postgres-client to verify DB connectivity
+We will use pgsql-postgres-client to verify DB connectivity:
 
-* Create a testdb namespace for trial
+* Create a testdb namespace for trial.
 
   .. code-block:: bash
 
@@ -242,8 +242,8 @@ We will use pgsql-postgres-client to verify DB connectivity
    pod "pgsql-postgresql-client" deleted
    pod flyte/pgsql-postgresql-client terminated (Error)
 
-Install Amazon Loadbalancer Ingress Controller
-==============================================
+Install an Amazon Loadbalancer Ingress Controller
+=================================================
 
 The cluster doesn't come with any ingress controllers so we have to install one separately. This one will create an AWS load balancer for K8s Ingress objects.
 
@@ -253,15 +253,15 @@ Before we begin, make sure all the subnets are tagged correctly for subnet disco
 * Add 2 tags on all the three subnets
   Key kubernetes.io/role/elb Value 1
   Key kubernetes.io/cluster/<Name-EKS-Cluster> Value shared
-* Refer this doc for additional details https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/deploy/subnet_discovery/
+* Refer to this doc for additional details https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/deploy/subnet_discovery/
 
-* Download IAM policy for the AWS Load Balancer Controller
+* Download the IAM policy for the AWS Load Balancer Controller:
 
   .. code-block::
 
      curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json
 
-* Create an IAM policy called AWSLoadBalancerControllerIAMPolicy(delete it if it already exists from IAM service)
+* Create an IAM policy called AWSLoadBalancerControllerIAMPolicy (delete it if it already exists from IAM service):
 
   .. code-block::
 
@@ -269,7 +269,7 @@ Before we begin, make sure all the subnets are tagged correctly for subnet disco
        --policy-name AWSLoadBalancerControllerIAMPolicy \
        --policy-document file://iam-policy.json
 
-* Create a IAM role and ServiceAccount for the AWS Load Balancer controller, using the ARN from the step above.
+* Create an IAM role and ServiceAccount for the AWS Load Balancer controller, using the ARN from the step above:
 
   .. code-block::
 
@@ -282,28 +282,26 @@ Before we begin, make sure all the subnets are tagged correctly for subnet disco
      --override-existing-serviceaccounts \
      --approve
 
-* Add the EKS chart repo to helm
+* Add the EKS chart repo to helm:
 
   .. code-block::
 
      helm repo add eks https://aws.github.io/eks-charts
 
-*
-  Install the TargetGroupBinding CRDs
+* Install the TargetGroupBinding CRDs:
 
   .. code-block::
 
      kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
 
-*
-  Install the load balancer controller using helm
+* Install the load balancer controller using helm:
 
 .. code-block::
 
    helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=<Name-EKS-Cluster> --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 
 
-* Verify load balancer webhook service is running in kube-system ns
+* Verify load balancer webhook service is running in kube-system ns:
 
 .. code-block::
 
@@ -325,13 +323,13 @@ Sample o/p
    aws-load-balancer-controller-674869f987-tpwvn   1/1     Running   0          11s
 
 
-* Use this doc for any additional installation instructions
+* Use this doc for any additional installation instructions: 
   https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/installation/
 
 
 SSL Certificate
 ===============
-In order to use SSL (which we need to use gRPC clients), we next need to create an SSL certificate. We realize that
+In order to use SSL (which we need to use gRPC clients), we now need to create an SSL certificate. We realize that
 you may need to work with your infrastructure team to acquire a legitimate certificate, so the first set of instructions
 help you get going with a self-signed certificate. These are of course not secure and will show up as a security warning
 to any users, so we recommend deploying a legitimate certificate as soon as possible.
@@ -379,22 +377,23 @@ Generate a self signed cert using open ssl and get the <KEY> and <CRT> file.
 Production
 ----------
 
-Generate a cert from the CA used by your org and get the <KEY> and <CRT>
+Generate a cert from the CA used by your org and get the <KEY> and <CRT>.
 Flyte doesn't manage the lifecycle of certificates so this will need to be managed by your security or infrastructure team.
 
+Please refer to:
 AWS docs for importing the cert https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-prerequisites.html
 Requesting a public cert issued by ACM Private CA https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html#request-public-console
 
 Note the generated ARN. Let's calls it <CERT-ARN> in this doc which we will use to replace in our values-eks.yaml
 
-Use AWS Certificate manager for generating the SSL certificate to host your hosted flyte installation
+Use the AWS Certificate manager for generating the SSL certificate to host your hosted Flyte installation.
 
 
-Create S3 Bucket
-================
+Create an S3 Bucket
+===================
 * Create an S3 bucket without public access.
 * Choose a good name for it  <ClusterName-Bucket>
-* Use the same region as the EKS cluster
+* Use the same region as the EKS cluster.
 
 
 Create a Log Group
@@ -408,18 +407,18 @@ Time for Helm
 Installing Flyte
 -----------------
 
-1. Add the flyte chart repo to Helm
+1. Add the Flyte chart repo to Helm
 
 .. code-block::
 
  helm repo add flyteorg https://flyteorg.github.io/flyte
 
 
-2. Download eks values for Helm
+2. Download EKS values for Helm
 
 .. tabbed:: Flyte Native Scheduler
 
-  * Download eks Helm values (it enables Flyte native scheduler by default)
+  * Download EKS Helm values (it enables Flyte native scheduler by default)
 
     .. code-block:: bash
 
@@ -427,7 +426,7 @@ Installing Flyte
 
 .. tabbed:: AWS scheduler
 
-  * Download eks helm values for AWS Scheduler
+  * Download EKS helm values for AWS Scheduler
 
     .. code-block:: bash
 
@@ -437,7 +436,7 @@ Installing Flyte
 
 3. Update values in the YAML file
 
-Search and replace the following
+Search and replace the following:
 
 .. list-table:: Helm EKS Values
    :widths: 25 25 75
@@ -482,7 +481,7 @@ To restrict projects, update Helm values. By default, Flyte creates three projec
        - flytetester
        - flyteexamples
 
-To restrict domains, update Helm values again. By default, Flyte creates three domains per project: development, staging and production.
+To restrict domains, update the Helm values again. By default, Flyte creates three domains per project: development, staging and production.
 
 .. code-block::
 
@@ -525,7 +524,7 @@ To restrict domains, update Helm values again. By default, Flyte creates three d
                 - defaultIamRole:
                   value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
 
-1. Install Flyte
+5. Install Flyte
 
 .. tabbed:: Flyte Native scheduler
 
@@ -544,7 +543,7 @@ To restrict domains, update Helm values again. By default, Flyte creates three d
        helm install -n flyte -f values-eks.yaml -f values-eks-override.yaml --create-namespace flyte flyteorg/flyte-core
 
 
-6. Verify if all the pods have come up correctly
+6. Verify if all of the pods have come up correctly
 
 .. code-block:: bash
 
@@ -579,7 +578,7 @@ Upgrading Flyte
 Connecting to Flyte
 ===================
 
-Flyte can be accessed using the UI console or your terminal
+Flyte can be accessed using the UI console or your terminal.
 
 * First, find the Flyte endpoint created by the ALB ingress controller.
 
@@ -594,7 +593,7 @@ Flyte can be accessed using the UI console or your terminal
 <FLYTE-ENDPOINT> = Value in ADDRESS column and both will be the same as the same port is used for both GRPC and HTTP.
 
 
-* Connecting to flytectl CLI
+* Connect to flytectl CLI.
 
 Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
 
@@ -615,7 +614,7 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
         region: <REGION> # Example: us-east-2
       container: <ClusterName-Bucket> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
 
-Accessing Flyte Console (web UI)
+Accessing Flyte Console (Web UI)
 ================================
 
 * Use the https://<FLYTE-ENDPOINT>/console to get access to flyteconsole UI
@@ -625,19 +624,25 @@ Troubleshooting
 ===============
 
 
-* If flyteadmin pod is not coming up, then describe the pod and check which of the container or init-containers had an error.
+* If a flyteadmin pod is not coming up, then describe the pod and check which of the container or init-containers had an error.
 
 .. code-block:: bash
 
    kubectl describe pod/<flyteadmin-pod-instance> -n flyte
 
 Then check the logs for the container which failed.
-eg: to check for run-migrations init container do this. If you see connectivity issue then check your security group rules on the DB and eks cluster. Authentication issues then check you have used the same password in helm and RDS DB creation. (Note : Using Cloud formation template make sure passwords are not double/single quoted)
+
+Eg: to check for run-migrations init container do this:
 
 .. code-block:: bash
 
    kubectl logs -f <flyteadmin-pod-instance> run-migrations -n flyte
 
+If you see connectivity issues, then check your security group rules on the DB and eks cluster. 
+
+For authentication issues, check that you have used the same password in helm and RDS DB creation. 
+
+(Note : When using Cloud formation templates, make sure the passwords are not double/single quoted.)
 
 * Increasing log level for flytectl
   Change your logger config to this

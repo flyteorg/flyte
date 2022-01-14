@@ -88,7 +88,7 @@ If you change either of these structures, you will find you must change the corr
 Component Details
 =================
 
-This section dives into detail for each top-level directory defined in ``pkg/``.
+This section dives into the details of each top-level directory defined in ``pkg/``.
 
 Asynchronous Components
 -----------------------
@@ -218,7 +218,7 @@ and include information about respective phase transitions, phase transition tim
 
 These events are the **only** way to update an execution. No raw Update endpoint exists.
 
-To track the lifecycle of an execution admin stores attributes such as duration, timestamp at which an execution transitioned to running, and end time.
+To track the lifecycle of an execution admin, store attributes such as duration, timestamp at which an execution transitioned to running, and end time.
 
 For debug purposes admin also stores Workflow and Node execution events in its database, but does not currently expose them through an API. Because array tasks can yield very many executions,
 admin does **not** store TaskExecutionEvents.
@@ -226,7 +226,7 @@ admin does **not** store TaskExecutionEvents.
 
 Platform entities
 +++++++++++++++++
-Projects: like named entities, project have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
+Projects: like named entities, projects have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
 
 Permitted project operations:
 
@@ -238,16 +238,16 @@ Permitted project operations:
 Matchable resources
 +++++++++++++++++++
 
-A thorough background on :std:ref:`matchable resources <protos/docs/admin/admin:matchableresource>` explains
+A thorough background on :ref:`matchable resources <deployment-cluster-config-general>` explains
 their purpose and application logic. As a summary, these are used to override system level defaults for Kubernetes cluster
-resource management, default execution values, and more all across different levels of specificity.
+resource management, default execution values, and more across different levels of specificity.
 
 These entities consist of:
 
 - ProjectDomainAttributes
 - WorkflowAttributes
 
-Where ProjectDomainAttributes configure customizable overrides at the project and domain level and WorkflowAttributes configure customizable overrides at the project, domain and workflow level.
+ProjectDomainAttributes configure customizable overrides at the project and domain level, and WorkflowAttributes configure customizable overrides at the project, domain and workflow level.
 
 Permitted attribute operations:
 
@@ -301,13 +301,15 @@ Filterable fields vary based on entity types:
   - name	
   - version	
   - created_at	
+  
 - Workflow	
 
   - project	
   - domain	
   - name	
   - version	
-  - created_at	
+  - created_at
+  
 - Launch plans	
 
   - project	
@@ -319,10 +321,12 @@ Filterable fields vary based on entity types:
   - workflows.{any workflow field above} (for example: workflow.domain)	
   - state (you must use the integer enum e.g. 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
+     
 - Named Entity Metadata
 
   - state (you must use the integer enum e.g. 1)	
      - States are defined in :std:ref:`namedentitystate <protos/docs/admin/admin:namedentitystate>`.
+     
 - Executions (Workflow executions)	
 
   - project	
@@ -348,7 +352,8 @@ Filterable fields vary based on entity types:
   - started_at	
   - node_execution_created_at	
   - node_execution_updated_at	
-  - duration (in seconds)	
+  - duration (in seconds)
+  
 - Task Executions	
 
   - retry_attempt	
@@ -362,7 +367,7 @@ Filterable fields vary based on entity types:
   - task_execution_updated_at	
   - duration (in seconds)	
 
-Putting it all together	
+Putting It All Together	
 -----------------------	
 
 If you wanted to do query on specific executions that were launched with a specific launch plan for a workflow with specific attributes, you could do something like:	
@@ -387,11 +392,13 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - domain	
   - name	
   - version	
-  - created_at	
+  - created_at
+  
 - ListTaskIds	
 
   - project	
   - domain	
+  
 - ListWorkflows	
 
   - project	
@@ -399,10 +406,12 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - name	
   - version	
   - created_at	
+  
 - ListWorkflowIds	
 
   - project	
   - domain	
+  
 - ListLaunchPlans	
 
   - project	
@@ -413,10 +422,12 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - updated_at	
   - state (you must use the integer enum e.g. 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
+     
 - ListWorkflowIds	
 
   - project	
   - domain	
+  
 - ListExecutions	
 
   - project	
@@ -429,6 +440,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - duration (in seconds)	
   - mode (you must use the integer enum e.g. 1)	
      - Modes are defined :std:ref:`execution.proto <protos/docs/admin/admin:executionmetadata.executionmode>`.
+     
 - ListNodeExecutions	
 
   - node_id	
@@ -439,6 +451,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - node_execution_created_at	
   - node_execution_updated_at	
   - duration (in seconds)	
+  
 - ListTaskExecutions	
 
   - retry_attempt	

@@ -45,14 +45,18 @@ be registered and executed within it. See :std:ref:`flytectl <flytectl:flytectl_
 
 This project should immediately show up in the Flyte console after refreshing.
 
-*******************************
-Cloud Based Pub/Sub Integration
-*******************************
-Flyte relies on cloud-provided pub/sub and schedulers to provide automated periodic execution of your launch plans. In AWS,
+**********
+Scheduling
+**********
+Flyte has an in-built native scheduler to provide automated periodic execution of your launch plans. See the :ref:`Scheduling Launch Plans <concepts-schedules>` page for detailed information.
 
-* `CloudWatch Events <https://docs.aws.amazon.com/cloudwatch/index.html>`_ are used for the triggering mechanism to accurately serve periodic executions.
-* `SNS <https://aws.amazon.com/sns>`_ and `SQS <https://aws.amazon.com/sqs/>`_ are used for handling notifications.
+*************
+Notifications
+*************
+Users can be notified about their workflow completions via email, slack, pagerduty etc. See the :ref:`Notifications <deployment-cluster-config-notifications>` page for detailed information.
 
+.. note::
+   In AWS, `SNS <https://aws.amazon.com/sns>`_ and `SQS <https://aws.amazon.com/sqs/>`_ are used for handling notifications.
 
 **************
 Authentication

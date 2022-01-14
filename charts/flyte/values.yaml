@@ -16,7 +16,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v0.6.69 # FLYTEADMIN_TAG
+      tag: v0.6.75 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteadmin deployment
@@ -73,7 +73,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v0.6.69 # FLYTESCHEDULER_TAG
+      tag: v0.6.75 # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -167,7 +167,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v0.16.4 # FLYTEPROPELLER_TAG
+      tag: v0.16.13 # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -212,7 +212,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v0.34.0 # FLYTECONSOLE_TAG
+      tag: v0.38.0 # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
@@ -235,6 +235,9 @@ flyte:
     tolerations: []
     # -- affinity for Flyteconsole deployment
     affinity: {}
+    ga:
+      enabled: true
+      tracking_id: "G-0QW4DJWJ20"
 
   #
   # WEBHOOK SETTINGS

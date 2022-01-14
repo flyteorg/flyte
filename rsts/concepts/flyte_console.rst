@@ -34,7 +34,7 @@ The UI should be accessible at http://localhost:30081/console.
 
 |
 
-The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_implement`.
+The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_build`.
 
 A pop-up window appears with input fields that the execution requires on clicking the **Launch Workflow** button.
 If the default inputs are given, they will be auto-populated.
