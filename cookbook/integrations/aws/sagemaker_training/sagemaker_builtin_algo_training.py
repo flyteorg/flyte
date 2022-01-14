@@ -72,10 +72,8 @@ alg_spec = AlgorithmSpecification(
 
 # %%
 # Finally, the Flytekit plugin called SdkBuiltinAlgorithmTrainingJobTask will be used to create a task that wraps the algorithm.
-# This task does not have a user-defined function as the actual algorithm is pre-defined in Sagemaker, but still has the same set of properties like any other FlyteTask.
-# - Caching
-# - Resource specification
-# - Versioning etc
+# This task does not have a user-defined function as the actual algorithm is pre-defined in Sagemaker, but still has the same set of properties like any other FlyteTask:
+# Caching, Resource specification, Versioning, etc.
 xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
     name="xgboost_trainer",
     task_config=SagemakerTrainingJobConfig(
@@ -92,8 +90,10 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
 # :ref:`single_task_execution` can be used to execute just the task without needing to create a workflow.
 # To trigger an execution, you will need to provide:
 #
-# Project (flyteexamples): project where the execution will be created under
-# Domain (development): domain where the execution will be created, under the project
+# Project (flyteexamples): the project under which the execution will be created
+#
+# Domain (development): the domain where the execution will be created, under the project
+#
 # Inputs: the actual inputs
 #
 # Pre-built algorithms have a restrictive set of inputs. They always expect:
@@ -142,18 +142,17 @@ xgboost_hpo_task = SagemakerHPOTask(
 # %%
 # Launch the HPO Job
 # -------------------
-# Just like Training Job, HPO job can be launched directly from the notebook. The inputs for an HPO job that wraps a
+# Just like the Training Job, the HPO job can be launched directly from the notebook. The inputs for an HPO job that wraps a
 # training job are the combination of all inputs for the training job, i.e.
 #
-# #. "train" dataset, "validation" dataset and "static hyper parameters" for Training job,
+# #. "train" dataset, "validation" dataset and "static hyper parameters" for the Training job,
 # #. HyperparameterTuningJobConfig, which consists of ParameterRanges, for the parameters that should be tuned,
-# #. tuning strategy - Bayesian OR Random (or others as described in Sagemaker),
+# #. Tuning strategy - Bayesian OR Random (or others as described in Sagemaker),
 # #. Stopping condition, and
-# #. Objective metric name and type (whether to minimize etc).
+# #. Objective metric name and type (whether to minimize, etc).
 #
-# When launching the TrainingJob and HPOJob, we need to define the inputs.
-# Inputs are those directly related to algorithm outputs. We use the inputs
-# and the version information to decide cache hit/miss
+# When launching the TrainingJob and HPOJob, we need to define the inputs, which are directly related to algorithm outputs. We use the inputs
+# and the version information to decide cache hit/miss.
 def execute():
     # TODO Local execution of hpo task is not supported. To add example of remote execution
     xgboost_hpo_task(
