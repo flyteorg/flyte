@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/flytek8s"
 	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
@@ -48,4 +49,8 @@ func getRestClientFromKubeConfig(initializationErrorCounter prometheus.Counter, 
 		return nil, err
 	}
 	return fc, nil
+}
+
+func NewExecutionTargetProvider() interfaces.ExecutionTargetProvider {
+	return &clusterExecutionTargetProvider{}
 }

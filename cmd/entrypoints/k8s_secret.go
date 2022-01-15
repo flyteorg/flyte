@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"k8s.io/client-go/rest"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	kubeErrors "k8s.io/apimachinery/pkg/api/errors"
 
@@ -15,8 +17,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
+	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -93,24 +94,28 @@ func buildK8sSecretData(_ context.Context, localPath string) (map[string][]byte,
 }
 
 func persistSecrets(ctx context.Context, _ *pflag.FlagSet) error {
-	serverCfg := config.GetConfig()
 	configuration := runtime.NewConfigurationProvider()
 	scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope)
 	initializationErrorCounter := scope.NewSubScope("secrets").MustNewCounter(
 		"flyteclient_initialization_error",
 		"count of errors encountered initializing a flyte client from kube config")
-	clusterClient, err := impl.NewInCluster(initializationErrorCounter, serverCfg.KubeConfig, serverCfg.Master)
+	listTargetsProvider, err := executioncluster.NewListTargets(initializationErrorCounter, executioncluster.NewExecutionTargetProvider(), configuration.ClusterConfiguration())
 	if err != nil {
 		return err
 	}
 
-	targets := clusterClient.GetAllValidTargets()
+	targets := listTargetsProvider.GetValidTargets()
 	// Since we are targeting the cluster Admin is running in, this list should contain exactly one item
 	if len(targets) != 1 {
 		return fmt.Errorf("expected exactly 1 valid target cluster. Found [%v]", len(targets))
 	}
+	var clusterCfg rest.Config
+	for _, target := range targets {
+		// We've just ascertained targets contains exactly 1 item, so we can safely assume we'll assign the clusterCfg
+		// from that one item now.
+		clusterCfg = target.Config
+	}
 
-	clusterCfg := targets[0].Config
 	kubeClient, err := kubernetes.NewForConfig(&clusterCfg)
 	if err != nil {
 		return errors.Wrapf("INIT", err, "Error building kubernetes clientset")

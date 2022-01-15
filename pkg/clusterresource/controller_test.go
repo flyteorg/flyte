@@ -7,22 +7,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	clientMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
-
-	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
+
+const proj = "project-foo"
+const domain = "domain-bar"
 
 var testScope = mockScope.NewTestScope()
 
@@ -153,37 +152,34 @@ func TestPopulateDefaultTemplateValues(t *testing.T) {
 }
 
 func TestGetCustomTemplateValues(t *testing.T) {
-	mockRepository := repositoryMocks.NewMockRepository()
-	projectDomainAttributes := admin.ProjectDomainAttributes{
-		Project: "project-foo",
-		Domain:  "domain-bar",
-		MatchingAttributes: &admin.MatchingAttributes{
-			Target: &admin.MatchingAttributes_ClusterResourceAttributes{ClusterResourceAttributes: &admin.ClusterResourceAttributes{
-				Attributes: map[string]string{
-					"var1": "val1",
-					"var2": "val2",
+	adminClient := clientMocks.AdminServiceClient{}
+	adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
+		return req.Project == proj && req.Domain == domain
+	})).Return(&admin.ProjectDomainAttributesGetResponse{
+		Attributes: &admin.ProjectDomainAttributes{
+			Project: proj,
+			Domain:  domain,
+			MatchingAttributes: &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ClusterResourceAttributes{
+					ClusterResourceAttributes: &admin.ClusterResourceAttributes{
+						Attributes: map[string]string{
+							"var1": "val1",
+							"var2": "val2",
+						},
+					},
 				},
 			},
-			},
 		},
-	}
-	resourceModel, err := transformers.ProjectDomainAttributesToResourceModel(projectDomainAttributes, admin.MatchableResource_CLUSTER_RESOURCE)
-	assert.Nil(t, err)
-	mockRepository.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
-		assert.Equal(t, "project-foo", ID.Project)
-		assert.Equal(t, "domain-bar", ID.Domain)
-		return resourceModel, nil
-	}
+	}, nil)
+
 	testController := controller{
-		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
+		adminClient: &adminClient,
 	}
 	domainTemplateValues := templateValuesType{
 		"{{ var1 }}": "i'm getting overwritten",
 		"{{ var3 }}": "persist",
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), "project-foo",
-		"domain-bar", domainTemplateValues)
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), proj, domain, domainTemplateValues)
 	assert.Nil(t, err)
 	assert.EqualValues(t, templateValuesType{
 		"{{ var1 }}": "val1",
@@ -195,12 +191,14 @@ func TestGetCustomTemplateValues(t *testing.T) {
 }
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
-	mockRepository := repositoryMocks.NewMockRepository()
+	adminClient := clientMocks.AdminServiceClient{}
+	adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
+		return req.Project == proj && req.Domain == domain
+	})).Return(&admin.ProjectDomainAttributesGetResponse{}, nil)
 	testController := controller{
-		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
+		adminClient: &adminClient,
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), proj, domain, templateValuesType{
 		"{{ var1 }}": "val1",
 		"{{ var2 }}": "val2",
 	})
@@ -212,31 +210,12 @@ func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 		"missing project-domain combinations in the db should result in the config defaults being applied")
 }
 
-func TestGetCustomTemplateValues_InvalidDBModel(t *testing.T) {
-	mockRepository := repositoryMocks.NewMockRepository()
-	mockRepository.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
-		return models.Resource{
-			Attributes: []byte("i'm invalid"),
-		}, nil
-	}
-	testController := controller{
-		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
-	}
-	_, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
-		"{{ var1 }}": "val1",
-		"{{ var2 }}": "val2",
-	})
-	assert.NotNil(t, err,
-		"invalid project-domain combinations in the db should result in the config defaults being applied")
-}
-
 func Test_controller_createResourceFromTemplate(t *testing.T) {
 	type args struct {
 		ctx                  context.Context
 		templateDir          string
 		templateFileName     string
-		project              models.Project
+		project              *admin.Project
 		domain               runtimeInterfaces.Domain
 		namespace            NamespaceName
 		templateValues       templateValuesType
@@ -254,9 +233,9 @@ func Test_controller_createResourceFromTemplate(t *testing.T) {
 				ctx:              context.Background(),
 				templateDir:      "testdata",
 				templateFileName: "namespace.yaml",
-				project: models.Project{
-					Name:       "my-project",
-					Identifier: "my-project",
+				project: &admin.Project{
+					Name: "my-project",
+					Id:   "my-project",
 				},
 				domain: runtimeInterfaces.Domain{
 					ID:   "dev",
@@ -282,9 +261,9 @@ spec:
 				ctx:              context.Background(),
 				templateDir:      "testdata",
 				templateFileName: "docker.yaml",
-				project: models.Project{
-					Name:       "my-project",
-					Identifier: "my-project",
+				project: &admin.Project{
+					Name: "my-project",
+					Id:   "my-project",
 				},
 				domain: runtimeInterfaces.Domain{
 					ID:   "dev",
@@ -314,9 +293,9 @@ type: kubernetes.io/dockerconfigjson
 				ctx:              context.Background(),
 				templateDir:      "testdata",
 				templateFileName: "imagepullsecrets.yaml",
-				project: models.Project{
-					Name:       "my-project",
-					Identifier: "my-project",
+				project: &admin.Project{
+					Name: "my-project",
+					Id:   "my-project",
 				},
 				domain: runtimeInterfaces.Domain{
 					ID:   "dev",
@@ -342,9 +321,9 @@ imagePullSecrets:
 				ctx:              context.Background(),
 				templateDir:      "testdata",
 				templateFileName: "gsa.yaml",
-				project: models.Project{
-					Name:       "my-project",
-					Identifier: "my-project",
+				project: &admin.Project{
+					Name: "my-project",
+					Id:   "my-project",
 				},
 				domain: runtimeInterfaces.Domain{
 					ID:   "dev",
@@ -365,10 +344,11 @@ metadata:
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepository := repositoryMocks.NewMockRepository()
-			mockCluster := &mocks.MockCluster{}
+			adminClient := clientMocks.AdminServiceClient{}
+			adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(&admin.ProjectDomainAttributesGetResponse{}, nil)
 			mockPromScope := mockScope.NewTestScope()
-			c := NewClusterResourceController(mockRepository, mockCluster, mockPromScope)
+
+			c := NewClusterResourceController(&adminClient, &mocks.ListTargetsInterface{}, mockPromScope)
 			testController := c.(*controller)
 
 			gotK8sManifest, err := testController.createResourceFromTemplate(tt.args.ctx, tt.args.templateDir, tt.args.templateFileName, tt.args.project, tt.args.domain, tt.args.namespace, tt.args.templateValues, tt.args.customTemplateValues)

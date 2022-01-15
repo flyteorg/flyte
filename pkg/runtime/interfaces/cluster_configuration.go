@@ -46,6 +46,8 @@ type Clusters struct {
 	LabelClusterMap map[string][]ClusterEntity `json:"labelClusterMap"`
 }
 
+//go:generate mockery -name ClusterConfiguration -case=underscore -output=../mocks -case=underscore
+
 // Provides values set in runtime configuration files.
 // These files can be changed without requiring a full server restart.
 type ClusterConfiguration interface {
