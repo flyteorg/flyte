@@ -7,10 +7,11 @@ import (
 )
 
 type GetTargetFunc func(context.Context, *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error)
-type GetAllValidTargetsFunc func() []executioncluster.ExecutionTarget
+type GetAllValidTargetsFunc func() map[string]*executioncluster.ExecutionTarget
 
 type MockCluster struct {
 	getTargetFunc          GetTargetFunc
+	getAllTargetsFunc      GetAllValidTargetsFunc
 	getAllValidTargetsFunc GetAllValidTargetsFunc
 }
 
@@ -22,6 +23,10 @@ func (m *MockCluster) SetGetAllValidTargetsCallback(getAllValidTargetsFunc GetAl
 	m.getAllValidTargetsFunc = getAllValidTargetsFunc
 }
 
+func (m *MockCluster) SetGetAllTargetsCallback(getAllTargetsFunc GetAllValidTargetsFunc) {
+	m.getAllTargetsFunc = getAllTargetsFunc
+}
+
 func (m *MockCluster) GetTarget(ctx context.Context, execCluster *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
 	if m.getTargetFunc != nil {
 		return m.getTargetFunc(ctx, execCluster)
@@ -29,9 +34,16 @@ func (m *MockCluster) GetTarget(ctx context.Context, execCluster *executionclust
 	return nil, nil
 }
 
-func (m *MockCluster) GetAllValidTargets() []executioncluster.ExecutionTarget {
+func (m *MockCluster) GetValidTargets() map[string]*executioncluster.ExecutionTarget {
 	if m.getAllValidTargetsFunc != nil {
 		return m.getAllValidTargetsFunc()
+	}
+	return nil
+}
+
+func (m *MockCluster) GetAllTargets() map[string]*executioncluster.ExecutionTarget {
+	if m.getAllTargetsFunc != nil {
+		return m.getAllTargetsFunc()
 	}
 	return nil
 }

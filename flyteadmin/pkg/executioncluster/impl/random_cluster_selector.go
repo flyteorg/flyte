@@ -6,8 +6,6 @@ import (
 	"hash/fnv"
 	"math/rand"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -29,9 +27,9 @@ import (
 // Implementation of Random cluster selector
 // Selects cluster based on weights and domains.
 type RandomClusterSelector struct {
+	interfaces.ListTargetsInterface
 	equalWeightedAllClusters random.WeightedRandomList
 	labelWeightedRandomMap   map[string]random.WeightedRandomList
-	executionTargetMap       map[string]executioncluster.ExecutionTarget
 	resourceManager          managerInterfaces.ResourceInterface
 }
 
@@ -45,19 +43,9 @@ func getRandSource(seed string) (rand.Source, error) {
 	return rand.NewSource(hashedSeed), nil
 }
 
-func getExecutionTargets(ctx context.Context, initializationErrorCounter prometheus.Counter, executionTargetProvider interfaces.ExecutionTargetProvider,
-	clusterConfig runtime.ClusterConfiguration) (random.WeightedRandomList, map[string]executioncluster.ExecutionTarget, error) {
-	executionTargetMap := make(map[string]executioncluster.ExecutionTarget)
+func convertToRandomWeightedList(ctx context.Context, targets map[string]*executioncluster.ExecutionTarget) (random.WeightedRandomList, error) {
 	entries := make([]random.Entry, 0)
-	for _, cluster := range clusterConfig.GetClusterConfigs() {
-		if _, ok := executionTargetMap[cluster.Name]; ok {
-			return nil, nil, fmt.Errorf("duplicate clusters for name %s", cluster.Name)
-		}
-		executionTarget, err := executionTargetProvider.GetExecutionTarget(initializationErrorCounter, cluster)
-		if err != nil {
-			return nil, nil, err
-		}
-		executionTargetMap[cluster.Name] = *executionTarget
+	for _, executionTarget := range targets {
 		if executionTarget.Enabled {
 			targetEntry := random.Entry{
 				Item: *executionTarget,
@@ -67,24 +55,24 @@ func getExecutionTargets(ctx context.Context, initializationErrorCounter prometh
 	}
 	weightedRandomList, err := random.NewWeightedRandom(ctx, entries)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return weightedRandomList, executionTargetMap, nil
+	return weightedRandomList, nil
 }
 
 func getLabeledWeightedRandomForCluster(ctx context.Context,
-	clusterConfig runtime.ClusterConfiguration, executionTargetMap map[string]executioncluster.ExecutionTarget) (map[string]random.WeightedRandomList, error) {
+	clusterConfig runtime.ClusterConfiguration, executionTargetMap map[string]*executioncluster.ExecutionTarget) (map[string]random.WeightedRandomList, error) {
 	labeledWeightedRandomMap := make(map[string]random.WeightedRandomList)
 	for label, clusterEntities := range clusterConfig.GetLabelClusterMap() {
 		entries := make([]random.Entry, 0)
 		for _, clusterEntity := range clusterEntities {
-			cluster := executionTargetMap[clusterEntity.ID]
-			// If cluster is not enabled, it is not eligible for selection
-			if !cluster.Enabled {
+			cluster, found := executionTargetMap[clusterEntity.ID]
+			// If cluster is not found, it was never enabled. Non-enabled clusters are not eligible for selection
+			if !(found && cluster.Enabled) {
 				continue
 			}
 			targetEntry := random.Entry{
-				Item:   cluster,
+				Item:   *cluster,
 				Weight: clusterEntity.Weight,
 			}
 			entries = append(entries, targetEntry)
@@ -100,23 +88,13 @@ func getLabeledWeightedRandomForCluster(ctx context.Context,
 	return labeledWeightedRandomMap, nil
 }
 
-func (s RandomClusterSelector) GetAllValidTargets() []executioncluster.ExecutionTarget {
-	v := make([]executioncluster.ExecutionTarget, 0)
-	for _, value := range s.executionTargetMap {
-		if value.Enabled {
-			v = append(v, value)
-		}
-	}
-	return v
-}
-
 func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
 	if spec == nil {
 		return nil, fmt.Errorf("empty executionTargetSpec")
 	}
 	if spec.TargetID != "" {
-		if val, ok := s.executionTargetMap[spec.TargetID]; ok {
-			return &val, nil
+		if val, ok := s.GetAllTargets()[spec.TargetID]; ok {
+			return val, nil
 		}
 		return nil, fmt.Errorf("invalid cluster target %s", spec.TargetID)
 	}
@@ -167,19 +145,20 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 	return &execTarget, nil
 }
 
-func NewRandomClusterSelector(initializationErrorCounter prometheus.Counter, config runtime.Configuration, executionTargetProvider interfaces.ExecutionTargetProvider, db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
-	equalWeightedAllClusters, executionTargetMap, err := getExecutionTargets(context.Background(), initializationErrorCounter, executionTargetProvider, config.ClusterConfiguration())
+func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, config runtime.Configuration,
+	db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
+	equalWeightedAllClusters, err := convertToRandomWeightedList(context.Background(), listTargets.GetValidTargets())
 	if err != nil {
 		return nil, err
 	}
-	labelWeightedRandomMap, err := getLabeledWeightedRandomForCluster(context.Background(), config.ClusterConfiguration(), executionTargetMap)
+	labelWeightedRandomMap, err := getLabeledWeightedRandomForCluster(context.Background(), config.ClusterConfiguration(), listTargets.GetValidTargets())
 	if err != nil {
 		return nil, err
 	}
 	return &RandomClusterSelector{
 		labelWeightedRandomMap:   labelWeightedRandomMap,
-		executionTargetMap:       executionTargetMap,
 		resourceManager:          resources.NewResourceManager(db, config.ApplicationConfiguration()),
 		equalWeightedAllClusters: equalWeightedAllClusters,
+		ListTargetsInterface:     listTargets,
 	}, nil
 }

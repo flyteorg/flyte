@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	repo_interface "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repo_mock "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
@@ -28,6 +26,12 @@ import (
 const testProject = "project"
 const testDomain = "domain"
 const testWorkflow = "name"
+
+const (
+	testCluster1 = "testcluster1"
+	testCluster2 = "testcluster2"
+	testCluster3 = "testcluster3"
+)
 
 func initTestConfig(fileName string) error {
 	pwd, err := os.Getwd()
@@ -84,21 +88,46 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 		return response, nil
 	}
 	configProvider := runtime.NewConfigurationProvider()
-	var initializationErrorCounter prometheus.Counter
-	randomCluster, err := NewRandomClusterSelector(initializationErrorCounter, configProvider, &mocks.MockExecutionTargetProvider{}, db)
+	listTargetsProvider := mocks.ListTargetsInterface{}
+	validTargets := map[string]*executioncluster.ExecutionTarget{
+		testCluster2: {
+			ID:      testCluster2,
+			Enabled: true,
+		},
+		testCluster3: {
+			ID:      testCluster3,
+			Enabled: true,
+		},
+	}
+	targets := map[string]*executioncluster.ExecutionTarget{
+		testCluster1: {
+			ID: testCluster1,
+		},
+		testCluster2: {
+			ID:      testCluster2,
+			Enabled: true,
+		},
+		testCluster3: {
+			ID:      testCluster3,
+			Enabled: true,
+		},
+	}
+	listTargetsProvider.OnGetValidTargets().Return(validTargets)
+	listTargetsProvider.OnGetAllTargets().Return(targets)
+	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
 	assert.NoError(t, err)
 	return randomCluster
 }
 
 func TestRandomClusterSelectorGetTarget(t *testing.T) {
 	cluster := getRandomClusterSelectorForTest(t)
-	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: "testcluster"})
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: testCluster1})
 	assert.Nil(t, err)
-	assert.Equal(t, "testcluster", target.ID)
+	assert.Equal(t, testCluster1, target.ID)
 	assert.False(t, target.Enabled)
-	target, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: "testcluster2"})
+	target, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: testCluster2})
 	assert.Nil(t, err)
-	assert.Equal(t, "testcluster2", target.ID)
+	assert.Equal(t, testCluster2, target.ID)
 	assert.True(t, target.Enabled)
 }
 
@@ -110,7 +139,7 @@ func TestRandomClusterSelectorGetTargetForDomain(t *testing.T) {
 		ExecutionID: "e",
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, "testcluster2", target.ID)
+	assert.Equal(t, testCluster2, target.ID)
 	assert.True(t, target.Enabled)
 }
 
@@ -123,7 +152,7 @@ func TestRandomClusterSelectorGetTargetForExecution(t *testing.T) {
 		ExecutionID: "e1",
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, "testcluster3", target.ID)
+	assert.Equal(t, testCluster3, target.ID)
 	assert.True(t, target.Enabled)
 }
 
@@ -136,7 +165,7 @@ func TestRandomClusterSelectorGetTargetForDomainAndExecution2(t *testing.T) {
 		ExecutionID: "e22",
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, "testcluster2", target.ID)
+	assert.Equal(t, testCluster2, target.ID)
 	assert.True(t, target.Enabled)
 }
 
@@ -146,7 +175,7 @@ func TestRandomClusterSelectorGetRandomTarget(t *testing.T) {
 		Project: "",
 	})
 	assert.Nil(t, err)
-	assert.True(t, target.ID == "testcluster1" || target.ID == "testcluster2" || target.ID == "testcluster3")
+	assert.True(t, target.ID == testCluster1 || target.ID == testCluster2 || target.ID == testCluster3)
 	assert.True(t, target.Enabled)
 }
 
@@ -166,6 +195,6 @@ func TestRandomClusterSelectorGetRemoteTarget(t *testing.T) {
 
 func TestRandomClusterSelectorGetAllValidTargets(t *testing.T) {
 	cluster := getRandomClusterSelectorForTest(t)
-	targets := cluster.GetAllValidTargets()
+	targets := cluster.GetValidTargets()
 	assert.Equal(t, 2, len(targets))
 }
