@@ -291,46 +291,6 @@ func TestGetExecutionError(t *testing.T) {
 	assert.Nil(t, actualResponse)
 }
 
-func TestUpdateExecution(t *testing.T) {
-	response := &admin.ExecutionUpdateResponse{}
-	mockExecutionManager := mocks.MockExecutionManager{}
-	mockExecutionManager.SetUpdateExecutionCallback(
-		func(ctx context.Context,
-			request admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
-			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.Id))
-			return response, nil
-		},
-	)
-	mockServer := NewMockAdminServer(NewMockAdminServerInput{
-		executionManager: &mockExecutionManager,
-	})
-
-	actualResponse, err := mockServer.UpdateExecution(context.Background(), &admin.ExecutionUpdateRequest{
-		Id: &workflowExecutionIdentifier,
-	})
-	assert.NoError(t, err)
-	assert.True(t, proto.Equal(response, actualResponse))
-}
-
-func TestUpdateExecutionError(t *testing.T) {
-	mockExecutionManager := mocks.MockExecutionManager{}
-	mockExecutionManager.SetUpdateExecutionCallback(
-		func(ctx context.Context,
-			request admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
-			return nil, errors.New("expected error")
-		},
-	)
-	mockServer := NewMockAdminServer(NewMockAdminServerInput{
-		executionManager: &mockExecutionManager,
-	})
-
-	actualResponse, err := mockServer.UpdateExecution(context.Background(), &admin.ExecutionUpdateRequest{
-		Id: &workflowExecutionIdentifier,
-	})
-	assert.EqualError(t, err, "expected error")
-	assert.Nil(t, actualResponse)
-}
-
 func TestListExecutions(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetListCallback(func(ctx context.Context, request admin.ResourceListRequest) (

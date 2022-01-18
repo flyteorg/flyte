@@ -1267,32 +1267,6 @@ func (m *ExecutionManager) GetExecution(
 	return execution, nil
 }
 
-func (m *ExecutionManager) UpdateExecution(
-	ctx context.Context, request admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
-	if err := validation.ValidateWorkflowExecutionIdentifier(request.Id); err != nil {
-		logger.Debugf(ctx, "UpdateExecution request [%+v] failed validation with err: %v", request, err)
-		return nil, err
-	}
-	ctx = getExecutionContext(ctx, request.Id)
-	executionModel, err := util.GetExecutionModel(ctx, m.db, *request.Id)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
-		return nil, err
-	}
-
-	stateInt := int32(admin.ExecutionStatus_EXECUTION_ACTIVE)
-	if request.Status != nil {
-		stateInt = int32(request.Status.State)
-	}
-	executionModel.State = &stateInt
-
-	if err := m.db.ExecutionRepo().Update(ctx, *executionModel); err != nil {
-		return nil, err
-	}
-
-	return &admin.ExecutionUpdateResponse{}, nil
-}
-
 func (m *ExecutionManager) GetExecutionData(
 	ctx context.Context, request admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
 	ctx = getExecutionContext(ctx, request.Id)
@@ -1382,11 +1356,6 @@ func (m *ExecutionManager) ListExecutions(
 	joinTableEntities := make(map[common.Entity]bool)
 	for _, filter := range filters {
 		joinTableEntities[filter.GetEntity()] = true
-	}
-
-	// Check if state filter exists and if not then add filter to fetch only ACTIVE executions
-	if filters, err = addStateFilter(filters); err != nil {
-		return nil, err
 	}
 
 	listExecutionsInput := repositoryInterfaces.ListResourceInput{
@@ -1617,23 +1586,4 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 		}
 	}
 	return initialLabels, nil
-}
-
-func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error) {
-	var stateFilterExists bool
-	for _, inlineFilter := range filters {
-		if inlineFilter.GetField() == shared.State {
-			stateFilterExists = true
-		}
-	}
-
-	if !stateFilterExists {
-		stateFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, shared.State,
-			admin.ExecutionStatus_EXECUTION_ACTIVE)
-		if err != nil {
-			return filters, err
-		}
-		filters = append(filters, stateFilter)
-	}
-	return filters, nil
 }
