@@ -26,7 +26,7 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
         makeWorkflowQuery(useQueryClient(), workflowId)
     );
     const nodeExecutionsById = React.useMemo(
-        () => keyBy(nodeExecutions, 'scopedId'),
+        () => keyBy(nodeExecutions, 'id.nodeId'),
         [nodeExecutions]
     );
 
@@ -34,10 +34,6 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
     const onNodeSelectionChanged = (newSelection: string[]) => {
         const validSelection = newSelection.filter(nodeId => {
             if (nodeId === startNodeId || nodeId === endNodeId) {
-                return false;
-            }
-            const execution = nodeExecutionsById[nodeId];
-            if (!execution) {
                 return false;
             }
             return true;
@@ -48,7 +44,14 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
     // Note: flytegraph allows multiple selection, but we only support showing
     // a single item in the details panel
     const selectedExecution = selectedNodes.length
-        ? nodeExecutionsById[selectedNodes[0]].id
+        ? nodeExecutionsById[selectedNodes[0]]
+            ? nodeExecutionsById[selectedNodes[0]].id
+            : {
+                  nodeId: selectedNodes[0],
+                  executionId:
+                      nodeExecutionsById[Object.keys(nodeExecutionsById)[0]].id
+                          .executionId
+              }
         : null;
 
     const onCloseDetailsPanel = () => setSelectedNodes([]);

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from 'react-query';
 import { makeWorkflowQuery } from './workflowQueries';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { DataError } from 'components/Errors/DataError';
-import { transformerWorkflowToDAG } from 'components/WorkflowGraph/transformerWorkflowToDAG';
+import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWorkflowToDag';
 import { ReactFlowWrapper } from 'components/flytegraph/ReactFlow/ReactFlowWrapper';
 import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformerDAGToReactFlow';
 import { dNode } from 'models/Graph/types';
@@ -19,7 +19,7 @@ export const renderStaticGraph = props => {
     const workflow = props.closure.compiledWorkflow;
     const version = props.id.version;
 
-    const dag: dNode = transformerWorkflowToDAG(workflow);
+    const dag: dNode = transformerWorkflowToDag(workflow);
     const rfGraphJson = ConvertFlyteDagToReactFlows({
         root: dag,
         maxRenderDepth: 0,

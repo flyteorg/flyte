@@ -7,7 +7,7 @@ import { Legend } from './NodeStatusLegend';
 
 /**
  * Renders workflow graph using React Flow.
- * @param props.data    DAG from transformerWorkflowToDAG
+ * @param props.data    DAG from transformerWorkflowToDag
  * @returns ReactFlow Graph as <ReactFlowWrapper>
  */
 const ReactFlowGraphComponent = props => {

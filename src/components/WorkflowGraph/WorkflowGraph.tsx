@@ -1,4 +1,4 @@
-import { transformerWorkflowToDAG } from './transformerWorkflowToDAG';
+import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 import { dNode } from 'models/Graph/types';
 import { Workflow } from 'models/Workflow/types';
 import * as React from 'react';
@@ -31,7 +31,7 @@ function workflowToDag(workflow: Workflow): PrepareDAGResult {
             throw new Error('Workflow closure missing a compiled workflow');
         }
         const { compiledWorkflow } = workflow.closure;
-        const dag: dNode = transformerWorkflowToDAG(compiledWorkflow);
+        const dag: dNode = transformerWorkflowToDag(compiledWorkflow);
         return { dag };
     } catch (e) {
         return {

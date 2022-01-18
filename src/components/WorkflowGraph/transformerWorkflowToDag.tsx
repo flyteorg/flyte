@@ -25,7 +25,7 @@ import {
  * @param context input can be either CompiledWorkflow or CompiledNode
  * @returns Display name
  */
-export const transformerWorkflowToDAG = (
+export const transformerWorkflowToDag = (
     workflow: CompiledWorkflowClosure
 ): dNode => {
     const { primary } = workflow;
@@ -255,7 +255,7 @@ export const buildOutWorkflowEdges = (
     const list = context.downstream[ingress].ids;
     for (let i = 0; i < list.length; i++) {
         const edge: dEdge = {
-            sourceId: nodeMap[ingress].dNode.scopedId,
+            sourceId: nodeMap[ingress] && nodeMap[ingress].dNode.scopedId,
             targetId: nodeMap[list[i]].dNode.scopedId
         };
         root.edges.push(edge);

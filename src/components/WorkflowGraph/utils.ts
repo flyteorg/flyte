@@ -1,10 +1,10 @@
 import { Identifier } from 'models/Common/types';
 import { endNodeId, startNodeId } from 'models/Node/constants';
-import { CompiledWorkflow } from 'models/Workflow/types';
+import { CompiledWorkflow, Workflow } from 'models/Workflow/types';
 import { CompiledNode, TaskNode } from 'models/Node/types';
 import { CompiledTask, TaskTemplate } from 'models/Task/types';
-import { dTypes } from 'models/Graph/types';
-
+import { dTypes, dNode } from 'models/Graph/types';
+import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 /**
  * @TODO these are dupes for testing, remove once tests fixed
  */
@@ -115,4 +115,29 @@ export const getTaskTypeFromCompiledNode = (
         }
     }
     return null;
+};
+
+export const getNodeNameFromDag = (dagData: dNode, nodeId: string) => {
+    const id = nodeId.slice(nodeId.lastIndexOf('-') + 1);
+    const value = dagData[id].value;
+
+    if (value.taskNode) {
+        return value.taskNode.referenceId.name;
+    } else if (value.workflowNode) {
+        return value.workflowNode.subWorkflowRef.name;
+    }
+    return '';
+};
+
+export const transformWorkflowToKeyedDag = (workflow: Workflow) => {
+    if (!workflow.closure?.compiledWorkflow) return {};
+
+    const dagData = transformerWorkflowToDag(
+        workflow.closure?.compiledWorkflow
+    );
+    const data = {};
+    dagData.nodes.forEach(node => {
+        data[`${node.id}`] = node;
+    });
+    return data;
 };
