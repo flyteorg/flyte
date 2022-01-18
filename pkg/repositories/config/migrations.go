@@ -1,10 +1,20 @@
 package config
 
 import (
+	"database/sql"
+	"fmt"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	schedulerModels "github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	gormigrate "github.com/go-gormigrate/gormigrate/v2"
+	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
+)
+
+// TODO: add a way to get these list of tables directly from the gorm loaded models
+var (
+	tables = []string{"execution_events", "executions", "launch_plans", "named_entity_metadata",
+		"node_execution_events", "node_executions", "projects", "resources", "schedulable_entities",
+		"schedule_entities_snapshots", "task_executions", "tasks", "workflows"}
 )
 
 var Migrations = []*gormigrate.Migration{
@@ -330,7 +340,27 @@ var Migrations = []*gormigrate.Migration{
 		},
 	},
 
-	// Add state to execution model
+	// For any new table, Please use the following pattern due to a bug
+	// in the postgres gorm layer https://github.com/go-gorm/postgres/issues/65
+	{
+		ID: "2022-01-11-id-to-bigint",
+		Migrate: func(tx *gorm.DB) error {
+			db, err := tx.DB()
+			if err != nil {
+				return err
+			}
+			return alterTableColumnType(db, "id", "bigint")
+		},
+		Rollback: func(tx *gorm.DB) error {
+			db, err := tx.DB()
+			if err != nil {
+				return err
+			}
+			return alterTableColumnType(db, "id", "int")
+		},
+	},
+
+	// Add state to execution model.
 	{
 		ID: "2022-01-11-execution-state",
 		Migrate: func(tx *gorm.DB) error {
@@ -340,4 +370,16 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Table("execution").Migrator().DropColumn(&models.Execution{}, "state")
 		},
 	},
+}
+
+func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
+
+	var err error
+	for _, table := range tables {
+		if _, err = db.Exec(fmt.Sprintf(`ALTER TABLE IF EXISTS %s ALTER COLUMN "%s" TYPE %s`, table, columnName,
+			columnType)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
