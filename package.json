@@ -41,8 +41,8 @@
     ]
   },
   "dependencies": {
-    "@rjsf/core": "^3.0.0",
-    "@rjsf/material-ui": "^3.0.0",
+    "@rjsf/core": "^3.2.1",
+    "@rjsf/material-ui": "^3.2.1",
     "babel-polyfill": "^6.26.0",
     "cache": "^2.1.0",
     "chalk": "^2.0.1",
