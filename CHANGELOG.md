@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.40.0](http://github.com/lyft/flyteconsole/compare/v0.39.1...v0.40.0) (2022-01-18)
+
+
+### Features
+
+* show details panel for failed node ([#254](http://github.com/lyft/flyteconsole/issues/254)) ([e276493](http://github.com/lyft/flyteconsole/commit/e276493e956958a8e5858785ad5f5a4d31d5eb76))
+
 ## [0.39.1](http://github.com/lyft/flyteconsole/compare/v0.39.0...v0.39.1) (2022-01-14)
 
 
