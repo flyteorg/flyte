@@ -2571,46 +2571,6 @@ Define a set of simple types.
 
 
 
-.. _ref_flyteidl/core/workflow_closure.proto:
-
-flyteidl/core/workflow_closure.proto
-==================================================================
-
-
-
-
-
-.. _ref_flyteidl.core.WorkflowClosure:
-
-WorkflowClosure
-------------------------------------------------------------------
-
-Defines an enclosed package of workflow and tasks it references.
-
-
-
-.. csv-table:: WorkflowClosure type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
-   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
-
-
-
-
-
- 
-
- 
-
- 
-
- 
-
-
-
-
 .. _ref_flyteidl/core/workflow.proto:
 
 flyteidl/core/workflow.proto
@@ -2921,6 +2881,46 @@ Failure Handling Strategy
 
    "FAIL_IMMEDIATELY", "0", "FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It&#39;ll automatically abort all currently running nodes and clean up resources before finally marking the workflow executions as failed."
    "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE", "1", "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will not alter the dependencies of the execution graph so any node that depend on the failed node will not be run. Other nodes that will be executed to completion before cleaning up resources and marking the workflow execution as failed."
+
+ 
+
+ 
+
+ 
+
+
+
+
+.. _ref_flyteidl/core/workflow_closure.proto:
+
+flyteidl/core/workflow_closure.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.core.WorkflowClosure:
+
+WorkflowClosure
+------------------------------------------------------------------
+
+Defines an enclosed package of workflow and tasks it references.
+
+
+
+.. csv-table:: WorkflowClosure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflow", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "required. Workflow template."
+   "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "optional. A collection of tasks referenced by the workflow. Only needed if the workflow references tasks."
+
+
+
+
+
+ 
 
  
 

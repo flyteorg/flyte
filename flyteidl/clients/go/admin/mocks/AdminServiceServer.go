@@ -1696,6 +1696,47 @@ func (_m *AdminServiceServer) TerminateExecution(_a0 context.Context, _a1 *admin
 	return r0, r1
 }
 
+type AdminServiceServer_UpdateExecution struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateExecution) Return(_a0 *admin.ExecutionUpdateResponse, _a1 error) *AdminServiceServer_UpdateExecution {
+	return &AdminServiceServer_UpdateExecution{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateExecution(_a0 context.Context, _a1 *admin.ExecutionUpdateRequest) *AdminServiceServer_UpdateExecution {
+	c := _m.On("UpdateExecution", _a0, _a1)
+	return &AdminServiceServer_UpdateExecution{Call: c}
+}
+
+func (_m *AdminServiceServer) OnUpdateExecutionMatch(matchers ...interface{}) *AdminServiceServer_UpdateExecution {
+	c := _m.On("UpdateExecution", matchers...)
+	return &AdminServiceServer_UpdateExecution{Call: c}
+}
+
+// UpdateExecution provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateExecution(_a0 context.Context, _a1 *admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ExecutionUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionUpdateRequest) *admin.ExecutionUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionUpdateRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_UpdateLaunchPlan struct {
 	*mock.Call
 }

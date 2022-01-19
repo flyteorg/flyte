@@ -783,6 +783,53 @@
         "tags": [
           "AdminService"
         ]
+      },
+      "put": {
+        "summary": "Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.",
+        "description": "Update execution belonging to project domain.",
+        "operationId": "UpdateExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
       }
     },
     "/api/v1/launch_plan_ids/{project}/{domain}": {
@@ -3313,6 +3360,10 @@
         "workflow_id": {
           "$ref": "#/definitions/coreIdentifier",
           "description": "Identifies the workflow definition for this execution."
+        },
+        "state_change_details": {
+          "$ref": "#/definitions/adminExecutionStateChangeDetails",
+          "title": "Provides the details of the last stage change"
         }
       },
       "title": "Encapsulates the results of the Execution"
@@ -3508,6 +3559,33 @@
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
     },
+    "adminExecutionState": {
+      "type": "string",
+      "enum": [
+        "EXECUTION_ACTIVE",
+        "EXECUTION_ARCHIVED"
+      ],
+      "default": "EXECUTION_ACTIVE",
+      "description": "The state of the execution is used to control its visibility in the UI/CLI.\n\n - EXECUTION_ACTIVE: By default, all executions are considered active.\n - EXECUTION_ARCHIVED: Archived executions are no longer visible in the UI."
+    },
+    "adminExecutionStateChangeDetails": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/adminExecutionState",
+          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This timestamp represents when the state changed."
+        },
+        "principal": {
+          "type": "string",
+          "title": "Identifies the entity (if any) responsible for causing the state change of the execution"
+        }
+      }
+    },
     "adminExecutionTerminateRequest": {
       "type": "object",
       "properties": {
@@ -3523,6 +3601,22 @@
       "description": "Request to terminate an in-progress execution.  This action is irreversible.\nIf an execution is already terminated, this request will simply be a no-op.\nThis request will fail if it references a non-existent execution.\nIf the request succeeds the phase \"ABORTED\" will be recorded for the termination\nwith the optional cause added to the output_result."
     },
     "adminExecutionTerminateResponse": {
+      "type": "object"
+    },
+    "adminExecutionUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "title": "Identifier of the execution to update"
+        },
+        "state": {
+          "$ref": "#/definitions/adminExecutionState",
+          "title": "State to set as the new value active/archive"
+        }
+      }
+    },
+    "adminExecutionUpdateResponse": {
       "type": "object"
     },
     "adminFixedRate": {
