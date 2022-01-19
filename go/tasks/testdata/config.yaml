@@ -56,6 +56,7 @@ plugins:
       fsGroup: 2000
     default-security-context:
       allowPrivilegeEscalation: false
+    enable-host-networking-pod: true
   # Spark Plugin configuration
   spark:
     spark-config-default:
