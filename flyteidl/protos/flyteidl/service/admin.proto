@@ -277,6 +277,17 @@ service AdminService {
     };
   }
 
+  // Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.
+  rpc UpdateExecution (flyteidl.admin.ExecutionUpdateRequest) returns (flyteidl.admin.ExecutionUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update execution belonging to project domain."
+    };
+  }
+
   // Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
   rpc GetExecutionData (flyteidl.admin.WorkflowExecutionGetDataRequest) returns (flyteidl.admin.WorkflowExecutionGetDataResponse) {
     option (google.api.http) = {

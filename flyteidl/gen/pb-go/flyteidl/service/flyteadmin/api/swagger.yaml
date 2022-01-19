@@ -637,6 +637,43 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecution"
+    put:
+      tags:
+      - "AdminService"
+      summary: "Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`."
+      description: "Update execution belonging to project domain."
+      operationId: "UpdateExecution"
+      parameters:
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User or system provided value for the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminExecutionUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminExecutionUpdateResponse"
     delete:
       tags:
       - "AdminService"
@@ -2983,6 +3020,10 @@ definitions:
           project: "project"
           version: "version"
         created_at: "2000-01-23T04:56:07.000+00:00"
+        state_change_details:
+          occurred_at: "2000-01-23T04:56:07.000+00:00"
+          principal: "principal"
+          state: {}
         error:
           code: "code"
           kind: {}
@@ -3201,6 +3242,9 @@ definitions:
       workflow_id:
         description: "Identifies the workflow definition for this execution."
         $ref: "#/definitions/coreIdentifier"
+      state_change_details:
+        title: "Provides the details of the last stage change"
+        $ref: "#/definitions/adminExecutionStateChangeDetails"
     title: "Encapsulates the results of the Execution"
     example:
       outputs:
@@ -3215,6 +3259,10 @@ definitions:
         project: "project"
         version: "version"
       created_at: "2000-01-23T04:56:07.000+00:00"
+      state_change_details:
+        occurred_at: "2000-01-23T04:56:07.000+00:00"
+        principal: "principal"
+        state: {}
       error:
         code: "code"
         kind: {}
@@ -3340,6 +3388,10 @@ definitions:
             project: "project"
             version: "version"
           created_at: "2000-01-23T04:56:07.000+00:00"
+          state_change_details:
+            occurred_at: "2000-01-23T04:56:07.000+00:00"
+            principal: "principal"
+            state: {}
           error:
             code: "code"
             kind: {}
@@ -3520,6 +3572,10 @@ definitions:
             project: "project"
             version: "version"
           created_at: "2000-01-23T04:56:07.000+00:00"
+          state_change_details:
+            occurred_at: "2000-01-23T04:56:07.000+00:00"
+            principal: "principal"
+            state: {}
           error:
             code: "code"
             kind: {}
@@ -3941,6 +3997,35 @@ definitions:
       auth_role:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"
+  adminExecutionState:
+    type: "string"
+    description: "The state of the execution is used to control its visibility in\
+      \ the UI/CLI.\n\n - EXECUTION_ACTIVE: By default, all executions are considered\
+      \ active.\n - EXECUTION_ARCHIVED: Archived executions are no longer visible\
+      \ in the UI."
+    enum:
+    - "EXECUTION_ACTIVE"
+    - "EXECUTION_ARCHIVED"
+    default: "EXECUTION_ACTIVE"
+  adminExecutionStateChangeDetails:
+    type: "object"
+    properties:
+      state:
+        description: "The state of the execution is used to control its visibility\
+          \ in the UI/CLI."
+        $ref: "#/definitions/adminExecutionState"
+      occurred_at:
+        type: "string"
+        format: "date-time"
+        description: "This timestamp represents when the state changed."
+      principal:
+        type: "string"
+        title: "Identifies the entity (if any) responsible for causing the state change\
+          \ of the execution"
+    example:
+      occurred_at: "2000-01-23T04:56:07.000+00:00"
+      principal: "principal"
+      state: {}
   adminExecutionTerminateRequest:
     type: "object"
     properties:
@@ -3957,6 +4042,17 @@ definitions:
       \ succeeds the phase \"ABORTED\" will be recorded for the termination\nwith\
       \ the optional cause added to the output_result."
   adminExecutionTerminateResponse:
+    type: "object"
+  adminExecutionUpdateRequest:
+    type: "object"
+    properties:
+      id:
+        title: "Identifier of the execution to update"
+        $ref: "#/definitions/coreWorkflowExecutionIdentifier"
+      state:
+        title: "State to set as the new value active/archive"
+        $ref: "#/definitions/adminExecutionState"
+  adminExecutionUpdateResponse:
     type: "object"
   adminFixedRate:
     type: "object"

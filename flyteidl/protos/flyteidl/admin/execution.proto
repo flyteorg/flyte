@@ -169,6 +169,9 @@ message ExecutionClosure {
 
     // Identifies the workflow definition for this execution.
     core.Identifier workflow_id = 11;
+
+    // Provides the details of the last stage change
+    ExecutionStateChangeDetails state_change_details = 14;
 }
 
 // Represents system, rather than user-facing, metadata about an execution.
@@ -320,3 +323,33 @@ message WorkflowExecutionGetDataResponse {
     // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs = 4;
 }
+
+// The state of the execution is used to control its visibility in the UI/CLI.
+enum ExecutionState {
+    // By default, all executions are considered active.
+    EXECUTION_ACTIVE = 0;
+
+    // Archived executions are no longer visible in the UI.
+    EXECUTION_ARCHIVED = 1;
+}
+
+message ExecutionUpdateRequest {
+    // Identifier of the execution to update
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // State to set as the new value active/archive
+    ExecutionState state = 2;
+}
+
+message ExecutionStateChangeDetails {
+    // The state of the execution is used to control its visibility in the UI/CLI.
+    ExecutionState state = 1;
+
+    // This timestamp represents when the state changed.
+    google.protobuf.Timestamp occurred_at = 2;
+
+    // Identifies the entity (if any) responsible for causing the state change of the execution
+    string principal = 3;
+}
+
+message ExecutionUpdateResponse {}

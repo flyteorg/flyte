@@ -122,6 +122,11 @@ class AdminServiceStub(object):
         request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_execution__pb2.Execution.FromString,
         )
+    self.UpdateExecution = channel.unary_unary(
+        '/flyteidl.service.AdminService/UpdateExecution',
+        request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionUpdateRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionUpdateResponse.FromString,
+        )
     self.GetExecutionData = channel.unary_unary(
         '/flyteidl.service.AdminService/GetExecutionData',
         request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetDataRequest.SerializeToString,
@@ -396,6 +401,13 @@ class AdminServiceServicer(object):
 
   def GetExecution(self, request, context):
     """Fetches a :ref:`ref_flyteidl.admin.Execution`.
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def UpdateExecution(self, request, context):
+    """Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -689,6 +701,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.GetExecution,
           request_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_execution__pb2.Execution.SerializeToString,
+      ),
+      'UpdateExecution': grpc.unary_unary_rpc_method_handler(
+          servicer.UpdateExecution,
+          request_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionUpdateRequest.FromString,
+          response_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionUpdateResponse.SerializeToString,
       ),
       'GetExecutionData': grpc.unary_unary_rpc_method_handler(
           servicer.GetExecutionData,

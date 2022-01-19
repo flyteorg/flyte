@@ -336,6 +336,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_update_execution(self):
+        """Test case for update_execution
+
+        Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
     def test_update_launch_plan(self):
         """Test case for update_launch_plan
 

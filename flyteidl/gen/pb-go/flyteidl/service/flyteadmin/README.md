@@ -65,6 +65,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**RegisterProject**](docs/AdminServiceApi.md#registerproject) | **Post** /api/v1/projects | Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
 *AdminServiceApi* | [**RelaunchExecution**](docs/AdminServiceApi.md#relaunchexecution) | **Post** /api/v1/executions/relaunch | Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
 *AdminServiceApi* | [**TerminateExecution**](docs/AdminServiceApi.md#terminateexecution) | **Delete** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**UpdateExecution**](docs/AdminServiceApi.md#updateexecution) | **Put** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**UpdateLaunchPlan**](docs/AdminServiceApi.md#updatelaunchplan) | **Put** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
 *AdminServiceApi* | [**UpdateNamedEntity**](docs/AdminServiceApi.md#updatenamedentity) | **Put** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
 *AdminServiceApi* | [**UpdateProject**](docs/AdminServiceApi.md#updateproject) | **Put** /api/v1/projects/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60;  flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
@@ -93,8 +94,12 @@ Class | Method | HTTP request | Description
  - [AdminExecutionRecoverRequest](docs/AdminExecutionRecoverRequest.md)
  - [AdminExecutionRelaunchRequest](docs/AdminExecutionRelaunchRequest.md)
  - [AdminExecutionSpec](docs/AdminExecutionSpec.md)
+ - [AdminExecutionState](docs/AdminExecutionState.md)
+ - [AdminExecutionStateChangeDetails](docs/AdminExecutionStateChangeDetails.md)
  - [AdminExecutionTerminateRequest](docs/AdminExecutionTerminateRequest.md)
  - [AdminExecutionTerminateResponse](docs/AdminExecutionTerminateResponse.md)
+ - [AdminExecutionUpdateRequest](docs/AdminExecutionUpdateRequest.md)
+ - [AdminExecutionUpdateResponse](docs/AdminExecutionUpdateResponse.md)
  - [AdminFixedRate](docs/AdminFixedRate.md)
  - [AdminFixedRateUnit](docs/AdminFixedRateUnit.md)
  - [AdminGetVersionResponse](docs/AdminGetVersionResponse.md)
