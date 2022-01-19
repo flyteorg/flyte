@@ -9,25 +9,26 @@ Unlike traditional software, the users must conduct multiple experiments concurr
 This may happen when different data scientists simultaneously iterate on the same workflow/pipeline.
 
 The cost of creating an independent infrastructure for each version is enormous and not desirable.
-Also, it is desirable to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infra team,
-while users can use it independently. This also improves the cost of operation, as it is possible to reuse the same infrastructure for more teams.
+On the other hand, it is desirable to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infrastructure team,
+while users can use it independently. This also improves the cost of operation, since it is possible to reuse the same infrastructure for multiple teams.
 
 Moreover, versioned workflows help users quickly reproduce prior results or identify the source of previous successful experiments.
 
 Why Do You Need Versioning?
 ---------------------------
 
-Versioning is needed to:
+Versioning is required to:
 
-- Work on the same project concurrently and yet identify the version/experiment that was successful
-- Capture the environment for a version and independently launch this environment
-- Visualize prior runs and tie them to experiment results
-- Easily and cleanly roll-back production deployments in case of failures
-- Execute multiple experiments in production, which may use different training or data processing algorithms
-- Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy
+- Work on the same project concurrently yet identify the version/experiment that was successful.
+- Capture the environment for a version and independently launch this environment.
+- Visualize prior runs and tie them to experiment results.
+- Easily and cleanly roll-back production deployments in case of failures.
+- Execute multiple experiments in production, which may use different training or data processing algorithms.
+- Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy.
 
 Operational Benefits of Completely Versioned Workflows / Pipelines
 -------------------------------------------------------------------
+
 Since the entire workflow in Flyte is completely versioned and all tasks and entities are immutable, it is possible to completely change
 the structure of a workflow between versions, without worrying about consequences for the pipelines in production. This hermetic property makes it extremely
 easy to manage and deploy new workflow versions. This is especially important for workflows that are long-running. Flyte guarantees, that if a workflow execution is in progress
@@ -51,9 +52,9 @@ Let us take an example of a workflow:
        B-->C;
        C-->D;
 
-In the above graph, let us assume that task `C` fails. It is then possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run `A,B,...` as long as all are marked as `cache=True`
+In the above graph, let us assume that task `C` fails. It is then possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run tasks ``A``, and ``B`` as long as they are marked as `cache=True`.
 
-But let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``:
+Npw, let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``:
 
 .. mermaid::
 

@@ -1,8 +1,25 @@
 .. _divedeep-launchplans:
   
 Launch plans
-============
-Launch plans are used to execute workflows. A workflow can have many launch plans, but an individual launch plan is always tied to a single, specific workflow. Once created, launch plans are easy to share and execute.
+=============
+Launch plans help execute workflows. A workflow can be associated with multiple launch plans, but an individual launch plan is always associated with a single, specific workflow. 
+
+Every workflow comes with a `default` launch plan. While creating a new workflow, this default launch plan is authored (in code). The default launch plan has the same name as that of the workflow. 
+
+.. note::
+   Users rarely interact with the default launch plan.
+
+Things to know about workflows, launchplans and their version:
+A workflow can be associated with multiple launch plans and launch plan versions.
+A workflow (WF) version can be associated with multiple launch plans (LP) under different names, i.e, WF1.v1 => LP1.v1, WF1.v1 => LP2.v1, WF1.v1 => LP3.v2
+
+WF.version can be bound to multiple LP as different names (to clarify; the binding is still WF.version->LP.version but it could be something like WF1.v1 => LP1.v1, WF1.v1 => LP2.v1, WF1.v1 => LP3.v2, etc, etc)
+WF.version can be bound to multiple LP.versions
+Adding those two statements together = a WF.version can have multiple schedules attached to it as long as those schedules exist as versions of different LP-names.
+
+
+
+After creating a launch plan, it is easy to share and execute them.
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
 
@@ -13,7 +30,7 @@ optional notifications. Refer to the :ref:`deployment-cluster-config-notificatio
 See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
 
 What do launch plans provide?
------------------------------
+------------------------------
 
 - One click invocation of workflows with predefined inputs and friendly launch plan names.
 - Multiple schedules with different default values for inputs per workflow.

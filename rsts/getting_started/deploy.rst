@@ -46,7 +46,7 @@ Install Flytectl
 
       flytectl version
 
-#. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run these getting started steps in a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a Flyte cluster.
+#. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run these `getting started` steps in a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a Flyte cluster.
 
    .. tabs::
        .. group-tab:: Flyte Sandbox
@@ -65,7 +65,7 @@ Install Flytectl
 
              flytectl config init
 
-          **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
+          **NOTE** If having trouble with starting the sandbox refer to :ref:`troubleshoot`.
 
        .. group-tab:: Remote Flyte Cluster
 
@@ -78,7 +78,7 @@ Install Flytectl
 
 Build & Deploy Your Application to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. Flyte uses Docker containers to package the workflows and tasks and sends them to the remote Flyte cluster. Therefore, there is a ``Dockerfile`` already included in the cloned repo. You can build the Docker container and push the built image to a registry.
+#. Flyte uses Docker containers to package the workflows and tasks, and sends them to the remote Flyte cluster. Therefore, there is a ``Dockerfile`` already included in the cloned repo. You can build the Docker container and push the built image to a registry.
 
    .. tabs::
        .. group-tab:: Flyte Sandbox

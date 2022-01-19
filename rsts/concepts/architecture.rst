@@ -19,7 +19,7 @@ FlyteIDL uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ 
 Planes
 ======
 
-Flyte components are separated into 3 logical planes. The planes are summarized here and explained in further detail below. The goal is that any of these planes can be replaced by an alternate implementation.
+Flyte components are separated into 3 logical planes. The planes are summarized here and explained in detail below. The goal is that these planes can be replaced by an alternate implementation.
 
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 | **User Plane**    | The User Plane consists of all user tools that assist in interacting with the core Flyte API.                 |

@@ -15,22 +15,22 @@ Let us consider a simple Python task:
    def my_task(m: int, n: str, o: FlyteFile) -> pd.DataFrame:
       ...
 
-In the above code sample, ``m, n, o`` are inputs to the task.
+In the above code sample, ``m``, ``n``, ``o`` are inputs to the task.
 ``m`` of type ``int`` and ``n`` of type ``str`` are simple primitive types, while ``o`` is an arbitrarily sized file.
-All of them from Flyte's point of view are ``data``.
+All of them from Flyte's point of view, are ``data``.
 The difference lies in how Flyte stores and passes each of these data items.
 
 For every task that receives input, Flyte sends an **Inputs Metadata** object, which contains all the primitive or simple scalar values inlined, but in the case of
-complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m, n`` are inlined while
-``o`` and the output ``pd.DataFrame`` are offloaded to an object store, and reference is captured in the metadata.
+complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m``, and ``n`` are inlined while
+``o`` and the output ``pd.DataFrame`` are offloaded to an object store, and their reference is captured in the metadata.
 
 `Flytekit TypeTransformers` make it possible to use complex objects as if they are available locally - just like persistent filehandles. But Flyte backend only deals with
 the references.
 
-Thus, primitive data types and references to large objects fall under Metadata - `Meta input` or `Meta output`, and the actual large object is called **Raw data**.
+Thus, primitive data types and references to large objects fall under Metadata - `Meta input` or `Meta output`, and the actual large object is known as **Raw data**.
 A unique property of this separation is that all `meta values` are read by FlytePropeller engine and available on the FlyteConsole or CLI from the control plane.
-`Raw` data is not read by any of the Flyte components and hence it is possible to store it in a completely separate blob storage or alternate stores, which Flyte control plane components
-do not have access to but the users's container/tasks can access this data.
+`Raw` data is not read by any of the Flyte components and hence it is possible to store it in a completely separate blob storage or alternate stores, which can't be accessed by Flyte control plane components
+but can be accessed by users's container/tasks.
 
 Raw Data Prefix
 ~~~~~~~~~~~~~~~
@@ -40,7 +40,7 @@ data from the configured object-store paths. These paths are completely customiz
 
 - To configure the default Rawoutput path (prefix in an object store like S3/GCS), we can configure it during registration as shown in :std:ref:`flytectl_register_files`.
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
-- To override the RawOutput path (prefix in an object store like S3/GCS), we can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
+- To override the ``RawOutput`` path (prefix in an object store like S3/GCS), we can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
   .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/launch_raw_output.png
 
@@ -117,7 +117,7 @@ RUNTIME
 ^^^^^^^
 
 At runtime, data passes through Flyte using :std:ref:`ref_flyteidl.core.literal` where the values are set.
-For files, the corresponding `Literal` is called ``LiteralBlob`` (:std:ref:`ref_flyteidl.core.blob`)—a binary large object.
+For files, the corresponding `Literal` is called ``LiteralBlob`` (:std:ref:`ref_flyteidl.core.blob`) — which is a binary large object.
 Many different objects can be mapped to the underlying `Blob` or `Struct` types. For example, an image is a Blob, a ``pandas.DataFrame`` is a Blob of type parquet, etc.
 
 Data Movement
@@ -126,7 +126,7 @@ Data Movement
 Flyte is primarily a **DataFlow Engine**. It enables movement of data and provides an abstraction to enable movement of data between different languages.
 One implementation of Flyte is the current workflow engine.
 
-The workflow Engine is responsible to move data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.
+The workflow Engine is responsible in moving data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.
 The illustration below explains how data flows from engine to the task and how that is transferred between tasks. The medium to transfer the data can change, and will change in the future.
 We could use faster metadata stores to speed up data movement or exploit locality.
 

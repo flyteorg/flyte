@@ -22,7 +22,7 @@ With Flyte UI, you can:
 Launching Workflows
 -------------------
 
-Launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
+You can launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
 The UI should be accessible at http://localhost:30081/console.
 
 |
@@ -36,7 +36,7 @@ The UI should be accessible at http://localhost:30081/console.
 
 The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_build`.
 
-A pop-up window appears with input fields that the execution requires on clicking the **Launch Workflow** button.
+A pop-up window appears with input fields that the execution requires upon clicking the **Launch Workflow** button.
 If the default inputs are given, they will be auto-populated.
 
 |
@@ -62,7 +62,7 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 Launching Tasks
 ---------------
 
-Launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
+You can launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
 The UI should be accessible at http://localhost:30081/console.
 
 |
@@ -117,7 +117,7 @@ Every registered Flyte entity is versioned and can be triggered anytime.
 Inspecting Executions
 ---------------------
 
-Executions can be inspected through the UI. Inputs and Outputs can be viewed for every node and execution.
+Executions can be inspected through the UI. Inputs and Outputs for every node and execution can be viewed.
 
 |
 
@@ -146,7 +146,7 @@ Logs are accessible as well.
 
 |
 
-Every execution has two views: Nodes and Graph.
+Every execution has two views: ``Nodes`` and ``Graph``.
 
 A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
 More about nodes can be found in :std:ref:`divedeep-nodes`.
@@ -219,7 +219,7 @@ Recovering Executions
 ---------------------
 
 Recovery mode allows you to recover an individual execution by copying all successful node executions and running from the failed nodes.
-The **Recover** button is able to recover a failed execution.
+The **Recover** button helps recover a failed execution.
 
 |
 

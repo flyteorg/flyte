@@ -48,14 +48,14 @@ To retrieve the Artifact, we tag the Artifact with a hash of the input values fo
 
 When caching an execution, Flyte propeller will:
 
-1. Create a dataset for the task
-2. Create an artifact that represents the execution, along with the artifact data that represents the execution output
-3. Tag the artifact with a unique hash of the input values
+1. Create a dataset for the task.
+2. Create an artifact that represents the execution, along with the artifact data that represents the execution output.
+3. Tag the artifact with a unique hash of the input values.
 
-When checking to see if the task execution is memoized Flyte Propeller will:
+When checking to see if the task execution is memoized, Flyte Propeller will:
 
-1. Compute the tag by computing the hash of the input
-2. Check if a tagged artifact exists with that hash
+1. Compute the tag by computing the hash of the input.
+2. Check if a tagged artifact exists with that hash.
 
-    a. If it does we have a cache hit and Propeller can skip the task execution.
+    a. If it does, we have a cache hit and the Propeller can skip the task execution.
     b. If an artifact is not associated with the tag, Flyte Propeller needs to run the task.

@@ -7,7 +7,10 @@ Flyte Admin
 Admin Structure
 ===============
 
-FlyteAdmin serves the main Flyte API. It processes all client requests to the system. Clients include the FlyteConsole, which calls FlyteAdmin to list workflows, get execution details, etc., and FlyteKit, which calls FlyteAdmin to register workflows, launch workflows, etc.
+FlyteAdmin serves the main Flyte API to process all client requests to the system. Clients include the FlyteConsole, that calls:
+
+1. FlyteAdmin to list the workflows, get execution details, etc.,;
+2. FlyteKit to call FlyteAdmin to register workflows, launch workflows, etc.
 
 Below, we'll dive into each component defined in admin in more detail.
 
@@ -49,7 +52,7 @@ The managers utilize additional components to process requests. These additional
 - :ref:`workflow engine <divedeep-admin-workflowengine>`: compiles workflows and launches workflow executions from launch plans.
 - :ref:`data <divedeep-admin-data>` (remote cloud storage): offloads data blobs to the configured cloud provider.
 - :ref:`runtime <divedeep-admin-config>`: loads values from a config file to assign task resources, initialization values, execution queues, and more.
-- :ref:`async processes <divedeep-admin-async>`: provides functions for scheduling and executing workflows as well as enqueuing and triggering notifications
+- :ref:`async processes <divedeep-admin-async>`: provides functions to schedule and execute the workflows as well as enqueue and trigger notifications.
 
 .. _divedeep-admin-repository:
 
@@ -80,7 +83,7 @@ These database models inherit primary keys and indexes as defined in the corresp
 
 The repositories code also includes `transformers <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/transformers>`__.
 These convert entities from the database format to a response format for the external API.
-If you change either of these structures, you will find you must change the corresponding transformers.
+If you change either of these structures, you must change the corresponding transformers too.
 
 
 .. _divedeep-admin-async:
@@ -104,7 +107,7 @@ For the sandbox development, no-op implementations of the notifications and sche
 Common
 ------
 
-As the name implies, ``common`` houses shared components used across different flyteadmin components in a single, top-level directory to avoid cyclic dependencies. These components include execution naming and phase utils, query filter definitions, query sorting definitions, and named constants.
+As the name implies, ``common`` houses shared components used across different FlyteAdmin components in a single, top-level directory to avoid cyclic dependencies. These components include execution naming and phase utils, query filter definitions, query sorting definitions, and named constants.
 
 .. _divedeep-admin-data:
 
@@ -122,7 +125,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the flyteadmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
@@ -142,10 +145,10 @@ FlyteAdmin Service Background
 Entities
 ---------
 
-The :std:ref:`admin service definition <protos/docs/service/service:flyteidl/service/admin.proto>` defines REST operations for the entities
-flyteadmin administers.
+The :std:ref:`admin service definition <protos/docs/service/service:flyteidl/service/admin.proto>` defines REST operations for the entities that
+FlyteAdmin administers.
 
-As a refresher, the primary :ref:`entities <divedeep>` across Flyte map similarly to FlyteAdmin entities.
+As a refresher, the primary :ref:`entities <divedeep>` across Flyte maps to FlyteAdmin entities.
 
 Static entities
 +++++++++++++++
@@ -156,34 +159,35 @@ These include:
 - Tasks
 - Launch Plans
 
-Permitted operations:
+Permitted operations include:
 
 - Create
 - Get
 - List
 
-The above are designated by an :std:ref:`identifier <protos/docs/core/core:identifier>`
-that consists of a project, domain, name, and version specification. These entities are, for the most part, immutable. To update one of these specific entities, the updated
-version must be reregistered with a unique and new version identifier attribute.
+The above entities are designated by an :std:ref:`identifier <protos/docs/core/core:identifier>`
+that consists of a project, domain, name, and version specification. These entities are, for the most part, immutable. To update one of these entities, the updated
+version must be re-registered with a unique and new version identifier attribute.
 
-One caveat is that launch plan state can toggle between :std:ref:`ACTIVE or INACTIVE <protos/docs/admin/admin:launchplan>`.
-At most one launch plan version across a shared project, domain and name specification can be active at a time. The state affects scheduled launch plans only.
-An inactive launch plan can still be used to launch individual executions. However, only an active launch plan runs on a schedule (if it has a schedule defined).
+One caveat is that the launch plan can toggle between :std:ref:`ACTIVE or INACTIVE <protos/docs/admin/admin:launchplan>` states.
+At a given point in time, only one launch plan version across a shared project, domain and name specification can be active. The state affects the scheduled launch plans only.
+An inactive launch plan can also be used to launch individual executions. However, only an active launch plan runs on a schedule (given it has a schedule defined).
 
 
 Static entities metadata (Named Entities)
 +++++++++++++++++++++++++++++++++++++++++
+
 A :std:ref:`named entity <protos/docs/admin/admin:namedentity>` includes metadata for one of the above entities
-(workflow, task or launch plan) across versions. A named entity includes a resource type (workflow, task or launch plan) and an
+(workflow, task or launch plan) across versions. It also includes a resource type (workflow, task or launch plan) and an
 :std:ref:`id <protos/docs/admin/admin:namedentityidentifier>` which is composed of project, domain and name.
-A named entity also includes metadata, which are mutable attributes about the referenced entity.
+The named entity also includes metadata, which are mutable attributes about the referenced entity.
 
 This metadata includes:
 
-- Description: a human-readable description for the Named Entity collection
-- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain
+- Description: a human-readable description for the Named Entity collection.
+- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain.
 
-Permitted operations:
+Permitted operations include:
 
 - Create
 - Update
@@ -200,7 +204,7 @@ These include:
 - Node executions
 - Task executions
 
-Permitted operations:
+Permitted operations include:
 
 - Create
 - Get
@@ -228,7 +232,7 @@ Platform entities
 +++++++++++++++++
 Projects: like named entities, projects have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
 
-Permitted project operations:
+Permitted project operations include:
 
 - Register
 - List
@@ -247,9 +251,9 @@ These entities consist of:
 - ProjectDomainAttributes
 - WorkflowAttributes
 
-ProjectDomainAttributes configure customizable overrides at the project and domain level, and WorkflowAttributes configure customizable overrides at the project, domain and workflow level.
+``ProjectDomainAttributes`` configure customizable overrides at the project and domain level, and ``WorkflowAttributes`` configure customizable overrides at the project, domain and workflow level.
 
-Permitted attribute operations:
+Permitted attribute operations include:
 
 - Update (implicitly creates if there is no existing override)
 - Get
@@ -263,16 +267,16 @@ Adding request filters
 
 We use `gRPC Gateway <https://github.com/grpc-ecosystem/grpc-gateway>`_ to reverse proxy HTTP requests into gRPC.	
 While this allows for a single implementation for both HTTP and gRPC, an important limitation is that fields mapped to the path pattern cannot be	
-repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead use	
+repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead, they use	
 the internal syntax shown below::	
 
  func(field,value) or func(field, value)	
 
-For example, multiple filters would be appended to an http request::	
+For example, multiple filters would be appended to an http request like::	
 
  ?filters=ne(version, TheWorst)+eq(workflow.name, workflow)	
 
-Timestamp fields use the RFC3339Nano spec (ex: "2006-01-02T15:04:05.999999999Z07:00")	
+Timestamp fields use the ``RFC3339Nano`` spec (ex: "2006-01-02T15:04:05.999999999Z07:00")	
 
 The fully supported set of filter functions are	
 
@@ -319,12 +323,12 @@ Filterable fields vary based on entity types:
   - created_at	
   - updated_at	
   - workflows.{any workflow field above} (for example: workflow.domain)	
-  - state (you must use the integer enum e.g. 1)	
+  - state (you must use the integer enum ex: 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - Named Entity Metadata
 
-  - state (you must use the integer enum e.g. 1)	
+  - state (you must use the integer enum ex: 1)	
      - States are defined in :std:ref:`namedentitystate <protos/docs/admin/admin:namedentitystate>`.
      
 - Executions (Workflow executions)	
@@ -334,12 +338,12 @@ Filterable fields vary based on entity types:
   - name	
   - workflow.{any workflow field above} (for example: workflow.domain)	
   - launch_plan.{any launch plan field above} (for example: launch_plan.name)	
-  - phase (you must use the upper-cased string name e.g. RUNNING)	
+  - phase (you must use the upper-cased string name ex: ``RUNNING``)	
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
-  - mode (you must use the integer enum e.g. 1)	
+  - mode (you must use the integer enum ex: 1)	
      - Modes are defined in :std:ref:`executionmode <protos/docs/admin/admin:executionmetadata.executionmode>`.
   - user (authenticated user or role from flytekit config)
 
@@ -347,7 +351,7 @@ Filterable fields vary based on entity types:
 
   - node_id	
   - execution.{any execution field above} (for example: execution.domain)	
-  - phase (you must use the upper-cased string name e.g. QUEUED)	
+  - phase (you must use the upper-cased string name ex: ``QUEUED``)	
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at	
   - node_execution_created_at	
@@ -360,7 +364,7 @@ Filterable fields vary based on entity types:
   - task.{any task field above} (for example: task.version)	
   - execution.{any execution field above} (for example: execution.domain)	
   - node_execution.{any node execution field above} (for example: node_execution.phase)	
-  - phase (you must use the upper-cased string name e.g. SUCCEEDED)	
+  - phase (you must use the upper-cased string name ex: ``SUCCEEDED``)	
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at	
   - task_execution_created_at	
@@ -370,7 +374,7 @@ Filterable fields vary based on entity types:
 Putting It All Together	
 -----------------------	
 
-If you wanted to do query on specific executions that were launched with a specific launch plan for a workflow with specific attributes, you could do something like:	
+If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, it would look similar to:
 
 ::	
 
@@ -384,7 +388,7 @@ If you wanted to do query on specific executions that were launched with a speci
 Adding sorting to requests	
 ++++++++++++++++++++++++++	
 
-Only a subset of fields are supported for sorting list queries. The explicit list is below:	
+Only a subset of fields are supported for sorting list queries. The explicit list is shown below:	
 
 - ListTasks	
 
@@ -420,7 +424,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - version	
   - created_at	
   - updated_at	
-  - state (you must use the integer enum e.g. 1)	
+  - state (you must use the integer enum ex: 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - ListWorkflowIds	
@@ -433,19 +437,19 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - project	
   - domain	
   - name	
-  - phase (you must use the upper-cased string name e.g. RUNNING)	
+  - phase (you must use the upper-cased string name ex: ``RUNNING``)	
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
-  - mode (you must use the integer enum e.g. 1)	
+  - mode (you must use the integer enum ex: 1)	
      - Modes are defined :std:ref:`execution.proto <protos/docs/admin/admin:executionmetadata.executionmode>`.
      
 - ListNodeExecutions	
 
   - node_id	
   - retry_attempt	
-  - phase (you must use the upper-cased string name e.g. QUEUED)	
+  - phase (you must use the upper-cased string name ex: ``QUEUED``)	
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at	
   - node_execution_created_at	
@@ -455,7 +459,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 - ListTaskExecutions	
 
   - retry_attempt	
-  - phase (you must use the upper-cased string name e.g. SUCCEEDED)	
+  - phase (you must use the upper-cased string name ex: ``SUCCEEDED``)	
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at	
   - task_execution_created_at	
@@ -465,7 +469,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 Sorting syntax	
 --------------	
 
-Adding sorting to a request requires specifying the ``key``, e.g. the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
+Adding sorting to a request requires specifying the ``key``, ex: the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
 
 Example sorting HTTP parameter:	
 
@@ -473,7 +477,7 @@ Example sorting HTTP parameter:
 
    sort_by.key=created_at&sort_by.direction=DESCENDING	
    	
-Alternatively, since descending is the default, the above could be rewritten as	
+Alternatively, since `DESCENDING` is the default sorting direction, the above could be written as	
 
 ::	
 
