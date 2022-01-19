@@ -91,6 +91,9 @@ func UpdatePodWithInterruptibleFlag(taskExecutionMetadata pluginsCore.TaskExecut
 	if podSpec.SecurityContext == nil && config.GetK8sPluginConfig().DefaultPodSecurityContext != nil {
 		podSpec.SecurityContext = config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy()
 	}
+	if config.GetK8sPluginConfig().EnableHostNetworkingPod != nil {
+		podSpec.HostNetwork = *config.GetK8sPluginConfig().EnableHostNetworkingPod
+	}
 	ApplyInterruptibleNodeAffinity(isInterruptible, podSpec)
 }
 

@@ -139,6 +139,11 @@ type K8sPluginConfig struct {
 	// DefaultSecurityContext provides a default container security context that should be applied for the primary container launched and created by FlytePropeller. This may not be applicable to all plugins. For
 	//	// downstream plugins - i.e. TensorflowOperators may not support setting this, but Spark does.
 	DefaultSecurityContext *v1.SecurityContext `json:"default-security-context" pflag:"-,Optionally specify a default security context that should be applied to every container launched/created by FlytePropeller. This will not be applied to plugins that do not support it or to user supplied containers in pod tasks."`
+
+	// EnableHostNetworkingPod is a binary switch to enable `hostNetwork: true` for all pods launched by Flyte.
+	// Refer to - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces.
+	// As a follow up, the default pod configurations will now be adjusted using podTemplates per namespace
+	EnableHostNetworkingPod *bool `json:"enable-host-networking-pod" pflag:"-,If true, will schedule all pods with hostNetwork: true."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

@@ -87,6 +87,8 @@ func TestLoadConfig(t *testing.T) {
 		assert.NotNil(t, k8sConfig.DefaultSecurityContext)
 		assert.NotNil(t, k8sConfig.DefaultSecurityContext.AllowPrivilegeEscalation)
 		assert.False(t, *k8sConfig.DefaultSecurityContext.AllowPrivilegeEscalation)
+		assert.NotNil(t, k8sConfig.EnableHostNetworkingPod)
+		assert.True(t, *k8sConfig.EnableHostNetworkingPod)
 	})
 
 	t.Run("logs-config-test", func(t *testing.T) {

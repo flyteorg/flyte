@@ -494,6 +494,36 @@ func TestToK8sPod(t *testing.T) {
 		assert.NotNil(t, p.SecurityContext)
 		assert.Equal(t, *p.SecurityContext.RunAsGroup, v)
 	})
+
+	t.Run("enableHostNetwork", func(t *testing.T) {
+		enabled := true
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			EnableHostNetworkingPod: &enabled,
+		}))
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.True(t, p.HostNetwork)
+	})
+
+	t.Run("explicitDisableHostNetwork", func(t *testing.T) {
+		enabled := false
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			EnableHostNetworkingPod: &enabled,
+		}))
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.False(t, p.HostNetwork)
+	})
+
+	t.Run("skipSettingHostNetwork", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.False(t, p.HostNetwork)
+	})
 }
 
 func TestDemystifyPending(t *testing.T) {
