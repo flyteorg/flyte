@@ -6,16 +6,14 @@ Workflows can be run automatically using `schedules <https://docs.flyte.org/proj
 
 At most, only one launch plan version for a given {Project, Domain, Name} combination can be active, which means, at most, only one schedule can be active for a launch plan. This is because only one active schedule can exist across all versions of the launch plan. 
 
-However, a workflow version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
+However, a :ref:`workflow <divedeep-workflows>` version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
 
 Creating a new schedule creates a new version of that launch plan too.
-If you wish to change a schedule, you will have to create a new version of that launch plan since a schedule can't be edited.
+If you wish to change a schedule, you will have to create a new version of that launch plan since a **schedule can't be edited**.
 
-# Didn't understand this
-You cannot "edit" a schedule; if you want to change a schedule then you're actually creating a new version of that LP and Admin will do the work to notice you're adding a schedule and search through all the LP versions and set them to "deactivated"
-LP versions with schedules that have been deactivated can still be used manually (ie, click Launch and select that LP version)
-#
+The Admin keeps track of the newly added schedules, and searches through all the versions of launch plans to set them to 'deactivated'.
 
+The launch plan versions with schedules that were previously deactivated can be manually used, by clicking on ``Launch`` and selecting the specific launch plan version. 
 
 Schedules can define a cron_expression_. or rate_unit_.
 

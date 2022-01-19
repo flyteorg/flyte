@@ -78,10 +78,10 @@ Fault tolerance
 In any distributed system, failure is inevitable. Allowing users to design a fault-tolerant system (e.g. workflow) is an inherent goal of Flyte. 
 At a high level, tasks offer two parameters to achieve fault tolerance:
 
-Retries
+**Retries**
   Tasks can define a retry strategy to let the system know how to handle failures (example: retry 3 times on any kind of error).
 
-Timeouts
+**Timeouts**
   For the system to ensure it is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is also possible for task authors to define a timeout period, after which the task gets marked as failure. Note that a timed-out task will be retried if it has a retry strategy defined.
 
 Memoization

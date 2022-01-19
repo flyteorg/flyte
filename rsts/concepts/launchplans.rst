@@ -9,15 +9,14 @@ Every workflow comes with a `default` launch plan. While creating a new workflow
 .. note::
    Users rarely interact with the default launch plan.
 
-Things to know about workflows, launchplans and their version:
 A workflow can be associated with multiple launch plans and launch plan versions.
-A workflow (WF) version can be associated with multiple launch plans (LP) under different names, i.e, WF1.v1 => LP1.v1, WF1.v1 => LP2.v1, WF1.v1 => LP3.v2
+A workflow version can be associated with multiple launch plans and their versions under different names.
+The above two statements can be combined to state that a worflow version can have multiple schedules associated with it, as long as these schedules exists as versions under different launch plan names.
+Suppose we have ``Workflow A`` in ``version 1``, LaunchPlans ``A`` and ``B`` in ``version 1``, and LaunchPlan ``C`` in ``version 2``, then:
 
-WF.version can be bound to multiple LP as different names (to clarify; the binding is still WF.version->LP.version but it could be something like WF1.v1 => LP1.v1, WF1.v1 => LP2.v1, WF1.v1 => LP3.v2, etc, etc)
-WF.version can be bound to multiple LP.versions
-Adding those two statements together = a WF.version can have multiple schedules attached to it as long as those schedules exist as versions of different LP-names.
-
-
+1. ``Workflow A`` can be associated with LaunchPlan ``A`` (version 1);
+2. ``Workflow A`` can be associated with LaunchPlan ``B``(different launch plan name with same version);
+3. ``Workflow A`` can be associated with LaunchPlan ``C``(different launch plan name and version).
 
 After creating a launch plan, it is easy to share and execute them.
 

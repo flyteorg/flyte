@@ -81,7 +81,9 @@ To reproduce a past experiment, users need to identify the source code, and resu
 It is also necessary to instantiate any infrastructure that the previous version may have used and, if not already recorded, ensure that the previously used dataset (say) can be reconstructed.
 From the first principles, if reproducibility is considered to be one of the most important concerns, then one would capture all these variables and provide them in an easy-to-use method.
 
-This is exactly how Flyte was conceived. Every task is versioned, and Flyte precisely captures its dependency set. For external tasks, it is highly encouraged to use
+This is exactly how Flyte was conceived!
+
+Every task is versioned, and Flyte precisely captures its dependency set. For external tasks, it is highly encouraged to use
 memoization so that the constructed dataset is cached on the Flyte side, and hence, one can comfortably guarantee reproducible behavior from the external systems.
 Moreover, every piece of code is registered with the version of the code that was used to create the instance.
 Users can therefore easily construct the lineage for all the parts of the workflow.

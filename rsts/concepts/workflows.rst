@@ -9,6 +9,7 @@ or just executions. In other words, a workflow is a template for an ordered task
 
 Flyte workflows are defined in ``protobuf`` and the Flytekit SDK facilitates writing workflows. Users can define workflows as a collection of nodes.
 Nodes within a workflow can produce outputs that subsequent nodes consume as inputs. These dependencies dictate the workflow structure.
+
 Workflows written using the SDK do not need to explicitly define nodes to enclose execution units (tasks, sub-workflows, launch plans);
 these will be injected by the SDK and captured at registration time.
 
