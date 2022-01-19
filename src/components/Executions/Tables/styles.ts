@@ -194,11 +194,14 @@ export const useWorkflowExecutionsColumnStyles = makeStyles((theme: Theme) => ({
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         textAlign: 'left'
+    },
+    rightMargin: {
+        marginRight: theme.spacing(1)
     }
 }));
 
 /** Style overrides specific to columns in `WorkflowVersionsTable`. */
-export const useWorkflowVersionsColumnStyles = makeStyles((theme: Theme) => ({
+export const useWorkflowVersionsColumnStyles = makeStyles(() => ({
     columnRadioButton: {
         width: workflowVersionsTableColumnWidths.radio
     },

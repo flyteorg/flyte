@@ -1,4 +1,6 @@
-import { Link, Typography } from '@material-ui/core';
+import { IconButton, Typography } from '@material-ui/core';
+import InputOutputIcon from '@material-ui/icons/Tv';
+import LaunchPlanIcon from '@material-ui/icons/AssignmentOutlined';
 import {
     dateFromNow,
     formatDateLocalTimezone,
@@ -14,10 +16,12 @@ import { getWorkflowExecutionTimingMS } from '../utils';
 import { useWorkflowExecutionsColumnStyles } from './styles';
 import { WorkflowExecutionColumnDefinition } from './types';
 import { WorkflowExecutionLink } from './WorkflowExecutionLink';
+import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
 
 interface WorkflowExecutionColumnOptions {
     showWorkflowName: boolean;
 }
+
 /** Returns a memoized list of column definitions to use when rendering a
  * `WorkflowExecutionRow`. Memoization is based on common/column style objects
  * and any fields in the incoming `WorkflowExecutionColumnOptions` object.
@@ -27,6 +31,8 @@ export function useWorkflowExecutionsTableColumns({
 }: WorkflowExecutionColumnOptions): WorkflowExecutionColumnDefinition[] {
     const styles = useWorkflowExecutionsColumnStyles();
     const commonStyles = useCommonStyles();
+    const isLaunchPlanEnabled = useFeatureFlag(FeatureFlag.LaunchPlan);
+
     return React.useMemo(
         () => [
             {
@@ -112,13 +118,27 @@ export function useWorkflowExecutionsTableColumns({
                     const onClick = () =>
                         state.setSelectedIOExecution(execution);
                     return (
-                        <Link
-                            component="button"
-                            onClick={onClick}
-                            variant="body1"
-                        >
-                            View Inputs &amp; Outputs
-                        </Link>
+                        <>
+                            <IconButton
+                                size="small"
+                                title="View Inputs &amp; Outputs"
+                                onClick={onClick}
+                                className={styles.rightMargin}
+                            >
+                                <InputOutputIcon />
+                            </IconButton>
+                            {isLaunchPlanEnabled && (
+                                <IconButton
+                                    size="small"
+                                    title="View Launch Plan"
+                                    onClick={() => {
+                                        /* Not implemented */
+                                    }}
+                                >
+                                    <LaunchPlanIcon />
+                                </IconButton>
+                            )}
+                        </>
                     );
                 },
                 className: styles.columnInputsOutputs,
@@ -126,6 +146,6 @@ export function useWorkflowExecutionsTableColumns({
                 label: ''
             }
         ],
-        [styles, commonStyles, showWorkflowName]
+        [styles, commonStyles, showWorkflowName, isLaunchPlanEnabled]
     );
 }

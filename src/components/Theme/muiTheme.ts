@@ -33,7 +33,7 @@ const theme = createMuiTheme({
         },
         action: {
             selected: selectedActionColor,
-            hoverOpacity: 0.3
+            hoverOpacity: 0.15
         }
     },
     props: {

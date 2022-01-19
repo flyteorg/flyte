@@ -1,5 +1,6 @@
 import { CssBaseline } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
+import { FeatureFlagsProvider } from 'basics/FeatureFlags';
 import { env } from 'common/env';
 import { debug, debugPrefix } from 'common/log';
 import { ErrorBoundary } from 'components/common/ErrorBoundary';
@@ -32,34 +33,36 @@ export const AppComponent: React.FC = () => {
     const apiState = useAPIState();
 
     return (
-        <ThemeProvider theme={muiTheme}>
-            <QueryClientProvider client={queryClient}>
-                <APIContext.Provider value={apiState}>
-                    <QueryAuthorizationObserver />
-                    <SkeletonTheme
-                        color={skeletonColor}
-                        highlightColor={skeletonHighlightColor}
-                    >
-                        <CssBaseline />
-                        <Helmet>
-                            <title>Flyte Console</title>
-                            <meta
-                                name="viewport"
-                                content="width=device-width"
-                            />
-                        </Helmet>
-                        <Router history={history}>
-                            <ErrorBoundary fixed={true}>
-                                <NavBarRouter />
-                                <ApplicationRouter />
-                            </ErrorBoundary>
-                        </Router>
-                        <SystemStatusBanner />
-                    </SkeletonTheme>
-                </APIContext.Provider>
-                <ReactQueryDevtools initialIsOpen={false} />
-            </QueryClientProvider>
-        </ThemeProvider>
+        <FeatureFlagsProvider>
+            <ThemeProvider theme={muiTheme}>
+                <QueryClientProvider client={queryClient}>
+                    <APIContext.Provider value={apiState}>
+                        <QueryAuthorizationObserver />
+                        <SkeletonTheme
+                            color={skeletonColor}
+                            highlightColor={skeletonHighlightColor}
+                        >
+                            <CssBaseline />
+                            <Helmet>
+                                <title>Flyte Console</title>
+                                <meta
+                                    name="viewport"
+                                    content="width=device-width"
+                                />
+                            </Helmet>
+                            <Router history={history}>
+                                <ErrorBoundary fixed={true}>
+                                    <NavBarRouter />
+                                    <ApplicationRouter />
+                                </ErrorBoundary>
+                            </Router>
+                            <SystemStatusBanner />
+                        </SkeletonTheme>
+                    </APIContext.Provider>
+                    <ReactQueryDevtools initialIsOpen={false} />
+                </QueryClientProvider>
+            </ThemeProvider>
+        </FeatureFlagsProvider>
     );
 };
 
