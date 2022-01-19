@@ -39,4 +39,5 @@ type AdminExecutionClosure struct {
 	Notifications []AdminNotification `json:"notifications,omitempty"`
 	// Identifies the workflow definition for this execution.
 	WorkflowId *CoreIdentifier `json:"workflow_id,omitempty"`
+	StateChangeDetails *AdminExecutionStateChangeDetails `json:"state_change_details,omitempty"`
 }
