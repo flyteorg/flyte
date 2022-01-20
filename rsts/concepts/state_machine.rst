@@ -7,8 +7,26 @@ Understanding the State Transition in a Workflow
 High Level Overview of How a Workflow Progresses to Success
 ===========================================================
 
-.. image:: https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBSZWFkeVxuICAgIFJlYWR5IC0tPiBSdW5uaW5nXG4gICAgUnVubmluZyAtLT4gU3VjY2Vzc1xuXG4gICAgc3RhdGUgUnVubmluZyB7XG4gICAgICBbKl0gLS0-IE5vZGVRdWV1ZWRcbiAgICAgIE5vZGVRdWV1ZWQgLS0-IE5vZGVSdW5uaW5nXG4gICAgICBOb2RlUnVubmluZyAtLT4gTm9kZVN1Y2Nlc3NcblxuICAgICAgc3RhdGUgTm9kZVJ1bm5pbmcge1xuICAgICAgICBbKl0gLS0-IFRhc2tRdWV1ZWRcbiAgICAgICAgVGFza1F1ZXVlZCAtLT4gVGFza1J1bm5pbmdcbiAgICAgICAgVGFza1J1bm5pbmcgLS0-IFRhc2tTdWNjZXNzXG4gICAgICB9XG4gICAgfVxuXG4iLCJtZXJtYWlkIjp7fSwidXBkYXRlRWRpdG9yIjpmYWxzZX0
-    :alt: Happy case for a workflow with one node and one task.
+.. mermaid::
+
+   flowchart TD
+     id1(( ))
+     id1 --> Ready
+     Ready --> Running
+     subgraph Running
+     id2(( ))
+     id2 --> NodeQueued
+     NodeQueued --> NodeRunning
+     subgraph NodeRunning
+     id3(( ))
+     id3 --> TaskQueued
+     TaskQueued --> TaskRunning
+     TaskRunning --> TaskSuccess
+     end
+     TaskSuccess --> NodeSuccess
+     end
+     NodeSuccess --> Success
+
 
 This state diagram illustrates an extremely high-level, simplistic view of the state transitions that a workflow with a single node and one task will go through as the observer observes success.
 
@@ -70,8 +88,30 @@ The state machine specification for the illustration can be found `here <https:/
 Node States
 ===========
 
-.. image:: https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBOb3RZZXRTdGFydGVkXG4gICAgWypdIC0tPiBBYm9ydGVkIDogV2lsbCBzdG9wIHRoZSBub2RlIGV4ZWN1dGlvblxuICAgIE5vdFlldFN0YXJ0ZWQgLS0-IFF1ZXVlZCA6IElmIGFsbCB1cHN0cmVhbSBub2RlcyBhcmUgcmVhZHkgaS5lLCBpbnB1dHMgYXJlIHJlYWR5XG4gICAgTm90WWV0U3RhcnRlZCAtLT4gU2tpcHBlZCA6IElmIHRoZSBicmFuY2ggd2FzIG5vdCB0YWtlblxuICAgIFF1ZXVlZCAtLT4gUnVubmluZyA6IFN0YXJ0IHRhc2sgZXhlY3V0aW9uIC0gYXR0ZW1wdCAwXG4gICAgUnVubmluZyAtLT4gVGltaW5nT3V0IDogSWYgdGFzayB0aW1lb3V0IGhhcyBlbGFwc2VkIGFuZCByZXRyeV9hdHRlbXB0cyA-PSBtYXhfcmV0cmllc1xuICAgIFRpbWluZ091dCAtLT4gVGltZWRPdXQgOiBJdCB0b3RhbCBub2RlIHRpbWVvdXQgaGFzIGVsYXBzZWRcbiAgICBSdW5uaW5nIC0tPiBSZXRyeWFibGVGYWlsdXJlIDogb24gcmV0cnlhYmxlIGZhaWx1cmVcbiAgICBSdW5uaW5nIC0tPiBEeW5hbWljUnVubmluZyA6IEZvciBkeW5hbWljIG5vZGVzIGdlbmVyYXRpbmcgd29ya2Zsb3dzXG4gICAgUmV0cnlhYmxlRmFpbHVyZSAtLT4gUnVubmluZyA6IGlmIHJldHJ5X2F0dGVtcHRzIDwgbWF4X3JldHJpZXNcbiAgICBSZXRyeWFibGVGYWlsdXJlIC0tPiBGYWlsaW5nIDogcmV0cnlfYXR0ZW1wdHMgPj0gbWF4X3JldHJpZXNcbiAgICBGYWlsaW5nIC0tPiBGYWlsZWRcbiAgICBSdW5uaW5nIC0tPiBTdWNjZWVkaW5nIDogSW50ZXJuYWwgc3RhdGVcbiAgICBEeW5hbWljUnVubmluZyAtLT4gU3VjY2VlZGluZ1xuICAgIER5bmFtaWNSdW5uaW5nIC0tPiBSZXRyeWFibGVGYWlsdXJlXG4gICAgRHluYW1pY1J1bm5pbmcgLS0-IFRpbWluZ091dFxuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRlZCA6IFVzZXIgb2JzZXJ2ZXMgdGhlIHRhc2sgYXMgc3VjY2VlZGVkXG4gICAgU3VjY2VlZGVkIC0tPiBbKl1cbiAgICBGYWlsZWQgLS0-IFsqXVxuIiwibWVybWFpZCI6e30sInVwZGF0ZUVkaXRvciI6ZmFsc2V9
-    :alt: The state diagram illustrates the various states through which a node transitions. This is the core finite state machine for a node.
+.. mermaid::
+
+   flowchart TD
+     id1(( ))
+     id1-->NotYetStarted
+     id1-->|Will stop the node execution |Aborted
+     NotYetStarted-->|If all upstream nodes are ready, i.e, inputs are ready | Queued
+     NotYetStarted--> |If the branch was not taken |Skipped
+     Queued-->|Start task execution- attempt 0 | Running
+     Running-->|If task timeout has elapsed and retry_attempts >= max_retries|TimingOut
+     Running-->|Internal state|Succeeding
+     Running-->|For dynamic nodes generating workflows| DynamicRunning
+     DynamicRunning-->TimingOut
+     DynamicRunning-->RetryableFailure
+     TimingOut-->|If total node timeout has elapsed|TimedOut
+     DynamicRunning-->Succeeding
+     Succeeding-->|User observes the task as succeeded| Succeeded
+     Running-->|on retryable failure| RetryableFailure
+     RetryableFailure-->|if retry_attempts < max_retries|Running
+     RetryableFailure-->|retry_attempts >= max_retries|Failing
+     Failing-->Failed
+     Succeeded-->id2(( ))
+     Failed-->id2(( ))
+
 
 The state diagram above illustrates the various states through which a node transitions. This is the core finite state machine for a node.
 From the user's point of view, a workflow simply consists of a sequence of tasks. But to Flyte, a workflow internally creates a meta entity called a **node**.
@@ -101,8 +141,23 @@ The state machine specification for the illustration can be found `here <https:/
 Task States
 ===========
 
-.. image:: https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBOb3RSZWFkeVxuICAgIFsqXSAtLT4gQWJvcnRlZCA6IEFib3J0ZWQgYnkgTm9kZUhhbmRsZXIgLSB0aW1lb3V0cywgZXh0cmVuYWwgYWJvcnQsIGV0Y1xuICAgIE5vdFJlYWR5IC0tPiBXYWl0aW5nRm9yUmVzb3VyY2VzIDogQmxvY2tlZCBvbiByZXNvdXJjZSBxdW90YSBvciByZXNvdXJjZSBwb29sIChvcHRpb25hbClcbiAgICBXYWl0aW5nRm9yUmVzb3VyY2VzIC0tPiBRdWV1ZWQgOiBIYXMgYmVlbiBzdWJtaXR0ZWQsIGJ1dCBoYXMgbm90IHN0YXJ0ZWQgKG9wdGlvbmFsKVxuICAgIFF1ZXVlZCAtLT4gSW5pdGlhbGl6aW5nIDogUHJlc3RhcnQgaW5pdGlhbGl6YXRpb24gKG9wdGlvbmFsKVxuICAgIEluaXRpYWxpemluZyAtLT4gUnVubmluZyA6IEFjdHVhbCBleGVjdXRpb24gb2YgdXNlciBjb2RlIGhhcyBzdGFydGVkXG4gICAgUnVubmluZyAtLT4gU3VjY2VzcyA6IFN1Y2Nlc3NmdWwgZXhlY3V0aW9uXG4gICAgUnVubmluZyAtLT4gUmV0cnlhYmxlRmFpbHVyZSA6IEZhaWxlZCB3aXRoIGEgcmV0cnlhYmxlIGVycm9yXG4gICAgUnVubmluZyAtLT4gUGVybWFuZW50RmFpbHVyZSA6IFVucmVjb3ZlcmFibGUgZmFpbHVyZSwgd2lsbCBzdG9wIGFsbCBleGVjdXRpb25cbiAgICBTdWNjZXNzIC0tPiBbKl1cbiAgICBSZXRyeWFibGVGYWlsdXJlIC0tPiBbKl1cbiAgICBQZXJtYW5lbnRGYWlsdXJlIC0tPiBbKl1cbiIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ
-    :alt: The state diagram illustrates the various states through which a task transitions. This is the core finite state machine for any task in Flyte.
+.. mermaid::
+
+   flowchart TD
+     id1(( ))
+     id1-->|Aborted by NodeHandler- timeouts, external abort, etc,.| NotReady
+     id1-->Aborted
+     NotReady-->|Optional-Blocked on resource quota or resource pool | WaitingForResources
+     WaitingForResources--> |Optional- Has been submitted, but hasn't started |Queued
+     Queued-->|Optional- Prestart initialization | Initializing
+     Initializing-->|Actual execution of user code has started|Running
+     Running-->|Successful execution|Success
+     Running-->|Failed with a retryable error|RetryableFailure
+     Running-->|Unrecoverable failure, will stop all execution|PermanentFailure
+     Success-->id2(( ))
+     RetryableFailure-->id2(( ))
+     PermanentFailure-->id2(( ))
+
 
 The state diagram above illustrates the various states through which a task transitions. This is the core finite state machine for a task.
 
