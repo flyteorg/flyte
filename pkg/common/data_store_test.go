@@ -3,8 +3,11 @@ package common
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
+	errs "github.com/pkg/errors"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/codes"
 
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
@@ -61,5 +64,19 @@ func TestOffloadLiteralMap_StorageFailure(t *testing.T) {
 		return errors.NewFlyteAdminError(codes.Internal, "foo")
 	}
 	_, err := OffloadLiteralMap(context.TODO(), mockStorage, literalMap, "nested", "key")
+	assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
+}
+
+func TestOffloadLiteralMap_RetryOn409(t *testing.T) {
+	mockStorage := commonMocks.GetMockStorageClient()
+	retries := 0
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+		retries++
+		assert.Equal(t, reference.String(), "s3://bucket/metadata/nested/key")
+		return errs.Wrapf(&googleapi.Error{Code: 409}, "Failed to write data [%vb] to path [%v].", 10, "size")
+	}
+	expectedRetries := 2
+	_, err := OffloadLiteralMapWithRetryDelayAndAttempts(context.TODO(), mockStorage, literalMap, time.Millisecond, expectedRetries, "nested", "key")
+	assert.EqualValues(t, retries, expectedRetries+1)
 	assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
 }
