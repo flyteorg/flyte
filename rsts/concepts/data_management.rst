@@ -4,6 +4,8 @@
 Understand How Flyte Handles Data
 #################################
 
+Let's understand how Flyte handles data management.
+
 Types of Data
 =============
 
@@ -24,7 +26,7 @@ For every task that receives input, Flyte sends an **Inputs Metadata** object, w
 complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m``, and ``n`` are inlined while
 ``o`` and the output ``pd.DataFrame`` are offloaded to an object store, and their reference is captured in the metadata.
 
-`Flytekit TypeTransformers` make it possible to use complex objects as if they are available locally - just like persistent filehandles. But Flyte backend only deals with
+``Flytekit TypeTransformers`` make it possible to use complex objects as if they are available locally - just like persistent filehandles. But Flyte backend only deals with
 the references.
 
 Thus, primitive data types and references to large objects fall under Metadata - `Meta input` or `Meta output`, and the actual large object is known as **Raw data**.
@@ -149,4 +151,4 @@ Flytekit has a pluggable data persistence layer as explained in :std:ref:`data.e
 For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
 But for Metadata, the data should be accessible to Flyte control plane.
 
-Data persistence is also pluggable. By default, it supports all major blob stores and uses an `interface defined in Flytestdlib <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage>`__.
+Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in `Flytestdlib <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage>`__.

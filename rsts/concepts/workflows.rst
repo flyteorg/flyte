@@ -16,7 +16,7 @@ these will be injected by the SDK and captured at registration time.
 Structure
 ---------
 
-Workflows accept inputs and produce outputs and re-use task definitions across :ref:`projects <divedeep-projects>` and :ref:`domains <divedeep-domains>`. Every workflow has a default :ref: `launchplan <divedeep-launchplans>` with the same name as that of the workflow.
+Workflows accept inputs and produce outputs and re-use task definitions across :ref:`projects <divedeep-projects>` and :ref:`domains <divedeep-domains>`. Every workflow has a default :ref:`launchplan <divedeep-launchplans>` with the same name as that of the workflow.
 
 Workflow structure is flexible because:
 

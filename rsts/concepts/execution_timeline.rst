@@ -32,7 +32,7 @@ Transition latency refers to the time between successive node executions, i.e be
 
 Similarly, the last node also encapsulates executing ``End node`` as well. ``Start Node`` and ``End Node`` are capstones inserted to mark the beginning and end of the DAG.
 
-The Latency involves time consumed to,
+The Latency involves time consumed to:
 
 #. Gather outputs for a node after the node completes.
 #. Send an observation event to FlyteAdmin. Failing to do so will be regarded as an error and will be tried until it is a success or we exhaust system max retries. (as a default the the max system retries is configured to be 30 and can be altered per deployment).

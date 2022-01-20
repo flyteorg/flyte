@@ -56,7 +56,7 @@ Almost any action can be implemented and introduced into Flyte as a "Plugin".
 
 - Tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake, etc.
 - Tasks that run executions on compute engines like Spark, Flink, AWS Sagemaker, AWS Batch, Kubernetes pods, jobs, etc.
-- Tasks that call web services
+- Tasks that call web services.
 
 Flyte ships with some defaults; for example, running a simple Python function does not need any hosted service. Flyte knows how to
 execute these kinds of tasks on Kubernetes. It turns out these are the vast majority of tasks in ML, and Flyte is adept at 
