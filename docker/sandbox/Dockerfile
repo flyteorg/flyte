@@ -56,37 +56,6 @@ COPY charts/flyte-core/ /flyteorg/share/flyte-core
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
 
-
-FROM base_ AS default
-
-# Install dependencies
-RUN apk add --no-cache bash git make tini curl jq
-
-# Copy entrypoints
-COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
-COPY docker/sandbox/bashrc /root/.bashrc
-
-ARG FLYTE_VERSION="latest"
-ENV FLYTE_VERSION "${FLYTE_VERSION}"
-
-ARG FLYTE_TEST="release"
-ENV FLYTE_TEST "${FLYTE_TEST}"
-
-# Update PATH variable
-ENV PATH "/flyteorg/bin:${PATH}"
-
-# Declare volumes for k3s
-VOLUME /var/lib/kubelet
-VOLUME /var/lib/rancher/k3s
-VOLUME /var/lib/cni
-VOLUME /var/log
-
-# Expose Flyte ports
-EXPOSE 30081 30082 30084 30088
-
-ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
-
-
 FROM docker:20.10.11-dind AS dind
 
 # Install dependencies
@@ -96,7 +65,7 @@ RUN apk add --no-cache bash git make tini curl jq
 COPY --from=base_ /flyteorg/ /flyteorg/
 
 # Copy entrypoints
-COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
