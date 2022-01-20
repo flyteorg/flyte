@@ -477,7 +477,7 @@ Example sorting HTTP parameter:
 
    sort_by.key=created_at&sort_by.direction=DESCENDING	
    	
-Alternatively, since `DESCENDING` is the default sorting direction, the above could be written as	
+Alternatively, since ``DESCENDING`` is the default sorting direction, the above could be written as	
 
 ::	
 

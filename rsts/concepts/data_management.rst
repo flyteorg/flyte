@@ -117,7 +117,7 @@ RUNTIME
 ^^^^^^^
 
 At runtime, data passes through Flyte using :std:ref:`ref_flyteidl.core.literal` where the values are set.
-For files, the corresponding `Literal` is called ``LiteralBlob`` (:std:ref:`ref_flyteidl.core.blob`) — which is a binary large object.
+For files, the corresponding ``Literal`` is called ``LiteralBlob`` (:std:ref:`ref_flyteidl.core.blob`) — which is a binary large object.
 Many different objects can be mapped to the underlying `Blob` or `Struct` types. For example, an image is a Blob, a ``pandas.DataFrame`` is a Blob of type parquet, etc.
 
 Data Movement
@@ -126,7 +126,7 @@ Data Movement
 Flyte is primarily a **DataFlow Engine**. It enables movement of data and provides an abstraction to enable movement of data between different languages.
 One implementation of Flyte is the current workflow engine.
 
-The workflow Engine is responsible in moving data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.
+The workflow Engine is responsible for moving data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.
 The illustration below explains how data flows from engine to the task and how that is transferred between tasks. The medium to transfer the data can change, and will change in the future.
 We could use faster metadata stores to speed up data movement or exploit locality.
 
