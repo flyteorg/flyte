@@ -35,7 +35,7 @@
 Running flyteconsole locally requires [NodeJS](https://nodejs.org) and
 [yarn](https://yarnpkg.com). Once these are installed, you can run application locally.
 For help with installing dependencies look into
-[Installation section](https://github.com/flyteorg/flyteconsole/blob/narusina/fflags/CONTRIBUTING.md#-install-dependencies).
+[Installation section](CONTRIBUTING.md#-install-dependencies).
 
 ## 🚀 Quick Start
 1. Follow [Start a Local flyte backend](https://docs.flyte.org/en/latest/getting_started/index.html), like:
@@ -125,17 +125,17 @@ at http://localhost:3000 (if using the default port).
 ## 🛠 Development
 
 For continious development we are using:
-* **[Protobuf and Debug Output](https://github.com/flyteorg/flyteconsole/blob/narusina/fflags/CONTRIBUTING.md#protobuf-and-debug-output)**.
+* **[Protobuf and Debug Output](CONTRIBUTING.md#protobuf-and-debug-output)**.
   Protobuf is a binary response/request format, which makes _Network Tab_ hardly useful.
   To get more info on requests - use our Debug Output
   
-* **[Storybook](https://github.com/flyteorg/flyteconsole/blob/narusina/fflags/CONTRIBUTING.md#storybook)**
+* **[Storybook](CONTRIBUTING.md#storybook)**
   \- used for component stories and base UI testing.
 
-* **[Feature flags](https://github.com/flyteorg/flyteconsole/blob/narusina/fflags/CONTRIBUTING.md#feature-flags)**
+* **[Feature flags](CONTRIBUTING.md#feature-flags)**
   \- allows to enable/disable specific code paths. Used to simplify continious development.
 
-* **[Google Analytics](https://github.com/flyteorg/flyteconsole/blob/narusina/fflags/CONTRIBUTING.md#google-analytics)**
+* **[Google Analytics](CONTRIBUTING.md#google-analytics)**
   \- adds tracking code to the app or website. To disable use `ENABLE_GA=false`
 
 More info on each section could be found at [CONTRIBUTING.md](CONTRIBUTING.md)
