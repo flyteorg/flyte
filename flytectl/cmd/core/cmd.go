@@ -58,9 +58,10 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 			return err
 		}
 
+		adminCfg := admin.GetConfig(ctx)
 		clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
 			WithTokenCache(pkce.TokenCacheKeyringProvider{
-				ServiceUser: pkce.KeyRingServiceUser,
+				ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
 				ServiceName: pkce.KeyRingServiceName,
 			}).Build(ctx)
 		if err != nil {
