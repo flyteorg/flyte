@@ -17,10 +17,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyteadmin/pkg/config"
 	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/promutils"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
@@ -99,7 +102,15 @@ func persistSecrets(ctx context.Context, _ *pflag.FlagSet) error {
 	initializationErrorCounter := scope.NewSubScope("secrets").MustNewCounter(
 		"flyteclient_initialization_error",
 		"count of errors encountered initializing a flyte client from kube config")
-	listTargetsProvider, err := executioncluster.NewListTargets(initializationErrorCounter, executioncluster.NewExecutionTargetProvider(), configuration.ClusterConfiguration())
+
+	var listTargetsProvider interfaces.ListTargetsInterface
+	var err error
+	if len(configuration.ClusterConfiguration().GetClusterConfigs()) == 0 {
+		serverConfig := config.GetConfig()
+		listTargetsProvider, err = executioncluster.NewInCluster(initializationErrorCounter, serverConfig.KubeConfig, serverConfig.Master)
+	} else {
+		listTargetsProvider, err = executioncluster.NewListTargets(initializationErrorCounter, executioncluster.NewExecutionTargetProvider(), configuration.ClusterConfiguration())
+	}
 	if err != nil {
 		return err
 	}

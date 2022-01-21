@@ -21,6 +21,8 @@ type ExecutionInterface interface {
 	CreateWorkflowEvent(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
 		*admin.WorkflowExecutionEventResponse, error)
 	GetExecution(ctx context.Context, request admin.WorkflowExecutionGetRequest) (*admin.Execution, error)
+	UpdateExecution(ctx context.Context, request admin.ExecutionUpdateRequest, requestedAt time.Time) (
+		*admin.ExecutionUpdateResponse, error)
 	GetExecutionData(ctx context.Context, request admin.WorkflowExecutionGetDataRequest) (
 		*admin.WorkflowExecutionGetDataResponse, error)
 	ListExecutions(ctx context.Context, request admin.ResourceListRequest) (*admin.ExecutionList, error)
