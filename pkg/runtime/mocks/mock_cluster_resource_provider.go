@@ -7,10 +7,11 @@ import (
 )
 
 type MockClusterResourceConfiguration struct {
-	TemplatePath       string
-	TemplateData       interfaces.TemplateData
-	RefreshInterval    time.Duration
-	CustomTemplateData map[interfaces.DomainName]interfaces.TemplateData
+	TemplatePath         string
+	TemplateData         interfaces.TemplateData
+	RefreshInterval      time.Duration
+	CustomTemplateData   map[interfaces.DomainName]interfaces.TemplateData
+	StandaloneDeployment bool
 }
 
 func (c MockClusterResourceConfiguration) GetTemplatePath() string {
@@ -26,6 +27,10 @@ func (c MockClusterResourceConfiguration) GetRefreshInterval() time.Duration {
 
 func (c MockClusterResourceConfiguration) GetCustomTemplateData() map[interfaces.DomainName]interfaces.TemplateData {
 	return c.CustomTemplateData
+}
+
+func (c MockClusterResourceConfiguration) IsStandaloneDeployment() bool {
+	return c.StandaloneDeployment
 }
 
 func NewMockClusterResourceConfiguration() interfaces.ClusterResourceConfiguration {

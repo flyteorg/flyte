@@ -36,6 +36,10 @@ func (p *ClusterResourceConfigurationProvider) GetCustomTemplateData() map[inter
 	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).CustomData
 }
 
+func (p *ClusterResourceConfigurationProvider) IsStandaloneDeployment() bool {
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).StandaloneDeployment
+}
+
 func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {
 	return &ClusterResourceConfigurationProvider{}
 }

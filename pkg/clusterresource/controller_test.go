@@ -7,14 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/mock"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/clusterresource/mocks"
+	execClusterMocks "github.com/flyteorg/flyteadmin/pkg/executioncluster/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	clientMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -152,28 +154,16 @@ func TestPopulateDefaultTemplateValues(t *testing.T) {
 }
 
 func TestGetCustomTemplateValues(t *testing.T) {
-	adminClient := clientMocks.AdminServiceClient{}
-	adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
-		return req.Project == proj && req.Domain == domain
-	})).Return(&admin.ProjectDomainAttributesGetResponse{
-		Attributes: &admin.ProjectDomainAttributes{
-			Project: proj,
-			Domain:  domain,
-			MatchingAttributes: &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ClusterResourceAttributes{
-					ClusterResourceAttributes: &admin.ClusterResourceAttributes{
-						Attributes: map[string]string{
-							"var1": "val1",
-							"var2": "val2",
-						},
-					},
-				},
-			},
+	adminDataProvider := mocks.FlyteAdminDataProvider{}
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(&admin.ClusterResourceAttributes{
+		Attributes: map[string]string{
+			"var1": "val1",
+			"var2": "val2",
 		},
 	}, nil)
 
 	testController := controller{
-		adminClient: &adminClient,
+		adminDataProvider: &adminDataProvider,
 	}
 	domainTemplateValues := templateValuesType{
 		"{{ var1 }}": "i'm getting overwritten",
@@ -191,12 +181,11 @@ func TestGetCustomTemplateValues(t *testing.T) {
 }
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
-	adminClient := clientMocks.AdminServiceClient{}
-	adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
-		return req.Project == proj && req.Domain == domain
-	})).Return(&admin.ProjectDomainAttributesGetResponse{}, nil)
+	adminDataProvider := mocks.FlyteAdminDataProvider{}
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(
+		nil, errors.NewFlyteAdminError(codes.NotFound, "foo"))
 	testController := controller{
-		adminClient: &adminClient,
+		adminDataProvider: &adminDataProvider,
 	}
 	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), proj, domain, templateValuesType{
 		"{{ var1 }}": "val1",
@@ -344,11 +333,11 @@ metadata:
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			adminClient := clientMocks.AdminServiceClient{}
-			adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(&admin.ProjectDomainAttributesGetResponse{}, nil)
+			adminDataProvider := mocks.FlyteAdminDataProvider{}
+			adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, mock.Anything, mock.Anything).Return(&admin.ClusterResourceAttributes{}, nil)
 			mockPromScope := mockScope.NewTestScope()
 
-			c := NewClusterResourceController(&adminClient, &mocks.ListTargetsInterface{}, mockPromScope)
+			c := NewClusterResourceController(&adminDataProvider, &execClusterMocks.ListTargetsInterface{}, mockPromScope)
 			testController := c.(*controller)
 
 			gotK8sManifest, err := testController.createResourceFromTemplate(tt.args.ctx, tt.args.templateDir, tt.args.templateFileName, tt.args.project, tt.args.domain, tt.args.namespace, tt.args.templateValues, tt.args.customTemplateValues)

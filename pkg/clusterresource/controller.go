@@ -14,10 +14,9 @@ import (
 
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-
+	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	executionclusterIfaces "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -96,14 +95,9 @@ type controller struct {
 	metrics                controllerMetrics
 	lastAppliedTemplateDir string
 	// Map of [namespace -> [templateFileName -> last modified time]]
-	appliedTemplates NamespaceCache
-	adminClient      service.AdminServiceClient
-	listTargets      interfaces.ListTargetsInterface
-}
-
-var descCreatedAtSortParam = &admin.Sort{
-	Direction: admin.Sort_DESCENDING,
-	Key:       "created_at",
+	appliedTemplates  NamespaceCache
+	adminDataProvider interfaces.FlyteAdminDataProvider
+	listTargets       executionclusterIfaces.ListTargetsInterface
 }
 
 func (c *controller) templateAlreadyApplied(namespace NamespaceName, templateFile os.FileInfo) bool {
@@ -199,23 +193,19 @@ func (c *controller) getCustomTemplateValues(
 	}
 	collectedErrs := make([]error, 0)
 	// All override values saved in the database take precedence over the domain-specific defaults.
-	resource, err := c.adminClient.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
-		Project:      project,
-		Domain:       domain,
-		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
-	})
+	attributes, err := c.adminDataProvider.GetClusterResourceAttributes(ctx, project, domain)
 	if err != nil {
 		s, ok := status.FromError(err)
 		if !ok || s.Code() != codes.NotFound {
 			collectedErrs = append(collectedErrs, err)
 		}
 	}
-	if resource != nil && resource.Attributes != nil && resource.Attributes.MatchingAttributes != nil &&
-		resource.Attributes.MatchingAttributes.GetClusterResourceAttributes() != nil {
-		for templateKey, templateValue := range resource.Attributes.MatchingAttributes.GetClusterResourceAttributes().Attributes {
+	if attributes != nil && attributes.Attributes != nil {
+		for templateKey, templateValue := range attributes.Attributes {
 			customTemplateValues[fmt.Sprintf(templateVariableFormat, templateKey)] = templateValue
 		}
 	}
+
 	if len(collectedErrs) > 0 {
 		return nil, errors.NewCollectedFlyteAdminError(codes.InvalidArgument, collectedErrs)
 	}
@@ -550,32 +540,6 @@ func (c *controller) createPatch(gvk schema.GroupVersionKind, currentObj *unstru
 	return patch, patchType, nil
 }
 
-var activeProjectsFilter = fmt.Sprintf("ne(state,%d)", admin.Project_ARCHIVED)
-
-func (c *controller) listAllProjects(ctx context.Context) ([]*admin.Project, error) {
-	projects := make([]*admin.Project, 0)
-	listReq := &admin.ProjectListRequest{
-		Limit:   100,
-		Filters: activeProjectsFilter,
-		// Prefer to sync projects most newly created to ensure their resources get created first when other resources exist.
-		SortBy: descCreatedAtSortParam,
-	}
-
-	// Iterate through all pages of projects
-	for {
-		projectResp, err := c.adminClient.ListProjects(ctx, listReq)
-		if err != nil {
-			return nil, err
-		}
-		projects = append(projects, projectResp.Projects...)
-		if len(projectResp.Token) == 0 {
-			break
-		}
-		listReq.Token = projectResp.Token
-	}
-	return projects, nil
-}
-
 func (c *controller) Sync(ctx context.Context) error {
 	defer func() {
 		if err := recover(); err != nil {
@@ -586,7 +550,7 @@ func (c *controller) Sync(ctx context.Context) error {
 	c.metrics.SyncStarted.Inc()
 	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
-	projects, err := c.listAllProjects(ctx)
+	projects, err := c.adminDataProvider.GetProjects(ctx)
 	if err != nil {
 		return err
 	}
@@ -603,7 +567,7 @@ func (c *controller) Sync(ctx context.Context) error {
 		errs = append(errs, err)
 	}
 
-	for _, project := range projects {
+	for _, project := range projects.Projects {
 		for _, domain := range *domains {
 			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Id, domain.Name)
 			customTemplateValues, err := c.getCustomTemplateValues(
@@ -669,14 +633,14 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 	}
 }
 
-func NewClusterResourceController(adminClient service.AdminServiceClient, listTargets interfaces.ListTargetsInterface, scope promutils.Scope) Controller {
+func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataProvider, listTargets executionclusterIfaces.ListTargetsInterface, scope promutils.Scope) Controller {
 	config := runtime.NewConfigurationProvider()
 	return &controller{
-		adminClient:      adminClient,
-		config:           config,
-		listTargets:      listTargets,
-		poller:           make(chan struct{}),
-		metrics:          newMetrics(scope),
-		appliedTemplates: make(map[string]map[string]time.Time),
+		adminDataProvider: adminDataProvider,
+		config:            config,
+		listTargets:       listTargets,
+		poller:            make(chan struct{}),
+		metrics:           newMetrics(scope),
+		appliedTemplates:  make(map[string]map[string]time.Time),
 	}
 }
