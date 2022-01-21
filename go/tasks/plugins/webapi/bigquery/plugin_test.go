@@ -1,8 +1,20 @@
 package bigquery
 
 import (
+	"context"
 	"testing"
 	"time"
+
+	coreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/stretchr/testify/mock"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -11,6 +23,10 @@ import (
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
+}
 
 func TestFormatJobReference(t *testing.T) {
 	t.Run("format job reference", func(t *testing.T) {
@@ -44,6 +60,79 @@ func TestCreateTaskInfo(t *testing.T) {
 			Name: "BigQuery Console",
 		}, *taskInfo.Logs[0])
 	})
+}
+
+func TestOutputWriter(t *testing.T) {
+	ctx := context.Background()
+	statusContext := &mocks.StatusContext{}
+
+	template := flyteIdlCore.TaskTemplate{}
+	tr := &coreMocks.TaskReader{}
+	tr.OnRead(ctx).Return(&template, nil)
+	statusContext.OnTaskReader().Return(tr)
+
+	outputLocation := "bq://project:flyte.table"
+	err := writeOutput(ctx, statusContext, outputLocation)
+	assert.NoError(t, err)
+
+	ds, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+
+	outputWriter := &ioMocks.OutputWriter{}
+	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+		or := args.Get(1).(io.OutputReader)
+		literals, ee, err := or.Read(ctx)
+		assert.NoError(t, err)
+
+		sd := literals.GetLiterals()["results"].GetScalar().GetStructuredDataset()
+		assert.Equal(t, sd.Uri, outputLocation)
+		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].Name, "col1")
+		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].LiteralType.GetSimple(), flyteIdlCore.SimpleType_INTEGER)
+
+		if ee != nil {
+			assert.NoError(t, ds.WriteProtobuf(ctx, outputWriter.GetErrorPath(), storage.Options{}, ee))
+		}
+
+		if literals != nil {
+			assert.NoError(t, ds.WriteProtobuf(ctx, outputWriter.GetOutputPath(), storage.Options{}, literals))
+		}
+	})
+
+	execID := rand.String(3)
+	basePrefix := storage.DataReference("fake://bucket/prefix/" + execID)
+	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
+	statusContext.OnOutputWriter().Return(outputWriter)
+
+	template = flyteIdlCore.TaskTemplate{
+		Interface: &flyteIdlCore.TypedInterface{
+			Outputs: &flyteIdlCore.VariableMap{
+				Variables: map[string]*flyteIdlCore.Variable{
+					"results": {
+						Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_StructuredDatasetType{
+								StructuredDatasetType: &flyteIdlCore.StructuredDatasetType{
+									Columns: []*flyteIdlCore.StructuredDatasetType_DatasetColumn{
+										{
+											Name: "col1",
+											LiteralType: &flyteIdlCore.LiteralType{
+												Type: &flyteIdlCore.LiteralType_Simple{
+													Simple: flyteIdlCore.SimpleType_INTEGER,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	tr.OnRead(ctx).Return(&template, nil)
+	statusContext.OnTaskReader().Return(tr)
+	err = writeOutput(ctx, statusContext, outputLocation)
+	assert.NoError(t, err)
 }
 
 func TestHandleCreateError(t *testing.T) {

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
@@ -42,8 +44,9 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	Status      *bigquery.JobStatus
-	CreateError *googleapi.Error
+	Status         *bigquery.JobStatus
+	CreateError    *googleapi.Error
+	OutputLocation string
 }
 
 type ResourceMetaWrapper struct {
@@ -211,8 +214,12 @@ func (p Plugin) getImpl(ctx context.Context, taskCtx webapi.GetContext) (wrapper
 		return nil, err
 	}
 
+	dst := job.Configuration.Query.DestinationTable
+	outputLocation := fmt.Sprintf("bq://%v:%v.%v", dst.ProjectId, dst.DatasetId, dst.TableId)
+
 	return &ResourceWrapper{
-		Status: job.Status,
+		Status:         job.Status,
+		OutputLocation: outputLocation,
 	}, nil
 }
 
@@ -244,7 +251,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	return nil
 }
 
-func (p Plugin) Status(_ context.Context, tCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
+func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resourceMeta := tCtx.ResourceMeta().(*ResourceMetaWrapper)
 	resource := tCtx.Resource().(*ResourceWrapper)
 	version := pluginsCore.DefaultPhaseVersion
@@ -273,11 +280,52 @@ func (p Plugin) Status(_ context.Context, tCtx webapi.StatusContext) (phase core
 				resource.Status.ErrorResult.Message,
 				taskInfo), nil
 		}
-
+		err = writeOutput(ctx, tCtx, resource.OutputLocation)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to write output, uri [%s], err %s", resource.OutputLocation, err.Error())
+			return core.PhaseInfoUndefined, err
+		}
 		return pluginsCore.PhaseInfoSuccess(taskInfo), nil
 	}
 
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", resource.Status.State)
+}
+
+func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation string) error {
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return err
+	}
+
+	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return nil
+	}
+
+	resultsStructuredDatasetType, exists := taskTemplate.Interface.Outputs.Variables["results"]
+	if !exists {
+		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return nil
+	}
+	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+		&flyteIdlCore.LiteralMap{
+			Literals: map[string]*flyteIdlCore.Literal{
+				"results": {
+					Value: &flyteIdlCore.Literal_Scalar{
+						Scalar: &flyteIdlCore.Scalar{
+							Value: &flyteIdlCore.Scalar_StructuredDataset{
+								StructuredDataset: &flyteIdlCore.StructuredDataset{
+									Uri: OutputLocation,
+									Metadata: &flyteIdlCore.StructuredDatasetMetadata{
+										StructuredDatasetType: resultsStructuredDatasetType.GetType().GetStructuredDatasetType(),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}, nil))
 }
 
 func handleCreateError(createError *googleapi.Error, taskInfo *core.TaskInfo) core.PhaseInfo {
