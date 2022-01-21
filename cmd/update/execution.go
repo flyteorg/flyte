@@ -44,11 +44,11 @@ func updateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
 	}
 
-	var executionState admin.ExecutionStatus_ExecutionState
+	var executionState admin.ExecutionState
 	if activateExec {
-		executionState = admin.ExecutionStatus_EXECUTION_ACTIVE
+		executionState = admin.ExecutionState_EXECUTION_ACTIVE
 	} else if archiveExec {
-		executionState = admin.ExecutionStatus_EXECUTION_ARCHIVED
+		executionState = admin.ExecutionState_EXECUTION_ARCHIVED
 	}
 
 	if execution.UConfig.DryRun {
@@ -60,7 +60,7 @@ func updateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 				Domain:  domain,
 				Name:    executionName,
 			},
-			Status: &admin.ExecutionStatus{State: executionState},
+			State: executionState,
 		})
 		if err != nil {
 			fmt.Printf(clierrors.ErrFailedExecutionUpdate, executionName, err)
