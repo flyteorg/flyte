@@ -75,7 +75,11 @@ func newFakeBigQueryServer() *httptest.Server {
 
 		if strings.HasPrefix(request.URL.Path, "/projects/flyte/jobs/") && request.Method == "GET" {
 			writer.WriteHeader(200)
-			job := bigquery.Job{Status: &bigquery.JobStatus{State: "DONE"}}
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: "DONE"},
+				Configuration: &bigquery.JobConfiguration{
+					Query: &bigquery.JobConfigurationQuery{
+						DestinationTable: &bigquery.TableReference{
+							ProjectId: "project", DatasetId: "dataset", TableId: "table"}}}}
 			bytes, _ := json.Marshal(job)
 			_, _ = writer.Write(bytes)
 			return
