@@ -235,7 +235,7 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
 
 We run a suite of tests (defined in https://github.com/flyteorg/flytesnacks/blob/master/cookbook/flyte_tests_manifest.json) to ensure that basic functionality, and a subset of the integrations work across a variety of release versions. Those tests are run in a cluster where specific versions of the Flyte components, such as console, flyteadmin, datacatalog, and flytepropeller, are installed. The table below has different release versions as the columns and the result of each test suite as rows.
 
-<details>
+<details open>
 <center>
 
 | workflow group                  | nightly                                                                                                            | v0.18.2                                                                                                            |
