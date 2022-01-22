@@ -1,17 +1,3 @@
-FROM golang:1.16.5-alpine3.13 AS go_builder_
-
-# Install dependencies
-RUN apk add --no-cache build-base git make
-
-# Create directory to store built artifacts
-ARG INSTALL_DIR="/install"
-RUN mkdir -p ${INSTALL_DIR}
-
-ARG BUILDKIT_CLI_FOR_KUBECTL_VERSION="v0.1.2"
-RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 https://github.com/vmware-tanzu/buildkit-cli-for-kubectl.git ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl \
-    && make -C ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl ${INSTALL_DIR}/linux/kubectl-build BIN_DIR=${INSTALL_DIR} VERSION=${BUILDKIT_CLI_FOR_KUBECTL_VERSION}
-
-
 FROM alpine:3.13.5 AS base_
 
 # Install dependencies

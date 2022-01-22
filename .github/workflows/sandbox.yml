@@ -33,6 +33,7 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox
           tags: |
+            dind
             type=sha,format=long, prefix=dind-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -58,7 +59,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name == 'release' }}
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
