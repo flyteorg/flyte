@@ -32,9 +32,6 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
-# Install buildkit-cli-for-kubectl
-COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
-
 # Copy flyte chart
 COPY charts/flyte/ /flyteorg/share/flyte
 COPY charts/flyte-core/ /flyteorg/share/flyte-core
