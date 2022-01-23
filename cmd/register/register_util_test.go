@@ -456,19 +456,17 @@ func TestGetStorageClient(t *testing.T) {
 
 func TestGetAllFlytesnacksExample(t *testing.T) {
 	t.Run("Failed to get manifest with wrong name", func(t *testing.T) {
-		_, tag, err := getAllFlytesnacksExample("no////ne", "no////ne", "")
+		_, _, err := getAllExample("no////ne", "")
 		assert.NotNil(t, err)
-		assert.Equal(t, len(tag), 0)
 	})
 	t.Run("Failed to get release", func(t *testing.T) {
-		_, tag, err := getAllFlytesnacksExample("flyteorg", "homebrew-tap", "")
+		_, _, err := getAllExample("homebrew-tap", "")
 		assert.NotNil(t, err)
-		assert.Equal(t, len(tag), 0)
 	})
 	t.Run("Successfully get examples", func(t *testing.T) {
-		assets, tag, err := getAllFlytesnacksExample("flyteorg", "flytesnacks", "v0.2.175")
+		assets, r, err := getAllExample("flytesnacks", "v0.2.175")
 		assert.Nil(t, err)
-		assert.Greater(t, len(tag), 0)
+		assert.Greater(t, len(*r.TagName), 0)
 		assert.Greater(t, len(assets), 0)
 	})
 }

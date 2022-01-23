@@ -15,12 +15,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/utils"
-
-	"github.com/google/go-github/github"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/google/go-github/v37/github"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -541,8 +542,8 @@ func getJSONSpec(message proto.Message) string {
 	return jsonSpec
 }
 
-func filterExampleFromRelease(releases github.RepositoryRelease) []github.ReleaseAsset {
-	var assets []github.ReleaseAsset
+func filterExampleFromRelease(releases *github.RepositoryRelease) []*github.ReleaseAsset {
+	var assets []*github.ReleaseAsset
 	for _, v := range releases.Assets {
 		isValid, _ := checkSupportedExtensionForCompress(*v.Name)
 		if isValid {
@@ -552,24 +553,27 @@ func filterExampleFromRelease(releases github.RepositoryRelease) []github.Releas
 	return assets
 }
 
-func getAllFlytesnacksExample(org, repository, version string) ([]github.ReleaseAsset, string, error) {
-	c := github.NewClient(nil)
-	opt := &github.ListOptions{Page: 1, PerPage: 1}
+func getAllExample(repository, version string) ([]*github.ReleaseAsset, *github.RepositoryRelease, error) {
 	if len(version) > 0 {
-		releases, _, err := c.Repositories.GetReleaseByTag(context.Background(), org, repository, version)
+		release, err := githubutil.CheckVersionExist(version, repository)
 		if err != nil {
-			return nil, "", err
+			return nil, nil, err
 		}
-		return filterExampleFromRelease(*releases), version, nil
+		return filterExampleFromRelease(release), release, nil
 	}
-	releases, _, err := c.Repositories.ListReleases(context.Background(), org, repository, opt)
+	releases, err := githubutil.GetListRelease(repository)
 	if err != nil {
-		return nil, "", err
+		return nil, nil, err
 	}
 	if len(releases) == 0 {
-		return nil, "", fmt.Errorf("repository doesn't have any release")
+		return nil, nil, fmt.Errorf("repository doesn't have any release")
 	}
-	return filterExampleFromRelease(*releases[0]), *releases[0].TagName, nil
+	for _, v := range releases {
+		if !*v.Prerelease {
+			return filterExampleFromRelease(v), v, nil
+		}
+	}
+	return nil, nil, nil
 
 }
 
