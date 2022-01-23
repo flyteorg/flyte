@@ -1,10 +1,10 @@
 name: Master
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
-
 jobs:
   # Duplicated from pull request workflow because sharing is not yet supported
   build-docker:
@@ -31,6 +31,31 @@ jobs:
 
       - name: Tag and cache docker image
         run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+
+  tests-lint:
+    name: Run tests and lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Unit Tests
+        uses: cedrickring/golang-action@1.7.0
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+      - name: Lint
+        uses: cedrickring/golang-action@1.7.0
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make lint
 
   # Duplicated from pull request workflow because sharing is not yet supported
   endtoend:
@@ -72,20 +97,24 @@ jobs:
     name: Bump Version
     if: github.actor != 'goreleaserbot'
     runs-on: ubuntu-latest
-    needs: build-docker # Only to ensure it can successfully build
+    needs: [ endtoend, tests-lint ] # Only to ensure it can successfully build
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
+      - name: Set branch name
+        id: extract_branch
+        run: echo "::set-output name=branch_name::$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})"
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.34.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
           DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
 
   goreleaser:
     name: Goreleaser
@@ -137,27 +166,4 @@ jobs:
           dockerfile: Dockerfile.scheduler
           registry: ghcr.io
           build_extra_args: "--compress=true"
-  tests-lint:
-    name: Run tests and lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Unit Tests
-        uses: cedrickring/golang-action@1.7.0
-        env:
-          GO111MODULE: "on"
-        with:
-          args: make install && make test_unit_codecov
-      - name: Push CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: coverage.txt
-          flags: unittests
-          fail_ci_if_error: true
-      - name: Lint
-        uses: cedrickring/golang-action@1.7.0
-        env:
-          GO111MODULE: "on"
-        with:
-          args: make install && make lint
+
