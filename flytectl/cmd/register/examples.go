@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v37/github"
 
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -31,24 +31,23 @@ Usage
 )
 
 var (
-	githubOrg             = "flyteorg"
-	flytesnacksRepository = "flytesnacks"
+	flytesnacks = "flytesnacks"
 )
 
 func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	var examples []github.ReleaseAsset
+	var examples []*github.ReleaseAsset
 
 	// Deprecated checks for --k8Service
 	deprecatedCheck(ctx, &rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.K8ServiceAccount)
 
-	examples, tag, err := getAllFlytesnacksExample(githubOrg, flytesnacksRepository, rconfig.DefaultFilesConfig.Version)
+	examples, tag, err := getAllExample(flytesnacks, rconfig.DefaultFilesConfig.Version)
 	if err != nil {
 		return err
 	}
 
-	logger.Infof(ctx, "Register started for %s %s release https://github.com/%s/%s/releases/tag/%s", flytesnacksRepository, tag, githubOrg, flytesnacksRepository, tag)
+	logger.Infof(ctx, "Register started for %s %s release https://github.com/flyteorg/%s/releases/tag/%s", flytesnacks, tag, flytesnacks, tag)
 	rconfig.DefaultFilesConfig.Archive = true
-	rconfig.DefaultFilesConfig.Version = tag
+	rconfig.DefaultFilesConfig.Version = *tag.TagName
 	for _, v := range examples {
 		args := []string{
 			*v.BrowserDownloadURL,
