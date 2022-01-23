@@ -1,6 +1,7 @@
 name: Master
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -73,20 +74,24 @@ jobs:
     if: github.event.commits[0].author.name != 'goreleaserbot'
     runs-on: ubuntu-latest
     # Only to ensure it can successfully build
-    needs: build-docker
+    needs: [ endtoend, tests-lint ]
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
+      - name: Set branch name
+        id: extract_branch
+        run: echo "::set-output name=branch_name::$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})"
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.17.2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
           DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
 
   goreleaser:
     name: Goreleaser
