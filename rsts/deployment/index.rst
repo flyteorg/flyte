@@ -57,7 +57,7 @@ solution). The following pages will help you effectively deploy and manage an en
        :text: Multi-cluster setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Deployment guides with detailed instructions specific to multiple clusters.
+    Detailed instructions on multiple clusters setup.
 
     ---
 
