@@ -93,7 +93,7 @@ solution). The following pages will help you effectively deploy and manage an en
     overview
     aws/index
     gcp/index
-    multi-cluster setup
+    multicluster
     cluster_config/index
     sandbox
     plugin_setup/index
