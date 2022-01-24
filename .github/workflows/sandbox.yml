@@ -34,6 +34,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox
           tags: |
             dind
+            ${{ steps.set_version.outputs.flyte_version }}
             type=sha,format=long, prefix=dind-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
