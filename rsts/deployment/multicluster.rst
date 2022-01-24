@@ -1,3 +1,4 @@
+.. _multicluster-setup:
 """
 ##################################
 Using Multiple Kubernetes Clusters
