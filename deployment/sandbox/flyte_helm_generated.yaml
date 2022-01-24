@@ -402,6 +402,12 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: postgres
+      port: 5432
+      username: postgres
   domain.yaml: | 
     domains:
     - id: development

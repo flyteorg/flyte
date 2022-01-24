@@ -305,6 +305,13 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<RDS_HOST>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
   domain.yaml: | 
     domains:
     - id: development

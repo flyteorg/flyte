@@ -17,6 +17,12 @@ data:
   {{- end }}
   {{- end }}
 
+  {{- if not .Values.cluster_resource_manager.standalone_deploy }}
+  {{- with .Values.db.admin }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- end }}
+
   {{- with .Values.configmap.domain }}
   domain.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
