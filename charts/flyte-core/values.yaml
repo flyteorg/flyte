@@ -638,6 +638,8 @@ external_events:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+  standalone_deploy: false
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
