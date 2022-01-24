@@ -14,31 +14,65 @@ Updates the project according to the flags passed. Allows you to archive or acti
 Activate project flytesnacks:
 ::
 
- flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activate
 
 Archive project flytesnacks:
 
 ::
 
- flytectl update project -p flytesnacks --archiveProject
+ flytectl update project -p flytesnacks --archive
 
 Incorrect usage when passing both archive and activate:
 
 ::
 
- flytectl update project flytesnacks --archiveProject --activateProject
+ flytectl update project -p flytesnacks --archiveProject --activate
 
 Incorrect usage when passing unknown-project:
 
 ::
 
- flytectl update project unknown-project --archiveProject
+ flytectl update project unknown-project --archive
 
-Incorrect usage when passing valid project using -p option:
+project ID is required flag
 
 ::
 
- flytectl update project unknown-project --archiveProject -p known-project
+ flytectl update project unknown-project --archiveProject
+
+Update projects.(project/projects can be used interchangeably in these commands)
+
+::
+
+ flytectl update project -p flytesnacks --description "flytesnacks description"  --labels app=flyte
+
+Update a project by definition file. Note: The name shouldn't contain any whitespace characters.
+::
+
+ flytectl update project --file project.yaml 
+
+.. code-block:: yaml
+
+    id: "project-unique-id"
+    name: "Name"
+    labels:
+       values:
+         app: flyte
+    description: "Some description for the project"
+
+Update a project state by definition file. Note: The name shouldn't contain any whitespace characters.
+::
+
+ flytectl update project --file project.yaml  --archive
+
+.. code-block:: yaml
+
+    id: "project-unique-id"
+    name: "Name"
+    labels:
+       values:
+         app: flyte
+    description: "Some description for the project"
 
 Usage
 
@@ -52,10 +86,17 @@ Options
 
 ::
 
-      --activateProject   Activates the project specified as argument.
-      --archiveProject    Archives the project specified as argument.
-      --dryRun            execute command without making any modifications.
-  -h, --help              help for project
+      --activate                Activates the project specified as argument. Only used in update
+      --activateProject         (Deprecated) Activates the project specified as argument. Only used in update
+      --archive                 Archives the project specified as argument. Only used in update
+      --archiveProject          (Deprecated) Archives the project specified as argument. Only used in update
+      --description string      description for the project specified as argument.
+      --dryRun                  execute command without making any modifications.
+      --file string             file for the project definition.
+  -h, --help                    help for project
+      --id string               id for the project specified as argument.
+      --labels stringToString   labels for the project specified as argument. (default [])
+      --name string             name for the project specified as argument.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
