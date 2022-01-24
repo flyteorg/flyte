@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 
+	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/flyteorg/flytestdlib/logger"
 
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
@@ -53,6 +54,13 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 	}
 
 	metrics.SubTasksSubmitted.Add(ctx, float64(size))
+
+	retryAttemptsArray, err := bitarray.NewCompactArray(uint(size), bitarray.Item(pluginConfig.MaxRetries))
+	if err != nil {
+		logger.Errorf(context.Background(), "Failed to create attempts compact array with [count: %v, maxValue: %v]", size, pluginConfig.MaxRetries)
+		return nil, err
+	}
+
 	parentState := currentState.
 		SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, 0).
 		SetArrayStatus(arraystatus.ArrayStatus{
@@ -61,7 +69,8 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 			},
 			Detailed: arrayCore.NewPhasesCompactArray(uint(size)),
 		}).
-		SetReason("Successfully launched subtasks.")
+		SetReason("Successfully launched subtasks.").
+		SetRetryAttempts(retryAttemptsArray)
 
 	nextState = currentState.SetExternalJobID(j)
 	nextState.State = parentState

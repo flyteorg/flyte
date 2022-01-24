@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
 	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -186,11 +184,9 @@ func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 				Name: "Athena Query Console",
 			},
 		},
-		Metadata: &event.TaskExecutionMetadata{
-			ExternalResources: []*event.ExternalResourceInfo{
-				{
-					ExternalId: queryID,
-				},
+		ExternalResources: []*core.ExternalResource{
+			{
+				ExternalID: queryID,
 			},
 		},
 	}

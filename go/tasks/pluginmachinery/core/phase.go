@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
@@ -69,6 +67,18 @@ func (p Phase) IsWaitingForResources() bool {
 	return p == PhaseWaitingForResources
 }
 
+type ExternalResource struct {
+	// A unique identifier for the external resource
+	ExternalID string
+	// A unique index for the external resource. Although the ID may change, this will remain the same
+	// throughout task event reports and retries.
+	Index uint32
+	// The nubmer of times this external resource has been attempted
+	RetryAttempt uint32
+	// Phase (if exists) associated with the external resource
+	Phase Phase
+}
+
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog
@@ -77,8 +87,8 @@ type TaskInfo struct {
 	OccurredAt *time.Time
 	// Custom Event information that the plugin would like to expose to the front-end
 	CustomInfo *structpb.Struct
-	// Metadata around how a task was executed
-	Metadata *event.TaskExecutionMetadata
+	// A collection of information about external resources launched by this task
+	ExternalResources []*ExternalResource
 }
 
 func (t *TaskInfo) String() string {

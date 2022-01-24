@@ -112,6 +112,7 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 
 		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
 		newArrayStatus.Summary.Inc(actualPhase)
+		parentState.RetryAttempts.SetItem(childIdx, bitarray.Item(len(subJob.Attempts)))
 	}
 
 	if queued > 0 {

@@ -7,9 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	ioMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
@@ -128,13 +125,8 @@ func TestConstructTaskInfo(t *testing.T) {
 
 	taskInfo := ConstructTaskInfo(e)
 	assert.Equal(t, "https://wellness.qubole.com/v2/analyze?command_id=123", taskInfo.Logs[0].Uri)
-	assert.True(t, proto.Equal(taskInfo.Metadata, &event.TaskExecutionMetadata{
-		ExternalResources: []*event.ExternalResourceInfo{
-			{
-				ExternalId: "123",
-			},
-		},
-	}))
+	assert.Len(t, taskInfo.ExternalResources, 1)
+	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "123")
 }
 
 func TestMapExecutionStateToPhaseInfo(t *testing.T) {

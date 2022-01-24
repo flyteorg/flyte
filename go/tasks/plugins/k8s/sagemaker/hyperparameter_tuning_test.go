@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
-
 	"github.com/go-test/deep"
 
 	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -129,12 +126,7 @@ func Test_awsSagemakerPlugin_getEventInfoForHyperparameterTuningJob(t *testing.T
 		if diff := deep.Equal(expectedCustomInfo, taskInfo.CustomInfo); diff != nil {
 			assert.FailNow(t, "Should be equal.", "Diff: %v", diff)
 		}
-		assert.True(t, proto.Equal(taskInfo.Metadata, &event.TaskExecutionMetadata{
-			ExternalResources: []*event.ExternalResourceInfo{
-				{
-					ExternalId: "some-acceptable-name",
-				},
-			},
-		}))
+		assert.Len(t, taskInfo.ExternalResources, 1)
+		assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "some-acceptable-name")
 	})
 }

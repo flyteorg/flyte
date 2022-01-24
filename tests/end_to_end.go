@@ -161,6 +161,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetOverrides().Return(overrides)
 	tMeta.OnGetK8sServiceAccount().Return("s")
 	tMeta.OnGetNamespace().Return("fake-development")
+	tMeta.OnGetMaxAttempts().Return(2)
 	tMeta.OnGetSecurityContext().Return(idlCore.SecurityContext{
 		RunAs: &idlCore.Identity{
 			K8SServiceAccount: "s",

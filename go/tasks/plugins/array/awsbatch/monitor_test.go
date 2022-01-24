@@ -136,6 +136,9 @@ func TestCheckSubTasksState(t *testing.T) {
 		inMemDatastore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
+		retryAttemptsArray, err := bitarray.NewCompactArray(1, bitarray.Item(1))
+		assert.NoError(t, err)
+
 		newState, err := CheckSubTasksState(ctx, tMeta, "", "", jobStore, inMemDatastore, &config.Config{}, &State{
 			State: &arrayCore.State{
 				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -146,6 +149,7 @@ func TestCheckSubTasksState(t *testing.T) {
 					Detailed: arrayCore.NewPhasesCompactArray(1),
 				},
 				IndexesToCache: bitarray.NewBitSet(1),
+				RetryAttempts:  retryAttemptsArray,
 			},
 			ExternalJobID:    refStr("job-id"),
 			JobDefinitionArn: "",
@@ -180,6 +184,9 @@ func TestCheckSubTasksState(t *testing.T) {
 		inMemDatastore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
+		retryAttemptsArray, err := bitarray.NewCompactArray(2, bitarray.Item(1))
+		assert.NoError(t, err)
+
 		newState, err := CheckSubTasksState(ctx, tMeta, "", "", jobStore, inMemDatastore, &config.Config{}, &State{
 			State: &arrayCore.State{
 				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -190,6 +197,7 @@ func TestCheckSubTasksState(t *testing.T) {
 					Detailed: arrayCore.NewPhasesCompactArray(2),
 				},
 				IndexesToCache: bitarray.NewBitSet(2),
+				RetryAttempts:  retryAttemptsArray,
 			},
 			ExternalJobID:    refStr("job-id"),
 			JobDefinitionArn: "",

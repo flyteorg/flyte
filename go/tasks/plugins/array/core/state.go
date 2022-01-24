@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
 	"github.com/flyteorg/flytestdlib/errors"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
@@ -52,6 +50,9 @@ type State struct {
 
 	// Which sub-tasks to cache, (using the original index, that is, the length is ArrayJob.size)
 	IndexesToCache *bitarray.BitSet `json:"indexesToCache"`
+
+	// Tracks the number of subtask retries using the execution index
+	RetryAttempts bitarray.CompactArray `json:"retryAttempts"`
 }
 
 func (s State) GetReason() string {
@@ -108,6 +109,11 @@ func (s *State) SetOriginalMinSuccesses(size int64) *State {
 
 func (s *State) SetReason(reason string) *State {
 	s.Reason = reason
+	return s
+}
+
+func (s *State) SetRetryAttempts(retryAttempts bitarray.CompactArray) *State {
+	s.RetryAttempts = retryAttempts
 	return s
 }
 
@@ -171,20 +177,24 @@ func GetPhaseVersionOffset(currentPhase Phase, length int64) uint32 {
 // handling as we don't have to keep an ever growing list of log links (our batch jobs can be 5000 sub-tasks, keeping
 // all the log links takes up a lot of space).
 func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idlCore.TaskLog, subTaskIDs []*string) (core.PhaseInfo, error) {
-
 	phaseInfo := core.PhaseInfoUndefined
 	t := time.Now()
+
 	nowTaskInfo := &core.TaskInfo{
-		OccurredAt: &t,
-		Logs:       logLinks,
+		OccurredAt:        &t,
+		Logs:              logLinks,
+		ExternalResources: make([]*core.ExternalResource, len(subTaskIDs)),
 	}
-	if nowTaskInfo.Metadata == nil {
-		nowTaskInfo.Metadata = &event.TaskExecutionMetadata{}
-	}
-	for _, subTaskID := range subTaskIDs {
-		nowTaskInfo.Metadata.ExternalResources = append(nowTaskInfo.Metadata.ExternalResources, &event.ExternalResourceInfo{
-			ExternalId: *subTaskID,
-		})
+
+	for childIndex, subTaskID := range subTaskIDs {
+		originalIndex := CalculateOriginalIndex(childIndex, state.GetIndexesToCache())
+
+		nowTaskInfo.ExternalResources[childIndex] = &core.ExternalResource{
+			ExternalID:   *subTaskID,
+			Index:        uint32(originalIndex),
+			RetryAttempt: uint32(state.RetryAttempts.GetItem(childIndex)),
+			Phase:        core.Phases[state.ArrayStatus.Detailed.GetItem(childIndex)],
+		}
 	}
 
 	switch p, version := state.GetPhase(); p {
