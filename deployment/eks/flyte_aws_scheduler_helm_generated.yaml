@@ -308,17 +308,7 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
-  admin.yaml: | 
-    admin:
-      clientId: 'flytepropeller'
-      clientSecretLocation: /etc/secrets/client_secret
-      endpoint: flyteadmin:81
-      insecure: true
-    event:
-      capacity: 1000
-      rate: 500
-      type: admin
-domain.yaml: | 
+  domain.yaml: | 
     domains:
     - id: development
       name: development
@@ -1313,6 +1303,8 @@ spec:
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
             - mountPath: /etc/flyte/clusterresource/templates
               name: resource-templates
             - mountPath: /etc/flyte/config

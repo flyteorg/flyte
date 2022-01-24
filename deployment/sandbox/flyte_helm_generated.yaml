@@ -402,7 +402,7 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
-domain.yaml: | 
+  domain.yaml: | 
     domains:
     - id: development
       name: development
