@@ -82,10 +82,10 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 	}
 
 	if len(args) == 1 {
-		name := args[0]
+		id := args[0]
 		logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
 		for _, v := range projects.Projects {
-			if v.Name == name {
+			if v.Id == id {
 				err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, v)
 				if err != nil {
 					return err

@@ -1,6 +1,7 @@
 package create
 
 import (
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
@@ -25,7 +26,7 @@ func RemoteCreateCommand() *cobra.Command {
 		Long:  createCmdLong,
 	}
 	createResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"project": {CmdFunc: createProjectsCommand, Aliases: []string{"projects"}, ProjectDomainNotRequired: true, PFlagProvider: projectConfig, Short: projectShort,
+		"project": {CmdFunc: createProjectsCommand, Aliases: []string{"projects"}, ProjectDomainNotRequired: true, PFlagProvider: project.DefaultProjectConfig, Short: projectShort,
 			Long: projectLong},
 		"execution": {CmdFunc: createExecutionCommand, Aliases: []string{"executions"}, ProjectDomainNotRequired: false, PFlagProvider: executionConfig, Short: executionShort,
 			Long: executionLong},
