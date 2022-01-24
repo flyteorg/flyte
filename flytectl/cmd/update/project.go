@@ -4,22 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytectl/clierrors"
-
 	"github.com/flyteorg/flytectl/cmd/config"
+
+	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 )
-
-//go:generate pflags ProjectConfig --default-var DefaultProjectConfig --bind-default-var
-
-// Config hold configuration for project update flags.
-type ProjectConfig struct {
-	ActivateProject bool `json:"activateProject" pflag:",Activates the project specified as argument."`
-	ArchiveProject  bool `json:"archiveProject" pflag:",Archives the project specified as argument."`
-	DryRun          bool `json:"dryRun" pflag:",execute command without making any modifications."`
-}
 
 const (
 	projectShort = "Update project resources"
@@ -28,65 +19,96 @@ Updates the project according to the flags passed. Allows you to archive or acti
 Activate project flytesnacks:
 ::
 
- flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activate
 
 Archive project flytesnacks:
 
 ::
 
- flytectl update project -p flytesnacks --archiveProject
+ flytectl update project -p flytesnacks --archive
 
 Incorrect usage when passing both archive and activate:
 
 ::
 
- flytectl update project flytesnacks --archiveProject --activateProject
+ flytectl update project -p flytesnacks --archiveProject --activate
 
 Incorrect usage when passing unknown-project:
 
 ::
 
- flytectl update project unknown-project --archiveProject
+ flytectl update project unknown-project --archive
 
-Incorrect usage when passing valid project using -p option:
+project ID is required flag
 
 ::
 
- flytectl update project unknown-project --archiveProject -p known-project
+ flytectl update project unknown-project --archiveProject
+
+Update projects.(project/projects can be used interchangeably in these commands)
+
+::
+
+ flytectl update project -p flytesnacks --description "flytesnacks description"  --labels app=flyte
+
+Update a project by definition file. Note: The name shouldn't contain any whitespace characters.
+::
+
+ flytectl update project --file project.yaml 
+
+.. code-block:: yaml
+
+    id: "project-unique-id"
+    name: "Name"
+    labels:
+       values:
+         app: flyte
+    description: "Some description for the project"
+
+Update a project state by definition file. Note: The name shouldn't contain any whitespace characters.
+::
+
+ flytectl update project --file project.yaml  --archive
+
+.. code-block:: yaml
+
+    id: "project-unique-id"
+    name: "Name"
+    labels:
+       values:
+         app: flyte
+    description: "Some description for the project"
 
 Usage
 `
 )
 
-var DefaultProjectConfig = &ProjectConfig{}
-
 func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	id := config.GetConfig().Project
-	if id == "" {
-		fmt.Printf(clierrors.ErrProjectNotPassed)
-		return nil
+	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig().Project)
+	if err != nil {
+		return err
 	}
-	archiveProject := DefaultProjectConfig.ArchiveProject
-	activateProject := DefaultProjectConfig.ActivateProject
-	if activateProject == archiveProject {
-		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
+	if projectSpec.Id == "" {
+		return fmt.Errorf(clierrors.ErrProjectNotPassed)
 	}
-	projectState := admin.Project_ACTIVE
-	if archiveProject {
-		projectState = admin.Project_ARCHIVED
+	if projectSpec.Name == "" {
+		return fmt.Errorf(clierrors.ErrProjectNameNotPassed)
 	}
-	if DefaultProjectConfig.DryRun {
+
+	state, err := project.DefaultProjectConfig.MapToAdminState()
+	if err != nil {
+		return err
+	}
+	projectSpec.State = state
+	if project.DefaultProjectConfig.DryRun {
 		logger.Infof(ctx, "skipping UpdateProject request (dryRun)")
 	} else {
-		_, err := cmdCtx.AdminClient().UpdateProject(ctx, &admin.Project{
-			Id:    id,
-			State: projectState,
-		})
+		_, err := cmdCtx.AdminClient().UpdateProject(ctx, projectSpec)
 		if err != nil {
-			fmt.Printf(clierrors.ErrFailedProjectUpdate, id, projectState, err)
+			fmt.Printf(clierrors.ErrFailedProjectUpdate, projectSpec.Id, err)
 			return err
 		}
 	}
-	fmt.Printf("Project %v updated to %v state\n", id, projectState)
+	fmt.Printf("Project %v updated\n", projectSpec.Id)
 	return nil
 }

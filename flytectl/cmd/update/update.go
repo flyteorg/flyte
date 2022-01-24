@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
 	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -40,7 +41,7 @@ func CreateUpdateCommand() *cobra.Command {
 			Short: updateLPShort, Long: updateLPLong},
 		"launchplan-meta": {CmdFunc: updateLPMetaFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
 			Short: updateLPMetaShort, Long: updateLPMetaLong},
-		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: DefaultProjectConfig,
+		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: project.DefaultProjectConfig,
 			Short: projectShort, Long: projectLong},
 		"execution": {CmdFunc: updateExecutionFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: execution.UConfig,
 			Short: updateExecutionShort, Long: updateExecutionLong},

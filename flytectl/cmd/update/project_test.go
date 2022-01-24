@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
+
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
@@ -37,75 +39,107 @@ func modifyProjectFlags(archiveProject *bool, newArchiveVal bool, activateProjec
 func TestActivateProjectFunc(t *testing.T) {
 	setup()
 	updateProjectSetup()
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), false, &(DefaultProjectConfig.ActivateProject), true)
+	config.GetConfig().Project = projectValue
+	project.DefaultProjectConfig.Name = projectValue
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
+	projectUpdateRequest = &admin.Project{
+		Id:   projectValue,
+		Name: projectValue,
+		Labels: &admin.Labels{
+			Values: map[string]string{},
+		},
+		State: admin.Project_ACTIVE,
+	}
 	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, nil)
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject updated to ACTIVE state\n")
+	tearDownAndVerify(t, "Project dummyProject updated\n")
 }
 
 func TestActivateProjectFuncWithError(t *testing.T) {
 	setup()
 	updateProjectSetup()
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), false, &(DefaultProjectConfig.ActivateProject), true)
+	config.GetConfig().Project = projectValue
+	project.DefaultProjectConfig.Name = projectValue
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
+	projectUpdateRequest = &admin.Project{
+		Id:   projectValue,
+		Name: projectValue,
+		Labels: &admin.Labels{
+			Values: map[string]string{},
+		},
+		State: admin.Project_ACTIVE,
+	}
 	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, errors.New("Error Updating Project"))
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject failed to get updated to ACTIVE state due to Error Updating Project\n")
+	tearDownAndVerify(t, "Project dummyProject failed to get updated due to Error Updating Project\n")
 }
 
 func TestArchiveProjectFunc(t *testing.T) {
 	setup()
 	updateProjectSetup()
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), true, &(DefaultProjectConfig.ActivateProject), false)
+	config.GetConfig().Project = projectValue
+	project.DefaultProjectConfig = &project.ConfigProject{}
+	project.DefaultProjectConfig.Name = projectValue
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), false)
 	projectUpdateRequest = &admin.Project{
-		Id:    projectValue,
+		Id:   projectValue,
+		Name: projectValue,
+		Labels: &admin.Labels{
+			Values: nil,
+		},
 		State: admin.Project_ARCHIVED,
 	}
 	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, nil)
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject updated to ARCHIVED state\n")
+	tearDownAndVerify(t, "Project dummyProject updated\n")
 }
 
 func TestArchiveProjectFuncWithError(t *testing.T) {
 	setup()
 	updateProjectSetup()
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), true, &(DefaultProjectConfig.ActivateProject), false)
+	project.DefaultProjectConfig.Name = projectValue
+	project.DefaultProjectConfig.Labels = map[string]string{}
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), false)
 	projectUpdateRequest = &admin.Project{
-		Id:    projectValue,
+		Id:   projectValue,
+		Name: projectValue,
+		Labels: &admin.Labels{
+			Values: map[string]string{},
+		},
 		State: admin.Project_ARCHIVED,
 	}
 	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, errors.New("Error Updating Project"))
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject failed to get updated to ARCHIVED state due to Error Updating Project\n")
+	tearDownAndVerify(t, "Project dummyProject failed to get updated"+
+		" due to Error Updating Project\n")
 }
 
 func TestEmptyProjectInput(t *testing.T) {
 	setup()
 	updateProjectSetup()
 	config.GetConfig().Project = ""
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), false, &(DefaultProjectConfig.ActivateProject), true)
-	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, nil)
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
 	err = updateProjectsFunc(ctx, args, cmdCtx)
-	assert.Nil(t, err)
-	mockClient.AssertNotCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project not passed")
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf(clierrors.ErrProjectNotPassed), err)
 }
 
 func TestInvalidInput(t *testing.T) {
 	setup()
 	updateProjectSetup()
-	modifyProjectFlags(&(DefaultProjectConfig.ArchiveProject), false, &(DefaultProjectConfig.ActivateProject), false)
-	mockClient.OnUpdateProjectMatch(ctx, projectUpdateRequest).Return(nil, nil)
+	config.GetConfig().Project = projectValue
+	project.DefaultProjectConfig.Name = projectValue
+	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), true)
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf(clierrors.ErrInvalidStateUpdate), err)
-	mockClient.AssertNotCalled(t, "UpdateProject", ctx, projectUpdateRequest)
 	tearDownAndVerify(t, "")
 }
