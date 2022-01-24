@@ -52,7 +52,7 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
-    .. link-button:: deployment-multi-cluster
+    .. link-button:: multicluster
        :type: ref
        :text: Multi-cluster setup
        :classes: btn-block stretched-link
