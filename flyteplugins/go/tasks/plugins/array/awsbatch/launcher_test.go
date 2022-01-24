@@ -3,6 +3,7 @@ package awsbatch
 import (
 	"testing"
 
+	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/mock"
@@ -110,6 +111,9 @@ func TestLaunchSubTasks(t *testing.T) {
 			JobDefinitionArn: "arn",
 		}
 
+		retryAttemptsArray, err := bitarray.NewCompactArray(5, bitarray.Item(0))
+		assert.NoError(t, err)
+
 		expectedState := &State{
 			State: &core2.State{
 				CurrentPhase:         core2.PhaseCheckingSubTaskExecutions,
@@ -123,6 +127,7 @@ func TestLaunchSubTasks(t *testing.T) {
 					},
 					Detailed: arrayCore.NewPhasesCompactArray(5),
 				},
+				RetryAttempts: retryAttemptsArray,
 			},
 
 			ExternalJobID:    refStr("qpxyarq"),

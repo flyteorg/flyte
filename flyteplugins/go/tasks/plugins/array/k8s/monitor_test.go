@@ -75,6 +75,7 @@ func getMockTaskExecutionContext(ctx context.Context) *mocks.TaskExecutionContex
 	tMeta.OnIsInterruptible().Return(false)
 	tMeta.OnGetK8sServiceAccount().Return("s")
 
+	tMeta.OnGetMaxAttempts().Return(2)
 	tMeta.OnGetNamespace().Return("n")
 	tMeta.OnGetLabels().Return(nil)
 	tMeta.OnGetAnnotations().Return(nil)
@@ -194,6 +195,9 @@ func TestCheckSubTasksState(t *testing.T) {
 			},
 		}
 
+		retryAttemptsArray, err := bitarray.NewCompactArray(5, bitarray.Item(0))
+		assert.NoError(t, err)
+
 		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 			ExecutionArraySize:   5,
@@ -203,6 +207,7 @@ func TestCheckSubTasksState(t *testing.T) {
 				Detailed: arrayCore.NewPhasesCompactArray(uint(5)),
 			},
 			IndexesToCache: bitarray.NewBitSet(5),
+			RetryAttempts:  retryAttemptsArray,
 		})
 
 		assert.Nil(t, err)
@@ -236,6 +241,9 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 			},
 		}
 
+		retryAttemptsArray, err := bitarray.NewCompactArray(5, bitarray.Item(0))
+		assert.NoError(t, err)
+
 		cacheIndexes := bitarray.NewBitSet(5)
 		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -246,6 +254,7 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: arrayCore.NewPhasesCompactArray(uint(5)),
 			},
+			RetryAttempts: retryAttemptsArray,
 		})
 
 		assert.Nil(t, err)
@@ -273,6 +282,9 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 
 		}
 		cacheIndexes := bitarray.NewBitSet(5)
+		retryAttemptsArray, err := bitarray.NewCompactArray(5, bitarray.Item(0))
+		assert.NoError(t, err)
+
 		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 			ExecutionArraySize:   5,
@@ -280,6 +292,7 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 			OriginalMinSuccesses: 5,
 			ArrayStatus:          *arrayStatus,
 			IndexesToCache:       cacheIndexes,
+			RetryAttempts:        retryAttemptsArray,
 		})
 
 		assert.Nil(t, err)

@@ -5,8 +5,6 @@ import (
 
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,11 +18,6 @@ func TestCreateTaskInfo(t *testing.T) {
 			Name: "Athena Query Console",
 		},
 	}, taskInfo.Logs)
-	assert.True(t, proto.Equal(&event.TaskExecutionMetadata{
-		ExternalResources: []*event.ExternalResourceInfo{
-			{
-				ExternalId: "query_id",
-			},
-		},
-	}, taskInfo.Metadata))
+	assert.Len(t, taskInfo.ExternalResources, 1)
+	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "query_id")
 }

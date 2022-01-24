@@ -61,6 +61,30 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		currentState.ArrayStatus = *newArrayStatus
 	}
 
+	// If the current State is newly minted then we must initialize RetryAttempts to track how many
+	// times each subtask is executed.
+	if len(currentState.RetryAttempts.GetItems()) == 0 {
+		count := uint(currentState.GetExecutionArraySize())
+		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetMaxAttempts())
+
+		retryAttemptsArray, err := bitarray.NewCompactArray(count, maxValue)
+		if err != nil {
+			logger.Errorf(context.Background(), "Failed to create attempts compact array with [count: %v, maxValue: %v]", count, maxValue)
+			return currentState, logLinks, subTaskIDs, nil
+		}
+
+		// Currently if any subtask fails then all subtasks are retried up to MaxAttempts. Therefore, all
+		// subtasks have an identical RetryAttempt, namely that of the map task execution metadata. Once
+		// retries over individual subtasks are implemented we should revisit this logic and instead
+		// increment the RetryAttempt for each subtask everytime a new pod is created.
+		retryAttempt := bitarray.Item(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt)
+		for i := 0; i < currentState.GetExecutionArraySize(); i++ {
+			retryAttemptsArray.SetItem(i, retryAttempt)
+		}
+
+		currentState.RetryAttempts = retryAttemptsArray
+	}
+
 	logPlugin, err := logs.InitializeLogPlugins(&config.LogConfig.Config)
 	if err != nil {
 		logger.Errorf(ctx, "Error initializing LogPlugins: [%s]", err)
