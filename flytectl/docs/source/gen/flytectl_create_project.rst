@@ -26,7 +26,8 @@ Create a project by definition file. Note: The name shouldn't contain any whites
     id: "project-unique-id"
     name: "Name"
     labels:
-     app: flyte
+       values:
+         app: flyte
     description: "Some description for the project"
 
 
@@ -40,6 +41,10 @@ Options
 
 ::
 
+      --activate                Activates the project specified as argument. Only used in update
+      --activateProject         (Deprecated) Activates the project specified as argument. Only used in update
+      --archive                 Archives the project specified as argument. Only used in update
+      --archiveProject          (Deprecated) Archives the project specified as argument. Only used in update
       --description string      description for the project specified as argument.
       --dryRun                  execute command without making any modifications.
       --file string             file for the project definition.
