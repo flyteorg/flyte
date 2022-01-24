@@ -67,7 +67,10 @@ jobs:
         run: |
           flytectl sandbox exec -- docker load -i /root/snapshot.tar
       - name: Upgrade Helm charts
-        run:  flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /flyteorg/share/flyte -f /flyteorg/share/flyte/values-sandbox.yaml --set flyteadmin.image.repository=flyteorg/flyteadmin,flyteadmin.image.tag=latest
+        run:  |
+          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
+          flytectl sandbox exec -- helm repo update
+          flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte -f /flyteorg/share/flyte/values.yaml --set flyteadmin.image.repository=flyteorg/flyteadmin,flyteadmin.image.tag=latest
       - name: End2End
         env:
           KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
