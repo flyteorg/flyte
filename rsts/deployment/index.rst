@@ -52,6 +52,15 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    .. link-button:: deployment-multi-cluster
+       :type: ref
+       :text: Multi-cluster setup
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Deployment guides with detailed instructions specific to multiple clusters.
+
+    ---
+
     .. link-button:: deployment-plugin-setup
        :type: ref
        :text: Plugin Setup
