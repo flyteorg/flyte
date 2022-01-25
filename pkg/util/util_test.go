@@ -23,6 +23,30 @@ func TestSetupFlyteDir(t *testing.T) {
 	assert.Nil(t, SetupFlyteDir())
 }
 
+func TestPrintSandboxMessage(t *testing.T) {
+	t.Run("Print Sandbox Message", func(t *testing.T) {
+		PrintSandboxMessage()
+	})
+}
+
+func TestSendRequest(t *testing.T) {
+	t.Run("Successful get request", func(t *testing.T) {
+		response, err := SendRequest("GET", "https://github.com", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, response)
+	})
+	t.Run("Successful get request failed", func(t *testing.T) {
+		response, err := SendRequest("GET", "htp://github.com", nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, response)
+	})
+	t.Run("Successful get request failed", func(t *testing.T) {
+		response, err := SendRequest("GET", "https://github.com/evalsocket/flyte/archive/refs/tags/source-code.zip", nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, response)
+	})
+}
+
 func TestIsVersionGreaterThan(t *testing.T) {
 	t.Run("Compare FlyteCTL version when upgrade available", func(t *testing.T) {
 		_, err := IsVersionGreaterThan("v1.1.21", testVersion)
@@ -54,29 +78,5 @@ func TestIsVersionGreaterThan(t *testing.T) {
 	t.Run("Error in compare FlyteCTL version", func(t *testing.T) {
 		_, err := IsVersionGreaterThan(testVersion, "vvvvvvvv")
 		assert.NotNil(t, err)
-	})
-}
-
-func TestPrintSandboxMessage(t *testing.T) {
-	t.Run("Print Sandbox Message", func(t *testing.T) {
-		PrintSandboxMessage()
-	})
-}
-
-func TestSendRequest(t *testing.T) {
-	t.Run("Successful get request", func(t *testing.T) {
-		response, err := SendRequest("GET", "https://github.com", nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, response)
-	})
-	t.Run("Successful get request failed", func(t *testing.T) {
-		response, err := SendRequest("GET", "htp://github.com", nil)
-		assert.NotNil(t, err)
-		assert.Nil(t, response)
-	})
-	t.Run("Successful get request failed", func(t *testing.T) {
-		response, err := SendRequest("GET", "https://github.com/evalsocket/flyte/archive/refs/tags/source-code.zip", nil)
-		assert.NotNil(t, err)
-		assert.Nil(t, response)
 	})
 }

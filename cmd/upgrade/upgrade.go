@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flytectl/pkg/util"
+
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
 	"github.com/flyteorg/flytectl/pkg/util/githubutil"

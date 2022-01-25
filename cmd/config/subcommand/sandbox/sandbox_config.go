@@ -44,6 +44,9 @@ type Config struct {
 	// from there.
 	Image string `json:"image" pflag:",Optional. Provide a fully qualified path to a Flyte compliant docker image."`
 
+	// Default value false represents that flytectl will not use latest pre release if exist
+	Prerelease bool `json:"pre" pflag:",Optional. Pre release Version of flyte will be used for sandbox."`
+
 	// Optionally it is possible to use local sandbox image
 	// If local flag pass then flytectl will not pull image from registry. Usually useful, if you want to test your local images without pushing them to a registry
 	ImagePullPolicy ImagePullPolicy `json:"imagePullPolicy" pflag:",Optional. Defines the image pull behavior [Always/IfNotPresent/Never]"`
