@@ -7,7 +7,7 @@ require (
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/fatih/color v1.10.0
 	github.com/flyteorg/flyteidl v0.21.18
-	github.com/flyteorg/flyteplugins v0.9.1
+	github.com/flyteorg/flyteplugins v0.9.4
 	github.com/flyteorg/flytestdlib v0.4.7
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
