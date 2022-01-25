@@ -54,6 +54,7 @@ Options
   -h, --help                              help for start
       --image string                      Optional. Provide a fully qualified path to a Flyte compliant docker image.
       --imagePullPolicy ImagePullPolicy   Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --pre                               Optional. Pre release Version of flyte will be used for sandbox.
       --source string                     Path of your source code
       --version string                    Version of flyte. Only supports flyte releases greater than v0.10.0
 
