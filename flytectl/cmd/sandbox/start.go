@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/pkg/util/githubutil"
 
 	"github.com/avast/retry-go"
+	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/olekukonko/tablewriter"
 	corev1api "k8s.io/api/core/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -64,15 +64,13 @@ Specify a Flyte Sandbox image pull policy. Possible pull policy values are Alway
  flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
 Usage
 `
-	k8sEndpoint             = "https://127.0.0.1:30086"
-	flyteNamespace          = "flyte"
-	flyteRepository         = "flyte"
-	dind                    = "dind"
-	sandboxSupportedVersion = "v0.10.0"
-	diskPressureTaint       = "node.kubernetes.io/disk-pressure"
-	taintEffect             = "NoSchedule"
-	sandboxContextName      = "flyte-sandbox"
-	sandboxDockerContext    = "default"
+	k8sEndpoint          = "https://127.0.0.1:30086"
+	flyteNamespace       = "flyte"
+	diskPressureTaint    = "node.kubernetes.io/disk-pressure"
+	taintEffect          = "NoSchedule"
+	sandboxContextName   = "flyte-sandbox"
+	sandboxDockerContext = "default"
+	imageName            = "cr.flyte.org/flyteorg/flyte-sandbox"
 )
 
 type ExecResult struct {
@@ -160,20 +158,23 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	} else if vol != nil {
 		volumes = append(volumes, *vol)
 	}
-
-	image, err := getSandboxImage(sandboxConfig.DefaultConfig.Version, sandboxConfig.DefaultConfig.Image)
-	if err != nil {
-		return nil, err
+	sandboxImage := sandboxConfig.DefaultConfig.Image
+	if len(sandboxConfig.DefaultConfig.Image) == 0 {
+		image, version, err := githubutil.GetSandboxImage(sandboxConfig.DefaultConfig.Version, imageName)
+		if err != nil {
+			return nil, err
+		}
+		sandboxImage = image
+		fmt.Printf("%v Running Flyte %s release\n", emoji.Whale, version)
 	}
-	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, image)
-
-	if err := docker.PullDockerImage(ctx, cli, image, sandboxConfig.DefaultConfig.ImagePullPolicy); err != nil {
+	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, sandboxImage)
+	if err := docker.PullDockerImage(ctx, cli, sandboxImage, sandboxConfig.DefaultConfig.ImagePullPolicy); err != nil {
 		return nil, err
 	}
 
 	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
 	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
-	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, image)
+	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, sandboxImage)
 	if err != nil {
 		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
 		return nil, err
@@ -185,34 +186,6 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	}
 
 	return logReader, nil
-}
-
-// Returns the alternate image if specified, else
-// if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind is used
-// else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
-func getSandboxImage(version string, alternateImage string) (string, error) {
-
-	if len(alternateImage) > 0 {
-		return alternateImage, nil
-	}
-
-	var tag = dind
-	if len(version) > 0 {
-		isGreater, err := util.IsVersionGreaterThan(version, sandboxSupportedVersion)
-		if err != nil {
-			return "", err
-		}
-		if !isGreater {
-			return "", fmt.Errorf("version flag only supported with flyte %s+ release", sandboxSupportedVersion)
-		}
-		sha, err := githubutil.GetSHAFromVersion(version, flyteRepository)
-		if err != nil {
-			return "", err
-		}
-		tag = fmt.Sprintf("%s-%s", dind, sha)
-	}
-
-	return docker.GetSandboxImage(tag), nil
 }
 
 func mountVolume(file, destination string) (*mount.Mount, error) {

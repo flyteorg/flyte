@@ -3,34 +3,42 @@ package githubutil
 import (
 	"context"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
+
+	"github.com/flyteorg/flytectl/pkg/util"
+
+	"github.com/flyteorg/flytestdlib/logger"
+
+	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flytectl/pkg/util/platformutil"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 	"github.com/mouuff/go-rocket-update/pkg/provider"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 
-	"github.com/flyteorg/flytectl/pkg/util"
-
 	"fmt"
 
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v42/github"
 )
 
 const (
-	owner                = "flyteorg"
-	flyte                = "flyte"
-	sandboxManifest      = "flyte_sandbox_manifest.yaml"
-	flytectl             = "flytectl"
-	flytectlRepository   = "github.com/flyteorg/flytectl"
-	commonMessage        = "\n A new release of flytectl is available: %s → %s \n"
-	brewMessage          = "To upgrade, run: brew update && brew upgrade flytectl \n"
-	linuxMessage         = "To upgrade, run: flytectl upgrade \n"
-	darwinMessage        = "To upgrade, run: flytectl upgrade \n"
-	releaseURL           = "https://github.com/flyteorg/flytectl/releases/tag/%s \n"
-	brewInstallDirectory = "/Cellar/flytectl"
+	owner                   = "flyteorg"
+	flyte                   = "flyte"
+	sandboxManifest         = "flyte_sandbox_manifest.yaml"
+	flytectl                = "flytectl"
+	sandboxSupportedVersion = "v0.10.0"
+	flytectlRepository      = "github.com/flyteorg/flytectl"
+	commonMessage           = "\n A new release of flytectl is available: %s → %s \n"
+	brewMessage             = "To upgrade, run: brew update && brew upgrade flytectl \n"
+	linuxMessage            = "To upgrade, run: flytectl upgrade \n"
+	darwinMessage           = "To upgrade, run: flytectl upgrade \n"
+	releaseURL              = "https://github.com/flyteorg/flytectl/releases/tag/%s \n"
+	brewInstallDirectory    = "/Cellar/flytectl"
 )
 
 // FlytectlReleaseConfig represent the updater config for flytectl binary
@@ -49,6 +57,11 @@ var (
 
 //GetGHClient will return github client
 func GetGHClient() *github.Client {
+	if len(os.Getenv("GITHUB_TOKEN")) > 0 {
+		return github.NewClient(oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+		)))
+	}
 	return github.NewClient(&http.Client{})
 }
 
@@ -72,6 +85,45 @@ func GetListRelease(repository string) ([]*github.RepositoryRelease, error) {
 		return nil, err
 	}
 	return releases, err
+}
+
+// GetSandboxImageSha returns the sha as per input
+func GetSandboxImageSha(version string, pre bool) (string, string, error) {
+	var release *github.RepositoryRelease
+	if len(version) == 0 {
+		releases, err := GetListRelease(flyte)
+		if err != nil {
+			return "", release.GetTagName(), err
+		}
+		for _, v := range releases {
+			if *v.Prerelease && pre {
+				release = v
+				break
+			} else if !*v.Prerelease && !pre {
+				release = v
+				break
+			}
+		}
+		logger.Infof(context.Background(), "sandbox started with release %s", release.GetTagName())
+	} else if len(version) > 0 {
+		r, err := CheckVersionExist(version, flyte)
+		if err != nil {
+			return "", r.GetTagName(), err
+		}
+		release = r
+	}
+	isGreater, err := util.IsVersionGreaterThan(release.GetTagName(), sandboxSupportedVersion)
+	if err != nil {
+		return "", release.GetTagName(), err
+	}
+	if !isGreater {
+		return "", release.GetTagName(), fmt.Errorf("version flag only supported with flyte %s+ release", sandboxSupportedVersion)
+	}
+	sha, err := GetSHAFromVersion(release.GetTagName(), flyte)
+	if err != nil {
+		return "", release.GetTagName(), err
+	}
+	return sha, release.GetTagName(), nil
 }
 
 func getFlytectlAssetName() string {
@@ -158,4 +210,16 @@ func CheckBrewInstall(goos platformutil.Platform) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+// GetSandboxImage Returns the alternate image if specified, else
+// if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA} is used
+// else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
+func GetSandboxImage(version, image string) (string, string, error) {
+	sha, version, err := GetSandboxImageSha(version, sandboxConfig.DefaultConfig.Prerelease)
+	if err != nil {
+		return "", version, err
+	}
+
+	return fmt.Sprintf("%s:%s", image, fmt.Sprintf("dind-%s", sha)), version, nil
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v42/github"
 
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"

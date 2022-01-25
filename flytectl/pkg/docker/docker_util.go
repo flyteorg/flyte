@@ -9,6 +9,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/docker/docker/client"
+	"github.com/enescakir/emoji"
+
 	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 
 	"github.com/flyteorg/flytectl/clierrors"
@@ -16,10 +19,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
-	"github.com/enescakir/emoji"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
@@ -27,7 +28,6 @@ import (
 var (
 	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
 	SuccessMessage          = "Deploying Flyte..."
-	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox"
 	FlyteSandboxClusterName = "flyte-sandbox"
 	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
 	Source                  = "/root"
@@ -50,6 +50,19 @@ var (
 	StdWriterPrefixLen = 8
 	StartingBufLen     = 32*1024 + StdWriterPrefixLen + 1
 )
+
+// GetDockerClient will returns the docker client
+func GetDockerClient() (Docker, error) {
+	if Client == nil {
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			fmt.Printf("%v Please Check your docker client %v \n", emoji.GrimacingFace, emoji.Whale)
+			return nil, err
+		}
+		return cli, nil
+	}
+	return Client, nil
+}
 
 // GetSandbox will return sandbox container if it exist
 func GetSandbox(ctx context.Context, cli Docker) *types.Container {
@@ -166,19 +179,6 @@ func WaitForSandbox(reader *bufio.Scanner, message string) bool {
 	return false
 }
 
-// GetDockerClient will returns the docker client
-func GetDockerClient() (Docker, error) {
-	if Client == nil {
-		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-		if err != nil {
-			fmt.Printf("%v Please Check your docker client %v \n", emoji.GrimacingFace, emoji.Whale)
-			return nil, err
-		}
-		return cli, nil
-	}
-	return Client, nil
-}
-
 // ExecCommend will execute a command in container and returns an execution id
 func ExecCommend(ctx context.Context, cli Docker, containerID string, command []string) (types.IDResponse, error) {
 	ExecConfig.Cmd = command
@@ -199,9 +199,4 @@ func InspectExecResp(ctx context.Context, cli Docker, containerID string) error 
 		return err
 	}
 	return nil
-}
-
-// GetSandboxImage will return the sandbox image with tag
-func GetSandboxImage(tag string) string {
-	return fmt.Sprintf("%s:%s", ImageName, tag)
 }
