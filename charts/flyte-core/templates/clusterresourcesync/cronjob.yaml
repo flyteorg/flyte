@@ -26,7 +26,10 @@ spec:
             image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
             imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
             name: sync-cluster-resources
-            volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 12 }}
+            volumeMounts:
+            {{- if not .Values.cluster_resource_manager.standalone_deploy}}
+            {{- include "databaseSecret.volumeMount" . | nindent 12 }}
+            {{- end }}
             - mountPath: /etc/flyte/clusterresource/templates
               name: resource-templates
             - mountPath: /etc/flyte/config
@@ -38,7 +41,7 @@ spec:
               name: clusterresource-template
             name: resource-templates
           - configMap:
-              name: flyte-admin-config
+              name: flyte-clusterresourcesync-config
             name: config-volume
   {{- end }}
   {{- end }}

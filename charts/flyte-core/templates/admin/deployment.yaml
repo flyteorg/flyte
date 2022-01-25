@@ -62,7 +62,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         {{- end }}
-        {{- if .Values.cluster_resource_manager.enabled }}
+        {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
         - command:
           - flyteadmin
           - --config

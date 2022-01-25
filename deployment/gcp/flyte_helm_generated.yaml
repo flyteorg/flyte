@@ -98,49 +98,6 @@ metadata:
   namespace: flyte
 type: Opaque
 ---
-# Source: flyte-core/templates/admin/cluster_resource_configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: clusterresource-template
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-core-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-data:
-  aa_namespace.yaml: | 
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
-    
-  aab_default_service_account.yaml: | 
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: default
-      namespace: {{ namespace }}
-      annotations:
-        # Needed for gcp workload identity to function
-        # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-        iam.gke.io/gcp-service-account: {{ gsa }}
-    
-  ab_project_resource_quota.yaml: | 
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }}
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }}
-        limits.memory: {{ projectQuotaMemory }}
----
 # Source: flyte-core/templates/admin/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -269,6 +226,104 @@ data:
       refresh: 5m
       refreshInterval: 5m
       templatePath: /etc/flyte/clusterresource/templates
+---
+# Source: flyte-core/templates/clusterresourcesync/cluster_resource_configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clusterresource-template
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  aa_namespace.yaml: | 
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+    
+  aab_default_service_account.yaml: | 
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default
+      namespace: {{ namespace }}
+      annotations:
+        # Needed for gcp workload identity to function
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+        iam.gke.io/gcp-service-account: {{ gsa }}
+    
+  ab_project_resource_quota.yaml: | 
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }}
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }}
+        limits.memory: {{ projectQuotaMemory }}
+---
+# Source: flyte-core/templates/clusterresourcesync/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-clusterresourcesync-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  cluster_resources.yaml: | 
+    cluster_resources:
+      customData:
+      - production:
+        - projectQuotaCpu:
+            value: "5"
+        - projectQuotaMemory:
+            value: 4000Mi
+        - gsa:
+            value: gsa-production@<PROJECT-ID>.iam.gserviceaccount.com
+      - staging:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - gsa:
+            value: gsa-staging@<PROJECT-ID>.iam.gserviceaccount.com
+      - development:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - gsa:
+            value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
+      refresh: 5m
+      refreshInterval: 5m
+      templatePath: /etc/flyte/clusterresource/templates
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
+  domain.yaml: | 
+    domains:
+    - id: development
+      name: development
+    - id: staging
+      name: staging
+    - id: production
+      name: production
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -1377,7 +1432,7 @@ spec:
           secret:
             secretName: flyte-pod-webhook
 ---
-# Source: flyte-core/templates/admin/cronjob.yaml
+# Source: flyte-core/templates/clusterresourcesync/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -1421,7 +1476,7 @@ spec:
               name: clusterresource-template
             name: resource-templates
           - configMap:
-              name: flyte-admin-config
+              name: flyte-clusterresourcesync-config
             name: config-volume
 ---
 # Source: flyte-core/templates/common/ingress.yaml
