@@ -14,6 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// DO NOT USE: only for backwards compatibility
 const defaultInClusterTargetID = "id"
 
 type InCluster struct {
@@ -22,7 +23,7 @@ type InCluster struct {
 }
 
 func (i InCluster) GetTarget(ctx context.Context, spec *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
-	if spec != nil && spec.TargetID != "" {
+	if spec != nil && !(spec.TargetID == "" || spec.TargetID == defaultInClusterTargetID) {
 		return nil, errors.New(fmt.Sprintf("remote target %s is not supported", spec.TargetID))
 	}
 	return &i.target, nil
@@ -54,7 +55,6 @@ func NewInCluster(initializationErrorCounter prometheus.Counter, kubeConfig, mas
 		return nil, err
 	}
 	target := executioncluster.ExecutionTarget{
-		ID:            defaultInClusterTargetID,
 		Client:        kubeClient,
 		FlyteClient:   flyteClient,
 		DynamicClient: dynamicClient,

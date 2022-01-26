@@ -20,6 +20,30 @@ func TestInClusterGetTarget(t *testing.T) {
 	assert.Equal(t, "t1", target.ID)
 }
 
+func TestInClusterGetTarget_AllowableSpecIDs(t *testing.T) {
+	cluster := InCluster{
+		target: executioncluster.ExecutionTarget{},
+	}
+	target, err := cluster.GetTarget(context.Background(), nil)
+	assert.Nil(t, err)
+	assert.Equal(t, *target, cluster.target)
+
+	target, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{})
+	assert.Nil(t, err)
+	assert.Equal(t, *target, cluster.target)
+
+	target, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		TargetID: defaultInClusterTargetID,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, *target, cluster.target)
+
+	_, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		TargetID: "t1",
+	})
+	assert.Error(t, err)
+}
+
 func TestInClusterGetRemoteTarget(t *testing.T) {
 	cluster := InCluster{
 		target: executioncluster.ExecutionTarget{},
@@ -29,20 +53,20 @@ func TestInClusterGetRemoteTarget(t *testing.T) {
 }
 
 func TestInClusterGetAllValidTargets(t *testing.T) {
-	target := executioncluster.ExecutionTarget{
-		ID: defaultInClusterTargetID,
+	target := &executioncluster.ExecutionTarget{
+		Enabled: true,
 	}
 	cluster := InCluster{
-		target: target,
+		target: *target,
 		asTargets: map[string]*executioncluster.ExecutionTarget{
-			defaultInClusterTargetID: &target,
+			target.ID: target,
 		},
 	}
 	targets := cluster.GetValidTargets()
 	assert.Equal(t, 1, len(targets))
-	assert.Equal(t, defaultInClusterTargetID, targets[defaultInClusterTargetID].ID)
+	assert.Equal(t, targets[target.ID], target)
 
 	targets = cluster.GetAllTargets()
 	assert.Equal(t, 1, len(targets))
-	assert.Equal(t, defaultInClusterTargetID, targets[defaultInClusterTargetID].ID)
+	assert.Equal(t, targets[target.ID], target)
 }
