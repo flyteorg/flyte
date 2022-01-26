@@ -11,13 +11,11 @@ data:
   cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 
-  {{- if .Values.cluster_resource_manager.standalone_deploy }}
+  {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
   {{- with .Values.configmap.admin }}
   admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
-  {{- end }}
-
-  {{- if not .Values.cluster_resource_manager.standalone_deploy }}
+  {{- else }}
   {{- with .Values.db.admin }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
