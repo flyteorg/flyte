@@ -18,7 +18,7 @@ The control-plane (FlyteAdmin) can be configured to load-balance workflows acros
 To achieve this, first, you have to create additional Kubernetes clusters. 
 For now, let’s assume you have three Kubernetes clusters and that you can access them all with ``kubectl``. Let’s call these clusters ``cluster1``, ``cluster2``, and ``cluster3``.
 
-Next, deploy **just** the data-planes to these clusters. To do this, remove the data-plane components from the “flyte“ overlay, and create a new overlay containing **only** the data-plane resources.
+Next, deploy **just** the data-planes to these clusters. To do this, remove the data-plane components from the **flyte** overlay, and create a new overlay containing **only** the data-plane resources.
 
 Data Plane Deployment
 *********************
@@ -26,7 +26,7 @@ Data Plane Deployment
 .. NOTE::
   With v0.8.0 and the entire setup overhaul, this section will get updated soon!
 
-To create the "data-plane only" overlay, create a ``data-plane`` subdirectory inside the main deployment directory (“my-flyte-deployment“). This directory will only contain the data-plane resources. ::
+To create the ``data-plane only`` overlay, create a ``data-plane`` subdirectory inside the main deployment directory (“my-flyte-deployment“). This directory will only contain the data-plane resources. ::
 
   mkdir dataplane
 
@@ -36,7 +36,7 @@ Now, copy the ``flyte`` config to the data-plane config. ::
 
 Since the data-plane resources will live in the new deployment, they are no longer needed in the main ``flyte`` deployment. Remove the data-plane resources from the flyte deployment by opening ``flyte/kustomization.yaml`` file and removing everything in the ``DATA PLANE RESOURCES`` section.
 
-Likewise, the user-plane/control-plane resources are not needed in the data-plane deployment. Remove these resources from the data-plane deployment by opening “dataplane/kustomization.yaml“ and removing everything in the ``USER PLANE/CONTROL PLANE RESOURCES`` section. ::
+Likewise, the user-plane/control-plane resources are not needed in the data-plane deployment. Remove these resources from the data-plane deployment by opening ``dataplane/kustomization.yaml`` file and removing everything in the ``USER PLANE/CONTROL PLANE RESOURCES`` section. ::
 
   kustomize build dataplane > dataplane_generated.yaml
 
@@ -49,7 +49,7 @@ You can point your ``kubectl`` context at each of the three clusters and deploy 
 User and Control Plane Deployment
 *********************************
 
-For FlyteAdmin to create Flyte Workflows on the three remote clusters, it will need a secret “token“ and “cacert“ to access each cluster.
+For FlyteAdmin to create Flyte Workflows on the three remote clusters, it will need a secret ``token`` and ``cacert`` to access each cluster.
 
 Once you have deployed the data-plane as described above, you can retrieve the ``token`` and ``cacert`` by pointing your ``kubectl`` context to each data-plane cluster and executing the following commands:
 
