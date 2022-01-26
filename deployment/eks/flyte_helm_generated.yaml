@@ -1204,7 +1204,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.83"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.89"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -1220,7 +1220,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.83"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.89"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
