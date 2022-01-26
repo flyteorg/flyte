@@ -1915,17 +1915,18 @@ spec:
     kind: FlyteWorkflow
     plural: flyteworkflows
     shortNames:
-    - fly
+      - fly
     singular: flyteworkflow
   scope: Namespaced
   versions:
-  - name: v1alpha1
-    served: true
-    storage: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+          properties:
 ---
 # Source: flyte/charts/contour/templates/contour/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
