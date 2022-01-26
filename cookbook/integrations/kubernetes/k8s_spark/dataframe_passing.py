@@ -69,7 +69,7 @@ def sum_of_all_ages(s: my_schema) -> int:
     reader = s.open()
     # supported dataframes
     df: pandas.DataFrame = reader.all()
-    return df["age"].sum()
+    return int(df["age"].sum())
 
 
 # %%
