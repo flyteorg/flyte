@@ -15,10 +15,6 @@ helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/v
 
 for deployment in ${DEPLOYMENT_CORE}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
-    CHART="${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml"
-    echo "****** generated helm docs: $CHART ******"
-    cat ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
-    echo "****** end helm docs ******"
 done
 
 # Generate manifest AWS Scheduler
@@ -43,6 +39,10 @@ if [ -n "$DELTA_CHECK" ]; then
     echo "diff detected: $DIFF"
     DIFF=$(git diff --name-only)
     echo "files different: $DIFF"
+    for f in ${DIFF}; do
+      echo "contents of ${f}"
+      cat ${f}
+    done
     exit 1
   else
     echo "SUCCESS: Generated code is up to date."
