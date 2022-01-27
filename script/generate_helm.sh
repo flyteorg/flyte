@@ -41,7 +41,7 @@ if [ -n "$DELTA_CHECK" ]; then
     echo "files different: $DIFF"
     for f in ${DIFF}; do
       echo "contents of ${f}"
-      cat ${f}
+      cat "${f}"
     done
     exit 1
   else
