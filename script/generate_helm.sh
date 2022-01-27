@@ -15,6 +15,10 @@ helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/v
 
 for deployment in ${DEPLOYMENT_CORE}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    CHART="${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml"
+    echo "****** generated helm docs: $CHART ******"
+    cat ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    echo "****** end helm docs ******"
 done
 
 # Generate manifest AWS Scheduler
@@ -27,6 +31,7 @@ then
 fi
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
+
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
