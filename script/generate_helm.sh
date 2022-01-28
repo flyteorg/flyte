@@ -28,7 +28,6 @@ fi
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 
-
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
@@ -39,10 +38,6 @@ if [ -n "$DELTA_CHECK" ]; then
     echo "diff detected: $DIFF"
     DIFF=$(git diff --name-only)
     echo "files different: $DIFF"
-    for f in ${DIFF}; do
-      echo "contents of ${f}"
-      cat "${f}"
-    done
     exit 1
   else
     echo "SUCCESS: Generated code is up to date."
