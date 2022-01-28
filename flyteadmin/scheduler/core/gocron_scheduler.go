@@ -37,6 +37,7 @@ type GoCronScheduler struct {
 	snapshot    snapshoter.Snapshot
 }
 
+// GetTimedFuncWithSchedule returns the job function with scheduled time parameter
 func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 	return func(jobCtx context.Context, schedule models.SchedulableEntity, scheduleTime time.Time) error {
 		_ = g.rateLimiter.Wait(jobCtx)
@@ -49,6 +50,7 @@ func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 	}
 }
 
+// BootStrapSchedulesFromSnapShot allows to initialize the scheduler from a previous snapshot of the schedule executions
 func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, schedules []models.SchedulableEntity,
 	snapshot snapshoter.Snapshot) {
 	for _, s := range schedules {
@@ -74,6 +76,7 @@ func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, sc
 	}
 }
 
+// UpdateSchedules updates all the schedules in the schedulers job store
 func (g *GoCronScheduler) UpdateSchedules(ctx context.Context, schedules []models.SchedulableEntity) {
 	for _, s := range schedules {
 		// Schedule or Deschedule job from the scheduler based on the activation status
@@ -91,6 +94,7 @@ func (g *GoCronScheduler) UpdateSchedules(ctx context.Context, schedules []model
 	} // Done iterating over all the read schedules
 }
 
+// CalculateSnapshot creates a snapshot of the existing state of the schedules run by the scheduler which can be used in case of failure.
 func (g *GoCronScheduler) CalculateSnapshot(ctx context.Context) snapshoter.Snapshot {
 	snapshot := g.snapshot.Create()
 	g.jobStore.Range(func(key, value interface{}) bool {
@@ -104,6 +108,7 @@ func (g *GoCronScheduler) CalculateSnapshot(ctx context.Context) snapshoter.Snap
 	return snapshot
 }
 
+// ScheduleJob allows to schedule a job using the implemented scheduler
 func (g *GoCronScheduler) ScheduleJob(ctx context.Context, schedule models.SchedulableEntity,
 	funcWithSchedule TimedFuncWithSchedule, lastTime *time.Time) error {
 
@@ -142,6 +147,7 @@ func (g *GoCronScheduler) ScheduleJob(ctx context.Context, schedule models.Sched
 	return nil
 }
 
+// DeScheduleJob allows to remove a scheduled job using the implemented scheduler
 func (g *GoCronScheduler) DeScheduleJob(ctx context.Context, schedule models.SchedulableEntity) {
 	nameOfSchedule := identifier.GetScheduleName(ctx, schedule)
 	if _, ok := g.jobStore.Load(nameOfSchedule); !ok {
@@ -163,6 +169,7 @@ func (g *GoCronScheduler) DeScheduleJob(ctx context.Context, schedule models.Sch
 	g.jobStore.Delete(nameOfSchedule)
 }
 
+// CatchupAll catches up all the schedules from the jobStore to until time
 func (g *GoCronScheduler) CatchupAll(ctx context.Context, until time.Time) bool {
 	failed := false
 	g.jobStore.Range(func(key, value interface{}) bool {
@@ -189,6 +196,7 @@ func (g *GoCronScheduler) CatchupAll(ctx context.Context, until time.Time) bool 
 	return !failed
 }
 
+// CatchUpSingleSchedule catches up the schedule s from fromTime to toTime
 func (g *GoCronScheduler) CatchUpSingleSchedule(ctx context.Context, s models.SchedulableEntity, fromTime time.Time, toTime time.Time) error {
 	var catchUpTimes []time.Time
 	var err error
@@ -209,6 +217,7 @@ func (g *GoCronScheduler) CatchUpSingleSchedule(ctx context.Context, s models.Sc
 	return nil
 }
 
+// GetCatchUpTimes find list of timestamps to be caught up on for schedule s from fromTime to toTime
 func GetCatchUpTimes(s models.SchedulableEntity, from time.Time, to time.Time) ([]time.Time, error) {
 	var scheduledTimes []time.Time
 	currFrom := from
@@ -217,12 +226,16 @@ func GetCatchUpTimes(s models.SchedulableEntity, from time.Time, to time.Time) (
 		if err != nil {
 			return nil, err
 		}
+		if scheduledTime.After(to) {
+			break
+		}
 		scheduledTimes = append(scheduledTimes, scheduledTime)
 		currFrom = scheduledTime
 	}
 	return scheduledTimes, nil
 }
 
+// GetScheduledTime find next schedule time for both cron and fixed rate scheduled entity given the fromTime
 func GetScheduledTime(s models.SchedulableEntity, fromTime time.Time) (time.Time, error) {
 	if len(s.CronExpression) > 0 {
 		return getCronScheduledTime(s.CronExpression, fromTime)
@@ -247,6 +260,7 @@ func getFixedIntervalScheduledTime(unit admin.FixedRateUnit, fixedRateValue uint
 	return fixedRateSchedule.Next(fromTime), nil
 }
 
+// AddFixedIntervalJob adds the fixes interval job to the job store.
 func (g *GoCronScheduler) AddFixedIntervalJob(ctx context.Context, job *GoCronJob) error {
 	d, err := getFixedRateDurationFromSchedule(job.schedule.Unit, job.schedule.FixedRateValue)
 	if err != nil {
@@ -264,12 +278,14 @@ func (g *GoCronScheduler) AddFixedIntervalJob(ctx context.Context, job *GoCronJo
 	return nil
 }
 
+// RemoveFixedIntervalJob removes the fixes interval job from the job store.
 func (g *GoCronScheduler) RemoveFixedIntervalJob(ctx context.Context, job *GoCronJob) {
 	g.cron.Remove(job.entryID)
 	logger.Infof(ctx, "successfully removed the schedule %s from scheduler for schedule %+v",
 		job.nameOfSchedule, job.schedule)
 }
 
+// AddCronJob adds the job from the cron store
 func (g *GoCronScheduler) AddCronJob(ctx context.Context, job *GoCronJob) error {
 	//nolint
 	var jobFunc cron.TimedFuncJob
@@ -285,6 +301,7 @@ func (g *GoCronScheduler) AddCronJob(ctx context.Context, job *GoCronJob) error 
 	return err
 }
 
+// RemoveCronJob removes the job from the cron store
 func (g *GoCronScheduler) RemoveCronJob(ctx context.Context, job *GoCronJob) {
 	g.cron.Remove(job.entryID)
 	logger.Infof(ctx, "successfully removed the schedule %s from scheduler for schedue %+v",
