@@ -49,8 +49,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Kustomize and diff
-        run: DELTA_CHECK=true make kustomize
       - name: Helm and diff
         run: DELTA_CHECK=true make helm
       - uses: unionai/flytectl-setup-action@v0.0.1
@@ -60,7 +58,7 @@ jobs:
           flytectl config init
           flytectl sandbox start --source=$(pwd)
       - name: Upgrade Helm charts
-        run:  flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values-sandbox.yaml
+        run:  flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values.yaml
       - name: End2End
         env:
           KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
