@@ -28,6 +28,9 @@ spec:
             volumeMounts:
             {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
             {{- include "databaseSecret.volumeMount" . | nindent 12 }}
+            {{- else }}
+            - name: auth
+              mountPath: /etc/secrets/
             {{- end }}
             - mountPath: /etc/flyte/clusterresource/templates
               name: resource-templates
@@ -42,4 +45,10 @@ spec:
           - configMap:
               name: flyte-clusterresourcesync-config
             name: config-volume
+          {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+          - name: auth
+            secret:
+              secretName: flyte-secret-auth
+          {{- end }}
+
   {{- end }}
