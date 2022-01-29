@@ -28,6 +28,7 @@ import (
 var (
 	once            = sync.Once{}
 	adminConnection *grpc.ClientConn
+	authOpt         *grpc.DialOption
 
 	// A new connection just for auth metadata service since it will be used to retrieve auth
 	// related information that's needed to initialize the Clientset.
@@ -41,6 +42,11 @@ type Clientset struct {
 	authMetadataServiceClient service.AuthMetadataServiceClient
 	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
+	authOpt                   grpc.DialOption
+}
+
+func (c Clientset) AuthOpt() grpc.DialOption {
+	return c.authOpt
 }
 
 // AdminClient retrieves the AdminServiceClient
@@ -195,6 +201,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 
 		if opt != nil {
 			opts = append(opts, opt)
+			authOpt = &opt
 		}
 
 		adminConnection, err = NewAdminConnection(ctx, cfg, opts...)
@@ -208,6 +215,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 	cs.authMetadataServiceClient = service.NewAuthMetadataServiceClient(adminConnection)
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
+	if authOpt != nil {
+		cs.authOpt = *authOpt
+	}
 	return &cs, nil
 }
 
