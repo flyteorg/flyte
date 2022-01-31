@@ -2,7 +2,10 @@
 Run Bash Scripts Using ShellTask
 --------------------------------
 
-To run bash scripts from within Flyte, ShellTask can be used. In this example, let's define three ShellTasks to run some simple bash commands.
+To run bash scripts from within Flyte, ShellTask can be used. In this example, let's define three ShellTasks to run simple bash commands.
+
+.. note::
+    The new input/output placeholder syntax of ``ShellTask`` is available starting Flytekit 0.30.0b8+.
 """
 import os
 from typing import Tuple
@@ -20,17 +23,17 @@ t1 = ShellTask(
     script="""
     set -ex
     echo "Hey there! Let's run some bash scripts using Flyte's ShellTask."
-    echo "Showcasing Flyte's Shell Task." >> {{ .inputs.x }}
-    if grep "Flyte" {{ .inputs.x }}
+    echo "Showcasing Flyte's Shell Task." >> {inputs.x}
+    if grep "Flyte" {inputs.x}
     then
-        echo "Found it!" >> {{ .inputs.x }}
+        echo "Found it!" >> {inputs.x}
     else
         echo "Not found!"
     fi
     """,
     inputs=kwtypes(x=FlyteFile),
     output_locs=[
-        OutputLocation(var="x", var_type=FlyteFile, location="{{ .inputs.x }}")
+        OutputLocation(var="i", var_type=FlyteFile, location="{inputs.x}")
     ],
 )
 
@@ -40,12 +43,12 @@ t2 = ShellTask(
     debug=True,
     script="""
     set -ex
-    cp {{ .inputs.x }} {{ .inputs.y }}
-    tar -zcvf {{ .outputs.y }} {{ .inputs.y }}
+    cp {inputs.x} {inputs.y}
+    tar -zcvf {outputs.j} {inputs.y}
     """,
     inputs=kwtypes(x=FlyteFile, y=FlyteDirectory),
     output_locs=[
-        OutputLocation(var="y", var_type=FlyteFile, location="{{ .inputs.y }}.tar.gz")
+        OutputLocation(var="j", var_type=FlyteFile, location="{inputs.y}.tar.gz")
     ],
 )
 
@@ -55,18 +58,18 @@ t3 = ShellTask(
     debug=True,
     script="""
     set -ex
-    tar -zxvf {{ .inputs.z }}
-    cat {{ .inputs.y }}/$(basename {{ .inputs.x }}) | wc -m > {{ .outputs.z }}
+    tar -zxvf {inputs.z}
+    cat {inputs.y}/$(basename {inputs.x}) | wc -m > {outputs.k}
     """,
     inputs=kwtypes(x=FlyteFile, y=FlyteDirectory, z=FlyteFile),
-    output_locs=[OutputLocation(var="z", var_type=FlyteFile, location="output.txt")],
+    output_locs=[OutputLocation(var="k", var_type=FlyteFile, location="output.txt")],
 )
 
 
 # %%
 # * The ``inputs`` parameter is useful to specify the types of inputs that the task will accept
 # * The ``output_locs`` parameter is helpful to specify the output locations, could be a ``FlyteFile`` or ``FlyteDirectory``
-# * The ``script`` parameter is the actual bash script that will be executed
+# * The ``script`` parameter is the actual bash script that will be executed (``{inputs.x}``, ``{outputs.j}``, etc. will be replaced with the actual input and output values)
 # * The ``debug`` parameter is useful for debugging
 #
 # Next, we define a task to create FlyteFile and FlyteDirectory.

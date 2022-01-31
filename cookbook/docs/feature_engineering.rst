@@ -4,7 +4,7 @@
 Feature Engineering
 ###################
 
-**Feature Engineering** off-late has become one of the most prominent topics in Machine Learning.
+**Feature Engineering** of late has become one of the most prominent topics in Machine Learning.
 It is the process of transforming raw data into features that better represent the underlying problem to the predictive models, resulting in improved model accuracy on unseen data.
 
 .. panels::

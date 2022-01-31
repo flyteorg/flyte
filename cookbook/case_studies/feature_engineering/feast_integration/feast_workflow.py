@@ -115,8 +115,7 @@ load_horse_colic_sql = SQLite3Task(
 #    * - ``FeatureView``
 #      - A FeatureView defines a logical grouping of serve-able features.
 #    * - ``FileSource``
-#      - File data sources allow for the retrieval of historical feature values from files on disk for building training datasets,
-#        as well as for materializing features into an online store.
+#      - File data sources allow for the retrieval of historical feature values from files on disk for building training datasets, as well as for materializing features into an online store.
 #    * - ``apply()``
 #      - Register objects to metadata store and update related infrastructure.
 #    * - ``get_historical_features()``
@@ -124,9 +123,9 @@ load_horse_colic_sql = SQLite3Task(
 #
 # .. note::
 #
-#   The returned feature store is the same mutated feature store, so be careful! This is not really immutable and
-#   hence serialization of the feature store is required. This is because Feast registries are single files and
-#   Flyte workflows can be highly concurrent.
+#     The returned feature store is the same mutated feature store, so be careful! This is not really immutable and
+#     hence serialization of the feature store is required because FEAST registries are single files and
+#     Flyte workflows can be highly concurrent.
 @task(cache=True, cache_version="1.0", limits=Resources(mem="400Mi"))
 def store_offline(feature_store: FeatureStore, dataframe: FlyteSchema) -> FeatureStore:
     horse_colic_entity = Entity(name="Hospital Number", value_type=ValueType.STRING)
