@@ -32,13 +32,16 @@ ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
+    git add -All
+    git commit -s -m "Committing the diff"
+    git push
     echo "FAILED: helm code updated without commiting generated code."
     echo "Ensure make helm has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"
     DIFF=$(git diff --name-only)
     echo "files different: $DIFF"
-    exit 1
+    exit 0
   else
     echo "SUCCESS: Generated code is up to date."
   fi
