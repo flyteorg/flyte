@@ -100,7 +100,7 @@ export function formatLabelWithType(label: string, type: InputTypeDefinition) {
 export function versionsToSearchableSelectorOptions(
     items: SearchableVersion[]
 ): SearchableSelectorOption<Identifier>[] {
-    return items.map<SearchableSelectorOption<Identifier>>((item, index) => ({
+    return items.map<SearchableSelectorOption<Identifier>>((item, _index) => ({
         data: item.id,
         id: item.id.version,
         name: item.id.version,

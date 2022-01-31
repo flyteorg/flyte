@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
     animate: {
         height: 10,
         animation: '$shimmer 4s infinite linear',

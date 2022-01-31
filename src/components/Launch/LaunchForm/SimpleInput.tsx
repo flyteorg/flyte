@@ -15,7 +15,7 @@ import { InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { getLaunchInputId } from './utils';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
     formControl: {
         minWidth: '100%'
     }

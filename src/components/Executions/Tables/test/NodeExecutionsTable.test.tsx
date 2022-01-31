@@ -333,7 +333,7 @@ describe('NodeExecutionsTable', () => {
             });
         });
 
-        describe('without isParentNode flag, using taskNodeMetadata ', () => {
+        describe('without isParentNode flag, using taskNodeMetadata', () => {
             let fixture: ReturnType<typeof dynamicPythonTaskWorkflow.generate>;
             beforeEach(() => {
                 fixture = dynamicPythonTaskWorkflow.generate();

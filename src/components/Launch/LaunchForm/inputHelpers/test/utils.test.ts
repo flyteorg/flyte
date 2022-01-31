@@ -49,6 +49,7 @@ describe('Launch/inputHelpers/utils', () => {
         ];
 
         cases.forEach(([description, value, expected]) =>
+            // eslint-disable-next-line jest/valid-title
             it(description, () => expect(typeIsSupported(value)).toBe(expected))
         );
     });

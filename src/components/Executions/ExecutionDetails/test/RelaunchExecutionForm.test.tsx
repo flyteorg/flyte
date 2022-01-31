@@ -116,9 +116,9 @@ describe('RelaunchExecutionForm', () => {
 
     it('passes original execution as a referenceExecution', async () => {
         const { getByText } = renderForm();
-        await waitFor(() => getByText(mockContentString));
+        await waitFor(() => expect(getByText(mockContentString)).toBeDefined());
         checkLaunchFormProps({
-            referenceExecutionId: execution.id
+            referenceExecutionId: expect.objectContaining(execution.id)
         });
     });
 
@@ -152,9 +152,11 @@ describe('RelaunchExecutionForm', () => {
 
         it('passes workflowId to LaunchForm', async () => {
             const { getByText } = renderForm();
-            await waitFor(() => getByText(mockContentString));
+            await waitFor(() => expect(getByText(mockContentString)));
             checkLaunchFormProps({
-                workflowId: execution.closure.workflowId
+                workflowId: expect.objectContaining(
+                    execution.closure.workflowId
+                )
             });
         });
 
@@ -256,10 +258,12 @@ describe('RelaunchExecutionForm', () => {
         });
 
         it('passes taskId to LaunchForm', async () => {
-            const { getByText } = renderForm();
-            await waitFor(() => getByText(mockContentString));
+            renderForm();
+            await waitFor(() => {
+                /**/
+            });
             checkLaunchFormProps({
-                taskId: execution.spec.launchPlan
+                taskId: expect.objectContaining(execution.spec.launchPlan)
             });
         });
 

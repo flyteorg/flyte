@@ -1,5 +1,4 @@
 import { Button } from '@material-ui/core';
-import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 import { basicStoryContainer } from '__stories__/decorators';
 import * as React from 'react';

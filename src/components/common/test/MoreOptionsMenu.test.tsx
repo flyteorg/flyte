@@ -37,7 +37,8 @@ describe('MoreOptionsMenu', () => {
     };
 
     it('shows menu when button is clicked', async () => {
-        await getMenu(renderMenu());
+        const menuEl = await getMenu(renderMenu());
+        expect(getByText(menuEl, options[0].label)).toBeInTheDocument();
     });
 
     it('renders element for each option', async () => {
@@ -58,15 +59,21 @@ describe('MoreOptionsMenu', () => {
     it('hides menu when item is selected', async () => {
         const result = renderMenu();
         const menuEl = await getMenu(result);
+        expect(getByText(menuEl, options[0].label)).toBeInTheDocument();
+
         const itemEl = getByText(menuEl, options[0].label);
         fireEvent.click(itemEl);
         await waitForElementToBeRemoved(menuEl);
+        expect(getByText(menuEl, options[0].label)).not.toBeInTheDocument();
     });
 
     it('hides menu on escape', async () => {
         const result = renderMenu();
         const menuEl = await getMenu(result);
+        expect(getByText(menuEl, options[0].label)).toBeInTheDocument();
+
         fireEvent.keyDown(menuEl, { key: 'Escape', code: 'Escape' });
         await waitForElementToBeRemoved(menuEl);
+        expect(getByText(menuEl, options[0].label)).not.toBeInTheDocument();
     });
 });

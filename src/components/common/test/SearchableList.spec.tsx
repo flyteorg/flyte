@@ -68,6 +68,7 @@ describe('SearchableList', () => {
                 ? `should match ${expectedValues} with input ${input}`
                 : `should have no matches for input ${input}`;
 
+            // eslint-disable-next-line jest/valid-title
             it(expectString, () => {
                 const {
                     getByRole,

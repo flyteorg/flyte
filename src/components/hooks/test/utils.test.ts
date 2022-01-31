@@ -53,7 +53,7 @@ describe('hooks/utils', () => {
 
         it('assigns parent workflow id to subworkflow nodes', () => {
             const nodes = extractAndIdentifyNodes(workflow);
-            subWorkflow.template.nodes.forEach(node =>
+            subWorkflow.template.nodes.forEach(_node =>
                 expect(nodes).toContainEqual(
                     expect.objectContaining({
                         id: {

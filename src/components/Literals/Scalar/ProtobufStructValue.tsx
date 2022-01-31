@@ -27,7 +27,7 @@ const RenderedProtobufValue: React.FC<{
     switch (value.kind) {
         case 'nullValue':
             return <PrintValue label={label} value={<NoneTypeValue />} />;
-        case 'listValue':
+        case 'listValue': {
             const list = value.listValue as ProtobufListValue;
             return (
                 <>
@@ -38,6 +38,7 @@ const RenderedProtobufValue: React.FC<{
                     />
                 </>
             );
+        }
         case 'structValue':
             return (
                 <>

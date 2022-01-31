@@ -279,7 +279,7 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
         fontSize: '.3rem'
     };
 
-    const handleClick = e => {
+    const handleClick = _e => {
         setSelectedNode(true);
     };
 

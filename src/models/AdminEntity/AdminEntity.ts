@@ -1,9 +1,5 @@
 import axios, { AxiosRequestConfig, Method } from 'axios';
-import { env } from 'common/env';
-import { toBoolean } from 'common/utils';
-
 import { generateAdminApiQuery } from './AdminApiQuery';
-
 import { transformRequestError } from './transformRequestError';
 import {
     AdminEntityTransformer,

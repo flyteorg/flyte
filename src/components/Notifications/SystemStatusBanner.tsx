@@ -1,4 +1,4 @@
-import { ButtonBase, SvgIcon, Typography } from '@material-ui/core';
+import { ButtonBase, Typography } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Close from '@material-ui/icons/Close';
@@ -68,11 +68,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginRight: theme.spacing(2)
     }
 }));
-
-interface StatusConstantValues {
-    color: string;
-    IconComponent: typeof SvgIcon;
-}
 
 const InfoIcon = () => (
     <Info data-testid="info-icon" htmlColor={infoIconColor} />

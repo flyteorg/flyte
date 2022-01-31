@@ -348,11 +348,6 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     const commonStyles = useCommonStyles();
     const styles = useStyles();
     const detailsQuery = useNodeExecutionDetails(nodeExecution);
-    const displayId = detailsQuery.data ? (
-        detailsQuery.data.displayId
-    ) : (
-        <Skeleton />
-    );
     const displayName = detailsQuery.data ? (
         detailsQuery.data.displayName
     ) : (

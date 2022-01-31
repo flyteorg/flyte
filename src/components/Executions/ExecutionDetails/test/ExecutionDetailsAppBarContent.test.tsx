@@ -60,7 +60,7 @@ describe('ExecutionDetailsAppBarContent', () => {
 
         it('renders an overflow menu', async () => {
             const { getByLabelText } = renderContent();
-            await waitFor(() => getByLabelText(commonLabels.moreOptionsButton));
+            expect(getByLabelText(commonLabels.moreOptionsButton)).toBeTruthy();
         });
 
         describe('in overflow menu', () => {

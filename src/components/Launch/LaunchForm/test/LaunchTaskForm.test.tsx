@@ -12,17 +12,14 @@ import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { muiTheme } from 'components/Theme/muiTheme';
 import { Core } from 'flyteidl';
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { RequestConfig } from 'models/AdminEntity/types';
 import {
     Identifier,
     NamedEntityIdentifier,
     Variable
 } from 'models/Common/types';
-import {
-    createWorkflowExecution,
-    CreateWorkflowExecutionArguments
-} from 'models/Execution/api';
+import { createWorkflowExecution } from 'models/Execution/api';
 import { getTask, listTasks } from 'models/Task/api';
 import { Task } from 'models/Task/types';
 import { createMockTaskClosure } from 'models/__mocks__/taskData';
@@ -50,11 +47,9 @@ import {
 } from '../__mocks__/mockInputs';
 import {
     binaryInputName,
-    booleanInputName,
     floatInputName,
     iamRoleString,
     integerInputName,
-    k8sServiceAccountString,
     stringInputName
 } from './constants';
 import { createMockObjects } from './utils';

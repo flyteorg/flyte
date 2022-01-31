@@ -1,4 +1,3 @@
-import { CompiledNode } from 'models/Node/types';
 import { NodeExecution } from 'models/Execution/types';
 import { TaskTemplate } from 'models/Task/types';
 

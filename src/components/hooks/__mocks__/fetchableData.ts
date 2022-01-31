@@ -1,5 +1,5 @@
 import { State } from 'xstate';
-import { FetchableData, FetchFn, fetchStates } from '../types';
+import { FetchableData, fetchStates } from '../types';
 
 export function createMockFetchable<T>(
     value: any,
