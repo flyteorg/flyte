@@ -224,9 +224,9 @@ if __name__ == "__main__":
 # to be the subset of outputs that all then-nodes produce. In the following example, we call square() in one condition
 # and call double in another.
 @task
-def sum_diff(a: float, b: float) -> float:
+def calc_sum(a: float, b: float) -> float:
     """
-    sum_diff returns the sum and difference between a and b.
+    calc_sum returns the sum of a and b.
     """
     return a + b
 
@@ -250,7 +250,7 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
             .if_(is_heads.is_true())
             .then(square(n=my_input))
             .else_()
-            .then(sum_diff(a=my_input, b=my_input))
+            .then(calc_sum(a=my_input, b=my_input))
     )
 
     # Regardless of the result, always double before returning
@@ -262,6 +262,6 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
 # As usual local execution does not change
 if __name__ == "__main__":
     print(
-        f"consume_outputs(0.4) with default seed=5. This should return output of sum_diff => {consume_outputs(my_input=0.4)}")
+        f"consume_outputs(0.4) with default seed=5. This should return output of calc_sum => {consume_outputs(my_input=0.4)}")
     print(
         f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}")
