@@ -9,6 +9,23 @@ Let's understand how Flyte handles data management.
 Types of Data
 =============
 
+There are two parts to the data in Flyte:
+
+1. Metadata
+
+* It consists of data about inputs to a task, and other artifacts.
+* It is configured globally for FlytePropeller, Admin etc, and the running pods/jobs need access to this bucket to get the data.
+
+2. Raw data
+
+* It is the actual data (such as the pandas dataframe, spark dataframe, etc,).
+* Raw data paths are unique for every execution, and the prefixes can be modified per execution.
+* None of the Flyte control plane components would access the raw data. This provides a great separation of data between the control plane and the data plane.
+
+.. note:
+  Metadata and raw data can be present in entirely separate buckets.
+
+
 Let us consider a simple Python task:
 
 .. code-block:: python
@@ -40,11 +57,14 @@ Raw Data Prefix
 Every task can read/write its own data files. If ``FlyteFile``, or any natively supported type like ``pandas.DataFrame`` is used, Flyte will automatically offload and download
 data from the configured object-store paths. These paths are completely customizable per `LaunchPlan` or `Execution`.
 
-- To configure the default Rawoutput path (prefix in an object store like S3/GCS), we can configure it during registration as shown in :std:ref:`flytectl_register_files`.
+- The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :std:ref:`flytectl_register_files`.
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
 - To override the ``RawOutput`` path (prefix in an object store like S3/GCS), we can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
   .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/launch_raw_output.png
+
+- In sandbox, the default Rawoutput-prefix is configured to be the root of the local bucket. Hence Flyte will write all the raw data (reference types like blob, file, df/schema/parquet etc.) under a path defined by the execution.
+
 
 Metadata
 ~~~~~~~~
@@ -126,6 +146,7 @@ Data Movement
 =============
 
 Flyte is primarily a **DataFlow Engine**. It enables movement of data and provides an abstraction to enable movement of data between different languages.
+
 One implementation of Flyte is the current workflow engine.
 
 The workflow Engine is responsible for moving data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.

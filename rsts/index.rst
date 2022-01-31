@@ -57,8 +57,8 @@
    API Reference <reference/index>
 
    
-Flyte Documentation
-====================
+What is Flyte?
+==============
 
 .. raw:: html
 
@@ -67,9 +67,12 @@ Flyte Documentation
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
+It is implemented in Golang, and designed for container native execution and connecting external services. For external services, it offers backend plugins- allowing separating plugins from user code (Python library).
+
 Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
-The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit SDK:
+
+The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
 
 .. tabbed:: python
 
@@ -255,12 +258,13 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
 Why Flyte?
 ==========
 
-Flyte's main purpose is to increase the development velocity for data processing and machine learning, enabling large-scale compute execution without the operational overhead. Teams can therefore focus on the business goals and not the infrastructure.
+The main purpose of Flyte is to increase the development velocity for data processing and machine learning, enabling large-scale compute execution without the operational overhead. Teams can therefore focus on the business goals rather than the infrastructure.
 
 Core Features
 -------------
 
 * Container Native
+* Reproducibility
 * Extensible Backend & SDK’s
 * Ergonomic SDK’s in Python, Java & Scala
 * Versioned & Auditable - all actions are recorded
@@ -270,6 +274,7 @@ Core Features
 * Deep understanding of data-lineage & provenance
 * Operation Visibility - cost, performance, etc.
 * Cross-Cloud Portable Pipelines
+* Support for cross language workflows
 
 Who's Using Flyte?
 ------------------
