@@ -548,7 +548,7 @@ data:
         kubernetes-enabled: false
 ---
 # Source: flyte-core/templates/propeller/crds/flyteworkflow.yaml
-apiVersion: apiextensions.k8s.io/v1
+apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: flyteworkflows.flyte.lyft.com
@@ -561,15 +561,7 @@ spec:
       - fly
     singular: flyteworkflow
   scope: Namespaced
-  versions:
-    - name: v1alpha1
-      served: true
-      storage: true
-      schema:
-        openAPIV3Schema:
-          type: object
-          x-kubernetes-preserve-unknown-fields: true
-          properties:
+  version: v1alpha1
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -602,7 +594,7 @@ rules:
   - '*'
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: flytepropeller
@@ -1463,7 +1455,7 @@ spec:
             name: config-volume
 ---
 # Source: flyte-core/templates/common/ingress.yaml
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: flyte-core
@@ -1485,167 +1477,123 @@ spec:
           - path: /*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: ssl-redirect
-                port:
-                  name: use-annotation
+              serviceName: ssl-redirect
+              servicePort: use-annotation
           # This is useful only for frontend development
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
+              serviceName: flyteadmin
+              servicePort: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteconsole
-                port:
-                  number: 80
+              serviceName: flyteconsole
+              servicePort: 80
           - path: /console/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteconsole
-                port:
-                  number: 80
+              serviceName: flyteconsole
+              servicePort: 80
           - path: /api
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /api/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /healthcheck
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /v1/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
+              serviceName: flyteadmin
+              servicePort: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /login
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /login/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /logout
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /logout/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /callback
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /callback/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /me
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /config
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /config/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /oauth2
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /oauth2/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 80
+              serviceName: flyteadmin
+              servicePort: 80
       host: null
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
 # Source: flyte-core/templates/common/ingress.yaml
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: flyte-core-grpc
@@ -1678,56 +1626,40 @@ spec:
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /flyteidl.service.AdminService/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /flyteidl.service.AuthMetadataService
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /flyteidl.service.AuthMetadataService/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /flyteidl.service.IdentityService
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /flyteidl.service.IdentityService/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /grpc.health.v1.Health
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
           - path: /grpc.health.v1.Health/*
             pathType: ImplementationSpecific
             backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
+              serviceName: flyteadmin
+              servicePort: 81
