@@ -24,7 +24,7 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = u"Flyte"
-copyright = u"2021, Flyte Authors"
+copyright = u"2022, Flyte Authors"
 author = u"Flyte"
 
 # The short X.Y version
