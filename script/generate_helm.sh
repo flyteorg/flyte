@@ -37,7 +37,7 @@ if [ -n "$DELTA_CHECK" ]; then
     git switch -c commit-diff
     git add -A
     git commit -s -m "Committing the diff"
-    git push
+    git push --set-upstream origin commit-diff
     echo "FAILED: helm code updated without commiting generated code."
     echo "Ensure make helm has run and all changes are committed."
     DIFF=$(git diff)
