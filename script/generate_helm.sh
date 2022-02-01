@@ -32,6 +32,8 @@ ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
+    git config --global user.email "haytham@afutuh.com"
+    git config --global user.name "Haytham Abuelfutuh"
     git add -A
     git commit -s -m "Committing the diff"
     git push
