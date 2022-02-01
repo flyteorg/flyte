@@ -205,7 +205,7 @@ func Test_controller_createResourceFromTemplate(t *testing.T) {
 		templateDir          string
 		templateFileName     string
 		project              *admin.Project
-		domain               runtimeInterfaces.Domain
+		domain               *admin.Domain
 		namespace            NamespaceName
 		templateValues       templateValuesType
 		customTemplateValues templateValuesType
@@ -226,8 +226,8 @@ func Test_controller_createResourceFromTemplate(t *testing.T) {
 					Name: "my-project",
 					Id:   "my-project",
 				},
-				domain: runtimeInterfaces.Domain{
-					ID:   "dev",
+				domain: &admin.Domain{
+					Id:   "dev",
 					Name: "dev",
 				},
 				namespace:            "my-project-dev",
@@ -254,8 +254,8 @@ spec:
 					Name: "my-project",
 					Id:   "my-project",
 				},
-				domain: runtimeInterfaces.Domain{
-					ID:   "dev",
+				domain: &admin.Domain{
+					Id:   "dev",
 					Name: "dev",
 				},
 				namespace: "my-project-dev",
@@ -286,8 +286,8 @@ type: kubernetes.io/dockerconfigjson
 					Name: "my-project",
 					Id:   "my-project",
 				},
-				domain: runtimeInterfaces.Domain{
-					ID:   "dev",
+				domain: &admin.Domain{
+					Id:   "dev",
 					Name: "dev",
 				},
 				namespace:            "my-project-dev",
@@ -314,8 +314,8 @@ imagePullSecrets:
 					Name: "my-project",
 					Id:   "my-project",
 				},
-				domain: runtimeInterfaces.Domain{
-					ID:   "dev",
+				domain: &admin.Domain{
+					Id:   "dev",
 					Name: "dev",
 				},
 				namespace:            "my-project-dev",

@@ -265,7 +265,7 @@ func prepareDynamicCreate(target executioncluster.ExecutionTarget, config string
 //      a) read template file
 //      b) substitute templatized variables with their resolved values
 //   2) create the resource on the kubernetes cluster and cache successful outcomes
-func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, domain runtimeInterfaces.Domain, namespace NamespaceName,
+func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, domain *admin.Domain, namespace NamespaceName,
 	templateValues, customTemplateValues templateValuesType) error {
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
 	if c.lastAppliedTemplateDir != templateDir {
@@ -441,7 +441,7 @@ func addResourceVersion(patch []byte, rv string) ([]byte, error) {
 //      2) substitute templatized variables with their resolved values
 // the method will return the kubernetes raw manifest
 func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir string,
-	templateFileName string, project *admin.Project, domain runtimeInterfaces.Domain, namespace NamespaceName,
+	templateFileName string, project *admin.Project, domain *admin.Domain, namespace NamespaceName,
 	templateValues, customTemplateValues templateValuesType) (string, error) {
 	// 1) read the template file
 	template, err := ioutil.ReadFile(path.Join(templateDir, templateFileName))
@@ -462,7 +462,7 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	// rather than fetched via a user-specified source.
 	templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
 	templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.Id
-	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.ID
+	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Id
 
 	var k8sManifest = string(template)
 	for templateKey, templateValue := range templateValues {
@@ -554,7 +554,6 @@ func (c *controller) Sync(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	domains := c.config.ApplicationConfiguration().GetDomainsConfig()
 	var errs = make([]error, 0)
 	templateValues, err := populateTemplateValues(c.config.ClusterResourceConfiguration().GetTemplateData())
 	if err != nil {
@@ -568,10 +567,10 @@ func (c *controller) Sync(ctx context.Context) error {
 	}
 
 	for _, project := range projects.Projects {
-		for _, domain := range *domains {
+		for _, domain := range project.Domains {
 			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Id, domain.Name)
 			customTemplateValues, err := c.getCustomTemplateValues(
-				ctx, project.Id, domain.ID, domainTemplateValues[domain.ID])
+				ctx, project.Id, domain.Id, domainTemplateValues[domain.Id])
 			if err != nil {
 				logger.Warningf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
 				errs = append(errs, err)
