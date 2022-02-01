@@ -155,4 +155,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_use-admin-auth", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("use-admin-auth", testValue)
+			if vBool, err := cmdFlags.GetBool("use-admin-auth"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.UseAdminAuth)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

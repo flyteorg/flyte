@@ -351,8 +351,11 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 }
 
 // Create a new Datacatalog client for task execution caching
-func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration) (*CatalogClient, error) {
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration, useAdminAuth bool, authOpt grpc.DialOption) (*CatalogClient, error) {
 	var opts []grpc.DialOption
+	if useAdminAuth && authOpt != nil {
+		opts = append(opts, authOpt)
+	}
 
 	grpcOptions := []grpcRetry.CallOption{
 		grpcRetry.WithBackoff(grpcRetry.BackoffLinear(100 * time.Millisecond)),
