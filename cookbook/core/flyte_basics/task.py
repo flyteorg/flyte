@@ -1,10 +1,11 @@
+# .. _basics_of_tasks:
 """
 Tasks
 -----
 
 Task is a fundamental building block and an extension point of Flyte, which encapsulates the users' code. They possess the following properties:
 
-#. Versioned (usually tied to the git sha)
+#. Versioned (usually tied to the ``git sha``)
 #. Strong interfaces (specified inputs and outputs)
 #. Declarative
 #. Independently executable
@@ -12,22 +13,22 @@ Task is a fundamental building block and an extension point of Flyte, which enca
 
 A task in Flytekit can be of two types:
 
-#. A task that has a Python function associated with it. The execution of the task is equivalent to the execution of this function
-#. A task that does not have a Python function, e.g., an SQL query or some other portable task like Sagemaker prebuilt algorithms, or something that just invokes an API
+#. A task that has a Python function associated with it. The execution of the task is equivalent to the execution of this function.
+#. A task that doesn't have a Python function, e.g., an SQL query or any portable task like Sagemaker prebuilt algorithms, or a service that invokes an API.
 
-Flyte has multiple plugins for tasks, either a backend plugin (`Athena <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-aws-athena/flytekitplugins/athena/task.py>`__).
+Flyte provides multiple plugins for tasks, which can be a backend plugin as well (`Athena <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-aws-athena/flytekitplugins/athena/task.py>`__).
 
 In this example, you will learn how to write and execute a ``Python function task``. Other types of tasks will be covered in the later sections.
 """
 # %%
-# For any task in flyte, there is always one required import, which is:
+# For any task in Flyte, there is one necessary import, which is:
 from flytekit import task
 
 
 # %%
 # A ``PythonFunctionTask`` must always be decorated with the ``@task`` :py:func:`flytekit.task` decorator.
 # The task in itself is a regular Python function, although with one exception: it needs all the inputs and outputs to be clearly
-# annotated with the types. The types are regular python types; we'll go over more on this in the :ref:`type-system section <sphx_glr_auto_core_type_system_flyte_python_types.py>`.
+# annotated with the types. The types are regular Python types; we'll go over more on this in the :ref:`type-system section <sphx_glr_auto_core_type_system_flyte_python_types.py>`.
 @task
 def square(n: int) -> int:
     """
