@@ -24,7 +24,10 @@ jobs:
   end-to-end-kustomize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17.6"
       - name: Kustomize and diff
         run: DELTA_CHECK=true make kustomize
       - name: Helm and diff
@@ -48,7 +51,10 @@ jobs:
   end-to-end-helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17.6"
       - name: Kustomize and diff
         run: DELTA_CHECK=true make kustomize
       - name: Helm and diff
@@ -60,7 +66,7 @@ jobs:
           flytectl config init
           flytectl sandbox start --source=$(pwd)
       - name: Upgrade Helm charts
-        run:  flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values-sandbox.yaml
+        run: flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values-sandbox.yaml
       - name: End2End
         env:
           KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
