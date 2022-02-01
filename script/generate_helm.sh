@@ -34,6 +34,7 @@ if [ -n "$DELTA_CHECK" ]; then
   if [ -n "$DIRTY" ]; then
     git config --global user.email "haytham@afutuh.com"
     git config --global user.name "Haytham Abuelfutuh"
+    git switch -c commit-diff
     git add -A
     git commit -s -m "Committing the diff"
     git push
