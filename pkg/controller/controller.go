@@ -8,6 +8,8 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"google.golang.org/grpc"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
@@ -285,21 +287,21 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 	}
 }
 
-func getAdminClient(ctx context.Context) (client service.AdminServiceClient, err error) {
+func getAdminClient(ctx context.Context) (client service.AdminServiceClient, opt grpc.DialOption, err error) {
 	cfg := admin.GetConfig(ctx)
 	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
+		return nil, nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}
 
-	return clients.AdminClient(), nil
+	return clients.AdminClient(), clients.AuthOpt(), nil
 }
 
 // NewController returns a new FlyteWorkflow controller
 func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
-	adminClient, err := getAdminClient(ctx)
+	adminClient, authOpts, err := getAdminClient(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
 		return nil, err
@@ -382,7 +384,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	}
 
 	logger.Info(ctx, "Setting up Catalog client.")
-	catalogClient, err := catalog.NewCatalogClient(ctx)
+	catalogClient, err := catalog.NewCatalogClient(ctx, authOpts)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create datacatalog client")
 	}
