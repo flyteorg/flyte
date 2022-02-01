@@ -1,0 +1,28 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-clusterresourcesync-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
+  {{- with .Values.cluster_resource_manager.config }}
+  cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+
+  {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+  {{- with .Values.configmap.admin }}
+  admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  {{- with .Values.db.admin }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- end }}
+
+  {{- with .Values.configmap.domain }}
+  domain.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+
+  {{- end }}

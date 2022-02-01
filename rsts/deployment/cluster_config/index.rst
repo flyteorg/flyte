@@ -62,6 +62,24 @@ Cluster Config
 
     ---
 
+    .. link-button:: flytedatacatalog-config-specification
+       :type: ref
+       :text: Flyte Datacatalog Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Datacatalog configuration specification are covered here.
+
+    ---
+
+    .. link-button:: flytescheduler-config-specification
+       :type: ref
+       :text: Flyte Scheduler Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Scheduler configuration specification are covered here.
+
+    ---
+
     .. link-button:: deployment-cluster-config-notifications
        :type: ref
        :text: Notifications
@@ -106,8 +124,10 @@ Cluster Config
     auth_appendix
     general
     customizable_resources
+    datacatalog_config
     flyteadmin_config
     flytepropeller_config
+    scheduler_config
     monitoring
     notifications
     performance

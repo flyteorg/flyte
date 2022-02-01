@@ -259,6 +259,22 @@ Permitted attribute operations include:
 - Get
 - Delete
 
+
+Defaults
+--------
+
+Task resource defaults
+++++++++++++++++++++++
+
+User-facing documentation on configuring task resource requests and limits can be found in :std:ref:`cookbook:customizing task resources`.
+
+As a system administrator you may want to define default task resource requests and limits across your Flyte deployment.
+This can be done through the :std:ref:`flyteadmin config <deployment/cluster_config/flyteadmin_config:section: task_resources>`.
+
+**Default** values get injected as the task requests and limits when a task definition omits a specific resource.
+**Limit** values are only used as validation. Neither a task request nor limit can exceed the limit for a resource type.
+
+
 Using the Admin Service
 -----------------------
 

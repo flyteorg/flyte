@@ -77,7 +77,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. prompt:: bash $
 
-          docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30087:30087 cr.flyte.org/flyteorg/flyte-sandbox
+          docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30088:30088 cr.flyte.org/flyteorg/flyte-sandbox
 
 .. tabbed:: k3d
 
@@ -200,7 +200,7 @@ Flyte configuration on your remote cluster.
 
     flytectl config init --host='localhost:30081' --insecure
 
-#. Open the minio console http://localhost:30087, Your minio username is `minio` and password is `miniostorage`
+#. Open the minio console http://localhost:30088, Your minio username is `minio` and password is `miniostorage`
 
 #. Open the Kubernetes dashboard http://localhost:30082
 
