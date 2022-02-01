@@ -347,10 +347,11 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }
 
-// ConvertPodFailureToError retruns a legible error message and code from a failed v1.PodStatus field
-func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
-	code = "UnknownError"
-	message = "Pod failed. No message received from kubernetes."
+// DemystifyFailure resolves the various Kubernetes pod failure modes to determine
+// the most appropriate course of action
+func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	code := "UnknownError"
+	message := "Pod failed. No message received from kubernetes."
 	if len(status.Reason) > 0 {
 		code = status.Reason
 	}
@@ -359,6 +360,40 @@ func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 		message = status.Message
 	}
 
+	//
+	// Handle known pod statuses
+	//
+	// This is useful for handling node interruption events
+	// which can be different between providers and versions of Kubernetes. Given that
+	// we don't have a consistent way of detecting interruption events, we will be
+	// documenting all possibilities as follows. We will also be handling these as
+	// system retryable failures that do not count towards user-specified task retries,
+	// for now. This is required for FlytePropeller to correctly transition
+	// interruptible nodes to non-interruptible ones after the
+	// `interruptible-failure-threshold` is exceeded. See:
+	// https://github.com/flyteorg/flytepropeller/blob/a3c6e91f19c19601a957b29891437112868845de/pkg/controller/nodes/node_exec_context.go#L213
+
+	// GKE (>= v1.20) Kubelet graceful node shutdown
+	// See: https://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms#graceful-shutdown
+	// Cloud audit log for patch of Pod object during graceful node shutdown:
+	// request: {
+	//     @type: "k8s.io/Patch"
+	//     status: {
+	//         conditions: null
+	//         message: "Pod Node is in progress of shutting down, not admitting any new pods"
+	//         phase: "Failed"
+	//         qosClass: null
+	//         reason: "Shutdown"
+	//         startTime: "2022-01-30T14:24:07Z"
+	//     }
+	// }
+	if code == "Shutdown" {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+	}
+
+	//
+	// Handle known container statuses
+	//
 	for _, c := range append(
 		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
 		var containerState v1.ContainerState
@@ -387,7 +422,7 @@ func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 			}
 		}
 	}
-	return code, message
+	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 
 func GetLastTransitionOccurredAt(pod *v1.Pod) v12.Time {

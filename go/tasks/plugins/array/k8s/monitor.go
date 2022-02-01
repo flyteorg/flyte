@@ -267,8 +267,7 @@ func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8s
 	case v1.PodSucceeded:
 		phaseInfo, err2 = flytek8s.DemystifySuccess(pod.Status, taskInfo)
 	case v1.PodFailed:
-		code, message := flytek8s.ConvertPodFailureToError(pod.Status)
-		phaseInfo = core.PhaseInfoRetryableFailure(code, message, &taskInfo)
+		phaseInfo, err2 = flytek8s.DemystifyFailure(pod.Status, taskInfo)
 	case v1.PodPending:
 		phaseInfo, err2 = flytek8s.DemystifyPending(pod.Status)
 	case v1.PodUnknown:
