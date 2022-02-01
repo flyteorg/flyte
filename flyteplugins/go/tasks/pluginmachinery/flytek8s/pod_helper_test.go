@@ -828,19 +828,25 @@ func TestDemystifySuccess(t *testing.T) {
 	})
 }
 
-func TestConvertPodFailureToError(t *testing.T) {
+func TestDemystifyFailure(t *testing.T) {
 	t.Run("unknown-error", func(t *testing.T) {
-		code, _ := ConvertPodFailureToError(v1.PodStatus{})
-		assert.Equal(t, code, "UnknownError")
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "UnknownError", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("known-error", func(t *testing.T) {
-		code, _ := ConvertPodFailureToError(v1.PodStatus{Reason: "hello"})
-		assert.Equal(t, code, "hello")
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "hello", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("OOMKilled", func(t *testing.T) {
-		code, _ := ConvertPodFailureToError(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					State: v1.ContainerState{
@@ -851,28 +857,15 @@ func TestConvertPodFailureToError(t *testing.T) {
 					},
 				},
 			},
-		})
-		assert.Equal(t, code, "OOMKilled")
-	})
-
-	t.Run("OOMKilled", func(t *testing.T) {
-		code, _ := ConvertPodFailureToError(v1.PodStatus{
-			ContainerStatuses: []v1.ContainerStatus{
-				{
-					LastTerminationState: v1.ContainerState{
-						Terminated: &v1.ContainerStateTerminated{
-							Reason:   OOMKilled,
-							ExitCode: 137,
-						},
-					},
-				},
-			},
-		})
-		assert.Equal(t, code, "OOMKilled")
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("SIGKILL", func(t *testing.T) {
-		code, _ := ConvertPodFailureToError(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					LastTerminationState: v1.ContainerState{
@@ -883,8 +876,22 @@ func TestConvertPodFailureToError(t *testing.T) {
 					},
 				},
 			},
-		})
-		assert.Equal(t, code, "Interrupted")
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
+	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+			Message: "Pod Node is in progress of shutting down, not admitting any new pods",
+			Reason:  "Shutdown",
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
 	})
 }
 

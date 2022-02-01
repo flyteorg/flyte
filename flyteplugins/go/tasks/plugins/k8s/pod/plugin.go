@@ -95,8 +95,7 @@ func (plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext,
 	case v1.PodSucceeded:
 		return flytek8s.DemystifySuccess(pod.Status, info)
 	case v1.PodFailed:
-		code, message := flytek8s.ConvertPodFailureToError(pod.Status)
-		return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
+		return flytek8s.DemystifyFailure(pod.Status, info)
 	case v1.PodPending:
 		return flytek8s.DemystifyPending(pod.Status)
 	case v1.PodReasonUnschedulable:
