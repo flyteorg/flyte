@@ -350,9 +350,33 @@ func TestBuildResourceSpark(t *testing.T) {
 
 	// Set Interruptible Config
 	runAsUser := int64(1000)
+	dnsOptVal1 := "1"
+	dnsOptVal2 := "1"
+	dnsOptVal3 := "3"
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		DefaultPodSecurityContext: &corev1.PodSecurityContext{
 			RunAsUser: &runAsUser,
+		},
+		DefaultPodDNSConfig: &corev1.PodDNSConfig{
+			Nameservers: []string{"8.8.8.8", "8.8.4.4"},
+			Options: []corev1.PodDNSConfigOption{
+				{
+					Name:  "ndots",
+					Value: &dnsOptVal1,
+				},
+				{
+					Name: "single-request-reopen",
+				},
+				{
+					Name:  "timeout",
+					Value: &dnsOptVal2,
+				},
+				{
+					Name:  "attempts",
+					Value: &dnsOptVal3,
+				},
+			},
+			Searches: []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"},
 		},
 		InterruptibleNodeSelector: map[string]string{
 			"x/interruptible": "true",
@@ -379,6 +403,28 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
 	assert.NotNil(t, sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt)
 	assert.Equal(t, *sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt.RunAsUser, runAsUser)
+	assert.NotNil(t, sparkApp.Spec.Driver.DNSConfig)
+	assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, sparkApp.Spec.Driver.DNSConfig.Nameservers)
+	assert.Equal(t, "ndots", sparkApp.Spec.Driver.DNSConfig.Options[0].Name)
+	assert.Equal(t, dnsOptVal1, *sparkApp.Spec.Driver.DNSConfig.Options[0].Value)
+	assert.Equal(t, "single-request-reopen", sparkApp.Spec.Driver.DNSConfig.Options[1].Name)
+	assert.Equal(t, "timeout", sparkApp.Spec.Driver.DNSConfig.Options[2].Name)
+	assert.Equal(t, dnsOptVal2, *sparkApp.Spec.Driver.DNSConfig.Options[2].Value)
+	assert.Equal(t, "attempts", sparkApp.Spec.Driver.DNSConfig.Options[3].Name)
+	assert.Equal(t, dnsOptVal3, *sparkApp.Spec.Driver.DNSConfig.Options[3].Value)
+	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Driver.DNSConfig.Searches)
+	assert.NotNil(t, sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt)
+	assert.Equal(t, *sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt.RunAsUser, runAsUser)
+	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
+	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
+	assert.Equal(t, "ndots", sparkApp.Spec.Executor.DNSConfig.Options[0].Name)
+	assert.Equal(t, dnsOptVal1, *sparkApp.Spec.Executor.DNSConfig.Options[0].Value)
+	assert.Equal(t, "single-request-reopen", sparkApp.Spec.Executor.DNSConfig.Options[1].Name)
+	assert.Equal(t, "timeout", sparkApp.Spec.Executor.DNSConfig.Options[2].Name)
+	assert.Equal(t, dnsOptVal2, *sparkApp.Spec.Executor.DNSConfig.Options[2].Value)
+	assert.Equal(t, "attempts", sparkApp.Spec.Executor.DNSConfig.Options[3].Name)
+	assert.Equal(t, dnsOptVal3, *sparkApp.Spec.Executor.DNSConfig.Options[3].Value)
+	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Executor.DNSConfig.Searches)
 
 	//Validate Driver/Executor Spec.
 	driverCores, _ := strconv.ParseInt(dummySparkConf["spark.driver.cores"], 10, 32)
