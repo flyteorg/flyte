@@ -68,6 +68,7 @@ RUN chmod a+x /usr/local/bin/flytekit_venv
 # when registering tasks, workflows, and launch plans
 ARG tag
 ENV FLYTE_INTERNAL_IMAGE $tag
+ENV FLYTE_SDK_USE_STRUCTURED_DATASET TRUE
 
 # Enable the virtualenv for this image. Note this relies on the VENV variable we've set in this image.
 ENTRYPOINT ["/usr/local/bin/flytekit_venv"]

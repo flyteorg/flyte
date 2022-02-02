@@ -125,14 +125,14 @@ def blast_wf(
         datadir=datadir, outdir=outdir, query=query, db=db, blast_output=blast_output
     )
     result = is_batchx_success(stdout=stdout)
-    result, plot = (
+    final_result, plot = (
         conditional("blastx_output")
         .if_(result.is_true())
         .then(blastx_output(blastout=blastout))
         .else_()
         .fail("BLASTX failed")
     )
-    return BLASTXOutput(result=result, plot=plot)
+    return BLASTXOutput(result=final_result, plot=plot)
 
 
 # %%
