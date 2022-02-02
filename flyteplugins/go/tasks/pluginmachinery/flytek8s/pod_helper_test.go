@@ -524,6 +524,49 @@ func TestToK8sPod(t *testing.T) {
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
 	})
+
+	t.Run("default-pod-dns-config", func(t *testing.T) {
+		val1 := "1"
+		val2 := "1"
+		val3 := "3"
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			DefaultPodDNSConfig: &v1.PodDNSConfig{
+				Nameservers: []string{"8.8.8.8", "8.8.4.4"},
+				Options: []v1.PodDNSConfigOption{
+					{
+						Name:  "ndots",
+						Value: &val1,
+					},
+					{
+						Name: "single-request-reopen",
+					},
+					{
+						Name:  "timeout",
+						Value: &val2,
+					},
+					{
+						Name:  "attempts",
+						Value: &val3,
+					},
+				},
+				Searches: []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"},
+			},
+		}))
+
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.NotNil(t, p.DNSConfig)
+		assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, p.DNSConfig.Nameservers)
+		assert.Equal(t, "ndots", p.DNSConfig.Options[0].Name)
+		assert.Equal(t, val1, *p.DNSConfig.Options[0].Value)
+		assert.Equal(t, "single-request-reopen", p.DNSConfig.Options[1].Name)
+		assert.Equal(t, "timeout", p.DNSConfig.Options[2].Name)
+		assert.Equal(t, val2, *p.DNSConfig.Options[2].Value)
+		assert.Equal(t, "attempts", p.DNSConfig.Options[3].Name)
+		assert.Equal(t, val3, *p.DNSConfig.Options[3].Value)
+		assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, p.DNSConfig.Searches)
+	})
 }
 
 func TestDemystifyPending(t *testing.T) {

@@ -104,6 +104,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 			EnvVars:          sparkEnvVars,
 			Image:            &container.Image,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
+			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
 		},
 		ServiceAccount: &serviceAccountName,
 	}
@@ -115,6 +116,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 			Image:            &container.Image,
 			EnvVars:          sparkEnvVars,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
+			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
 		},
 	}
 

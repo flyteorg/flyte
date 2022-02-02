@@ -57,6 +57,22 @@ plugins:
     default-security-context:
       allowPrivilegeEscalation: false
     enable-host-networking-pod: true
+    default-pod-dns-config:
+      options:
+        - name: "ndots"
+          value: "1"
+        - name: "single-request-reopen"
+        - name: "timeout"
+          value: "1"
+        - name: "attempts"
+          value: "3"
+      nameservers:
+        - "8.8.8.8"
+        - "8.8.4.4"
+      searches:
+        - "ns1.svc.cluster-domain.example"
+        - "my.dns.search.suffix"
+
   # Spark Plugin configuration
   spark:
     spark-config-default:
