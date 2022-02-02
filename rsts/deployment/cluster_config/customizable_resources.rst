@@ -4,24 +4,23 @@
 Adding New Customizable Resources
 ##################################
 
-For background on customizable resources, see the :ref:`deployment-cluster-config-general`.
-As a quick refresher, custom resources allow you to manage configurations for :ref:`specific combinations <multicluster-setup>` of user projects,
-domains and workflows that override the default values. 
+As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects,
+domains and workflows that override default values. Examples of such resources include execution clusters, task resource
+defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`. If your goal is scalability, use :ref:`multiple clusters <multicluster-setup>`.
 
-Examples of such resources include execution clusters, task resource
-defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
-
+.. note::
+    For background on customizable resources, refer to :ref:`deployment-cluster-config-general`.
 
 Example
 -------
 
 Let's say you want to inject a default priority annotation for your workflows. Perhaps you start off with a model where everything has a default priority but soon you realize it makes sense that workflows in your production domain should take higher priority than those in your development domain.
 
-Now, one of your users team require critical workflows to have a higher priority than other production workflows. Here's how you could go about building a customizable priority designation.
+Now, one of your user teams requires critical workflows to have a higher priority than other production workflows. Here's how you could go about building a customizable priority designation.
 
 Flyte IDL
 ^^^^^^^^^
-Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>`, that includes a unique enum value and proto message definition. 
+Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>` that includes a unique enum value and proto message definition. 
 
 For example:
 
@@ -47,10 +46,10 @@ For example:
 See the changes in this `file <https://github.com/flyteorg/flyteidl/commit/b1767697705621a3fddcb332617a5304beba5bec#diff-d3c1945436aba8f7a76755d75d18e671>`__ for an example of what is required.
 
 
-Flyte admin
+Flyte Admin
 ^^^^^^^^^^^
 
-Once your IDL changes are released, update the logic of flyteadmin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it while creating executions or in relevant use cases.
+Once your IDL changes are released, update the logic of Flyte Admin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it while creating executions or in relevant use cases.
 
 For example:
 

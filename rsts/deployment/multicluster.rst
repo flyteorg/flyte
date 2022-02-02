@@ -20,7 +20,7 @@ For now, let’s assume you have three Kubernetes clusters and that you can acce
 
 Next, deploy **just** the data-planes to these clusters. To do this, remove the data-plane components from the **flyte** overlay, and create a new overlay containing **only** the data-plane resources.
 
-To establish routing rules to send certain workflows to specific clusters, :ref:`custom resources <deployment-customizable-resources>` can be used.
+To establish routing rules to route certain workflows to specific clusters, :ref:`custom resources <deployment-customizable-resources>` can be used.
 
 Data Plane Deployment
 *********************
