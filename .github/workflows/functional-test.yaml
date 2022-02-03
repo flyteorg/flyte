@@ -41,7 +41,7 @@ jobs:
           flytesnacks: true
           project: flytesnacks
           # TODO: put latest back once we have a new flytesnacks version
-          version: "v0.3.27"
+          version: "v0.1.1"
           domain: development
       - name: Install python dependencies
         run: |
