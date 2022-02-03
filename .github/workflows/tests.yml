@@ -43,6 +43,8 @@ jobs:
           echo "environment-kubeconfig:" ${KUBECONFIG}
           # launch flyte end2end
           kubectl apply -f "./deployment/test/flyte_generated.yaml"
+          flytectl config init
+          flytectl register examples   -p flytesnacks -d development --version v0.3.27
           make end2end_execute
 
   end-to-end-helm:
