@@ -118,10 +118,9 @@ Troubles with ``make start`` command in Flytesnacks
 
 - If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
 
-  - Check the memory stats of the Docker container using the command 
-  ``docker exec flyte-sandbox df -h``.
-  - Prune the images and volumes.
-  - Given there is less than 10% free disk space, Kubernetes, by default, throws the disk pressure error.
+- Check the memory stats of the Docker container using the command ``docker exec flyte-sandbox df -h``.
+- Prune the images and volumes.
+- Given there is less than 10% free disk space, Kubernetes, by default, throws the disk pressure error.
 
 
 Troubles with FlyteCTL command within proxy setting
