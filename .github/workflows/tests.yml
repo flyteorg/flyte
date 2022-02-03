@@ -59,6 +59,7 @@ jobs:
         run: |
           flytectl config init
           flytectl sandbox start --source=$(pwd)
+          flytectl register examples   -p flytesnacks -d development --version v0.3.27
       - name: Upgrade Helm charts
         run:  flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values-sandbox.yaml
       - name: End2End
