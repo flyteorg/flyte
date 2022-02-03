@@ -83,6 +83,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. TODO::
 
+      Allow installing latest version of k3d once this `issue is fixed <https://github.com/rancher/k3d/issues/380>`__
 
     #. Install k3d Using ``curl``::
 
@@ -93,7 +94,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
         wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.2.0 bash
 
 
-    #. Start a new K3s cluster called Flyte:
+    #. Start a new K3s cluster called Flyte ::
 
         k3d cluster create flyte -p 30081:30081 --no-lb  --k3s-server-arg '–no-deploy=traefik' --k3s-server-arg '–no-deploy=servicelb'
 
@@ -104,6 +105,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     #. Install Flyte::
 
+        kubectl create ns flyte
         kubectl create -f  https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_helm_generated.yaml
 
 
