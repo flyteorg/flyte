@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.41.0](http://github.com/lyft/flyteconsole/compare/v0.40.0...v0.41.0) (2022-02-03)
+
+
+### Features
+
+* archive/unarchive workflow's execution ([#271](http://github.com/lyft/flyteconsole/issues/271)) ([2c6c041](http://github.com/lyft/flyteconsole/commit/2c6c04147bf27219e5bcaf77642250ed8385b564))
+
 # [0.40.0](http://github.com/lyft/flyteconsole/compare/v0.39.1...v0.40.0) (2022-01-18)
 
 

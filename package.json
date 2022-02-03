@@ -1,6 +1,6 @@
 {
   "name": "flyteconsole",
-  "version": "0.40.0",
+  "version": "0.41.0",
   "description": "The web UI for the Flyte platform",
   "repository": {
     "type": "git",
