@@ -1,4 +1,6 @@
 """
+.. _spark_horovod_keras:
+
 Data-Parallel Distributed Training Using Horovod on Spark
 ---------------------------------------------------------
 
