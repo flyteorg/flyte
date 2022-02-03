@@ -114,8 +114,7 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 		return LaunchError, err
 	}
 
-	indexStr := strconv.Itoa(t.ChildIdx)
-	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), t.ChildIdx, t.State.RetryAttempts.GetItem(t.ChildIdx))
 	allocationStatus, err := allocateResource(ctx, tCtx, t.Config, podName)
 	if err != nil {
 		return LaunchError, err
@@ -186,8 +185,8 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 
 func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference,
 	logPlugin tasklog.Plugin) (MonitorResult, []*idlCore.TaskLog, error) {
-	indexStr := strconv.Itoa(t.ChildIdx)
-	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	retryAttempt := t.State.RetryAttempts.GetItem(t.ChildIdx)
+	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), t.ChildIdx, retryAttempt)
 	t.SubTaskIDs = append(t.SubTaskIDs, &podName)
 	var loglinks []*idlCore.TaskLog
 
@@ -200,6 +199,7 @@ func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		},
 		originalIdx,
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt,
+		retryAttempt,
 		logPlugin)
 	if err != nil {
 		return MonitorError, loglinks, errors2.Wrapf(ErrCheckPodStatus, err, "Failed to check pod status.")
@@ -228,8 +228,7 @@ func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kube
 }
 
 func (t Task) Abort(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient) error {
-	indexStr := strconv.Itoa(t.ChildIdx)
-	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), t.ChildIdx, t.State.RetryAttempts.GetItem(t.ChildIdx))
 	pod := &corev1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       PodKind,
@@ -255,8 +254,7 @@ func (t Task) Abort(ctx context.Context, tCtx core.TaskExecutionContext, kubeCli
 }
 
 func (t Task) Finalize(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient) error {
-	indexStr := strconv.Itoa(t.ChildIdx)
-	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), t.ChildIdx, t.State.RetryAttempts.GetItem(t.ChildIdx))
 
 	pod := &v1.Pod{
 		TypeMeta: metaV1.TypeMeta{
@@ -285,7 +283,7 @@ func (t Task) Finalize(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	}
 
 	// Deallocate Resource
-	err = deallocateResource(ctx, tCtx, t.Config, t.ChildIdx)
+	err = deallocateResource(ctx, tCtx, t.Config, podName)
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", podName, err)
 		return err
@@ -317,12 +315,10 @@ func allocateResource(ctx context.Context, tCtx core.TaskExecutionContext, confi
 	return allocationStatus, nil
 }
 
-func deallocateResource(ctx context.Context, tCtx core.TaskExecutionContext, config *Config, childIdx int) error {
+func deallocateResource(ctx context.Context, tCtx core.TaskExecutionContext, config *Config, podName string) error {
 	if !IsResourceConfigSet(config.ResourceConfig) {
 		return nil
 	}
-	indexStr := strconv.Itoa((childIdx))
-	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 	resourceNamespace := core.ResourceNamespace(config.ResourceConfig.PrimaryLabel)
 
 	err := tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespace, podName)

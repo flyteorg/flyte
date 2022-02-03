@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
@@ -73,10 +72,8 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			return currentState, logLinks, subTaskIDs, nil
 		}
 
-		// Currently if any subtask fails then all subtasks are retried up to MaxAttempts. Therefore, all
-		// subtasks have an identical RetryAttempt, namely that of the map task execution metadata. Once
-		// retries over individual subtasks are implemented we should revisit this logic and instead
-		// increment the RetryAttempt for each subtask everytime a new pod is created.
+		// Set subtask retryAttempts using the existing task context retry attempt. For new tasks
+		// this will initialize to 0, but running tasks will use the existing retry attempt.
 		retryAttempt := bitarray.Item(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt)
 		for i := 0; i < currentState.GetExecutionArraySize(); i++ {
 			retryAttemptsArray.SetItem(i, retryAttempt)
@@ -93,20 +90,38 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
-		indexStr := strconv.Itoa(childIdx)
-		podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, newState.GetIndexesToCache())
+
+		retryAttempt := currentState.RetryAttempts.GetItem(childIdx)
+		podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), childIdx, retryAttempt)
 
 		if existingPhase.IsTerminal() {
 			// If we get here it means we have already "processed" this terminal phase since we will only persist
 			// the phase after all processing is done (e.g. check outputs/errors file, record events... etc.).
 
 			// Since we know we have already "processed" this terminal phase we can safely deallocate resource
-			err = deallocateResource(ctx, tCtx, config, childIdx)
+			err = deallocateResource(ctx, tCtx, config, podName)
 			if err != nil {
 				logger.Errorf(ctx, "Error releasing allocation token [%s] in LaunchAndCheckSubTasks [%s]", podName, err)
 				return currentState, logLinks, subTaskIDs, errors2.Wrapf(ErrCheckPodStatus, err, "Error releasing allocation token.")
 			}
+
+			// If a subtask is marked as a retryable failure we check if the number of retries
+			// exceeds the maximum attempts. If so, transition the task to a permanent failure
+			// so that is not attempted again. If it can be retried, increment the retry attempts
+			// value and transition the task to "Undefined" so that it is reevaluated.
+			if existingPhase == core.PhaseRetryableFailure {
+				if uint32(retryAttempt+1) < tCtx.TaskExecutionMetadata().GetMaxAttempts() {
+					newState.RetryAttempts.SetItem(childIdx, retryAttempt+1)
+
+					newArrayStatus.Summary.Inc(core.PhaseUndefined)
+					newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(core.PhaseUndefined))
+					continue
+				} else {
+					existingPhase = core.PhasePermanentFailure
+				}
+			}
+
 			newArrayStatus.Summary.Inc(existingPhase)
 			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase))
 
@@ -117,6 +132,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 				},
 				originalIdx,
 				tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt,
+				retryAttempt,
 				logPlugin)
 
 			if err != nil {
@@ -209,7 +225,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	return newState, logLinks, subTaskIDs, nil
 }
 
-func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8sTypes.NamespacedName, index int, retryAttempt uint32, logPlugin tasklog.Plugin) (
+func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8sTypes.NamespacedName, index int, retryAttempt uint32, subtaskRetryAttempt uint64, logPlugin tasklog.Plugin) (
 	info core.PhaseInfo, err error) {
 
 	pod := &v1.Pod{
@@ -244,12 +260,20 @@ func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8s
 	}
 
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
+		// We append the subtaskRetryAttempt to the log name only when it is > 0 to ensure backwards
+		// compatibility when dynamically transitioning running map tasks to use subtask retry attempts.
+		var logName string
+		if subtaskRetryAttempt == 0 {
+			logName = fmt.Sprintf(" #%d-%d", retryAttempt, index)
+		} else {
+			logName = fmt.Sprintf(" #%d-%d-%d", retryAttempt, index, subtaskRetryAttempt)
+		}
 
 		if logPlugin != nil {
 			o, err := logPlugin.GetTaskLogs(tasklog.Input{
 				PodName:          pod.Name,
 				Namespace:        pod.Namespace,
-				LogName:          fmt.Sprintf(" #%d-%d", retryAttempt, index),
+				LogName:          logName,
 				PodUnixStartTime: pod.CreationTimestamp.Unix(),
 			})
 

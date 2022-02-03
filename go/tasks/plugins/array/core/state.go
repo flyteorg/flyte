@@ -256,24 +256,23 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus.ArraySummary) Phase {
 	totalCount := int64(0)
 	totalSuccesses := int64(0)
-	totalFailures := int64(0)
+	totalPermanentFailures := int64(0)
+	totalRetryableFailures := int64(0)
 	totalRunning := int64(0)
 	totalWaitingForResources := int64(0)
 	for phase, count := range summary {
 		totalCount += count
-		if phase.IsTerminal() {
-			if phase.IsSuccess() {
-				totalSuccesses += count
-			} else {
-				// TODO: Split out retryable failures to be retried without doing the entire array task.
-				// TODO: Other option: array tasks are only retryable as a full set and to get single task retriability
-				// TODO: dynamic_task must be updated to not auto-combine to array tasks.  For scale reasons, it is
-				// TODO: preferable to auto-combine to array tasks for now.
-				totalFailures += count
-			}
-		} else if phase.IsWaitingForResources() {
+
+		switch phase {
+		case core.PhaseSuccess:
+			totalSuccesses += count
+		case core.PhasePermanentFailure:
+			totalPermanentFailures += count
+		case core.PhaseRetryableFailure:
+			totalRetryableFailures += count
+		case core.PhaseWaitingForResources:
 			totalWaitingForResources += count
-		} else {
+		default:
 			totalRunning += count
 		}
 	}
@@ -284,9 +283,9 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 	}
 
 	// No chance to reach the required success numbers.
-	if totalRunning+totalSuccesses+totalWaitingForResources < minSuccesses {
-		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v]",
-			minSuccesses, totalRunning, totalSuccesses, totalWaitingForResources)
+	if totalRunning+totalSuccesses+totalWaitingForResources+totalRetryableFailures < minSuccesses {
+		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v] + totalRetryableFailures[%v]",
+			minSuccesses, totalRunning, totalSuccesses, totalWaitingForResources, totalRetryableFailures)
 		return PhaseWriteToDiscoveryThenFail
 	}
 
@@ -299,8 +298,8 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 		return PhaseWriteToDiscovery
 	}
 
-	logger.Debugf(ctx, "Array is still running [Successes: %v, Failures: %v, Total: %v, MinSuccesses: %v]",
-		totalSuccesses, totalFailures, totalCount, minSuccesses)
+	logger.Debugf(ctx, "Array is still running [Successes: %v, PermanentFailures: %v, RetryableFailures: %v, Total: %v, MinSuccesses: %v]",
+		totalSuccesses, totalPermanentFailures, totalRetryableFailures, totalCount, minSuccesses)
 	return PhaseCheckingSubTaskExecutions
 }
 

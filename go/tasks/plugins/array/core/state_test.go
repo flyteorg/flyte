@@ -315,3 +315,63 @@ func TestToArrayJob(t *testing.T) {
 		}))
 	})
 }
+
+func TestSummaryToPhase(t *testing.T) {
+	minSuccesses := int64(10)
+	tests := []struct {
+		name    string
+		phase   Phase
+		summary map[core.Phase]int64
+	}{
+		{
+			"FailOnTooFewTasks",
+			PhaseWriteToDiscoveryThenFail,
+			map[core.Phase]int64{},
+		},
+		{
+			"ContinueOnRetryableFailures",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseRetryableFailure: 1,
+				core.PhaseUndefined:        9,
+			},
+		},
+		{
+			"FailOnToManyPermanentFailures",
+			PhaseWriteToDiscoveryThenFail,
+			map[core.Phase]int64{
+				core.PhasePermanentFailure: 1,
+				core.PhaseUndefined:        9,
+			},
+		},
+		{
+			"CheckWaitingForResources",
+			PhaseWaitingForResources,
+			map[core.Phase]int64{
+				core.PhaseWaitingForResources: 1,
+				core.PhaseUndefined:           9,
+			},
+		},
+		{
+			"WaitForAllSubtasksToComplete",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseUndefined: 1,
+				core.PhaseSuccess:   9,
+			},
+		},
+		{
+			"SuccessfullyCompleted",
+			PhaseWriteToDiscovery,
+			map[core.Phase]int64{
+				core.PhaseSuccess: 10,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.phase, SummaryToPhase(context.TODO(), minSuccesses, tt.summary))
+		})
+	}
+}
