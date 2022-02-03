@@ -55,6 +55,7 @@ class CustomSorter(FileNameSortKey):
         "subworkflows.py",
         "dynamics.py",
         "map_task.py",
+        "checkpoint.py",
         "run_merge_sort.py",
         # Type System
         "flyte_python_types.py",
