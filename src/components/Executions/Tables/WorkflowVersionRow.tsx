@@ -4,10 +4,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 import { ListRowProps } from 'react-virtualized';
 import { Workflow } from 'models/Workflow/types';
-import {
-    useExecutionTableStyles,
-    useWorkflowVersionsColumnStyles
-} from './styles';
+import { useWorkflowVersionsColumnStyles } from './styles';
 import {
     WorkflowExecutionsTableState,
     WorkflowVersionColumnDefinition

@@ -5,6 +5,7 @@ import { merge } from 'lodash';
 import { timeStampOffset } from 'mocks/utils';
 import { Identifier, ResourceType } from 'models/Common/types';
 import {
+    ExecutionState,
     NodeExecutionPhase,
     TaskExecutionPhase,
     WorkflowExecutionPhase
@@ -149,7 +150,8 @@ export function generateExecutionForWorkflow(
             createdAt: executionStart,
             duration: millisecondsToDuration(defaultExecutionDuration),
             phase: WorkflowExecutionPhase.SUCCEEDED,
-            startedAt: executionStart
+            startedAt: executionStart,
+            stateChangeDetails: { state: ExecutionState.EXECUTION_ACTIVE }
         }
     };
     return merge(base, overrides);

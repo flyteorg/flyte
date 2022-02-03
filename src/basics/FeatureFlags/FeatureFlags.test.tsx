@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 
 import { FeatureFlagsProvider, useFeatureFlag } from '.';
 import { FeatureFlag } from './defaultConfig';
@@ -46,7 +46,7 @@ describe('FeatureFlags', () => {
             window.getFeatureFlag(FeatureFlag.TestFlagUndefined)
         ).toBeFalsy();
 
-        window.setFeatureFlag(FeatureFlag.TestFlagUndefined, true);
+        act(() => window.setFeatureFlag(FeatureFlag.TestFlagUndefined, true));
         await waitFor(() => {
             // check that flag cghanged value
             expect(
@@ -60,7 +60,7 @@ describe('FeatureFlags', () => {
         expect(screen.getByText(/Disabled/i)).toBeTruthy();
 
         // Enable flag
-        window.setFeatureFlag(FeatureFlag.TestFlagUndefined, true);
+        act(() => window.setFeatureFlag(FeatureFlag.TestFlagUndefined, true));
         await waitFor(() => {
             // check that component was updated accordingly
             expect(screen.getByText(/Enabled/i)).toBeTruthy();

@@ -1,10 +1,10 @@
-import { FormControlLabel, Checkbox } from '@material-ui/core';
+import * as React from 'react';
+import { FormControlLabel, Checkbox, FormGroup } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { MultiSelectForm } from 'components/common/MultiSelectForm';
 import { SearchInputForm } from 'components/common/SearchInputForm';
 import { SingleSelectForm } from 'components/common/SingleSelectForm';
 import { FilterPopoverButton } from 'components/Tables/filters/FilterPopoverButton';
-import * as React from 'react';
 import {
     FilterState,
     MultiFilterState,
@@ -62,7 +62,15 @@ export const ExecutionFilters: React.FC<{
     filters: (FilterState | BooleanFilterState)[];
     chartIds?: string[];
     clearCharts?: () => void;
-}> = ({ filters, chartIds, clearCharts }) => {
+    showArchived?: boolean;
+    onArchiveFilterChange?: (showArchievedItems: boolean) => void;
+}> = ({
+    filters,
+    chartIds,
+    clearCharts,
+    showArchived,
+    onArchiveFilterChange
+}) => {
     const styles = useStyles();
 
     filters = filters.map(filter => {
@@ -123,6 +131,22 @@ export const ExecutionFilters: React.FC<{
                     onReset={clearCharts}
                     key="charts"
                 />
+            )}
+            {!!onArchiveFilterChange && (
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                value={showArchived}
+                                onChange={(_, checked) =>
+                                    onArchiveFilterChange(checked)
+                                }
+                            />
+                        }
+                        className={styles.checkbox}
+                        label="Show archived executions"
+                    />
+                </FormGroup>
             )}
         </div>
     );

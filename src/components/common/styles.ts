@@ -127,6 +127,16 @@ export const useCommonStyles = makeStyles((theme: Theme) => ({
             textDecoration: 'underline'
         }
     },
+    secondaryLink: {
+        color: theme.palette.text.secondary,
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        textDecoration: 'none',
+        '&:hover': {
+            color: theme.palette.text.secondary,
+            textDecoration: 'underline'
+        }
+    },
     smallDropdownWindow: {
         border: `1px solid ${theme.palette.divider}`,
         marginTop: theme.spacing(0.5)

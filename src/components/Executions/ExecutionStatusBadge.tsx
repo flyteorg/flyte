@@ -1,6 +1,10 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
-import { bodyFontFamily, smallFontSize } from 'components/Theme/constants';
+import {
+    bodyFontFamily,
+    smallFontSize,
+    statusColors
+} from 'components/Theme/constants';
 import {
     NodeExecutionPhase,
     TaskExecutionPhase,
@@ -41,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface BaseProps {
     variant?: 'default' | 'text';
+    disabled?: boolean;
 }
 
 interface WorkflowExecutionStatusBadgeProps extends BaseProps {
@@ -83,7 +88,8 @@ function getPhaseConstants(
 export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
     phase,
     type,
-    variant = 'default'
+    variant = 'default',
+    disabled = false
 }) => {
     const styles = useStyles();
     const style: React.CSSProperties = {};
@@ -91,7 +97,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
     if (variant === 'text') {
         style.color = textColor;
     } else {
-        style.backgroundColor = badgeColor;
+        style.backgroundColor = disabled ? statusColors.UNKNOWN : badgeColor;
     }
 
     return (

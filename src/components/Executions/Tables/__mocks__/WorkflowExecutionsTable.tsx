@@ -3,9 +3,9 @@ import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { ExecutionsTableHeader } from '../ExecutionsTableHeader';
 import { useExecutionTableStyles } from '../styles';
-import { useWorkflowExecutionsTableColumns } from '../useWorkflowExecutionsTableColumns';
+import { useWorkflowExecutionsTableColumns } from '../WorkflowExecutionTable/useWorkflowExecutionsTableColumns';
 import { useWorkflowExecutionsTableState } from '../useWorkflowExecutionTableState';
-import { WorkflowExecutionRow } from '../WorkflowExecutionRow';
+import { WorkflowExecutionRow } from '../WorkflowExecutionTable/WorkflowExecutionRow';
 import { WorkflowExecutionsTableProps } from '../WorkflowExecutionsTable';
 
 /** Mocked, simpler version of WorkflowExecutionsTable which does not use a DataList since
@@ -16,7 +16,7 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const state = useWorkflowExecutionsTableState();
     const commonStyles = useCommonStyles();
     const tableStyles = useExecutionTableStyles();
-    const columns = useWorkflowExecutionsTableColumns({ showWorkflowName });
+    const columns = useWorkflowExecutionsTableColumns({});
 
     return (
         <div
@@ -28,9 +28,9 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
             <ExecutionsTableHeader columns={columns} />
             {executions.map(execution => (
                 <WorkflowExecutionRow
+                    showWorkflowName={showWorkflowName}
                     key={execution.id.name}
                     execution={execution}
-                    columns={columns}
                     state={state}
                 />
             ))}

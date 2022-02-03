@@ -1,9 +1,13 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
 import * as React from 'react';
+
 import { ExecutionFilters } from '../ExecutionFilters';
-import { useWorkflowExecutionFiltersState } from '../filters/useExecutionFiltersState';
+import {
+    useWorkflowExecutionFiltersState,
+    useNodeExecutionFiltersState
+} from '../filters/useExecutionFiltersState';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -15,12 +19,22 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-const changeAction = action('change');
-
 const stories = storiesOf('Tables/ExecutionFilters', module);
 stories.addDecorator(story => (
     <div className={useStyles().container}>{story()}</div>
 ));
-stories.add('Basic', () => (
+stories.add('Node executions', () => (
+    <ExecutionFilters {...useNodeExecutionFiltersState()} />
+));
+stories.add('Workflow executions - all', () => (
+    <ExecutionFilters
+        {...useWorkflowExecutionFiltersState()}
+        chartIds={['chart0']}
+        clearCharts={action('clearCharts')}
+        showArchived={false}
+        onArchiveFilterChange={action('onArchiveFilterChange')}
+    />
+));
+stories.add('Workflow executions - minimal', () => (
     <ExecutionFilters {...useWorkflowExecutionFiltersState()} />
 ));

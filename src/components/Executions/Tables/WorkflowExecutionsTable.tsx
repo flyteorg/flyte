@@ -1,18 +1,18 @@
 import * as classnames from 'classnames';
+import * as React from 'react';
+import { ListRowRenderer } from 'react-virtualized';
 import { noExecutionsFoundString } from 'common/constants';
 import { getCacheKey } from 'components/Cache/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { ListProps } from 'components/common/types';
 import { DataList, DataListRef } from 'components/Tables/DataList';
 import { Execution } from 'models/Execution/types';
-import * as React from 'react';
-import { ListRowRenderer } from 'react-virtualized';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionsTableHeader } from './ExecutionsTableHeader';
 import { useExecutionTableStyles } from './styles';
-import { useWorkflowExecutionsTableColumns } from './useWorkflowExecutionsTableColumns';
+import { useWorkflowExecutionsTableColumns } from './WorkflowExecutionTable/useWorkflowExecutionsTableColumns';
 import { useWorkflowExecutionsTableState } from './useWorkflowExecutionTableState';
-import { WorkflowExecutionRow } from './WorkflowExecutionRow';
+import { WorkflowExecutionRow } from './WorkflowExecutionTable/WorkflowExecutionRow';
 
 export interface WorkflowExecutionsTableProps extends ListProps<Execution> {
     showWorkflowName?: boolean;
@@ -36,7 +36,8 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
         setExpandedErrors({});
     }, [executions]);
 
-    const columns = useWorkflowExecutionsTableColumns({ showWorkflowName });
+    // passing an empty property list, as we only use it for table headers info here
+    const columns = useWorkflowExecutionsTableColumns({});
 
     const retry = () => props.fetch();
     const onCloseIOModal = () => state.setSelectedIOExecution(null);
@@ -61,7 +62,7 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
         return (
             <WorkflowExecutionRow
                 {...rowProps}
-                columns={columns}
+                showWorkflowName={showWorkflowName}
                 execution={execution}
                 errorExpanded={!!expandedErrors[cacheKey]}
                 onExpandCollapseError={onExpandCollapseError}

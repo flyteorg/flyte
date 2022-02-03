@@ -1,12 +1,12 @@
+import * as React from 'react';
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { DataError } from 'components/Errors/DataError';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
 import { Execution, NodeExecution } from 'models/Execution/types';
-import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
@@ -43,7 +43,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
     const styles = useStyles();
     const filterState = useNodeExecutionFiltersState();
     const tabState = useTabState(tabs, tabs.nodes.id);
-    const [graphStateReady, setGraphStateReady] = useState(false);
+
     const {
         closure: { abortMetadata }
     } = execution;

@@ -1,7 +1,6 @@
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common/WaitForData';
-import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { WorkflowVersionsTable } from 'components/Executions/Tables/WorkflowVersionsTable';
 import { isLoadingState } from 'components/hooks/fetchMachine';
 import { useWorkflowVersions } from 'components/hooks/useWorkflowVersions';

@@ -16,6 +16,7 @@ import {
 } from 'models/Common/types';
 import { makeIdentifierPath } from 'models/Common/utils';
 import { defaultExecutionPrincipal } from './constants';
+import { ExecutionState } from './enums';
 import {
     Execution,
     ExecutionData,
@@ -74,6 +75,7 @@ const emptyExecutionData: ExecutionData = {
     fullInputs: null,
     fullOutputs: null
 };
+
 /** Fetches data URLs for an `Execution` record */
 export const getExecutionData = (
     id: WorkflowExecutionIdentifier,
@@ -104,6 +106,7 @@ export interface CreateWorkflowExecutionArguments {
     project: string;
     referenceExecutionId?: WorkflowExecutionIdentifier;
 }
+
 /** Submits a request to create a new `WorkflowExecution` using the provided
  * LaunchPlan and input values.
  */
@@ -179,8 +182,7 @@ export const terminateWorkflowExecution = (
 ) =>
     postAdminEntity<
         Admin.IExecutionTerminateRequest,
-        Admin.ExecutionTerminateResponse,
-        {}
+        Admin.ExecutionTerminateResponse
     >(
         {
             data: { cause },
@@ -224,7 +226,6 @@ interface RecoverParams {
 /**
  * Submits a request to recover a WorkflowExecution
  */
-
 export const recoverWorkflowExecution = (
     { id, name, metadata }: RecoverParams,
     config?: RequestConfig
@@ -349,3 +350,24 @@ export const listTaskExecutions = (
             ...config
         }
     );
+
+/** Updates Execution archive state */
+export const updateExecution = (
+    id: WorkflowExecutionIdentifier,
+    newState: ExecutionState,
+    config?: RequestConfig
+): Promise<Admin.ExecutionUpdateResponse> => {
+    return postAdminEntity<
+        Admin.IExecutionUpdateRequest,
+        Admin.ExecutionUpdateResponse
+    >(
+        {
+            data: { id, state: newState },
+            path: makeExecutionPath(id),
+            requestMessageType: Admin.ExecutionUpdateRequest,
+            responseMessageType: Admin.ExecutionUpdateResponse,
+            method: 'put'
+        },
+        config
+    );
+};

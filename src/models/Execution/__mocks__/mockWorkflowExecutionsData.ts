@@ -1,13 +1,24 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
-import { Admin, Core } from 'flyteidl';
+import { Core } from 'flyteidl';
 import { cloneDeep, random } from 'lodash';
 import * as Long from 'long';
-import { WorkflowExecutionPhase } from '../enums';
+import { LiteralMap } from 'models/Common/types';
+import {
+    ExecutionMode,
+    ExecutionState,
+    WorkflowExecutionPhase
+} from '../enums';
 import { Execution } from '../types';
 import { mockWorkflowExecutionId } from './constants';
 import { sampleError } from './sampleExecutionError';
 
-export const mockWorkflowExecutionResponse: Admin.IExecution = {
+const map: LiteralMap = {
+    literals: {
+        input1: {}
+    }
+};
+
+export const mockWorkflowExecutionResponse: Execution = {
     id: mockWorkflowExecutionId,
     spec: {
         launchPlan: {
@@ -17,13 +28,17 @@ export const mockWorkflowExecutionResponse: Admin.IExecution = {
             name: 'MyExampleWorkflow',
             version: 'ABC123'
         },
-        inputs: {},
+        inputs: map,
+        notifications: { notifications: [] },
         metadata: {
-            principal: 'sdk'
+            principal: 'sdk',
+            mode: ExecutionMode.SCHEDULED,
+            nesting: 0
         }
     },
     closure: {
         phase: WorkflowExecutionPhase.SUCCEEDED,
+        createdAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 20)),
         startedAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 10)),
         duration: millisecondsToDuration(1000 * 60 * 60 * 1.251),
         workflowId: {
@@ -49,13 +64,19 @@ export const mockWorkflowExecutionResponse: Admin.IExecution = {
                     }
                 }
             }
+        },
+        stateChangeDetails: {
+            state: ExecutionState.EXECUTION_ARCHIVED
         }
     }
 };
 
 export const mockExecution = mockWorkflowExecutionResponse as Execution;
 
-export const createMockWorkflowExecutionsListResponse = (length: number) => ({
+export const createMockWorkflowExecutionsListResponse = (
+    length: number,
+    archiveState?: ExecutionState
+) => ({
     executions: Array.from({ length }, (_, idx) => {
         const execution = cloneDeep(mockExecution);
         const startedAtDate = new Date(Date.now() - 1000 * 60 * (idx + 1));
@@ -69,6 +90,12 @@ export const createMockWorkflowExecutionsListResponse = (length: number) => ({
         execution.closure.startedAt = dateToTimestamp(startedAtDate);
         execution.closure.duration = millisecondsToDuration(durationMS);
         execution.closure.phase = phase;
+        execution.closure.stateChangeDetails = {
+            state:
+                archiveState ??
+                random(Object.keys(WorkflowExecutionPhase).length - 1)
+        };
+
         if (phase === WorkflowExecutionPhase.FAILED) {
             execution.closure.error = {
                 code: 'user_error',

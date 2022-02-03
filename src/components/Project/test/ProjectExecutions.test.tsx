@@ -26,6 +26,9 @@ import { getUserProfile } from 'models/Common/api';
 import { UserProfile } from 'models/Common/types';
 
 jest.mock('components/Executions/Tables/WorkflowExecutionsTable');
+jest.mock('notistack', () => ({
+    useSnackbar: () => ({ enqueueSnackbar: jest.fn() })
+}));
 
 describe('ProjectExecutions', () => {
     let basicPythonFixture: ReturnType<typeof basicPythonWorkflow.generate>;

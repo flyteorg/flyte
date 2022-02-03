@@ -3,6 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { formatDateUTC, millisecondsToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
+import { fetchStates } from 'components/hooks/types';
 import { BarChart } from 'components/common/BarChart';
 import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
@@ -53,9 +54,9 @@ export const getExecutionTimeData = (
                     <span>Running time: {millisecondsToHMS(duration)}</span>
                     <span>
                         Started at:{' '}
-                        {execution.closure.startedAt != null &&
+                        {execution.closure.startedAt &&
                             formatDateUTC(
-                                timestampToDate(execution.closure.startedAt!)
+                                timestampToDate(execution.closure.startedAt)
                             )}
                     </span>
                 </div>
@@ -105,7 +106,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
 
     const baseFilters = React.useMemo(
         () => executionFilterGenerator[resourceType](id),
-        [id]
+        [id, resourceType]
     );
 
     const executions = useWorkflowExecutions(
@@ -117,16 +118,18 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
         }
     );
 
-    const handleClickItem = React.useCallback(item => {
-        if (item.metadata) {
-            onToggle(item.metadata.name);
-            // const executionId = item.metadata as WorkflowExecutionIdentifier;
-            // history.push(Routes.ExecutionDetails.makeUrl(executionId));
-        }
-    }, []);
+    const handleClickItem = React.useCallback(
+        item => {
+            if (item.metadata) {
+                onToggle(item.metadata.name);
+            }
+        },
+        [onToggle]
+    );
 
     /** Don't render component until finish fetching user profile */
-    if (filtersState.filters[4].status !== 'LOADED') {
+    const lastIndex = filtersState.filters.length - 1;
+    if (filtersState.filters[lastIndex].status !== fetchStates.LOADED) {
         return null;
     }
 

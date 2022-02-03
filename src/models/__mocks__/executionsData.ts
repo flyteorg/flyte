@@ -7,7 +7,11 @@ import {
     ExecutionMetadata,
     ExecutionSpec
 } from 'models/Execution/types';
-import { ExecutionMode, WorkflowExecutionPhase } from '../Execution/enums';
+import {
+    ExecutionMode,
+    ExecutionState,
+    WorkflowExecutionPhase
+} from 'models/Execution/enums';
 
 export const MOCK_LAUNCH_PLAN_ID = {
     resourceType: Core.ResourceType.LAUNCH_PLAN,
@@ -58,6 +62,10 @@ export function fixedPhase(): WorkflowExecutionPhase {
     return WorkflowExecutionPhase.SUCCEEDED;
 }
 
+export function stateActive(): ExecutionState {
+    return ExecutionState.EXECUTION_ACTIVE;
+}
+
 export const createMockExecutionClosure: () => ExecutionClosure = () => ({
     computedInputs: generateLiteralMap(),
     createdAt: fixedTimestamp(),
@@ -65,7 +73,8 @@ export const createMockExecutionClosure: () => ExecutionClosure = () => ({
     outputs: generateLiteralMapBlob(),
     phase: fixedPhase(),
     startedAt: fixedTimestamp(),
-    workflowId: { ...MOCK_WORKFLOW_ID }
+    workflowId: { ...MOCK_WORKFLOW_ID },
+    status: { state: stateActive() }
 });
 
 export function generateExecutionMetadata(): ExecutionMetadata {

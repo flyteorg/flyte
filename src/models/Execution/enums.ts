@@ -5,6 +5,8 @@ import { Admin, Core } from 'flyteidl';
  * modules individually (such as when running with ts-jest)
  */
 
+export type ExecutionState = Admin.ExecutionState;
+export const ExecutionState = Admin.ExecutionState;
 export type ExecutionMode = Admin.ExecutionMetadata.ExecutionMode;
 export const ExecutionMode = Admin.ExecutionMetadata.ExecutionMode;
 export type WorkflowExecutionPhase = Core.WorkflowExecution.Phase;

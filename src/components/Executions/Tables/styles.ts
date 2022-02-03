@@ -10,7 +10,6 @@ import {
 } from 'components/Theme/constants';
 import {
     nodeExecutionsTableColumnWidths,
-    workflowExecutionsTableColumnWidths,
     workflowVersionsTableColumnWidths
 } from './constants';
 
@@ -95,6 +94,9 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        '&:hover': {
+            backgroundColor: listhoverColor
+        },
         [`&.${selectedClassName}`]: {
             backgroundColor: listhoverColor
         }
@@ -166,41 +168,6 @@ export const useColumnStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-/** Style overrides specific to columns in `WorkflowExecutionsTable`. */
-export const useWorkflowExecutionsColumnStyles = makeStyles((theme: Theme) => ({
-    cellName: {
-        paddingLeft: theme.spacing(1)
-    },
-    columnName: {
-        flexBasis: workflowExecutionsTableColumnWidths.name,
-        whiteSpace: 'normal'
-    },
-    columnLastRun: {
-        flexBasis: workflowExecutionsTableColumnWidths.lastRun
-    },
-    columnStatus: {
-        flexBasis: workflowExecutionsTableColumnWidths.phase
-    },
-    columnStartedAt: {
-        flexBasis: workflowExecutionsTableColumnWidths.startedAt
-    },
-    columnDuration: {
-        flexBasis: workflowExecutionsTableColumnWidths.duration,
-        textAlign: 'right'
-    },
-    columnInputsOutputs: {
-        flexGrow: 1,
-        flexBasis: workflowExecutionsTableColumnWidths.inputsOutputs,
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        textAlign: 'left'
-    },
-    rightMargin: {
-        marginRight: theme.spacing(1)
-    }
-}));
-
-/** Style overrides specific to columns in `WorkflowVersionsTable`. */
 export const useWorkflowVersionsColumnStyles = makeStyles(() => ({
     columnRadioButton: {
         width: workflowVersionsTableColumnWidths.radio
@@ -210,16 +177,7 @@ export const useWorkflowVersionsColumnStyles = makeStyles(() => ({
         whiteSpace: 'normal',
         flexGrow: 1
     },
-    columnRelease: {
-        flexBasis: workflowVersionsTableColumnWidths.release
-    },
     columnCreatedAt: {
         flexBasis: workflowVersionsTableColumnWidths.createdAt
-    },
-    columnLastRun: {
-        flexBasis: workflowVersionsTableColumnWidths.lastRun
-    },
-    columnRecentRun: {
-        flexGrow: 1
     }
 }));

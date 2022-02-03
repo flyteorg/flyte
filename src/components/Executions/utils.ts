@@ -6,6 +6,7 @@ import {
     terminalTaskExecutionStates
 } from 'models/Execution/constants';
 import {
+    ExecutionState,
     NodeExecutionPhase,
     TaskExecutionPhase,
     WorkflowExecutionPhase
@@ -220,4 +221,9 @@ export function getTaskExecutionTimingMS(execution: TaskExecution) {
     const { closure } = execution;
     const isTerminal = taskExecutionIsTerminal(execution);
     return getExecutionTimingMS({ closure, isTerminal });
+}
+
+export function isExecutionArchived(execution: Execution): boolean {
+    const state = execution.closure.stateChangeDetails?.state ?? null;
+    return !!state && state === ExecutionState.EXECUTION_ARCHIVED;
 }

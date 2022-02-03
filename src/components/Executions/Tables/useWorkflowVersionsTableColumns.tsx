@@ -1,7 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { formatDateUTC } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
-import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { useWorkflowVersionsColumnStyles } from './styles';
 import { WorkflowVersionColumnDefinition } from './types';
@@ -13,7 +12,6 @@ import { WorkflowVersionColumnDefinition } from './types';
  */
 export function useWorkflowVersionsTableColumns(): WorkflowVersionColumnDefinition[] {
     const styles = useWorkflowVersionsColumnStyles();
-    const commonStyles = useCommonStyles();
     return React.useMemo(
         () => [
             {
@@ -26,18 +24,6 @@ export function useWorkflowVersionsTableColumns(): WorkflowVersionColumnDefiniti
                 key: 'name',
                 label: 'version id'
             },
-            // {
-            //     cellRenderer: ({ workflow: { closure } }) => {
-            //         return (
-            //             <Typography variant="body1">
-            //                 1.8.1
-            //             </Typography>
-            //         );
-            //     },
-            //     className: styles.columnRelease,
-            //     key: 'release',
-            //     label: 'Release'
-            // },
             {
                 cellRenderer: ({ workflow: { closure } }) => {
                     if (!closure?.createdAt) {
@@ -54,38 +40,7 @@ export function useWorkflowVersionsTableColumns(): WorkflowVersionColumnDefiniti
                 key: 'createdAt',
                 label: 'time created'
             }
-            // {
-            //     cellRenderer: ({ workflow }) => {
-            //         // const timing = getWorkflowExecutionTimingMS(workflow);
-            //         // return (
-            //         //     <Typography variant="body1">
-            //         //         {timing !== null
-            //         //             ? millisecondsToHMS(timing.duration)
-            //         //             : ''}
-            //         //     </Typography>
-            //         // );
-            //         return <Typography variant="body1">NA hours ago</Typography>
-            //     },
-            //     className: styles.columnLastRun,
-            //     key: 'duration',
-            //     label: 'last execution'
-            // },
-            // {
-            //     cellRenderer: ({ workflow, state }) => {
-            //         return (
-            //             <Link
-            //                 component="button"
-            //                 variant="body1"
-            //             >
-            //                 View Inputs &amp; Outputs
-            //             </Link>
-            //         );
-            //     },
-            //     className: styles.columnRecentRun,
-            //     key: 'inputsOutputs',
-            //     label: 'recent run'
-            // }
         ],
-        [styles, commonStyles]
+        [styles]
     );
 }
