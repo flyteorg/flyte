@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
@@ -33,8 +34,17 @@ var arrayJobEnvVars = []corev1.EnvVar{
 	},
 }
 
-func formatSubTaskName(_ context.Context, parentName, suffix string) (subTaskName string) {
-	return utils.ConvertToDNS1123SubdomainCompatibleString(fmt.Sprintf("%v-%v", parentName, suffix))
+func formatSubTaskName(_ context.Context, parentName string, index int, retryAttempt uint64) (subTaskName string) {
+	indexStr := strconv.Itoa(index)
+
+	// If the retryAttempt is 0 we do not include it in the pod name. The gives us backwards
+	// compatibility in the ability to dynamically transition running map tasks to use subtask retries.
+	if retryAttempt == 0 {
+		return utils.ConvertToDNS1123SubdomainCompatibleString(fmt.Sprintf("%v-%v", parentName, indexStr))
+	}
+
+	retryAttemptStr := strconv.FormatUint(retryAttempt, 10)
+	return utils.ConvertToDNS1123SubdomainCompatibleString(fmt.Sprintf("%v-%v-%v", parentName, indexStr, retryAttemptStr))
 }
 
 func ApplyPodPolicies(_ context.Context, cfg *Config, pod *corev1.Pod) *corev1.Pod {

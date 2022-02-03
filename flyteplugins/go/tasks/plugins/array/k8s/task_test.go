@@ -9,6 +9,9 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+
+	"github.com/flyteorg/flytestdlib/bitarray"
 
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,8 +27,8 @@ func TestFinalize(t *testing.T) {
 	resourceManager := mocks.ResourceManager{}
 	podTemplate, _, _ := FlyteArrayJobToK8sPodTemplate(ctx, tCtx, "")
 	pod := addPodFinalizer(&podTemplate)
-	pod.Name = formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "1")
-	assert.Equal(t, "notfound-1", pod.Name)
+	pod.Name = formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), 1, 1)
+	assert.Equal(t, "notfound-1-1", pod.Name)
 	assert.NoError(t, kubeClient.GetClient().Create(ctx, pod))
 
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -39,12 +42,20 @@ func TestFinalize(t *testing.T) {
 		},
 	}
 
+	retryAttemptsArray, err := bitarray.NewCompactArray(2, 1)
+	assert.NoError(t, err)
+
+	state := core.State{
+		RetryAttempts: retryAttemptsArray,
+	}
+
 	task := &Task{
+		State:    &state,
 		Config:   &config,
 		ChildIdx: 1,
 	}
 
-	err := task.Finalize(ctx, tCtx, &kubeClient)
+	err = task.Finalize(ctx, tCtx, &kubeClient)
 	assert.NoError(t, err)
 }
 
