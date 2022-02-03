@@ -7,11 +7,11 @@ metadata:
 spec:
   containers:
     - args:
-        - make end2end_test
+        - make functional_test
       command:
         - bash
         - -c
-      image: ghcr.io/flyteorg/flytetools:3cc3b7187338dc753ef8952706f9e591f4cc58e6
+      image: ghcr.io/flyteorg/flytetools:d763e4d9c7fe7f8c4ec1326efb471f0d202a285c
       imagePullPolicy: IfNotPresent
       name: flytetester
       resources:
