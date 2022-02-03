@@ -133,12 +133,17 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 
 func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
 	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
-	if len(claims.Audience) != 1 {
-		return nil, fmt.Errorf("expected exactly one granted audience. found [%v]", len(claims.Audience))
+
+	foundAudIndex := -1
+	for audIndex, aud := range claims.Audience {
+		if expectedAudience.Has(aud) {
+			foundAudIndex = audIndex
+			break
+		}
 	}
 
-	if !expectedAudience.Has(claims.Audience[0]) {
-		return nil, fmt.Errorf("invalid audience [%v]", claims.Audience[0])
+	if foundAudIndex < 0 {
+		return nil, fmt.Errorf("invalid audience [%v]", claims)
 	}
 
 	userInfo := &service.UserInfoResponse{}
@@ -170,7 +175,7 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		scopes.Insert(auth.ScopeAll)
 	}
 
-	return auth.NewIdentityContext(claims.Audience[0], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo), nil
+	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo), nil
 }
 
 // NewProvider creates a new OAuth2 Provider that is able to do OAuth 2-legged and 3-legged flows. It'll lookup

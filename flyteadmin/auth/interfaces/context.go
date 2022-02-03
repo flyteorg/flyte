@@ -59,6 +59,7 @@ type AuthenticationContext interface {
 // to the platform.
 type IdentityContext interface {
 	UserID() string
+	Audience() string
 	AppID() string
 	UserInfo() *service.UserInfoResponse
 	AuthenticatedAt() time.Time

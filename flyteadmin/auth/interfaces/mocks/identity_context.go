@@ -51,6 +51,38 @@ func (_m *IdentityContext) AppID() string {
 	return r0
 }
 
+type IdentityContext_Audience struct {
+	*mock.Call
+}
+
+func (_m IdentityContext_Audience) Return(_a0 string) *IdentityContext_Audience {
+	return &IdentityContext_Audience{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *IdentityContext) OnAudience() *IdentityContext_Audience {
+	c := _m.On("Audience")
+	return &IdentityContext_Audience{Call: c}
+}
+
+func (_m *IdentityContext) OnAudienceMatch(matchers ...interface{}) *IdentityContext_Audience {
+	c := _m.On("Audience", matchers...)
+	return &IdentityContext_Audience{Call: c}
+}
+
+// Audience provides a mock function with given fields:
+func (_m *IdentityContext) Audience() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type IdentityContext_AuthenticatedAt struct {
 	*mock.Call
 }
