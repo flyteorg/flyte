@@ -50,8 +50,6 @@ jobs:
     name: Serialize & Register Flytesnacks workflow
     needs: [prerelease]
     uses: flyteorg/flytesnacks/.github/workflows/serialize_workflow.yml@master
-    with:
-      tag: ${{ needs.bump-version.outputs.version }}
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
@@ -59,7 +57,7 @@ jobs:
   release-workflow:
     name: Publish artifacts to github release
     runs-on: ubuntu-latest
-    needs: [ trigger-serialize-flytesnacks-workflow]
+    needs: [ trigger-release-flytesnacks-workflow ]
     steps:
       - uses: actions/checkout@v2
         with:
