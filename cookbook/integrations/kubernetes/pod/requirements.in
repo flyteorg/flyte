@@ -1,2 +1,2 @@
 -r ../../../common/requirements-common.in
-flytekitplugins-pod>=0.20.0
+flytekitplugins-pod>=0.30.0
