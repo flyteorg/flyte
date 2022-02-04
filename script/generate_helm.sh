@@ -39,7 +39,7 @@ if [ -n "$DELTA_CHECK" ]; then
     echo "diff detected: $DIFF"
     DIFF=$(git diff --name-only)
     echo "files different: $DIFF"
-    exit 0
+    exit 1
   else
     echo "SUCCESS: Generated code is up to date."
   fi
