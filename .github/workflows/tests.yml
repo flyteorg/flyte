@@ -44,7 +44,7 @@ jobs:
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
           # launch flyte end2end
-          kubectl apply -f "./deployment/test/flyte_generated.yaml"
+          kubectl apply -f "./deployment/sandbox/flyte_generated.yaml"
           sleep 120
           flytectl config init
           flytectl register examples -p flytesnacks -d development
