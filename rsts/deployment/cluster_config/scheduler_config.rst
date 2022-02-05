@@ -450,6 +450,18 @@ customData (map[string]map[string]interfaces.DataSource)
   {}
   
 
+standaloneDeployment (bool)
+--------------------------------------------------------------------------------
+
+Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: clusters
 ================================================================================
 

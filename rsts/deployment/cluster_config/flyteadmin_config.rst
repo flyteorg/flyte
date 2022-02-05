@@ -4,6 +4,8 @@
 Flyte Admin Configuration
 #########################################
 
+- `admin <#section-admin>`_
+
 - `auth <#section-auth>`_
 
 - `cluster_resources <#section-cluster_resources>`_
@@ -26,6 +28,8 @@ Flyte Admin Configuration
 
 - `plugins <#section-plugins>`_
 
+- `propeller <#section-propeller>`_
+
 - `qualityofservice <#section-qualityofservice>`_
 
 - `queues <#section-queues>`_
@@ -45,6 +49,373 @@ Flyte Admin Configuration
 - `task_resources <#section-task_resources>`_
 
 - `task_type_whitelist <#section-task_type_whitelist>`_
+
+Section: admin
+================================================================================
+
+endpoint (`config.URL`_)
+--------------------------------------------------------------------------------
+
+For admin types, specify where the uri of the service is located.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+insecure (bool)
+--------------------------------------------------------------------------------
+
+Use insecure connection.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureSkipVerify (bool)
+--------------------------------------------------------------------------------
+
+InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+caCertFilePath (string)
+--------------------------------------------------------------------------------
+
+Use specified certificate file to verify the admin server peer.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+maxBackoffDelay (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Max delay for grpc backoff
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  8s
+  
+
+perRetryTimeout (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+gRPC per retry timeout
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  15s
+  
+
+maxRetries (int)
+--------------------------------------------------------------------------------
+
+Max number of gRPC retries
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "4"
+  
+
+authType (uint8)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ClientSecret
+  
+
+useAuth (bool)
+--------------------------------------------------------------------------------
+
+Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+clientId (string)
+--------------------------------------------------------------------------------
+
+Client ID
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  flytepropeller
+  
+
+clientSecretLocation (string)
+--------------------------------------------------------------------------------
+
+File containing the client secret
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /etc/secrets/client_secret
+  
+
+scopes ([]string)
+--------------------------------------------------------------------------------
+
+List of scopes to request
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+authorizationServerUrl (string)
+--------------------------------------------------------------------------------
+
+This is the URL to your IdP's authorization server. It'll default to Endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+tokenUrl (string)
+--------------------------------------------------------------------------------
+
+OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+authorizationHeader (string)
+--------------------------------------------------------------------------------
+
+Custom metadata header to pass JWT
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+pkceConfig (`pkce.Config`_)
+--------------------------------------------------------------------------------
+
+Config for Pkce authentication flow.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  refreshTime: 5m0s
+  timeout: 15s
+  
+
+command ([]string)
+--------------------------------------------------------------------------------
+
+Command for external authentication token generation
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+config.Duration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Duration (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  8s
+  
+
+config.URL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+URL (`url.URL`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ForceQuery: false
+  Fragment: ""
+  Host: ""
+  Opaque: ""
+  Path: ""
+  RawFragment: ""
+  RawPath: ""
+  RawQuery: ""
+  Scheme: ""
+  User: null
+  
+
+url.URL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Scheme (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+Opaque (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+User (url.Userinfo)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+Host (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+Path (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+RawPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+ForceQuery (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+RawQuery (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+Fragment (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+RawFragment (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+pkce.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  15s
+  
+
+refreshTime (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5m0s
+  
 
 Section: auth
 ================================================================================
@@ -462,19 +833,6 @@ staticClients (map[string]*fosite.DefaultClient)
     - access_token
   
 
-config.Duration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Duration (int64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  30m0s
-  
-
 config.ExternalAuthorizationServer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -506,131 +864,6 @@ metadataUrl (`config.URL`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-config.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-URL (`url.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ForceQuery: false
-  Fragment: ""
-  Host: ""
-  Opaque: ""
-  Path: ""
-  RawFragment: ""
-  RawPath: ""
-  RawQuery: ""
-  Scheme: ""
-  User: null
-  
-
-url.URL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Scheme (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Opaque (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-User (url.Userinfo)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
-  
-
-Host (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Path (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-RawPath (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-ForceQuery (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-RawQuery (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-Fragment (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-RawFragment (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 
@@ -840,6 +1073,18 @@ customData (map[string]map[string]interfaces.DataSource)
 .. code-block:: yaml
 
   {}
+  
+
+standaloneDeployment (bool)
+--------------------------------------------------------------------------------
+
+Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 Section: clusters
@@ -1524,12 +1769,12 @@ k8s (`config.K8sPluginConfig`_)
     cpu: 500m
     default-input-path: /var/flyte/inputs
     default-output-path: /var/flyte/outputs
-    image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+    image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
     input-vol-name: flyte-inputs
     memory: 128Mi
     name: flyte-copilot-
     output-vol-name: flyte-outputs
-    start-timeout: 1m0s
+    start-timeout: 1m40s
     storage: ""
   create-container-error-grace-period: 3m0s
   default-annotations:
@@ -1540,6 +1785,8 @@ k8s (`config.K8sPluginConfig`_)
   default-labels: null
   default-memory: 1Gi
   default-node-selector: null
+  default-pod-security-context: null
+  default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
   gpu-resource-name: nvidia.com/gpu
@@ -1805,12 +2052,12 @@ Co-Pilot Configuration
   cpu: 500m
   default-input-path: /var/flyte/inputs
   default-output-path: /var/flyte/outputs
-  image: cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  image: cr.flyte.org/flyteorg/flytecopilot:v0.0.15
   input-vol-name: flyte-inputs
   memory: 128Mi
   name: flyte-copilot-
   output-vol-name: flyte-outputs
-  start-timeout: 1m0s
+  start-timeout: 1m40s
   storage: ""
   
 
@@ -1839,13 +2086,31 @@ create-container-error-grace-period (`config.Duration`_)
 gpu-resource-name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The name of the GPU resource to use when the task resource requests GPUs.
-
 **Default Value**: 
 
 .. code-block:: yaml
 
   nvidia.com/gpu
+  
+
+default-pod-security-context (v1.PodSecurityContext)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-security-context (v1.SecurityContext)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.FlyteCoPilotConfig
@@ -1872,7 +2137,7 @@ Flyte co-pilot Docker Image FQN
 
 .. code-block:: yaml
 
-  cr.flyte.org/flyteorg/flytecopilot:v0.0.9
+  cr.flyte.org/flyteorg/flytecopilot:v0.0.15
   
 
 default-input-path (string)
@@ -1930,7 +2195,7 @@ start-timeout (`config.Duration`_)
 
 .. code-block:: yaml
 
-  1m0s
+  1m40s
   
 
 cpu (string)
@@ -2046,6 +2311,759 @@ scale (int32)
 .. code-block:: yaml
 
   "0"
+  
+
+Section: propeller
+================================================================================
+
+kube-config (string)
+--------------------------------------------------------------------------------
+
+Path to kubernetes client config file.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+master (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+workers (int)
+--------------------------------------------------------------------------------
+
+Number of threads to process workflows
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "20"
+  
+
+workflow-reeval-duration (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Frequency of re-evaluating workflows
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
+  
+
+downstream-eval-duration (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Frequency of re-evaluating downstream tasks
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
+  
+
+limit-namespace (string)
+--------------------------------------------------------------------------------
+
+Namespaces to watch for this propeller
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  all
+  
+
+prof-port (`config.Port`_)
+--------------------------------------------------------------------------------
+
+Profiler port
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10254
+  
+
+metadata-prefix (string)
+--------------------------------------------------------------------------------
+
+MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  metadata/propeller
+  
+
+rawoutput-prefix (string)
+--------------------------------------------------------------------------------
+
+a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+queue (`config.CompositeQueueConfig`_)
+--------------------------------------------------------------------------------
+
+Workflow workqueue configuration, affects the way the work is consumed from the queue.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  batch-size: -1
+  batching-interval: 1s
+  queue:
+    base-delay: 5s
+    capacity: 1000
+    max-delay: 1m0s
+    rate: 100
+    type: maxof
+  sub-queue:
+    base-delay: 0s
+    capacity: 1000
+    max-delay: 0s
+    rate: 100
+    type: bucket
+  type: batch
+  
+
+metrics-prefix (string)
+--------------------------------------------------------------------------------
+
+An optional prefix for all published metrics.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  flyte
+  
+
+enable-admin-launcher (bool)
+--------------------------------------------------------------------------------
+
+Enable remote Workflow launcher to Admin
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+max-workflow-retries (int)
+--------------------------------------------------------------------------------
+
+Maximum number of retries per workflow
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+max-ttl-hours (int)
+--------------------------------------------------------------------------------
+
+Maximum number of hours a completed workflow should be retained. Number between 1-23 hours
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "23"
+  
+
+gc-interval (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Run periodic GC every 30 minutes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30m0s
+  
+
+leader-election (`config.LeaderElectionConfig`_)
+--------------------------------------------------------------------------------
+
+Config for leader election.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  lease-duration: 15s
+  lock-config-map:
+    Name: ""
+    Namespace: ""
+  renew-deadline: 10s
+  retry-period: 2s
+  
+
+publish-k8s-events (bool)
+--------------------------------------------------------------------------------
+
+Enable events publishing to K8s events API.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+max-output-size-bytes (int64)
+--------------------------------------------------------------------------------
+
+Maximum size of outputs per task
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10485760"
+  
+
+kube-client-config (`config.KubeClientConfig`_)
+--------------------------------------------------------------------------------
+
+Configuration to control the Kubernetes client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 25
+  qps: 100
+  timeout: 30s
+  
+
+node-config (`config.NodeConfig`_)
+--------------------------------------------------------------------------------
+
+config for a workflow node
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-deadlines:
+    node-active-deadline: 48h0m0s
+    node-execution-deadline: 48h0m0s
+    workflow-active-deadline: 72h0m0s
+  interruptible-failure-threshold: 1
+  max-node-retries-system-failures: 3
+  
+
+max-streak-length (int)
+--------------------------------------------------------------------------------
+
+Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "8"
+  
+
+event-config (`config.EventConfig`_)
+--------------------------------------------------------------------------------
+
+Configures execution event behavior.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  fallback-to-output-reference: false
+  raw-output-policy: reference
+  
+
+include-shard-key-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified shard key label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-shard-key-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+include-project-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified project label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-project-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified project label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+include-domain-label ([]string)
+--------------------------------------------------------------------------------
+
+Include the specified domain label in the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+exclude-domain-label ([]string)
+--------------------------------------------------------------------------------
+
+Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+cluster-id (string)
+--------------------------------------------------------------------------------
+
+Unique cluster id running this flytepropeller instance with which to annotate execution events
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  propeller
+  
+
+config.CompositeQueueConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+type (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Type of composite queue to use for the WorkQueue
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  batch
+  
+
+queue (`config.WorkqueueConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Workflow workqueue configuration, affects the way the work is consumed from the queue.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  base-delay: 5s
+  capacity: 1000
+  max-delay: 1m0s
+  rate: 100
+  type: maxof
+  
+
+sub-queue (`config.WorkqueueConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+SubQueue configuration, affects the way the nodes cause the top-level Work to be re-evaluated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  base-delay: 0s
+  capacity: 1000
+  max-delay: 0s
+  rate: 100
+  type: bucket
+  
+
+batching-interval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Duration for which downstream updates are buffered
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1s
+  
+
+batch-size (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "-1"
+  
+
+config.WorkqueueConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+type (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Type of RateLimiter to use for the WorkQueue
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxof
+  
+
+base-delay (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+base backoff delay for failure
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5s
+  
+
+max-delay (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max backoff delay for failure
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1m0s
+  
+
+rate (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Bucket Refill rate per second
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+capacity (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Bucket capacity as number of items
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+config.EventConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+raw-output-policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+How output data should be passed along in execution events.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  reference
+  
+
+fallback-to-output-reference (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Whether output data should be sent by reference when it is too large to be sent inline in execution events.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+config.KubeClientConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+qps (float32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+burst (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max burst rate for throttle. 0 defaults to 10
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "25"
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
+  
+
+config.LeaderElectionConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enables/Disables leader election.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+lock-config-map (`types.NamespacedName`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+ConfigMap namespace/name to use for resource lock.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Name: ""
+  Namespace: ""
+  
+
+lease-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last observed ack.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  15s
+  
+
+renew-deadline (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Duration that the acting master will retry refreshing leadership before giving up.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
+  
+
+retry-period (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Duration the LeaderElector clients should wait between tries of actions.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  2s
+  
+
+types.NamespacedName
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Namespace (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+Name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+config.NodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+default-deadlines (`config.DefaultDeadlines`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default value for timeouts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  node-active-deadline: 48h0m0s
+  node-execution-deadline: 48h0m0s
+  workflow-active-deadline: 72h0m0s
+  
+
+max-node-retries-system-failures (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum number of retries per node for node failure due to infra issues
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "3"
+  
+
+interruptible-failure-threshold (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+number of failures for a node to be still considered interruptible'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1"
+  
+
+config.DefaultDeadlines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+node-execution-deadline (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default value of node execution timeout
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  48h0m0s
+  
+
+node-active-deadline (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default value of node timeout
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  48h0m0s
+  
+
+workflow-active-deadline (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default value of workflow timeout
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  72h0m0s
+  
+
+config.Port
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+port (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10254"
   
 
 Section: qualityofservice
@@ -2294,19 +3312,6 @@ reconnectDelaySeconds (int)
 .. code-block:: yaml
 
   "0"
-  
-
-config.Port
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-port (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "10254"
   
 
 interfaces.EventSchedulerConfig
