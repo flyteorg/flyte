@@ -43,7 +43,11 @@ rules:
   - '*'
 
 ---
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
 apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
 kind: ClusterRoleBinding
 metadata:
   name: {{ template "flyteadmin.name" . }}-binding
