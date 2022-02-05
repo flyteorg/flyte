@@ -24,7 +24,7 @@ helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/fl
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
 then
-    GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+    GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 fi
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
