@@ -65,7 +65,7 @@ func TestSetupConfigFunc(t *testing.T) {
 }
 
 func TestTrimFunc(t *testing.T) {
-	assert.Equal(t, trimEndpoint("dns://localhost"), "localhost")
+	assert.Equal(t, trimEndpoint("dns:///localhost"), "localhost")
 	assert.Equal(t, trimEndpoint("http://localhost"), "localhost")
 	assert.Equal(t, trimEndpoint("https://localhost"), "localhost")
 }

@@ -58,7 +58,7 @@ var prompt = promptui.Select{
 	Items: []string{"S3", "GCS"},
 }
 
-var endpointPrefix = [3]string{"dns://", "http://", "https://"}
+var endpointPrefix = [3]string{"dns:///", "http://", "https://"}
 
 // CreateConfigCommand will return configuration command
 func CreateConfigCommand() *cobra.Command {
@@ -95,7 +95,7 @@ func initFlytectlConfig(ctx context.Context, reader io.Reader) error {
 		if !validateEndpointName(trimHost) {
 			return errors.New("Please use a valid endpoint")
 		}
-		templateValues.Host = fmt.Sprintf("dns://%s", trimHost)
+		templateValues.Host = fmt.Sprintf("dns:///%s", trimHost)
 		templateValues.Insecure = initConfig.DefaultConfig.Insecure
 		templateStr = configutil.AdminConfigTemplate
 		if initConfig.DefaultConfig.Storage {
