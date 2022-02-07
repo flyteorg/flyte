@@ -60,6 +60,7 @@ class CustomSorter(FileNameSortKey):
         # Type System
         "flyte_python_types.py",
         "schema.py",
+        "structured_dataset.py"
         "typed_schema.py",
         "custom_objects.py",
         "enums.py",
