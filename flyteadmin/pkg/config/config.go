@@ -48,7 +48,15 @@ type SslOptions struct {
 }
 
 var defaultServerConfig = &ServerConfig{
-	Security: ServerSecurityOptions{},
+	HTTPPort:             8088,
+	GrpcPort:             8089,
+	GrpcServerReflection: true,
+	KubeConfig:           "$HOME/.kube/config",
+	Security: ServerSecurityOptions{
+		AllowCors:      true,
+		AllowedHeaders: []string{"Content-Type", "flyte-authorization"},
+		AllowedOrigins: []string{"*"},
+	},
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
 
