@@ -175,6 +175,20 @@ func TestDetermineDiscoverability(t *testing.T) {
 		},
 	}
 
+	t.Run("Run AWS Batch single job", func(t *testing.T) {
+		toCache := arrayCore.InvertBitSet(bitarray.NewBitSet(1), 1)
+		template.Type = AwsBatchTaskType
+		runDetermineDiscoverabilityTest(t, template, f, &arrayCore.State{
+			CurrentPhase:         arrayCore.PhasePreLaunch,
+			PhaseVersion:         core2.DefaultPhaseVersion,
+			ExecutionArraySize:   1,
+			OriginalArraySize:    1,
+			OriginalMinSuccesses: 1,
+			IndexesToCache:       toCache,
+			Reason:               "Task is not discoverable.",
+		}, nil)
+	})
+
 	t.Run("Not discoverable", func(t *testing.T) {
 		toCache := arrayCore.InvertBitSet(bitarray.NewBitSet(1), 1)
 

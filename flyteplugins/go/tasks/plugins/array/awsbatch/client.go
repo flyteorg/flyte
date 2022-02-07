@@ -9,16 +9,13 @@ import (
 	"context"
 	"fmt"
 
-	definition2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/aws"
-	"github.com/flyteorg/flytestdlib/utils"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
 	a "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"
+	"github.com/flyteorg/flyteplugins/go/tasks/aws"
+	definition2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/utils"
 )
 
 //go:generate mockery -all -case=underscore
@@ -35,7 +32,7 @@ type Client interface {
 	GetJobDetailsBatch(ctx context.Context, ids []JobID) ([]*batch.JobDetail, error)
 
 	// Registers a new Job Definition with AWS Batch provided a name, image and role.
-	RegisterJobDefinition(ctx context.Context, name, image, role string) (arn string, err error)
+	RegisterJobDefinition(ctx context.Context, name, image, role string, platformCapabilities string) (arn string, err error)
 
 	// Gets the single region this client interacts with.
 	GetRegion() string
@@ -68,12 +65,13 @@ func (b client) GetAccountID() string {
 }
 
 // Registers a new job definition. There is no deduping on AWS side (even for the same name).
-func (b *client) RegisterJobDefinition(ctx context.Context, name, image, role string) (arn definition2.JobDefinitionArn, err error) {
-	logger.Infof(ctx, "Registering job definition with name [%v], image [%v], role [%v]", name, image, role)
+func (b *client) RegisterJobDefinition(ctx context.Context, name, image, role string, platformCapabilities string) (arn definition2.JobDefinitionArn, err error) {
+	logger.Infof(ctx, "Registering job definition with name [%v], image [%v], role [%v], platformCapabilities [%v]", name, image, role, platformCapabilities)
 
 	res, err := b.Batch.RegisterJobDefinitionWithContext(ctx, &batch.RegisterJobDefinitionInput{
-		Type:              refStr(batch.JobDefinitionTypeContainer),
-		JobDefinitionName: refStr(name),
+		Type:                 refStr(batch.JobDefinitionTypeContainer),
+		JobDefinitionName:    refStr(name),
+		PlatformCapabilities: refStrSlice([]string{platformCapabilities}),
 		ContainerProperties: &batch.ContainerProperties{
 			Image:      refStr(image),
 			JobRoleArn: refStr(role),
@@ -83,7 +81,6 @@ func (b *client) RegisterJobDefinition(ctx context.Context, name, image, role st
 			Memory: refInt(100),
 		},
 	})
-
 	if err != nil {
 		return "", err
 	}

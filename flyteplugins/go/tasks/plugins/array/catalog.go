@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 
+	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
 	"github.com/flyteorg/flytestdlib/bitarray"
@@ -20,6 +22,8 @@ import (
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
+
+const AwsBatchTaskType = "aws-batch"
 
 // DetermineDiscoverability checks if there are any previously cached tasks. If there are we will only submit an
 // ArrayJob for the non-cached tasks. The ArrayJob is now a different size, and each task will get a new index location
@@ -38,7 +42,18 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// Extract the custom plugin pb
-	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+	var arrayJob *idlPlugins.ArrayJob
+	if taskTemplate.Type == AwsBatchTaskType {
+		arrayJob = &idlPlugins.ArrayJob{
+			Parallelism: 1,
+			Size:        1,
+			SuccessCriteria: &idlPlugins.ArrayJob_MinSuccesses{
+				MinSuccesses: 1,
+			},
+		}
+	} else {
+		arrayJob, err = arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+	}
 	if err != nil {
 		return state, err
 	}

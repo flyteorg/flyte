@@ -22,6 +22,7 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
 	v12 "k8s.io/api/core/v1"
@@ -191,11 +192,11 @@ func TestArrayJobToBatchInput(t *testing.T) {
 		Target: &core.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
 		},
+		Type: arrayTaskType,
 	}
 
 	tr := &mocks.TaskReader{}
 	tr.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-
 	taskCtx.OnTaskReader().Return(tr)
 
 	ctx := context.Background()
@@ -205,6 +206,14 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.Size)
 	assert.NotNil(t, batchInput)
 	assert.Equal(t, *expectedBatchInput, *batchInput)
+
+	taskTemplate.Type = array.AwsBatchTaskType
+	tr.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.OnTaskReader().Return(tr)
+
+	ctx = context.Background()
+	_, err = FlyteTaskToBatchInput(ctx, taskCtx, "", &config.Config{})
+	assert.NoError(t, err)
 }
 
 func Test_getEnvVarsForTask(t *testing.T) {

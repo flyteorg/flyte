@@ -20,7 +20,7 @@ func (i arrayJobInputReader) GetInputPath() storage.DataReference {
 }
 
 func GetInputReader(tCtx core.TaskExecutionContext, taskTemplate *idlCore.TaskTemplate) io.InputReader {
-	if taskTemplate.GetTaskTypeVersion() == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 && taskTemplate.Type != AwsBatchTaskType {
 		// Prior to task type version == 1, dynamic type tasks (including array tasks) would write input files for each
 		// individual array task instance. In this case we use a modified input reader to only pass in the parent input
 		// directory.

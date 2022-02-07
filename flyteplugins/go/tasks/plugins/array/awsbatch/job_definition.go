@@ -16,6 +16,9 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 )
 
+const defaultComputeEngine = "EC2"
+const platformCapabilitiesConfigKey = "platformCapabilities"
+
 func getContainerImage(_ context.Context, task *core.TaskTemplate) string {
 	if task.GetContainer() != nil && len(task.GetContainer().Image) > 0 {
 		return task.GetContainer().Image
@@ -51,11 +54,15 @@ func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionConte
 	}
 
 	role := awsUtils.GetRoleFromSecurityContext(cfg.RoleAnnotationKey, tCtx.TaskExecutionMetadata())
+	platformCapabilities := taskTemplate.GetConfig()[platformCapabilitiesConfigKey]
+	if len(platformCapabilities) == 0 {
+		platformCapabilities = defaultComputeEngine
+	}
 
-	cacheKey := definition.NewCacheKey(role, containerImage)
+	cacheKey := definition.NewCacheKey(role, containerImage, platformCapabilities)
 	if existingArn, found := definitionCache.Get(cacheKey); found {
-		logger.Infof(ctx, "Found an existing job definition for Image [%v] and Role [%v]. Arn [%v]",
-			containerImage, role, existingArn)
+		logger.Infof(ctx, "Found an existing job definition for Image [%v], Role [%v], JobDefinitionInput [%v]. Arn [%v]",
+			containerImage, role, platformCapabilities, existingArn)
 
 		nextState = currentState.SetJobDefinitionArn(existingArn)
 		nextState.State = nextState.SetPhase(arrayCore.PhaseLaunch, 0).SetReason("AWS job definition already exist.")
@@ -64,7 +71,7 @@ func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionConte
 
 	name := definition.GetJobDefinitionSafeName(containerImageRepository(containerImage))
 
-	arn, err := client.RegisterJobDefinition(ctx, name, containerImage, role)
+	arn, err := client.RegisterJobDefinition(ctx, name, containerImage, role, platformCapabilities)
 	if err != nil {
 		return currentState, err
 	}
