@@ -98,10 +98,11 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 	phases.SetItem(3, bitarray.Item(pluginCore.PhasePermanentFailure))
 
 	item := &outputAssembleItem{
-		outputPaths: ow,
-		varNames:    []string{"var1", "var2"},
-		finalPhases: phases,
-		dataStore:   memStore,
+		outputPaths:    ow,
+		varNames:       []string{"var1", "var2"},
+		finalPhases:    phases,
+		dataStore:      memStore,
+		isAwsSingleJob: false,
 	}
 
 	w := assembleOutputsWorker{}
@@ -386,16 +387,22 @@ func Test_assembleErrorsWorker_Process(t *testing.T) {
 	phases.SetItem(3, bitarray.Item(pluginCore.PhasePermanentFailure))
 
 	item := &outputAssembleItem{
-		varNames:    []string{"var1", "var2"},
-		finalPhases: phases,
-		outputPaths: ow,
-		dataStore:   memStore,
+		varNames:       []string{"var1", "var2"},
+		finalPhases:    phases,
+		outputPaths:    ow,
+		dataStore:      memStore,
+		isAwsSingleJob: false,
 	}
 
 	w := assembleErrorsWorker{
 		maxErrorMessageLength: 1000,
 	}
 	actual, err := w.Process(ctx, item)
+	assert.NoError(t, err)
+	assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
+
+	item.isAwsSingleJob = true
+	actual, err = w.Process(ctx, item)
 	assert.NoError(t, err)
 	assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
 }

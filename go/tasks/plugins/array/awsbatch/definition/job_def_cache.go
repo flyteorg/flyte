@@ -27,12 +27,13 @@ type CacheKey interface {
 }
 
 type cacheKey struct {
-	role  string
-	image string
+	role                 string
+	image                string
+	platformCapabilities string
 }
 
 func (k cacheKey) String() string {
-	return fmt.Sprintf("%v-%v", k.image, k.role)
+	return fmt.Sprintf("%v-%v-%v", k.image, k.role, k.platformCapabilities)
 }
 
 type cache struct {
@@ -52,10 +53,11 @@ func (c cache) Put(key CacheKey, definition JobDefinitionArn) error {
 }
 
 // Creates a new deterministic cache key.
-func NewCacheKey(role, image string) CacheKey {
+func NewCacheKey(role, image, platformCapabilities string) CacheKey {
 	return cacheKey{
-		role:  role,
-		image: image,
+		role:                 role,
+		image:                image,
+		platformCapabilities: platformCapabilities,
 	}
 }
 

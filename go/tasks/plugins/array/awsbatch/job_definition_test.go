@@ -91,7 +91,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 
 	t.Run("Found", func(t *testing.T) {
 		dCache := definition.NewCache(10)
-		assert.NoError(t, dCache.Put(definition.NewCacheKey("", "img1"), "their-arn"))
+		assert.NoError(t, dCache.Put(definition.NewCacheKey("", "img1", defaultComputeEngine), "their-arn"))
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
@@ -99,6 +99,11 @@ func TestEnsureJobDefinition(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, nextState)
 		assert.Equal(t, "their-arn", nextState.JobDefinitionArn)
+	})
+
+	t.Run("Test New Cache Key", func(t *testing.T) {
+		cacheKey := definition.NewCacheKey("default", "img1", defaultComputeEngine)
+		assert.Equal(t, cacheKey.String(), "img1-default-EC2")
 	})
 }
 
@@ -115,6 +120,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 		Target: &core.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
 		},
+		Config: map[string]string{platformCapabilitiesConfigKey: defaultComputeEngine},
 	}, nil)
 
 	overrides := &mocks.TaskOverrides{}
@@ -158,7 +164,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 
 	t.Run("Found", func(t *testing.T) {
 		dCache := definition.NewCache(10)
-		assert.NoError(t, dCache.Put(definition.NewCacheKey("new-role", "img1"), "their-arn"))
+		assert.NoError(t, dCache.Put(definition.NewCacheKey("new-role", "img1", defaultComputeEngine), "their-arn"))
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},

@@ -44,10 +44,11 @@ func (o OutputAssembler) Queue(ctx context.Context, id workqueue.WorkItemID, ite
 }
 
 type outputAssembleItem struct {
-	outputPaths io.OutputFilePaths
-	varNames    []string
-	finalPhases bitarray.CompactArray
-	dataStore   *storage.DataStore
+	outputPaths    io.OutputFilePaths
+	varNames       []string
+	finalPhases    bitarray.CompactArray
+	dataStore      *storage.DataStore
+	isAwsSingleJob bool
 }
 
 type assembleOutputsWorker struct {
@@ -75,13 +76,21 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 			}
 
 			if executionError == nil && output != nil {
-				appendSubTaskOutput(finalOutputs, output, int64(i.finalPhases.ItemsCount))
-				continue
+				if i.isAwsSingleJob {
+					// We will only have one output.pb when running aws single job, so we don't need
+					// to aggregate outputs here
+					finalOutputs.Literals = output.GetLiterals()
+				} else {
+					appendSubTaskOutput(finalOutputs, output, int64(i.finalPhases.ItemsCount))
+					continue
+				}
 			}
 		}
 
 		// TODO: Do we need the names of the outputs in the literalMap here?
-		appendEmptyOutputs(finalOutputs, i.varNames)
+		if !i.isAwsSingleJob {
+			appendEmptyOutputs(finalOutputs, i.varNames)
+		}
 	}
 
 	ow := ioutils.NewRemoteFileOutputWriter(ctx, i.dataStore, i.outputPaths)
@@ -185,10 +194,11 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 			state.GetIndexesToCache(), uint(state.GetOriginalArraySize()))
 
 		err = assemblyQueue.Queue(ctx, workItemID, &outputAssembleItem{
-			varNames:    varNames,
-			finalPhases: finalPhases,
-			outputPaths: tCtx.OutputWriter(),
-			dataStore:   tCtx.DataStore(),
+			varNames:       varNames,
+			finalPhases:    finalPhases,
+			outputPaths:    tCtx.OutputWriter(),
+			dataStore:      tCtx.DataStore(),
+			isAwsSingleJob: taskTemplate.Type == AwsBatchTaskType,
 		})
 
 		if err != nil {

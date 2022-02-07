@@ -128,8 +128,8 @@ func (_m Client_RegisterJobDefinition) Return(arn string, err error) *Client_Reg
 	return &Client_RegisterJobDefinition{Call: _m.Call.Return(arn, err)}
 }
 
-func (_m *Client) OnRegisterJobDefinition(ctx context.Context, name string, image string, role string) *Client_RegisterJobDefinition {
-	c := _m.On("RegisterJobDefinition", ctx, name, image, role)
+func (_m *Client) OnRegisterJobDefinition(ctx context.Context, name string, image string, role string, platformCapabilities string) *Client_RegisterJobDefinition {
+	c := _m.On("RegisterJobDefinition", ctx, name, image, role, platformCapabilities)
 	return &Client_RegisterJobDefinition{Call: c}
 }
 
@@ -138,20 +138,20 @@ func (_m *Client) OnRegisterJobDefinitionMatch(matchers ...interface{}) *Client_
 	return &Client_RegisterJobDefinition{Call: c}
 }
 
-// RegisterJobDefinition provides a mock function with given fields: ctx, name, image, role
-func (_m *Client) RegisterJobDefinition(ctx context.Context, name string, image string, role string) (string, error) {
-	ret := _m.Called(ctx, name, image, role)
+// RegisterJobDefinition provides a mock function with given fields: ctx, name, image, role, structObj
+func (_m *Client) RegisterJobDefinition(ctx context.Context, name string, image string, role string, platformCapabilities string) (string, error) {
+	ret := _m.Called(ctx, name, image, role, platformCapabilities)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) string); ok {
-		r0 = rf(ctx, name, image, role)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) string); ok {
+		r0 = rf(ctx, name, image, role, platformCapabilities)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
-		r1 = rf(ctx, name, image, role)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
+		r1 = rf(ctx, name, image, role, platformCapabilities)
 	} else {
 		r1 = ret.Error(1)
 	}
