@@ -26,4 +26,6 @@ type CoreLiteralType struct {
 	StructuredDatasetType *CoreStructuredDatasetType `json:"structured_dataset_type,omitempty"`
 	// This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by consumers to identify special behavior or display extended information for the type.
 	Metadata *ProtobufStruct `json:"metadata,omitempty"`
+	// This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior.
+	Annotation *CoreTypeAnnotation `json:"annotation,omitempty"`
 }

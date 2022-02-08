@@ -312,6 +312,7 @@ Class | Method | HTTP request | Description
  - [CoreTaskNode](docs/CoreTaskNode.md)
  - [CoreTaskNodeOverrides](docs/CoreTaskNodeOverrides.md)
  - [CoreTaskTemplate](docs/CoreTaskTemplate.md)
+ - [CoreTypeAnnotation](docs/CoreTypeAnnotation.md)
  - [CoreTypedInterface](docs/CoreTypedInterface.md)
  - [CoreVariable](docs/CoreVariable.md)
  - [CoreVariableMap](docs/CoreVariableMap.md)

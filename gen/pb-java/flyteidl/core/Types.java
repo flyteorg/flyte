@@ -5614,6 +5614,680 @@ public final class Types {
 
   }
 
+  public interface TypeAnnotationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.TypeAnnotation)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    boolean hasAnnotations();
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    com.google.protobuf.Struct getAnnotations();
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    com.google.protobuf.StructOrBuilder getAnnotationsOrBuilder();
+  }
+  /**
+   * <pre>
+   * TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.TypeAnnotation}
+   */
+  public  static final class TypeAnnotation extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.TypeAnnotation)
+      TypeAnnotationOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TypeAnnotation.newBuilder() to construct.
+    private TypeAnnotation(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TypeAnnotation() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TypeAnnotation(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.Struct.Builder subBuilder = null;
+              if (annotations_ != null) {
+                subBuilder = annotations_.toBuilder();
+              }
+              annotations_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(annotations_);
+                annotations_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Types.internal_static_flyteidl_core_TypeAnnotation_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Types.internal_static_flyteidl_core_TypeAnnotation_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Types.TypeAnnotation.class, flyteidl.core.Types.TypeAnnotation.Builder.class);
+    }
+
+    public static final int ANNOTATIONS_FIELD_NUMBER = 1;
+    private com.google.protobuf.Struct annotations_;
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    public boolean hasAnnotations() {
+      return annotations_ != null;
+    }
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    public com.google.protobuf.Struct getAnnotations() {
+      return annotations_ == null ? com.google.protobuf.Struct.getDefaultInstance() : annotations_;
+    }
+    /**
+     * <pre>
+     * A arbitrary JSON payload to describe a type.
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct annotations = 1;</code>
+     */
+    public com.google.protobuf.StructOrBuilder getAnnotationsOrBuilder() {
+      return getAnnotations();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (annotations_ != null) {
+        output.writeMessage(1, getAnnotations());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (annotations_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getAnnotations());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Types.TypeAnnotation)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Types.TypeAnnotation other = (flyteidl.core.Types.TypeAnnotation) obj;
+
+      if (hasAnnotations() != other.hasAnnotations()) return false;
+      if (hasAnnotations()) {
+        if (!getAnnotations()
+            .equals(other.getAnnotations())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasAnnotations()) {
+        hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getAnnotations().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.TypeAnnotation parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Types.TypeAnnotation prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.TypeAnnotation}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.TypeAnnotation)
+        flyteidl.core.Types.TypeAnnotationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_TypeAnnotation_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_TypeAnnotation_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Types.TypeAnnotation.class, flyteidl.core.Types.TypeAnnotation.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Types.TypeAnnotation.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (annotationsBuilder_ == null) {
+          annotations_ = null;
+        } else {
+          annotations_ = null;
+          annotationsBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_TypeAnnotation_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.TypeAnnotation getDefaultInstanceForType() {
+        return flyteidl.core.Types.TypeAnnotation.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.TypeAnnotation build() {
+        flyteidl.core.Types.TypeAnnotation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.TypeAnnotation buildPartial() {
+        flyteidl.core.Types.TypeAnnotation result = new flyteidl.core.Types.TypeAnnotation(this);
+        if (annotationsBuilder_ == null) {
+          result.annotations_ = annotations_;
+        } else {
+          result.annotations_ = annotationsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Types.TypeAnnotation) {
+          return mergeFrom((flyteidl.core.Types.TypeAnnotation)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Types.TypeAnnotation other) {
+        if (other == flyteidl.core.Types.TypeAnnotation.getDefaultInstance()) return this;
+        if (other.hasAnnotations()) {
+          mergeAnnotations(other.getAnnotations());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Types.TypeAnnotation parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Types.TypeAnnotation) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private com.google.protobuf.Struct annotations_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> annotationsBuilder_;
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public boolean hasAnnotations() {
+        return annotationsBuilder_ != null || annotations_ != null;
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public com.google.protobuf.Struct getAnnotations() {
+        if (annotationsBuilder_ == null) {
+          return annotations_ == null ? com.google.protobuf.Struct.getDefaultInstance() : annotations_;
+        } else {
+          return annotationsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public Builder setAnnotations(com.google.protobuf.Struct value) {
+        if (annotationsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          annotations_ = value;
+          onChanged();
+        } else {
+          annotationsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public Builder setAnnotations(
+          com.google.protobuf.Struct.Builder builderForValue) {
+        if (annotationsBuilder_ == null) {
+          annotations_ = builderForValue.build();
+          onChanged();
+        } else {
+          annotationsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public Builder mergeAnnotations(com.google.protobuf.Struct value) {
+        if (annotationsBuilder_ == null) {
+          if (annotations_ != null) {
+            annotations_ =
+              com.google.protobuf.Struct.newBuilder(annotations_).mergeFrom(value).buildPartial();
+          } else {
+            annotations_ = value;
+          }
+          onChanged();
+        } else {
+          annotationsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public Builder clearAnnotations() {
+        if (annotationsBuilder_ == null) {
+          annotations_ = null;
+          onChanged();
+        } else {
+          annotations_ = null;
+          annotationsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public com.google.protobuf.Struct.Builder getAnnotationsBuilder() {
+        
+        onChanged();
+        return getAnnotationsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      public com.google.protobuf.StructOrBuilder getAnnotationsOrBuilder() {
+        if (annotationsBuilder_ != null) {
+          return annotationsBuilder_.getMessageOrBuilder();
+        } else {
+          return annotations_ == null ?
+              com.google.protobuf.Struct.getDefaultInstance() : annotations_;
+        }
+      }
+      /**
+       * <pre>
+       * A arbitrary JSON payload to describe a type.
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct annotations = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
+          getAnnotationsFieldBuilder() {
+        if (annotationsBuilder_ == null) {
+          annotationsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  getAnnotations(),
+                  getParentForChildren(),
+                  isClean());
+          annotations_ = null;
+        }
+        return annotationsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.TypeAnnotation)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.TypeAnnotation)
+    private static final flyteidl.core.Types.TypeAnnotation DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Types.TypeAnnotation();
+    }
+
+    public static flyteidl.core.Types.TypeAnnotation getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TypeAnnotation>
+        PARSER = new com.google.protobuf.AbstractParser<TypeAnnotation>() {
+      @java.lang.Override
+      public TypeAnnotation parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TypeAnnotation(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TypeAnnotation> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TypeAnnotation> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Types.TypeAnnotation getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface LiteralTypeOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.LiteralType)
       com.google.protobuf.MessageOrBuilder {
@@ -5813,6 +6487,34 @@ public final class Types {
      */
     com.google.protobuf.StructOrBuilder getMetadataOrBuilder();
 
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    boolean hasAnnotation();
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    flyteidl.core.Types.TypeAnnotation getAnnotation();
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    flyteidl.core.Types.TypeAnnotationOrBuilder getAnnotationOrBuilder();
+
     public flyteidl.core.Types.LiteralType.TypeCase getTypeCase();
   }
   /**
@@ -5959,6 +6661,19 @@ public final class Types {
                 type_ = subBuilder.buildPartial();
               }
               typeCase_ = 8;
+              break;
+            }
+            case 74: {
+              flyteidl.core.Types.TypeAnnotation.Builder subBuilder = null;
+              if (annotation_ != null) {
+                subBuilder = annotation_.toBuilder();
+              }
+              annotation_ = input.readMessage(flyteidl.core.Types.TypeAnnotation.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(annotation_);
+                annotation_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -6336,6 +7051,42 @@ public final class Types {
       return getMetadata();
     }
 
+    public static final int ANNOTATION_FIELD_NUMBER = 9;
+    private flyteidl.core.Types.TypeAnnotation annotation_;
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    public boolean hasAnnotation() {
+      return annotation_ != null;
+    }
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    public flyteidl.core.Types.TypeAnnotation getAnnotation() {
+      return annotation_ == null ? flyteidl.core.Types.TypeAnnotation.getDefaultInstance() : annotation_;
+    }
+    /**
+     * <pre>
+     * This field contains arbitrary data that might have special semantic
+     * meaning for the client but does not effect internal flyte behavior.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+     */
+    public flyteidl.core.Types.TypeAnnotationOrBuilder getAnnotationOrBuilder() {
+      return getAnnotation();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6373,6 +7124,9 @@ public final class Types {
       }
       if (typeCase_ == 8) {
         output.writeMessage(8, (flyteidl.core.Types.StructuredDatasetType) type_);
+      }
+      if (annotation_ != null) {
+        output.writeMessage(9, getAnnotation());
       }
       unknownFields.writeTo(output);
     }
@@ -6415,6 +7169,10 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, (flyteidl.core.Types.StructuredDatasetType) type_);
       }
+      if (annotation_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getAnnotation());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -6434,6 +7192,11 @@ public final class Types {
       if (hasMetadata()) {
         if (!getMetadata()
             .equals(other.getMetadata())) return false;
+      }
+      if (hasAnnotation() != other.hasAnnotation()) return false;
+      if (hasAnnotation()) {
+        if (!getAnnotation()
+            .equals(other.getAnnotation())) return false;
       }
       if (!getTypeCase().equals(other.getTypeCase())) return false;
       switch (typeCase_) {
@@ -6482,6 +7245,10 @@ public final class Types {
       if (hasMetadata()) {
         hash = (37 * hash) + METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getMetadata().hashCode();
+      }
+      if (hasAnnotation()) {
+        hash = (37 * hash) + ANNOTATION_FIELD_NUMBER;
+        hash = (53 * hash) + getAnnotation().hashCode();
       }
       switch (typeCase_) {
         case 1:
@@ -6658,6 +7425,12 @@ public final class Types {
           metadata_ = null;
           metadataBuilder_ = null;
         }
+        if (annotationBuilder_ == null) {
+          annotation_ = null;
+        } else {
+          annotation_ = null;
+          annotationBuilder_ = null;
+        }
         typeCase_ = 0;
         type_ = null;
         return this;
@@ -6736,6 +7509,11 @@ public final class Types {
         } else {
           result.metadata_ = metadataBuilder_.build();
         }
+        if (annotationBuilder_ == null) {
+          result.annotation_ = annotation_;
+        } else {
+          result.annotation_ = annotationBuilder_.build();
+        }
         result.typeCase_ = typeCase_;
         onBuilt();
         return result;
@@ -6787,6 +7565,9 @@ public final class Types {
         if (other == flyteidl.core.Types.LiteralType.getDefaultInstance()) return this;
         if (other.hasMetadata()) {
           mergeMetadata(other.getMetadata());
+        }
+        if (other.hasAnnotation()) {
+          mergeAnnotation(other.getAnnotation());
         }
         switch (other.getTypeCase()) {
           case SIMPLE: {
@@ -8131,6 +8912,168 @@ public final class Types {
           metadata_ = null;
         }
         return metadataBuilder_;
+      }
+
+      private flyteidl.core.Types.TypeAnnotation annotation_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Types.TypeAnnotation, flyteidl.core.Types.TypeAnnotation.Builder, flyteidl.core.Types.TypeAnnotationOrBuilder> annotationBuilder_;
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public boolean hasAnnotation() {
+        return annotationBuilder_ != null || annotation_ != null;
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public flyteidl.core.Types.TypeAnnotation getAnnotation() {
+        if (annotationBuilder_ == null) {
+          return annotation_ == null ? flyteidl.core.Types.TypeAnnotation.getDefaultInstance() : annotation_;
+        } else {
+          return annotationBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public Builder setAnnotation(flyteidl.core.Types.TypeAnnotation value) {
+        if (annotationBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          annotation_ = value;
+          onChanged();
+        } else {
+          annotationBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public Builder setAnnotation(
+          flyteidl.core.Types.TypeAnnotation.Builder builderForValue) {
+        if (annotationBuilder_ == null) {
+          annotation_ = builderForValue.build();
+          onChanged();
+        } else {
+          annotationBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public Builder mergeAnnotation(flyteidl.core.Types.TypeAnnotation value) {
+        if (annotationBuilder_ == null) {
+          if (annotation_ != null) {
+            annotation_ =
+              flyteidl.core.Types.TypeAnnotation.newBuilder(annotation_).mergeFrom(value).buildPartial();
+          } else {
+            annotation_ = value;
+          }
+          onChanged();
+        } else {
+          annotationBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public Builder clearAnnotation() {
+        if (annotationBuilder_ == null) {
+          annotation_ = null;
+          onChanged();
+        } else {
+          annotation_ = null;
+          annotationBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public flyteidl.core.Types.TypeAnnotation.Builder getAnnotationBuilder() {
+        
+        onChanged();
+        return getAnnotationFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      public flyteidl.core.Types.TypeAnnotationOrBuilder getAnnotationOrBuilder() {
+        if (annotationBuilder_ != null) {
+          return annotationBuilder_.getMessageOrBuilder();
+        } else {
+          return annotation_ == null ?
+              flyteidl.core.Types.TypeAnnotation.getDefaultInstance() : annotation_;
+        }
+      }
+      /**
+       * <pre>
+       * This field contains arbitrary data that might have special semantic
+       * meaning for the client but does not effect internal flyte behavior.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypeAnnotation annotation = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Types.TypeAnnotation, flyteidl.core.Types.TypeAnnotation.Builder, flyteidl.core.Types.TypeAnnotationOrBuilder> 
+          getAnnotationFieldBuilder() {
+        if (annotationBuilder_ == null) {
+          annotationBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Types.TypeAnnotation, flyteidl.core.Types.TypeAnnotation.Builder, flyteidl.core.Types.TypeAnnotationOrBuilder>(
+                  getAnnotation(),
+                  getParentForChildren(),
+                  isClean());
+          annotation_ = null;
+        }
+        return annotationBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -9750,6 +10693,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_EnumType_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_TypeAnnotation_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_TypeAnnotation_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_LiteralType_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -9792,25 +10740,28 @@ public final class Types {
       "ity\030\002 \001(\0162*.flyteidl.core.BlobType.BlobD" +
       "imensionality\"/\n\022BlobDimensionality\022\n\n\006S" +
       "INGLE\020\000\022\r\n\tMULTIPART\020\001\"\032\n\010EnumType\022\016\n\006va" +
-      "lues\030\001 \003(\t\"\247\003\n\013LiteralType\022+\n\006simple\030\001 \001" +
-      "(\0162\031.flyteidl.core.SimpleTypeH\000\022+\n\006schem" +
-      "a\030\002 \001(\0132\031.flyteidl.core.SchemaTypeH\000\0225\n\017" +
-      "collection_type\030\003 \001(\0132\032.flyteidl.core.Li" +
-      "teralTypeH\000\0224\n\016map_value_type\030\004 \001(\0132\032.fl" +
-      "yteidl.core.LiteralTypeH\000\022\'\n\004blob\030\005 \001(\0132" +
-      "\027.flyteidl.core.BlobTypeH\000\022,\n\tenum_type\030" +
-      "\007 \001(\0132\027.flyteidl.core.EnumTypeH\000\022G\n\027stru" +
-      "ctured_dataset_type\030\010 \001(\0132$.flyteidl.cor" +
-      "e.StructuredDatasetTypeH\000\022)\n\010metadata\030\006 " +
-      "\001(\0132\027.google.protobuf.StructB\006\n\004type\"/\n\017" +
-      "OutputReference\022\017\n\007node_id\030\001 \001(\t\022\013\n\003var\030" +
-      "\002 \001(\t\"0\n\005Error\022\026\n\016failed_node_id\030\001 \001(\t\022\017" +
-      "\n\007message\030\002 \001(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000" +
-      "\022\013\n\007INTEGER\020\001\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007" +
-      "BOOLEAN\020\004\022\014\n\010DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n" +
-      "\006BINARY\020\007\022\t\n\005ERROR\020\010\022\n\n\006STRUCT\020\tB6Z4gith" +
-      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
-      "idl/coreb\006proto3"
+      "lues\030\001 \003(\t\">\n\016TypeAnnotation\022,\n\013annotati" +
+      "ons\030\001 \001(\0132\027.google.protobuf.Struct\"\332\003\n\013L" +
+      "iteralType\022+\n\006simple\030\001 \001(\0162\031.flyteidl.co" +
+      "re.SimpleTypeH\000\022+\n\006schema\030\002 \001(\0132\031.flytei" +
+      "dl.core.SchemaTypeH\000\0225\n\017collection_type\030" +
+      "\003 \001(\0132\032.flyteidl.core.LiteralTypeH\000\0224\n\016m" +
+      "ap_value_type\030\004 \001(\0132\032.flyteidl.core.Lite" +
+      "ralTypeH\000\022\'\n\004blob\030\005 \001(\0132\027.flyteidl.core." +
+      "BlobTypeH\000\022,\n\tenum_type\030\007 \001(\0132\027.flyteidl" +
+      ".core.EnumTypeH\000\022G\n\027structured_dataset_t" +
+      "ype\030\010 \001(\0132$.flyteidl.core.StructuredData" +
+      "setTypeH\000\022)\n\010metadata\030\006 \001(\0132\027.google.pro" +
+      "tobuf.Struct\0221\n\nannotation\030\t \001(\0132\035.flyte" +
+      "idl.core.TypeAnnotationB\006\n\004type\"/\n\017Outpu" +
+      "tReference\022\017\n\007node_id\030\001 \001(\t\022\013\n\003var\030\002 \001(\t" +
+      "\"0\n\005Error\022\026\n\016failed_node_id\030\001 \001(\t\022\017\n\007mes" +
+      "sage\030\002 \001(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007I" +
+      "NTEGER\020\001\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLE" +
+      "AN\020\004\022\014\n\010DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINA" +
+      "RY\020\007\022\t\n\005ERROR\020\010\022\n\n\006STRUCT\020\tB6Z4github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
+      "oreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9861,20 +10812,26 @@ public final class Types {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_EnumType_descriptor,
         new java.lang.String[] { "Values", });
-    internal_static_flyteidl_core_LiteralType_descriptor =
+    internal_static_flyteidl_core_TypeAnnotation_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_flyteidl_core_TypeAnnotation_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_TypeAnnotation_descriptor,
+        new java.lang.String[] { "Annotations", });
+    internal_static_flyteidl_core_LiteralType_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_core_LiteralType_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_LiteralType_descriptor,
-        new java.lang.String[] { "Simple", "Schema", "CollectionType", "MapValueType", "Blob", "EnumType", "StructuredDatasetType", "Metadata", "Type", });
+        new java.lang.String[] { "Simple", "Schema", "CollectionType", "MapValueType", "Blob", "EnumType", "StructuredDatasetType", "Metadata", "Annotation", "Type", });
     internal_static_flyteidl_core_OutputReference_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_core_OutputReference_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_OutputReference_descriptor,
         new java.lang.String[] { "NodeId", "Var", });
     internal_static_flyteidl_core_Error_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_core_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Error_descriptor,

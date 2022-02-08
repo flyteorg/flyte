@@ -3290,6 +3290,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TypeAnnotation. */
+        interface ITypeAnnotation {
+
+            /** TypeAnnotation annotations */
+            annotations?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents a TypeAnnotation. */
+        class TypeAnnotation implements ITypeAnnotation {
+
+            /**
+             * Constructs a new TypeAnnotation.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITypeAnnotation);
+
+            /** TypeAnnotation annotations. */
+            public annotations?: (google.protobuf.IStruct|null);
+
+            /**
+             * Creates a new TypeAnnotation instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TypeAnnotation instance
+             */
+            public static create(properties?: flyteidl.core.ITypeAnnotation): flyteidl.core.TypeAnnotation;
+
+            /**
+             * Encodes the specified TypeAnnotation message. Does not implicitly {@link flyteidl.core.TypeAnnotation.verify|verify} messages.
+             * @param message TypeAnnotation message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITypeAnnotation, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TypeAnnotation message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TypeAnnotation
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TypeAnnotation;
+
+            /**
+             * Verifies a TypeAnnotation message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a LiteralType. */
         interface ILiteralType {
 
@@ -3316,6 +3368,9 @@ export namespace flyteidl {
 
             /** LiteralType metadata */
             metadata?: (google.protobuf.IStruct|null);
+
+            /** LiteralType annotation */
+            annotation?: (flyteidl.core.ITypeAnnotation|null);
         }
 
         /** Represents a LiteralType. */
@@ -3350,6 +3405,9 @@ export namespace flyteidl {
 
             /** LiteralType metadata. */
             public metadata?: (google.protobuf.IStruct|null);
+
+            /** LiteralType annotation. */
+            public annotation?: (flyteidl.core.ITypeAnnotation|null);
 
             /** LiteralType type. */
             public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType");
