@@ -142,9 +142,8 @@ const (
 func ToArrayJob(structObj *structpb.Struct, taskTypeVersion int32) (*idlPlugins.ArrayJob, error) {
 	if structObj == nil {
 		if taskTypeVersion == 0 {
-
 			return &idlPlugins.ArrayJob{
-				Parallelism: 1,
+				Parallelism: 0,
 				Size:        1,
 				SuccessCriteria: &idlPlugins.ArrayJob_MinSuccesses{
 					MinSuccesses: 1,
@@ -152,7 +151,7 @@ func ToArrayJob(structObj *structpb.Struct, taskTypeVersion int32) (*idlPlugins.
 			}, nil
 		}
 		return &idlPlugins.ArrayJob{
-			Parallelism: 1,
+			Parallelism: 0,
 			Size:        1,
 			SuccessCriteria: &idlPlugins.ArrayJob_MinSuccessRatio{
 				MinSuccessRatio: 1.0,

@@ -5,30 +5,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
+
+	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
-
-	"github.com/flyteorg/flytestdlib/bitarray"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
-
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	errors2 "github.com/flyteorg/flytestdlib/errors"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const (
@@ -87,6 +84,22 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		logger.Errorf(ctx, "Error initializing LogPlugins: [%s]", err)
 		return currentState, logLinks, subTaskIDs, err
 	}
+
+	// identify max parallelism
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return currentState, logLinks, subTaskIDs, err
+	} else if taskTemplate == nil {
+		return currentState, logLinks, subTaskIDs, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+	}
+
+	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+	if err != nil {
+		return currentState, logLinks, subTaskIDs, err
+	}
+
+	currentParallelism := 0
+	maxParallelism := int(arrayJob.Parallelism)
 
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
@@ -191,17 +204,26 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			}
 			return currentState, logLinks, subTaskIDs, err
 		}
+
+		// validate map task parallelism
+		newSubtaskPhase := core.Phases[newArrayStatus.Detailed.GetItem(childIdx)]
+		if !newSubtaskPhase.IsTerminal() || newSubtaskPhase == core.PhaseRetryableFailure {
+			currentParallelism++
+		}
+
+		if maxParallelism != 0 && currentParallelism >= maxParallelism {
+			// If max parallelism has been achieved we need to fill the subtask phase summary with
+			// the remaining subtasks so the overall map task phase can be accurately identified.
+			for i := childIdx + 1; i < len(currentState.GetArrayStatus().Detailed.GetItems()); i++ {
+				childSubtaskPhase := core.Phases[newArrayStatus.Detailed.GetItem(i)]
+				newArrayStatus.Summary.Inc(childSubtaskPhase)
+			}
+
+			break
+		}
 	}
 
 	newState = newState.SetArrayStatus(*newArrayStatus)
-
-	// Check that the taskTemplate is valid
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		return currentState, logLinks, subTaskIDs, err
-	} else if taskTemplate == nil {
-		return currentState, logLinks, subTaskIDs, fmt.Errorf("required value not set, taskTemplate is nil")
-	}
 
 	phase := arrayCore.SummaryToPhase(ctx, currentState.GetOriginalMinSuccesses()-currentState.GetOriginalArraySize()+int64(currentState.GetExecutionArraySize()), newArrayStatus.Summary)
 	if phase == arrayCore.PhaseWriteToDiscoveryThenFail {

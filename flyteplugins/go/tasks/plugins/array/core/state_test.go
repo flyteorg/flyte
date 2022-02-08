@@ -295,7 +295,7 @@ func TestToArrayJob(t *testing.T) {
 		arrayJob, err := ToArrayJob(nil, 0)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(arrayJob, &plugins.ArrayJob{
-			Parallelism: 1,
+			Parallelism: 0,
 			Size:        1,
 			SuccessCriteria: &plugins.ArrayJob_MinSuccesses{
 				MinSuccesses: 1,
@@ -307,7 +307,7 @@ func TestToArrayJob(t *testing.T) {
 		arrayJob, err := ToArrayJob(nil, 1)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(arrayJob, &plugins.ArrayJob{
-			Parallelism: 1,
+			Parallelism: 0,
 			Size:        1,
 			SuccessCriteria: &plugins.ArrayJob_MinSuccessRatio{
 				MinSuccessRatio: 1.0,

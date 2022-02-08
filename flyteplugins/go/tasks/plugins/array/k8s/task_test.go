@@ -20,7 +20,7 @@ import (
 func TestFinalize(t *testing.T) {
 	ctx := context.Background()
 
-	tCtx := getMockTaskExecutionContext(ctx)
+	tCtx := getMockTaskExecutionContext(ctx, 0)
 	kubeClient := mocks.KubeClient{}
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
 

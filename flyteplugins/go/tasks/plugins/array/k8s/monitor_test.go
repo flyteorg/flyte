@@ -23,6 +23,8 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
+
+	structpb "google.golang.org/protobuf/types/known/structpb"
 )
 
 func createSampleContainerTask() *core2.Container {
@@ -33,9 +35,14 @@ func createSampleContainerTask() *core2.Container {
 	}
 }
 
-func getMockTaskExecutionContext(ctx context.Context) *mocks.TaskExecutionContext {
+func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.TaskExecutionContext {
+	customStruct, _ := structpb.NewStruct(map[string]interface{}{
+		"parallelism": fmt.Sprintf("%d", parallelism),
+	})
+
 	tr := &mocks.TaskReader{}
 	tr.OnRead(ctx).Return(&core2.TaskTemplate{
+		Custom: customStruct,
 		Target: &core2.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
 		},
@@ -103,7 +110,7 @@ func getMockTaskExecutionContext(ctx context.Context) *mocks.TaskExecutionContex
 
 func TestGetNamespaceForExecution(t *testing.T) {
 	ctx := context.Background()
-	tCtx := getMockTaskExecutionContext(ctx)
+	tCtx := getMockTaskExecutionContext(ctx, 0)
 
 	assert.Equal(t, GetNamespaceForExecution(tCtx, ""), tCtx.TaskExecutionMetadata().GetNamespace())
 	assert.Equal(t, GetNamespaceForExecution(tCtx, "abcd"), "abcd")
@@ -122,7 +129,7 @@ func testSubTaskIDs(t *testing.T, actual []*string) {
 func TestCheckSubTasksState(t *testing.T) {
 	ctx := context.Background()
 
-	tCtx := getMockTaskExecutionContext(ctx)
+	tCtx := getMockTaskExecutionContext(ctx, 0)
 	kubeClient := mocks.KubeClient{}
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
 	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
@@ -289,10 +296,65 @@ func TestCheckSubTasksState(t *testing.T) {
 	})
 }
 
+func TestCheckSubTasksStateParallelism(t *testing.T) {
+	subtaskCount := 5
+
+	for i := 1; i <= subtaskCount; i++ {
+		t.Run(fmt.Sprintf("Parallelism-%d", i), func(t *testing.T) {
+			// construct task context
+			ctx := context.Background()
+
+			tCtx := getMockTaskExecutionContext(ctx, i)
+			kubeClient := mocks.KubeClient{}
+			kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+			kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
+			resourceManager := mocks.ResourceManager{}
+			resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
+			tCtx.OnResourceManager().Return(&resourceManager)
+
+			// evaluate one round of subtask launch and monitor
+			config := Config{
+				MaxArrayJobSize: 100,
+			}
+
+			retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(0))
+			assert.NoError(t, err)
+
+			cacheIndexes := bitarray.NewBitSet(uint(subtaskCount))
+			newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+				ExecutionArraySize:   subtaskCount,
+				OriginalArraySize:    int64(subtaskCount * 2),
+				OriginalMinSuccesses: int64(subtaskCount * 2),
+				IndexesToCache:       cacheIndexes,
+				ArrayStatus: arraystatus.ArrayStatus{
+					Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)),
+				},
+				RetryAttempts: retryAttemptsArray,
+			})
+
+			assert.Nil(t, err)
+			p, _ := newState.GetPhase()
+			assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
+
+			// validate only i subtasks were processed
+			executed := 0
+			for _, existingPhaseIdx := range newState.GetArrayStatus().Detailed.GetItems() {
+				if core.Phases[existingPhaseIdx] != core.PhaseUndefined {
+					executed++
+				}
+			}
+
+			assert.Equal(t, i, executed)
+		})
+	}
+}
+
 func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 	ctx := context.Background()
 
-	tCtx := getMockTaskExecutionContext(ctx)
+	tCtx := getMockTaskExecutionContext(ctx, 0)
 	kubeClient := mocks.KubeClient{}
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
 	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
