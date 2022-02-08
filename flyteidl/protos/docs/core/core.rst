@@ -2383,6 +2383,7 @@ Defines a strong type to allow type checking between interfaces.
    "enum_type", ":ref:`ref_flyteidl.core.EnumType`", "", "Defines an enum with pre-defined string values."
    "structured_dataset_type", ":ref:`ref_flyteidl.core.StructuredDatasetType`", "", "Generalized schema support"
    "metadata", ":ref:`ref_google.protobuf.Struct`", "", "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking. This might be used by consumers to identify special behavior or display extended information for the type."
+   "annotation", ":ref:`ref_flyteidl.core.TypeAnnotation`", "", "This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior."
 
 
 
@@ -2495,6 +2496,27 @@ StructuredDatasetType.DatasetColumn
 
    "name", ":ref:`ref_string`", "", "A unique name within the schema type for the column."
    "literal_type", ":ref:`ref_flyteidl.core.LiteralType`", "", "The column type."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.TypeAnnotation:
+
+TypeAnnotation
+------------------------------------------------------------------
+
+TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
+
+
+
+.. csv-table:: TypeAnnotation type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "annotations", ":ref:`ref_google.protobuf.Struct`", "", "A arbitrary JSON payload to describe a type."
 
 
 

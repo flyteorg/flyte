@@ -4138,6 +4138,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -4236,6 +4248,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -4399,6 +4423,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -4510,6 +4546,18 @@ definitions:
                   type: {}
                 - name: "name"
                   type: {}
+              annotation:
+                annotations:
+                  fields:
+                    key:
+                      list_value:
+                        values:
+                        - null
+                        - null
+                      number_value: 6.027456183070403
+                      string_value: "string_value"
+                      null_value: {}
+                      bool_value: true
               structured_dataset_type:
                 external_schema_type: "external_schema_type"
                 columns:
@@ -4608,6 +4656,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -4686,6 +4746,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -4784,6 +4856,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -4947,6 +5031,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -5038,6 +5134,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -5136,6 +5244,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -5299,6 +5419,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -5614,6 +5746,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -7140,6 +7284,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -7177,6 +7333,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8104,6 +8272,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8141,6 +8321,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8282,6 +8474,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8319,6 +8523,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8496,6 +8712,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -8533,6 +8761,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -9498,6 +9738,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -9535,6 +9787,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -10293,6 +10557,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -10330,6 +10606,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -10523,6 +10811,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -10560,6 +10860,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -11079,6 +11391,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -11116,6 +11440,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -11302,6 +11638,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -11339,6 +11687,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -12411,6 +12771,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -12448,6 +12820,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13375,6 +13759,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13412,6 +13808,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13553,6 +13961,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13590,6 +14010,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13767,6 +14199,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -13804,6 +14248,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -14769,6 +15225,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -14806,6 +15274,18 @@ definitions:
                             type: {}
                           - name: "name"
                             type: {}
+                        annotation:
+                          annotations:
+                            fields:
+                              key:
+                                list_value:
+                                  values:
+                                  - null
+                                  - null
+                                number_value: 6.027456183070403
+                                string_value: "string_value"
+                                null_value: {}
+                                bool_value: true
                         structured_dataset_type:
                           external_schema_type: "external_schema_type"
                           columns:
@@ -15894,6 +16374,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -15931,6 +16423,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -16858,6 +17362,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -16895,6 +17411,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -17036,6 +17564,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -17073,6 +17613,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -17250,6 +17802,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -17287,6 +17851,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -18252,6 +18828,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -18289,6 +18877,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -19313,6 +19913,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -19350,6 +19962,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20277,6 +20901,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20314,6 +20950,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20455,6 +21103,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20492,6 +21152,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20669,6 +21341,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -20706,6 +21390,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -21671,6 +22367,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -21708,6 +22416,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -22645,6 +23365,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -22682,6 +23414,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -23609,6 +24353,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -23646,6 +24402,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -23787,6 +24555,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -23824,6 +24604,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -24001,6 +24793,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -24038,6 +24842,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -25003,6 +25819,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -25040,6 +25868,18 @@ definitions:
                               type: {}
                             - name: "name"
                               type: {}
+                          annotation:
+                            annotations:
+                              fields:
+                                key:
+                                  list_value:
+                                    values:
+                                    - null
+                                    - null
+                                  number_value: 6.027456183070403
+                                  string_value: "string_value"
+                                  null_value: {}
+                                  bool_value: true
                           structured_dataset_type:
                             external_schema_type: "external_schema_type"
                             columns:
@@ -25670,6 +26510,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -25707,6 +26559,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -26684,6 +27548,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -26721,6 +27597,18 @@ definitions:
                       type: {}
                     - name: "name"
                       type: {}
+                  annotation:
+                    annotations:
+                      fields:
+                        key:
+                          list_value:
+                            values:
+                            - null
+                            - null
+                          number_value: 6.027456183070403
+                          string_value: "string_value"
+                          null_value: {}
+                          bool_value: true
                   structured_dataset_type:
                     external_schema_type: "external_schema_type"
                     columns:
@@ -27675,6 +28563,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -27712,6 +28612,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -28639,6 +29551,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -28676,6 +29600,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -28817,6 +29753,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -28854,6 +29802,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -29031,6 +29991,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -29068,6 +30040,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -30033,6 +31017,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -30070,6 +31066,18 @@ definitions:
                         type: {}
                       - name: "name"
                         type: {}
+                    annotation:
+                      annotations:
+                        fields:
+                          key:
+                            list_value:
+                              values:
+                              - null
+                              - null
+                            number_value: 6.027456183070403
+                            string_value: "string_value"
+                            null_value: {}
+                            bool_value: true
                     structured_dataset_type:
                       external_schema_type: "external_schema_type"
                       columns:
@@ -30736,6 +31744,10 @@ definitions:
           consumers to identify special behavior or display extended information for\
           \ the type."
         $ref: "#/definitions/protobufStruct"
+      annotation:
+        description: "This field contains arbitrary data that might have special semantic\n\
+          meaning for the client but does not effect internal flyte behavior."
+        $ref: "#/definitions/coreTypeAnnotation"
     description: "Defines a strong type to allow type checking between interfaces."
     example:
       schema:
@@ -30744,6 +31756,18 @@ definitions:
           type: {}
         - name: "name"
           type: {}
+      annotation:
+        annotations:
+          fields:
+            key:
+              list_value:
+                values:
+                - null
+                - null
+              number_value: 6.027456183070403
+              string_value: "string_value"
+              null_value: {}
+              bool_value: true
       structured_dataset_type:
         external_schema_type: "external_schema_type"
         columns:
@@ -31299,6 +32323,18 @@ definitions:
               type: {}
             - name: "name"
               type: {}
+          annotation:
+            annotations:
+              fields:
+                key:
+                  list_value:
+                    values:
+                    - null
+                    - null
+                  number_value: 6.027456183070403
+                  string_value: "string_value"
+                  null_value: {}
+                  bool_value: true
           structured_dataset_type:
             external_schema_type: "external_schema_type"
             columns:
@@ -31404,6 +32440,18 @@ definitions:
                   type: {}
                 - name: "name"
                   type: {}
+              annotation:
+                annotations:
+                  fields:
+                    key:
+                      list_value:
+                        values:
+                        - null
+                        - null
+                      number_value: 6.027456183070403
+                      string_value: "string_value"
+                      null_value: {}
+                      bool_value: true
               structured_dataset_type:
                 external_schema_type: "external_schema_type"
                 columns:
@@ -32161,6 +33209,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -32198,6 +33258,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -32272,6 +33344,27 @@ definitions:
       sql:
         dialect: {}
         statement: "statement"
+  coreTypeAnnotation:
+    type: "object"
+    properties:
+      annotations:
+        description: "A arbitrary JSON payload to describe a type."
+        $ref: "#/definitions/protobufStruct"
+    description: "TypeAnnotation encapsulates registration time information about\
+      \ a type. This can be used for various control-plane operations. TypeAnnotation\
+      \ will not be available at runtime when a task runs."
+    example:
+      annotations:
+        fields:
+          key:
+            list_value:
+              values:
+              - null
+              - null
+            number_value: 6.027456183070403
+            string_value: "string_value"
+            null_value: {}
+            bool_value: true
   coreTypedInterface:
     type: "object"
     properties:
@@ -32292,6 +33385,18 @@ definitions:
                   type: {}
                 - name: "name"
                   type: {}
+              annotation:
+                annotations:
+                  fields:
+                    key:
+                      list_value:
+                        values:
+                        - null
+                        - null
+                      number_value: 6.027456183070403
+                      string_value: "string_value"
+                      null_value: {}
+                      bool_value: true
               structured_dataset_type:
                 external_schema_type: "external_schema_type"
                 columns:
@@ -32329,6 +33434,18 @@ definitions:
                   type: {}
                 - name: "name"
                   type: {}
+              annotation:
+                annotations:
+                  fields:
+                    key:
+                      list_value:
+                        values:
+                        - null
+                        - null
+                      number_value: 6.027456183070403
+                      string_value: "string_value"
+                      null_value: {}
+                      bool_value: true
               structured_dataset_type:
                 external_schema_type: "external_schema_type"
                 columns:
@@ -32374,6 +33491,18 @@ definitions:
             type: {}
           - name: "name"
             type: {}
+        annotation:
+          annotations:
+            fields:
+              key:
+                list_value:
+                  values:
+                  - null
+                  - null
+                number_value: 6.027456183070403
+                string_value: "string_value"
+                null_value: {}
+                bool_value: true
         structured_dataset_type:
           external_schema_type: "external_schema_type"
           columns:
@@ -32420,6 +33549,18 @@ definitions:
                 type: {}
               - name: "name"
                 type: {}
+            annotation:
+              annotations:
+                fields:
+                  key:
+                    list_value:
+                      values:
+                      - null
+                      - null
+                    number_value: 6.027456183070403
+                    string_value: "string_value"
+                    null_value: {}
+                    bool_value: true
             structured_dataset_type:
               external_schema_type: "external_schema_type"
               columns:
@@ -33476,6 +34617,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -33513,6 +34666,18 @@ definitions:
                     type: {}
                   - name: "name"
                     type: {}
+                annotation:
+                  annotations:
+                    fields:
+                      key:
+                        list_value:
+                          values:
+                          - null
+                          - null
+                        number_value: 6.027456183070403
+                        string_value: "string_value"
+                        null_value: {}
+                        bool_value: true
                 structured_dataset_type:
                   external_schema_type: "external_schema_type"
                   columns:
@@ -34693,6 +35858,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -34730,6 +35907,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -35657,6 +36846,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -35694,6 +36895,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -35835,6 +37048,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -35872,6 +37097,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -36049,6 +37286,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -36086,6 +37335,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -37051,6 +38312,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
@@ -37088,6 +38361,18 @@ definitions:
                           type: {}
                         - name: "name"
                           type: {}
+                      annotation:
+                        annotations:
+                          fields:
+                            key:
+                              list_value:
+                                values:
+                                - null
+                                - null
+                              number_value: 6.027456183070403
+                              string_value: "string_value"
+                              null_value: {}
+                              bool_value: true
                       structured_dataset_type:
                         external_schema_type: "external_schema_type"
                         columns:
