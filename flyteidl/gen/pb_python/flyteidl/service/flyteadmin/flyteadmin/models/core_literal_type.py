@@ -22,6 +22,7 @@ from flyteadmin.models.core_literal_type import CoreLiteralType  # noqa: F401,E5
 from flyteadmin.models.core_schema_type import CoreSchemaType  # noqa: F401,E501
 from flyteadmin.models.core_simple_type import CoreSimpleType  # noqa: F401,E501
 from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType  # noqa: F401,E501
+from flyteadmin.models.core_type_annotation import CoreTypeAnnotation  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -46,7 +47,8 @@ class CoreLiteralType(object):
         'blob': 'CoreBlobType',
         'enum_type': 'CoreEnumType',
         'structured_dataset_type': 'CoreStructuredDatasetType',
-        'metadata': 'ProtobufStruct'
+        'metadata': 'ProtobufStruct',
+        'annotation': 'CoreTypeAnnotation'
     }
 
     attribute_map = {
@@ -57,10 +59,11 @@ class CoreLiteralType(object):
         'blob': 'blob',
         'enum_type': 'enum_type',
         'structured_dataset_type': 'structured_dataset_type',
-        'metadata': 'metadata'
+        'metadata': 'metadata',
+        'annotation': 'annotation'
     }
 
-    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, metadata=None):  # noqa: E501
+    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, metadata=None, annotation=None):  # noqa: E501
         """CoreLiteralType - a model defined in Swagger"""  # noqa: E501
 
         self._simple = None
@@ -71,6 +74,7 @@ class CoreLiteralType(object):
         self._enum_type = None
         self._structured_dataset_type = None
         self._metadata = None
+        self._annotation = None
         self.discriminator = None
 
         if simple is not None:
@@ -89,6 +93,8 @@ class CoreLiteralType(object):
             self.structured_dataset_type = structured_dataset_type
         if metadata is not None:
             self.metadata = metadata
+        if annotation is not None:
+            self.annotation = annotation
 
     @property
     def simple(self):
@@ -271,6 +277,29 @@ class CoreLiteralType(object):
         """
 
         self._metadata = metadata
+
+    @property
+    def annotation(self):
+        """Gets the annotation of this CoreLiteralType.  # noqa: E501
+
+        This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior.  # noqa: E501
+
+        :return: The annotation of this CoreLiteralType.  # noqa: E501
+        :rtype: CoreTypeAnnotation
+        """
+        return self._annotation
+
+    @annotation.setter
+    def annotation(self, annotation):
+        """Sets the annotation of this CoreLiteralType.
+
+        This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior.  # noqa: E501
+
+        :param annotation: The annotation of this CoreLiteralType.  # noqa: E501
+        :type: CoreTypeAnnotation
+        """
+
+        self._annotation = annotation
 
     def to_dict(self):
         """Returns the model properties as a dict"""
