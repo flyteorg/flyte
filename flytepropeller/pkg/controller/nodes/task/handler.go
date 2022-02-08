@@ -235,7 +235,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
 		pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(p.ID))
 		sCtxFinal := newNameSpacedSetupCtx(
-			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix))
+			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 		if err != nil {
