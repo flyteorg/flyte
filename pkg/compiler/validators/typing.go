@@ -58,6 +58,8 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	downstreamTypeCopy := *t.literalType
 	upstreamTypeCopy.Metadata = &structpb.Struct{}
 	downstreamTypeCopy.Metadata = &structpb.Struct{}
+	upstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
+	downstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
 	return upstreamTypeCopy.String() == downstreamTypeCopy.String()
 }
 

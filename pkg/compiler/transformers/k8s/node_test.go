@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -208,4 +209,86 @@ func TestBuildNodeSpec(t *testing.T) {
 		mustBuild(t, n, 2, errs.NewScope())
 	})
 
+}
+
+func TestBuildTasks(t *testing.T) {
+
+	withoutAnnotations := make(map[string]*core.Variable)
+	withoutAnnotations["a"] = &core.Variable{
+		Type: &core.LiteralType{
+			Annotation: &core.TypeAnnotation{},
+		},
+	}
+
+	randomData, _ := structpb.NewStruct(map[string]interface{}{
+		"foo": "bar",
+	})
+
+	withAnnotations := make(map[string]*core.Variable)
+	withAnnotations["a"] = &core.Variable{
+		Type: &core.LiteralType{
+			Annotation: &core.TypeAnnotation{Annotations: randomData},
+		},
+	}
+
+	tasks := []*core.CompiledTask{
+		{
+			Template: &core.TaskTemplate{
+				Id: &core.Identifier{Name: "annotatedInput"},
+				Interface: &core.TypedInterface{
+					Inputs: &core.VariableMap{
+						Variables: withAnnotations,
+					},
+				},
+			},
+		},
+		{
+			Template: &core.TaskTemplate{
+				Id: &core.Identifier{Name: "unannotatedInput"},
+				Interface: &core.TypedInterface{
+					Inputs: &core.VariableMap{
+						Variables: withoutAnnotations,
+					},
+				},
+			},
+		},
+		{
+			Template: &core.TaskTemplate{
+				Id: &core.Identifier{Name: "annotatedOutput"},
+				Interface: &core.TypedInterface{
+					Outputs: &core.VariableMap{
+						Variables: withAnnotations,
+					},
+				},
+			},
+		},
+		{
+			Template: &core.TaskTemplate{
+				Id: &core.Identifier{Name: "unannotatedOutput"},
+				Interface: &core.TypedInterface{
+					Outputs: &core.VariableMap{
+						Variables: withoutAnnotations,
+					},
+				},
+			},
+		},
+	}
+
+	errs := errors.NewCompileErrors()
+
+	t.Run("Tasks with annotations", func(t *testing.T) {
+		taskMap := buildTasks(tasks, errs)
+
+		annInputTask := taskMap[(&core.Identifier{Name: "annotatedInput"}).String()]
+		assert.Nil(t, annInputTask.Interface.Inputs.Variables["a"].Type.Annotation)
+
+		unAnnInputTask := taskMap[(&core.Identifier{Name: "unannotatedInput"}).String()]
+		assert.Nil(t, unAnnInputTask.Interface.Inputs.Variables["a"].Type.Annotation)
+
+		annOutputTask := taskMap[(&core.Identifier{Name: "annotatedOutput"}).String()]
+		assert.Nil(t, annOutputTask.Interface.Outputs.Variables["a"].Type.Annotation)
+
+		unAnnOutputTask := taskMap[(&core.Identifier{Name: "unannotatedOutput"}).String()]
+		assert.Nil(t, unAnnOutputTask.Interface.Outputs.Variables["a"].Type.Annotation)
+	})
 }
