@@ -45,7 +45,7 @@ func (c StopWatch) Start(ctx context.Context) Timer {
 	}
 }
 
-// Observes specified duration between the start and end time. The data point will be labeled with values from context.
+// Observe observes specified duration between the start and end time. The data point will be labeled with values from context.
 // See labeled.SetMetricsKeys for information about how to configure that.
 func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
 	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
@@ -59,7 +59,7 @@ func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
 	}
 }
 
-// This method observes the elapsed duration since the creation of the timer. The timer is created using a StopWatch.
+// Time observes the elapsed duration since the creation of the timer. The timer is created using a StopWatch.
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about to
 // configure that.
 func (c StopWatch) Time(ctx context.Context, f func()) {
@@ -68,7 +68,7 @@ func (c StopWatch) Time(ctx context.Context, f func()) {
 	t.Stop()
 }
 
-// Creates a new labeled stopwatch. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys
+// NewStopWatch creates a new labeled stopwatch. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys
 // for information about how to configure that.
 func NewStopWatch(name, description string, scale time.Duration, scope promutils.Scope, opts ...MetricOption) StopWatch {
 	if len(metricKeys) == 0 {
@@ -77,6 +77,7 @@ func NewStopWatch(name, description string, scale time.Duration, scope promutils
 
 	sw := StopWatch{}
 
+	name = promutils.SanitizeMetricName(name)
 	for _, opt := range opts {
 		if _, emitUnableMetric := opt.(EmitUnlabeledMetricOption); emitUnableMetric {
 			sw.StopWatch = scope.MustNewStopWatch(GetUnlabeledMetricName(name), description, scale)

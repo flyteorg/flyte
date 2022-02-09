@@ -92,7 +92,7 @@ func (s StopWatchVec) GetMetricWith(labels prometheus.Labels) (StopWatch, error)
 	}, nil
 }
 
-// This is a stoppable instance of a StopWatch or a Timer
+// Timer is a stoppable instance of a StopWatch or a Timer
 // A Timer can only be stopped. On stopping it will output the elapsed duration to prometheus
 type Timer struct {
 	start       time.Time
@@ -100,7 +100,7 @@ type Timer struct {
 	timer       prometheus.Observer
 }
 
-// This method observes the elapsed duration since the creation of the timer. The timer is created using a StopWatch
+// Stop observes the elapsed duration since the creation of the timer. The timer is created using a StopWatch
 func (s Timer) Stop() float64 {
 	observed := time.Since(s.start).Nanoseconds()
 	outputScaleDuration := s.outputScale.Nanoseconds()
@@ -124,55 +124,55 @@ type SummaryOptions struct {
 // provide a prefix, but just the name of the metric. As long as the Scope is used to create a new instance of the metric
 // The prefix (or scope) is automatically set.
 type Scope interface {
-	// Creates new prometheus.Gauge metric with the prefix as the CurrentScope
+	// NewGauge creates new prometheus.Gauge metric with the prefix as the CurrentScope
 	// Name is a string that follows prometheus conventions (mostly [_a-z])
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewGauge(name, description string) (prometheus.Gauge, error)
 	MustNewGauge(name, description string) prometheus.Gauge
 
-	// Creates new prometheus.GaugeVec metric with the prefix as the CurrentScope
+	// NewGaugeVec creates new prometheus.GaugeVec metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewGaugeVec(name, description string, labelNames ...string) (*prometheus.GaugeVec, error)
 	MustNewGaugeVec(name, description string, labelNames ...string) *prometheus.GaugeVec
 
-	// Creates new prometheus.Summary metric with the prefix as the CurrentScope
+	// NewSummary creates new prometheus.Summary metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewSummary(name, description string) (prometheus.Summary, error)
 	MustNewSummary(name, description string) prometheus.Summary
 
-	// Creates new prometheus.Summary metric with custom options, such as a custom set of objectives (i.e., target quantiles).
+	// NewSummaryWithOptions creates new prometheus.Summary metric with custom options, such as a custom set of objectives (i.e., target quantiles).
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewSummaryWithOptions(name, description string, options SummaryOptions) (prometheus.Summary, error)
 	MustNewSummaryWithOptions(name, description string, options SummaryOptions) prometheus.Summary
 
-	// Creates new prometheus.SummaryVec metric with the prefix as the CurrentScope
+	// NewSummaryVec creates new prometheus.SummaryVec metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewSummaryVec(name, description string, labelNames ...string) (*prometheus.SummaryVec, error)
 	MustNewSummaryVec(name, description string, labelNames ...string) *prometheus.SummaryVec
 
-	// Creates new prometheus.Histogram metric with the prefix as the CurrentScope
+	// NewHistogram creates new prometheus.Histogram metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewHistogram(name, description string) (prometheus.Histogram, error)
 	MustNewHistogram(name, description string) prometheus.Histogram
 
-	// Creates new prometheus.HistogramVec metric with the prefix as the CurrentScope
+	// NewHistogramVec creates new prometheus.HistogramVec metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewHistogramVec(name, description string, labelNames ...string) (*prometheus.HistogramVec, error)
 	MustNewHistogramVec(name, description string, labelNames ...string) *prometheus.HistogramVec
 
-	// Creates new prometheus.Counter metric with the prefix as the CurrentScope
+	// NewCounter creates new prometheus.Counter metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	// Important to note, counters are not like typical counters. These are ever increasing and cumulative.
 	// So if you want to observe counters within buckets use Summary/Histogram
 	NewCounter(name, description string) (prometheus.Counter, error)
 	MustNewCounter(name, description string) prometheus.Counter
 
-	// Creates new prometheus.GaugeVec metric with the prefix as the CurrentScope
+	// NewCounterVec creates new prometheus.GaugeVec metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewCounterVec(name, description string, labelNames ...string) (*prometheus.CounterVec, error)
 	MustNewCounterVec(name, description string, labelNames ...string) *prometheus.CounterVec
 
-	// This is a custom wrapper to create a StopWatch object in the current Scope.
+	// NewStopWatch is a custom wrapper to create a StopWatch object in the current Scope.
 	// Duration is to specify the scale of the Timer. For example if you are measuring times in milliseconds
 	// pass scale=times.Millisecond
 	// https://golang.org/pkg/time/#Duration
@@ -180,7 +180,7 @@ type Scope interface {
 	NewStopWatch(name, description string, scale time.Duration) (StopWatch, error)
 	MustNewStopWatch(name, description string, scale time.Duration) StopWatch
 
-	// This is a custom wrapper to create a StopWatch object in the current Scope.
+	// NewStopWatchVec is a custom wrapper to create a StopWatch object in the current Scope.
 	// Duration is to specify the scale of the Timer. For example if you are measuring times in milliseconds
 	// pass scale=times.Millisecond
 	// https://golang.org/pkg/time/#Duration
@@ -188,14 +188,14 @@ type Scope interface {
 	NewStopWatchVec(name, description string, scale time.Duration, labelNames ...string) (*StopWatchVec, error)
 	MustNewStopWatchVec(name, description string, scale time.Duration, labelNames ...string) *StopWatchVec
 
-	// In case nesting is desired for metrics, create a new subScope. This is generally useful in creating
+	// NewSubScope creates a new subScope in case nesting is desired for metrics. This is generally useful in creating
 	// Scoped and SubScoped metrics
 	NewSubScope(name string) Scope
 
-	// Returns the current ScopeName. Use for creating your own metrics
+	// CurrentScope returns the current ScopeName. Use for creating your own metrics
 	CurrentScope() string
 
-	// Method that provides a scoped metric name. Can be used, if you want to directly create your own metric
+	// NewScopedMetricName provides a scoped metric name. Can be used, if you want to directly create your own metric
 	NewScopedMetricName(name string) string
 }
 
@@ -398,13 +398,14 @@ func (m metricsScope) CurrentScope() string {
 	return m.scope
 }
 
-// Creates a metric name under the scope. Scope will always have a defaultScopeDelimiterRune as the last character
+// NewScopedMetricName creates a metric name under the scope. Scope will always have a defaultScopeDelimiterRune as the
+// last character
 func (m metricsScope) NewScopedMetricName(name string) string {
 	if name == "" {
 		panic("metric name cannot be an empty string")
 	}
 
-	return m.scope + name
+	return SanitizeMetricName(m.scope + name)
 }
 
 func (m metricsScope) NewSubScope(subscopeName string) Scope {
@@ -421,7 +422,7 @@ func (m metricsScope) NewSubScope(subscopeName string) Scope {
 	return NewScope(m.scope + subscopeName)
 }
 
-// Creates a new scope in the format `name + defaultScopeDelimiterRune`
+// NewScope creates a new scope in the format `name + defaultScopeDelimiterRune`
 // If the last character is already a defaultScopeDelimiterRune, then it does not add it to the scope name
 func NewScope(name string) Scope {
 	if name == "" {
@@ -438,7 +439,21 @@ func NewScope(name string) Scope {
 	}
 }
 
-// Returns a randomly-named scope for use in tests.
+// SanitizeMetricName ensures the generates metric name is compatible with the underlying prometheus library.
+func SanitizeMetricName(name string) string {
+	out := strings.Builder{}
+	for i, b := range name {
+		if (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || b == ':' || (b >= '0' && b <= '9' && i > 0) {
+			out.WriteRune(b)
+		} else if b == '-' {
+			out.WriteRune('_')
+		}
+	}
+
+	return out.String()
+}
+
+// NewTestScope returns a randomly-named scope for use in tests.
 // Prometheus requires that metric names begin with a single word, which is generated from the alphabetic testScopeNameCharset.
 func NewTestScope() Scope {
 	return NewScope("test" + rand.String(6))

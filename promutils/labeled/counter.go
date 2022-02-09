@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Represents a counter labeled with values from the context. See labeled.SetMetricsKeys for information about how to
+// Counter represents a counter labeled with values from the context. See labeled.SetMetricsKeys for information about to
 // configure that.
 type Counter struct {
 	*prometheus.CounterVec
@@ -45,7 +45,7 @@ func (c Counter) Add(ctx context.Context, v float64) {
 	}
 }
 
-// Creates a new labeled counter. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys for
+// NewCounter  creates a new labeled counter. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys for
 // information about to configure that.
 func NewCounter(name, description string, scope promutils.Scope, opts ...MetricOption) Counter {
 	if len(metricKeys) == 0 {
@@ -54,6 +54,7 @@ func NewCounter(name, description string, scope promutils.Scope, opts ...MetricO
 
 	c := Counter{}
 
+	name = promutils.SanitizeMetricName(name)
 	for _, opt := range opts {
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			c.Counter = scope.MustNewCounter(GetUnlabeledMetricName(name), description)
