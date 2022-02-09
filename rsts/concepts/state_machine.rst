@@ -28,7 +28,7 @@ High Level Overview of How a Workflow Progresses to Success
      NodeSuccess --> Success
 
 
-This state diagram illustrates a very high-level, simplistic view of the state transitions that a workflow with a single task and single node would go through as the observer observes success.
+This state diagram illustrates a very high-level, simplistic view of the state transitions that a workflow with a single task and node would go through as the observer observes success.
 
 The following sections explain the various observable (and some hidden) states for workflow, node, and task state transitions.
 
@@ -63,11 +63,11 @@ Any system error within a state causes a retry on that state. These retries are 
 .. note::
     System retry can be of two types:
 
-    - **Downstream System Retry**: When a downstream system (or service) fails or remote service is not contactable, 
+    - **Downstream System Retry**: When a downstream system (or service) fails, or remote service is not contactable, 
       the failure is retried against the number of retries set 
       `here <https://github.com/flyteorg/flytepropeller/blob/6a14e7fbffe89786fb1d8cde22715f93c2f3aff5/pkg/controller/config/config.go#L192>`__. 
-      This performs end-to-end system retries against the node whenever the task fails with a system error. This is useful when the downstream 
-      service throws a ``500`` error, abrupt network failure, etc.
+      This performs end-to-end system retry against the node whenever the task fails with a system error. This is useful when the downstream 
+      service throws a 500 error, abrupt network failure, etc.
     - **Transient Failure Retry**: This retry mechanism offers resiliency against transient failures, which are opaque to the user. 
       It is tracked across the entire duration of execution. It helps Flyte entities and the additional services 
       connected to Flyte like S3, to continue operating despite a system failure. Indeed, all transient failures are handled gracefully 
@@ -114,9 +114,9 @@ Node States
 
 
 This state diagram illustrates the node transition through various states. This is the core finite state machine for a node.
-From the user's perspective, a workflow simply consists of a sequence of tasks. But to Flyte, a Workflow internally creates a meta entity known as **node**.
+From the user's perspective, a workflow simply consists of a sequence of tasks. But to Flyte, a workflow internally creates a meta entity known as **node**.
 
-Once a Workflow enters a ``Running`` state, it triggers the phantom ``start node`` of the workflow. The ``start node`` is considered to be the entry node of any workflow. 
+Once a Workflow enters the ``Running`` state, it triggers the phantom ``start node`` of the workflow. The ``start node`` is considered to be the entry node of any workflow. 
 The ``start node`` begins by executing all its child-nodes using a modified Depth First Search algorithm recursively.
 
 Nodes can be of different types as listed below, but all the nodes traverse through the same transitions:

@@ -2,23 +2,7 @@
   
 Launch plans
 =============
-Launch plans help execute workflows. A workflow can be associated with multiple launch plans, but an individual launch plan is always associated with a single, specific workflow. 
-
-Every workflow comes with a `default` launch plan. While creating a new workflow, this default launch plan is authored (in code). The default launch plan has the same name as that of the workflow. 
-
-.. note::
-   Users rarely interact with the default launch plan.
-
-A workflow can be associated with multiple launch plans and launch plan versions.
-A workflow version can be associated with multiple launch plans and their versions under different names.
-The above two statements can be combined to state that a worflow version can have multiple schedules associated with it, as long as these schedules exists as versions under different launch plan names.
-Suppose we have ``Workflow A`` in ``version 1``, ``LaunchPlans`` ``A`` and ``B`` in ``version 1``, and ``LaunchPlan`` ``C`` in ``version 2``, then:
-
-1. ``Workflow A`` can be associated with ``LaunchPlan A`` (version 1);
-2. ``Workflow A`` can be associated with ``LaunchPlan B`` (different launch plan name with same version);
-3. ``Workflow A`` can be associated with ``LaunchPlan C`` (different launch plan name and version).
-
-After creating a launch plan, it is easy to share and execute them.
+Launch plans help execute workflows. A workflow can be associated with multiple launch plans and launch plan versions, but an individual launch plan is always associated with a single, specific workflow. After creating a launch plan, it is easy to share and execute them.
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
 
@@ -28,7 +12,22 @@ optional notifications. Refer to the :ref:`deployment-cluster-config-notificatio
 
 See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
 
-What do launch plans provide?
+The Association between Workflows and LaunchPlans
+--------------------------------------------------
+Every workflow comes with a `default` launch plan that has the same name as that of a workflow. The default launch plan is authored (in code) as part of creating a new workflow.
+A launch plan version can only ever be mapped to one WF version; meaning a launch plan version cannot be used twice. This is because part of what makes a new launch plan version is the mapping to the specific workflow version.
+
+.. note::
+   Users rarely interact with the default launch plan.
+
+Suppose we have ``Workflow A`` in ``version 1``, ``LaunchPlans`` ``A`` and ``B`` in ``version 1``, and ``LaunchPlan`` ``C`` in ``version 2``, then:
+
+1. ``Workflow A`` can be associated with ``LaunchPlan A`` (version 1);
+2. ``Workflow A`` can be associated with ``LaunchPlan B`` (different launch plan name; version 1);
+3. ``Workflow A`` can be associated with ``LaunchPlan B`` (version 2).
+
+
+What do Launch Plans Provide?
 ------------------------------
 
 - One click invocation of workflows with predefined inputs and friendly launch plan names.

@@ -33,7 +33,7 @@ At execution time, node executions will be triggered as soon as their inputs are
 For example, when a workflow has five independent nodes, i.e., when these five nodes don't consume outputs produced by other nodes,
 Flyte runs these nodes in parallel in accordance with the data and resource constraints.
 
-Flyte-specific Structure
+Flyte-Specific Structure
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 During :ref: `registration <divedeep-registration>`, Flyte validates the workflow structure and saves the workflow.
@@ -46,4 +46,4 @@ Versioning
 
 Like :ref:`tasks <divedeep-tasks>`, workflows are versioned too. Registered workflows are immutable, i.e., an instance of a
 workflow defined by a specific project-domain-name-version combination can't be updated.
-Tasks referenced in a workflow version are immutable on their own, and are tied to specific tasks' versions.
+Tasks referenced in a workflow version are immutable and are tied to specific tasks' versions.

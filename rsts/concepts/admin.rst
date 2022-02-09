@@ -7,10 +7,10 @@ Flyte Admin
 Admin Structure
 ===============
 
-FlyteAdmin serves the main Flyte API to process all client requests to the system. Clients include the FlyteConsole, that calls:
+FlyteAdmin serves as the main Flyte API to process all client requests to the system. Clients include the Flyte Console, which calls:
 
-1. FlyteAdmin to list the workflows, get execution details, etc.,;
-2. FlyteKit to call FlyteAdmin to register workflows, launch workflows, etc.
+1. FlyteAdmin to list the workflows, get execution details, etc.
+2. Flytekit that in turn calls FlyteAdmin to register, launch workflows, etc.
 
 Below, we'll dive into each component defined in admin in more detail.
 
@@ -98,7 +98,7 @@ Asynchronous Components
 
 Notifications and schedules are handled by async routines that are responsible for enqueuing and subsequently processing dequeued messages.
 
-Flyteadmin uses the `gizmo toolkit <https://github.com/nytimes/gizmo>`__ to abstract queueing implementation. Gizmo's
+FlyteAdmin uses the `gizmo toolkit <https://github.com/nytimes/gizmo>`__ to abstract queueing implementation. Gizmo's
 `pubsub <https://github.com/nytimes/gizmo#pubsub>`__ library offers implementations for Amazon SNS/SQS, Google's Pubsub, Kafka topics, and publishing over HTTP.
 
 For the sandbox development, no-op implementations of the notifications and schedule handlers are used to remove external cloud dependencies.
@@ -132,7 +132,7 @@ Values specific to the FlyteAdmin application, including task, workflow registra
 Workflow engine
 ----------------
 
-This directory contains interfaces to build and execute workflows leveraging flytepropeller compiler and client components.
+This directory contains interfaces to build and execute workflows leveraging FlytePropeller compiler and client components.
 
 .. [0] Unfortunately, given unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
 
@@ -169,9 +169,9 @@ The above entities are designated by an :std:ref:`identifier <protos/docs/core/c
 that consists of a project, domain, name, and version specification. These entities are, for the most part, immutable. To update one of these entities, the updated
 version must be re-registered with a unique and new version identifier attribute.
 
-One caveat is that the launch plan can toggle between :std:ref:`ACTIVE or INACTIVE <protos/docs/admin/admin:launchplan>` states.
+One caveat is that the launch plan can toggle between :std:ref:`ACTIVE and INACTIVE <protos/docs/admin/admin:launchplan>` states.
 At a given point in time, only one launch plan version across a shared project, domain and name specification can be active. The state affects the scheduled launch plans only.
-An inactive launch plan can also be used to launch individual executions. However, only an active launch plan runs on a schedule (given it has a schedule defined).
+An inactive launch plan can be used to launch individual executions. However, only an active launch plan runs on a schedule (given it has a schedule defined).
 
 
 Static entities metadata (Named Entities)
@@ -184,8 +184,8 @@ The named entity also includes metadata, which are mutable attributes about the 
 
 This metadata includes:
 
-- Description: a human-readable description for the Named Entity collection.
-- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain.
+- Description: a human-readable description for the Named Entity collection
+- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain
 
 Permitted operations include:
 
@@ -210,7 +210,7 @@ Permitted operations include:
 - Get
 - List
 
-After an execution begins, flyte propeller monitors the execution and sends events which admin uses to update the above executions. 
+After an execution begins, FlytePropeller monitors the execution and sends events which admin uses to update the above executions. 
 
 These :std:ref:`events <protos/docs/event/event:flyteidl/event/event.proto>` include
 
@@ -339,12 +339,12 @@ Filterable fields vary based on entity types:
   - created_at	
   - updated_at	
   - workflows.{any workflow field above} (for example: workflow.domain)	
-  - state (you must use the integer enum ex: 1)	
+  - state (you must use the integer enum, e.g., 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - Named Entity Metadata
 
-  - state (you must use the integer enum ex: 1)	
+  - state (you must use the integer enum, e.g., 1)	
      - States are defined in :std:ref:`namedentitystate <protos/docs/admin/admin:namedentitystate>`.
      
 - Executions (Workflow executions)	
@@ -354,7 +354,7 @@ Filterable fields vary based on entity types:
   - name	
   - workflow.{any workflow field above} (for example: workflow.domain)	
   - launch_plan.{any launch plan field above} (for example: launch_plan.name)	
-  - phase (you must use the upper-cased string name ex: ``RUNNING``)	
+  - phase (you must use the upper-cased string name, e.g., ``RUNNING``)	
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at	
   - execution_updated_at	
@@ -390,7 +390,7 @@ Filterable fields vary based on entity types:
 Putting It All Together	
 -----------------------	
 
-If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, it would look similar to:
+If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, you coul something like:
 
 ::	
 

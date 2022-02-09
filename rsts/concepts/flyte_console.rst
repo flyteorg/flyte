@@ -146,7 +146,7 @@ Logs are accessible as well.
 
 |
 
-Every execution has two views: ``Nodes`` and ``Graph``.
+Every execution has two views: Nodes and Graph.
 
 A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
 More about nodes can be found in :std:ref:`divedeep-nodes`.

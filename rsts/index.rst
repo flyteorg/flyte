@@ -65,16 +65,14 @@ What is Flyte?
    <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
 
 
-Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
+Flyte is an open-source, container-native, structured programming and distributed processing platform implemented in Golang. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-It is implemented in Golang, and designed for container native execution and connecting external services. For external services, it offers backend plugins- allowing separating plugins from user code (Python library).
-
-Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, JAVA, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
 
 The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
 
-.. tabbed:: python
+.. tabbed:: Python
 
     .. code:: python
 
@@ -98,7 +96,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
         welcome(name="Traveler")
         # Output: "Welcome, Traveler! How are you?"
 
-.. tabbed:: java
+.. tabbed:: JAVA
 
     .. code:: java
 
@@ -190,7 +188,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
 
     Link to the example code: `WelcomeWorkflow.java <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples/src/main/java/org/flyte/examples/WelcomeWorkflow.java>`_
 
-.. tabbed:: scala
+.. tabbed:: Scala
 
     .. code:: scala
 

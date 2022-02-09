@@ -3,7 +3,7 @@
 Nodes
 =====
 
-A node represents a unit of execution or work within a workflow. Ordinarily, a node encapsulate an instance of 
+A node represents a unit of execution or work within a workflow. Ordinarily, a node encapsulates an instance of 
 a :ref:`task <divedeep-tasks>`, but it can also contain an entire subworkflow or trigger a child workflow. 
 Nodes can have inputs and outputs, which are used to coordinate task inputs and outputs. 
 Moreover, node outputs can be used as inputs to other nodes within a workflow.
@@ -23,7 +23,7 @@ For example, an array task will be enclosed by a single node.
 
 Workflow Nodes
 --------------
-A node can contain an entire sub-workflow. Since workflow executions always require a launch plan, workflow nodes can reference a launch plan that would trigger their enclosed workflows.
+A node can contain an entire sub-workflow. Since workflow executions always require a launch plan, workflow nodes have a reference to a launch plan to trigger their enclosed workflows.
 
 .. _divedeep-branch-nodes:
 

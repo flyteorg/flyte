@@ -46,7 +46,7 @@ To retrieve the Artifact, we tag the Artifact with a hash of the input values fo
        Name: flyte_cached-<unique hash of the input values>
     }
 
-When caching an execution, Flyte propeller will:
+When caching an execution, FlytePropeller will:
 
 1. Create a dataset for the task.
 2. Create an artifact that represents the execution, along with the artifact data that represents the execution output.

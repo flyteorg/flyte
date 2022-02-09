@@ -9,7 +9,7 @@ Unlike traditional software, the users must conduct multiple experiments concurr
 This may happen when different data scientists simultaneously iterate on the same workflow/pipeline.
 
 The cost of creating an independent infrastructure for each version is enormous and not desirable.
-On the other hand, it is desirable to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infrastructure team,
+Moreover, it is desirable to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infrastructure team,
 while users can use it independently. This also improves the cost of operation, since it is possible to reuse the same infrastructure for multiple teams.
 
 Moreover, versioned workflows help users quickly reproduce prior results or identify the source of previous successful experiments.
@@ -54,7 +54,7 @@ Let us take an example of a workflow:
 
 In the above graph, let us assume that task `C` fails. It is then possible to simply fix `C` and ``relaunch`` the previous execution (maintaining the inputs etc). This will not re-run tasks ``A``, and ``B`` as long as they are marked as `cache=True`.
 
-Npw, let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``:
+Now, let us consider that the only solution to fix the bug is to change the graph structure and introduce a new step ``B1`` that short circuits the execution to ``D``:
 
 .. mermaid::
 

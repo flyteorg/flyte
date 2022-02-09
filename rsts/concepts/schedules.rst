@@ -2,20 +2,20 @@
 
 Schedules
 ==========
-Workflows can be run automatically using `schedules <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#scheduling-workflows>`_ associated with launch plans. 
+Workflows can be run automatically using :ref:`schedules <launchplan_schedules>` associated with launch plans. 
 
 At most, only one launch plan version for a given {Project, Domain, Name} combination can be active, which means, at most, only one schedule can be active for a launch plan. This is because only one active schedule can exist across all versions of the launch plan. 
 
-However, a :ref:`workflow <divedeep-workflows>` version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
+To clarify, a :ref:`workflow <divedeep-workflows>` version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
 
-Creating a new schedule creates a new version of that launch plan too.
-If you wish to change a schedule, you will have to create a new version of that launch plan since a **schedule can't be edited**.
+Creating a new schedule creates a new version of the launch plan.
+If you wish to change a schedule, you will have to create a new version of that launch plan since a **schedule cannot be edited**.
 
-The Admin keeps track of the newly added schedules, and searches through all the versions of launch plans to set them to 'deactivated'.
+FlyteAdmin keeps track of the newly-added schedules, and searches through all the versions of launch plans to set them to 'deactivated'.
 
-The launch plan versions with schedules that were previously deactivated can be manually used, by clicking on ``Launch`` and selecting the specific launch plan version. 
+The launch plan versions with schedules that were previously deactivated can be manually used, by clicking on the launch button and selecting the specific launch plan version. 
 
-Schedules can define a cron_expression_. or rate_unit_.
+Let's now look at how schedules can be defined through cron_expression_. or rate_unit_.
 
 .. _cron_expression:
 

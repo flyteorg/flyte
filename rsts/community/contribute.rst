@@ -1,3 +1,5 @@
+.. _contribute_Flyte:
+
 ######################
 Contributing to Flyte
 ######################
