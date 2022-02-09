@@ -23,7 +23,7 @@ func panicIfError(err error) {
 	}
 }
 
-// A Simple StopWatch that works with prometheus summary
+// StopWatch implements a stopwatch style interface that works with prometheus summary
 // It will scale the output to match the expected time scale (milliseconds, seconds etc)
 // NOTE: Do not create a StopWatch object by hand, use a Scope to get a new instance of the StopWatch object
 type StopWatch struct {
@@ -46,7 +46,7 @@ func (s StopWatch) Start() Timer {
 	}
 }
 
-// Observes specified duration between the start and end time
+// Observe records a specified duration between the start and end time
 func (s StopWatch) Observe(start, end time.Time) {
 	observed := end.Sub(start).Nanoseconds()
 	outputScaleDuration := s.outputScale.Nanoseconds()
@@ -58,7 +58,7 @@ func (s StopWatch) Observe(start, end time.Time) {
 	s.Observer.Observe(scaled)
 }
 
-// Observes/records the time to execute the given function synchronously
+// Time Observes/records the time to execute the given function synchronously
 func (s StopWatch) Time(f func()) {
 	t := s.Start()
 	f()
@@ -435,7 +435,7 @@ func NewScope(name string) Scope {
 	}
 
 	return metricsScope{
-		scope: name,
+		scope: SanitizeMetricName(name),
 	}
 }
 

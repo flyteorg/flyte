@@ -37,6 +37,7 @@ func TestNewScope(t *testing.T) {
 	assert.Equal(t, "test:timer_x", s.NewScopedMetricName("timer_x"))
 	assert.Equal(t, "test:hello:timer:", s.NewSubScope("hello").NewSubScope("timer").CurrentScope())
 	assert.Equal(t, "test:hello:timer:", s.NewSubScope("hello").NewSubScope("timer:").CurrentScope())
+	assert.Equal(t, "test:k8s_array:test_1:", s.NewSubScope("k8s-array").NewSubScope("test-1:").CurrentScope())
 }
 
 func TestMetricsScope(t *testing.T) {
