@@ -1,3 +1,5 @@
+# .. launchplan_schedules:
+
 """
 Scheduling Workflows Example
 ----------------------------
