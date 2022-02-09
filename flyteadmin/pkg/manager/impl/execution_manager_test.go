@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"google.golang.org/grpc/status"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine"
@@ -1677,6 +1679,7 @@ func TestCreateWorkflowEvent_UpdateModelError(t *testing.T) {
 			OutputResult: &event.WorkflowExecutionEvent_Error{
 				Error: &executionError,
 			},
+			ProducerId: testCluster,
 		},
 	})
 	assert.Nil(t, resp)
@@ -1748,6 +1751,62 @@ func TestCreateWorkflowEvent_DatabaseUpdateError(t *testing.T) {
 	})
 	assert.Nil(t, resp)
 	assert.EqualError(t, expectedErr, err.Error())
+}
+
+func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	occurredAt := time.Now().UTC()
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+			return models.Execution{
+				ExecutionKey: models.ExecutionKey{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				BaseModel: models.BaseModel{
+					ID: uint(8),
+				},
+				Spec:         specBytes,
+				Phase:        core.WorkflowExecution_RUNNING.String(),
+				Closure:      closureBytes,
+				LaunchPlanID: uint(1),
+				WorkflowID:   uint(2),
+				StartedAt:    &occurredAt,
+				Cluster:      testCluster,
+			}, nil
+		},
+	)
+
+	execManager := NewExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	resp, err := execManager.CreateWorkflowEvent(context.Background(), admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			OccurredAt:  occurredAtTimestamp,
+			Phase:       core.WorkflowExecution_ABORTING,
+			ProducerId:  "C2",
+		},
+	})
+	assert.NotNil(t, err)
+	adminError := err.(flyteAdminErrors.FlyteAdminError)
+	assert.Equal(t, adminError.Code(), codes.FailedPrecondition)
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	var seenIncompatibleClusterErr bool
+	for _, detail := range s.Details() {
+		failureReason, ok := detail.(*admin.EventFailureReason)
+		if ok {
+			if failureReason.GetIncompatibleCluster() != nil {
+				seenIncompatibleClusterErr = true
+				break
+			}
+		}
+	}
+	assert.True(t, seenIncompatibleClusterErr)
+	assert.Nil(t, resp)
 }
 
 func TestGetExecution(t *testing.T) {
