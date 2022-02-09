@@ -211,7 +211,7 @@ Flyte configuration on your remote cluster.
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
 
-#. Now use these cedentials for postgress
+#. Now use these credentials for postgres
 
   .. code-block::
 
