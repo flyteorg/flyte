@@ -23,7 +23,7 @@ from flytekit.models import literals
 from flytekit.models.literals import StructuredDatasetMetadata
 from flytekit.types.schema import FlyteSchema
 from flytekit.types.structured.structured_dataset import StructuredDataset, StructuredDatasetEncoder, \
-    StructuredDatasetDecoder, FLYTE_DATASET_TRANSFORMER, PARQUET, S3, LOCAL
+    StructuredDatasetDecoder, StructuredDatasetTransformerEngine, PARQUET, S3, LOCAL
 
 try:
     from typing import Annotated
@@ -115,8 +115,8 @@ class NumpyDecodingHandlers(StructuredDatasetDecoder):
 
 
 for protocol in [LOCAL, S3]:
-    FLYTE_DATASET_TRANSFORMER.register_handler(NumpyEncodingHandlers(np.ndarray, protocol, PARQUET))
-    FLYTE_DATASET_TRANSFORMER.register_handler(NumpyDecodingHandlers(np.ndarray, protocol, PARQUET))
+    StructuredDatasetTransformerEngine.register(NumpyEncodingHandlers(np.ndarray, protocol, PARQUET))
+    StructuredDatasetTransformerEngine.register(NumpyDecodingHandlers(np.ndarray, protocol, PARQUET))
 
 
 # %%
