@@ -15,7 +15,7 @@ type ServerConfig struct {
 	HTTPPort             int                   `json:"httpPort" pflag:",On which http port to serve admin"`
 	GrpcPort             int                   `json:"grpcPort" pflag:",On which grpc port to serve admin"`
 	GrpcServerReflection bool                  `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
-	KubeConfig           string                `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	KubeConfig           string                `json:"kube-config" pflag:",Path to kubernetes client config file, default is empty, useful for incluster config."`
 	Master               string                `json:"master" pflag:",The address of the Kubernetes API server."`
 	Security             ServerSecurityOptions `json:"security"`
 
@@ -51,7 +51,6 @@ var defaultServerConfig = &ServerConfig{
 	HTTPPort:             8088,
 	GrpcPort:             8089,
 	GrpcServerReflection: true,
-	KubeConfig:           "$HOME/.kube/config",
 	Security: ServerSecurityOptions{
 		AllowCors:      true,
 		AllowedHeaders: []string{"Content-Type", "flyte-authorization"},
