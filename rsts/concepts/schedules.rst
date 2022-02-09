@@ -2,7 +2,7 @@
 
 Schedules
 ==========
-Workflows can be run automatically using :ref:`schedules <launchplan_schedules>` associated with launch plans. 
+Workflows can be run automatically using :ref:`schedules <flytesnacks:launchplan_schedules>` associated with launch plans. 
 
 At most, only one launch plan version for a given {Project, Domain, Name} combination can be active, which means, at most, only one schedule can be active for a launch plan. This is because only one active schedule can exist across all versions of the launch plan. 
 
