@@ -15,7 +15,7 @@ FlyteAdmin keeps track of the newly-added schedules, and searches through all th
 
 The launch plan versions with schedules that were previously deactivated can be manually used, by clicking on the launch button and selecting the specific launch plan version. 
 
-Let's now look at how schedules can be defined through cron_expression_. or rate_unit_.
+Let's now look at how schedules can be defined through cron_expression_ or rate_unit_.
 
 .. _cron_expression:
 
