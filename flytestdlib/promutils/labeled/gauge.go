@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Represents a gauge labeled with values from the context. See labeled.SetMetricsKeys for more information
+// Gauge represents a gauge labeled with values from the context. See labeled.SetMetricsKeys for more information
 type Gauge struct {
 	*prometheus.GaugeVec
 
@@ -99,7 +99,7 @@ func (g Gauge) SetToCurrentTime(ctx context.Context) {
 	}
 }
 
-// Creates a new labeled gauge. Label keys must be set before instantiating. If the unlabeled option is given,
+// NewGauge creates a new labeled gauge. Label keys must be set before instantiating. If the unlabeled option is given,
 // this object will also instantiate and emit another gauge with the given name with an _unlabeled suffix.
 // See labeled.SetMetricsKeys for information about how to configure that.
 func NewGauge(name, description string, scope promutils.Scope, opts ...MetricOption) Gauge {
@@ -108,6 +108,7 @@ func NewGauge(name, description string, scope promutils.Scope, opts ...MetricOpt
 	}
 
 	g := Gauge{}
+	name = promutils.SanitizeMetricName(name)
 	for _, opt := range opts {
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			g.Gauge = scope.MustNewGauge(GetUnlabeledMetricName(name), description)
