@@ -1,4 +1,4 @@
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { htmlEntities } from './constants';

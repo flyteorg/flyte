@@ -2,7 +2,7 @@ import { Button, Popover } from '@material-ui/core';
 import { fade, makeStyles, Theme } from '@material-ui/core/styles';
 import Close from '@material-ui/icons/Close';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import {
     buttonHoverColor,
     interactiveTextBackgroundColor,

@@ -1,7 +1,7 @@
 import { CircularProgress, IconButton } from '@material-ui/core';
 import { Admin } from 'flyteidl';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useTheme } from 'components/Theme/useTheme';
 import { isEqual } from 'lodash';
 import { NodeExecution } from 'models/Execution/types';

@@ -1,4 +1,4 @@
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { Admin } from 'flyteidl';
 import { getCacheKey } from 'components/Cache/utils';
 import { DetailsPanel } from 'components/common/DetailsPanel';

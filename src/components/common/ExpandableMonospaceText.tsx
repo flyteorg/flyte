@@ -1,7 +1,7 @@
 import { Button, ButtonBase } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FileCopy from '@material-ui/icons/FileCopy';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import {
     bodyFontFamily,
     errorBackgroundColor,

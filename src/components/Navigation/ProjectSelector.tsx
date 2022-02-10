@@ -1,7 +1,7 @@
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { KeyCodes } from 'common/constants';
 import { useCommonStyles } from 'components/common/styles';
 import { listhoverColor } from 'components/Theme/constants';

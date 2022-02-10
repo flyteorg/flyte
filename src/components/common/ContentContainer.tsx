@@ -1,5 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { contentContainerId } from 'common/constants';
 import {
     contentMarginGridUnits,

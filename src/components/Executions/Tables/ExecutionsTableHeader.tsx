@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { isFunction } from 'common/typeCheckers';
 import * as React from 'react';
 import { useExecutionTableStyles } from './styles';

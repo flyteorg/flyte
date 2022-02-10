@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { dashedValueString } from 'common/constants';
 import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';

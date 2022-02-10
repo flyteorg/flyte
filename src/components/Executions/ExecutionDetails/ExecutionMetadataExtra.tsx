@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import { Execution } from 'models/Execution/types';
 import * as React from 'react';

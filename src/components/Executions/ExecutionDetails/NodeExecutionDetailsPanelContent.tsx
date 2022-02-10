@@ -4,7 +4,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Close from '@material-ui/icons/Close';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import { InfoIcon } from 'components/common/Icons/InfoIcon';
 import { bodyFontFamily, smallFontSize } from 'components/Theme/constants';

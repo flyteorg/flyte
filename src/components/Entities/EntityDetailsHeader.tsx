@@ -1,7 +1,7 @@
 import { Button, Dialog } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import { Project } from 'models/Project/types';

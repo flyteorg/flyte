@@ -1,4 +1,4 @@
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { noWorkflowVersionsFoundString } from 'common/constants';
 import { useCommonStyles } from 'components/common/styles';
 import { ListProps } from 'components/common/types';

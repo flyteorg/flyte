@@ -1,6 +1,6 @@
 import { Button, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { getCacheKey } from 'components/Cache/utils';
 import { useTheme } from 'components/Theme/useTheme';
 import { Admin } from 'flyteidl';

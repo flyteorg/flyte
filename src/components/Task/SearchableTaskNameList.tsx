@@ -2,7 +2,7 @@ import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { noDescriptionString } from 'common/constants';
 import { SearchResult } from 'components/common/SearchableList';
 import {

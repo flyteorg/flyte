@@ -3,7 +3,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import CachedOutlined from '@material-ui/icons/CachedOutlined';
 import ErrorOutlined from '@material-ui/icons/ErrorOutlined';
 import InfoOutlined from '@material-ui/icons/InfoOutlined';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { assertNever } from 'common/utils';
 import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
 import { useCommonStyles } from 'components/common/styles';

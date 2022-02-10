@@ -1,4 +1,4 @@
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { sortedObjectEntries } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import {

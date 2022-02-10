@@ -1,4 +1,4 @@
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import * as React from 'react';
 import { ListRowRenderer } from 'react-virtualized';
 import { noExecutionsFoundString } from 'common/constants';

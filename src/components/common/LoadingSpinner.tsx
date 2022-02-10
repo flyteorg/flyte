@@ -1,6 +1,6 @@
 import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useDelayedValue } from 'components/hooks/useDelayedValue';
 import * as React from 'react';
 import { loadingSpinnerDelayMs } from './constants';

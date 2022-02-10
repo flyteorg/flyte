@@ -1,7 +1,7 @@
 import { Collapse, IconButton } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { withRouteParams } from 'components/common/withRouteParams';

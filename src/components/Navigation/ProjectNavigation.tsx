@@ -4,7 +4,7 @@ import ChevronRight from '@material-ui/icons/ChevronRight';
 import DeviceHub from '@material-ui/icons/DeviceHub';
 import LinearScale from '@material-ui/icons/LinearScale';
 import TrendingFlat from '@material-ui/icons/TrendingFlat';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import { withRouteParams } from 'components/common/withRouteParams';
 import { useProject, useProjects } from 'components/hooks/useProjects';

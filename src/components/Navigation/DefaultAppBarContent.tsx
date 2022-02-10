@@ -1,5 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { FlyteLogo } from 'components/common/FlyteLogo';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';

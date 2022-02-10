@@ -1,6 +1,6 @@
 import Button, { ButtonProps } from '@material-ui/core/Button';
 import Popover from '@material-ui/core/Popover';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 const { useRef, useState } = React;

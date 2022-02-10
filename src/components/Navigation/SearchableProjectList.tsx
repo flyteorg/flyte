@@ -1,6 +1,6 @@
 import { Fade, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import { SearchableList, SearchResult } from 'components/common/SearchableList';
 import { useCommonStyles } from 'components/common/styles';
 import { defaultProjectDescription } from 'components/SelectProject/constants';
