@@ -1,0 +1,20 @@
+name: Upgrade Automation
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: "Name of Flyte component"
+        required: true
+        default: "boilerplate"
+        type: choice
+        options:
+          - boilerplate
+          - flyteidl
+jobs:
+  trigger-upgrade:
+    name: ${{ github.event.inputs.component }} Upgrade
+    uses: flyteorg/flytetools/.github/workflows/flyte_automation.yml@master
+    with:
+      component: ${{ github.event.inputs.component }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
