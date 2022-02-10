@@ -2,7 +2,7 @@
 
 Schedules
 ==========
-Workflows can be run automatically using :ref:`schedules <flytesnacks:launchplan_schedules>` associated with launch plans. 
+Workflows can be run automatically using :ref:`schedules <cookbook:launchplan_schedules>` associated with launch plans.
 
 At most, only one launch plan version for a given {Project, Domain, Name} combination can be active, which means, at most, only one schedule can be active for a launch plan. This is because only one active schedule can exist across all versions of the launch plan. 
 
@@ -65,8 +65,8 @@ Short hand cron formats/predefined schedules
 | @hourly                | Run once an hour, beginning of hour        | 0 * * * *     |
 +------------------------+--------------------------------------------+---------------+
 
-The string field of the schedule should be populated. `Here`_ is an example.
-.. _Here: https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#cron-schedules
+The string field of the schedule should be populated. :ref:`Here <cookbook:_cron_schedule>` is an example.
+
 
 Cron schedules
 ----------------
@@ -95,7 +95,7 @@ Instead of cron schedules, fixed rate schedules can be used.
 
 You can specify the duration in the schedule using `timedelta`, that supports `minutes`, `hours`, `days` and `weeks`.
 
-`Here <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#fixed-rate-intervals>`_ is an example with duration in `minutes`.
+:ref:`Here <fixed_rate_interval>` is an example with duration in `minutes`.
 
 Below is an example with duration in `days`.
 
