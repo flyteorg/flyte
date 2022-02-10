@@ -7,7 +7,6 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"strings"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 
@@ -151,11 +150,6 @@ func sharedInformerOptions(cfg *config2.Config) []informers.SharedInformerOption
 	return opts
 }
 
-func safeMetricName(original string) string {
-	// TODO: Replace all non-prom-compatible charset
-	return strings.Replace(original, "-", "_", -1)
-}
-
 func executeRootCmd(cfg *config2.Config) {
 	baseCtx := context.Background()
 
@@ -176,7 +170,7 @@ func executeRootCmd(cfg *config2.Config) {
 	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(safeMetricName(cfg.LimitNamespace))
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, cfg.ProfilerPort.Port, nil)
