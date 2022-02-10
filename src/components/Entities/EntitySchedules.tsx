@@ -10,7 +10,8 @@ import { useWorkflowSchedules } from 'components/hooks/useWorkflowSchedules';
 import { ResourceIdentifier } from 'models/Common/types';
 import { LaunchPlan } from 'models/Launch/types';
 import * as React from 'react';
-import { noSchedulesStrings, schedulesHeader } from './constants';
+import { entityStrings } from './constants';
+import t from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
     schedulesContainer: {
@@ -46,7 +47,7 @@ export const EntitySchedules: React.FC<{
     return (
         <>
             <WaitForData {...scheduledLaunchPlans} spinnerVariant="none">
-                <Typography variant="h6">{schedulesHeader}</Typography>
+                <Typography variant="h6">{t('schedulesHeader')}</Typography>
                 <div className={styles.schedulesContainer}>
                     {scheduledLaunchPlans.value.length > 0 ? (
                         <RenderSchedules
@@ -57,7 +58,7 @@ export const EntitySchedules: React.FC<{
                             variant="body2"
                             className={commonStyles.hintText}
                         >
-                            {noSchedulesStrings[id.resourceType]}
+                            {t('noSchedules', entityStrings[id.resourceType])}
                         </Typography>
                     )}
                 </div>

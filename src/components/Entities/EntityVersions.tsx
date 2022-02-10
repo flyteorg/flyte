@@ -1,5 +1,11 @@
+import * as React from 'react';
+import { Routes } from 'routes/routes';
+import { history } from 'routes/history';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { IconButton, makeStyles, Theme } from '@material-ui/core';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import { LocalCacheItem, useLocalCache } from 'basics/LocalCache';
 import { WaitForData } from 'components/common/WaitForData';
 import { WorkflowVersionsTable } from 'components/Executions/Tables/WorkflowVersionsTable';
 import { isLoadingState } from 'components/hooks/fetchMachine';
@@ -8,43 +14,50 @@ import { interactiveTextColor } from 'components/Theme/constants';
 import { SortDirection } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
 import { executionSortFields } from 'models/Execution/constants';
-import { Routes } from 'routes/routes';
-import { history } from 'routes/history';
-import * as React from 'react';
 import { executionFilterGenerator } from './generators';
 import { WorkflowVersionsTablePageSize } from './constants';
+import t from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
     headerContainer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1)
+        display: 'flex'
+    },
+    collapseButton: {
+        marginTop: theme.spacing(-0.5)
     },
     header: {
-        marginBottom: theme.spacing(1)
+        flexGrow: 1,
+        marginBottom: theme.spacing(1),
+        marginRight: theme.spacing(1)
     },
     viewAll: {
         color: interactiveTextColor,
         cursor: 'pointer'
+    },
+    divider: {
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        marginBottom: theme.spacing(1)
     }
 }));
 
 export interface EntityVersionsProps {
     id: ResourceIdentifier;
-    versionView?: boolean;
+    showAll?: boolean;
 }
 
 /**
  * The tab/page content for viewing a workflow's versions.
  * @param id
- * @param versionView
+ * @param showAll - shows all available entity versions
  */
 export const EntityVersions: React.FC<EntityVersionsProps> = ({
     id,
-    versionView = false
+    showAll = false
 }) => {
     const { domain, project, resourceType, name } = id;
+    const [showTable, setShowTable] = useLocalCache(
+        LocalCacheItem.ShowWorkflowVersions
+    );
     const styles = useStyles();
     const sort = {
         key: executionSortFields.createdAt,
@@ -53,7 +66,7 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
 
     const baseFilters = React.useMemo(
         () => executionFilterGenerator[resourceType](id),
-        [id]
+        [id, resourceType]
     );
 
     const versions = useWorkflowVersions(
@@ -61,10 +74,11 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
         {
             sort,
             filter: baseFilters,
-            limit: versionView ? 100 : WorkflowVersionsTablePageSize
+            limit: showAll ? 100 : WorkflowVersionsTablePageSize
         }
     );
 
+    const preventDefault = e => e.preventDefault();
     const handleViewAll = React.useCallback(() => {
         history.push(
             Routes.WorkflowVersionDetails.makeUrl(
@@ -78,26 +92,43 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({
 
     return (
         <>
-            {!versionView && (
+            {!showAll && (
                 <div className={styles.headerContainer}>
+                    <IconButton
+                        className={styles.collapseButton}
+                        edge="start"
+                        disableRipple={true}
+                        disableTouchRipple={true}
+                        onClick={() => setShowTable(!showTable)}
+                        onMouseDown={preventDefault}
+                        size="small"
+                        aria-label=""
+                        title={t('collapseButton', showTable)}
+                    >
+                        {showTable ? <ExpandLess /> : <ExpandMore />}
+                    </IconButton>
                     <Typography className={styles.header} variant="h6">
-                        Recent Workflow Versions
+                        {t('workflowVersionsTitle')}
                     </Typography>
                     <Typography
                         className={styles.viewAll}
                         variant="body1"
                         onClick={handleViewAll}
                     >
-                        View All
+                        {t('viewAll')}
                     </Typography>
                 </div>
             )}
             <WaitForData {...versions}>
-                <WorkflowVersionsTable
-                    {...versions}
-                    isFetching={isLoadingState(versions.state)}
-                    versionView={versionView}
-                />
+                {showTable || showAll ? (
+                    <WorkflowVersionsTable
+                        {...versions}
+                        isFetching={isLoadingState(versions.state)}
+                        versionView={showAll}
+                    />
+                ) : (
+                    <div className={styles.divider} />
+                )}
             </WaitForData>
         </>
     );

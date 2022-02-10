@@ -1,4 +1,3 @@
-import { mapValues, startCase } from 'lodash';
 import { ResourceType } from 'models/Common/types';
 
 type EntityStringMap = { [k in ResourceType]: string };
@@ -11,24 +10,7 @@ export const entityStrings: EntityStringMap = {
     [ResourceType.WORKFLOW]: 'workflow'
 };
 
-export const noDescriptionStrings: EntityStringMap = mapValues(
-    entityStrings,
-    typeString => `This ${typeString} has no description.`
-);
-
-export const schedulesHeader = 'Schedules';
-
-export const noSchedulesStrings: EntityStringMap = mapValues(
-    entityStrings,
-    typeString => `This ${typeString} has no schedules.`
-);
-
-export const launchStrings: EntityStringMap = mapValues(
-    entityStrings,
-    typeString => `Launch ${startCase(typeString)}`
-);
-
-export interface EntitySectionsFlags {
+interface EntitySectionsFlags {
     description?: boolean;
     executions?: boolean;
     launch?: boolean;

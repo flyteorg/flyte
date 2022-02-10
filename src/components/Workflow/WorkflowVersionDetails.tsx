@@ -1,15 +1,29 @@
-import { withRouteParams } from 'components/common/withRouteParams';
-import { EntityDetails } from 'components/Entities/EntityDetails';
-import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import * as React from 'react';
+import { withRouteParams } from 'components/common/withRouteParams';
+import { ResourceIdentifier, ResourceType } from 'models/Common/types';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { WaitForData } from 'components/common/WaitForData';
+import { useProject } from 'components/hooks/useProjects';
+import { StaticGraphContainer } from 'components/Workflow/StaticGraphContainer';
+import { WorkflowId } from 'models/Workflow/types';
+import { entitySections } from 'components/Entities/constants';
+import { EntityDetailsHeader } from 'components/Entities/EntityDetailsHeader';
+import { EntityVersions } from 'components/Entities/EntityVersions';
 
-export interface WorkflowVersionDetailsRouteParams {
+const useStyles = makeStyles((_theme: Theme) => ({
+    versionsContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto'
+    }
+}));
+
+interface WorkflowVersionDetailsRouteParams {
     projectId: string;
     domainId: string;
     workflowName: string;
     workflowVersion: string;
 }
-export type WorkflowDetailsProps = WorkflowVersionDetailsRouteParams;
 
 /**
  * The view component for the Workflow Versions page
@@ -17,13 +31,13 @@ export type WorkflowDetailsProps = WorkflowVersionDetailsRouteParams;
  * @param domainId
  * @param workflowName
  */
-export const WorkflowVersionDetailsContainer: React.FC<WorkflowVersionDetailsRouteParams> = ({
+const WorkflowVersionDetailsContainer: React.FC<WorkflowVersionDetailsRouteParams> = ({
     projectId,
     domainId,
     workflowName,
     workflowVersion
 }) => {
-    const id = React.useMemo<ResourceIdentifier>(
+    const workflowId = React.useMemo<WorkflowId>(
         () => ({
             resourceType: ResourceType.WORKFLOW,
             project: projectId,
@@ -33,7 +47,26 @@ export const WorkflowVersionDetailsContainer: React.FC<WorkflowVersionDetailsRou
         }),
         [projectId, domainId, workflowName, workflowVersion]
     );
-    return <EntityDetails id={id} versionView showStaticGraph />;
+
+    const id = workflowId as ResourceIdentifier;
+    const sections = entitySections[ResourceType.WORKFLOW];
+    const project = useProject(workflowId.project);
+    const styles = useStyles();
+
+    return (
+        <WaitForData {...project}>
+            <EntityDetailsHeader
+                project={project.value}
+                id={id}
+                launchable={sections.launch}
+                backToWorkflow
+            />
+            <StaticGraphContainer workflowId={workflowId} />
+            <div className={styles.versionsContainer}>
+                <EntityVersions id={id} showAll />
+            </div>
+        </WaitForData>
+    );
 };
 
 export const WorkflowVersionDetails = withRouteParams<

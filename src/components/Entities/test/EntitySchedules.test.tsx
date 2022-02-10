@@ -10,8 +10,8 @@ import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import { listLaunchPlans } from 'models/Launch/api';
 import { LaunchPlan, LaunchPlanState } from 'models/Launch/types';
 import * as React from 'react';
-import { schedulesHeader } from '../constants';
 import { EntitySchedules } from '../EntitySchedules';
+import t from '../strings';
 
 jest.mock('models/Launch/api');
 
@@ -29,7 +29,7 @@ describe('EntitySchedules', () => {
 
     const renderSchedules = async () => {
         const result = render(<EntitySchedules id={id} />);
-        await waitFor(() => result.getByText(schedulesHeader));
+        await waitFor(() => result.getByText(t('schedulesHeader')));
         return result;
     };
 
