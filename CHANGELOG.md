@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](http://github.com/lyft/flyteconsole/compare/v0.41.0...v0.42.0) (2022-02-10)
+
+
+### Features
+
+* **#281:** allow to collapse/expand workflow version section ([#282](http://github.com/lyft/flyteconsole/issues/282)) ([a4ac862](http://github.com/lyft/flyteconsole/commit/a4ac8627280f6793113d7538023a6644cf43f429)), closes [#281](http://github.com/lyft/flyteconsole/issues/281)
+
 # [0.41.0](http://github.com/lyft/flyteconsole/compare/v0.40.0...v0.41.0) (2022-02-03)
 
 
