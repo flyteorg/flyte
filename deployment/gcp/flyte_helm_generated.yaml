@@ -984,8 +984,6 @@ spec:
         - --config
         - serve
         - /etc/flyte/config/*.yaml
-        - hello
-        - world
         image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.92"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
@@ -1320,8 +1318,6 @@ spec:
         - flytepropeller
         - --config
         - /etc/flyte/config/*.yaml
-        - hello
-        - world
         env:
         - name: POD_NAME
           valueFrom:
