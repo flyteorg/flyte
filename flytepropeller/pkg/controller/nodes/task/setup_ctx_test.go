@@ -23,5 +23,5 @@ func Test_nameSpacedSetupCtx_MetricsScope(t *testing.T) {
 	ns := newNameSpacedSetupCtx(&setupContext{SetupContext: &dummySetupCtx{testScopeName: "test-scope-1"}}, r, "p1")
 	scope := ns.MetricsScope()
 	assert.NotNil(t, scope)
-	assert.Equal(t, "test-scope-1:p1:", scope.CurrentScope())
+	assert.Equal(t, "test_scope_1:p1:", scope.CurrentScope())
 }

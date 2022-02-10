@@ -112,7 +112,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	}
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(safeMetricName(propellerCfg.LimitNamespace))
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
 	webhookScope := propellerScope.NewSubScope("webhook")
 
 	go func() {
