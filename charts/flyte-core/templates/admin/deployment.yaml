@@ -100,11 +100,11 @@ spec:
       - command:
         - flyteadmin
         - --config
+        - serve
         - {{ .Values.flyteadmin.configPath }}
         {{- with .Values.flyteadmin.extraArgs }}
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml $) . | nindent 6 }}
         {{- end }}
-        - serve
         image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin

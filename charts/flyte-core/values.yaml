@@ -64,6 +64,8 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
+  # -- Appends extra command line arguments to the serve command
+  extraArgs: {}
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -156,6 +158,8 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -201,6 +205,8 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
 
 #
 # FLYTECONSOLE SETTINGS

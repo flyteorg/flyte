@@ -47,7 +47,7 @@ spec:
         - --config
         - {{ .Values.flytepropeller.configPath }}
         {{- with .Values.flytepropeller.extraArgs }}
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml $) . | nindent 6 }}
         {{- end }}
         env:
         - name: POD_NAME
