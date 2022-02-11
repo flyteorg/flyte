@@ -40,7 +40,7 @@ As your Flyte user-base evolves, adding new projects is as simple as registering
 
    $ flytectl create project --id myflyteproject --name "My Flyte Project" --description "My very first project onboarding onto Flyte"
 
-A cron which runs at the cadence specified in Flyte Admin configuration ensures that all Kubernetes resources necessary for the new project are created and new workflows can successfully
+A cron which runs at the cadence specified in FlyteAdmin configuration ensures that all Kubernetes resources necessary for the new project are created and new workflows can successfully
 be registered and executed within it. See :std:ref:`flytectl <flytectl:flytectl_create_project>` for more information.
 
 This project should immediately show up in the Flyte console after refreshing.

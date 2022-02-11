@@ -56,7 +56,7 @@ The following is required for non-sandbox deployments:
    .. note::
 
       Flyte's Ingress routes traffic to either
-      Flyte Console or Flyte Admin based on the url path
+      Flyte Console or FlyteAdmin based on the url path
 
    .. prompt:: bash
 
@@ -65,7 +65,7 @@ The following is required for non-sandbox deployments:
 
 IdP Configuration
 =================
-Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
+FlyteAdmin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
 
 Example Flyte Configurations
 ============================
@@ -196,7 +196,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
 
 .. tabbed:: Okta
 
-   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. https://flyte.mycompany.io/).
+   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of FlyteAdmin (e.g. https://flyte.mycompany.io/).
    2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
    3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
    4. Create 2 apps (for flytectl and flytepropeller) to enable these clients to communicate with the service.
@@ -211,7 +211,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
-#. It is possible to direct Flyte admin to use an external authorization server. To do so, edit the same config map once
+#. It is possible to direct FlyteAdmin to use an external authorization server. To do so, edit the same config map once
    more and follow these changes:
 
    .. code-block:: yaml
@@ -219,7 +219,7 @@ Apply Configuration
         auth:
             appAuth:
                 # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
-                #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
+                #    Choose Self (or omit the value) to use FlyteAdmin's internal (albeit limited) Authorization Server.
                 authServerType: External
 
                 # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
@@ -328,7 +328,7 @@ Apply Configuration
 Continuous Integration - CI
 ---------------------------
 
-If your organization does any automated registration, then you'll need to authenticate with the `client credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_ flow. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
+If your organization does any automated registration, then you'll need to authenticate with the `client credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_ flow. After retrieving an access token from the IDP, you can send it along to FlyteAdmin as usual.
 
 .. tabbed:: Flytectl
 

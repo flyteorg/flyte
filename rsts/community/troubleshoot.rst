@@ -94,7 +94,7 @@ Troubles with ``flyte sandbox`` log viewing
 Troubles with FlyteCTL command within proxy setting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- FlyteCTL uses GRPC APIs of Flyte Admin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the GRPC layer to perform the same. Additional info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__.
+- FlyteCTL uses GRPC APIs of FlyteAdmin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the GRPC layer to perform the same. Additional info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__.
 
 - On the Windows environment, it has been noticed that the ``NO_PROXY`` variable doesn't work to bypass the proxy settings. `This <https://github.com/grpc/grpc/issues/9989>`__ GRPC issue provides additional details, though it doesn't seem to have been tested on Windows yet. To get around this issue, unset both the ``HTTP_PROXY`` and ``HTTPS_PROXY`` variables.
 

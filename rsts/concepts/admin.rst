@@ -1,7 +1,7 @@
 .. _divedeep-admin:
 
 ###########
-Flyte Admin
+FlyteAdmin
 ###########
 
 Admin Structure

@@ -43,10 +43,10 @@ You'll want to introduce a new :std:ref:`matchable resource <protos/docs/admin/a
 See the changes in this `file <https://github.com/flyteorg/flyteidl/commit/b1767697705621a3fddcb332617a5304beba5bec#diff-d3c1945436aba8f7a76755d75d18e671>`__ for an example of what is required.
 
 
-Flyte admin
+FlyteAdmin
 ^^^^^^^^^^^
 
-Once your idl changes are released, update the logic of flyteadmin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it when creating executions or wherever makes sense for your use case.
+Once your idl changes are released, update the logic of FlyteAdmin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it when creating executions or wherever makes sense for your use case.
 
 For example:
 
