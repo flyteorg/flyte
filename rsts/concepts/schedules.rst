@@ -65,7 +65,7 @@ Short hand cron formats/predefined schedules
 | @hourly                | Run once an hour, beginning of hour        | 0 * * * *     |
 +------------------------+--------------------------------------------+---------------+
 
-The string field of the schedule should be populated. :ref:`Here <cookbook:_cron_schedule>` is an example.
+The string field of the schedule should be populated. :ref:`Here <cookbook:Cron Schedules>` is an example.
 
 
 Cron schedules
@@ -95,7 +95,7 @@ Instead of cron schedules, fixed rate schedules can be used.
 
 You can specify the duration in the schedule using `timedelta`, that supports `minutes`, `hours`, `days` and `weeks`.
 
-:ref:`Here <fixed_rate_interval>` is an example with duration in `minutes`.
+:ref:`Here <Fixed Rate Intervals>` is an example with duration in `minutes`.
 
 Below is an example with duration in `days`.
 
