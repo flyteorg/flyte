@@ -4,12 +4,6 @@ import {
     NodeExecutionMetadata,
     WorkflowNodeMetadata
 } from 'models/Execution/types';
-import {
-    BranchNode,
-    CompiledNode,
-    TaskNode,
-    WorkflowNode
-} from 'models/Node/types';
 import { TaskTemplate } from 'models/Task/types';
 
 export interface ExecutionPhaseConstants {
@@ -34,18 +28,6 @@ export enum NodeExecutionDisplayType {
     MpiTask = 'MPI Task'
 }
 
-export interface CompiledTaskNode extends CompiledNode {
-    taskNode: TaskNode;
-}
-
-export interface CompiledWorkflowNode extends CompiledNode {
-    workflowNode: WorkflowNode;
-}
-
-export interface CompiledBranchNode extends CompiledNode {
-    branchNode: BranchNode;
-}
-
 export interface ParentNodeExecution extends NodeExecution {
     metadata: NodeExecutionMetadata & {
         isParentNode: true;
@@ -54,10 +36,6 @@ export interface ParentNodeExecution extends NodeExecution {
 
 export interface WorkflowNodeExecutionClosure extends NodeExecutionClosure {
     workflowNodeMetadata: WorkflowNodeMetadata;
-}
-
-export interface WorkflowNodeExecution extends NodeExecution {
-    closure: WorkflowNodeExecutionClosure;
 }
 
 export interface NodeExecutionDetails {

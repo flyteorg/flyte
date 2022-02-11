@@ -7,6 +7,7 @@ import { DataError } from 'components/Errors/DataError';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
 import { Execution, NodeExecution } from 'models/Execution/types';
+import { NodeExecutionDetailsContextProvider } from '../contextProvider/NodeExecutionDetails';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
@@ -85,29 +86,33 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                 <Tab value={tabs.nodes.id} label={tabs.nodes.label} />
                 <Tab value={tabs.graph.id} label={tabs.graph.label} />
             </Tabs>
-            <div className={styles.nodesContainer}>
-                {tabState.value === tabs.nodes.id && (
-                    <>
-                        <div className={styles.filters}>
-                            <ExecutionFilters {...filterState} />
-                        </div>
+            <NodeExecutionDetailsContextProvider
+                workflowId={execution.closure.workflowId}
+            >
+                <div className={styles.nodesContainer}>
+                    {tabState.value === tabs.nodes.id && (
+                        <>
+                            <div className={styles.filters}>
+                                <ExecutionFilters {...filterState} />
+                            </div>
+                            <WaitForQuery
+                                errorComponent={DataError}
+                                query={nodeExecutionsQuery}
+                            >
+                                {renderNodeExecutionsTable}
+                            </WaitForQuery>
+                        </>
+                    )}
+                    {tabState.value === tabs.graph.id && (
                         <WaitForQuery
                             errorComponent={DataError}
                             query={nodeExecutionsQuery}
                         >
-                            {renderNodeExecutionsTable}
+                            {renderExecutionLoader}
                         </WaitForQuery>
-                    </>
-                )}
-                {tabState.value === tabs.graph.id && (
-                    <WaitForQuery
-                        errorComponent={DataError}
-                        query={nodeExecutionsQuery}
-                    >
-                        {renderExecutionLoader}
-                    </WaitForQuery>
-                )}
-            </div>
+                    )}
+                </div>
+            </NodeExecutionDetailsContextProvider>
         </>
     );
 };

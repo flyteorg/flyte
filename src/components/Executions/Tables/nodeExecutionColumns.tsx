@@ -6,16 +6,14 @@ import {
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
-import { WaitForQuery } from 'components/common/WaitForQuery';
 import { Core } from 'flyteidl';
 import { isEqual } from 'lodash';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import { TaskNodeMetadata } from 'models/Execution/types';
 import * as React from 'react';
+import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
-import { NodeExecutionDetails } from '../types';
-import { useNodeExecutionDetails } from '../useNodeExecutionDetails';
 import { getNodeExecutionTimingMS } from '../utils';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
@@ -24,11 +22,25 @@ import {
     NodeExecutionColumnDefinition
 } from './types';
 
-const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
+const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     execution,
     state
 }) => {
-    const detailsQuery = useNodeExecutionDetails(execution);
+    const detailsContext = useNodeExecutionContext();
+    const [displayName, setDisplayName] = React.useState<string | undefined>();
+
+    React.useEffect(() => {
+        let isCurrent = true;
+        detailsContext.getNodeExecutionDetails(execution).then(res => {
+            if (isCurrent) {
+                setDisplayName(res.displayName);
+            }
+        });
+        return () => {
+            isCurrent = false;
+        };
+    });
+
     const commonStyles = useCommonStyles();
     const styles = useColumnStyles();
 
@@ -36,63 +48,70 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
         state.selectedExecution != null &&
         isEqual(execution.id, state.selectedExecution);
 
-    const renderReadableName = ({ displayName }: NodeExecutionDetails) => {
-        const truncatedName = displayName?.split('.').pop() || '';
-        const readableName = isSelected ? (
-            <Typography
-                variant="body1"
-                className={styles.selectedExecutionName}
-            >
-                {truncatedName}
-            </Typography>
-        ) : (
-            <SelectNodeExecutionLink
-                className={commonStyles.primaryLink}
-                execution={execution}
-                linkText={truncatedName || ''}
-                state={state}
-            />
-        );
-        return (
-            <>
-                {readableName}
-                <Typography variant="subtitle1" color="textSecondary">
-                    {displayName}
-                </Typography>
-            </>
-        );
-    };
+    const name = displayName ?? execution.id.nodeId;
+    const truncatedName = name?.split('.').pop() || name;
+
+    const readableName = isSelected ? (
+        <Typography variant="body1" className={styles.selectedExecutionName}>
+            {truncatedName}
+        </Typography>
+    ) : (
+        <SelectNodeExecutionLink
+            className={commonStyles.primaryLink}
+            execution={execution}
+            linkText={truncatedName || ''}
+            state={state}
+        />
+    );
 
     return (
         <>
-            <WaitForQuery query={detailsQuery}>
-                {renderReadableName}
-            </WaitForQuery>
+            {readableName}
+            <Typography variant="subtitle1" color="textSecondary">
+                {displayName}
+            </Typography>
         </>
     );
 };
 
-const NodeExecutionDisplayId: React.FC<NodeExecutionCellRendererData> = ({
-    execution
-}) => {
-    const detailsQuery = useNodeExecutionDetails(execution);
-    const extractDisplayId = ({ displayId }: NodeExecutionDetails) =>
-        displayId || execution.id.nodeId;
-    return <WaitForQuery query={detailsQuery}>{extractDisplayId}</WaitForQuery>;
+const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
+    const detailsContext = useNodeExecutionContext();
+    const [displayId, setDisplayId] = React.useState<string | undefined>();
+
+    React.useEffect(() => {
+        let isCurrent = true;
+        detailsContext.getNodeExecutionDetails(execution).then(res => {
+            if (isCurrent) {
+                setDisplayId(res.displayId);
+            }
+        });
+        return () => {
+            isCurrent = false;
+        };
+    });
+
+    return <>{displayId ?? execution.id.nodeId}</>;
 };
 
-const NodeExecutionDisplayType: React.FC<NodeExecutionCellRendererData> = ({
+const DisplayType: React.FC<NodeExecutionCellRendererData> = ({
     execution
 }) => {
-    const detailsQuery = useNodeExecutionDetails(execution);
-    const extractDisplayType = ({ displayType }: NodeExecutionDetails) => (
-        <Typography color="textSecondary">
-            {displayType || execution.id.nodeId}
-        </Typography>
-    );
-    return (
-        <WaitForQuery query={detailsQuery}>{extractDisplayType}</WaitForQuery>
-    );
+    const detailsContext = useNodeExecutionContext();
+    const [type, setType] = React.useState<string | undefined>();
+
+    React.useEffect(() => {
+        let isCurrent = true;
+        detailsContext.getNodeExecutionDetails(execution).then(res => {
+            if (isCurrent) {
+                setType(res.displayType);
+            }
+        });
+        return () => {
+            isCurrent = false;
+        };
+    });
+
+    return <Typography color="textSecondary">{type}</Typography>;
 };
 
 const hiddenCacheStatuses = [
@@ -114,19 +133,19 @@ export function generateColumns(
 ): NodeExecutionColumnDefinition[] {
     return [
         {
-            cellRenderer: props => <NodeExecutionName {...props} />,
+            cellRenderer: props => <ExecutionName {...props} />,
             className: styles.columnName,
             key: 'name',
             label: 'task name'
         },
         {
-            cellRenderer: props => <NodeExecutionDisplayId {...props} />,
+            cellRenderer: props => <DisplayId {...props} />,
             className: styles.columnNodeId,
             key: 'nodeId',
             label: 'node id'
         },
         {
-            cellRenderer: props => <NodeExecutionDisplayType {...props} />,
+            cellRenderer: props => <DisplayType {...props} />,
             className: styles.columnType,
             key: 'type',
             label: 'type'

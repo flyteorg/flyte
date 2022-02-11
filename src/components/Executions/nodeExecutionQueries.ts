@@ -273,6 +273,7 @@ async function fetchGroupsForParentNodeExecution(
             let scopedId: string | undefined =
                 nodeExecution.metadata?.specNodeId;
             if (scopedId != undefined) {
+                child['parentId'] = scopedId;
                 scopedId += `-${child.metadata?.retryGroup}-${child.metadata?.specNodeId}`;
                 child['scopedId'] = scopedId;
             } else {

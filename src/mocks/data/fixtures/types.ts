@@ -6,6 +6,14 @@ import {
 import { LaunchPlan } from 'models/Launch/types';
 import { Task } from 'models/Task/types';
 import { Workflow } from 'models/Workflow/types';
+import { Identifier } from 'models/Common/types';
+
+export const mockWorkflowId: Identifier = {
+    project: 'project',
+    domain: 'domain',
+    name: 'specific.workflow.name_wf',
+    version: '0.1'
+};
 
 /** Represents a TaskExecution and its associated children. */
 export interface MockTaskExecutionData {

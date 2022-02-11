@@ -80,6 +80,10 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
 
     const renderNodeExecutionsTable = (nodeExecutions: NodeExecution[]) => (
         <NodeExecutionsRequestConfigContext.Provider value={requestConfig}>
+            {/* TODO: legacy code - looks like it's never called
+                If code still in use NodeExecutionsTable should be wrapped by 
+                NodeExecutionDetailsContextProvider here or in one of the parent components.
+            */}
             <NodeExecutionsTable nodeExecutions={nodeExecutions} />
         </NodeExecutionsRequestConfigContext.Provider>
     );

@@ -1,5 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { storiesOf } from '@storybook/react';
+import { NodeExecutionDetailsContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
 import { makeNodeExecutionListQuery } from 'components/Executions/nodeExecutionQueries';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import * as React from 'react';
@@ -19,6 +20,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 const fixture = basicPythonWorkflow.generate();
 const workflowExecution = fixture.workflowExecutions.top.data;
 
+const getNodeExecutionDetails = async () => {
+    return {
+        displayId: 'node0',
+        displayName: 'basic.byton.workflow.unique.task_name',
+        displayType: 'Python-Task'
+    };
+};
+
 const stories = storiesOf('Tables/NodeExecutionsTable', module);
 stories.addDecorator(story => {
     return <div className={useStyles().container}>{story()}</div>;
@@ -28,9 +37,21 @@ stories.add('Basic', () => {
         makeNodeExecutionListQuery(useQueryClient(), workflowExecution.id)
     );
     return query.data ? (
-        <NodeExecutionsTable nodeExecutions={query.data} />
+        <NodeExecutionDetailsContext.Provider
+            value={{ getNodeExecutionDetails }}
+        >
+            <NodeExecutionsTable nodeExecutions={query.data} />
+        </NodeExecutionDetailsContext.Provider>
     ) : (
         <div />
     );
 });
-stories.add('With no items', () => <NodeExecutionsTable nodeExecutions={[]} />);
+stories.add('With no items', () => {
+    return (
+        <NodeExecutionDetailsContext.Provider
+            value={{ getNodeExecutionDetails }}
+        >
+            <NodeExecutionsTable nodeExecutions={[]} />
+        </NodeExecutionDetailsContext.Provider>
+    );
+});

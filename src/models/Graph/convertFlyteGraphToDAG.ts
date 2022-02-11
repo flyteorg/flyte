@@ -2,8 +2,8 @@ import { createDebugLogger } from 'common/log';
 import { createTimer } from 'common/timer';
 import { cloneDeep, keyBy, values } from 'lodash';
 import { identifierToString } from 'models/Common/utils';
+import { startNodeId } from 'models/Node/constants';
 import { CompiledWorkflowClosure } from 'models/Workflow/types';
-import { nodeIds } from './constants';
 import { DAGNode } from './types';
 
 const log = createDebugLogger('models/Workflow');
@@ -16,7 +16,6 @@ const log = createDebugLogger('models/Workflow');
 export function convertFlyteGraphToDAG(
     workflow: CompiledWorkflowClosure
 ): DAGNode[] {
-
     const timer = createTimer();
 
     const {
@@ -75,7 +74,7 @@ export function convertFlyteGraphToDAG(
 
     // Filter out any nodes with no parents (except for the start node)
     const result = values(nodeMap).filter(
-        n => n.id === nodeIds.start || (n.parentIds && n.parentIds.length > 0)
+        n => n.id === startNodeId || (n.parentIds && n.parentIds.length > 0)
     );
 
     log(`Compilation time: ${timer.timeStringMS}`);
