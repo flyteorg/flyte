@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.1](http://github.com/lyft/flyteconsole/compare/v0.42.0...v0.42.1) (2022-02-11)
+
+
+### Bug Fixes
+
+* **#278:** wrong nodeExecutions details are showed in node executions list ([#277](http://github.com/lyft/flyteconsole/issues/277)) ([15878ab](http://github.com/lyft/flyteconsole/commit/15878abe4e31f79ae3afbf29ab41b66e941e6ee1)), closes [#278](http://github.com/lyft/flyteconsole/issues/278)
+
 # [0.42.0](http://github.com/lyft/flyteconsole/compare/v0.41.0...v0.42.0) (2022-02-10)
 
 
