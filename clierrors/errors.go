@@ -3,7 +3,7 @@ package clierrors
 var (
 	ErrInvalidStateUpdate = "Invalid state passed. Specify either activate or archive\n"
 
-	ErrProjectNotPassed     = "Project not passed\n"
+	ErrProjectNotPassed     = "Project id not passed\n" // #nosec
 	ErrProjectNameNotPassed = "project name is required flag"
 	ErrFailedProjectUpdate  = "Project %v failed to get updated due to %v\n"
 
