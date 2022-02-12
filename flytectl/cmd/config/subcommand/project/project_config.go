@@ -56,6 +56,10 @@ func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
 		if err != nil {
 			return nil, err
 		}
+		if projectSpec.Id == id {
+			return &projectSpec, nil
+		}
+		projectSpec.Id = id
 		return &projectSpec, nil
 	}
 

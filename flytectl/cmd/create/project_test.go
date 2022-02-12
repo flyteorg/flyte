@@ -62,7 +62,7 @@ func TestEmptyProjectID(t *testing.T) {
 	project.DefaultProjectConfig = &project.ConfigProject{}
 	mockClient.OnRegisterProjectMatch(ctx, projectRegisterRequest).Return(nil, nil)
 	err := createProjectsCommand(ctx, args, cmdCtx)
-	assert.Equal(t, errors.New(clierrors.ErrProjectNameNotPassed), err)
+	assert.Equal(t, errors.New(clierrors.ErrProjectNotPassed), err)
 	mockClient.AssertNotCalled(t, "RegisterProject", ctx, mock.Anything)
 }
 
