@@ -963,8 +963,8 @@ spec:
       - command:
         - flyteadmin
         - --config
-        - serve
         - /etc/flyte/config/*.yaml
+        - serve
         image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.92"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin

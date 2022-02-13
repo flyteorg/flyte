@@ -100,8 +100,8 @@ spec:
       - command:
         - flyteadmin
         - --config
-        - serve
         - {{ .Values.flyteadmin.configPath }}
+        - serve
         {{- with .Values.flyteadmin.extraArgs }}
         {{- tpl (toYaml $) . | nindent 6 }}
         {{- end }}
