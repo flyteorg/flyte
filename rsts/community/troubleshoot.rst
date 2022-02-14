@@ -11,26 +11,11 @@ We've been working diligently to help users sort out issues.
 
 Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
 
-Troubles with ``flytectl sandbox start``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR
-- The process ends with a message ``Timed out while waiting for the datacatalog rollout to be created``
-- To fix this:
-    - Reclaim disk space using the following command ::
+Debug yourself
+^^^^^^^^^^^^^^^
 
-        docker system prune [OPTIONS]
-
-    - Increase mem/CPU available for Docker.
-
-
-**Potential causes**
-
-- Your Docker daemon is constrained on disk, memory, or CPU. Why Docker? Refer to :ref:`deployment-sandbox`.
-
-**Debug yourself**
-
-- Sandbox is a Docker container that runs Kubernetes and Flyte in it. So you can simply ``exec`` into it,
+- Sandbox is a Docker container that runs Kubernetes and Flyte in it. So you can simply ``exec`` into it;
 
 .. prompt:: bash $
 
@@ -45,22 +30,32 @@ Troubles with ``flytectl sandbox start``
 
  docker exec -it <imageid> bash
 
-and run::
+- and run: ::
 
- kubectl get pods -n flyte
+    kubectl get pods -n flyte
 
-You can check on the pending pods and perform a detailed check as to why a pod is failing::
+- You can check on the pending pods and perform a detailed check as to why a pod is failing::
 
-  kubectl describe po <pod-name> -n flyte 
+    kubectl describe po <pod-name> -n flyte 
 
-Also, you can simply export this variable to use local kubectl::
+- Also, you can simply export this variable to use local kubectl::
 
- export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
+    export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
 
 
-Another useful way to debug Docker is::
+- Another useful way to debug Docker is::
 
- docker system df
+    docker system df
+
+- If you have trouble running ``flytectl sandbox start``, it could be because your Docker daemon is constrained on disk, memory, or CPU. If the process hangs at ``Waiting for Flyte to become ready...`` for a while; OR ends with a message ``Timed out while waiting for the datacatalog rollout to be created``,
+    - Reclaim disk space using the following command: ::
+
+        docker system prune [OPTIONS]
+
+    - Increase mem/CPU available for Docker.
+
+.. note::
+    Why Docker? Refer to :ref:`deployment-sandbox`.
 
 
 Troubles with ``flyte sandbox`` log viewing
