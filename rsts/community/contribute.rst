@@ -228,7 +228,7 @@ Output:
     * - `Repo <https://github.com/flyteorg/flyteconsole>`__
     * - **Purpose**: Admin Console
     * - **Language**: Typescript
-    * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteconsole/blob/master/README.rst>`__
+    * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteconsole/blob/master/README.md>`__
 
 ``datacatalog``
 ***************
@@ -302,5 +302,5 @@ Also, add relevant labels to your issue. For example, if you are filing a Flytek
 
 |
 
-For feedback at any point in the contribution process, feel free to reach out to us on `Slack <http://flyte-org.slack.com/>`__. 
-If you haven't joined Slack yet, you can do so by clicking `this link <https://docs.google.com/forms/d/e/1FAIpQLScWPJZncyL-bBCWbuQ9HWuMzA8-r2RJc__CSWJoAYUQADN-BQ/viewform>`__.
+For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__. 
+
