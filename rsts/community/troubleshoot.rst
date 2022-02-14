@@ -47,7 +47,18 @@ Debug yourself
 
     docker system df
 
-- If you have trouble running ``flytectl sandbox start``, it could be because your Docker daemon is constrained on disk, memory, or CPU. If the process hangs at ``Waiting for Flyte to become ready...`` for a while; OR ends with a message ``Timed out while waiting for the datacatalog rollout to be created``,
+
+Troubles with ``flytectl sandbox start``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
+- It ends with a message ``Timed out while waiting for the datacatalog rollout to be created``.
+
+**Potential causes**
+
+- Your Docker daemon is constrained on disk, memory, or CPU. 
+
+**To fix this:**
     - Reclaim disk space using the following command: ::
 
         docker system prune [OPTIONS]
