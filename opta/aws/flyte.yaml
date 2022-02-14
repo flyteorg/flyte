@@ -11,6 +11,16 @@ modules:
   - name: s3
     type: aws-s3
     bucket_name: "{parent_name}-{layer_name}"
+  - name: adminflyterole
+    type: aws-iam-role
+    extra_iam_policies:
+      - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
+    #      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
+    allowed_k8s_services:
+      - namespace: "*"
+        service_name: "*"
+    links:
+      - s3: ["write"]
   - name: userflyterole
     type: aws-iam-role
     extra_iam_policies:
