@@ -58,7 +58,7 @@ Troubles with ``flytectl sandbox start``
 
 - Your Docker daemon is constrained on disk, memory, or CPU. 
 
-**To fix this:**
+- **To fix this:**
     - Reclaim disk space using the following command: ::
 
         docker system prune [OPTIONS]
@@ -109,7 +109,7 @@ Troubles with FlyteCTL commands with Cloudflare DNS
 
 - FlyteCTL throws permission error with Cloudflare DNS endpoint
 - Cloudflare instance by default proxies the requests and would filter out GRPC.
-- To fix this: 
+- **To fix this**: 
     - Enable grpc in the network tab; OR
     - Turn off the proxy.
 
