@@ -5,7 +5,7 @@ Community
 ##########
 
 Flyte is an ambitious open source project and would not be possible without an
-amazing community. We are a completely open community and vouch to treat
+amazing community. We are a completely open community and strive to treat
 every member with respect. You will find the community welcoming and responsive,
 so please join us on:
 
@@ -100,12 +100,12 @@ Flyte maintainers are available on Zoom for you to ask anything, weekly on Wedne
 
 .. link-button:: https://www.addevent.com/event/zF10349020/
     :type: url
-    :text: 7:00 am PT / 3:00 pm GMT - Haytham Abuelfutuh
+    :text: 7:00 am PT / 3:00 pm GMT
     :classes: btn-outline-secondary
 
 .. link-button:: https://www.addevent.com/event/dQ10349168/
     :type: url
-    :text: 9:00 pm PT / 10:30 am IST - Ketan Umare
+    :text: 9:00 pm PT / 10:30 am IST
     :classes: btn-outline-secondary
 
 .. toctree::
@@ -113,7 +113,7 @@ Flyte maintainers are available on Zoom for you to ask anything, weekly on Wedne
     :maxdepth: -1
     :name: communitytoc
     :hidden:
-  
+
     contribute
     roadmap
     Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
