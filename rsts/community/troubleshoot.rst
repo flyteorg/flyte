@@ -11,9 +11,14 @@ We've been working diligently to help users sort out issues.
 
 Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
 
+Troubles with ``flytectl sandbox start``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Debug yourself
-^^^^^^^^^^^^^^^
+- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
+- It ends with a message ``Timed out while waiting for the datacatalog rollout to be created``.
+
+How Do I Debug?
+"""""""""""""""
 
 - Sandbox is a Docker container that runs Kubernetes and Flyte in it. So you can simply ``exec`` into it;
 
@@ -30,11 +35,11 @@ Debug yourself
 
  docker exec -it <imageid> bash
 
-- and run: ::
+and run: ::
 
     kubectl get pods -n flyte
 
-- You can check on the pending pods and perform a detailed check as to why a pod is failing::
+You can check on the pending pods and perform a detailed check as to why a pod is failing::
 
     kubectl describe po <pod-name> -n flyte 
 
@@ -42,31 +47,12 @@ Debug yourself
 
     export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
 
-
-- Another useful way to debug Docker is::
-
-    docker system df
-
-
-Troubles with ``flytectl sandbox start``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
-- It ends with a message ``Timed out while waiting for the datacatalog rollout to be created``.
-
-**Potential causes**
-
-- Your Docker daemon is constrained on disk, memory, or CPU. 
-
-- **To fix this:**
-    - Reclaim disk space using the following command: ::
+- Another useful method to debug Docker is:
+    - If you would like to reclaim disk space: ::
 
         docker system prune [OPTIONS]
 
     - Increase mem/CPU available for Docker.
-
-.. note::
-    Why Docker? Refer to :ref:`deployment-sandbox`.
 
 
 Troubles with ``flyte sandbox`` log viewing
