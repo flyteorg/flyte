@@ -10,7 +10,7 @@ Prerequisites
 ^^^^^^^^^^^^^^^^
 Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ and Docker Daemon is running. Some of our users noted that being connected to a VPN may cause problems downloading the image.
 
-Install Flytectl
+Install FlyteCTL
 ^^^^^^^^^^^^^^^^^
 
 #. Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte.
