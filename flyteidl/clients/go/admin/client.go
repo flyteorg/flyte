@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"sync"
-
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
@@ -24,17 +22,6 @@ import (
 
 // IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
 //go:generate mockery -dir ../../../gen/pb-go/flyteidl/service -name AdminServiceClient -output ../admin/mocks
-
-var (
-	once            = sync.Once{}
-	adminConnection *grpc.ClientConn
-	authOpt         *grpc.DialOption
-
-	// A new connection just for auth metadata service since it will be used to retrieve auth
-	// related information that's needed to initialize the Clientset.
-	onceAuthMetadata       = sync.Once{}
-	authMetadataConnection *grpc.ClientConn
-)
 
 // Clientset contains the clients exposed to communicate with various admin services.
 type Clientset struct {
@@ -121,10 +108,8 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourcePr
 
 // InitializeAuthMetadataClient creates a new anonymously Auth Metadata Service client.
 func InitializeAuthMetadataClient(ctx context.Context, cfg *Config) (client service.AuthMetadataServiceClient, err error) {
-	onceAuthMetadata.Do(func() {
-		authMetadataConnection, err = NewAdminConnection(ctx, cfg)
-	})
-
+	// Create an unauthenticated connection to fetch AuthMetadata
+	authMetadataConnection, err := NewAdminConnection(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize admin connection. Error: %w", err)
 	}
@@ -168,7 +153,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, opts ...grpc.DialOptio
 	return grpc.Dial(cfg.Endpoint.String(), opts...)
 }
 
-// Create an AdminClient with a shared Admin connection for the process
+// InitializeAdminClient creates an AdminClient with a shared Admin connection for the process
 // Deprecated: Please use initializeClients instead.
 func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOption) service.AdminServiceClient {
 	set, err := initializeClients(ctx, cfg, nil, opts...)
@@ -183,32 +168,29 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 // initializeClients creates an AdminClient, AuthServiceClient and IdentityServiceClient with a shared Admin connection
 // for the process. Note that if called with different cfg/dialoptions, it will not refresh the connection.
 func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
-	once.Do(func() {
-		authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg)
-		if err != nil {
-			logger.Panicf(ctx, "failed to initialize Auth Metadata Client. Error: %v", err)
-		}
+	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg)
+	if err != nil {
+		logger.Panicf(ctx, "failed to initialize Auth Metadata Client. Error: %v", err)
+	}
 
-		tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
-		if err != nil {
-			logger.Errorf(ctx, "failed to initialize token source provider. Err: %s", err.Error())
-		}
+	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
+	if err != nil {
+		logger.Errorf(ctx, "failed to initialize token source provider. Err: %s", err.Error())
+	}
 
-		opt, err := getAuthenticationDialOption(ctx, cfg, tokenSourceProvider, authMetadataClient)
-		if err != nil {
-			logger.Warnf(ctx, "Starting an unauthenticated client because: %v", err)
-		}
+	authOpt, err := getAuthenticationDialOption(ctx, cfg, tokenSourceProvider, authMetadataClient)
+	if err != nil {
+		logger.Warnf(ctx, "Starting an unauthenticated client because: %v", err)
+	}
 
-		if opt != nil {
-			opts = append(opts, opt)
-			authOpt = &opt
-		}
+	if authOpt != nil {
+		opts = append(opts, authOpt)
+	}
 
-		adminConnection, err = NewAdminConnection(ctx, cfg, opts...)
-		if err != nil {
-			logger.Panicf(ctx, "failed to initialize Admin connection. Err: %s", err.Error())
-		}
-	})
+	adminConnection, err := NewAdminConnection(ctx, cfg, opts...)
+	if err != nil {
+		logger.Panicf(ctx, "failed to initialize Admin connection. Err: %s", err.Error())
+	}
 
 	var cs Clientset
 	cs.adminServiceClient = NewAdminClient(ctx, adminConnection)
@@ -216,8 +198,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	if authOpt != nil {
-		cs.authOpt = *authOpt
+		cs.authOpt = authOpt
 	}
+
 	return &cs, nil
 }
 

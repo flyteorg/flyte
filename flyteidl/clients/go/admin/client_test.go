@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"sync"
 	"testing"
 	"time"
 
@@ -32,11 +31,6 @@ func TestInitializeAndGetAdminClient(t *testing.T) {
 		assert.NotNil(t, InitializeAdminClient(ctx, &Config{
 			Endpoint: config.URL{URL: *u},
 		}))
-	})
-
-	t.Run("illegal", func(t *testing.T) {
-		once = sync.Once{}
-		assert.NotNil(t, InitializeAdminClient(ctx, &Config{}))
 	})
 }
 
@@ -76,7 +70,6 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
-		once = sync.Once{}
 		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
@@ -85,7 +78,6 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
 	t.Run("legal-from-config-with-cacerts", func(t *testing.T) {
-		once = sync.Once{}
 		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem"}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
@@ -93,7 +85,6 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.AdminClient())
 	})
 	t.Run("legal-from-config-with-invalid-cacerts", func(t *testing.T) {
-		once = sync.Once{}
 		defer func() {
 			if r := recover(); r == nil {
 				t.Errorf("The code did not panic")
