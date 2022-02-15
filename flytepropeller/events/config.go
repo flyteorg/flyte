@@ -31,12 +31,13 @@ var (
 	defaultConfig = Config{
 		Rate:     int64(500),
 		Capacity: 1000,
+		Type:     EventSinkAdmin,
 	}
 
 	configSection = config.MustRegisterSection(configSectionKey, &defaultConfig)
 )
 
-// Retrieve current global config for storage.
+// GetConfig Retrieves current global config for storage.
 func GetConfig(ctx context.Context) *Config {
 	if c, ok := configSection.GetConfig().(*Config); ok {
 		return c
