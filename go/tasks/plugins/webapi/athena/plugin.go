@@ -73,9 +73,17 @@ func (p Plugin) Create(ctx context.Context, tCtx webapi.TaskExecutionContextRead
 		return nil, nil, errors.Errorf(errors2.BadTaskSpecification, "Database must not be empty.")
 	}
 
-	execID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId()
+	// https://docs.aws.amazon.com/athena/latest/APIReference/API_StartQueryExecution.html dictates that the length
+	// must be within the range [32, 128].
+	clientRequestToken, err := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(32, 128)
+	if err != nil {
+		return nil, nil, errors.Wrapf(errors2.BadTaskSpecification, err,
+			"Generated Name [%v] couldn't be converted to a ClientRequestToken",
+			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	}
+
 	resp, err := p.client.StartQueryExecution(ctx, &athena.StartQueryExecutionInput{
-		ClientRequestToken: awsSdk.String(fmt.Sprintf("%v-%v-%v", execID.Project, execID.Domain, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())),
+		ClientRequestToken: awsSdk.String(clientRequestToken),
 		QueryExecutionContext: &athenaTypes.QueryExecutionContext{
 			Database: awsSdk.String(queryInfo.Database),
 			Catalog:  awsSdk.String(queryInfo.Catalog),

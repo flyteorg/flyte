@@ -44,6 +44,45 @@ func (_m *TaskExecutionID) GetGeneratedName() string {
 	return r0
 }
 
+type TaskExecutionID_GetGeneratedNameWith struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionID_GetGeneratedNameWith) Return(_a0 string, _a1 error) *TaskExecutionID_GetGeneratedNameWith {
+	return &TaskExecutionID_GetGeneratedNameWith{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *TaskExecutionID) OnGetGeneratedNameWith(minLength int, maxLength int) *TaskExecutionID_GetGeneratedNameWith {
+	c := _m.On("GetGeneratedNameWith", minLength, maxLength)
+	return &TaskExecutionID_GetGeneratedNameWith{Call: c}
+}
+
+func (_m *TaskExecutionID) OnGetGeneratedNameWithMatch(matchers ...interface{}) *TaskExecutionID_GetGeneratedNameWith {
+	c := _m.On("GetGeneratedNameWith", matchers...)
+	return &TaskExecutionID_GetGeneratedNameWith{Call: c}
+}
+
+// GetGeneratedNameWith provides a mock function with given fields: minLength, maxLength
+func (_m *TaskExecutionID) GetGeneratedNameWith(minLength int, maxLength int) (string, error) {
+	ret := _m.Called(minLength, maxLength)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(int, int) string); ok {
+		r0 = rf(minLength, maxLength)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int, int) error); ok {
+		r1 = rf(minLength, maxLength)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type TaskExecutionID_GetID struct {
 	*mock.Call
 }

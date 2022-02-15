@@ -138,7 +138,7 @@ func (_m *Client) OnRegisterJobDefinitionMatch(matchers ...interface{}) *Client_
 	return &Client_RegisterJobDefinition{Call: c}
 }
 
-// RegisterJobDefinition provides a mock function with given fields: ctx, name, image, role, structObj
+// RegisterJobDefinition provides a mock function with given fields: ctx, name, image, role, platformCapabilities
 func (_m *Client) RegisterJobDefinition(ctx context.Context, name string, image string, role string, platformCapabilities string) (string, error) {
 	ret := _m.Called(ctx, name, image, role, platformCapabilities)
 

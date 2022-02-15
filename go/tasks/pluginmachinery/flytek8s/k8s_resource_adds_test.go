@@ -221,6 +221,10 @@ func (m mockTaskExecutionIdentifier) GetID() core.TaskExecutionIdentifier {
 	return testTaskExecutionIdentifier
 }
 
+func (m mockTaskExecutionIdentifier) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
+	return "task-exec-name", nil
+}
+
 func (m mockTaskExecutionIdentifier) GetGeneratedName() string {
 	return "task-exec-name"
 }
