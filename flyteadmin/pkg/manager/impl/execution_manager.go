@@ -1184,7 +1184,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
 			"This phase %s was already recorded for workflow execution %v",
 			wfExecPhase.String(), request.Event.ExecutionId)
-	} else if err := validation.ValidateCluster(ctx, request.Event.ProducerId, executionModel.Cluster); err != nil {
+	} else if err := validation.ValidateCluster(ctx, executionModel.Cluster, request.Event.ProducerId); err != nil {
 		return nil, err
 	} else if common.IsExecutionTerminal(wfExecPhase) {
 		// Cannot go backwards in time from a terminal state to anything else
