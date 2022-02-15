@@ -106,7 +106,7 @@ For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/
 Execution Queues
 ================
 Execution queues themselves are currently defined in the
-`FlyteAdmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
+`flyteadmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
 
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the admin database.
