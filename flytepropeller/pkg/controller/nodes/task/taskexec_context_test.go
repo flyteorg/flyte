@@ -200,6 +200,37 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.NotNil(t, anotherTaskExecCtx.tr)
 }
 
+func TestGetGeneratedNameWith(t *testing.T) {
+	t.Run("length 0", func(t *testing.T) {
+		tCtx := taskExecutionID{
+			execName: "exec name",
+		}
+
+		_, err := tCtx.GetGeneratedNameWith(0, 0)
+		assert.Error(t, err)
+	})
+
+	t.Run("within range", func(t *testing.T) {
+		tCtx := taskExecutionID{
+			execName: "exec name name",
+		}
+
+		name, err := tCtx.GetGeneratedNameWith(10, 100)
+		assert.NoError(t, err)
+		assert.Equal(t, tCtx.execName, name)
+	})
+
+	t.Run("needs padding", func(t *testing.T) {
+		tCtx := taskExecutionID{
+			execName: "exec",
+		}
+
+		name, err := tCtx.GetGeneratedNameWith(10, 100)
+		assert.NoError(t, err)
+		assert.Equal(t, "exec000000", name)
+	})
+}
+
 func TestAssignResource(t *testing.T) {
 	type testCase struct {
 		name              string

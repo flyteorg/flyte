@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCatalog "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -41,6 +42,19 @@ func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
 
 func (te taskExecutionID) GetGeneratedName() string {
 	return te.execName
+}
+
+func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
+	origLength := len(te.execName)
+	if origLength < minLength {
+		return te.execName + strings.Repeat("0", minLength-origLength), nil
+	}
+
+	if origLength > maxLength {
+		return encoding.FixedLengthUniqueID(te.execName, maxLength)
+	}
+
+	return te.execName, nil
 }
 
 type taskExecutionMetadata struct {
