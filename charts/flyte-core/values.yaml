@@ -356,6 +356,16 @@ db:
 #
 
 configmap:
+  # Details of cluster
+  clusters: []
+#    - name: "cluster_1"
+#      endpoint: { { your-cluster-1-kubeapi-endpoint.com } }
+#      enabled: true
+#      auth:
+#        type: "file_path"
+#        tokenPath: "/var/run/credentials/cluster_1_token"
+#        certPath: "/var/run/credentials/cluster_1_cacert"
+
   # -- Configuration for Flyte console UI
   console:
     BASE_URL: /console

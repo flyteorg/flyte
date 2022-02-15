@@ -3,6 +3,9 @@
 set -ex
 
 echo "Generating Helm"
+
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 helm version
 # All the values files to be built
 DEPLOYMENT_CORE=${1:-eks gcp}
@@ -24,6 +27,9 @@ helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/fl
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
 then
+    if [[ -f "$(which helm-docs)" ]]; then
+      rm $(which helm-docs)
+    fi
     GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 fi
 
