@@ -33,6 +33,12 @@ export const transformerWorkflowToDag = (
     return root;
 };
 
+export const transformerWorkflowToPlainNodes = (
+    workflow: CompiledWorkflowClosure
+): dNode => {
+    return buildDAG(null, workflow.primary, dTypes.primary, workflow);
+};
+
 const createDNode = (
     compiledNode: CompiledNode,
     parentDNode?: dNode | null,

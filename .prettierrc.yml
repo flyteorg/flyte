@@ -1,7 +1,9 @@
 singleQuote: true
 tabWidth: 4
+max-line-length: 120
+printWidth: 120
 overrides:
-  - files: "*.json"
+  - files: ["*.js*", "*.ts*", "*.json"]
     options:
       tabWidth: 2
   - files: ["*.yml", "*.yaml"]

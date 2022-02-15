@@ -3,21 +3,23 @@
  */
 
 export enum FeatureFlag {
-    // Test flag is created only for unit-tests
-    TestFlagUndefined = 'test-flag-undefined',
-    TestFlagTrue = 'test-flag-true',
+  // Test flag is created only for unit-tests
+  TestFlagUndefined = 'test-flag-undefined',
+  TestFlagTrue = 'test-flag-true',
 
-    // Production flags
-    LaunchPlan = 'launch-plan'
+  // Production flags
+  LaunchPlan = 'launch-plan',
+  TimelineView = 'timeline-view'
 }
 
 export type FeatureFlagConfig = { [k: string]: boolean };
 
 export const defaultFlagConfig: FeatureFlagConfig = {
-    // Test
-    'test-flag-true': true,
+  // Test
+  'test-flag-true': true,
 
-    // Production - new code should be turned off by default
-    // If you need to turn it on locally -> update runtimeConfig in ./index.tsx file
-    'launch-plan': false
+  // Production - new code should be turned off by default
+  // If you need to turn it on locally -> update runtimeConfig in ./index.tsx file
+  'launch-plan': false,
+  'timeline-view': false
 };

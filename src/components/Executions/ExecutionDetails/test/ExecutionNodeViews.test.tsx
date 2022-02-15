@@ -17,6 +17,15 @@ jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
     ExecutionWorkflowGraph: () => null
 }));
 
+jest.mock('chart.js', () => ({
+    Chart: { register: () => null },
+    registerables: []
+}));
+
+jest.mock('chartjs-plugin-datalabels', () => ({
+    ChartDataLabels: null
+}));
+
 // ExecutionNodeViews uses query params for NE list, so we must match them
 // for the list to be returned properly
 const baseQueryParams = {
