@@ -22,7 +22,7 @@ the security of the overall system.
 
 In abstract, Flyte supports OAuth2 and OpenId Connect (built on top of OAuth2) to secure the various connections:
 
-* :ref:`OpenId Connect <auth-openid-appendix>`: Used to secure user's authentication to flyteadmin service.
+* :ref:`OpenId Connect <auth-openid-appendix>`: Used to secure user's authentication to FlyteAdmin service.
 * :ref:`OAuth2 <auth-oauth2-appendix>`: Used to secure communication between clients (i.e. flyte-cli, flytectl and
   flytepropeller) and flyteadmin service.
 
@@ -349,7 +349,7 @@ If your organization does any automated registration, then you'll need to authen
            authType: Pkce
 
            # Set to the clientId (will be used for both Pkce and ClientSecret flows)
-           # Leave empty to use the value discovered through flyteAdmin's Auth discovery endpoint.
+           # Leave empty to use the value discovered through FlyteAdmin's Auth discovery endpoint.
            clientId: <Id>
 
            # Set to the location where the client secret is mounted.
@@ -357,7 +357,7 @@ If your organization does any automated registration, then you'll need to authen
            clientSecretLocation: </some/path/to/key>
 
            # If required, set the scopes needed here. Otherwise, flytectl will discover scopes required for OpenID
-           # Connect through flyteAdmin's Auth discovery endpoint.
+           # Connect through FlyteAdmin's Auth discovery endpoint.
            # scopes: [ "scope1", "scope2" ]
 
    To read further about the available config options, please

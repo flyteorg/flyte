@@ -46,7 +46,7 @@ Cluster Config
 
     .. link-button:: flyteadmin-config-specification
        :type: ref
-       :text: Flyte Admin Configuration
+       :text: FlyteAdmin Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     All about FlyteAdmin configuration specification.

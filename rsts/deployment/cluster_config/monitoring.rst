@@ -90,7 +90,7 @@ The dashboards are divided into two types:
 
 - **System Dashboards**: Dashboards that are useful for the system maintainer to maintain their Flyte deployments. These are further divided into:
         - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`__
-        - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
+        - ControlPlane/FlyteAdmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
 
 The abovementioned are basic dashboards and do no include all the metrics exposed by Flyte.
 Please help us improve the dashboards by contributing to them 🙏.

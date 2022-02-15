@@ -96,7 +96,7 @@ Let us first look at various config properties that can be set and would impact 
    * - admin-launcher.tps, admin-launcher.cacheSize, admin-launcher.workers
      - propeller
      - This config is used to configure the max rate and launch-plans that FlytePropeller can launch against FlyteAdmin
-     - It is essential to limit the number of writes from FlytePropeller to flyteadmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
+     - It is essential to limit the number of writes from FlytePropeller to FlyteAdmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
    * - tasks.backoff.max-duration
      - propeller
      - This config is used to configure the maximum back-off interval incase of resource-quota errors
@@ -147,7 +147,7 @@ This can done in multiple ways
 
 #. Platform default: This allows to set platform-wide defaults for maximum concurrency within a Workflow execution. This can be overriden per Launch plan or per execution.
    The default `maxParallelism is configured to be 25 <https://github.com/flyteorg/flyteadmin/blob/master/pkg/runtime/application_config_provider.go#L40>`_.
-   It can be overriden with this config block in flyteadmin
+   It can be overriden with this config block in FlyteAdmin.
 
    .. code-block:: yaml
 
@@ -246,4 +246,4 @@ The Project and Domain Shard Strategies, denoted by "type: project" and "type: d
  
 Multi-Cluster mode
 ===================
-In our experience at Lyft, we saw that the Kubernetes cluster would have problems before FlytePropeller or FlyteAdmin would have impact. Thus Flyte supports adding multiple dataplane clusters by default. Each dataplane cluster, has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
+In our experience at Lyft, we saw that the Kubernetes cluster would have problems before FlytePropeller or FlyteAdmin would have impact. Thus Flyte supports adding multiple dataplane clusters by default. Each dataplane cluster, has one or more FlytePropellers running in them, and FlyteAdmin manages the routing and assigning of workloads to these clusters.

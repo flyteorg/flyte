@@ -702,7 +702,7 @@ projectId (string)
   ""
   
 
-Section: flyteadmin
+Section: FlyteAdmin
 ================================================================================
 
 roleNameKey (string)
