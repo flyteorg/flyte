@@ -8,6 +8,10 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
@@ -76,7 +80,7 @@ type Controller struct {
 	levelMonitor  *ResourceLevelMonitor
 }
 
-// Runs either as a leader -if configured- or as a standalone process.
+// Run either as a leader -if configured- or as a standalone process.
 func (c *Controller) Run(ctx context.Context) error {
 	if c.leaderElector == nil {
 		logger.Infof(ctx, "Running without leader election.")
@@ -189,9 +193,9 @@ func (c *Controller) getWorkflowUpdatesHandler() cache.ResourceEventHandler {
 	}
 }
 
-// This object is responsible for emitting metrics that show the current number of Flyte workflows, cut by project and domain.
-// It needs to be kicked off. The periodicity is not currently configurable because it seems unnecessary. It will also
-// a timer measuring how long it takes to run each measurement cycle.
+// ResourceLevelMonitor is responsible for emitting metrics that show the current number of Flyte workflows,
+// by project and domain. It needs to be kicked off. The periodicity is not currently configurable because it seems
+// unnecessary. It will also a timer measuring how long it takes to run each measurement cycle.
 type ResourceLevelMonitor struct {
 	Scope promutils.Scope
 
@@ -297,7 +301,7 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, opt
 	return clients.AdminClient(), clients.AuthOpt(), nil
 }
 
-// NewController returns a new FlyteWorkflow controller
+// New returns a new FlyteWorkflow controller
 func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
@@ -421,4 +425,109 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	// Set up an event handler for when FlyteWorkflow resources change
 	flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
 	return controller, nil
+}
+
+// SharedInformerOptions creates informer options to work with FlytePropeller Sharding
+func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []informers.SharedInformerOption {
+	selectors := []struct {
+		label     string
+		operation v1.LabelSelectorOperator
+		values    []string
+	}{
+		{k8s.ShardKeyLabel, v1.LabelSelectorOpIn, cfg.IncludeShardKeyLabel},
+		{k8s.ShardKeyLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeShardKeyLabel},
+		{k8s.ProjectLabel, v1.LabelSelectorOpIn, cfg.IncludeProjectLabel},
+		{k8s.ProjectLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeProjectLabel},
+		{k8s.DomainLabel, v1.LabelSelectorOpIn, cfg.IncludeDomainLabel},
+		{k8s.DomainLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeDomainLabel},
+	}
+
+	labelSelector := IgnoreCompletedWorkflowsLabelSelector()
+	for _, selector := range selectors {
+		if len(selector.values) > 0 {
+			labelSelectorRequirement := v1.LabelSelectorRequirement{
+				Key:      selector.label,
+				Operator: selector.operation,
+				Values:   selector.values,
+			}
+
+			labelSelector.MatchExpressions = append(labelSelector.MatchExpressions, labelSelectorRequirement)
+		}
+	}
+
+	opts := []informers.SharedInformerOption{
+		informers.WithTweakListOptions(func(options *v1.ListOptions) {
+			options.LabelSelector = v1.FormatLabelSelector(labelSelector)
+		}),
+	}
+
+	if cfg.LimitNamespace != defaultNamespace {
+		opts = append(opts, informers.WithNamespace(cfg.LimitNamespace))
+	}
+	return opts
+}
+
+// StartController creates a new FlytePropeller Controller and starts it
+func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string) error {
+	// Setup cancel on the context
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	kubeClient, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
+	if err != nil {
+		return errors.Wrapf(err, "error building Kubernetes Clientset")
+	}
+
+	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
+	if err != nil {
+		return errors.Wrapf(err, "error building FlyteWorkflow clientset")
+	}
+
+	opts := SharedInformerOptions(cfg, defaultNamespace)
+	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
+
+	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
+
+	limitNamespace := ""
+	if cfg.LimitNamespace != defaultNamespace {
+		limitNamespace = cfg.LimitNamespace
+	}
+
+	mgr, err := manager.New(kubecfg, manager.Options{
+		Namespace:     limitNamespace,
+		SyncPeriod:    &cfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
+	})
+	if err != nil {
+		return errors.Wrapf(err, "failed to initialize controller-runtime manager")
+	}
+
+	// Start controller runtime manager to start listening to resource changes.
+	// K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
+	// EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
+	// workflow changes faster than the default sync interval for workflow CRDs.
+	go func(ctx context.Context) {
+		ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
+		pprof.SetGoroutineLabels(ctx)
+		logger.Infof(ctx, "Starting controller-runtime manager")
+		err := mgr.Start(ctx)
+		if err != nil {
+			logger.Fatalf(ctx, "Failed to start manager. Error: %v", err)
+		}
+	}(ctx)
+
+	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, mgr, propellerScope)
+	if err != nil {
+		return errors.Wrap(err, "failed to start FlytePropeller")
+	} else if c == nil {
+		return errors.Errorf("Failed to create a new instance of FlytePropeller")
+	}
+
+	go flyteworkflowInformerFactory.Start(ctx.Done())
+
+	if err = c.Run(ctx); err != nil {
+		return errors.Wrapf(err, "Error running FlytePropeller.")
+	}
+	return nil
 }

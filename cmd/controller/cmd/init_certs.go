@@ -5,6 +5,8 @@ import (
 	"context"
 	cryptorand "crypto/rand"
 
+	"github.com/flyteorg/flytepropeller/pkg/webhook"
+
 	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -74,7 +76,7 @@ func init() {
 }
 
 func runCertsCmd(ctx context.Context, propellerCfg *config.Config, cfg *webhookConfig.Config) error {
-	podNamespace, found := os.LookupEnv(PodNamespaceEnvVar)
+	podNamespace, found := os.LookupEnv(webhook.PodNamespaceEnvVar)
 	if !found {
 		podNamespace = podDefaultNamespace
 	}

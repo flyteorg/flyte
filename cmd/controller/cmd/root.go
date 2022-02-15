@@ -1,4 +1,4 @@
-// Commands for FlytePropeller controller.
+// Package cmd contains commands for FlytePropeller controller.
 package cmd
 
 import (
@@ -6,36 +6,23 @@ import (
 	"flag"
 	"os"
 	"runtime"
-	"runtime/pprof"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-
-	transformers "github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytestdlib/profutils"
 	"k8s.io/klog"
 
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-
 	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/flyteorg/flytestdlib/version"
 
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/profutils"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/spf13/pflag"
 
 	"github.com/spf13/cobra"
 
-	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
-	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
 	"github.com/flyteorg/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flytepropeller/pkg/signals"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 const (
@@ -55,8 +42,9 @@ var rootCmd = &cobra.Command{
 	Long: `Flyte Propeller runs a workflow to completion by recursing through the nodes, 
 			handling their tasks to completion and propagating their status upstream.`,
 	PersistentPreRunE: initConfig,
-	Run: func(cmd *cobra.Command, args []string) {
-		executeRootCmd(config2.GetConfig())
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := context.Background()
+		return executeRootCmd(ctx, config2.GetConfig())
 	},
 }
 
@@ -111,113 +99,16 @@ func logAndExit(err error) {
 	os.Exit(-1)
 }
 
-func sharedInformerOptions(cfg *config2.Config) []informers.SharedInformerOption {
-	selectors := []struct {
-		label     string
-		operation v1.LabelSelectorOperator
-		values    []string
-	}{
-		{transformers.ShardKeyLabel, v1.LabelSelectorOpIn, cfg.IncludeShardKeyLabel},
-		{transformers.ShardKeyLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeShardKeyLabel},
-		{transformers.ProjectLabel, v1.LabelSelectorOpIn, cfg.IncludeProjectLabel},
-		{transformers.ProjectLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeProjectLabel},
-		{transformers.DomainLabel, v1.LabelSelectorOpIn, cfg.IncludeDomainLabel},
-		{transformers.DomainLabel, v1.LabelSelectorOpNotIn, cfg.ExcludeDomainLabel},
-	}
-
-	labelSelector := controller.IgnoreCompletedWorkflowsLabelSelector()
-	for _, selector := range selectors {
-		if len(selector.values) > 0 {
-			labelSelectorRequirement := v1.LabelSelectorRequirement{
-				Key:      selector.label,
-				Operator: selector.operation,
-				Values:   selector.values,
-			}
-
-			labelSelector.MatchExpressions = append(labelSelector.MatchExpressions, labelSelectorRequirement)
-		}
-	}
-
-	opts := []informers.SharedInformerOption{
-		informers.WithTweakListOptions(func(options *v1.ListOptions) {
-			options.LabelSelector = v1.FormatLabelSelector(labelSelector)
-		}),
-	}
-
-	if cfg.LimitNamespace != defaultNamespace {
-		opts = append(opts, informers.WithNamespace(cfg.LimitNamespace))
-	}
-	return opts
-}
-
-func executeRootCmd(cfg *config2.Config) {
-	baseCtx := context.Background()
-
+func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
-
-	kubeClient, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
-	if err != nil {
-		logger.Fatalf(ctx, "Error building kubernetes clientset: %s", err.Error())
-	}
-
-	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
-	if err != nil {
-		logger.Fatalf(ctx, "Error building example clientset: %s", err.Error())
-	}
-
-	opts := sharedInformerOptions(cfg)
-	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
-
-	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, cfg.ProfilerPort.Port, nil)
 		if err != nil {
-			logger.Panicf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
+			logger.Fatalf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
 		}
 	}()
 
-	limitNamespace := ""
-	if cfg.LimitNamespace != defaultNamespace {
-		limitNamespace = cfg.LimitNamespace
-	}
-
-	mgr, err := manager.New(kubecfg, manager.Options{
-		Namespace:     limitNamespace,
-		SyncPeriod:    &cfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
-	})
-	if err != nil {
-		logger.Fatalf(ctx, "Failed to initialize controller run-time manager. Error: %v", err)
-	}
-
-	// Start controller runtime manager to start listening to resource changes.
-	// K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
-	// EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
-	// workflow changes faster than the default sync interval for workflow CRDs.
-	go func(ctx context.Context) {
-		ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
-		pprof.SetGoroutineLabels(ctx)
-		logger.Infof(ctx, "Starting controller-runtime manager")
-		err := mgr.Start(ctx)
-		if err != nil {
-			logger.Fatalf(ctx, "Failed to start manager. Error: %v", err)
-		}
-	}(ctx)
-
-	c, err := controller.New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, mgr, propellerScope)
-	if err != nil {
-		logger.Fatalf(ctx, "Failed to start Controller - [%v]", err.Error())
-		return
-	} else if c == nil {
-		logger.Fatalf(ctx, "Failed to start Controller, nil controller received.")
-	}
-
-	go flyteworkflowInformerFactory.Start(ctx.Done())
-
-	if err = c.Run(ctx); err != nil {
-		logger.Fatalf(ctx, "Error running controller: %s", err.Error())
-	}
+	return controller.StartController(ctx, cfg, defaultNamespace)
 }
