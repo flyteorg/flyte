@@ -102,6 +102,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.enabled | bool | `true` |  |
+| datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
 | datacatalog.image.tag | string | `"v0.3.22"` | Docker image tag |
@@ -131,6 +132,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.enabled | bool | `true` |  |
+| flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
 | flyteadmin.image.tag | string | `"v0.6.92"` |  |
@@ -164,6 +166,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.cacheSizeMbs | int | `0` |  |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytepropeller.enabled | bool | `true` |  |
+| flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
 | flytepropeller.image.tag | string | `"v0.16.19"` |  |
