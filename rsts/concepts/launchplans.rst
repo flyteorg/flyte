@@ -20,7 +20,7 @@ A launch plan version can only ever be mapped to one WF version; meaning a launc
 .. note::
    Users rarely interact with the default launch plan.
 
-Suppose we have ``Workflow A`` in ``version 1``, ``LaunchPlans`` ``A`` and ``B`` in ``version 1``, and ``LaunchPlan`` ``C`` in ``version 2``, then:
+Suppose we have ``Workflow A`` in ``version 1``, ``LaunchPlans`` ``A`` and ``B`` in ``version 1``, and ``LaunchPlan`` ``B`` in ``version 2``, then:
 
 1. ``Workflow A`` can be associated with ``LaunchPlan A`` (version 1);
 2. ``Workflow A`` can be associated with ``LaunchPlan B`` (different launch plan name; version 1);

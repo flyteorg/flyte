@@ -47,12 +47,11 @@ You can check on the pending pods and perform a detailed check as to why a pod i
 
     export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
 
-- Another useful method to debug Docker is:
-    - If you would like to reclaim disk space: ::
+- If you would like to reclaim disk space: ::
 
-        docker system prune [OPTIONS]
+    docker system prune [OPTIONS]
 
-    - Increase mem/CPU available for Docker.
+- Increase mem/CPU available for Docker.
 
 
 Troubles with ``flyte sandbox`` log viewing

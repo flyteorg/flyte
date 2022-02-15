@@ -292,7 +292,7 @@ For example, multiple filters would be appended to an http request like::
 
  ?filters=ne(version, TheWorst)+eq(workflow.name, workflow)	
 
-Timestamp fields use the ``RFC3339Nano`` spec (ex: "2006-01-02T15:04:05.999999999Z07:00")	
+Timestamp fields use the ``RFC3339Nano`` spec (e.g., "2006-01-02T15:04:05.999999999Z07:00")	
 
 The fully supported set of filter functions are	
 
@@ -359,7 +359,7 @@ Filterable fields vary based on entity types:
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
-  - mode (you must use the integer enum ex: 1)	
+  - mode (you must use the integer enum e.g., 1)	
      - Modes are defined in :std:ref:`executionmode <protos/docs/admin/admin:executionmetadata.executionmode>`.
   - user (authenticated user or role from flytekit config)
 
@@ -367,7 +367,7 @@ Filterable fields vary based on entity types:
 
   - node_id	
   - execution.{any execution field above} (for example: execution.domain)	
-  - phase (you must use the upper-cased string name ex: ``QUEUED``)	
+  - phase (you must use the upper-cased string name e.g., ``QUEUED``)	
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at	
   - node_execution_created_at	
@@ -380,7 +380,7 @@ Filterable fields vary based on entity types:
   - task.{any task field above} (for example: task.version)	
   - execution.{any execution field above} (for example: execution.domain)	
   - node_execution.{any node execution field above} (for example: node_execution.phase)	
-  - phase (you must use the upper-cased string name ex: ``SUCCEEDED``)	
+  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)	
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at	
   - task_execution_created_at	
@@ -440,7 +440,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - version	
   - created_at	
   - updated_at	
-  - state (you must use the integer enum ex: 1)	
+  - state (you must use the integer enum e.g., 1)	
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - ListWorkflowIds	
@@ -453,19 +453,19 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - project	
   - domain	
   - name	
-  - phase (you must use the upper-cased string name ex: ``RUNNING``)	
+  - phase (you must use the upper-cased string name e.g., ``RUNNING``)	
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
-  - mode (you must use the integer enum ex: 1)	
+  - mode (you must use the integer enum e.g., 1)	
      - Modes are defined :std:ref:`execution.proto <protos/docs/admin/admin:executionmetadata.executionmode>`.
      
 - ListNodeExecutions	
 
   - node_id	
   - retry_attempt	
-  - phase (you must use the upper-cased string name ex: ``QUEUED``)	
+  - phase (you must use the upper-cased string name e.g., ``QUEUED``)	
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at	
   - node_execution_created_at	
@@ -475,7 +475,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 - ListTaskExecutions	
 
   - retry_attempt	
-  - phase (you must use the upper-cased string name ex: ``SUCCEEDED``)	
+  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)	
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at	
   - task_execution_created_at	
@@ -485,7 +485,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 Sorting syntax	
 --------------	
 
-Adding sorting to a request requires specifying the ``key``, ex: the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
+Adding sorting to a request requires specifying the ``key``, e.g., the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
 
 Example sorting HTTP parameter:	
 
