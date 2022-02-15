@@ -186,7 +186,7 @@ OAuth2 Authorization Server
 ---------------------------
 
 An OAuth2 Authorization Server allows external clients to request to authenticate and act on behalf of users (or as their own identities). Having
-an OAuth2 Authorization Server enables Flyte Administrators control over which apps can be installed and what scopes they are allowed to request or be granted (i.e. what privileges can they assume).
+an OAuth2 Authorization Server enables Flyte administrators control over which apps can be installed and what scopes they are allowed to request or be granted (i.e. what privileges can they assume).
 
 Flyte comes with a built-in authorization server that can be statically configured with a set of clients to request and act on behalf of the user.
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/pull/168/files#diff-1267ff8bd9146e1c0ff22a9e9d53cfc56d71c1d47fed9905f95ed4bddf930f8eR74-R100>`__

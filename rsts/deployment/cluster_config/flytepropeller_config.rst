@@ -3609,7 +3609,7 @@ launchplan.AdminConfig
 tps (int64)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The maximum number of transactions per second to FlyteAdmin from this client.
+The maximum number of transactions per second to flyte admin from this client.
 
 **Default Value**: 
 
