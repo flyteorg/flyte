@@ -70,7 +70,7 @@ FlyteAdmin requires that the application in your identity provider be configured
 Example Flyte Configurations
 ============================
 
-Below are some canonical examples of how to set up some of the common IdPs to secure your Fyte services. OpenID Connect enables users to authenticate, in the
+Below are some canonical examples of how to set up some of the common IdPs to secure your Flyte services. OpenID Connect enables users to authenticate, in the
 browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed third party app access.
 
 OpenID Connect

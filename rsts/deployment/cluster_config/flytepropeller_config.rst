@@ -1,7 +1,7 @@
 .. _flytepropeller-config-specification:
 
 #########################################
-Flyte Propeller Configuration
+FlytePropeller Configuration
 #########################################
 
 - `admin <#section-admin>`_

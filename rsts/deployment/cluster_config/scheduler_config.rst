@@ -1,7 +1,7 @@
 .. _flytescheduler-config-specification:
 
 #########################################
-Flyte Scheduler Configuration
+FlyteScheduler Configuration
 #########################################
 
 - `admin <#section-admin>`_

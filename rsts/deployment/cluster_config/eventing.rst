@@ -21,7 +21,7 @@ Event egress can be configured to work with **AWS** using `SQS <https://aws.amaz
 Configuration
 *************
 
-To turn on, add the following to your FlyteAdmin
+To turn on, add the following to your FlyteAdmin:
 
 .. code:: yaml
 
