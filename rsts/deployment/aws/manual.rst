@@ -195,7 +195,7 @@ The initial EKS cluster will not have any instances configured to operate the cl
 
 Create an RDS Database
 ======================
-Next, create a relational database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
+Next, create a relational database. This database will be used by both the primary control plane service (FlyteAdmin) and the Flyte memoization service (Data Catalog).
 
 * Navigate to `RDS <https://console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database.
 * Leave the Template as Production.

@@ -285,7 +285,7 @@ Verify by creating a test namespace:
 
 Create a Cloud SQL Database
 ===========================
-Next, create a relational `Cloud SQL for PostgreSQL <https://cloud.google.com/sql/docs/postgres/introduction>`__ database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
+Next, create a relational `Cloud SQL for PostgreSQL <https://cloud.google.com/sql/docs/postgres/introduction>`__ database. This database will be used by both the primary control plane service (FlyteAdmin) and the Flyte memoization service (Data Catalog).
 Follow this `link <https://console.cloud.google.com/sql/choose-instance-engine>`__ to create the cloud SQL instance.
 
 * Select PostgreSQL

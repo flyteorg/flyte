@@ -12,23 +12,15 @@ We've been working diligently to help users sort out issues.
 Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
 
 Troubles with ``flytectl sandbox start``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- The process hangs at ``Waiting for Flyte to become ready...`` for a while
-- OR ends with a message ``Timed out while waiting for the datacatalog rollout to be created``
+- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
+- It ends with a message ``Timed out while waiting for the datacatalog rollout to be created``.
 
-**Potential causes**
+How Do I Debug?
+"""""""""""""""
 
-- your docker daemon is constrained on disk, memory or CPU potentially. Why docker? refer to :ref:`deployment-sandbox`.
-- a simple solution reclaim disk from docker - `docs <https://docs.docker.com/engine/reference/commandline/system_prune/>`__ ::
-
-   docker system prune [OPTIONS]
-
-- Another simple solution, increase mem / cpu available for docker
-
-**Debug yourself**
-
-- sandbox is a docker container that runs kubernetes and flyte in it. So you can simple ``exec`` into it
+- Sandbox is a Docker container that runs Kubernetes and Flyte in it. So you can simply ``exec`` into it;
 
 .. prompt:: bash $
 
@@ -43,27 +35,30 @@ Troubles with ``flytectl sandbox start``
 
  docker exec -it <imageid> bash
 
-Inside the container you can run::
+and run: ::
 
- kubectl get pods -n flyte
+    kubectl get pods -n flyte
 
-you can check on the Pending pods and do a detail check as to why the scheduler is failing. This could also affect your workflows.
+You can check on the pending pods and perform a detailed check as to why a pod is failing::
 
-Also you can simply export this variable to use local kubectl::
+    kubectl describe po <pod-name> -n flyte 
 
- export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
+- Also, you can simply export this variable to use local kubectl::
 
+    export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
 
-Another useful way to debug docker is::
+- If you would like to reclaim disk space: ::
 
- docker system df
+    docker system prune [OPTIONS]
+
+- Increase mem/CPU available for Docker.
 
 
 Troubles with ``flyte sandbox`` log viewing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- When testing locally using flyte-sandbox, one way to view the logs is by the link ``Kubernetes Logs (User)`` in the FlyteConsole. 
-- This might take you to the kubernetes dashboard, and require a login.
+- When testing locally using the ``flyte sandbox`` command, one way to view the logs is using the ``Kubernetes Logs (User)`` option on the Flyte Console. 
+- This takes you to the Kubernetes dashboard which requires a login.
 
 ::
 
@@ -85,72 +80,34 @@ Troubles with ``flyte sandbox`` log viewing
 
 .. note::
 
-   There is a ``skip`` button, which will take you straight to the logs without needing to log in.
+   There is a ``skip`` button that takes you straight to the logs without logging in.
 
-
-Troubles with ``make start`` command in flytesnacks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
-- If ``make start`` results in a timeout issue:
-   .. code-block:: bash
-
-     Starting Flyte sandbox
-     Waiting for Flyte to become ready...
-     Error from server (NotFound): deployments.apps "datacatalog" not found
-     Error from server (NotFound): deployments.apps "flyteadmin" not found
-     Error from server (NotFound): deployments.apps "flyteconsole" not found
-     Error from server (NotFound): deployments.apps "flytepropeller" not found
-     Timed out while waiting for the Flyte deployment to start
-
-   You can run ``make teardown`` followed by the ``make start`` command.
-
-- If the ``make start`` command isn't proceeding by any chance, check the pods' statuses by run this command
-
-  ::
-
-   docker exec flyte-sandbox kubectl get po -A
-- If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command which gives detailed overview of pod's status
-
-  ::
-
-   docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte
-
-- If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
-
-  - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
-  - Prune the images and volumes.
-  - Given there's less than 10% free disk space, Kubernetes, by default, throws the disk pressure error.
-
-
-Troubles with flytectl command within proxy setting
+Troubles with FlyteCTL command within proxy setting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- flytectl uses GRPC api's of the flyteadmin to administer flyte resources and in case of proxy settings it uses an additional CONNECT handshake at GRPC layer to perfrom the same. Additonal info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__
+- FlyteCTL uses GRPC APIs of FlyteAdmin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the GRPC layer to perform the same. Additional info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__.
 
-- On windows environment it has been noticed that NO_PROXY variable doesn't work for bypassing the proxy settings. GRPC issue reported `here <https://github.com/grpc/grpc/issues/9989>`__ provides additional details though it doesn't seem to have been tested on windows yet.Inorder to get around this issue unset both the HTTP_PROXY and HTTPS_PROXY variables.
+- On the Windows environment, it has been noticed that the ``NO_PROXY`` variable doesn't work to bypass the proxy settings. `This <https://github.com/grpc/grpc/issues/9989>`__ GRPC issue provides additional details, though it doesn't seem to have been tested on Windows yet. To get around this issue, unset both the ``HTTP_PROXY`` and ``HTTPS_PROXY`` variables.
 
-Troubles with flytectl command with cloudfare DNS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Troubles with FlyteCTL commands with Cloudflare DNS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- flytectl throws permission error with cloudfare DNS endpoint
-- Cloudflare instance by default would proxy the requests and would filter out grpc.
-- You have two options either enable grpc in the network tab or turn off the proxy.
+- FlyteCTL throws permission error with Cloudflare DNS endpoint
+- Cloudflare instance by default proxies the requests and would filter out GRPC.
+- **To fix this**: 
+    - Enable grpc in the network tab; OR
+    - Turn off the proxy.
 
-Troubles with flytectl command with auth enabled
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Troubles with FlyteCTL commands with auth enabled
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- flytectl uses OpenID connect if auth is enabled in the flyte environment.
-- It opens an http server port on localhost:53593 and has a callback endpoint for the OpendID connect server to call into for the response.
-- If the callback server call fails, then please check if flytectl failed in running the server.
-- Verify if you have an entry for localhost in your /etc/hosts file
-- It could also mean that the call back took longer and flytectl deadline expired on the wait which defaults to 15 secs.
-
-.. NOTE::
-
-      More coming soon. Stay tuned 👀
+- FlyteCTL commands use OpenID connect if auth is enabled in the Flyte environment
+- It opens an ``HTTP`` server port on localhost:53593. It has a callback endpoint for the OpenID connect server to call into for the response
+    - If the callback server call fails, please check if FlyteCTL failed to run the server
+    - Verify if you have an entry for localhost in your ``/etc/hosts`` file
+    - It could also mean that the callback took longer and the FlyteCTL deadline expired on the wait which defaults to 15 secs
 
 
 I NEED HELP!
 ^^^^^^^^^^^^^
-The community is always available and ready to help `Slack <http://flyte-org.slack.com/>`__.
+Our `Slack <http://flyte-org.slack.com/>`__ community is always available and ready to help!

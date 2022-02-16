@@ -1,7 +1,7 @@
 .. _flyteadmin-config-specification:
 
 #########################################
-Flyte Admin Configuration
+FlyteAdmin Configuration
 #########################################
 
 - `admin <#section-admin>`_
