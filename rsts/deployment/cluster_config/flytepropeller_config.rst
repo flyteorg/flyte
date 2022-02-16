@@ -442,6 +442,18 @@ Cache entries past this age will incur cache miss. 0 means cache never expires
   0s
   
 
+use-admin-auth (bool)
+--------------------------------------------------------------------------------
+
+Use the same gRPC credentials option as the flyteadmin client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: event
 ================================================================================
 
@@ -666,6 +678,7 @@ k8s (`config.K8sPluginConfig`_)
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  enable-host-networking-pod: null
   gpu-resource-name: nvidia.com/gpu
   inject-finalizer: false
   interruptible-node-selector: null
@@ -698,8 +711,9 @@ k8s-array (`k8s.Config`_)
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
       gcp-project: ""
-      kubernetes-enabled: false
-      kubernetes-template-uri: ""
+      kubernetes-enabled: true
+      kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+        }}/pod?namespace={{ .namespace }}
       kubernetes-url: ""
       stackdriver-enabled: false
       stackdriver-logresourcename: ""
@@ -1657,6 +1671,16 @@ default-security-context (v1.SecurityContext)
   null
   
 
+enable-host-networking-pod (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  <invalid reflect.Value>
+  
+
 config.FlyteCoPilotConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1992,8 +2016,9 @@ Config for log links for k8s array jobs.
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
     gcp-project: ""
-    kubernetes-enabled: false
-    kubernetes-template-uri: ""
+    kubernetes-enabled: true
+    kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+      }}/pod?namespace={{ .namespace }}
     kubernetes-url: ""
     stackdriver-enabled: false
     stackdriver-logresourcename: ""
@@ -2108,8 +2133,9 @@ Defines the log config for k8s logs.
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
   gcp-project: ""
-  kubernetes-enabled: false
-  kubernetes-template-uri: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
   kubernetes-url: ""
   stackdriver-enabled: false
   stackdriver-logresourcename: ""
@@ -2177,7 +2203,7 @@ Enable Kubernetes Logging
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 kubernetes-url (string)
@@ -2201,7 +2227,8 @@ Template Uri to use when building kubernetes log links
 
 .. code-block:: yaml
 
-  ""
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
   
 
 stackdriver-enabled (bool)

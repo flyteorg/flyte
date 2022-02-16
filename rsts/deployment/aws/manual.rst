@@ -592,7 +592,6 @@ Flyte can be accessed using the UI console or your terminal.
 
 <FLYTE-ENDPOINT> = Value in ADDRESS column and both will be the same as the same port is used for both GRPC and HTTP.
 
-
 * Connect to flytectl CLI.
 
 Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
@@ -603,7 +602,7 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
      # For GRPC endpoints you might want to use dns:///flyte.myexample.com
      endpoint: dns:///<FLYTE-ENDPOINT>
      insecureSkipVerify: true # only required if using a self-signed cert. Caution: not to be used in production
-     insecure: true
+     insecure: true # only required when using insecure ingress. Secure ingress may cause an unavailable desc error to true option.
     logger:
      show-source: true
      level: 0

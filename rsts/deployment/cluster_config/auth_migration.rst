@@ -13,9 +13,9 @@ Okta Config changes
 ===================
 
 * An Application (OpenID Connect Web) for FlyteAdmin itself (e.g. **0oal5rch46pVhCGF45d6**).
-* An Application (OpenID Native app) for Flyte-cli/flytectl (e.g. **0oal62nxuD6OSFSRq5d6**).
+* An Application (OpenID Native app) for Flyte-cli/FlyteCTL (e.g. **0oal62nxuD6OSFSRq5d6**).
   These two applications would be assigned to the relevant users.
-* An Application (Web) for Flyte Propeller (e.g. **0abc5rch46pVhCGF9876**).
+* An Application (Web) for FlytePropeller (e.g. **0abc5rch46pVhCGF9876**).
   This application would either use the default Authorization server, or you would create a new one.
 
 Admin Config Changes

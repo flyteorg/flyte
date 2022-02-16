@@ -19,7 +19,7 @@ GO111MODULE=on go get github.com/flyteorg/flytepropeller/cmd/controller@${FLYTEP
 mv $GOBIN/controller $GOBIN/flytepropeller
 GO111MODULE=on go get github.com/flyteorg/datacatalog/cmd@${DATACATALOG_TAG}
 mv $GOBIN/cmd $GOBIN/datacatalog
-git clone git@github.com:flyteorg/flyteadmin.git && cd flyteadmin && go build cmd/scheduler/main.go
+git clone https://github.com/flyteorg/flyteadmin.git && cd flyteadmin && go build cmd/scheduler/main.go
 mv main $GOBIN/scheduler && rm -rf ../flyteadmin
 
 output_config () {

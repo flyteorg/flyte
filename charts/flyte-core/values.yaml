@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.83 # FLYTEADMIN_TAG
+    tag: v0.6.92 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -64,6 +64,8 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
+  # -- Appends extra command line arguments to the serve command
+  extraArgs: {}
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -74,7 +76,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.83 # FLYTESCHEDULER_TAG
+    tag: v0.6.92 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -120,7 +122,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v0.3.19 # DATACATALOG_TAG
+    tag: v0.3.22 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -156,6 +158,8 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -169,7 +173,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v0.16.14 # FLYTEPROPELLER_TAG
+    tag: v0.16.19 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -201,6 +205,8 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
 
 #
 # FLYTECONSOLE SETTINGS
@@ -213,7 +219,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v0.40.0 # FLYTECONSOLE_TAG
+    tag: v0.41.0 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -638,6 +644,8 @@ external_events:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  # -- Service account name to run with
+  service_account_name: flyteadmin
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
@@ -645,6 +653,8 @@ cluster_resource_manager:
     cluster_resources:
       refreshInterval: 5m
       templatePath: "/etc/flyte/clusterresource/templates"
+      # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+      standaloneDeployment: false
       customData:
         - production:
             - projectQuotaCpu:

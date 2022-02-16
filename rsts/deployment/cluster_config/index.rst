@@ -55,7 +55,7 @@ Cluster Config
 
     .. link-button:: flytepropeller-config-specification
        :type: ref
-       :text: Flyte Propeller Configuration
+       :text: FlytePropeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Detailed list of all Flyte Propeller configuration options and their default values.

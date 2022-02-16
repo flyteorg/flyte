@@ -30,7 +30,7 @@ The Flyte console displays information fetched from the FlyteAdmin API. This
 environment variable specifies the host prefix used in constructing API requests.
 
 .. NOTE::
-    this is only the host portion of the API endpoint, consisting of the
+    This is only the host portion of the API endpoint, consisting of the
     protocol, domain, and port (if not using the standard 80/443).
 
 This value will be combined with a suffix (such as ``/api/v1``) to construct the
@@ -39,7 +39,7 @@ final URL used in an API request.
 *Default Behavior*
 
 In most cases, ``flyteconsole`` will be hosted in the same cluster as the Admin
-API, meaning that the domain used to access the console is the same value used to
+API, meaning that the domain used to access the console is the same as that used to
 access the API. For this reason, if no value is set for ``ADMIN_API_URL``, the
 default behavior is to use the value of `window.location.origin`.
 
