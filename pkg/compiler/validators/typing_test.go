@@ -411,7 +411,7 @@ func TestSchemaCasting(t *testing.T) {
 
 	t.Run("GenericSchemaToNonGeneric", func(t *testing.T) {
 		castable := AreTypesCastable(genericSchema, subsetIntegerSchema)
-		assert.False(t, castable, "Schema() should not be castable to Schema(a=Integer)")
+		assert.True(t, castable, "Schema() should be castable to Schema(a=Integer)")
 	})
 
 	t.Run("NonGenericSchemaToGeneric", func(t *testing.T) {
@@ -548,7 +548,7 @@ func TestStructuredDatasetCasting(t *testing.T) {
 
 	t.Run("GenericStructuredDatasetToNonGeneric", func(t *testing.T) {
 		castable := AreTypesCastable(genericStructuredDataset, subsetStructuredDataset)
-		assert.False(t, castable, "StructuredDataset() should not be castable to StructuredDataset(a=Integer, b=Collection)")
+		assert.True(t, castable, "StructuredDataset() should be castable to StructuredDataset(a=Integer, b=Collection)")
 	})
 
 	t.Run("NonGenericStructuredDatasetToGeneric", func(t *testing.T) {

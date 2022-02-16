@@ -165,7 +165,7 @@ func (t structuredDatasetChecker) CastsFrom(upstreamType *flyte.LiteralType) boo
 
 // Upstream (schema) -> downstream (schema)
 func schemaCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.SchemaType) bool {
-	if len(downstream.Columns) == 0 {
+	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
 		return true
 	}
 
@@ -189,7 +189,7 @@ func schemaCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.SchemaTy
 
 // Upstream (structuredDatasetType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.StructuredDatasetType) bool {
-	if len(downstream.Columns) == 0 {
+	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
 		return true
 	}
 
@@ -213,7 +213,7 @@ func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatase
 
 // Upstream (schemaType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.StructuredDatasetType) bool {
-	if len(downstream.Columns) == 0 {
+	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SchemaType_SchemaColumn_SchemaColumnType)
@@ -236,7 +236,7 @@ func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *fly
 
 // Upstream (structuredDatasetType) -> downstream (schemaType)
 func schemaCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.SchemaType) bool {
-	if len(downstream.Columns) == 0 {
+	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SimpleType)
