@@ -294,7 +294,7 @@ Here are some resources to help you learn more about Flyte.
 ### Biweekly Community Sync
 
 - 📣 **Flyte OSS Community Sync** Every other Tuesday, 9:00 am - 10:00 am PT. Check out the [calendar](https://www.addevent.com/calendar/kE355955), and register to stay up-to-date with our meeting times. Or join us on [Zoom](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
-- Upcoming meeting agenda, previous meeting notes, and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
+- Upcoming meeting agenda, previous meeting notes, and a backlog of topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.9myl24m7crgz).
 - If you'd like to revisit any previous community sync meetings, you can access the video recordings on [Flyte's YouTube channel](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
 ### Office Hours
