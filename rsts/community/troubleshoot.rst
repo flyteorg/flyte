@@ -3,15 +3,13 @@
 Troubleshooting Guide
 ---------------------
 
-.. admonition:: Why have we crafted this guide?
+.. admonition:: Why did we craft this guide?
 
-    Let go of overthinking; peep into this page.
+    To help streamline your onboarding experience as much as possible, and sort out common issues.
 
-We've been working diligently to help users sort out issues. 
+Here are a couple of techniques we believe could help get you up and running in no time! 
 
-Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
-
-Troubles with ``flytectl sandbox start``
+Troubles With ``flytectl sandbox start``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
@@ -39,25 +37,25 @@ and run: ::
 
     kubectl get pods -n flyte
 
-You can check on the pending pods and perform a detailed check as to why a pod is failing::
+You can check on the pending pods and perform a detailed check as to why a pod is failing by running: ::
 
     kubectl describe po <pod-name> -n flyte 
 
-- Also, you can simply export this variable to use local kubectl::
+- Also, you can use this command to simply export this variable to use local kubectl::
 
     export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
 
-- If you would like to reclaim disk space: ::
+- If you would like to reclaim disk space, run: ::
 
     docker system prune [OPTIONS]
 
 - Increase mem/CPU available for Docker.
 
 
-Troubles with ``flyte sandbox`` log viewing
+Troubles With ``flyte sandbox`` Log Viewing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- When testing locally using the ``flyte sandbox`` command, one way to view the logs is using the ``Kubernetes Logs (User)`` option on the Flyte Console. 
+- When testing locally using the ``flyte sandbox`` command, one way to view the logs is using the ``Kubernetes Logs (User)`` option on the FlyteConsole. 
 - This takes you to the Kubernetes dashboard which requires a login.
 
 ::
@@ -82,32 +80,32 @@ Troubles with ``flyte sandbox`` log viewing
 
    There is a ``skip`` button that takes you straight to the logs without logging in.
 
-Troubles with FlyteCTL command within proxy setting
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- FlyteCTL uses GRPC APIs of FlyteAdmin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the GRPC layer to perform the same. Additional info is available `here <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__.
-
-- On the Windows environment, it has been noticed that the ``NO_PROXY`` variable doesn't work to bypass the proxy settings. `This <https://github.com/grpc/grpc/issues/9989>`__ GRPC issue provides additional details, though it doesn't seem to have been tested on Windows yet. To get around this issue, unset both the ``HTTP_PROXY`` and ``HTTPS_PROXY`` variables.
-
-Troubles with FlyteCTL commands with Cloudflare DNS
+Troubles With Flytectl Commands Within Proxy Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- FlyteCTL throws permission error with Cloudflare DNS endpoint
-- Cloudflare instance by default proxies the requests and would filter out GRPC.
-- **To fix this**: 
-    - Enable grpc in the network tab; OR
-    - Turn off the proxy.
+- Flytectl uses gRPC APIs of FlyteAdmin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the gRPC layer to perform the same. Additional info is available on this `gRPC proxy documentation <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__ page.
 
-Troubles with FlyteCTL commands with auth enabled
+- In the Windows environment, it has been noticed that the ``NO_PROXY`` variable doesn't work to bypass the proxy settings. This `GRPC issue <https://github.com/grpc/grpc/issues/9989>`__ provides additional details, though it doesn't seem to have been tested on Windows yet. To bypass this issue, unset both ``HTTP_PROXY`` and ``HTTPS_PROXY`` variables.
+
+Troubles With Flytectl Commands With Cloudflare DNS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- FlyteCTL commands use OpenID connect if auth is enabled in the Flyte environment
-- It opens an ``HTTP`` server port on localhost:53593. It has a callback endpoint for the OpenID connect server to call into for the response
-    - If the callback server call fails, please check if FlyteCTL failed to run the server
-    - Verify if you have an entry for localhost in your ``/etc/hosts`` file
-    - It could also mean that the callback took longer and the FlyteCTL deadline expired on the wait which defaults to 15 secs
+- Flytectl produces permission errors with Cloudflare DNS endpoints
+- Cloudflare instance proxies by default the requests and filters out gRPC.
+- **To fix this**: 
+    - Enable gRPC in the network tab; or
+    - Turn off the proxy.
+
+Troubles With Flytectl Commands With Auth Enabled
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Flytectl commands use OpenID connect if auth is enabled in the Flyte environment
+- It opens an ``HTTP`` server port on localhost:53593. It has a callback endpoint for the OpenID connect server to call into for the response.
+    - If the callback server call fails, please check if Flytectl failed to run the server.
+    - Verify that you have an entry for localhost in your ``/etc/hosts`` file.
+    - It could also mean that the callback took longer than the default 15 secs, and the Flytectl wait deadline expired. 
 
 
-I NEED HELP!
-^^^^^^^^^^^^^
-Our `Slack <http://flyte-org.slack.com/>`__ community is always available and ready to help!
+I Still Need Help!
+^^^^^^^^^^^^^^^^^^
+Our `Slack <https://slack.flyte.org/>`__ community is always available and ready to help!
