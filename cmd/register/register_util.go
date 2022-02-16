@@ -561,20 +561,11 @@ func getAllExample(repository, version string) ([]*github.ReleaseAsset, *github.
 		}
 		return filterExampleFromRelease(release), release, nil
 	}
-	releases, err := githubutil.GetListRelease(repository)
+	release, err := githubutil.GetLatestVersion(repository)
 	if err != nil {
 		return nil, nil, err
 	}
-	if len(releases) == 0 {
-		return nil, nil, fmt.Errorf("repository doesn't have any release")
-	}
-	for _, v := range releases {
-		if !*v.Prerelease {
-			return filterExampleFromRelease(v), v, nil
-		}
-	}
-	return nil, nil, nil
-
+	return filterExampleFromRelease(release), release, nil
 }
 
 func getRemoteStoragePath(ctx context.Context, s *storage.DataStore, remoteLocation, file, identifier string) (storage.DataReference, error) {
