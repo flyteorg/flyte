@@ -4,9 +4,9 @@
 Tutorials
 #########
 
-The Tutorials showcase step-by-step case studies of how to combine the different features of Flyte to achieve everything
-from data processing, feature engineering, model training, and batch predictions. Code for all of the examples in the
-user guide be found in the `flytesnacks repo <https://github.com/flyteorg/flytesnacks>`_.
+This section showcases step-by-step case studies of how to combine the different features of Flyte to achieve everything
+from data processing, feature engineering, model training, to batch predictions. Code for all of the examples in the
+user guide can be found in the `flytesnacks repo <https://github.com/flyteorg/flytesnacks>`_.
 
 `Flytesnacks <https://github.com/flyteorg/flytesnacks>`_ comes with a highly customized environment to make running,
 documenting and contributing samples easy. If this is your first time running these examples, follow the
@@ -39,4 +39,13 @@ documenting and contributing samples easy. If this is your first time running th
        :text: 🧪 Bioinformatics
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Do computational biology with Flyte.
+    Perform computational biology with Flyte.
+
+    ---
+
+    .. link-button:: flytelab
+       :type: ref
+       :text: 🔬 Flytelab
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    The open-source repository of machine learning projects using Flyte.

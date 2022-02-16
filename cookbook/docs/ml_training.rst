@@ -2,6 +2,8 @@
 ML Training
 ################
 
+Understand how machine learning models can be trained from within Flyte, with an added advantage of orchestration benefits.
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2
@@ -11,7 +13,7 @@ ML Training
        :text: Diabetes Classification
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Train an XGBoost model on the Pima Indians Diabetes Dataset
+    Train an XGBoost model on the Pima Indians Diabetes Dataset.
 
     ---
 
@@ -20,7 +22,7 @@ ML Training
        :text: House Price Regression
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Use dynamic workflows to train a multiregion house price prediction model using XGBoost
+    Use dynamic workflows to train a multiregion house price prediction model using XGBoost.
 
     ---
 
@@ -38,7 +40,7 @@ ML Training
        :text: Forecast Sales Using Rossmann Store Sales Data with Horovod and Spark
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Data-parallel distributed training using Horovod on Spark
+    Data-parallel distributed training using Horovod on Spark.
 
 
 .. toctree::

@@ -7,6 +7,8 @@ Feature Engineering
 **Feature Engineering** of late has become one of the most prominent topics in Machine Learning.
 It is the process of transforming raw data into features that better represent the underlying problem to the predictive models, resulting in improved model accuracy on unseen data.
 
+Explore how features can be engineered with the power of Flyte.
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2

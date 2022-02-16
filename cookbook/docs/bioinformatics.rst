@@ -4,6 +4,8 @@ Bioinformatics
 
 **Bioinformatics** is defined as the application of tools of computation and analysis to capture and interpret biological data.
 
+Flyte very much supports running your bioinformatics applications. Dive deeper into how that can be done.
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2

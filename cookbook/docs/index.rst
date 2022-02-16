@@ -274,3 +274,4 @@ Table of Contents
    ml_training
    feature_engineering
    bioinformatics
+   flytelab
