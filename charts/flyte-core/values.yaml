@@ -207,6 +207,8 @@ flytepropeller:
   affinity: {}
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
+  # -- Defines the cluster name used in events sent to Admin
+  clusterName: ""
 
 #
 # FLYTECONSOLE SETTINGS
