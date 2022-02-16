@@ -27,9 +27,9 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
    Then modify the policy document to allow the role to pass other roles to AWS Batch.
    Follow the guide: `Granting a user permissions to pass a role to an AWS service <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html>`_.
 
-4. Update Flyte Admin's Config
+4. Update FlyteAdmin's Config
 
-   Flyte Admin needs to be made aware of all the AWS Batch Job Queues and how the system should distribute the load onto them.
+   FlyteAdmin needs to be made aware of all the AWS Batch Job Queues and how the system should distribute the load onto them.
    The simplest setup looks something like this:
 
    .. code-block:: yaml

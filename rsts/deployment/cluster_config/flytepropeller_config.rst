@@ -1,7 +1,7 @@
 .. _flytepropeller-config-specification:
 
 #########################################
-Flyte Propeller Configuration
+FlytePropeller Configuration
 #########################################
 
 - `admin <#section-admin>`_
@@ -184,7 +184,7 @@ This is the URL to your IdP's authorization server. It'll default to Endpoint
 tokenUrl (string)
 --------------------------------------------------------------------------------
 
-OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
+OPTIONAL: Your IdP's token endpoint. It'll be discovered from FlyteAdmin's OAuth Metadata endpoint if not provided.
 
 **Default Value**: 
 

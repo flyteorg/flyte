@@ -49,7 +49,7 @@ See the changes in this `file <https://github.com/flyteorg/flyteidl/commit/b1767
 FlyteAdmin
 ^^^^^^^^^^^
 
-Once your IDL changes are released, update the logic of Flyte Admin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it while creating executions or in relevant use cases.
+Once your IDL changes are released, update the logic of FlyteAdmin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it while creating executions or in relevant use cases.
 
 For example:
 
@@ -76,6 +76,6 @@ For example:
 
 Flytekit
 ^^^^^^^^
-For convenience, add a FlyteCTL wrapper to update the new attributes. Refer to `this section <https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_update_plugin-override.html>`__ for the entire set of changes required.
+For convenience, add a FlyteCTL wrapper to update the new attributes. Refer to `this PR <https://github.com/flyteorg/flytectl/pull/65>`__ for the entire set of changes required.
 
 That's it! You now have a new matchable attribute to configure according to the requirements of your users evolve.
