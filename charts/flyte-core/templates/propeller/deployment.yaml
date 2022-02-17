@@ -46,8 +46,12 @@ spec:
         {{- end }}
         - --config
         - {{ .Values.flytepropeller.configPath }}
+        {{- with .Values.flytepropeller.clusterName }}
+        - --propeller.cluster-id
+        - {{ tpl (toYaml .) $ }}
+        {{- end -}}
         {{- with .Values.flytepropeller.extraArgs }}
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml $) . | nindent 6 }}
         {{- end }}
         env:
         - name: POD_NAME
