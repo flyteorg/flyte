@@ -12,13 +12,13 @@ import (
 
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+	"github.com/flyteorg/flytectl/pkg/githubutil"
 
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/util/platformutil"
+	"github.com/flyteorg/flytectl/pkg/platformutil"
 	"github.com/spf13/cobra"
 )
 

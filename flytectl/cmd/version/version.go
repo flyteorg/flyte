@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+	"github.com/flyteorg/flytectl/pkg/githubutil"
 
-	"github.com/flyteorg/flytectl/pkg/util/platformutil"
+	"github.com/flyteorg/flytectl/pkg/platformutil"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"

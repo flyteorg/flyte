@@ -15,7 +15,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+	"github.com/flyteorg/flytectl/pkg/githubutil"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"

@@ -5,10 +5,10 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/githubutil"
 	"github.com/flyteorg/flytectl/pkg/util"
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
 
-	"github.com/flyteorg/flytectl/pkg/util/platformutil"
+	"github.com/flyteorg/flytectl/pkg/platformutil"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
