@@ -115,7 +115,7 @@ func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
 	if isGreater, err := util.IsVersionGreaterThan(latest, stdlibversion.Version); err != nil {
 		return false, err
 	} else if !isGreater {
-		fmt.Println("You have already latest version of flytectl")
+		fmt.Println("You already have the latest version of flytectl")
 		return false, nil
 	}
 
