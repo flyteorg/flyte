@@ -20,6 +20,8 @@ Let's say you want to inject a default priority annotation for your workflows. P
 
 Now, one of your user teams requires critical workflows to have a higher priority than other production workflows.
 
+Now, let's understand how this can be implemented in FlyteIDL:
+
 Flyte IDL
 ^^^^^^^^^
 Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>` that includes a unique enum value and proto message definition. 
