@@ -94,7 +94,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
         welcome(name="Traveler")
         # Output: "Welcome, Traveler! How are you?"
 
-.. tabbed:: JAVA
+.. tabbed:: Java
 
     .. code:: java
 
