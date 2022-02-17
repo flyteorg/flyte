@@ -1,13 +1,3 @@
-# ---------------------------------------------------------------------
-# Core System settings
-# This section consists of Core components of Flyte and their deployment
-# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
-# Flyteconsole
-# ---------------------------------------------------------------------
-
-#
-# FLYTEADMIN SETTINGS
-#
 flyteadmin:
   enabled: false
 
@@ -17,28 +7,11 @@ cluster_resource_manager:
 workflow_scheduler:
   enabled: false
 
-#
-# FLYTESCHEDULER SETTINGS
-#
 flytescheduler:
   enabled: false
 
-#
-# DATACATALOG SETTINGS
-#
 datacatalog:
   enabled: false
-
-
-#
-# FLYTEPROPELLER SETTINGS
-#
-flytepropeller:
-  enabled: true
-
-#
-# FLYTECONSOLE SETTINGS
-#
 
 flyteconsole:
   enabled: false

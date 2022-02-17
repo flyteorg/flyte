@@ -19,6 +19,8 @@ helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/v
 
 for deployment in ${DEPLOYMENT_CORE}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml  -f ${DIR}/../charts/flyte-core/values-controlplane.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/${deployment}/flyte_helm_controlplane_generated.yaml
+    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml -f ${DIR}/../charts/flyte-core/values-dataplane.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/${deployment}/flyte_helm_dataplane_generated.yaml
 done
 
 # Generate manifest AWS Scheduler
