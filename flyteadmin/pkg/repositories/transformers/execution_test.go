@@ -446,7 +446,7 @@ func TestSetExecutionAborted(t *testing.T) {
 	}
 	cause := "a snafoo occurred"
 	principal := "principal"
-	err := SetExecutionAborted(&existingModel, cause, principal)
+	err := SetExecutionAborting(&existingModel, cause, principal)
 	assert.NoError(t, err)
 	var actualClosure admin.ExecutionClosure
 	err = proto.Unmarshal(existingModel.Closure, &actualClosure)

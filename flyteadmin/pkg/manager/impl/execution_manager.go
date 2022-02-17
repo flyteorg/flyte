@@ -1504,6 +1504,17 @@ func (m *ExecutionManager) TerminateExecution(
 		return nil, err
 	}
 
+	err = transformers.SetExecutionAborting(&executionModel, request.Cause, getUser(ctx))
+	if err != nil {
+		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.Id, err)
+		return nil, err
+	}
+	err = m.db.ExecutionRepo().Update(ctx, executionModel)
+	if err != nil {
+		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.Id, err)
+		return nil, err
+	}
+
 	err = workflowengine.GetRegistry().GetExecutor().Abort(ctx, workflowengineInterfaces.AbortData{
 		Namespace: common.GetNamespaceName(
 			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.Id.Project, request.Id.Domain),
@@ -1513,17 +1524,6 @@ func (m *ExecutionManager) TerminateExecution(
 	})
 	if err != nil {
 		m.systemMetrics.TerminateExecutionFailures.Inc()
-		return nil, err
-	}
-
-	err = transformers.SetExecutionAborted(&executionModel, request.Cause, getUser(ctx))
-	if err != nil {
-		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.Id, err)
-		return nil, err
-	}
-	err = m.db.ExecutionRepo().Update(ctx, executionModel)
-	if err != nil {
-		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.Id, err)
 		return nil, err
 	}
 	return &admin.ExecutionTerminateResponse{}, nil

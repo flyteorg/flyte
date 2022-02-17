@@ -2466,10 +2466,12 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 	workflowengine.GetRegistry().Register(&mockExecutor)
 	defer resetExecutor()
 
+	updateCalled := false
 	repository := repositoryMocks.NewMockRepository()
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(func(
 		context context.Context, execution models.Execution) error {
-		t.Fatal("update should not be called when propeller fails to terminate an execution")
+		updateCalled = true
+		assert.Equal(t, core.WorkflowExecution_ABORTING.String(), execution.Phase)
 		return nil
 	})
 	execManager := NewExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2484,6 +2486,7 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 	})
 	assert.Nil(t, resp)
 	assert.EqualError(t, err, expectedError.Error())
+	assert.True(t, updateCalled)
 }
 
 func TestTerminateExecution_DatabaseError(t *testing.T) {
