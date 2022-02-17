@@ -3,10 +3,10 @@ package validation
 import (
 	"context"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/golang/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -21,7 +21,7 @@ import (
 const numSystemNodes = 2 // A workflow graph always has a start and end node injected by the platform.
 
 func ValidateWorkflow(
-	ctx context.Context, request admin.WorkflowCreateRequest, db repositories.RepositoryInterface,
+	ctx context.Context, request admin.WorkflowCreateRequest, db repositoryInterfaces.Repository,
 	config runtime.ApplicationConfiguration) error {
 	if err := ValidateIdentifier(request.Id, common.Workflow); err != nil {
 		return err

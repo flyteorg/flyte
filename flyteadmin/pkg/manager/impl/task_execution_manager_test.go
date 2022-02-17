@@ -15,7 +15,6 @@ import (
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -66,7 +65,7 @@ var mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 
 var retryAttemptValue = uint32(1)
 
-func addGetWorkflowExecutionCallback(repository repositories.RepositoryInterface) {
+func addGetWorkflowExecutionCallback(repository interfaces.Repository) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			return models.Execution{
@@ -82,7 +81,7 @@ func addGetWorkflowExecutionCallback(repository repositories.RepositoryInterface
 
 }
 
-func addGetNodeExecutionCallback(repository repositories.RepositoryInterface) {
+func addGetNodeExecutionCallback(repository interfaces.Repository) {
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{
@@ -99,7 +98,7 @@ func addGetNodeExecutionCallback(repository repositories.RepositoryInterface) {
 	)
 }
 
-func addGetTaskCallback(repository repositories.RepositoryInterface) {
+func addGetTaskCallback(repository interfaces.Repository) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
 		func(input interfaces.Identifier) (models.Task, error) {
 			return models.Task{

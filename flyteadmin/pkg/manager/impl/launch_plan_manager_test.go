@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -52,7 +51,7 @@ var launchPlanNamedIdentifier = core.Identifier{
 	Version: "version",
 }
 
-func getMockRepositoryForLpTest() repositories.RepositoryInterface {
+func getMockRepositoryForLpTest() interfaces.Repository {
 	return repositoryMocks.NewMockRepository()
 }
 
@@ -62,7 +61,7 @@ func getMockConfigForLpTest() runtimeInterfaces.Configuration {
 	return mockConfig
 }
 
-func setDefaultWorkflowCallbackForLpTest(repository repositories.RepositoryInterface) {
+func setDefaultWorkflowCallbackForLpTest(repository interfaces.Repository) {
 	workflowSpec := testutils.GetSampleWorkflowSpecForTest()
 	typedInterface, _ := proto.Marshal(workflowSpec.Template.Interface)
 	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {

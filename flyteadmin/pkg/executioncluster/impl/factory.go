@@ -2,12 +2,12 @@ package impl
 
 import (
 	executioncluster_interface "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
-func GetExecutionCluster(scope promutils.Scope, kubeConfig, master string, config interfaces.Configuration, db repositories.RepositoryInterface) executioncluster_interface.ClusterInterface {
+func GetExecutionCluster(scope promutils.Scope, kubeConfig, master string, config interfaces.Configuration, db repositoryInterfaces.Repository) executioncluster_interface.ClusterInterface {
 	initializationErrorCounter := scope.MustNewCounter(
 		"flyteclient_initialization_error",
 		"count of errors encountered initializing a flyte client from kube config")

@@ -10,7 +10,6 @@ import (
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -75,7 +74,7 @@ func getMockWorkflowConfigProvider() runtimeInterfaces.Configuration {
 	return mockWorkflowConfigProvider
 }
 
-func getMockRepository(workflowOnGet bool) repositories.RepositoryInterface {
+func getMockRepository(workflowOnGet bool) interfaces.Repository {
 	mockRepo := repositoryMocks.NewMockRepository()
 	if !workflowOnGet {
 		mockRepo.(*repositoryMocks.MockRepository).WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(

@@ -16,7 +16,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -39,7 +38,7 @@ type NamedEntityMetrics struct {
 }
 
 type NamedEntityManager struct {
-	db      repositories.RepositoryInterface
+	db      repoInterfaces.Repository
 	config  runtimeInterfaces.Configuration
 	metrics NamedEntityMetrics
 }
@@ -164,7 +163,7 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 }
 
 func NewNamedEntityManager(
-	db repositories.RepositoryInterface,
+	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	scope promutils.Scope) interfaces.NamedEntityInterface {
 

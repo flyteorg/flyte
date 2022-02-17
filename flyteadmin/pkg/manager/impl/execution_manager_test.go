@@ -47,7 +47,6 @@ import (
 	notificationMocks "github.com/flyteorg/flyteadmin/pkg/async/notifications/mocks"
 	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -149,7 +148,7 @@ func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 	return mockExecutionsConfigProvider
 }
 
-func setDefaultLpCallbackForExecTest(repository repositories.RepositoryInterface) {
+func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 	lpSpec := testutils.GetSampleLpSpecForTest()
 	lpSpec.Labels = &admin.Labels{
 		Values: map[string]string{
@@ -214,7 +213,7 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 	return mockStorage
 }
 
-func getMockRepositoryForExecTest() repositories.RepositoryInterface {
+func getMockRepositoryForExecTest() interfaces.Repository {
 	repository := repositoryMocks.NewMockRepository()
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(
 		func(input interfaces.Identifier) (models.Workflow, error) {

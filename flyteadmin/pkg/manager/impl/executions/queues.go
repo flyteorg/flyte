@@ -4,10 +4,11 @@ import (
 	"context"
 	"math/rand"
 
+	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -34,7 +35,7 @@ type QueueAllocator interface {
 type queueAllocatorImpl struct {
 	queueConfigMap  queueConfig
 	config          runtimeInterfaces.Configuration
-	db              repositories.RepositoryInterface
+	db              repoInterfaces.Repository
 	resourceManager interfaces.ResourceInterface
 }
 
@@ -109,7 +110,7 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 	return singleQueueConfiguration{}
 }
 
-func NewQueueAllocator(config runtimeInterfaces.Configuration, db repositories.RepositoryInterface) QueueAllocator {
+func NewQueueAllocator(config runtimeInterfaces.Configuration, db repoInterfaces.Repository) QueueAllocator {
 	queueAllocator := queueAllocatorImpl{
 		config:          config,
 		db:              db,

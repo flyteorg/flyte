@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	adminModels "github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
 	schedMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	db repositories.RepositoryInterface
+	db repositoryInterfaces.SchedulerRepoInterface
 )
 
 func setupSnapShoter(scope string) Persistence {

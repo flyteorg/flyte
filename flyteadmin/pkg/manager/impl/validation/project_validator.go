@@ -3,10 +3,11 @@ package validation
 import (
 	"context"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
@@ -56,7 +57,7 @@ func ValidateProject(project admin.Project) error {
 
 // Validates that a specified project and domain combination has been registered and exists in the db.
 func ValidateProjectAndDomain(
-	ctx context.Context, db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID string) error {
+	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID string) error {
 	project, err := db.ProjectRepo().Get(ctx, projectID)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,

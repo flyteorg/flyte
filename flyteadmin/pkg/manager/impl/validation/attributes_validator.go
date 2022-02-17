@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
@@ -36,7 +37,7 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 }
 
 func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
-	db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration,
+	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration,
 	request admin.ProjectDomainAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
@@ -50,7 +51,7 @@ func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 		fmt.Sprintf("%s-%s", request.Attributes.Project, request.Attributes.Domain))
 }
 
-func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositories.RepositoryInterface,
+func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
@@ -59,7 +60,7 @@ func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositor
 	return nil
 }
 
-func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db repositories.RepositoryInterface,
+func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
@@ -68,7 +69,7 @@ func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db reposi
 	return nil
 }
 
-func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositories.RepositoryInterface,
+func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
@@ -85,7 +86,7 @@ func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositorie
 		fmt.Sprintf("%s-%s-%s", request.Attributes.Project, request.Attributes.Domain, request.Attributes.Workflow))
 }
 
-func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositories.RepositoryInterface,
+func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
@@ -97,7 +98,7 @@ func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositories.R
 	return nil
 }
 
-func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositories.RepositoryInterface,
+func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err

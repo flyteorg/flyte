@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
@@ -26,7 +26,7 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 }
 
 func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
-	db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration) error {
+	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}

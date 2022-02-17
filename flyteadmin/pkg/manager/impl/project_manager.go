@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -18,7 +17,7 @@ import (
 )
 
 type ProjectManager struct {
-	db     repositories.RepositoryInterface
+	db     repoInterfaces.Repository
 	config runtimeInterfaces.Configuration
 }
 
@@ -128,7 +127,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	return &response, nil
 }
 
-func NewProjectManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {
+func NewProjectManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {
 	return &ProjectManager{
 		db:     db,
 		config: config,

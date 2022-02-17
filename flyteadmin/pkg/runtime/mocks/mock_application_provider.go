@@ -14,8 +14,8 @@ type MockApplicationProvider struct {
 	externalEventsConfig interfaces.ExternalEventsConfig
 }
 
-func (p *MockApplicationProvider) GetDbConfig() interfaces.DbConfig {
-	return p.dbConfig
+func (p *MockApplicationProvider) GetDbConfig() *interfaces.DbConfig {
+	return &p.dbConfig
 }
 
 func (p *MockApplicationProvider) SetDbConfig(dbConfig interfaces.DbConfig) {

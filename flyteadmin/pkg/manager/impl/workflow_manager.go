@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -40,7 +39,7 @@ type workflowMetrics struct {
 }
 
 type WorkflowManager struct {
-	db            repositories.RepositoryInterface
+	db            repoInterfaces.Repository
 	config        runtimeInterfaces.Configuration
 	compiler      workflowengineInterfaces.Compiler
 	storageClient *storage.DataStore
@@ -337,7 +336,7 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 }
 
 func NewWorkflowManager(
-	db repositories.RepositoryInterface,
+	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	compiler workflowengineInterfaces.Compiler,
 	storageClient *storage.DataStore,

@@ -10,7 +10,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -71,7 +70,7 @@ func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
 }
 
 func CreateOrGetWorkflowModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, db repositories.RepositoryInterface,
+	ctx context.Context, request admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
 	task *admin.Task) (*models.Workflow, error) {
 	workflowIdentifier := core.Identifier{
@@ -162,7 +161,7 @@ func CreateOrGetWorkflowModel(
 }
 
 func CreateOrGetLaunchPlan(ctx context.Context,
-	db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, taskIdentifier *core.Identifier,
+	db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, taskIdentifier *core.Identifier,
 	workflowInterface *core.TypedInterface, workflowID uint, spec *admin.ExecutionSpec) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error

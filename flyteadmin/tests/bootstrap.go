@@ -6,9 +6,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+
 	"gorm.io/gorm"
 
-	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 )
@@ -19,22 +21,31 @@ const insertExecutionQueryStr = `INSERT INTO "executions" ` +
 
 var adminScope = promutils.NewScope("flyteadmin")
 
-func getDbConfig() database_config.DbConfig {
-	return database_config.DbConfig{
-		Host:   "postgres",
-		Port:   5432,
-		DbName: "postgres",
-		User:   "postgres",
+func getDbConfig() *runtimeInterfaces.DbConfig {
+	return &runtimeInterfaces.DbConfig{
+		PostgresConfig: runtimeInterfaces.PostgresConfig{
+			Host:   "postgres",
+			Port:   5432,
+			DbName: "postgres",
+			User:   "postgres",
+		},
 	}
 }
 
-// Use this for running integration tests in tandem with flyteadmin_config.yaml
-func getLocalDbConfig() database_config.DbConfig {
-	return database_config.DbConfig{
-		Host:   "localhost",
-		Port:   5432,
-		DbName: "postgres",
-		User:   "postgres",
+func getLocalDbConfig() *runtimeInterfaces.DbConfig {
+	return &runtimeInterfaces.DbConfig{
+		PostgresConfig: runtimeInterfaces.PostgresConfig{
+			Host:   "localhost",
+			Port:   5432,
+			DbName: "flyteadmin",
+			User:   "postgres",
+		},
+	}
+}
+
+func getLoggerConfig() *logger.Config {
+	return &logger.Config{
+		Level: logger.DebugLevel,
 	}
 }
 
@@ -60,7 +71,7 @@ func truncateAllTablesForTestingOnly() {
 	TruncateSchedulableEntities := fmt.Sprintf("TRUNCATE TABLE schedulable_entities;")
 	TruncateSchedulableEntitiesSnapshots := fmt.Sprintf("TRUNCATE TABLE schedule_entities_snapshots;")
 	ctx := context.Background()
-	db, err := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	if err != nil {
 		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
 	}
@@ -90,7 +101,7 @@ func truncateAllTablesForTestingOnly() {
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {
 	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2)
-	db, err := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
 		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)

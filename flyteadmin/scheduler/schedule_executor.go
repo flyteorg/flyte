@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
+
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteadmin/scheduler/core"
 	"github.com/flyteorg/flyteadmin/scheduler/executor"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories"
 	"github.com/flyteorg/flyteadmin/scheduler/snapshoter"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/futures"
@@ -27,7 +28,7 @@ const snapShotVersion = 1
 type ScheduledExecutor struct {
 	scheduler              core.Scheduler
 	snapshoter             snapshoter.Persistence
-	db                     repositories.SchedulerRepoInterface
+	db                     repositoryInterfaces.SchedulerRepoInterface
 	scope                  promutils.Scope
 	adminServiceClient     service.AdminServiceClient
 	workflowExecutorConfig *runtimeInterfaces.FlyteWorkflowExecutorConfig
@@ -102,7 +103,7 @@ func (w *ScheduledExecutor) Run(ctx context.Context) error {
 	return nil
 }
 
-func NewScheduledExecutor(db repositories.SchedulerRepoInterface,
+func NewScheduledExecutor(db repositoryInterfaces.SchedulerRepoInterface,
 	workflowExecutorConfig runtimeInterfaces.WorkflowExecutorConfig,
 	scope promutils.Scope, adminServiceClient service.AdminServiceClient) ScheduledExecutor {
 	return ScheduledExecutor{

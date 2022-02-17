@@ -3,13 +3,13 @@ package entrypoints
 import (
 	"context"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource/impl"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
 	execClusterIfaces "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	repositoryConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
-
 	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin"
@@ -54,11 +54,19 @@ func getClusterResourceController(ctx context.Context, scope promutils.Scope, co
 		}
 		adminDataProvider = impl.NewAdminServiceDataProvider(clientSet.AdminClient())
 	} else {
-		dbConfig := repositoryConfig.NewDbConfig(configuration.ApplicationConfiguration().GetDbConfig())
-		db := repositories.GetRepository(
-			repositories.POSTGRES, dbConfig, scope.NewSubScope("database"))
+		dbConfig := runtime.NewConfigurationProvider().ApplicationConfiguration().GetDbConfig()
+		logConfig := logger.GetConfig()
 
-		adminDataProvider = impl.NewDatabaseAdminDataProvider(db, configuration, resources.NewResourceManager(db, configuration.ApplicationConfiguration()))
+		db, err := repositories.GetDB(ctx, dbConfig, logConfig)
+		if err != nil {
+			logger.Fatal(ctx, err)
+		}
+		dbScope := scope.NewSubScope("db")
+
+		repo := repositories.NewGormRepo(
+			db, errors.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
+
+		adminDataProvider = impl.NewDatabaseAdminDataProvider(repo, configuration, resources.NewResourceManager(repo, configuration.ApplicationConfiguration()))
 	}
 
 	return clusterresource.NewClusterResourceController(adminDataProvider, listTargetsProvider, scope)

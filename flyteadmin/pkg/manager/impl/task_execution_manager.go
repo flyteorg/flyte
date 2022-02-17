@@ -21,7 +21,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -47,7 +46,7 @@ type taskExecutionMetrics struct {
 }
 
 type TaskExecutionManager struct {
-	db                 repositories.RepositoryInterface
+	db                 repoInterfaces.Repository
 	config             runtimeInterfaces.Configuration
 	storageClient      *storage.DataStore
 	metrics            taskExecutionMetrics
@@ -330,7 +329,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	return response, nil
 }
 
-func NewTaskExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface, publisher notificationInterfaces.Publisher) interfaces.TaskExecutionInterface {
+func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface, publisher notificationInterfaces.Publisher) interfaces.TaskExecutionInterface {
 	metrics := taskExecutionMetrics{
 		Scope: scope,
 		ActiveTaskExecutions: scope.MustNewGauge("active_executions",

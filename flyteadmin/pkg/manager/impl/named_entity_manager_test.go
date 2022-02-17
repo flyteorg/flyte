@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -29,7 +28,7 @@ var badIdentifier = admin.NamedEntityIdentifier{
 	Name:    "",
 }
 
-func getMockRepositoryForNETest() repositories.RepositoryInterface {
+func getMockRepositoryForNETest() interfaces.Repository {
 	return repositoryMocks.NewMockRepository()
 }
 

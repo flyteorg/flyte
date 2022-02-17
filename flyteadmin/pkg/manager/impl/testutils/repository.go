@@ -3,14 +3,15 @@ package testutils
 import (
 	"context"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 )
 
-func GetRepoWithDefaultProjectAndErr(err error) repositories.RepositoryInterface {
+func GetRepoWithDefaultProjectAndErr(err error) repositoryInterfaces.Repository {
 	repo := repositoryMocks.NewMockRepository()
 	repo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {
@@ -20,7 +21,7 @@ func GetRepoWithDefaultProjectAndErr(err error) repositories.RepositoryInterface
 	return repo
 }
 
-func GetRepoWithDefaultProject() repositories.RepositoryInterface {
+func GetRepoWithDefaultProject() repositoryInterfaces.Repository {
 	repo := repositoryMocks.NewMockRepository()
 	repo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {

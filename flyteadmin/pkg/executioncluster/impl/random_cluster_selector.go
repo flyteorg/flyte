@@ -6,6 +6,8 @@ import (
 	"hash/fnv"
 	"math/rand"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -13,7 +15,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
@@ -146,7 +147,7 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 }
 
 func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, config runtime.Configuration,
-	db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
+	db repositoryInterfaces.Repository) (interfaces.ClusterInterface, error) {
 	equalWeightedAllClusters, err := convertToRandomWeightedList(context.Background(), listTargets.GetValidTargets())
 	if err != nil {
 		return nil, err

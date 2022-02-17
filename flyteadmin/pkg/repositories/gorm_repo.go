@@ -10,7 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type PostgresRepo struct {
+type GormRepo struct {
+	db                           *gorm.DB
 	executionRepo                interfaces.ExecutionRepoInterface
 	executionEventRepo           interfaces.ExecutionEventRepoInterface
 	namedEntityRepo              interfaces.NamedEntityRepoInterface
@@ -26,60 +27,65 @@ type PostgresRepo struct {
 	scheduleEntitiesSnapshotRepo schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
 }
 
-func (p *PostgresRepo) ExecutionRepo() interfaces.ExecutionRepoInterface {
-	return p.executionRepo
+func (r *GormRepo) ExecutionRepo() interfaces.ExecutionRepoInterface {
+	return r.executionRepo
 }
 
-func (p *PostgresRepo) ExecutionEventRepo() interfaces.ExecutionEventRepoInterface {
-	return p.executionEventRepo
+func (r *GormRepo) ExecutionEventRepo() interfaces.ExecutionEventRepoInterface {
+	return r.executionEventRepo
 }
 
-func (p *PostgresRepo) LaunchPlanRepo() interfaces.LaunchPlanRepoInterface {
-	return p.launchPlanRepo
+func (r *GormRepo) LaunchPlanRepo() interfaces.LaunchPlanRepoInterface {
+	return r.launchPlanRepo
 }
 
-func (p *PostgresRepo) NamedEntityRepo() interfaces.NamedEntityRepoInterface {
-	return p.namedEntityRepo
+func (r *GormRepo) NamedEntityRepo() interfaces.NamedEntityRepoInterface {
+	return r.namedEntityRepo
 }
 
-func (p *PostgresRepo) ProjectRepo() interfaces.ProjectRepoInterface {
-	return p.projectRepo
+func (r *GormRepo) ProjectRepo() interfaces.ProjectRepoInterface {
+	return r.projectRepo
 }
 
-func (p *PostgresRepo) NodeExecutionRepo() interfaces.NodeExecutionRepoInterface {
-	return p.nodeExecutionRepo
+func (r *GormRepo) NodeExecutionRepo() interfaces.NodeExecutionRepoInterface {
+	return r.nodeExecutionRepo
 }
 
-func (p *PostgresRepo) NodeExecutionEventRepo() interfaces.NodeExecutionEventRepoInterface {
-	return p.nodeExecutionEventRepo
+func (r *GormRepo) NodeExecutionEventRepo() interfaces.NodeExecutionEventRepoInterface {
+	return r.nodeExecutionEventRepo
 }
 
-func (p *PostgresRepo) TaskRepo() interfaces.TaskRepoInterface {
-	return p.taskRepo
+func (r *GormRepo) TaskRepo() interfaces.TaskRepoInterface {
+	return r.taskRepo
 }
 
-func (p *PostgresRepo) TaskExecutionRepo() interfaces.TaskExecutionRepoInterface {
-	return p.taskExecutionRepo
+func (r *GormRepo) TaskExecutionRepo() interfaces.TaskExecutionRepoInterface {
+	return r.taskExecutionRepo
 }
 
-func (p *PostgresRepo) WorkflowRepo() interfaces.WorkflowRepoInterface {
-	return p.workflowRepo
+func (r *GormRepo) WorkflowRepo() interfaces.WorkflowRepoInterface {
+	return r.workflowRepo
 }
 
-func (p *PostgresRepo) ResourceRepo() interfaces.ResourceRepoInterface {
-	return p.resourceRepo
+func (r *GormRepo) ResourceRepo() interfaces.ResourceRepoInterface {
+	return r.resourceRepo
 }
 
-func (p *PostgresRepo) SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface {
-	return p.schedulableEntityRepo
+func (r *GormRepo) SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface {
+	return r.schedulableEntityRepo
 }
 
-func (p *PostgresRepo) ScheduleEntitiesSnapshotRepo() schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface {
-	return p.scheduleEntitiesSnapshotRepo
+func (r *GormRepo) ScheduleEntitiesSnapshotRepo() schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface {
+	return r.scheduleEntitiesSnapshotRepo
 }
 
-func NewPostgresRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) RepositoryInterface {
-	return &PostgresRepo{
+func (r *GormRepo) GetGormDB() *gorm.DB {
+	return r.db
+}
+
+func NewGormRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.Repository {
+	return &GormRepo{
+		db:                           db,
 		executionRepo:                gormimpl.NewExecutionRepo(db, errorTransformer, scope.NewSubScope("executions")),
 		executionEventRepo:           gormimpl.NewExecutionEventRepo(db, errorTransformer, scope.NewSubScope("execution_events")),
 		launchPlanRepo:               gormimpl.NewLaunchPlanRepo(db, errorTransformer, scope.NewSubScope("launch_plans")),
