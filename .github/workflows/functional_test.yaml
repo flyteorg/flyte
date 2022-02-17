@@ -49,12 +49,7 @@ jobs:
           pip freeze
       - name: End2End
         env:
-          KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
+          PRIORITIES: "P0"
         run: |
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          # launch flyte end2end
-          make end2end_execute
+          ./boilerplate/flyte/end2end/end2end.sh
 
