@@ -1,34 +1,37 @@
 .. _deployment-customizable-resources:
 
-##################################
+#################################
 Adding New Customizable Resources
-##################################
+#################################
 
-As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values. Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
-
-In a :ref:`multi-cluster setup <multicluster-setup>`, an example one can think of is setting some routing rules to send certain workflows to certain clusters; this demands setting up custom resources.
+As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values.
+Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
 
 .. note::
     For background on customizable resources, refer to :ref:`deployment-cluster-config-general`.
 
-Here’s how you could go about building a customizable priority designation.
+In a :ref:`multi-cluster setup <multicluster-setup>`, an example one could think of is setting routing rules to send certain workflows to specific clusters, which demands setting up custom resources.
+
+Here's how you could go about building a customizable priority designation.
 
 Example
 -------
 
-Let's say you want to inject a default priority annotation for your workflows. Perhaps you start off with a model where everything has a default priority but soon you realize it makes sense that workflows in your production domain should take higher priority than those in your development domain.
+Let's say you want to inject a default priority annotation for your workflows.
+Perhaps you start off with a model where everything has a default priority but soon you realize it makes sense that workflows in your production domain should take higher priority than those in your development domain.
 
 Now, one of your user teams requires critical workflows to have a higher priority than other production workflows.
 
-Now, let's understand how this can be implemented in FlyteIDL:
+Here's how you could do that.
 
 Flyte IDL
 ^^^^^^^^^
-Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>` that includes a unique enum value and proto message definition. 
+
+Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>` that includes a unique enum value and proto message definition.
 
 For example:
 
-::      
+::
 
    enum MatchableResource {
      ...
@@ -51,15 +54,15 @@ See the changes in this `file <https://github.com/flyteorg/flyteidl/commit/b1767
 
 
 FlyteAdmin
-^^^^^^^^^^^
+^^^^^^^^^^
 
 Once your IDL changes are released, update the logic of FlyteAdmin to `fetch <https://github.com/flyteorg/flyteadmin/commit/60b4c876ea105d4c79e3cad7d56fde6b9c208bcd#diff-510e72225172f518850fe582149ff320R122-R128>`__ your new matchable priority resource and use it while creating executions or in relevant use cases.
 
 For example:
 
-::      
+::
 
-   
+
    resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
        Domain:       domain,
        Project:      project, // optional
@@ -80,6 +83,7 @@ For example:
 
 Flytekit
 ^^^^^^^^
+
 For convenience, add a FlyteCTL wrapper to update the new attributes. Refer to `this PR <https://github.com/flyteorg/flytectl/pull/65>`__ for the entire set of changes required.
 
 That's it! You now have a new matchable attribute to configure as the needs of your users evolve.
