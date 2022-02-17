@@ -84,7 +84,7 @@ func testDecodeJson_DataCatalogConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_DataCatalogConfig(val, result))
 }
 
-func testDecodeSlice_DataCatalogConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_DataCatalogConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_DataCatalogConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestDataCatalogConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_storage-prefix", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage-prefix"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestDataCatalogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_metrics-scope", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("metrics-scope"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestDataCatalogConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_profiler-port", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("profiler-port"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -159,6 +135,34 @@ func TestDataCatalogConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("profiler-port", testValue)
 			if vInt, err := cmdFlags.GetInt("profiler-port"); err == nil {
 				testDecodeJson_DataCatalogConfig(t, fmt.Sprintf("%v", vInt), &actual.ProfilerPort)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_heartbeat-grace-period-multiplier", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("heartbeat-grace-period-multiplier", testValue)
+			if vInt, err := cmdFlags.GetInt("heartbeat-grace-period-multiplier"); err == nil {
+				testDecodeJson_DataCatalogConfig(t, fmt.Sprintf("%v", vInt), &actual.HeartbeatGracePeriodMultiplier)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_max-reservation-heartbeat", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.MaxReservationHeartbeat.String()
+
+			cmdFlags.Set("max-reservation-heartbeat", testValue)
+			if vString, err := cmdFlags.GetString("max-reservation-heartbeat"); err == nil {
+				testDecodeJson_DataCatalogConfig(t, fmt.Sprintf("%v", vString), &actual.MaxReservationHeartbeat)
 
 			} else {
 				assert.FailNow(t, err.Error())

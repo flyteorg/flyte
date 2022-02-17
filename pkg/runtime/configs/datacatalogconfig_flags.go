@@ -28,6 +28,15 @@ func (DataCatalogConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (DataCatalogConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (DataCatalogConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,8 +50,10 @@ func (DataCatalogConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg DataCatalogConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("DataCatalogConfig", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage-prefix"), *new(string), "StoragePrefix specifies the prefix where DataCatalog stores offloaded ArtifactData in CloudStorage. If not specified,  the data will be stored in the base container directly.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metrics-scope"), *new(string), "Scope that the metrics will record under.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "profiler-port"), *new(int), "Port that the profiling service is listening on.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage-prefix"), defaultConfig.StoragePrefix, "StoragePrefix specifies the prefix where DataCatalog stores offloaded ArtifactData in CloudStorage. If not specified,  the data will be stored in the base container directly.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metrics-scope"), defaultConfig.MetricsScope, "Scope that the metrics will record under.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "profiler-port"), defaultConfig.ProfilerPort, "Port that the profiling service is listening on.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "heartbeat-grace-period-multiplier"), defaultConfig.HeartbeatGracePeriodMultiplier, "Number of heartbeats before a reservation expires without an extension.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "max-reservation-heartbeat"), defaultConfig.MaxReservationHeartbeat.String(), "The maximum available reservation extension heartbeat interval.")
 	return cmdFlags
 }

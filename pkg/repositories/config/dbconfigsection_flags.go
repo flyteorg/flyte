@@ -28,6 +28,15 @@ func (DbConfigSection) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (DbConfigSection) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (DbConfigSection) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
