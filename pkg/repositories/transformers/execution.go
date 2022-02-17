@@ -269,7 +269,7 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 
 // The execution abort metadata is recorded but the phase is not actually updated *until* the abort event is propagated
 // by flytepropeller. The metadata is preemptively saved at the time of the abort.
-func SetExecutionAborted(execution *models.Execution, cause, principal string) error {
+func SetExecutionAborting(execution *models.Execution, cause, principal string) error {
 	var closure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &closure)
 	if err != nil {
