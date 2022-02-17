@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/flyteorg/flytectl/pkg/util/githubutil"
+	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/pkg/githubutil"
 
 	"github.com/avast/retry-go"
-	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/olekukonko/tablewriter"
 	corev1api "k8s.io/api/core/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -52,11 +52,19 @@ Run specific version of Flyte. FlyteCTL sandbox only supports Flyte version avai
 
 Note: FlyteCTL sandbox is only supported for Flyte versions > v0.10.0
 
+Run latest pre release of  Flyte.
+::
+
+ flytectl sandbox start  --pre
+
+Note: pre release flag will be ignore if user pass version flag, In that case Flytectl will use specific version. 
+
 Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
 
   flytectl sandbox start --image docker.io/my-override:latest
 
+Note: If image flag is passed then Flytectl will ignore version and pre flags.
 	
 Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
@@ -70,7 +78,7 @@ Usage
 	taintEffect          = "NoSchedule"
 	sandboxContextName   = "flyte-sandbox"
 	sandboxDockerContext = "default"
-	imageName            = "cr.flyte.org/flyteorg/flyte-sandbox"
+	sandboxImageName     = "cr.flyte.org/flyteorg/flyte-sandbox"
 )
 
 type ExecResult struct {
@@ -159,8 +167,8 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		volumes = append(volumes, *vol)
 	}
 	sandboxImage := sandboxConfig.DefaultConfig.Image
-	if len(sandboxConfig.DefaultConfig.Image) == 0 {
-		image, version, err := githubutil.GetSandboxImage(sandboxConfig.DefaultConfig.Version, imageName)
+	if len(sandboxImage) == 0 {
+		image, version, err := githubutil.GetFullyQualifiedImageName(sandboxConfig.DefaultConfig.Version, sandboxImageName, sandboxConfig.DefaultConfig.Prerelease)
 		if err != nil {
 			return nil, err
 		}

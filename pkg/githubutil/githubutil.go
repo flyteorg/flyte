@@ -8,15 +8,13 @@ import (
 	"runtime"
 	"strings"
 
-	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-
 	"github.com/flyteorg/flytectl/pkg/util"
 
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flytectl/pkg/util/platformutil"
+	"github.com/flyteorg/flytectl/pkg/platformutil"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 	"github.com/mouuff/go-rocket-update/pkg/provider"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
@@ -105,7 +103,7 @@ func GetSandboxImageSha(version string, pre bool) (string, string, error) {
 				break
 			}
 		}
-		logger.Infof(context.Background(), "sandbox started with release %s", release.GetTagName())
+		logger.Infof(context.Background(), "starting with release %s", release.GetTagName())
 	} else if len(version) > 0 {
 		r, err := CheckVersionExist(version, flyte)
 		if err != nil {
@@ -213,11 +211,12 @@ func CheckBrewInstall(goos platformutil.Platform) (string, error) {
 	return "", nil
 }
 
-// GetSandboxImage Returns the alternate image if specified, else
+// GetFullyQualifiedImageName Returns the sandbox image, version and error
 // if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA} is used
 // else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
-func GetSandboxImage(version, image string) (string, string, error) {
-	sha, version, err := GetSandboxImageSha(version, sandboxConfig.DefaultConfig.Prerelease)
+// If pre release is true then use latest pre release of Flyte, In that case User don't need to pass version
+func GetFullyQualifiedImageName(version, image string, pre bool) (string, string, error) {
+	sha, version, err := GetSandboxImageSha(version, pre)
 	if err != nil {
 		return "", version, err
 	}

@@ -8,10 +8,12 @@ import (
 
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
-	"github.com/flyteorg/flytectl/pkg/util/platformutil"
+	"github.com/flyteorg/flytectl/pkg/platformutil"
 
 	"github.com/stretchr/testify/assert"
 )
+
+var sandboxImageName = "cr.flyte.org/flyteorg/flyte-sandbox"
 
 func TestGetLatestVersion(t *testing.T) {
 	t.Run("Get latest release with wrong url", func(t *testing.T) {
@@ -39,6 +41,27 @@ func TestCheckVersionExist(t *testing.T) {
 		release, err := CheckVersionExist("v0.15.0", "flyte")
 		assert.Nil(t, err)
 		assert.Equal(t, true, strings.HasPrefix(release.GetTagName(), "v"))
+	})
+}
+
+func TestGetFullyQualifiedImageName(t *testing.T) {
+	t.Run("Get tFully Qualified Image Name ", func(t *testing.T) {
+		image, tag, err := GetFullyQualifiedImageName("", sandboxImageName, false)
+		assert.Nil(t, err)
+		assert.Equal(t, true, strings.HasPrefix(tag, "v"))
+		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
+	})
+	t.Run("Get tFully Qualified Image Name with pre release", func(t *testing.T) {
+		image, tag, err := GetFullyQualifiedImageName("", sandboxImageName, true)
+		assert.Nil(t, err)
+		assert.Equal(t, true, strings.HasPrefix(tag, "v"))
+		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
+	})
+	t.Run("Get tFully Qualified Image Name with specific version", func(t *testing.T) {
+		image, tag, err := GetFullyQualifiedImageName("v0.19.0", sandboxImageName, true)
+		assert.Nil(t, err)
+		assert.Equal(t, "v0.19.0", tag)
+		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
 	})
 }
 
