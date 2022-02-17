@@ -84,7 +84,7 @@ func testDecodeJson_DbConfigSection(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_DbConfigSection(val, result))
 }
 
-func testDecodeSlice_DbConfigSection(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_DbConfigSection(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_DbConfigSection(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_host", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("host"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_port", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("port"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_dbname", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("dbname"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_username", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("username"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_password", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("password"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -210,14 +170,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_passwordPath", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("passwordPath"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -232,14 +184,6 @@ func TestDbConfigSection_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_options", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("options"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

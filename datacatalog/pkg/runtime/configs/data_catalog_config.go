@@ -4,9 +4,11 @@ import (
 	"github.com/flyteorg/flytestdlib/config"
 )
 
-//go:generate pflags DataCatalogConfig
+//go:generate pflags DataCatalogConfig --default-var=defaultConfig
 
-// This configuration is the base configuration to start admin
+var defaultConfig = &DataCatalogConfig{}
+
+// DataCatalogConfig is the base configuration to start datacatalog
 type DataCatalogConfig struct {
 	StoragePrefix                  string          `json:"storage-prefix" pflag:",StoragePrefix specifies the prefix where DataCatalog stores offloaded ArtifactData in CloudStorage. If not specified, the data will be stored in the base container directly."`
 	MetricsScope                   string          `json:"metrics-scope" pflag:",Scope that the metrics will record under."`
