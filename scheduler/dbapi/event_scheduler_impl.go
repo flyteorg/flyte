@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories"
 	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -16,7 +17,7 @@ import (
 
 // eventScheduler used for saving the scheduler entries after launch plans are enabled or disabled.
 type eventScheduler struct {
-	db repositories.SchedulerRepoInterface
+	db repositoryInterfaces.Repository
 }
 
 func (s *eventScheduler) CreateScheduleInput(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
@@ -82,6 +83,6 @@ func (s *eventScheduler) RemoveSchedule(ctx context.Context, input interfaces.Re
 	return nil
 }
 
-func New(db repositories.SchedulerRepoInterface) interfaces.EventScheduler {
+func New(db repositoryInterfaces.Repository) interfaces.EventScheduler {
 	return &eventScheduler{db: db}
 }

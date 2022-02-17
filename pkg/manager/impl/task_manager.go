@@ -23,7 +23,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -39,7 +38,7 @@ type taskMetrics struct {
 }
 
 type TaskManager struct {
-	db       repositories.RepositoryInterface
+	db       repoInterfaces.Repository
 	config   runtimeInterfaces.Configuration
 	compiler workflowengine.Compiler
 	metrics  taskMetrics
@@ -251,7 +250,7 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 }
 
 func NewTaskManager(
-	db repositories.RepositoryInterface,
+	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
 	scope promutils.Scope) interfaces.TaskInterface {
 	metrics := taskMetrics{

@@ -5,8 +5,9 @@ import (
 	"context"
 	"time"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories"
 	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -23,7 +24,7 @@ type Metrics struct {
 
 type snapshoter struct {
 	metrics Metrics
-	db      repositories.SchedulerRepoInterface
+	db      repositoryInterfaces.SchedulerRepoInterface
 }
 
 func (w *snapshoter) Save(ctx context.Context, writer Writer, snapshot Snapshot) {
@@ -70,7 +71,7 @@ func (w *snapshoter) Read(ctx context.Context, reader Reader) (Snapshot, error) 
 	return snapshot, nil
 }
 
-func New(scope promutils.Scope, db repositories.SchedulerRepoInterface) Persistence {
+func New(scope promutils.Scope, db repositoryInterfaces.SchedulerRepoInterface) Persistence {
 	return &snapshoter{
 		metrics: getSnapshoterMetrics(scope),
 		db:      db,

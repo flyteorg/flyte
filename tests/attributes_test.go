@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+
 	"github.com/golang/protobuf/proto"
 
 	"github.com/stretchr/testify/assert"
 
-	databaseConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
@@ -29,8 +30,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
-
-	db, err := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
 	truncateTableForTesting(db, "resources")
 	sqlDB, err := db.DB()
@@ -106,7 +106,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
-	db, err := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
 	truncateTableForTesting(db, "resources")
 	sqlDB, err := db.DB()
@@ -167,7 +167,7 @@ func TestListAllMatchableAttributes(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
-	db, err := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
 	truncateTableForTesting(db, "resources")
 	sqlDB, err := db.DB()

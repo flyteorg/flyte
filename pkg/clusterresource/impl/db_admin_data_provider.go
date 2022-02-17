@@ -6,8 +6,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	repositoriesInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -15,7 +14,7 @@ import (
 
 // Implementation of an interfaces.FlyteAdminDataProvider which fetches data directly from the provided database connection.
 type dbAdminProvider struct {
-	db              repositories.RepositoryInterface
+	db              repositoryInterfaces.Repository
 	config          runtimeInterfaces.Configuration
 	resourceManager managerInterfaces.ResourceInterface
 }
@@ -52,7 +51,7 @@ func (p dbAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, erro
 	if err != nil {
 		return nil, err
 	}
-	projectModels, err := p.db.ProjectRepo().List(ctx, repositoriesInterfaces.ListResourceInput{
+	projectModels, err := p.db.ProjectRepo().List(ctx, repositoryInterfaces.ListResourceInput{
 		SortParameter: descCreatedAtSortDBParam,
 		InlineFilters: []common.InlineFilter{filter},
 	})
@@ -65,7 +64,7 @@ func (p dbAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, erro
 	}, nil
 }
 
-func NewDatabaseAdminDataProvider(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, resourceManager managerInterfaces.ResourceInterface) interfaces.FlyteAdminDataProvider {
+func NewDatabaseAdminDataProvider(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, resourceManager managerInterfaces.ResourceInterface) interfaces.FlyteAdminDataProvider {
 	return &dbAdminProvider{
 		db:              db,
 		config:          config,

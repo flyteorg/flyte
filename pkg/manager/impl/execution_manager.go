@@ -36,7 +36,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -82,7 +81,7 @@ type executionUserMetrics struct {
 }
 
 type ExecutionManager struct {
-	db                        repositories.RepositoryInterface
+	db                        repositoryInterfaces.Repository
 	config                    runtimeInterfaces.Configuration
 	storageClient             *storage.DataStore
 	queueAllocator            executions.QueueAllocator
@@ -1560,7 +1559,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 	}
 }
 
-func NewExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration,
+func NewExecutionManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,

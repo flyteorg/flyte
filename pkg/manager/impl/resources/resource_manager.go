@@ -17,14 +17,13 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 )
 
 type ResourceManager struct {
-	db     repositories.RepositoryInterface
+	db     repo_interface.Repository
 	config runtimeInterfaces.ApplicationConfiguration
 }
 
@@ -264,7 +263,7 @@ func (m *ResourceManager) ListAll(ctx context.Context, request admin.ListMatchab
 	}, nil
 }
 
-func NewResourceManager(db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration) interfaces.ResourceInterface {
+func NewResourceManager(db repo_interface.Repository, config runtimeInterfaces.ApplicationConfiguration) interfaces.ResourceInterface {
 	return &ResourceManager{
 		db:     db,
 		config: config,

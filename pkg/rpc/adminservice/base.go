@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/implementations"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
@@ -18,7 +20,6 @@ import (
 	manager "github.com/flyteorg/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	repositoryConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine"
 	workflowengineImpl "github.com/flyteorg/flyteadmin/pkg/workflowengine/impl"
@@ -27,7 +28,6 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	gormLogger "gorm.io/gorm/logger"
 )
 
 type AdminService struct {
@@ -58,7 +58,7 @@ func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message
 
 const defaultRetries = 3
 
-func NewAdminServer(kubeConfig, master string) *AdminService {
+func NewAdminServer(ctx context.Context, kubeConfig, master string) *AdminService {
 	configuration := runtime.NewConfigurationProvider()
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
@@ -69,44 +69,36 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	defer func() {
 		if err := recover(); err != nil {
 			panicCounter.Inc()
-			logger.Fatalf(context.Background(), fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
+			logger.Fatalf(ctx, fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
 		}
 	}()
 
-	dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
-	dbLogLevel := gormLogger.Silent
-	if dbConfigValues.Debug {
-		dbLogLevel = gormLogger.Info
+	databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
+	logConfig := logger.GetConfig()
+
+	db, err := repositories.GetDB(ctx, databaseConfig, logConfig)
+	if err != nil {
+		logger.Fatal(ctx, err)
 	}
-	dbConfig := repositoryConfig.DbConfig{
-		BaseConfig: repositoryConfig.BaseConfig{
-			LogLevel: dbLogLevel,
-		},
-		Host:         dbConfigValues.Host,
-		Port:         dbConfigValues.Port,
-		DbName:       dbConfigValues.DbName,
-		User:         dbConfigValues.User,
-		Password:     dbConfigValues.Password,
-		ExtraOptions: dbConfigValues.ExtraOptions,
-	}
-	db := repositories.GetRepository(
-		repositories.POSTGRES, dbConfig, adminScope.NewSubScope("database"))
+	dbScope := adminScope.NewSubScope("database")
+	repo := repositories.NewGormRepo(
+		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)
 	storeConfig := storage.GetConfig()
 	execCluster := executionCluster.GetExecutionCluster(
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),
 		kubeConfig,
 		master,
 		configuration,
-		db)
+		repo)
 	workflowBuilder := workflowengineImpl.NewFlyteWorkflowBuilder(
 		adminScope.NewSubScope("builder").NewSubScope("flytepropeller"))
 	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(execCluster, workflowBuilder)
-	logger.Info(context.Background(), "Successfully created a workflow executor engine")
+	logger.Info(ctx, "Successfully created a workflow executor engine")
 	workflowengine.GetRegistry().RegisterDefault(workflowExecutor)
 
 	dataStorageClient, err := storage.NewDataStore(storeConfig, adminScope.NewSubScope("storage"))
 	if err != nil {
-		logger.Error(context.Background(), "Failed to initialize storage config")
+		logger.Error(ctx, "Failed to initialize storage config")
 		panic(err)
 	}
 
@@ -114,13 +106,13 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	go func() {
-		logger.Info(context.Background(), "Started processing notifications.")
+		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
 	}()
 
 	// Configure workflow scheduler async processes.
 	schedulerConfig := configuration.ApplicationConfiguration().GetSchedulerConfig()
-	workflowScheduler := schedule.NewWorkflowScheduler(db, schedule.WorkflowSchedulerConfig{
+	workflowScheduler := schedule.NewWorkflowScheduler(repo, schedule.WorkflowSchedulerConfig{
 		Retries:         defaultRetries,
 		SchedulerConfig: *schedulerConfig,
 		Scope:           adminScope,
@@ -128,7 +120,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
 	launchPlanManager := manager.NewLaunchPlanManager(
-		db, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
+		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
 
 	// Configure admin-specific remote data handler (separate from storage)
 	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()
@@ -142,56 +134,56 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	}).GetRemoteURLInterface()
 
 	workflowManager := manager.NewWorkflowManager(
-		db, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
+		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
 		adminScope.NewSubScope("workflow_manager"))
-	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
+	namedEntityManager := manager.NewNamedEntityManager(repo, configuration, adminScope.NewSubScope("named_entity_manager"))
 
-	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(db, applicationConfiguration.GetAsyncEventsBufferSize())
+	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(repo, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {
 		executionEventWriter.Run()
 	}()
 
-	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient,
+	executionManager := manager.NewExecutionManager(repo, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
 		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
-	logger.Info(context.Background(), "Successfully initialized a new scheduled workflow executor")
+	logger.Info(ctx, "Successfully initialized a new scheduled workflow executor")
 	go func() {
-		logger.Info(context.Background(), "Starting the scheduled workflow executor")
+		logger.Info(ctx, "Starting the scheduled workflow executor")
 		scheduledWorkflowExecutor.Run()
 	}()
 
 	// Serve profiling endpoints.
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(
-			context.Background(), applicationConfiguration.GetProfilerPort(), nil)
+			ctx, applicationConfiguration.GetProfilerPort(), nil)
 		if err != nil {
-			logger.Panicf(context.Background(), "Failed to Start profiling and Metrics server. Error, %v", err)
+			logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
 		}
 	}()
 
-	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(db, applicationConfiguration.GetAsyncEventsBufferSize())
+	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(repo, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {
 		nodeExecutionEventWriter.Run()
 	}()
 
-	logger.Info(context.Background(), "Initializing a new AdminService")
+	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
-		TaskManager: manager.NewTaskManager(db, configuration, workflowengineImpl.NewCompiler(),
+		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
 			adminScope.NewSubScope("task_manager")),
 		WorkflowManager:    workflowManager,
 		LaunchPlanManager:  launchPlanManager,
 		ExecutionManager:   executionManager,
 		NamedEntityManager: namedEntityManager,
 		VersionManager:     versionManager,
-		NodeExecutionManager: manager.NewNodeExecutionManager(db, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
+		NodeExecutionManager: manager.NewNodeExecutionManager(repo, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
 			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, nodeExecutionEventWriter),
-		TaskExecutionManager: manager.NewTaskExecutionManager(db, configuration, dataStorageClient,
+		TaskExecutionManager: manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
 			adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher),
-		ProjectManager:  manager.NewProjectManager(db, configuration),
-		ResourceManager: resources.NewResourceManager(db, configuration.ApplicationConfiguration()),
+		ProjectManager:  manager.NewProjectManager(repo, configuration),
+		ResourceManager: resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
 		Metrics:         InitMetrics(adminScope),
 	}
 }

@@ -6,14 +6,13 @@ import (
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // ValidateClusterForExecutionID validates that the execution denoted by executionId is recorded as executing on `cluster`.
-func ValidateClusterForExecutionID(ctx context.Context, db repositories.RepositoryInterface, executionID *core.WorkflowExecutionIdentifier, clusterInEvent string) error {
+func ValidateClusterForExecutionID(ctx context.Context, db repoInterfaces.Repository, executionID *core.WorkflowExecutionIdentifier, clusterInEvent string) error {
 	workflowExecution, err := db.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,

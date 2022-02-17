@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
@@ -64,7 +62,7 @@ func getMockTaskCompiler() workflowengine.Compiler {
 	return mockCompiler
 }
 
-func getMockTaskRepository() repositories.RepositoryInterface {
+func getMockTaskRepository() interfaces.Repository {
 	return repositoryMocks.NewMockRepository()
 }
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	schedMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	db repositories.RepositoryInterface
+	db repositoryInterfaces.Repository
 )
 
 func setupEventScheduler() interfaces.EventScheduler {

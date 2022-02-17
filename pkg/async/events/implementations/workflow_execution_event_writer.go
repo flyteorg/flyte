@@ -3,8 +3,9 @@ package implementations
 import (
 	"context"
 
+	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -13,7 +14,7 @@ import (
 // This event writer acts to asynchronously persist workflow execution events. As flytepropeller sends workflow
 // events, workflow execution processing doesn't have to wait on these to be committed.
 type workflowExecutionEventWriter struct {
-	db     repositories.RepositoryInterface
+	db     repositoryInterfaces.Repository
 	events chan admin.WorkflowExecutionEventRequest
 }
 
@@ -37,7 +38,7 @@ func (w *workflowExecutionEventWriter) Run() {
 	}
 }
 
-func NewWorkflowExecutionEventWriter(db repositories.RepositoryInterface, bufferSize int) interfaces.WorkflowExecutionEventWriter {
+func NewWorkflowExecutionEventWriter(db repositoryInterfaces.Repository, bufferSize int) interfaces.WorkflowExecutionEventWriter {
 	return &workflowExecutionEventWriter{
 		db:     db,
 		events: make(chan admin.WorkflowExecutionEventRequest, bufferSize),

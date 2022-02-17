@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+
 	gizmoConfig "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -13,7 +15,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/noop"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	flytescheduler "github.com/flyteorg/flyteadmin/scheduler/dbapi"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -57,7 +58,7 @@ func (w *workflowScheduler) GetWorkflowExecutor(
 	return w.workflowExecutor
 }
 
-func NewWorkflowScheduler(db repositories.RepositoryInterface, cfg WorkflowSchedulerConfig) WorkflowScheduler {
+func NewWorkflowScheduler(db repoInterfaces.Repository, cfg WorkflowSchedulerConfig) WorkflowScheduler {
 	var eventScheduler interfaces.EventScheduler
 	var workflowExecutor interfaces.WorkflowExecutor
 

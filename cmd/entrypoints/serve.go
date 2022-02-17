@@ -116,7 +116,7 @@ func newGRPCServer(ctx context.Context, cfg *config.ServerConfig, authCtx interf
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
 	grpcPrometheus.Register(grpcServer)
-	flyteService.RegisterAdminServiceServer(grpcServer, adminservice.NewAdminServer(cfg.KubeConfig, cfg.Master))
+	flyteService.RegisterAdminServiceServer(grpcServer, adminservice.NewAdminServer(ctx, cfg.KubeConfig, cfg.Master))
 	if cfg.Security.UseAuth {
 		flyteService.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
 		flyteService.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())

@@ -5,39 +5,33 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// This configuration section is used to for initiating the database connection with the store that holds registered
+// DbConfig is used to for initiating the database connection with the store that holds registered
 // entities (e.g. workflows, tasks, launch plans...)
-// This struct specifically maps to the flyteadmin config yaml structure.
-type DbConfigSection struct {
-	// The host name of the database server
-	Host string `json:"host"`
-	// The port name of the database server
-	Port int `json:"port"`
-	// The database name
-	DbName string `json:"dbname"`
-	// The database user who is connecting to the server.
-	User string `json:"username"`
-	// Either Password or PasswordPath must be set.
-	// The Password resolves to the database password.
-	Password     string `json:"password"`
-	PasswordPath string `json:"passwordPath"`
-	// See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above.
-	ExtraOptions string `json:"options"`
-	// Whether or not to start the database connection with debug mode enabled.
-	Debug bool `json:"debug"`
+type DbConfig struct {
+	DeprecatedHost         string `json:"host" pflag:",deprecated"`
+	DeprecatedPort         int    `json:"port" pflag:",deprecated"`
+	DeprecatedDbName       string `json:"dbname" pflag:",deprecated"`
+	DeprecatedUser         string `json:"username" pflag:",deprecated"`
+	DeprecatedPassword     string `json:"password" pflag:",deprecated"`
+	DeprecatedPasswordPath string `json:"passwordPath" pflag:",deprecated"`
+	DeprecatedExtraOptions string `json:"options" pflag:",deprecated"`
+	DeprecatedDebug        bool   `json:"debug" pflag:",deprecated"`
+
+	EnableForeignKeyConstraintWhenMigrating bool           `json:"enableForeignKeyConstraintWhenMigrating" pflag:",Whether to enable gorm foreign keys when migrating the db"`
+	PostgresConfig                          PostgresConfig `json:"postgres"`
 }
 
-// This represents a configuration used for initiating database connections much like DbConfigSection, however the
-// password is *resolved* in this struct and therefore it is used as the value the runtime provider returns to callers
-// requesting the database config.
-type DbConfig struct {
-	Host         string `json:"host"`
-	Port         int    `json:"port"`
-	DbName       string `json:"dbname"`
-	User         string `json:"username"`
-	Password     string `json:"password"`
-	ExtraOptions string `json:"options"`
-	Debug        bool   `json:"debug"`
+// PostgresConfig includes specific config options for opening a connection to a postgres database.
+type PostgresConfig struct {
+	Host   string `json:"host" pflag:",The host name of the database server"`
+	Port   int    `json:"port" pflag:",The port name of the database server"`
+	DbName string `json:"dbname" pflag:",The database name"`
+	User   string `json:"username" pflag:",The database user who is connecting to the server."`
+	// Either Password or PasswordPath must be set.
+	Password     string `json:"password" pflag:",The database password."`
+	PasswordPath string `json:"passwordPath" pflag:",Points to the file containing the database password."`
+	ExtraOptions string `json:"options" pflag:",See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above."`
+	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
 }
 
 // This configuration is the base configuration to start admin
@@ -417,7 +411,7 @@ type DomainsConfig = []Domain
 
 // Defines the interface to return top-level config structs necessary to start up a flyteadmin application.
 type ApplicationConfiguration interface {
-	GetDbConfig() DbConfig
+	GetDbConfig() *DbConfig
 	GetTopLevelConfig() *ApplicationConfig
 	GetSchedulerConfig() *SchedulerConfig
 	GetRemoteDataConfig() *RemoteDataConfig

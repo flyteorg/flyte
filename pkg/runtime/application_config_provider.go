@@ -1,15 +1,9 @@
 package runtime
 
 import (
-	"context"
-	"io/ioutil"
-	"os"
-	"strings"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const database = "database"
@@ -25,12 +19,12 @@ const postgres = "postgres"
 const KB = 1024
 const MB = KB * KB
 
-var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfigSection{
-	Port:         5432,
-	User:         postgres,
-	Host:         postgres,
-	DbName:       postgres,
-	ExtraOptions: "sslmode=disable",
+var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfig{
+	DeprecatedPort:         5432,
+	DeprecatedUser:         postgres,
+	DeprecatedHost:         postgres,
+	DeprecatedDbName:       postgres,
+	DeprecatedExtraOptions: "sslmode=disable",
 })
 var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{
 	ProfilerPort:          metricPort,
@@ -89,32 +83,8 @@ var externalEventsConfig = config.MustRegisterSection(externalEvents, &interface
 // Implementation of an interfaces.ApplicationConfiguration
 type ApplicationConfigurationProvider struct{}
 
-func (p *ApplicationConfigurationProvider) GetDbConfig() interfaces.DbConfig {
-	dbConfigSection := databaseConfig.GetConfig().(*interfaces.DbConfigSection)
-	password := dbConfigSection.Password
-	if len(dbConfigSection.PasswordPath) > 0 {
-		if _, err := os.Stat(dbConfigSection.PasswordPath); os.IsNotExist(err) {
-			logger.Fatalf(context.Background(),
-				"missing database password at specified path [%s]", dbConfigSection.PasswordPath)
-		}
-		passwordVal, err := ioutil.ReadFile(dbConfigSection.PasswordPath)
-		if err != nil {
-			logger.Fatalf(context.Background(), "failed to read database password from path [%s] with err: %v",
-				dbConfigSection.PasswordPath, err)
-		}
-		// Passwords can contain special characters as long as they are percent encoded
-		// https://www.postgresql.org/docs/current/libpq-connect.html
-		password = strings.TrimSpace(string(passwordVal))
-	}
-	return interfaces.DbConfig{
-		Host:         dbConfigSection.Host,
-		Port:         dbConfigSection.Port,
-		DbName:       dbConfigSection.DbName,
-		User:         dbConfigSection.User,
-		Password:     password,
-		ExtraOptions: dbConfigSection.ExtraOptions,
-		Debug:        dbConfigSection.Debug,
-	}
+func (p *ApplicationConfigurationProvider) GetDbConfig() *interfaces.DbConfig {
+	return databaseConfig.GetConfig().(*interfaces.DbConfig)
 }
 
 func (p *ApplicationConfigurationProvider) GetTopLevelConfig() *interfaces.ApplicationConfig {

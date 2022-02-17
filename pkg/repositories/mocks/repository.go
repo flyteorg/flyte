@@ -1,10 +1,10 @@
 package mocks
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	sIface "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
 	sMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
+	"gorm.io/gorm"
 )
 
 type MockRepository struct {
@@ -21,6 +21,10 @@ type MockRepository struct {
 	namedEntityRepo               interfaces.NamedEntityRepoInterface
 	schedulableEntityRepo         sIface.SchedulableEntityRepoInterface
 	schedulableEntitySnapshotRepo sIface.ScheduleEntitiesSnapShotRepoInterface
+}
+
+func (r *MockRepository) GetGormDB() *gorm.DB {
+	return nil
 }
 
 func (r *MockRepository) SchedulableEntityRepo() sIface.SchedulableEntityRepoInterface {
@@ -75,7 +79,7 @@ func (r *MockRepository) NamedEntityRepo() interfaces.NamedEntityRepoInterface {
 	return r.namedEntityRepo
 }
 
-func NewMockRepository() repositories.RepositoryInterface {
+func NewMockRepository() interfaces.Repository {
 	return &MockRepository{
 		taskRepo:                      NewMockTaskRepo(),
 		workflowRepo:                  NewMockWorkflowRepo(),

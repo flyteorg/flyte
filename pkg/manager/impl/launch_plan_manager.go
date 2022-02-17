@@ -19,7 +19,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -38,7 +37,7 @@ type launchPlanMetrics struct {
 }
 
 type LaunchPlanManager struct {
-	db        repositories.RepositoryInterface
+	db        repoInterfaces.Repository
 	config    runtimeInterfaces.Configuration
 	scheduler scheduleInterfaces.EventScheduler
 	metrics   launchPlanMetrics
@@ -550,7 +549,7 @@ func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin
 }
 
 func NewLaunchPlanManager(
-	db repositories.RepositoryInterface,
+	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	scheduler scheduleInterfaces.EventScheduler,
 	scope promutils.Scope) interfaces.LaunchPlanInterface {

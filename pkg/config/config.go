@@ -38,7 +38,7 @@ type ServerSecurityOptions struct {
 	AllowedOrigins []string `json:"allowedOrigins"`
 	// These are the Access-Control-Request-Headers that the server will respond to.
 	// By default, the server will allow Accept, Accept-Language, Content-Language, and Content-Type.
-	// User this setting to add any additional headers which are needed
+	// DeprecatedUser this setting to add any additional headers which are needed
 	AllowedHeaders []string `json:"allowedHeaders"`
 }
 

@@ -8,7 +8,8 @@ import (
 	"testing"
 	"time"
 
-	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -156,7 +157,7 @@ func populateWorkflowExecutionsForTestingOnly() {
 		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2),
 		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2),
 	}
-	db, err := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
 		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)

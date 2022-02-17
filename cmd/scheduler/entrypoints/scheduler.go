@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
-	repositoryCommonConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyteadmin/scheduler"
-	schdulerRepoConfig "github.com/flyteorg/flyteadmin/scheduler/repositories"
 	"github.com/flyteorg/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -42,10 +43,16 @@ var schedulerRunCmd = &cobra.Command{
 			}
 		}()
 
-		dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
-		dbConfig := repositoryCommonConfig.NewDbConfig(dbConfigValues)
-		db := schdulerRepoConfig.GetRepository(
-			schdulerRepoConfig.POSTGRES, dbConfig, schedulerScope.NewSubScope("database"))
+		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
+		logConfig := logger.GetConfig()
+
+		db, err := repositories.GetDB(ctx, databaseConfig, logConfig)
+		if err != nil {
+			logger.Fatal(ctx, err)
+		}
+		dbScope := schedulerScope.NewSubScope("database")
+		repo := repositories.NewGormRepo(
+			db, errors.NewPostgresErrorTransformer(schedulerScope.NewSubScope("errors")), dbScope)
 
 		clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).Build(ctx)
 		if err != nil {
@@ -54,7 +61,7 @@ var schedulerRunCmd = &cobra.Command{
 		}
 		adminServiceClient := clientSet.AdminClient()
 
-		scheduleExecutor := scheduler.NewScheduledExecutor(db,
+		scheduleExecutor := scheduler.NewScheduledExecutor(repo,
 			configuration.ApplicationConfiguration().GetSchedulerConfig().GetWorkflowExecutorConfig(), schedulerScope, adminServiceClient)
 
 		logger.Info(ctx, "Successfully initialized a native flyte scheduler")

@@ -28,7 +28,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -52,7 +51,7 @@ type nodeExecutionMetrics struct {
 }
 
 type NodeExecutionManager struct {
-	db             repositories.RepositoryInterface
+	db             repoInterfaces.Repository
 	config         runtimeInterfaces.Configuration
 	storagePrefix  []string
 	storageClient  *storage.DataStore
@@ -499,7 +498,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	return response, nil
 }
 
-func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration,
+func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
 	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
 	eventPublisher notificationInterfaces.Publisher, eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{

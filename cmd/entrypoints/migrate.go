@@ -3,27 +3,20 @@ package entrypoints
 import (
 	"context"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/spf13/cobra"
-	"gorm.io/driver/postgres"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 )
 
 var parentMigrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "This command controls migration behavior for the Flyte admin database. Please choose a subcommand.",
 }
-
-var migrationsScope = promutils.NewScope("migrations")
-var migrateScope = migrationsScope.NewSubScope("migrate")
-var rollbackScope = promutils.NewScope("migrations").NewSubScope("rollback")
 
 // This runs all the migrations
 var migrateCmd = &cobra.Command{
@@ -33,26 +26,9 @@ var migrateCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
-		dbLogLevel := gormLogger.Silent
-		if databaseConfig.Debug {
-			dbLogLevel = gormLogger.Info
-		}
-		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
-			BaseConfig: config.BaseConfig{
-				LogLevel:                                 dbLogLevel,
-				DisableForeignKeyConstraintWhenMigrating: true,
-			},
-			Host:         databaseConfig.Host,
-			Port:         databaseConfig.Port,
-			DbName:       databaseConfig.DbName,
-			User:         databaseConfig.User,
-			Password:     databaseConfig.Password,
-			ExtraOptions: databaseConfig.ExtraOptions,
-		}, migrateScope)
-		db, err := gorm.Open(postgres.Open(postgresConfigProvider.GetDSN()), &gorm.Config{
-			Logger:                                   gormLogger.Default.LogMode(postgresConfigProvider.GetDBConfig().LogLevel),
-			DisableForeignKeyConstraintWhenMigrating: postgresConfigProvider.GetDBConfig().DisableForeignKeyConstraintWhenMigrating,
-		})
+		logConfig := logger.GetConfig()
+
+		db, err := repositories.GetDB(ctx, databaseConfig, logConfig)
 		if err != nil {
 			logger.Fatal(ctx, err)
 		}
@@ -87,25 +63,9 @@ var rollbackCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
-		dbLogLevel := gormLogger.Silent
-		if databaseConfig.Debug {
-			dbLogLevel = gormLogger.Info
-		}
-		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
-			BaseConfig: config.BaseConfig{
-				LogLevel: dbLogLevel,
-			},
-			Host:         databaseConfig.Host,
-			Port:         databaseConfig.Port,
-			DbName:       databaseConfig.DbName,
-			User:         databaseConfig.User,
-			Password:     databaseConfig.Password,
-			ExtraOptions: databaseConfig.ExtraOptions,
-		}, rollbackScope)
+		logConfig := logger.GetConfig()
 
-		db, err := gorm.Open(postgres.Open(postgresConfigProvider.GetDSN()), &gorm.Config{
-			Logger: gormLogger.Default.LogMode(postgresConfigProvider.GetDBConfig().LogLevel),
-		})
+		db, err := repositories.GetDB(ctx, databaseConfig, logConfig)
 		if err != nil {
 			logger.Fatal(ctx, err)
 		}
@@ -140,24 +100,9 @@ var seedProjectsCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
-		dbLogLevel := gormLogger.Silent
-		if databaseConfig.Debug {
-			dbLogLevel = gormLogger.Info
-		}
-		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
-			BaseConfig: config.BaseConfig{
-				LogLevel: dbLogLevel,
-			},
-			Host:         databaseConfig.Host,
-			Port:         databaseConfig.Port,
-			DbName:       databaseConfig.DbName,
-			User:         databaseConfig.User,
-			Password:     databaseConfig.Password,
-			ExtraOptions: databaseConfig.ExtraOptions,
-		}, migrateScope)
-		db, err := gorm.Open(postgres.Open(postgresConfigProvider.GetDSN()), &gorm.Config{
-			Logger: gormLogger.Default.LogMode(postgresConfigProvider.GetDBConfig().LogLevel),
-		})
+		logConfig := logger.GetConfig()
+
+		db, err := repositories.GetDB(ctx, databaseConfig, logConfig)
 		if err != nil {
 			logger.Fatal(ctx, err)
 		}

@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
@@ -27,7 +26,7 @@ func GetExecutionName(request admin.ExecutionCreateRequest) string {
 	return common.GetExecutionName(time.Now().UnixNano())
 }
 
-func GetTask(ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (
+func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (
 	*admin.Task, error) {
 	taskModel, err := GetTaskModel(ctx, repo, &identifier)
 	if err != nil {
@@ -43,7 +42,7 @@ func GetTask(ctx context.Context, repo repositories.RepositoryInterface, identif
 }
 
 func GetWorkflowModel(
-	ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (models.Workflow, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.Workflow, error) {
 	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
@@ -71,7 +70,7 @@ func FetchAndGetWorkflowClosure(ctx context.Context,
 
 func GetWorkflow(
 	ctx context.Context,
-	repo repositories.RepositoryInterface,
+	repo repoInterfaces.Repository,
 	store *storage.DataStore,
 	identifier core.Identifier) (*admin.Workflow, error) {
 	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
@@ -92,7 +91,7 @@ func GetWorkflow(
 }
 
 func GetLaunchPlanModel(
-	ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (models.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.LaunchPlan, error) {
 	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
@@ -106,7 +105,7 @@ func GetLaunchPlanModel(
 }
 
 func GetLaunchPlan(
-	ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (*admin.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.LaunchPlan, error) {
 	launchPlanModel, err := GetLaunchPlanModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -115,7 +114,7 @@ func GetLaunchPlan(
 }
 
 func GetNamedEntityModel(
-	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
 	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
 		ResourceType: resourceType,
 		Project:      identifier.Project,
@@ -129,7 +128,7 @@ func GetNamedEntityModel(
 }
 
 func GetNamedEntity(
-	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
 	metadataModel, err := GetNamedEntityModel(ctx, repo, resourceType, identifier)
 	if err != nil {
 		return nil, err
@@ -177,7 +176,7 @@ func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.Inlin
 }
 
 func GetExecutionModel(
-	ctx context.Context, repo repositories.RepositoryInterface, identifier core.WorkflowExecutionIdentifier) (
+	ctx context.Context, repo repoInterfaces.Repository, identifier core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
 	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
@@ -190,7 +189,7 @@ func GetExecutionModel(
 	return &executionModel, nil
 }
 
-func GetNodeExecutionModel(ctx context.Context, repo repositories.RepositoryInterface, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
+func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
 	*models.NodeExecution, error) {
 	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: *nodeExecutionIdentifier,
@@ -202,7 +201,7 @@ func GetNodeExecutionModel(ctx context.Context, repo repositories.RepositoryInte
 	return &nodeExecutionModel, nil
 }
 
-func GetTaskModel(ctx context.Context, repo repositories.RepositoryInterface, taskIdentifier *core.Identifier) (
+func GetTaskModel(ctx context.Context, repo repoInterfaces.Repository, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
 
 	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
@@ -219,7 +218,7 @@ func GetTaskModel(ctx context.Context, repo repositories.RepositoryInterface, ta
 }
 
 func GetTaskExecutionModel(
-	ctx context.Context, repo repositories.RepositoryInterface, taskExecutionID *core.TaskExecutionIdentifier) (*models.TaskExecution, error) {
+	ctx context.Context, repo repoInterfaces.Repository, taskExecutionID *core.TaskExecutionIdentifier) (*models.TaskExecution, error) {
 	if err := validation.ValidateTaskExecutionIdentifier(taskExecutionID); err != nil {
 		logger.Debugf(ctx, "can't get task execution with invalid identifier [%v]: %v", taskExecutionID, err)
 		return nil, err

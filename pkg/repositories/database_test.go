@@ -1,30 +1,63 @@
-// +build integration
-
 package repositories
 
 import (
+	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/logger"
+	gormLogger "gorm.io/gorm/logger"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInsertionOfTask(t *testing.T) {
-	// Because this is an integration test, we'll need to load the version of configuration that's actually being run
-	// instead of the sample one in this repo
-	config.Init("/etc/flyte/config/flyteadmin_config.yaml")
+func TestGetGormLogLevel(t *testing.T) {
+	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.PanicLevel,
+	}))
+	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.FatalLevel,
+	}))
+	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.ErrorLevel,
+	}))
 
-	repository := GetRepository(POSTGRES)
-	taskRepository := repository.TaskRepo()
+	assert.Equal(t, gormLogger.Warn, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.WarnLevel,
+	}))
 
-	err := taskRepository.Create(models.Task{
-		Name:    "sometesttask",
-		Closure: []byte("in bytes"),
-		Domain:  "testdev",
-		Project: "flyte",
-		Version: "0.0.0",
+	assert.Equal(t, gormLogger.Info, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.InfoLevel,
+	}))
+	assert.Equal(t, gormLogger.Info, getGormLogLevel(context.TODO(), &logger.Config{
+		Level: logger.DebugLevel,
+	}))
+
+	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), nil))
+}
+
+func TestGetPostgresDsn(t *testing.T) {
+	pgConfig := runtimeInterfaces.PostgresConfig{
+		Host:         "localhost",
+		Port:         5432,
+		DbName:       "postgres",
+		User:         "postgres",
+		ExtraOptions: "sslmode=disable",
+	}
+	t.Run("no password", func(t *testing.T) {
+		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=disable", dsn)
 	})
+	t.Run("with password", func(t *testing.T) {
+		pgConfig.Password = "pass"
+		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass sslmode=disable", dsn)
 
-	assert.NoError(t, err)
+	})
+	t.Run("with password, no extra", func(t *testing.T) {
+		pgConfig.Password = "pass"
+		pgConfig.ExtraOptions = ""
+		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass ", dsn)
+	})
 }

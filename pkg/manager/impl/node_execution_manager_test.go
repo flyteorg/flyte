@@ -16,7 +16,6 @@ import (
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -88,7 +87,7 @@ var workflowExecutionIdentifier = core.WorkflowExecutionIdentifier{
 
 var mockNodeExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 
-func addGetExecutionCallback(t *testing.T, repository repositories.RepositoryInterface) {
+func addGetExecutionCallback(t *testing.T, repository interfaces.Repository) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.Equal(t, "project", input.Project)
