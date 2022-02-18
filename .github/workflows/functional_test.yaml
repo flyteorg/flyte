@@ -5,6 +5,7 @@ on:
     paths:
       - docker/**
       - charts/**
+      - .github/workflows/functional_test.yaml
 
 defaults:
   run:
