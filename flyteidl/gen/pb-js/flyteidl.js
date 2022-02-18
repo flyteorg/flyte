@@ -28622,6 +28622,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [retryGroup] NodeExecutionMetaData retryGroup
              * @property {boolean|null} [isParentNode] NodeExecutionMetaData isParentNode
              * @property {string|null} [specNodeId] NodeExecutionMetaData specNodeId
+             * @property {boolean|null} [isDynamic] NodeExecutionMetaData isDynamic
              */
 
             /**
@@ -28664,6 +28665,14 @@ export const flyteidl = $root.flyteidl = (() => {
             NodeExecutionMetaData.prototype.specNodeId = "";
 
             /**
+             * NodeExecutionMetaData isDynamic.
+             * @member {boolean} isDynamic
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @instance
+             */
+            NodeExecutionMetaData.prototype.isDynamic = false;
+
+            /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NodeExecutionMetaData
@@ -28693,6 +28702,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 2, wireType 0 =*/16).bool(message.isParentNode);
                 if (message.specNodeId != null && message.hasOwnProperty("specNodeId"))
                     writer.uint32(/* id 3, wireType 2 =*/26).string(message.specNodeId);
+                if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isDynamic);
                 return writer;
             };
 
@@ -28723,6 +28734,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                         message.specNodeId = reader.string();
                         break;
+                    case 4:
+                        message.isDynamic = reader.bool();
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -28751,6 +28765,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.specNodeId != null && message.hasOwnProperty("specNodeId"))
                     if (!$util.isString(message.specNodeId))
                         return "specNodeId: string expected";
+                if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
+                    if (typeof message.isDynamic !== "boolean")
+                        return "isDynamic: boolean expected";
                 return null;
             };
 

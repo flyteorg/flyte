@@ -5106,6 +5106,16 @@ public final class NodeExecutionOuterClass {
      */
     com.google.protobuf.ByteString
         getSpecNodeIdBytes();
+
+    /**
+     * <pre>
+     * Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+     * This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+     * </pre>
+     *
+     * <code>bool is_dynamic = 4;</code>
+     */
+    boolean getIsDynamic();
   }
   /**
    * <pre>
@@ -5167,6 +5177,11 @@ public final class NodeExecutionOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               specNodeId_ = s;
+              break;
+            }
+            case 32: {
+
+              isDynamic_ = input.readBool();
               break;
             }
             default: {
@@ -5304,6 +5319,20 @@ public final class NodeExecutionOuterClass {
       }
     }
 
+    public static final int IS_DYNAMIC_FIELD_NUMBER = 4;
+    private boolean isDynamic_;
+    /**
+     * <pre>
+     * Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+     * This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+     * </pre>
+     *
+     * <code>bool is_dynamic = 4;</code>
+     */
+    public boolean getIsDynamic() {
+      return isDynamic_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5327,6 +5356,9 @@ public final class NodeExecutionOuterClass {
       if (!getSpecNodeIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, specNodeId_);
       }
+      if (isDynamic_ != false) {
+        output.writeBool(4, isDynamic_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5345,6 +5377,10 @@ public final class NodeExecutionOuterClass {
       }
       if (!getSpecNodeIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, specNodeId_);
+      }
+      if (isDynamic_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, isDynamic_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5367,6 +5403,8 @@ public final class NodeExecutionOuterClass {
           != other.getIsParentNode()) return false;
       if (!getSpecNodeId()
           .equals(other.getSpecNodeId())) return false;
+      if (getIsDynamic()
+          != other.getIsDynamic()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5385,6 +5423,9 @@ public final class NodeExecutionOuterClass {
           getIsParentNode());
       hash = (37 * hash) + SPEC_NODE_ID_FIELD_NUMBER;
       hash = (53 * hash) + getSpecNodeId().hashCode();
+      hash = (37 * hash) + IS_DYNAMIC_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsDynamic());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5528,6 +5569,8 @@ public final class NodeExecutionOuterClass {
 
         specNodeId_ = "";
 
+        isDynamic_ = false;
+
         return this;
       }
 
@@ -5557,6 +5600,7 @@ public final class NodeExecutionOuterClass {
         result.retryGroup_ = retryGroup_;
         result.isParentNode_ = isParentNode_;
         result.specNodeId_ = specNodeId_;
+        result.isDynamic_ = isDynamic_;
         onBuilt();
         return result;
       }
@@ -5615,6 +5659,9 @@ public final class NodeExecutionOuterClass {
         if (!other.getSpecNodeId().isEmpty()) {
           specNodeId_ = other.specNodeId_;
           onChanged();
+        }
+        if (other.getIsDynamic() != false) {
+          setIsDynamic(other.getIsDynamic());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5873,6 +5920,47 @@ public final class NodeExecutionOuterClass {
   checkByteStringIsUtf8(value);
         
         specNodeId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean isDynamic_ ;
+      /**
+       * <pre>
+       * Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+       * This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_dynamic = 4;</code>
+       */
+      public boolean getIsDynamic() {
+        return isDynamic_;
+      }
+      /**
+       * <pre>
+       * Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+       * This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_dynamic = 4;</code>
+       */
+      public Builder setIsDynamic(boolean value) {
+        
+        isDynamic_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+       * This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_dynamic = 4;</code>
+       */
+      public Builder clearIsDynamic() {
+        
+        isDynamic_ = false;
         onChanged();
         return this;
       }
@@ -14714,46 +14802,46 @@ public final class NodeExecutionOuterClass {
       "ionIdentifier\022\021\n\tinput_uri\030\002 \001(\t\0225\n\007clos" +
       "ure\030\003 \001(\0132$.flyteidl.admin.NodeExecution" +
       "Closure\0227\n\010metadata\030\004 \001(\0132%.flyteidl.adm" +
-      "in.NodeExecutionMetaData\"Z\n\025NodeExecutio" +
+      "in.NodeExecutionMetaData\"n\n\025NodeExecutio" +
       "nMetaData\022\023\n\013retry_group\030\001 \001(\t\022\026\n\016is_par" +
-      "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\"Z\n\021" +
-      "NodeExecutionList\0226\n\017node_executions\030\001 \003" +
-      "(\0132\035.flyteidl.admin.NodeExecution\022\r\n\005tok" +
-      "en\030\002 \001(\t\"\262\004\n\024NodeExecutionClosure\022\030\n\nout" +
-      "put_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.fly" +
-      "teidl.core.ExecutionErrorH\000\0224\n\013output_da" +
-      "ta\030\n \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H" +
-      "\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExe" +
-      "cution.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.googl" +
-      "e.protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031" +
-      ".google.protobuf.Duration\022.\n\ncreated_at\030" +
-      "\006 \001(\0132\032.google.protobuf.Timestamp\022.\n\nupd" +
-      "ated_at\030\007 \001(\0132\032.google.protobuf.Timestam" +
-      "p\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyt" +
-      "eidl.admin.WorkflowNodeMetadataH\001\022>\n\022tas" +
-      "k_node_metadata\030\t \001(\0132 .flyteidl.admin.T" +
-      "askNodeMetadataH\001B\017\n\routput_resultB\021\n\017ta" +
-      "rget_metadata\"W\n\024WorkflowNodeMetadata\022?\n" +
-      "\013executionId\030\001 \001(\0132*.flyteidl.core.Workf" +
-      "lowExecutionIdentifier\"\200\001\n\020TaskNodeMetad" +
-      "ata\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.cor" +
-      "e.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001(" +
-      "\0132\036.flyteidl.core.CatalogMetadata\"\207\001\n\033Dy" +
-      "namicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031." +
-      "flyteidl.core.Identifier\022A\n\021compiled_wor" +
-      "kflow\030\002 \001(\0132&.flyteidl.core.CompiledWork" +
-      "flowClosure\"Q\n\033NodeExecutionGetDataReque" +
-      "st\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExecu" +
-      "tionIdentifier\"\241\002\n\034NodeExecutionGetDataR" +
-      "esponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin" +
-      ".UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl" +
-      ".admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132" +
-      "\031.flyteidl.core.LiteralMap\022/\n\014full_outpu" +
-      "ts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n\020d" +
-      "ynamic_workflow\030\020 \001(\0132+.flyteidl.admin.D" +
-      "ynamicWorkflowNodeMetadataB7Z5github.com" +
-      "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad" +
-      "minb\006proto3"
+      "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n\n" +
+      "is_dynamic\030\004 \001(\010\"Z\n\021NodeExecutionList\0226\n" +
+      "\017node_executions\030\001 \003(\0132\035.flyteidl.admin." +
+      "NodeExecution\022\r\n\005token\030\002 \001(\t\"\262\004\n\024NodeExe" +
+      "cutionClosure\022\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022" +
+      ".\n\005error\030\002 \001(\0132\035.flyteidl.core.Execution" +
+      "ErrorH\000\0224\n\013output_data\030\n \001(\0132\031.flyteidl." +
+      "core.LiteralMapB\002\030\001H\000\0221\n\005phase\030\003 \001(\0162\".f" +
+      "lyteidl.core.NodeExecution.Phase\022.\n\nstar" +
+      "ted_at\030\004 \001(\0132\032.google.protobuf.Timestamp" +
+      "\022+\n\010duration\030\005 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022.\n\ncreated_at\030\006 \001(\0132\032.google.proto" +
+      "buf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.goog" +
+      "le.protobuf.Timestamp\022F\n\026workflow_node_m" +
+      "etadata\030\010 \001(\0132$.flyteidl.admin.WorkflowN" +
+      "odeMetadataH\001\022>\n\022task_node_metadata\030\t \001(" +
+      "\0132 .flyteidl.admin.TaskNodeMetadataH\001B\017\n" +
+      "\routput_resultB\021\n\017target_metadata\"W\n\024Wor" +
+      "kflowNodeMetadata\022?\n\013executionId\030\001 \001(\0132*" +
+      ".flyteidl.core.WorkflowExecutionIdentifi" +
+      "er\"\200\001\n\020TaskNodeMetadata\0227\n\014cache_status\030" +
+      "\001 \001(\0162!.flyteidl.core.CatalogCacheStatus" +
+      "\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl.core.Ca" +
+      "talogMetadata\"\207\001\n\033DynamicWorkflowNodeMet" +
+      "adata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identi" +
+      "fier\022A\n\021compiled_workflow\030\002 \001(\0132&.flytei" +
+      "dl.core.CompiledWorkflowClosure\"Q\n\033NodeE" +
+      "xecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fly" +
+      "teidl.core.NodeExecutionIdentifier\"\241\002\n\034N" +
+      "odeExecutionGetDataResponse\022+\n\006inputs\030\001 " +
+      "\001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007outp" +
+      "uts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022." +
+      "\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lite" +
+      "ralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl." +
+      "core.LiteralMap\022E\n\020dynamic_workflow\030\020 \001(" +
+      "\0132+.flyteidl.admin.DynamicWorkflowNodeMe" +
+      "tadataB7Z5github.com/flyteorg/flyteidl/g" +
+      "en/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14804,7 +14892,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor,
-        new java.lang.String[] { "RetryGroup", "IsParentNode", "SpecNodeId", });
+        new java.lang.String[] { "RetryGroup", "IsParentNode", "SpecNodeId", "IsDynamic", });
     internal_static_flyteidl_admin_NodeExecutionList_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_NodeExecutionList_fieldAccessorTable = new

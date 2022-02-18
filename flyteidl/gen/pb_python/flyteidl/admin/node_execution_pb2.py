@@ -28,7 +28,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n#flyteidl/admin/node_execution.proto\x12\x0e\x66lyteidl.admin\x1a\x1b\x66lyteidl/admin/common.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1b\x66lyteidl/core/catalog.proto\x1a\x1c\x66lyteidl/core/compiler.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/duration.proto\"M\n\x17NodeExecutionGetRequest\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\"\xd5\x01\n\x18NodeExecutionListRequest\x12I\n\x15workflow_execution_id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x18\n\x10unique_parent_id\x18\x06 \x01(\t\"\xba\x01\n\x1fNodeExecutionForTaskListRequest\x12\x41\n\x11task_execution_id\x18\x01 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\"\xc6\x01\n\rNodeExecution\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\x12\x11\n\tinput_uri\x18\x02 \x01(\t\x12\x35\n\x07\x63losure\x18\x03 \x01(\x0b\x32$.flyteidl.admin.NodeExecutionClosure\x12\x37\n\x08metadata\x18\x04 \x01(\x0b\x32%.flyteidl.admin.NodeExecutionMetaData\"Z\n\x15NodeExecutionMetaData\x12\x13\n\x0bretry_group\x18\x01 \x01(\t\x12\x16\n\x0eis_parent_node\x18\x02 \x01(\x08\x12\x14\n\x0cspec_node_id\x18\x03 \x01(\t\"Z\n\x11NodeExecutionList\x12\x36\n\x0fnode_executions\x18\x01 \x03(\x0b\x32\x1d.flyteidl.admin.NodeExecution\x12\r\n\x05token\x18\x02 \x01(\t\"\xb2\x04\n\x14NodeExecutionClosure\x12\x18\n\noutput_uri\x18\x01 \x01(\tB\x02\x18\x01H\x00\x12.\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x1d.flyteidl.core.ExecutionErrorH\x00\x12\x34\n\x0boutput_data\x18\n \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01H\x00\x12\x31\n\x05phase\x18\x03 \x01(\x0e\x32\".flyteidl.core.NodeExecution.Phase\x12.\n\nstarted_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12+\n\x08\x64uration\x18\x05 \x01(\x0b\x32\x19.google.protobuf.Duration\x12.\n\ncreated_at\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nupdated_at\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x46\n\x16workflow_node_metadata\x18\x08 \x01(\x0b\x32$.flyteidl.admin.WorkflowNodeMetadataH\x01\x12>\n\x12task_node_metadata\x18\t \x01(\x0b\x32 .flyteidl.admin.TaskNodeMetadataH\x01\x42\x0f\n\routput_resultB\x11\n\x0ftarget_metadata\"W\n\x14WorkflowNodeMetadata\x12?\n\x0b\x65xecutionId\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"\x80\x01\n\x10TaskNodeMetadata\x12\x37\n\x0c\x63\x61\x63he_status\x18\x01 \x01(\x0e\x32!.flyteidl.core.CatalogCacheStatus\x12\x33\n\x0b\x63\x61talog_key\x18\x02 \x01(\x0b\x32\x1e.flyteidl.core.CatalogMetadata\"\x87\x01\n\x1b\x44ynamicWorkflowNodeMetadata\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x41\n\x11\x63ompiled_workflow\x18\x02 \x01(\x0b\x32&.flyteidl.core.CompiledWorkflowClosure\"Q\n\x1bNodeExecutionGetDataRequest\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\"\xa1\x02\n\x1cNodeExecutionGetDataResponse\x12+\n\x06inputs\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB\x02\x18\x01\x12,\n\x07outputs\x18\x02 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB\x02\x18\x01\x12.\n\x0b\x66ull_inputs\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\x12/\n\x0c\x66ull_outputs\x18\x04 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\x12\x45\n\x10\x64ynamic_workflow\x18\x10 \x01(\x0b\x32+.flyteidl.admin.DynamicWorkflowNodeMetadataB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n#flyteidl/admin/node_execution.proto\x12\x0e\x66lyteidl.admin\x1a\x1b\x66lyteidl/admin/common.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1b\x66lyteidl/core/catalog.proto\x1a\x1c\x66lyteidl/core/compiler.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/duration.proto\"M\n\x17NodeExecutionGetRequest\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\"\xd5\x01\n\x18NodeExecutionListRequest\x12I\n\x15workflow_execution_id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x18\n\x10unique_parent_id\x18\x06 \x01(\t\"\xba\x01\n\x1fNodeExecutionForTaskListRequest\x12\x41\n\x11task_execution_id\x18\x01 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\"\xc6\x01\n\rNodeExecution\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\x12\x11\n\tinput_uri\x18\x02 \x01(\t\x12\x35\n\x07\x63losure\x18\x03 \x01(\x0b\x32$.flyteidl.admin.NodeExecutionClosure\x12\x37\n\x08metadata\x18\x04 \x01(\x0b\x32%.flyteidl.admin.NodeExecutionMetaData\"n\n\x15NodeExecutionMetaData\x12\x13\n\x0bretry_group\x18\x01 \x01(\t\x12\x16\n\x0eis_parent_node\x18\x02 \x01(\x08\x12\x14\n\x0cspec_node_id\x18\x03 \x01(\t\x12\x12\n\nis_dynamic\x18\x04 \x01(\x08\"Z\n\x11NodeExecutionList\x12\x36\n\x0fnode_executions\x18\x01 \x03(\x0b\x32\x1d.flyteidl.admin.NodeExecution\x12\r\n\x05token\x18\x02 \x01(\t\"\xb2\x04\n\x14NodeExecutionClosure\x12\x18\n\noutput_uri\x18\x01 \x01(\tB\x02\x18\x01H\x00\x12.\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x1d.flyteidl.core.ExecutionErrorH\x00\x12\x34\n\x0boutput_data\x18\n \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01H\x00\x12\x31\n\x05phase\x18\x03 \x01(\x0e\x32\".flyteidl.core.NodeExecution.Phase\x12.\n\nstarted_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12+\n\x08\x64uration\x18\x05 \x01(\x0b\x32\x19.google.protobuf.Duration\x12.\n\ncreated_at\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nupdated_at\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x46\n\x16workflow_node_metadata\x18\x08 \x01(\x0b\x32$.flyteidl.admin.WorkflowNodeMetadataH\x01\x12>\n\x12task_node_metadata\x18\t \x01(\x0b\x32 .flyteidl.admin.TaskNodeMetadataH\x01\x42\x0f\n\routput_resultB\x11\n\x0ftarget_metadata\"W\n\x14WorkflowNodeMetadata\x12?\n\x0b\x65xecutionId\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"\x80\x01\n\x10TaskNodeMetadata\x12\x37\n\x0c\x63\x61\x63he_status\x18\x01 \x01(\x0e\x32!.flyteidl.core.CatalogCacheStatus\x12\x33\n\x0b\x63\x61talog_key\x18\x02 \x01(\x0b\x32\x1e.flyteidl.core.CatalogMetadata\"\x87\x01\n\x1b\x44ynamicWorkflowNodeMetadata\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x41\n\x11\x63ompiled_workflow\x18\x02 \x01(\x0b\x32&.flyteidl.core.CompiledWorkflowClosure\"Q\n\x1bNodeExecutionGetDataRequest\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\"\xa1\x02\n\x1cNodeExecutionGetDataResponse\x12+\n\x06inputs\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB\x02\x18\x01\x12,\n\x07outputs\x18\x02 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB\x02\x18\x01\x12.\n\x0b\x66ull_inputs\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\x12/\n\x0c\x66ull_outputs\x18\x04 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\x12\x45\n\x10\x64ynamic_workflow\x18\x10 \x01(\x0b\x32+.flyteidl.admin.DynamicWorkflowNodeMetadataB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_admin_dot_common__pb2.DESCRIPTOR,flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_core_dot_catalog__pb2.DESCRIPTOR,flyteidl_dot_core_dot_compiler__pb2.DESCRIPTOR,flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,flyteidl_dot_core_dot_literals__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,google_dot_protobuf_dot_duration__pb2.DESCRIPTOR,])
 
@@ -271,6 +271,13 @@ _NODEEXECUTIONMETADATA = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='is_dynamic', full_name='flyteidl.admin.NodeExecutionMetaData.is_dynamic', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -284,7 +291,7 @@ _NODEEXECUTIONMETADATA = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=986,
-  serialized_end=1076,
+  serialized_end=1096,
 )
 
 
@@ -321,8 +328,8 @@ _NODEEXECUTIONLIST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1078,
-  serialized_end=1168,
+  serialized_start=1098,
+  serialized_end=1188,
 )
 
 
@@ -421,8 +428,8 @@ _NODEEXECUTIONCLOSURE = _descriptor.Descriptor(
       name='target_metadata', full_name='flyteidl.admin.NodeExecutionClosure.target_metadata',
       index=1, containing_type=None, fields=[]),
   ],
-  serialized_start=1171,
-  serialized_end=1733,
+  serialized_start=1191,
+  serialized_end=1753,
 )
 
 
@@ -452,8 +459,8 @@ _WORKFLOWNODEMETADATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1735,
-  serialized_end=1822,
+  serialized_start=1755,
+  serialized_end=1842,
 )
 
 
@@ -490,8 +497,8 @@ _TASKNODEMETADATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1825,
-  serialized_end=1953,
+  serialized_start=1845,
+  serialized_end=1973,
 )
 
 
@@ -528,8 +535,8 @@ _DYNAMICWORKFLOWNODEMETADATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1956,
-  serialized_end=2091,
+  serialized_start=1976,
+  serialized_end=2111,
 )
 
 
@@ -559,8 +566,8 @@ _NODEEXECUTIONGETDATAREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2093,
-  serialized_end=2174,
+  serialized_start=2113,
+  serialized_end=2194,
 )
 
 
@@ -618,8 +625,8 @@ _NODEEXECUTIONGETDATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2177,
-  serialized_end=2466,
+  serialized_start=2197,
+  serialized_end=2486,
 )
 
 _NODEEXECUTIONGETREQUEST.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._NODEEXECUTIONIDENTIFIER
