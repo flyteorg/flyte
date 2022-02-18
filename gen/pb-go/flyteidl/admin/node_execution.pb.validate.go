@@ -419,6 +419,8 @@ func (m *NodeExecutionMetaData) Validate() error {
 
 	// no validation rules for SpecNodeId
 
+	// no validation rules for IsDynamic
+
 	return nil
 }
 

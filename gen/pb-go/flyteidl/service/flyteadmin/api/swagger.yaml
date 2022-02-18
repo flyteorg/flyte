@@ -9867,6 +9867,7 @@ definitions:
           retry_group: "retry_group"
           is_parent_node: true
           spec_node_id: "spec_node_id"
+          is_dynamic: true
         input_uri: "input_uri"
         id:
           execution_id:
@@ -9923,6 +9924,7 @@ definitions:
           retry_group: "retry_group"
           is_parent_node: true
           spec_node_id: "spec_node_id"
+          is_dynamic: true
         input_uri: "input_uri"
         id:
           execution_id:
@@ -9993,11 +9995,18 @@ definitions:
         type: "string"
         title: "Node id of the node in the original workflow\nThis maps to value of\
           \ WorkflowTemplate.nodes[X].id"
+      is_dynamic:
+        type: "boolean"
+        format: "boolean"
+        description: "Boolean flag indicating if the node has contains a dynamic workflow\
+          \ which then produces child nodes.\nThis is to distinguish between subworkflows\
+          \ and dynamic workflows which can both have is_parent_node as true."
     title: "Represents additional attributes related to a Node Execution"
     example:
       retry_group: "retry_group"
       is_parent_node: true
       spec_node_id: "spec_node_id"
+      is_dynamic: true
   adminNotification:
     type: "object"
     properties:
@@ -38441,6 +38450,7 @@ definitions:
         retry_group: "retry_group"
         is_parent_node: true
         spec_node_id: "spec_node_id"
+        is_dynamic: true
       input_uri: "input_uri"
       id:
         execution_id:

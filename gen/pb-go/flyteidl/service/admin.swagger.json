@@ -4170,6 +4170,11 @@
         "spec_node_id": {
           "type": "string",
           "title": "Node id of the node in the original workflow\nThis maps to value of WorkflowTemplate.nodes[X].id"
+        },
+        "is_dynamic": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.\nThis is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true."
         }
       },
       "title": "Represents additional attributes related to a Node Execution"
