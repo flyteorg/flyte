@@ -1,7 +1,9 @@
 .. _deployment-plugin-setup-aws-array:
 
-AWS Batch Setup for Map Tasks
------------------------------
+AWS Batch Setup
+---------------
+
+This setup document applies to both :std:doc:`map tasks <generated/flytekit.map_task>` and single tasks running on AWS Batch. (For single [non-map] task use, please take note of the additional code when updating Propeller config.)
 
 AWS Batch enables developers, scientists, and engineers to easily and efficiently run hundreds of thousands of batch
 computing jobs on AWS.
@@ -113,6 +115,8 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
           default-for-task-types:
             # Set it as the default handler for array/map tasks.
             container_array: aws_array
+            # Make sure to add this line to enable single (non-map) AWS Batch tasks
+            aws-batch: aws_array
 
 Let's now look at how to launch an execution to leverage AWS Batch to execute jobs:
 
