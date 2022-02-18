@@ -105,7 +105,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v0.3.22"` | Docker image tag |
+| datacatalog.image.tag | string | `"v0.3.23"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
@@ -135,7 +135,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.6.92"` |  |
+| flyteadmin.image.tag | string | `"v0.6.104"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -155,7 +155,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.ga.tracking_id | string | `"G-0QW4DJWJ20"` |  |
 | flyteconsole.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
-| flyteconsole.image.tag | string | `"v0.41.0"` |  |
+| flyteconsole.image.tag | string | `"v0.43.0"` |  |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
@@ -170,7 +170,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v0.16.19"` |  |
+| flytepropeller.image.tag | string | `"v0.16.29"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
@@ -185,7 +185,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flytescheduler.image.tag | string | `"v0.6.92"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v0.6.104"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |

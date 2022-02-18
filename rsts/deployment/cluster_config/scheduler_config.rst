@@ -1,7 +1,7 @@
 .. _flytescheduler-config-specification:
 
 #########################################
-FlyteScheduler Configuration
+Flyte Scheduler Configuration
 #########################################
 
 - `admin <#section-admin>`_
@@ -200,7 +200,7 @@ This is the URL to your IdP's authorization server. It'll default to Endpoint
 tokenUrl (string)
 --------------------------------------------------------------------------------
 
-OPTIONAL: Your IdP's token endpoint. It'll be discovered from FlyteAdmin's OAuth Metadata endpoint if not provided.
+OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
 
 **Default Value**: 
 
@@ -491,6 +491,8 @@ Section: database
 host (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -500,6 +502,8 @@ host (string)
 
 port (int)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -511,6 +515,8 @@ port (int)
 dbname (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -520,6 +526,8 @@ dbname (string)
 
 username (string)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -531,6 +539,8 @@ username (string)
 password (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -540,6 +550,8 @@ password (string)
 
 passwordPath (string)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -551,6 +563,8 @@ passwordPath (string)
 options (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -560,6 +574,136 @@ options (string)
 
 debug (bool)
 --------------------------------------------------------------------------------
+
+deprecated
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+enableForeignKeyConstraintWhenMigrating (bool)
+--------------------------------------------------------------------------------
+
+Whether to enable gorm foreign keys when migrating the db
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+postgres (`interfaces.PostgresConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dbname: ""
+  debug: false
+  host: ""
+  options: ""
+  password: ""
+  passwordPath: ""
+  port: 0
+  username: ""
+  
+
+interfaces.PostgresConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+host (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+port (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The port name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+dbname (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database name
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+username (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database user who is connecting to the server.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Points to the file containing the database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+options (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+debug (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Whether or not to start the database connection with debug mode enabled.
 
 **Default Value**: 
 
