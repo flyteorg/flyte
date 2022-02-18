@@ -4,7 +4,6 @@
 Flyte Datacatalog Configuration
 #########################################
 
-Using config file:  []
 - `application <#section-application>`_
 
 - `database <#section-database>`_
