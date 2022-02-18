@@ -1,0 +1,111 @@
+name: Flyteconsole Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  unit_tests_with_coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # We need history for codecov to work correctly
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - uses: bahmutov/npm-install@v1
+      - name: Run tests and generate coverage
+        run: make test_unit_codecov
+      - uses: codecov/codecov-action@v1
+        with:
+          files: .coverage/coverage-final.json
+          fail_ci_if_error: true
+
+  lint_project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - uses: bahmutov/npm-install@v1
+      - name: Run linter
+        run: make lint
+
+  build_docker_image:
+    name: Build & Push Flyteconsole Image
+    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+    with:
+      version: v1
+      dockerfile: Dockerfile
+      push: false
+      repository: ${{ github.repository }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  release:
+    name: Generate Release
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: [ unit_tests_with_coverage, lint_project, build_docker_image ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GIT_AUTHOR_NAME: "flyte bot"
+          GIT_AUTHOR_EMAIL: "admin@flyte.org"
+          GIT_COMMITTER_NAME: "flyte bot"
+          GIT_COMMITTER_EMAIL: "admin@flyte.org"
+        run: npx semantic-release
+
+  check_for_tag:
+    name: Get Release Tag
+    needs: release
+    runs-on: ubuntu-latest
+    outputs:
+      currentTag: ${{ steps.setTag.outputs.currentTag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Use the latest commit on the branch which triggered this workflow,
+          # not the commit which triggered the workflow
+          ref: ${{ github.ref }}
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Get target git ref
+        id: setTag
+        # Print any tags associated with the target ref, in reverse lexicographical
+        # order so that the first item is the highest version number. If we find
+        # a tag, update our target
+        run: |
+          CURRENT_TAG=$(git tag --sort=-refname --points-at ${{ github.ref }} | head -n 1)
+          echo "::set-output name=currentTag::$CURRENT_TAG"
+
+  push_docker_image:
+    name: Build & Push Flyteconsole Image
+    needs: [ check_for_tag ]
+    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+    with:
+      version: ${{ needs.check_for_tag.outputs.currentTag }}
+      dockerfile: Dockerfile
+      push: true
+      repository: ${{ github.repository }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}

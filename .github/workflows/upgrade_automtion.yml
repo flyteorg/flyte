@@ -1,11 +1,29 @@
-name: Update flyteidl version
-on: 
+name: Upgrade Automation
+on:
   workflow_dispatch:
-
+    inputs:
+      component:
+        description: "Name of Flyte component"
+        required: true
+        default: "boilerplate"
+        type: choice
+        options:
+          - boilerplate
+          - flyteidl
 jobs:
-  update-flyte-releases:
-    name: Update Flyteidl version 
+  trigger-upgrade:
+    name: ${{ github.event.inputs.component }} Upgrade
+    if: ${{ github.event.inputs.component  == "boilerplate" }}
+    uses: flyteorg/flytetools/.github/workflows/flyte_automation.yml@master
+    with:
+      component: ${{ github.event.inputs.component }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+
+  upgrade_flyteidl:
+    name: Upgrade Flyteidl
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.component  == "boilerplate" }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -38,4 +56,4 @@ jobs:
           team-reviewers: |
             owners
             maintainers
-          draft: false 
+          draft: false
