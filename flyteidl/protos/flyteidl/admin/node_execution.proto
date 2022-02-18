@@ -110,6 +110,10 @@ message NodeExecutionMetaData {
     // Node id of the node in the original workflow
     // This maps to value of WorkflowTemplate.nodes[X].id
     string spec_node_id = 3;
+
+    // Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+    // This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+    bool is_dynamic = 4;
 }
 
 // Request structure to retrieve a list of node execution entities.
