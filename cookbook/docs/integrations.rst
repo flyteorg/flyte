@@ -170,6 +170,15 @@ the Flyte task that use the respective plugin.
 
     ---
 
+    .. link-button:: auto/integrations/aws/batch/index
+       :type: ref
+       :text: AWS Batch
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Running tasks and workflows on AWS batch service
+
+    ---
+
     .. link-button:: auto/integrations/external_services/hive/index
        :type: ref
        :text: Hive

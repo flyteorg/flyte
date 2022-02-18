@@ -1,0 +1,2 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-awsbatch>=0.31.0b1
