@@ -29,11 +29,19 @@ Run specific version of Flyte. FlyteCTL sandbox only supports Flyte version avai
 
 Note: FlyteCTL sandbox is only supported for Flyte versions > v0.10.0
 
+Run latest pre release of  Flyte.
+::
+
+ flytectl sandbox start  --pre
+
+Note: pre release flag will be ignore if user pass version flag, In that case Flytectl will use specific version. 
+
 Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
 
   flytectl sandbox start --image docker.io/my-override:latest
 
+Note: If image flag is passed then Flytectl will ignore version and pre flags.
 	
 Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
