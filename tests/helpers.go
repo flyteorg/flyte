@@ -15,7 +15,7 @@ func GetTestAdminServiceClient() (service.AdminServiceClient, *grpc.ClientConn) 
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
-	conn, err := grpc.Dial(fmt.Sprintf(":%d", 8089), opts...)
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%d", 8089), opts...)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
