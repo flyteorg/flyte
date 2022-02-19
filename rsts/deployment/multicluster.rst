@@ -25,60 +25,50 @@ To establish routing rules to route certain workflows to specific clusters, :ref
 Data Plane Deployment
 *********************
 
-.. tabbed:: Kustomize
+* Add Flyteorg Helm repo
 
-    .. NOTE::
-      With v0.8.0 and the entire setup overhaul, this section will get updated soon!
+ .. code-block::
 
-    To create the ``data-plane only`` overlay, create a ``data-plane`` subdirectory inside the main deployment directory (“my-flyte-deployment“). This directory will only contain the data-plane resources. ::
+    helm repo add flytyteorg https://flyteorg.github.io/flyte
+    helm repo update
+    # Get flyte-core helm chart
+    helm fetch --untar --untardir . flyteorg/flyte-core
+    cd flyte-core
 
-      mkdir dataplane
+* Install Flyte Dataplane helm chart
 
-    Now, copy the ``flyte`` config to the data-plane config. ::
-
-      cp flyte/kustomization.yaml dataplane/kustomization.yaml
-
-    Since the data-plane resources will live in the new deployment, they are no longer needed in the main ``flyte`` deployment. Remove the data-plane resources from the flyte deployment by opening ``flyte/kustomization.yaml`` file and removing everything in the ``DATA PLANE RESOURCES`` section.
-
-    Likewise, the user-plane/control-plane resources are not needed in the data-plane deployment. Remove these resources from the data-plane deployment by opening ``dataplane/kustomization.yaml`` file and removing everything in the ``USER PLANE/CONTROL PLANE RESOURCES`` section. ::
-
-      kustomize build dataplane > dataplane_generated.yaml
-
-    You will notice that only the data-plane resources are included in this file.
-
-    You can point your ``kubectl`` context at each of the three clusters and deploy the data-plane using the following command: ::
-
-      kubectl apply -f dataplane_generated.yaml
-
-.. tabbed:: Helm
-
-  * Add Helm repo
-
-     .. code-block::
-        helm repo add flytyteorg https://flyteorg.github.io/flyte
-        helm repo update
-
-  * Install helm chart
+.. tabbed:: AWS
 
     .. code-block::
 
-        helm fetch --untar --untardir . flyteorg/flyte-core
-        cd flyte-core
-        helm install flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-dataplane.yaml --create-namespace flyte
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-dataplane.yaml --create-namespace flyte --install
+
+.. tabbed:: GCP
+
+    .. code-block::
+
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-dataplane.yaml --create-namespace flyte --install
 
 
 User and Control Plane Deployment
 *********************************
 
-For FlyteAdmin to create Flyte Workflows on the three remote clusters, it will need a secret ``token`` and ``cacert`` to access each cluster.
+Some deployments of Flyte may choose to run the control-plane separate from the data-plane. FlyteAdmin is designed to create Kubernetes resources in one or more Flyte data-plane clusters. For the admin to access remote clusters, it needs credentials to each cluster.
+In Kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster. When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_ in each data-plane cluster to generate these tokens.
 
-Once you have deployed the data-plane as described above, you can retrieve the ``token`` and ``cacert`` by pointing your ``kubectl`` context to each data-plane cluster and executing the following commands:
+When you first create the FlyteAdmin ServiceAccount in a new cluster, a bearer token is generated and will continue to allow access unless the “ServiceAccount“ is deleted. Once we create the FlyteAdmin ServiceAccount on a cluster, we should never delete it. To feed the credentials to FlyteAdmin, you must retrieve them from your new data-plane cluster, and upload them to admin somehow (within Lyft, we use Confidant, for example).
 
-:token:
-  ``kubectl get secrets -n flyte | grep flyteadmin-token | awk '{print $1}' | xargs kubectl get secret -n flyte -o jsonpath='{.data.token}'``
+The credentials have two parts (“ca cert“ and “bearer token"). Find the generated secret via, ::
 
-:cacert:
-  ``kubectl get secrets -n flyte | grep flyteadmin-token | awk '{print $1}' | xargs kubectl get secret -n flyte -o jsonpath='{.data.ca\.crt}'``
+  kubectl get secrets -n flyte | grep flyteadmin-token
+
+Once you have the name of the secret, you can copy the ``ca cert`` to your clipboard using the following command: ::
+
+  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.ca\.crt}' | base64 -D | pbcopy
+
+You can copy the bearer token to your clipboard using the following command: ::
+
+  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}’ | base64 -D | pbcopy
 
 Now, these credentials need to be included in the control-plane. Create a new file named ``secrets.yaml`` that looks like: ::
 
@@ -96,128 +86,69 @@ Now, these credentials need to be included in the control-plane. Create a new fi
     cluster_3_token: {{ cluster 3 token here }}
     cluster_3_cacert: {{ cluster 3 cacert here }}
 
-.. tabbed:: Kustomize
+* Create cluster credentials secret in control plane cluster
 
-    Include the new ``secrets.yaml`` file in the ``admindeployment`` by opening ``admindeployment/kustomization.yaml`` file and add the following line under ``resources:`` to include the secrets in the deploy. ::
+  .. code-block::
 
-      - secrets.yaml
+    kubectl apply -f secrets.yaml
 
-    Next, attach these secrets to the FlyteAdmin pods so that FlyteAdmin can access them. Open ``admindeployment/deployment.yaml`` file and add an entry under ``volumes`` ::
 
-      volumes:
-      - name: cluster_credentials
-        secret:
-          secretName: cluster_credentials
+* Create a file named ``values-override.yaml`` and add the following config to it:
 
-    Look for the container labeled ``flyteadmin``. Add a ``volumeMounts`` to that section. ::
+  .. code-block::
 
-      volumeMounts:
-      - name: cluster_credentials
+      flyteadmin:
+        additionalVolumes:
+        - name: cluster_credentials
+          secret:
+            secretName: cluster_credentials
+        additionalVolumeMounts:
+        - name: cluster_credentials
         mountPath: /var/run/credentials
-
-    This mounts the credentials inside the FlyteAdmin pods.
-
-    However, FlyteAdmin needs to be configured to use these credentials. Open the ``admindeployment/configmap.yaml`` file and add a ``clusters`` key to the configmap, with an entry for each cluster. ::
-
-      clusters:
-      - name: "cluster_1"
-        endpoint: {{ your-cluster-1-kubeapi-endpoint.com }}
-        enabled: true
-        auth:
-          type: "file_path"
-          tokenPath: "/var/run/credentials/cluster_1_token"
-          certPath: "/var/run/credentials/cluster_1_cacert"
-      - name: "cluster_2"
-        endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
-        auth:
+      configmap:
+        labelClusterMap:
+          team1:
+            - id: testcluster
+              weight: 1
+          team2:
+            - id: testcluster2
+              weight: 0.5
+            - id: testcluster3
+              weight: 0.5
+        clusterConfigs:
+        - name: "cluster_1"
+          endpoint: {{ your-cluster-1-kubeapi-endpoint.com }}
           enabled: true
-          type: "file_path"
-          tokenPath: "/var/run/credentials/cluster_2_token"
-          certPath: "/var/run/credentials/cluster_2_cacert"
-      - name: "cluster_3"
-        endpoint: {{ your-cluster-3-kubeapi-endpoint.com }}
-        enabled: true
-        auth:
-          type: "file_path"
-          tokenPath: "/var/run/credentials/cluster_3_token"
-          certPath: "/var/run/credentials/cluster_3_cacert"
+          auth:
+            type: "file_path"
+            tokenPath: "/var/run/credentials/cluster_1_token"
+            certPath: "/var/run/credentials/cluster_1_cacert"
+        - name: "cluster_2"
+          endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
+          auth:
+            enabled: true
+            type: "file_path"
+            tokenPath: "/var/run/credentials/cluster_2_token"
+            certPath: "/var/run/credentials/cluster_2_cacert"
+        - name: "cluster_3"
+          endpoint: {{ your-cluster-3-kubeapi-endpoint.com }}
+          enabled: true
+          auth:
+            type: "file_path"
+            tokenPath: "/var/run/credentials/cluster_3_token"
+            certPath: "/var/run/credentials/cluster_3_cacert"
 
-    Now re-run the following command to emit a YAML stream. ::
+* Install Flyte Control Plane helm chart
 
-      kustomize build flyte > flyte_generated.yaml
-
-    You will notice that the data-plane resources have been removed from the ``flyte_generated.yaml`` file, and your new configurations have been added.
-
-    Deploy the user-plane/control-plane to one cluster (you can use one of the three existing clusters or an entirely separate cluster) ::
-
-      kubectl apply -f flyte_generated.yaml
-
-.. tabbed:: Helm
-
-    * Create control plane secret
-
-        kubectl apply -f secrets.yaml
-
-    * Create a file named ``values-override.yaml`` and add the following config to it:
-
-      .. code-block::
-
-          flyteadmin:
-            additionalVolumes:
-            - name: cluster_credentials
-              secret:
-                secretName: cluster_credentials
-            additionalVolumeMounts:
-            - name: cluster_credentials
-            mountPath: /var/run/credentials
-          configmap:
-            clusters:
-            - name: "cluster_1"
-              endpoint: {{ your-cluster-1-kubeapi-endpoint.com }}
-              enabled: true
-              auth:
-                type: "file_path"
-                tokenPath: "/var/run/credentials/cluster_1_token"
-                certPath: "/var/run/credentials/cluster_1_cacert"
-            - name: "cluster_2"
-              endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
-              auth:
-                enabled: true
-                type: "file_path"
-                tokenPath: "/var/run/credentials/cluster_2_token"
-                certPath: "/var/run/credentials/cluster_2_cacert"
-            - name: "cluster_3"
-              endpoint: {{ your-cluster-3-kubeapi-endpoint.com }}
-              enabled: true
-              auth:
-                type: "file_path"
-                tokenPath: "/var/run/credentials/cluster_3_token"
-                certPath: "/var/run/credentials/cluster_3_cacert"
+.. tabbed:: AWS
 
     .. code-block::
 
-        helm install flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-controlplane.yaml -f values-override.yaml --create-namespace flyte
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-controlplane.yaml -f values-override.yaml --create-namespace flyte --install
 
-FlyteAdmin Remote Cluster Access
-*********************************
+.. tabbed:: Helm
 
-Some deployments of Flyte may choose to run the control-plane separate from the data-plane. FlyteAdmin is designed to create Kubernetes resources in one or more Flyte data-plane clusters. 
-For the admin to access remote clusters, it needs credentials to each cluster. 
-In Kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster. 
-When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/kustomize/base/adminserviceaccount/adminserviceaccount.yaml>`_ in each data-plane cluster to generate these tokens.
+    .. code-block::
 
-When you first create the FlyteAdmin ServiceAccount in a new cluster, a bearer token is generated and will continue to allow access unless the “ServiceAccount“ is deleted. Once we create the FlyteAdmin ServiceAccount on a cluster, we should never delete it. To feed the credentials to FlyteAdmin, you must retrieve them from your new data-plane cluster, and upload them to admin somehow (within Lyft, we use Confidant, for example).
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-controlplane.yaml -f values-override.yaml --create-namespace flyte --install
 
-The credentials have two parts (“ca cert“ and “bearer token"). Find the generated secret via, ::
-
-  kubectl get secrets -n flyte | grep flyteadmin-token
-
-Once you have the name of the secret, you can copy the ``ca cert`` to your clipboard using the following command: ::
-
-  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.ca\.crt}' | base64 -D | pbcopy
-
-You can copy the bearer token to your clipboard using the following command: ::
-
-  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}’ | base64 -D | pbcopy
-
-"""

@@ -224,6 +224,9 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  clusters: | 
+    clusterConfigs: []
+    labelClusterMap: {}
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -4415,7 +4418,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4c2b21ffd7fbd7bb8eae5d29e9d06856f014cffde66a848e52dfe35668eb268"
+        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4730,7 +4733,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4c2b21ffd7fbd7bb8eae5d29e9d06856f014cffde66a848e52dfe35668eb268"
+        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
