@@ -146,9 +146,50 @@ Now, these credentials need to be included in the control-plane. Create a new fi
 
         helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-controlplane.yaml -f values-override.yaml --create-namespace flyte --install
 
-.. tabbed:: Helm
+.. tabbed:: GCP
 
     .. code-block::
 
         helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-controlplane.yaml -f values-override.yaml --create-namespace flyte --install
 
+Configure execution cluster labels
+**********************************
+
+.. tabbed:: Configure Project & Domain
+
+    * Get Execution cluster label of a project domain
+
+        .. code-block::
+
+            flytectl get execution-cluster-label -p flytesnacks -d development --attrFile ecl.yaml
+
+    * Update the label in `ecl.yaml`
+
+       .. code-block::
+
+            domain: development
+            project: flytesnacks
+            value: team1
+
+.. tabbed:: Configure Specific Workflow
+
+    * Get Execution cluster label of a project domain
+
+        .. code-block::
+
+            flytectl get execution-cluster-label -p flytesnacks -d development core.control_flow.run_merge_sort.merge_sort --attrFile ecl.yaml
+
+    * Update the label in `ecl.yaml`
+
+       .. code-block::
+
+            domain: development
+            project: flytesnacks
+            workflow: core.control_flow.run_merge_sort.merge_sort
+            value: team1
+
+* Update the execution cluster label
+
+   .. code-block::
+
+        flytectl update execution-cluster-label --attrFile ecl.yaml
