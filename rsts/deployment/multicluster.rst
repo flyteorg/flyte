@@ -20,34 +20,33 @@ For now, let’s assume you have three Kubernetes clusters and that you can acce
 
 Next, deploy **just** the data-planes to these clusters. To do this, remove the data-plane components from the **flyte** overlay, and create a new overlay containing **only** the data-plane resources.
 
-To establish routing rules to route certain workflows to specific clusters, :ref:`custom resources <deployment-customizable-resources>` can be used.
 
 Data Plane Deployment
 *********************
 
 * Add Flyteorg Helm repo
 
- .. code-block::
+    .. code-block::
 
-    helm repo add flytyteorg https://flyteorg.github.io/flyte
-    helm repo update
-    # Get flyte-core helm chart
-    helm fetch --untar --untardir . flyteorg/flyte-core
-    cd flyte-core
+        helm repo add flytyteorg https://flyteorg.github.io/flyte
+        helm repo update
+        # Get flyte-core helm chart
+        helm fetch --untar --untardir . flyteorg/flyte-core
+        cd flyte-core
 
 * Install Flyte Dataplane helm chart
 
-.. tabbed:: AWS
+    .. tabbed:: AWS
 
-    .. code-block::
+        .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-dataplane.yaml --create-namespace flyte --install
+            helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-dataplane.yaml --create-namespace flyte --install
 
-.. tabbed:: GCP
+    .. tabbed:: GCP
 
-    .. code-block::
+        .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-dataplane.yaml --create-namespace flyte --install
+            helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-dataplane.yaml --create-namespace flyte --install
 
 
 User and Control Plane Deployment
@@ -68,29 +67,31 @@ Once you have the name of the secret, you can copy the ``ca cert`` to your clipb
 
 You can copy the bearer token to your clipboard using the following command: ::
 
-  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}’ | base64 -D | pbcopy
+  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}' | base64 -D | pbcopy
 
 Now, these credentials need to be included in the control-plane. Create a new file named ``secrets.yaml`` that looks like: ::
 
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: cluster_credentials
-    namespace: flyte
-  type: Opaque
-  data:
-    cluster_1_token: {{ cluster 1 token here }}
-    cluster_1_cacert: {{ cluster 1 cacert here }}
-    cluster_2_token: {{ cluster 2 token here }}
-    cluster_2_cacert: {{ cluster 2 cacert here }}
-    cluster_3_token: {{ cluster 3 token here }}
-    cluster_3_cacert: {{ cluster 3 cacert here }}
+  .. code-block::
+
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cluster_credentials
+        namespace: flyte
+      type: Opaque
+      data:
+        cluster_1_token: {{ cluster 1 token here }}
+        cluster_1_cacert: {{ cluster 1 cacert here }}
+        cluster_2_token: {{ cluster 2 token here }}
+        cluster_2_cacert: {{ cluster 2 cacert here }}
+        cluster_3_token: {{ cluster 3 token here }}
+        cluster_3_cacert: {{ cluster 3 cacert here }}
 
 * Create cluster credentials secret in control plane cluster
 
-  .. code-block::
+    .. code-block::
 
-    kubectl apply -f secrets.yaml
+        kubectl apply -f secrets.yaml
 
 
 * Create a file named ``values-override.yaml`` and add the following config to it:
@@ -155,38 +156,38 @@ Now, these credentials need to be included in the control-plane. Create a new fi
 Configure execution cluster labels
 **********************************
 
-.. tabbed:: Configure Project & Domain
+    .. tabbed:: Configure Project & Domain
 
-    * Get Execution cluster label of a project domain
+        * Get Execution cluster label of a project domain
 
-        .. code-block::
+            .. code-block::
 
-            flytectl get execution-cluster-label -p flytesnacks -d development --attrFile ecl.yaml
+                flytectl get execution-cluster-label -p flytesnacks -d development --attrFile ecl.yaml
 
-    * Update the label in `ecl.yaml`
+        * Update the label in `ecl.yaml`
 
-       .. code-block::
+           .. code-block::
 
-            domain: development
-            project: flytesnacks
-            value: team1
+                domain: development
+                project: flytesnacks
+                value: team1
 
-.. tabbed:: Configure Specific Workflow
+    .. tabbed:: Configure Specific Workflow
 
-    * Get Execution cluster label of a project domain
+        * Get Execution cluster label of a project domain
 
-        .. code-block::
+            .. code-block::
 
-            flytectl get execution-cluster-label -p flytesnacks -d development core.control_flow.run_merge_sort.merge_sort --attrFile ecl.yaml
+                flytectl get execution-cluster-label -p flytesnacks -d development core.control_flow.run_merge_sort.merge_sort --attrFile ecl.yaml
 
-    * Update the label in `ecl.yaml`
+        * Update the label in `ecl.yaml`
 
-       .. code-block::
+           .. code-block::
 
-            domain: development
-            project: flytesnacks
-            workflow: core.control_flow.run_merge_sort.merge_sort
-            value: team1
+                domain: development
+                project: flytesnacks
+                workflow: core.control_flow.run_merge_sort.merge_sort
+                value: team1
 
 * Update the execution cluster label
 
