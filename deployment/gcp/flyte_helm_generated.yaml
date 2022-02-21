@@ -176,6 +176,9 @@ data:
       scheme: gcs
       signedUrls:
         durationMinutes: 3
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
   storage.yaml: | 
     storage:
       type: stow
@@ -326,6 +329,9 @@ data:
       name: staging
     - id: production
       name: production
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -893,7 +899,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "29f4384e966e0946df1235113dbdc1b8502a9a36c82d6480d2986212f8bf7f3"
+        configChecksum: "78f5250dcfd90ce330bcdacb1344d85c6be76908ffa57d7621fea36a3d00523"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1214,7 +1220,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "29f4384e966e0946df1235113dbdc1b8502a9a36c82d6480d2986212f8bf7f3"
+        configChecksum: "78f5250dcfd90ce330bcdacb1344d85c6be76908ffa57d7621fea36a3d00523"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
