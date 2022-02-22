@@ -83,19 +83,19 @@ Now these credentials need to be included in the control plane.
 
 * Create a new file named ``secrets.yaml`` that looks like: ::
 
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: cluster_credentials
-    namespace: flyte
-  type: Opaque
-  data:
-    cluster_1_token: {{ cluster 1 token here }}
-    cluster_1_cacert: {{ cluster 1 cacert here }}
-    cluster_2_token: {{ cluster 2 token here }}
-    cluster_2_cacert: {{ cluster 2 cacert here }}
-    cluster_3_token: {{ cluster 3 token here }}
-    cluster_3_cacert: {{ cluster 3 cacert here }}
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cluster_credentials
+        namespace: flyte
+      type: Opaque
+      data:
+        cluster_1_token: {{ cluster 1 token here }}
+        cluster_1_cacert: {{ cluster 1 cacert here }}
+        cluster_2_token: {{ cluster 2 token here }}
+        cluster_2_cacert: {{ cluster 2 cacert here }}
+        cluster_3_token: {{ cluster 3 token here }}
+        cluster_3_cacert: {{ cluster 3 cacert here }}
 
 * Create cluster credentials secret in the control plane cluster
 
@@ -117,12 +117,12 @@ Now these credentials need to be included in the control plane.
       configmap:
         labelClusterMap:
           team1:
-            - id: testcluster
+            - id: cluster_1
               weight: 1
           team2:
-            - id: testcluster2
+            - id: cluster_2
               weight: 0.5
-            - id: testcluster3
+            - id: cluster_3
               weight: 0.5
         clusterConfigs:
         - name: "cluster_1"
