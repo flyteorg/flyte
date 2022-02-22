@@ -13,7 +13,7 @@ Scaling Beyond Kubernetes
 
 Often, the total compute needs could exceed the limits of a single Kubernetes cluster.
 To address this, you can deploy the data plane to several isolated Kubernetes clusters.
-The control-plane (FlyteAdmin) can be configured to load-balance workflows across these isolated data planes, which protects you from failure in a single Kubernetes cluster, increasing scalability.
+The control plane (FlyteAdmin) can be configured to load-balance workflows across these isolated data planes, protecting you from failure in a single Kubernetes cluster increasing scalability.
 
 To achieve this, first, you have to create additional Kubernetes clusters.
 For now, let's assume you have three Kubernetes clusters and that you can access them all with ``kubectl``.
