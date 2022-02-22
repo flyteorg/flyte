@@ -17,7 +17,7 @@ The control plane (FlyteAdmin) can be configured to load-balance workflows acros
 
 To achieve this, first, you have to create additional Kubernetes clusters.
 For now, let's assume you have three Kubernetes clusters and that you can access them all with ``kubectl``.
-Lets call these clusters ``cluster1``, ``cluster2``, and ``cluster3``.
+Let's call these clusters ``cluster1``, ``cluster2``, and ``cluster3``.
 
 Next, deploy **just** the data planes to these clusters.
 To do this, remove the data plane components from the **flyte** overlay, and create a new overlay containing **only** the data plane resources.
@@ -54,20 +54,20 @@ Data Plane Deployment
 User and Control Plane Deployment
 *********************************
 
-Some deployments of Flyte may choose to run control plane separate from the data plane.
+Some Flyte deployments may choose to run the control plane separate from the data plane.
 FlyteAdmin is designed to create Kubernetes resources in one or more Flyte data plane clusters.
 For the admin to access remote clusters, it needs credentials to each cluster.
 
-In Kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster.
-When you attach the role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access.
+In Kubernetes, scoped service credentials are created by configuring a "Role" resource in a Kubernetes cluster.
+When you attach the role to a "ServiceAccount", Kubernetes generates a bearer token that permits access.
 Hence, create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_ in each data plane cluster to generate these tokens.
 
-When you first create the FlyteAdmin ``ServiceAccount`` in a new cluster, a bearer token is generated and will continue to allow access unless the “ServiceAccount“ is deleted.
+When you first create the FlyteAdmin ``ServiceAccount`` in a new cluster, a bearer token is generated and will continue to allow access unless the "ServiceAccount" is deleted.
 Hence, you should never delete a ``ServiceAccount`` ⚠️.
 
-To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster, and upload them to admin somehow (for example, within Lyft, :ref:`Confidant <https://github.com/lyft/confidant>`__ is used).
+To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster and upload them to admin (for example, within Lyft, ref:`Confidant <https://github.com/lyft/confidant>`__ is used).
 
-The credentials have two parts (“ca cert“ and “bearer token"). Find the generated secret via, ::
+The credentials have two parts ("ca cert" and "bearer token"). Find the generated secret via,::
 
   kubectl get secrets -n flyte | grep flyteadmin-token
 
