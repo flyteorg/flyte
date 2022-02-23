@@ -36,6 +36,14 @@ func TestBitSet_Set(t *testing.T) {
 }
 
 func TestNewBitSet(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		b := new(BitSet)
+		assert.Equal(t, 0, b.BlockCount())
+
+		b = NewBitSet(0)
+		assert.Equal(t, 0, b.BlockCount())
+	})
+
 	t.Run("Block size", func(t *testing.T) {
 		b := NewBitSet(63)
 		assert.Equal(t, 2, b.BlockCount())
