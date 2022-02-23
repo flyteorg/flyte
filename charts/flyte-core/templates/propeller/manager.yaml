@@ -19,6 +19,9 @@ template:
       fsGroup: 65534
       runAsUser: 1001
       fsGroupChangePolicy: "Always"
+    {{- if .Values.flytepropeller.priorityClassName }}
+    priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
+    {{- end }}
     containers:
     - command:
       - flytepropeller

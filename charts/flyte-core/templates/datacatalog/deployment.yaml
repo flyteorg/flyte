@@ -22,6 +22,9 @@ spec:
         fsGroup: 1001
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
+      {{- if .Values.datacatalog.priorityClassName }}
+      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
+      {{- end }}
       initContainers:
       {{- if .Values.db.checks }}
       - name: check-db-ready
