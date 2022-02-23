@@ -13,6 +13,8 @@ setup(
     package_dir={'': 'gen/pb_python'},
     dependency_links=[],
     install_requires=[
+        'googleapis-common-protos',
+        'protoc_gen_swagger',
         'protobuf>=3.5.0,<4.0.0',
         # Packages in here should rarely be pinned. This is because these
         # packages (at the specified version) are required for project
