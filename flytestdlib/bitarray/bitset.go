@@ -67,7 +67,10 @@ func (s BitSet) DeepCopy() BitSet {
 
 // Initializes a new BitSet of the specified size.
 func NewBitSet(desiredCap uint) *BitSet {
-	// Create enough blocks to contain the number of intended bits.
-	a := make(BitSet, ((desiredCap-1)/blockSize)+1)
+	size := desiredCap / blockSize
+	if desiredCap%blockSize != 0 {
+		size++
+	}
+	a := make(BitSet, size)
 	return &a
 }
