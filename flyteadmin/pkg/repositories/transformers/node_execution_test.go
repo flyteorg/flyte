@@ -387,7 +387,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 			Name:    "name",
 		},
 	}
-	nodeExecution, err := FromNodeExecutionModel(models.NodeExecution{
+	nodeExecModel := models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: "nodey",
 			ExecutionKey: models.ExecutionKey{
@@ -411,18 +411,40 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 		},
 		InputURI: "input uri",
 		Duration: duration,
+	}
+	t.Run("dynamic workflow", func(t *testing.T) {
+		nodeExecModel.DynamicWorkflowRemoteClosureReference = "dummy_dynamic_worklfow_ref"
+		nodeExecution, err := FromNodeExecutionModel(nodeExecModel)
+		assert.Nil(t, err)
+		assert.True(t, proto.Equal(&admin.NodeExecution{
+			Id:       &nodeExecutionIdentifier,
+			InputUri: "input uri",
+			Closure:  closure,
+			Metadata: &admin.NodeExecutionMetaData{
+				IsParentNode: true,
+				RetryGroup:   "r",
+				SpecNodeId:   "sp",
+				IsDynamic:    true,
+			},
+		}, nodeExecution))
 	})
-	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.NodeExecution{
-		Id:       &nodeExecutionIdentifier,
-		InputUri: "input uri",
-		Closure:  closure,
-		Metadata: &admin.NodeExecutionMetaData{
-			IsParentNode: true,
-			RetryGroup:   "r",
-			SpecNodeId:   "sp",
-		},
-	}, nodeExecution))
+	t.Run("non dynamic workflow", func(t *testing.T) {
+		nodeExecModel.DynamicWorkflowRemoteClosureReference = ""
+		nodeExecution, err := FromNodeExecutionModel(nodeExecModel)
+		assert.Nil(t, err)
+		assert.True(t, proto.Equal(&admin.NodeExecution{
+			Id:       &nodeExecutionIdentifier,
+			InputUri: "input uri",
+			Closure:  closure,
+			Metadata: &admin.NodeExecutionMetaData{
+				IsParentNode: true,
+				RetryGroup:   "r",
+				SpecNodeId:   "sp",
+				IsDynamic:    false,
+			},
+		}, nodeExecution))
+	})
+
 }
 
 func TestFromNodeExecutionModels(t *testing.T) {

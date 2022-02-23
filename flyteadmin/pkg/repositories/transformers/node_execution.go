@@ -240,6 +240,9 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.Nod
 	}
 	if len(nodeExecutionModel.ChildNodeExecutions) > 0 {
 		nodeExecutionMetadata.IsParentNode = true
+		if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
+			nodeExecutionMetadata.IsDynamic = true
+		}
 	}
 	return &admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
