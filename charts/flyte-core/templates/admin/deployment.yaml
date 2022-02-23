@@ -22,6 +22,9 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      {{- if .Values.flyteadmin.priorityClassName }}
+      priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
+      {{- end }}
       initContainers:
         {{- if .Values.db.checks }}
         - name: check-db-ready
