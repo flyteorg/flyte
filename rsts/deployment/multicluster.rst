@@ -114,37 +114,38 @@ Now these credentials need to be included in the control plane.
         - name: cluster_credentials
           mountPath: /var/run/credentials
       configmap:
-        labelClusterMap:
-          team1:
-            - id: cluster_1
-              weight: 1
-          team2:
-            - id: cluster_2
-              weight: 0.5
-            - id: cluster_3
-              weight: 0.5
-        clusterConfigs:
-        - name: "cluster_1"
-          endpoint: {{ your-cluster-1-kubeapi-endpoint.com }}
-          enabled: true
-          auth:
-            type: "file_path"
-            tokenPath: "/var/run/credentials/cluster_1_token"
-            certPath: "/var/run/credentials/cluster_1_cacert"
-        - name: "cluster_2"
-          endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
-          auth:
-            enabled: true
-            type: "file_path"
-            tokenPath: "/var/run/credentials/cluster_2_token"
-            certPath: "/var/run/credentials/cluster_2_cacert"
-        - name: "cluster_3"
-          endpoint: {{ your-cluster-3-kubeapi-endpoint.com }}
-          enabled: true
-          auth:
-            type: "file_path"
-            tokenPath: "/var/run/credentials/cluster_3_token"
-            certPath: "/var/run/credentials/cluster_3_cacert"
+        clusters:
+         labelClusterMap:
+           team1:
+           - id: cluster_1
+             weight: 1
+           team2:
+           - id: cluster_2
+             weight: 0.5
+           - id: cluster_3
+             weight: 0.5
+         clusterConfigs:
+         - name: "cluster_1"
+           endpoint: {{ your-cluster-1-kubeapi-endpoint.com }}
+           enabled: true
+           auth:
+              type: "file_path"
+              tokenPath: "/var/run/credentials/cluster_1_token"
+              certPath: "/var/run/credentials/cluster_1_cacert"
+         - name: "cluster_2"
+           endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
+           auth:
+               enabled: true
+               type: "file_path"
+               tokenPath: "/var/run/credentials/cluster_2_token"
+               certPath: "/var/run/credentials/cluster_2_cacert"
+         - name: "cluster_3"
+           endpoint: {{ your-cluster-3-kubeapi-endpoint.com }}
+           enabled: true
+           auth:
+               type: "file_path"
+               tokenPath: "/var/run/credentials/cluster_3_token"
+               certPath: "/var/run/credentials/cluster_3_cacert"
 
 
   The ``configmap`` is used to schedule pods in different Kubernetes clusters, and hence, acts like a "load balancer".
