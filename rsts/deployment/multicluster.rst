@@ -65,7 +65,7 @@ Hence, create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/bl
 When you first create the FlyteAdmin ``ServiceAccount`` in a new cluster, a bearer token is generated and will continue to allow access unless the "ServiceAccount" is deleted.
 Hence, you should never delete a ``ServiceAccount`` ⚠️.
 
-To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster and upload them to admin (for example, within Lyft, ref:`Confidant <https://github.com/lyft/confidant>`__ is used).
+To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster and upload them to admin (for example, within Lyft, `Confidant <https://github.com/lyft/confidant>`__ is used).
 
 The credentials have two parts ("ca cert" and "bearer token"). Find the generated secret via,::
 
@@ -79,7 +79,7 @@ You can copy the bearer token to your clipboard using the following command: ::
 
   kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}' | base64 -D | pbcopy
 
-Now these credentials need to be included in the control plane. 
+Now these credentials need to be included in the control plane.
 
 * Create a new file named ``secrets.yaml`` that looks like: ::
 
@@ -97,12 +97,11 @@ Now these credentials need to be included in the control plane.
         cluster_3_token: {{ cluster 3 token here }}
         cluster_3_cacert: {{ cluster 3 cacert here }}
 
-* Create cluster credentials secret in the control plane cluster
+* Create cluster credentials secret in the control plane cluster.
 
 .. code-block::
 
     kubectl apply -f secrets.yaml
-
 
 * Create a file named ``values-override.yaml`` and add the following config to it: ::
 
@@ -147,7 +146,24 @@ Now these credentials need to be included in the control plane.
             tokenPath: "/var/run/credentials/cluster_3_token"
             certPath: "/var/run/credentials/cluster_3_cacert"
 
-* Install Flyte control plane Helm chart
+
+  The ``configmap`` is used to schedule pods in different Kubernetes clusters, and hence, acts like a "load balancer".
+  ``team1`` and ``team2`` are the labels, where each label can schedule a pod on multiple clusters depending on the weight.
+
+  .. code-block:: yaml
+
+      configmap:
+        labelClusterMap:
+          team1:
+            - id: cluster_1
+              weight: 1
+          team2:
+            - id: cluster_2
+              weight: 0.5
+            - id: cluster_3
+              weight: 0.5
+
+* Lastly, install the Flyte control plane Helm chart.
 
 .. tabbed:: AWS
 
@@ -163,6 +179,8 @@ Now these credentials need to be included in the control plane.
 
 Configure Execution Cluster Labels
 **********************************
+
+The next step is to configure project-domain or workflow to schedule on a specific Kubernetes cluster, for which the correct label needs to be added.
 
 .. tabbed:: Configure Project & Domain
 
@@ -193,8 +211,10 @@ Configure Execution Cluster Labels
         workflow: core.control_flow.run_merge_sort.merge_sort
         value: team1
 
-* Lastly, update the execution cluster label
+* Lastly, update the execution cluster label.
 
 .. code-block::
 
     flytectl update execution-cluster-label --attrFile ecl.yaml
+
+With this, the execution of workflows belonging to a specific project-domain or a single workflow will be scheduled on the target label cluster.
