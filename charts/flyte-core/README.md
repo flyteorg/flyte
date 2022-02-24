@@ -110,6 +110,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.image.tag | string | `"v0.3.23"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
+| datacatalog.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
 | datacatalog.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
 | datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
@@ -141,6 +142,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
+| flyteadmin.priorityClassName | string | `""` | Sets priorityClassName for flyteadmin pod(s). |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
@@ -160,6 +162,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.image.tag | string | `"v0.43.0"` |  |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
+| flyteconsole.priorityClassName | string | `""` | Sets priorityClassName for flyte console pod(s). |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
@@ -176,6 +179,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
+| flytepropeller.priorityClassName | string | `"system-cluster-critical"` | Sets priorityClassName for propeller pod(s). |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
 | flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for FlytePropeller |
@@ -190,6 +194,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.image.tag | string | `"v0.6.104"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
+| flytescheduler.priorityClassName | string | `""` | Sets priorityClassName for flyte scheduler pod(s). |
 | flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
 | flytescheduler.secrets | object | `{}` |  |
 | flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for Flytescheduler |

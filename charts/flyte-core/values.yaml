@@ -66,6 +66,8 @@ flyteadmin:
   deployRedoc: true
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
+  # -- Sets priorityClassName for flyteadmin pod(s).
+  priorityClassName: ""
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -109,6 +111,8 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
+  # -- Sets priorityClassName for flyte scheduler pod(s).
+  priorityClassName: ""
 
 #
 # DATACATALOG SETTINGS
@@ -160,6 +164,8 @@ datacatalog:
   affinity: {}
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
+  # -- Sets priorityClassName for datacatalog pod(s).
+  priorityClassName: ""
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -209,6 +215,8 @@ flytepropeller:
   extraArgs: {}
   # -- Defines the cluster name used in events sent to Admin
   clusterName: ""
+  # -- Sets priorityClassName for propeller pod(s).
+  priorityClassName: "system-cluster-critical"
 
 #
 # FLYTECONSOLE SETTINGS
@@ -247,6 +255,8 @@ flyteconsole:
   ga:
     enabled: false
     tracking_id: "G-0QW4DJWJ20"
+  # -- Sets priorityClassName for flyte console pod(s).
+  priorityClassName: ""
 
 #
 # Common secret auth for propeller & scheduler

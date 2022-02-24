@@ -24,6 +24,9 @@ data:
 {{- with .Values.configmap.remoteData }}
   remoteData.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.namespace_config }}
+  namespace_config.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}

@@ -15,7 +15,7 @@ HELM_CAPABILITIES="-a rbac.authorization.k8s.io/v1 -a networking.k8s.io/v1/Ingre
 
 helm dep update ${DIR}/../charts/flyte/
 
-helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
+helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
 for deployment in ${DEPLOYMENT_CORE}; do
     helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
@@ -24,7 +24,7 @@ for deployment in ${DEPLOYMENT_CORE}; do
 done
 
 # Generate manifest AWS Scheduler
-helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml ${HELM_CAPABILITIES} > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
+helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
 
 echo "Generating helm docs"
 if  command -v helm-docs &> /dev/null

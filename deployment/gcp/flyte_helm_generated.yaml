@@ -179,6 +179,9 @@ data:
       scheme: gcs
       signedUrls:
         durationMinutes: 3
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
   storage.yaml: | 
     storage:
       type: stow
@@ -329,6 +332,9 @@ data:
       name: staging
     - id: production
       name: production
+  namespace_config.yaml: | 
+    namespace_mapping:
+      template: '{{ domain }}'
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -896,7 +902,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a5c62e7ceb44e47bc99a6cc31ad7202dc754baf6e9dd81001aeb9eac6533009"
+        configChecksum: "59f04b289445b7a883e5de2a26b58c442769f954ca1fbeee7430290405a8b14"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1217,7 +1223,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a5c62e7ceb44e47bc99a6cc31ad7202dc754baf6e9dd81001aeb9eac6533009"
+        configChecksum: "59f04b289445b7a883e5de2a26b58c442769f954ca1fbeee7430290405a8b14"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1316,6 +1322,7 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      priorityClassName: system-cluster-critical
       containers:
       - command:
         - flytepropeller

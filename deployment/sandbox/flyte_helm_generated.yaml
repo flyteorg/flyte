@@ -4828,6 +4828,7 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      priorityClassName: system-cluster-critical
       containers:
       - command:
         - flytepropeller
