@@ -49,7 +49,7 @@ The backend plugin is where the actual logic of the execution is implemented. Th
 
 #. A `Kubernetes operator Plugin <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/k8s#Plugin>`_. The following demo shows 2 examples of K8s backend plugins: Flytekit Athena & Spark, and Flyte K8s Pod & Spark:
 
-  .. youtube:: oK2RGQuP94k
+.. youtube:: oK2RGQuP94k
 
 #. A Web API plugin - `Async <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#AsyncPlugin>`_ or `Sync <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#SyncPlugin>`_.
 #. Or if none of the above fits then - a `Core Plugin <https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core#Plugin>`_
