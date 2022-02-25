@@ -575,7 +575,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyteadmin
+  name: flyte-flyteadmin
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -605,7 +605,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -679,7 +679,7 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 rules:
   - apiGroups:
@@ -698,7 +698,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyteadmin-binding
+  name: flyte-flyteadmin-binding
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -707,7 +707,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyteadmin
+  name: flyte-flyteadmin
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
@@ -717,7 +717,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -726,7 +726,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flytepropeller
+  name: flyte-flytepropeller
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
@@ -737,12 +737,12 @@ subjects:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
 subjects:
   - kind: ServiceAccount
     name: flyte-pod-webhook

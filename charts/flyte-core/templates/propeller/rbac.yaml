@@ -22,7 +22,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 {{- end }}
 kind: ClusterRole
 metadata:
-  name: {{ template "flytepropeller.name" . }}
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
 rules:
 # Allow RO access to PODS
@@ -90,12 +90,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ template "flytepropeller.name" . }}
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ template "flytepropeller.name" . }}
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
 subjects:
 - kind: ServiceAccount
   name: {{ template "flytepropeller.name" . }}

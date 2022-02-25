@@ -169,6 +169,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.cacheSizeMbs | int | `0` |  |
 | flytepropeller.clusterName | string | `""` | Defines the cluster name used in events sent to Admin |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
+| flytepropeller.createCRDs | bool | `true` | Whether to install the flyteworkflows CRD with helm |
 | flytepropeller.enabled | bool | `true` |  |
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
