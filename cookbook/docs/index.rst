@@ -6,7 +6,7 @@ User Guide
 
 If this is your first time using Flyte, check out the `Getting Started <https://docs.flyte.org/en/latest/getting_started.html>`_ guide.
 
-The :ref:`User Guide <userguide>` and :ref:`Tutorials <tutorials>` sections of the Flyte documentation covers all of the
+The :ref:`User Guide <userguide>` and :ref:`Tutorials <tutorials>` cover all the
 key features of Flyte organized by topic. Each of the sections below introduces a topic and discusses how you can use
 Flyte to address a specific problem. Code for all of the examples in the user guide be found in the
 `flytesnacks repo <https://github.com/flyteorg/flytesnacks>`_.
