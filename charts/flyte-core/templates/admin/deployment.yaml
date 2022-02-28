@@ -22,6 +22,9 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      {{- if .Values.flyteadmin.priorityClassName }}
+      priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
+      {{- end }}
       initContainers:
         {{- if .Values.db.checks }}
         - name: check-db-ready
@@ -62,7 +65,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         {{- end }}
-        {{- if .Values.cluster_resource_manager.enabled }}
+        {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
         - command:
           - flyteadmin
           - --config
@@ -101,10 +104,10 @@ spec:
         - flyteadmin
         - --config
         - {{ .Values.flyteadmin.configPath }}
-        {{- with .Values.flyteadmin.extraArgs }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         - serve
+        {{- with .Values.flyteadmin.extraArgs }}
+        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- end }}
         image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin

@@ -26,11 +26,11 @@ Before we can run the server, we need to set up an environment variable or two.
 
 ``ADMIN_API_URL`` (default: `window.location.origin <https://developer.mozilla.org/en-US/docs/Web/API/Window/location>`_)
 
-The Flyte console displays information fetched from the Flyte Admin API. This
+The Flyte console displays information fetched from the FlyteAdmin API. This
 environment variable specifies the host prefix used in constructing API requests.
 
 .. NOTE::
-    this is only the host portion of the API endpoint, consisting of the
+    This is only the host portion of the API endpoint, consisting of the
     protocol, domain, and port (if not using the standard 80/443).
 
 This value will be combined with a suffix (such as ``/api/v1``) to construct the
@@ -39,7 +39,7 @@ final URL used in an API request.
 *Default Behavior*
 
 In most cases, ``flyteconsole`` will be hosted in the same cluster as the Admin
-API, meaning that the domain used to access the console is the same value used to
+API, meaning that the domain used to access the console is the same as that used to
 access the API. For this reason, if no value is set for ``ADMIN_API_URL``, the
 default behavior is to use the value of `window.location.origin`.
 
@@ -84,7 +84,7 @@ You can run storybook with ``npm run storybook``, and view the stories at http:/
 Protobuf and the Network tab
 =============================
 
-Communication with the Flyte Admin API is done using Protobuf as the
+Communication with the FlyteAdmin API is done using Protobuf as the
 request/response format. Protobuf is a binary format, which means looking at
 responses in the Network tab won't be very helpful. To make debugging easier,
 each network request is logged to the console with it's URL followed by the

@@ -52,6 +52,15 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    .. link-button:: multicluster
+       :type: ref
+       :text: Multi-cluster setup
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Detailed instructions on multiple clusters' setup.
+
+    ---
+
     .. link-button:: deployment-plugin-setup
        :type: ref
        :text: Plugin Setup
@@ -84,6 +93,7 @@ solution). The following pages will help you effectively deploy and manage an en
     overview
     aws/index
     gcp/index
+    multicluster
     cluster_config/index
     sandbox
     plugin_setup/index

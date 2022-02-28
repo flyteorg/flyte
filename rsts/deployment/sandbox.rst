@@ -83,19 +83,21 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. TODO::
 
-        These instructions currently still rely on the old kustomize setup, and will be moved over to the Helm chart soon.
+      Allow installing latest version of k3d once this `issue is fixed <https://github.com/rancher/k3d/issues/380>`__
 
     #. Install k3d Using ``curl``::
 
-        curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+        curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.2.0 bash
 
        Or Using ``wget`` ::
 
-        wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+        wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.2.0 bash
 
-    #. Start a new K3s cluster called Flyte:
 
-        k3d cluster create -p "30081:30081" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
+    #. Start a new K3s cluster called Flyte ::
+
+        k3d cluster create flyte -p 30081:30081 --no-lb  --k3s-server-arg '–no-deploy=traefik' --k3s-server-arg '–no-deploy=servicelb'
+
 
     #. Ensure the context is set to the new cluster::
 
@@ -103,7 +105,8 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     #. Install Flyte::
 
-        kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
+        kubectl create ns flyte
+        kubectl create -f  https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_helm_generated.yaml
 
 
     #. Connect to `FlyteConsole <localhost:30081/console>`__
@@ -208,7 +211,7 @@ Flyte configuration on your remote cluster.
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
 
-#. Now use these cedentials for postgress
+#. Now use these credentials for postgres
 
   .. code-block::
 

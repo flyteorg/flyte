@@ -8,22 +8,23 @@ helm version
 DEPLOYMENT_CORE=${1:-eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+HELM_CAPABILITIES="-a rbac.authorization.k8s.io/v1 -a networking.k8s.io/v1/Ingress -a apiextensions.k8s.io/v1/CustomResourceDefinition"
 
 helm dep update ${DIR}/../charts/flyte/
 
-helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml  > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
+helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
 for deployment in ${DEPLOYMENT_CORE}; do
-    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
 # Generate manifest AWS Scheduler
-helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
+helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
 
 echo "Generating helm docs"
 if ! command -v helm-docs &> /dev/null
 then
-    GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
+    GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 fi
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
