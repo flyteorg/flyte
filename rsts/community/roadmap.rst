@@ -7,8 +7,9 @@ Roadmap
 How the Community Works
 =======================
 Flyte is actively used in production at multiple companies. We pride ourselves on being extremely customer-focused, and care about providing a high quality customer experience. We therefore always
-prioritize stability, reliability, observability and maintainability over raw feature development. Features are usually developed in response to specific use cases and user scenarios. That being said,
-we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes reflect future development scenarios, and in
+prioritize stability, reliability, observability and maintainability over raw feature development. 
+
+Features are usually developed in response to specific use cases and user scenarios. That being said, we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes reflect future development scenarios, and in
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases, we would proactively develop features behind feature flags.
 
 It is extremely important to let the community know about your use cases, so that we adapt parts of Flyte to meet those requirements. We welcome collaboration and contributions, but please follow our `Contribution Guidelines <https://docs.flyte.org/en/latest/community/contribute.html>`_. 
@@ -16,9 +17,10 @@ It is extremely important to let the community know about your use cases, so tha
 
 Milestones and Releases
 ========================
-Flyte consists of many components and services. In true Agile fashion, each service is independently iterated and coordinated by maintaing backwards compatible contracts using protobuf defined in `idl <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>`__. Therefore, components like FlyteKit, FlytePropeller, and datacatalog are independently versioned.
 
-We have decided to release a new version of the overall platform in the `Flyte repo <https://github.com/flyteorg/flyte>`_ every month. We create one milestone at the end of every month which points to a new release of
+Flyte consists of many components and services. In true Agile fashion, each service is independently iterated and coordinated by maintaing backwards compatible contracts using protobuf defined in `FlyteIDL <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>`__. Therefore, components like FlyteKit, FlytePropeller, and datacatalog are independently versioned.
+
+We have decided to release a new version of the overall platform in the `Flyte repo <https://github.com/flyteorg/flyte>`_ every month. We create one milestone at the end of every month, which points to a new release of
 Flyte. This may change in the future, but to match the rate of our development, this is our preferred option. Every release will be associated with a CHANGELOG (in the repo).
 
 Change Management
@@ -37,6 +39,7 @@ Release Train
 - Flyte release are monthly.
 - We may have patch releases eg. 0.1.x in between the monthly releases.
 
+
 Upcoming Features and Issues
 ============================
 
@@ -46,10 +49,11 @@ Issues by Theme
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 | Theme       | Description                                                    | Open Issues                                                                           | Comment                                                                                                     |
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
-| Bugs        | Currently known and open bugs                                  | `Bugs <https://github.com/flyteorg/flyte/labels/bug>`_                                | We are always working on bugs. Open a new one `here <https://github.com/flyteorg/flyte/issues/new/choose>`_ |
+| Bugs        | Currently known and open bugs.                                 | `Bugs <https://github.com/flyteorg/flyte/labels/bug>`_                                | We are always working on bugs. Open a new one `here <https://github.com/flyteorg/flyte/issues/new/choose>`_.|
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
-| Security    | Issues related to security enhancements                        | `Security issues <https://github.com/flyteorg/flyte/labels/security>`_                |                                                                                                             |
+| Security    | Issues related to security enhancements.                       | `Security issues <https://github.com/flyteorg/flyte/labels/security>`_                |                                                                                                             |
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+
 | Docs        | All issues open with our documentation                     | `Docs issues <https://github.com/flyteorg/flyte/labels/documentation>`_               | Starting Feb 2021, we will be completely overhauling our docs. Feedback appreciated!                                     |
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 | Features    | All new features in development                            | `Features issues <https://github.com/flyteorg/flyte/labels/enhancement>`_             |                                                                                                             |
@@ -62,11 +66,13 @@ Issues by Theme
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 | Contribute  | If you are looking to contribute and want a great first issue, | `Contribute issues <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`_  | These are the best issues to get started with.                                                               |
 |             | check out these issues                                           |                                                                                       |                                                                                                             |
+
 +-------------+----------------------------------------------------------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 
 
 Issues by Components
 ---------------------
+
 
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
 | Theme        | Description                                   | Open Issues                                                                 | Comment                                    |
@@ -75,3 +81,6 @@ Issues by Components
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
 | flytectl     | Issues on Flytectl (standalone CLI for Flyte) | `flytectl issues <https://github.com/flyteorg/flyte/labels/flytectl>`_      | Great issues to start with.                 |
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
+
+For an overview of what we're currently working on, check out our `live roadmap <https://github.com/orgs/flyteorg/projects/3>`__.
+

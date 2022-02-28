@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.92 # FLYTEADMIN_TAG
+    tag: v0.6.104 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -64,6 +64,10 @@ flyteadmin:
   additionalVolumeMounts: []
   # -- Deploys a Redoc container in Flyteadmin's pod
   deployRedoc: true
+  # -- Appends extra command line arguments to the serve command
+  extraArgs: {}
+  # -- Sets priorityClassName for flyteadmin pod(s).
+  priorityClassName: ""
 
 #
 # FLYTESCHEDULER SETTINGS
@@ -74,7 +78,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.92 # FLYTESCHEDULER_TAG
+    tag: v0.6.104 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -107,6 +111,8 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
+  # -- Sets priorityClassName for flyte scheduler pod(s).
+  priorityClassName: ""
 
 #
 # DATACATALOG SETTINGS
@@ -120,7 +126,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v0.3.22 # DATACATALOG_TAG
+    tag: v0.3.23 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -156,6 +162,10 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
+  # -- Sets priorityClassName for datacatalog pod(s).
+  priorityClassName: ""
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -169,7 +179,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v0.16.19 # FLYTEPROPELLER_TAG
+    tag: v0.16.29 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -201,6 +211,12 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
+  # -- Defines the cluster name used in events sent to Admin
+  clusterName: ""
+  # -- Sets priorityClassName for propeller pod(s).
+  priorityClassName: "system-cluster-critical"
 
 #
 # FLYTECONSOLE SETTINGS
@@ -213,7 +229,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v0.41.0 # FLYTECONSOLE_TAG
+    tag: v0.43.0 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -239,6 +255,8 @@ flyteconsole:
   ga:
     enabled: false
     tracking_id: "G-0QW4DJWJ20"
+  # -- Sets priorityClassName for flyte console pod(s).
+  priorityClassName: ""
 
 #
 # Common secret auth for propeller & scheduler

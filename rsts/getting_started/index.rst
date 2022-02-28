@@ -5,8 +5,7 @@ Getting Started
 ################
 
 This is a step-by-step guide intended for newcomers to the Flyte ecosystem. By the
-end of this guide, you'll be able to build, deploy, and iterate on Flyte tasks and
-workflows.
+end of this guide, you'll be able to build, deploy, and iterate on Flyte :ref:`tasks <divedeep-tasks>` and :ref:`workflows <divedeep-workflows>`.
 
 
 .. panels::

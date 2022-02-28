@@ -1116,6 +1116,8 @@ Section: database
 host (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -1125,6 +1127,8 @@ host (string)
 
 port (int)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -1136,6 +1140,8 @@ port (int)
 dbname (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -1145,6 +1151,8 @@ dbname (string)
 
 username (string)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -1156,6 +1164,8 @@ username (string)
 password (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -1165,6 +1175,8 @@ password (string)
 
 passwordPath (string)
 --------------------------------------------------------------------------------
+
+deprecated
 
 **Default Value**: 
 
@@ -1176,6 +1188,8 @@ passwordPath (string)
 options (string)
 --------------------------------------------------------------------------------
 
+deprecated
+
 **Default Value**: 
 
 .. code-block:: yaml
@@ -1185,6 +1199,136 @@ options (string)
 
 debug (bool)
 --------------------------------------------------------------------------------
+
+deprecated
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+enableForeignKeyConstraintWhenMigrating (bool)
+--------------------------------------------------------------------------------
+
+Whether to enable gorm foreign keys when migrating the db
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+postgres (`interfaces.PostgresConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dbname: ""
+  debug: false
+  host: ""
+  options: ""
+  password: ""
+  passwordPath: ""
+  port: 0
+  username: ""
+  
+
+interfaces.PostgresConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+host (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+port (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The port name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+dbname (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database name
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+username (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database user who is connecting to the server.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Points to the file containing the database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+options (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+debug (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Whether or not to start the database connection with debug mode enabled.
 
 **Default Value**: 
 
@@ -3531,13 +3675,13 @@ On which http port to serve admin
 
 .. code-block:: yaml
 
-  "0"
+  "8088"
   
 
 grpcPort (int)
 --------------------------------------------------------------------------------
 
-On which grpc port to serve admin
+deprecated
 
 **Default Value**: 
 
@@ -3549,7 +3693,7 @@ On which grpc port to serve admin
 grpcServerReflection (bool)
 --------------------------------------------------------------------------------
 
-Enable GRPC Server Reflection
+deprecated
 
 **Default Value**: 
 
@@ -3561,7 +3705,7 @@ Enable GRPC Server Reflection
 kube-config (string)
 --------------------------------------------------------------------------------
 
-Path to kubernetes client config file.
+Path to kubernetes client config file, default is empty, useful for incluster config.
 
 **Default Value**: 
 
@@ -3589,7 +3733,7 @@ security (`config.ServerSecurityOptions`_)
 
 .. code-block:: yaml
 
-  allowCors: false
+  allowCors: true
   allowedHeaders: []
   allowedOrigins: []
   auditAccess: false
@@ -3598,6 +3742,18 @@ security (`config.ServerSecurityOptions`_)
     certificateFile: ""
     keyFile: ""
   useAuth: false
+  
+
+grpc (`config.GrpcConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxMessageSizeBytes: 0
+  port: 8089
+  serverReflection: true
   
 
 thirdPartyConfig (`config.ThirdPartyConfigOptions`_)
@@ -3613,6 +3769,45 @@ Deprecated please use auth.appAuth.thirdPartyConfig instead.
     clientId: ""
     redirectUri: ""
     scopes: []
+  
+
+config.GrpcConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+port (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+On which grpc port to serve admin
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "8089"
+  
+
+serverReflection (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable GRPC Server Reflection
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+maxMessageSizeBytes (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 config.ServerSecurityOptions
@@ -3666,7 +3861,7 @@ allowCors (bool)
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 allowedOrigins ([]string)

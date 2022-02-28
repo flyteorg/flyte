@@ -13,8 +13,8 @@ Typical Flow Using Flytekit
 
  * A user defines tasks using the :py:mod:`Flytekit <flytekit:flytekit>` Task Definition language
  * A user defines a workflow using the :py:mod:`Flytekit <flytekit:flytekit>` Workflow definition lanugage.
- * The user then uses flytekit's register cli to compile the tasks into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. During this time the task representation is also bound to a container that contains the code for the task. This associated entity is registered with FlyteAdmin using the registerTask api.
- * The user then uses flytekit's register cli to compile the workflow into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. The referenced tasks are replaced by their Flyte Admin registered Identifier, obtained in the previous step. This associated entity is registered with FlyteAdmin using the registerWorkflow api.
+ * The user then uses flytekit's register cli to compile the tasks into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. During this time the task representation is also bound to a container that contains the code for the task. This associated entity is registered with FlyteAdmin using the registerTask API.
+ * The user then uses Flytekit's register CLI to compile the workflow into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. The referenced tasks are replaced by their FlyteAdmin registered Identifier, obtained in the previous step. This associated entity is registered with FlyteAdmin using the registerWorkflow API.
  * The user can then launch an execution using the FlyteAdmin launch execution API, which requires the necessary inputs provided. This is automatically done if the user uses the Flytectl to launch the execution.
  * The user can later use the FlyteAdmin read API's to get details of the execution,
    monitor it to completion or retrieve a historical execution
@@ -28,7 +28,7 @@ Typical Flow Using Flytekit
 
 Typical Flow Without Flytekit
 -----------------------------
-It is possible to achieve the exact same workflow as above in case Flytekit is not available. Workflows and tasks are purely specifications and can be provided using any tool like YAML, JSON, protobuf binary or any other programming language. 
+It is possible to achieve the exact same workflow as above in case Flytekit is not available. Workflows and tasks are purely specifications and can be provided using any tool like ``YAML``, ``JSON``, ``protobuf binary`` or any other programming language. 
 
 Contributions using other tools are welcome.
 
