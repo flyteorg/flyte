@@ -74,7 +74,7 @@ Issues by Components
 +===============+=======================================+========================================================================+
 | Flyte Console | Issues concerning our web UI.         | `Flyte Console issues <https://github.com/flyteorg/flyte/labels/ui>`_  |
 +---------------+---------------------------------------+------------------------------------------------------------------------+
-| FlyteCTL      | Issues concerning our standalone CLI. | `FlyteCTL issues <https://github.com/flyteorg/flyte/labels/flytectl>`_ |
+| Flytectl      | Issues concerning our standalone CLI. | `Flytectl issues <https://github.com/flyteorg/flyte/labels/flytectl>`_ |
 +---------------+---------------------------------------+------------------------------------------------------------------------+
 
 There's a `live roadmap <https://github.com/orgs/flyteorg/projects/3>`__ we highly encourage you to look at to get a consolidated view of what we're working on currently.
