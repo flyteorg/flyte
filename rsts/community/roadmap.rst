@@ -75,7 +75,7 @@ Issues by Components
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
 | Theme        | Description                                   | Open Issues                                                                 | Comment                                    |
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
-| flyteconsole | Issues on FlyteConsole (Flyte's UI)           | `flyteconsole issues <https://github.com/flyteorg/flyte/labels/ui>`_        | These are great issues to get started with. |
+| flyteconsole | Issues on FlyteConsole (Flyte's UI)           | `flyteconsole issues <https://github.com/flyteorg/flyte/labels/ui>`_        | These are great issues to get started with.|
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
 | flytectl     | Issues on Flytectl (standalone CLI for Flyte) | `flytectl issues <https://github.com/flyteorg/flyte/labels/flytectl>`_      | Great issues to start with.                |
 +--------------+-----------------------------------------------+-----------------------------------------------------------------------------+--------------------------------------------+
