@@ -98,9 +98,26 @@ func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig 
 	default:
 		panic(fmt.Sprintf("Unrecognized database config %v", dbConfig))
 	}
-
-	return gorm.Open(dialector, &gorm.Config{
+	gormDb, err := gorm.Open(dialector, &gorm.Config{
 		Logger:                                   gormLogger.Default.LogMode(logLevel),
 		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Setup connection pool settings
+	return gormDb, setupDbConnectionPool(gormDb, dbConfig)
+}
+
+func setupDbConnectionPool(gormDb *gorm.DB, dbConfig *runtimeInterfaces.DbConfig) error {
+	genericDb, err := gormDb.DB()
+	if err != nil {
+		return err
+	}
+	genericDb.SetConnMaxLifetime(dbConfig.ConnMaxLifeTime.Duration)
+	genericDb.SetMaxIdleConns(dbConfig.MaxIdleConnections)
+	genericDb.SetMaxOpenConns(dbConfig.MaxOpenConnections)
+	return nil
 }

@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"time"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
@@ -25,6 +27,9 @@ var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfig{
 	DeprecatedHost:         postgres,
 	DeprecatedDbName:       postgres,
 	DeprecatedExtraOptions: "sslmode=disable",
+	MaxIdleConnections:     10,
+	MaxOpenConnections:     1000,
+	ConnMaxLifeTime:        config.Duration{Duration: time.Hour},
 })
 var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{
 	ProfilerPort:          metricPort,
