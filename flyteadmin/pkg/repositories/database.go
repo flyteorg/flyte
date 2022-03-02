@@ -67,7 +67,7 @@ func getPostgresDsn(ctx context.Context, pgConfig runtimeInterfaces.PostgresConf
 			pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User)
 	}
 	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
-		pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, pgConfig.Password, pgConfig.ExtraOptions)
+		pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
 }
 
 func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig *logger.Config) (
