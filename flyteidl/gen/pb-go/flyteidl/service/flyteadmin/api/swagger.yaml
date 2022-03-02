@@ -4239,6 +4239,7 @@ definitions:
                   - null
                 map:
                   literals: {}
+                hash: "hash"
               var:
                 description: "description"
                 type:
@@ -4414,6 +4415,7 @@ definitions:
                   - null
                 map:
                   literals: {}
+                hash: "hash"
               var:
                 description: "description"
                 type:
@@ -4647,6 +4649,7 @@ definitions:
                 - null
               map:
                 literals: {}
+              hash: "hash"
             var:
               description: "description"
               type:
@@ -4847,6 +4850,7 @@ definitions:
                     - null
                   map:
                     literals: {}
+                  hash: "hash"
                 var:
                   description: "description"
                   type:
@@ -5022,6 +5026,7 @@ definitions:
                     - null
                   map:
                     literals: {}
+                  hash: "hash"
                 var:
                   description: "description"
                   type:
@@ -5235,6 +5240,7 @@ definitions:
                     - null
                   map:
                     literals: {}
+                  hash: "hash"
                 var:
                   description: "description"
                   type:
@@ -5410,6 +5416,7 @@ definitions:
                     - null
                   map:
                     literals: {}
+                  hash: "hash"
                 var:
                   description: "description"
                   type:
@@ -5737,6 +5744,7 @@ definitions:
                 - null
               map:
                 literals: {}
+              hash: "hash"
             var:
               description: "description"
               type:
@@ -31637,6 +31645,10 @@ definitions:
       map:
         description: "A map of strings to literals."
         $ref: "#/definitions/coreLiteralMap"
+      hash:
+        type: "string"
+        title: "A hash representing this literal.\nThis is used for caching purposes.\
+          \ For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
     description: "A simple value. This supports any level of nesting (e.g. array of\
       \ array of array of Blobs) as well as simple primitives."
     example:
@@ -31696,6 +31708,7 @@ definitions:
         - null
       map:
         literals: {}
+      hash: "hash"
   coreLiteralCollection:
     type: "object"
     properties:
@@ -32323,6 +32336,7 @@ definitions:
           - null
         map:
           literals: {}
+        hash: "hash"
       var:
         description: "description"
         type:
@@ -32440,6 +32454,7 @@ definitions:
               - null
             map:
               literals: {}
+            hash: "hash"
           var:
             description: "description"
             type:

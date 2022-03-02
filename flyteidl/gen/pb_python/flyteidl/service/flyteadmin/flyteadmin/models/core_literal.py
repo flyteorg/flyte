@@ -37,21 +37,24 @@ class CoreLiteral(object):
     swagger_types = {
         'scalar': 'CoreScalar',
         'collection': 'CoreLiteralCollection',
-        'map': 'CoreLiteralMap'
+        'map': 'CoreLiteralMap',
+        'hash': 'str'
     }
 
     attribute_map = {
         'scalar': 'scalar',
         'collection': 'collection',
-        'map': 'map'
+        'map': 'map',
+        'hash': 'hash'
     }
 
-    def __init__(self, scalar=None, collection=None, map=None):  # noqa: E501
+    def __init__(self, scalar=None, collection=None, map=None, hash=None):  # noqa: E501
         """CoreLiteral - a model defined in Swagger"""  # noqa: E501
 
         self._scalar = None
         self._collection = None
         self._map = None
+        self._hash = None
         self.discriminator = None
 
         if scalar is not None:
@@ -60,6 +63,8 @@ class CoreLiteral(object):
             self.collection = collection
         if map is not None:
             self.map = map
+        if hash is not None:
+            self.hash = hash
 
     @property
     def scalar(self):
@@ -129,6 +134,27 @@ class CoreLiteral(object):
         """
 
         self._map = map
+
+    @property
+    def hash(self):
+        """Gets the hash of this CoreLiteral.  # noqa: E501
+
+
+        :return: The hash of this CoreLiteral.  # noqa: E501
+        :rtype: str
+        """
+        return self._hash
+
+    @hash.setter
+    def hash(self, hash):
+        """Sets the hash of this CoreLiteral.
+
+
+        :param hash: The hash of this CoreLiteral.  # noqa: E501
+        :type: str
+        """
+
+        self._hash = hash
 
     def to_dict(self):
         """Returns the model properties as a dict"""
