@@ -2,8 +2,13 @@ package validation
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"testing"
+
+	"google.golang.org/protobuf/types/known/structpb"
+
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,6 +32,54 @@ func getMockTaskConfigProvider() runtimeInterfaces.TaskResourceConfiguration {
 
 var mockWhitelistConfigProvider = runtimeMocks.NewMockWhitelistConfiguration()
 var taskApplicationConfigProvider = testutils.GetApplicationConfigWithDefaultDomains()
+
+func TestValidateTask(t *testing.T) {
+	request := testutils.GetValidTaskRequest()
+	resources := []*core.Resources_ResourceEntry{
+		{
+			Name:  core.Resources_CPU,
+			Value: "1.5Gi",
+		},
+		{
+			Name:  core.Resources_MEMORY,
+			Value: "200m",
+		},
+	}
+	request.Spec.Template.GetContainer().Resources = &core.Resources{Requests: resources}
+	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
+		getMockTaskConfigProvider(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
+
+	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{}}
+	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
+		getMockTaskConfigProvider(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+	assert.EqualError(t, err, "invalid TaskSpecification, pod tasks should specify their target as a K8sPod with a defined pod spec")
+
+	resourceList := corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("1.5Gi")}
+	podSpec := &corev1.PodSpec{Containers: []corev1.Container{{Resources: corev1.ResourceRequirements{Requests: resourceList}}}}
+	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{PodSpec: transformStructToStructPB(t, podSpec)}}
+	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
+		getMockTaskConfigProvider(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
+
+	resourceList = corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("200m")}
+	podSpec = &corev1.PodSpec{Containers: []corev1.Container{{Resources: corev1.ResourceRequirements{Requests: resourceList}}}}
+	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{PodSpec: transformStructToStructPB(t, podSpec)}}
+	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
+		getMockTaskConfigProvider(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+	assert.Nil(t, err)
+}
+
+func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
+	data, err := json.Marshal(obj)
+	assert.Nil(t, err)
+	podSpecMap := make(map[string]interface{})
+	err = json.Unmarshal(data, &podSpecMap)
+	assert.Nil(t, err)
+	s, err := structpb.NewStruct(podSpecMap)
+	assert.Nil(t, err)
+	return s
+}
 
 func TestValidateTaskEmptyProject(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
@@ -217,6 +270,18 @@ func TestAddResourceEntryToMap(t *testing.T) {
 	assert.Equal(t, val, int64(104857600), "Existing values in the resource entry map should not be overwritten")
 }
 
+func TestResourceListToQuantity(t *testing.T) {
+	cpuResources := resourceListToQuantity(corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("100Mi")})
+	cpuQuantity := cpuResources[core.Resources_CPU]
+	val := cpuQuantity.Value()
+	assert.Equal(t, val, int64(104857600))
+
+	gpuResources := resourceListToQuantity(corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("2")})
+	gpuQuantity := gpuResources[core.Resources_CPU]
+	val = gpuQuantity.Value()
+	assert.Equal(t, val, int64(2))
+}
+
 func TestRequestedResourcesToQuantity(t *testing.T) {
 	resources, err := requestedResourcesToQuantity(&core.Identifier{}, []*core.Resources_ResourceEntry{
 		{
@@ -357,7 +422,7 @@ func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than  current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
@@ -396,7 +461,7 @@ func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		})
-	assert.EqualError(t, err, "Requested GPU default [2] is greater than  current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
@@ -411,7 +476,7 @@ func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Requested GPU default [2] is greater than  current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
 }
 
 func TestIsWholeNumber(t *testing.T) {
