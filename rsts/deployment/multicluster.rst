@@ -12,7 +12,7 @@ Scaling Beyond Kubernetes
   As described in the `Architecture Overview <https://docs.flyte.org/en/latest/concepts/architecture.html>`_, the Flyte ``Control Plane`` sends workflows off to the ``Data Plane`` for execution. The data plane fulfills these workflows by launching pods in Kubernetes.
 
 Often, the total compute needs could exceed the limits of a single Kubernetes cluster.
-To address this, you can deploy the data plane to several isolated Kubernetes clusters.
+You can deploy the data plane to several isolated Kubernetes clusters to address this.
 The control plane (FlyteAdmin) can be configured to load-balance workflows across these isolated data planes, protecting you from failure in a single Kubernetes cluster increasing scalability.
 
 To achieve this, first, you have to create additional Kubernetes clusters.
@@ -56,7 +56,7 @@ User and Control Plane Deployment
 
 Some Flyte deployments may choose to run the control plane separate from the data plane.
 FlyteAdmin is designed to create Kubernetes resources in one or more Flyte data plane clusters.
-For the admin to access remote clusters, it needs credentials to each cluster.
+For the admin to access remote clusters, it needs credentials for each cluster.
 
 In Kubernetes, scoped service credentials are created by configuring a "Role" resource in a Kubernetes cluster.
 When you attach the role to a "ServiceAccount", Kubernetes generates a bearer token that permits access.

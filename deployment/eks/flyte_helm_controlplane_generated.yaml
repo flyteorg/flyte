@@ -1005,7 +1005,7 @@ spec:
                 name: ssl-redirect
                 port:
                   name: use-annotation
-          # This is useful only for frontend development
+          # This is useful only for frontend development.
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific
@@ -1014,7 +1014,7 @@ spec:
                 name: flyteadmin
                 port:
                   number: 87
-          # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
+          # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml.
           - path: /console
             pathType: ImplementationSpecific
             backend:
@@ -1158,7 +1158,7 @@ spec:
                   number: 80
       host: null
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
-# enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
+# be enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
 # Source: flyte-core/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1
