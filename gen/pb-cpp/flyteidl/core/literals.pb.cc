@@ -490,6 +490,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fliterals_2eproto:
   offsetof(::flyteidl::core::LiteralDefaultTypeInternal, scalar_),
   offsetof(::flyteidl::core::LiteralDefaultTypeInternal, collection_),
   offsetof(::flyteidl::core::LiteralDefaultTypeInternal, map_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::Literal, hash_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Literal, value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::LiteralCollection, _internal_metadata_),
@@ -575,16 +576,16 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 50, -1, sizeof(::flyteidl::core::StructuredDataset)},
   { 57, -1, sizeof(::flyteidl::core::Scalar)},
   { 71, -1, sizeof(::flyteidl::core::Literal)},
-  { 80, -1, sizeof(::flyteidl::core::LiteralCollection)},
-  { 86, 93, sizeof(::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse)},
-  { 95, -1, sizeof(::flyteidl::core::LiteralMap)},
-  { 101, -1, sizeof(::flyteidl::core::BindingDataCollection)},
-  { 107, 114, sizeof(::flyteidl::core::BindingDataMap_BindingsEntry_DoNotUse)},
-  { 116, -1, sizeof(::flyteidl::core::BindingDataMap)},
-  { 122, -1, sizeof(::flyteidl::core::BindingData)},
-  { 132, -1, sizeof(::flyteidl::core::Binding)},
-  { 139, -1, sizeof(::flyteidl::core::KeyValuePair)},
-  { 146, -1, sizeof(::flyteidl::core::RetryStrategy)},
+  { 81, -1, sizeof(::flyteidl::core::LiteralCollection)},
+  { 87, 94, sizeof(::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse)},
+  { 96, -1, sizeof(::flyteidl::core::LiteralMap)},
+  { 102, -1, sizeof(::flyteidl::core::BindingDataCollection)},
+  { 108, 115, sizeof(::flyteidl::core::BindingDataMap_BindingsEntry_DoNotUse)},
+  { 117, -1, sizeof(::flyteidl::core::BindingDataMap)},
+  { 123, -1, sizeof(::flyteidl::core::BindingData)},
+  { 133, -1, sizeof(::flyteidl::core::Binding)},
+  { 140, -1, sizeof(::flyteidl::core::KeyValuePair)},
+  { 147, -1, sizeof(::flyteidl::core::RetryStrategy)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -646,38 +647,38 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto[] =
   "dl.core.ErrorH\000\022*\n\007generic\030\007 \001(\0132\027.googl"
   "e.protobuf.StructH\000\022>\n\022structured_datase"
   "t\030\010 \001(\0132 .flyteidl.core.StructuredDatase"
-  "tH\000B\007\n\005value\"\235\001\n\007Literal\022\'\n\006scalar\030\001 \001(\013"
+  "tH\000B\007\n\005value\"\253\001\n\007Literal\022\'\n\006scalar\030\001 \001(\013"
   "2\025.flyteidl.core.ScalarH\000\0226\n\ncollection\030"
   "\002 \001(\0132 .flyteidl.core.LiteralCollectionH"
   "\000\022(\n\003map\030\003 \001(\0132\031.flyteidl.core.LiteralMa"
-  "pH\000B\007\n\005value\"=\n\021LiteralCollection\022(\n\010lit"
-  "erals\030\001 \003(\0132\026.flyteidl.core.Literal\"\220\001\n\n"
-  "LiteralMap\0229\n\010literals\030\001 \003(\0132\'.flyteidl."
-  "core.LiteralMap.LiteralsEntry\032G\n\rLiteral"
-  "sEntry\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.fly"
-  "teidl.core.Literal:\0028\001\"E\n\025BindingDataCol"
-  "lection\022,\n\010bindings\030\001 \003(\0132\032.flyteidl.cor"
-  "e.BindingData\"\234\001\n\016BindingDataMap\022=\n\010bind"
-  "ings\030\001 \003(\0132+.flyteidl.core.BindingDataMa"
-  "p.BindingsEntry\032K\n\rBindingsEntry\022\013\n\003key\030"
-  "\001 \001(\t\022)\n\005value\030\002 \001(\0132\032.flyteidl.core.Bin"
-  "dingData:\0028\001\"\334\001\n\013BindingData\022\'\n\006scalar\030\001"
-  " \001(\0132\025.flyteidl.core.ScalarH\000\022:\n\ncollect"
-  "ion\030\002 \001(\0132$.flyteidl.core.BindingDataCol"
-  "lectionH\000\0221\n\007promise\030\003 \001(\0132\036.flyteidl.co"
-  "re.OutputReferenceH\000\022,\n\003map\030\004 \001(\0132\035.flyt"
-  "eidl.core.BindingDataMapH\000B\007\n\005value\"C\n\007B"
-  "inding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001(\0132\032.f"
-  "lyteidl.core.BindingData\"*\n\014KeyValuePair"
-  "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRetryStr"
-  "ategy\022\017\n\007retries\030\005 \001(\rB6Z4github.com/fly"
-  "teorg/flyteidl/gen/pb-go/flyteidl/coreb\006"
-  "proto3"
+  "pH\000\022\014\n\004hash\030\004 \001(\tB\007\n\005value\"=\n\021LiteralCol"
+  "lection\022(\n\010literals\030\001 \003(\0132\026.flyteidl.cor"
+  "e.Literal\"\220\001\n\nLiteralMap\0229\n\010literals\030\001 \003"
+  "(\0132\'.flyteidl.core.LiteralMap.LiteralsEn"
+  "try\032G\n\rLiteralsEntry\022\013\n\003key\030\001 \001(\t\022%\n\005val"
+  "ue\030\002 \001(\0132\026.flyteidl.core.Literal:\0028\001\"E\n\025"
+  "BindingDataCollection\022,\n\010bindings\030\001 \003(\0132"
+  "\032.flyteidl.core.BindingData\"\234\001\n\016BindingD"
+  "ataMap\022=\n\010bindings\030\001 \003(\0132+.flyteidl.core"
+  ".BindingDataMap.BindingsEntry\032K\n\rBinding"
+  "sEntry\022\013\n\003key\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032.fly"
+  "teidl.core.BindingData:\0028\001\"\334\001\n\013BindingDa"
+  "ta\022\'\n\006scalar\030\001 \001(\0132\025.flyteidl.core.Scala"
+  "rH\000\022:\n\ncollection\030\002 \001(\0132$.flyteidl.core."
+  "BindingDataCollectionH\000\0221\n\007promise\030\003 \001(\013"
+  "2\036.flyteidl.core.OutputReferenceH\000\022,\n\003ma"
+  "p\030\004 \001(\0132\035.flyteidl.core.BindingDataMapH\000"
+  "B\007\n\005value\"C\n\007Binding\022\013\n\003var\030\001 \001(\t\022+\n\007bin"
+  "ding\030\002 \001(\0132\032.flyteidl.core.BindingData\"*"
+  "\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001"
+  "(\t\" \n\rRetryStrategy\022\017\n\007retries\030\005 \001(\rB6Z4"
+  "github.com/flyteorg/flyteidl/gen/pb-go/f"
+  "lyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fliterals_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fliterals_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto,
-  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 2206,
+  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 2220,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fliterals_2eproto() {
@@ -4566,6 +4567,7 @@ void Literal::set_allocated_map(::flyteidl::core::LiteralMap* map) {
 const int Literal::kScalarFieldNumber;
 const int Literal::kCollectionFieldNumber;
 const int Literal::kMapFieldNumber;
+const int Literal::kHashFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Literal::Literal()
@@ -4577,6 +4579,10 @@ Literal::Literal(const Literal& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  hash_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.hash().size() > 0) {
+    hash_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hash_);
+  }
   clear_has_value();
   switch (from.value_case()) {
     case kScalar: {
@@ -4601,6 +4607,7 @@ Literal::Literal(const Literal& from)
 void Literal::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base);
+  hash_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_value();
 }
 
@@ -4610,6 +4617,7 @@ Literal::~Literal() {
 }
 
 void Literal::SharedDtor() {
+  hash_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (has_value()) {
     clear_value();
   }
@@ -4653,6 +4661,7 @@ void Literal::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  hash_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_value();
   _internal_metadata_.Clear();
 }
@@ -4709,6 +4718,22 @@ const char* Literal::_InternalParse(const char* begin, const char* end, void* ob
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // string hash = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.core.Literal.hash");
+        object = msg->mutable_hash();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -4724,6 +4749,10 @@ const char* Literal::_InternalParse(const char* begin, const char* end, void* ob
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -4766,6 +4795,21 @@ bool Literal::MergePartialFromCodedStream(
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_map()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string hash = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_hash()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->hash().data(), static_cast<int>(this->hash().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.Literal.hash"));
         } else {
           goto handle_unusual;
         }
@@ -4817,6 +4861,16 @@ void Literal::SerializeWithCachedSizes(
       3, HasBitSetters::map(this), output);
   }
 
+  // string hash = 4;
+  if (this->hash().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hash().data(), static_cast<int>(this->hash().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.Literal.hash");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->hash(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -4851,6 +4905,17 @@ void Literal::SerializeWithCachedSizes(
         3, HasBitSetters::map(this), target);
   }
 
+  // string hash = 4;
+  if (this->hash().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hash().data(), static_cast<int>(this->hash().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.Literal.hash");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->hash(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -4871,6 +4936,13 @@ size_t Literal::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string hash = 4;
+  if (this->hash().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->hash());
+  }
 
   switch (value_case()) {
     // .flyteidl.core.Scalar scalar = 1;
@@ -4925,6 +4997,10 @@ void Literal::MergeFrom(const Literal& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.hash().size() > 0) {
+
+    hash_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hash_);
+  }
   switch (from.value_case()) {
     case kScalar: {
       mutable_scalar()->::flyteidl::core::Scalar::MergeFrom(from.scalar());
@@ -4969,6 +5045,8 @@ void Literal::Swap(Literal* other) {
 void Literal::InternalSwap(Literal* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  hash_.Swap(&other->hash_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(value_, other->value_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }

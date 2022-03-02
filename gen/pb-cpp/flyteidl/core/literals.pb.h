@@ -1524,6 +1524,20 @@ class Literal final :
 
   // accessors -------------------------------------------------------
 
+  // string hash = 4;
+  void clear_hash();
+  static const int kHashFieldNumber = 4;
+  const ::std::string& hash() const;
+  void set_hash(const ::std::string& value);
+  #if LANG_CXX11
+  void set_hash(::std::string&& value);
+  #endif
+  void set_hash(const char* value);
+  void set_hash(const char* value, size_t size);
+  ::std::string* mutable_hash();
+  ::std::string* release_hash();
+  void set_allocated_hash(::std::string* hash);
+
   // .flyteidl.core.Scalar scalar = 1;
   bool has_scalar() const;
   void clear_scalar();
@@ -1564,6 +1578,7 @@ class Literal final :
   inline void clear_has_value();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr hash_;
   union ValueUnion {
     ValueUnion() {}
     ::flyteidl::core::Scalar* scalar_;
@@ -3898,6 +3913,59 @@ inline ::flyteidl::core::LiteralMap* Literal::mutable_map() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.Literal.map)
   return value_.map_;
+}
+
+// string hash = 4;
+inline void Literal::clear_hash() {
+  hash_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Literal::hash() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Literal.hash)
+  return hash_.GetNoArena();
+}
+inline void Literal::set_hash(const ::std::string& value) {
+  
+  hash_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Literal.hash)
+}
+#if LANG_CXX11
+inline void Literal::set_hash(::std::string&& value) {
+  
+  hash_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Literal.hash)
+}
+#endif
+inline void Literal::set_hash(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  hash_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Literal.hash)
+}
+inline void Literal::set_hash(const char* value, size_t size) {
+  
+  hash_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Literal.hash)
+}
+inline ::std::string* Literal::mutable_hash() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Literal.hash)
+  return hash_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Literal::release_hash() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Literal.hash)
+  
+  return hash_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Literal::set_allocated_hash(::std::string* hash) {
+  if (hash != nullptr) {
+    
+  } else {
+    
+  }
+  hash_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), hash);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Literal.hash)
 }
 
 inline bool Literal::has_value() const {
