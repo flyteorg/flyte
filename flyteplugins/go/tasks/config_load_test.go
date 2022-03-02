@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
@@ -27,10 +26,6 @@ func TestLoadConfig(t *testing.T) {
 
 	err := configAccessor.UpdateConfig(context.TODO())
 	assert.NoError(t, err)
-
-	t.Run("root-config-test", func(t *testing.T) {
-		assert.Equal(t, 1, len(pluginsConfig.GetConfig().EnabledPlugins))
-	})
 
 	t.Run("k8s-config-test", func(t *testing.T) {
 

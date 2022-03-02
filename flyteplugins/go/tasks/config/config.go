@@ -2,11 +2,7 @@ package config
 
 import (
 	"github.com/flyteorg/flytestdlib/config"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 )
-
-//go:generate pflags Config
 
 const configSectionKey = "plugins"
 
@@ -18,12 +14,6 @@ var (
 
 // Top level plugins config.
 type Config struct {
-	EnabledPlugins []string `json:"enabled-plugins" pflag:"[]string{\"*\"},List of enabled plugins, default value is to enable all plugins."`
-}
-
-func (cfg Config) IsEnabled(pluginToCheck string) bool {
-	return cfg.EnabledPlugins != nil && len(cfg.EnabledPlugins) >= 1 &&
-		(cfg.EnabledPlugins[0] == "*" || utils.Contains(cfg.EnabledPlugins, pluginToCheck))
 }
 
 // Retrieves the current config value or default.

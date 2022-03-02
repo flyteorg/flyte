@@ -445,7 +445,6 @@ func init() {
 			ResourceToWatch:     &sparkOp.SparkApplication{},
 			Plugin:              sparkResourceHandler{},
 			IsDefault:           false,
-			DefaultForTaskTypes: []pluginsCore.TaskType{sparkTaskType},
 		})
 }
 

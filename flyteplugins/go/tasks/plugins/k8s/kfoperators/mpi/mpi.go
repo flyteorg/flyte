@@ -161,6 +161,5 @@ func init() {
 			ResourceToWatch:     &mpi.MPIJob{},
 			Plugin:              mpiOperatorResourceHandler{},
 			IsDefault:           false,
-			DefaultForTaskTypes: []pluginsCore.TaskType{common.MPITaskType},
 		})
 }

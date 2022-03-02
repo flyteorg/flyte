@@ -153,6 +153,5 @@ func init() {
 			RegisteredTaskTypes: []core.TaskType{prestoTaskType},
 			LoadPlugin:          ExecutorLoader,
 			IsDefault:           false,
-			DefaultForTaskTypes: []core.TaskType{prestoTaskType},
 		})
 }
