@@ -155,6 +155,5 @@ func init() {
 			ResourceToWatch:     &tfOp.TFJob{},
 			Plugin:              tensorflowOperatorResourceHandler{},
 			IsDefault:           false,
-			DefaultForTaskTypes: []pluginsCore.TaskType{common.TensorflowTaskType},
 		})
 }

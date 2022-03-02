@@ -192,7 +192,6 @@ func init() {
 			RegisteredTaskTypes: []core.TaskType{arrayTaskType, array.AwsBatchTaskType},
 			LoadPlugin:          createNewExecutorPlugin,
 			IsDefault:           false,
-			DefaultForTaskTypes: []core.TaskType{arrayTaskType, array.AwsBatchTaskType},
 		})
 }
 

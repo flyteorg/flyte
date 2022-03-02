@@ -142,6 +142,5 @@ func init() {
 			ResourceToWatch:     &ptOp.PyTorchJob{},
 			Plugin:              pytorchOperatorResourceHandler{},
 			IsDefault:           false,
-			DefaultForTaskTypes: []pluginsCore.TaskType{common.PytorchTaskType},
 		})
 }

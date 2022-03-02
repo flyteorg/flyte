@@ -28,10 +28,6 @@ type PluginEntry struct {
 	// Boolean that indicates if this plugin can be used as the default for unknown task types. There can only be
 	// one default in the system
 	IsDefault bool
-	// A list of all task types for which this plugin should be default handler when multiple registered plugins
-	// support the same task type. This must be a subset of RegisteredTaskTypes and at most one default per task type
-	// is supported.
-	DefaultForTaskTypes []TaskType
 }
 
 // System level properties that this Plugin supports
