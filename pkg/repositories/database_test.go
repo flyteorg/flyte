@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"io/ioutil"
 	"testing"
 
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -36,6 +37,20 @@ func TestGetGormLogLevel(t *testing.T) {
 	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), nil))
 }
 
+func TestResolvePassword(t *testing.T) {
+	password := "123abc"
+	tmpFile, err := ioutil.TempFile("", "prefix")
+	if err != nil {
+		t.Errorf("Couldn't open temp file: %v", err)
+	}
+	defer tmpFile.Close()
+	if _, err = tmpFile.WriteString(password); err != nil {
+		t.Errorf("Couldn't write to temp file: %v", err)
+	}
+	resolvedPassword := resolvePassword(context.TODO(), "", tmpFile.Name())
+	assert.Equal(t, resolvedPassword, password)
+}
+
 func TestGetPostgresDsn(t *testing.T) {
 	pgConfig := runtimeInterfaces.PostgresConfig{
 		Host:         "localhost",
@@ -59,5 +74,19 @@ func TestGetPostgresDsn(t *testing.T) {
 		pgConfig.ExtraOptions = ""
 		dsn := getPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass ", dsn)
+	})
+	t.Run("with password path", func(t *testing.T) {
+		password := "123abc"
+		tmpFile, err := ioutil.TempFile("", "prefix")
+		if err != nil {
+			t.Errorf("Couldn't open temp file: %v", err)
+		}
+		defer tmpFile.Close()
+		if _, err = tmpFile.WriteString(password); err != nil {
+			t.Errorf("Couldn't write to temp file: %v", err)
+		}
+		pgConfig.PasswordPath = tmpFile.Name()
+		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=123abc ", dsn)
 	})
 }
