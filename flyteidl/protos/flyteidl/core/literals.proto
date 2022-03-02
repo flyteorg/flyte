@@ -96,6 +96,11 @@ message Literal {
         // A map of strings to literals.
         LiteralMap map = 3;
     }
+
+    // A hash representing this literal.
+    // This is used for caching purposes. For more details refer to RFC 1893
+    // (https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)
+    string hash = 4;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
