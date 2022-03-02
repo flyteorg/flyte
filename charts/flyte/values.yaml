@@ -1,9 +1,9 @@
+--- # ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
 # settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
 # Flyteconsole
-# ---------------------------------------------------------------------
 flyte:
   #
   # FLYTEADMIN SETTINGS
@@ -19,6 +19,19 @@ flyte:
       tag: v0.6.104 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
+    # -- Additional flyteadmin container environment variables
+    #
+    # e.g. SendGrid's API key
+    #  - name: SENDGRID_API_KEY
+    #    value: "<your sendgrid api key>"
+    #
+    # e.g. secret environment variable (you can combine it with .additionalVolumes):
+    # - name: SENDGRID_API_KEY
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: sendgrid-secret
+    #       key: api_key
+    env: []
     # -- Default resources requests and limits for Flyteadmin deployment
     resources:
       limits:
@@ -359,7 +372,6 @@ flyte:
           name: staging
         - id: production
           name: production
-
 
     # -- FlyteAdmin server configuration
     adminServer:
