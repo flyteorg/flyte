@@ -59,7 +59,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 	}
 	timer := r.metrics.GetDuration.Start()
 	var record models.Resource
-	tx := r.db.Omit("id").FirstOrCreate(&record, models.Resource{
+	tx := r.db.FirstOrCreate(&record, models.Resource{
 		Project:      input.Project,
 		Domain:       input.Domain,
 		Workflow:     input.Workflow,

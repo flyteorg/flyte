@@ -36,6 +36,48 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 	assert.True(t, query.Triggered)
 }
 
+func getMockResourceResponseFromDb(expected models.Resource) map[string]interface{} {
+	metadata := make(map[string]interface{})
+	metadata["resource_type"] = expected.ResourceType
+	metadata["project"] = expected.Project
+	metadata["domain"] = expected.Domain
+	metadata["priority"] = 2
+	return metadata
+}
+
+func TestUpdateWorkflowAttributes_WithExisting(t *testing.T) {
+	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	results := make([]map[string]interface{}, 0)
+	metadata := getMockResourceResponseFromDb(models.Resource{
+		ResourceType: resourceType.String(),
+		Project:      project,
+		Domain:       domain,
+		Priority:     2,
+	})
+	results = append(results, metadata)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	mockSelectQuery := GlobalMock.NewMock()
+	mockSelectQuery.WithQuery(
+		`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."resource_type" = $3 AND "resources"."priority" = $4 ORDER BY "resources"."id" LIMIT 1`).WithReply(results)
+
+	mockSaveQuery := GlobalMock.NewMock()
+	mockSaveQuery.WithQuery(
+		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
+
+	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
+		ResourceType: resourceType.String(),
+		Project:      project,
+		Domain:       domain,
+		Priority:     2,
+	})
+	assert.NoError(t, err)
+	assert.True(t, mockSelectQuery.Triggered)
+	assert.True(t, mockSaveQuery.Triggered)
+}
+
 func TestGetWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
