@@ -10,8 +10,8 @@ or just executions. In other words, a workflow is a template for an ordered task
 Flyte workflows are defined in ``protobuf`` and the Flytekit SDK facilitates writing workflows. Users can define workflows as a collection of nodes.
 Nodes within a workflow can produce outputs that subsequent nodes consume as inputs. These dependencies dictate the workflow structure.
 
-Workflows written using the SDK do not need to explicitly define the nodes to enclose execution units (tasks, subworkflows, launch plans);
-they will be injected by the SDK and captured at registration time.
+Workflows written using the SDK do not need to explicitly define nodes to enclose execution units (tasks, sub-workflows, launch plans);
+these will be injected by the SDK and captured at registration time.
 
 Structure
 ---------
@@ -27,7 +27,7 @@ Workflow structure is flexible because:
 - A workflow can contain multiple nodes in all sorts of arrangements.
 - A workflow can launch other workflows as well.
 
-At execution time, node executions are triggered as soon as their inputs are available.
+At execution time, node executions will be triggered as soon as their inputs are available.
 
 **Workflow nodes naturally run in parallel when possible**.
 For example, when a workflow has five independent nodes, i.e., when these five nodes don't consume outputs produced by other nodes,
@@ -36,7 +36,7 @@ Flyte runs these nodes in parallel in accordance with the data and resource cons
 Flyte-Specific Structure
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-During :ref:`registration <divedeep-registration>`, Flyte validates the workflow structure and saves the workflow.
+During :ref: `registration <divedeep-registration>`, Flyte validates the workflow structure and saves the workflow.
 The registration process updates the workflow graph too.
 A compiled workflow will always have a start and end node injected into the workflow graph.
 In addition, a failure handler will catch and process execution failures.
