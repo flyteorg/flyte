@@ -1158,6 +1158,7 @@ spec:
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
+        app: flytepropeller
     spec:
       securityContext:
         fsGroup: 65534
