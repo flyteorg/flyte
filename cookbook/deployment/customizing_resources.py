@@ -31,7 +31,7 @@ Flytekit makes it possible to specify these requirements declaratively and close
 #
 # The ``storage`` resources option is not yet supported, but coming soon.
 #
-# The acutal values follow the `kubernetes convention <https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#resource-units-in-kubernetes>`_.
+# The actual values follow the `kubernetes convention <https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#resource-units-in-kubernetes>`_.
 
 
 import typing
@@ -48,23 +48,21 @@ def count_unique_numbers(x: typing.List[int]) -> int:
 
 
 # %%
-# Now lets create a dummy task that squares the number
+# Let's create a dummy task that determines the square of a number.
 @task
 def square(x: int) -> int:
     return x * x
 
 
 # %%
-# The tasks decorated with memory and storage hints can be used like regular tasks in a workflow, as follows
-
-
+# The tasks decorated with memory and storage hints can be used like regular tasks in a workflow.
 @workflow
 def my_workflow(x: typing.List[int]) -> int:
     return square(x=count_unique_numbers(x=x))
 
 
 # %%
-# The workflow and task can be executed locally
+# The workflow and task can be executed locally.
 if __name__ == "__main__":
     print(count_unique_numbers(x=[1, 1, 2]))
     print(my_workflow(x=[1, 1, 2]))
