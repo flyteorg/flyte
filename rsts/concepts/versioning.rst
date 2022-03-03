@@ -26,7 +26,7 @@ Versioning is required to:
 - Execute multiple experiments in production, which may use different training or data processing algorithms.
 - Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy.
 
-Operational Benefits of Completely Versioned Workflows / Pipelines
+Operational Benefits of Completely Versioned Workflows/Pipelines
 -------------------------------------------------------------------
 
 Since the entire workflow in Flyte is completely versioned and all tasks and entities are immutable, it is possible to completely change
