@@ -28,7 +28,7 @@ var matchingAttributes = &admin.MatchingAttributes{
 }
 
 func TestUpdateClusterResourceAttributes(t *testing.T) {
-	matchingAttributes = &admin.MatchingAttributes{
+	clusterMatchingAttributes := &admin.MatchingAttributes{
 		Target: &admin.MatchingAttributes_ClusterResourceAttributes{
 			ClusterResourceAttributes: &admin.ClusterResourceAttributes{
 				Attributes: map[string]string{
@@ -53,7 +53,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: clusterMatchingAttributes,
 		},
 	}
 
@@ -80,11 +80,11 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: clusterMatchingAttributes,
 		},
 	}, response))
 
-	var updatedMatchingAttributes = &admin.MatchingAttributes{
+	var updatedClusterMatchingAttributes = &admin.MatchingAttributes{
 		Target: &admin.MatchingAttributes_ClusterResourceAttributes{
 			ClusterResourceAttributes: &admin.ClusterResourceAttributes{
 				Attributes: map[string]string{
@@ -97,7 +97,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: updatedMatchingAttributes,
+			MatchingAttributes: updatedClusterMatchingAttributes,
 		},
 	}
 
@@ -123,7 +123,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: updatedMatchingAttributes,
+			MatchingAttributes: updatedClusterMatchingAttributes,
 		},
 	}, response))
 
