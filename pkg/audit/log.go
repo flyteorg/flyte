@@ -61,7 +61,7 @@ func (b *logBuilder) WithResponse(sentAt time.Time, err error) LogBuilder {
 	if err != nil {
 		switch err := err.(type) {
 		case errors.FlyteAdminError:
-			responseCode = err.(errors.FlyteAdminError).Code().String()
+			responseCode = err.Code().String()
 		default:
 			responseCode = codes.Internal.String()
 		}

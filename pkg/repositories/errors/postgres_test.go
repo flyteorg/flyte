@@ -4,7 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	flyteAdminError "github.com/flyteorg/flyteadmin/pkg/errors"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/jackc/pgconn"
@@ -15,8 +14,8 @@ import (
 func TestToFlyteAdminError_InvalidPqError(t *testing.T) {
 	err := errors.New("foo")
 	transformedErr := NewPostgresErrorTransformer(mockScope.NewTestScope()).ToFlyteAdminError(err)
-	assert.Equal(t, codes.Internal, transformedErr.(flyteAdminError.FlyteAdminError).Code())
-	assert.Equal(t, "unexpected error type for: foo", transformedErr.(flyteAdminError.FlyteAdminError).Error())
+	assert.Equal(t, codes.Internal, transformedErr.Code())
+	assert.Equal(t, "unexpected error type for: foo", transformedErr.Error())
 }
 
 func TestToFlyteAdminError_UniqueConstraintViolation(t *testing.T) {
@@ -25,9 +24,9 @@ func TestToFlyteAdminError_UniqueConstraintViolation(t *testing.T) {
 		Message: "message",
 	}
 	transformedErr := NewPostgresErrorTransformer(mockScope.NewTestScope()).ToFlyteAdminError(err)
-	assert.Equal(t, codes.AlreadyExists, transformedErr.(flyteAdminError.FlyteAdminError).Code())
+	assert.Equal(t, codes.AlreadyExists, transformedErr.Code())
 	assert.Equal(t, "value with matching already exists (message)",
-		transformedErr.(flyteAdminError.FlyteAdminError).Error())
+		transformedErr.Error())
 }
 
 func TestToFlyteAdminError_UnrecognizedPostgresError(t *testing.T) {
@@ -36,7 +35,7 @@ func TestToFlyteAdminError_UnrecognizedPostgresError(t *testing.T) {
 		Message: "message",
 	}
 	transformedErr := NewPostgresErrorTransformer(mockScope.NewTestScope()).ToFlyteAdminError(err)
-	assert.Equal(t, codes.Unknown, transformedErr.(flyteAdminError.FlyteAdminError).Code())
+	assert.Equal(t, codes.Unknown, transformedErr.Code())
 	assert.Equal(t, "failed database operation with message",
-		transformedErr.(flyteAdminError.FlyteAdminError).Error())
+		transformedErr.Error())
 }
