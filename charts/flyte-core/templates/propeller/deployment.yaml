@@ -29,6 +29,7 @@ spec:
       labels: {{ include "flytepropeller-manager.labels" . | nindent 8 }}
       {{- else }}
       labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+        app: flytepropeller
       {{- end }}
     spec:
       securityContext:
