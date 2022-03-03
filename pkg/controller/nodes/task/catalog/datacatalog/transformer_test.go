@@ -340,3 +340,559 @@ func TestDatasetIDToIdentifier(t *testing.T) {
 	assert.Equal(t, "d", id.Domain)
 	assert.Equal(t, "v", id.Version)
 }
+
+func TestGenerateArtifactTagName_LiteralsWithHashSet(t *testing.T) {
+	tests := []struct {
+		name            string
+		literal         *core.Literal
+		expectedLiteral *core.Literal
+	}{
+		{
+			name:            "single literal where hash is not set",
+			literal:         coreutils.MustMakeLiteral(42),
+			expectedLiteral: coreutils.MustMakeLiteral(42),
+		},
+		{
+			name: "single literal containing hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_StructuredDataset{
+							StructuredDataset: &core.StructuredDataset{
+								Uri: "my-blob-stora://some-address",
+								Metadata: &core.StructuredDatasetMetadata{
+									StructuredDatasetType: &core.StructuredDatasetType{
+										Format: "my-columnar-data-format",
+									},
+								},
+							},
+						},
+					},
+				},
+				Hash: "abcde",
+			},
+			expectedLiteral: &core.Literal{
+				Value: nil,
+				Hash:  "abcde",
+			},
+		},
+		{
+			name: "list of literals containing a single item where literal sets its hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "hash1",
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: nil,
+								Hash:  "hash1",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list of literals containing two items where each literal sets its hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "hash1",
+							},
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://another-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "hash2",
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: nil,
+								Hash:  "hash1",
+							},
+							&core.Literal{
+								Value: nil,
+								Hash:  "hash2",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list of literals containing two items where only one literal has its hash set",
+			literal: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "hash1",
+							},
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://another-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: nil,
+								Hash:  "hash1",
+							},
+							&core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://another-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "map of literals containing a single item where literal sets its hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"literal1": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "hash-42",
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"literal1": &core.Literal{
+								Value: nil,
+								Hash:  "hash-42",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "map of literals containing a three items where only one literal sets its hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"literal1": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							"literal2-set-its-hash": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address-for-literal-2",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+								Hash: "literal-2-hash",
+							},
+							"literal3": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address-for-literal-3",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"literal1": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							"literal2-set-its-hash": &core.Literal{
+								Value: nil,
+								Hash:  "literal-2-hash",
+							},
+							"literal3": &core.Literal{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_StructuredDataset{
+											StructuredDataset: &core.StructuredDataset{
+												Uri: "my-blob-stora://some-address-for-literal-3",
+												Metadata: &core.StructuredDatasetMetadata{
+													StructuredDatasetType: &core.StructuredDatasetType{
+														Format: "my-columnar-data-format",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list of map of literals containing a mixture of literals have their hashes set or not set",
+			literal: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Map{
+									Map: &core.LiteralMap{
+										Literals: map[string]*core.Literal{
+											"literal1": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+											"literal2-set-its-hash": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-literal-2",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+												Hash: "literal-2-hash",
+											},
+											"literal3": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-literal-3",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							&core.Literal{
+								Value: &core.Literal_Map{
+									Map: &core.LiteralMap{
+										Literals: map[string]*core.Literal{
+											"another-literal-1": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-another-literal-1",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+												Hash: "another-literal-1-hash",
+											},
+											"another-literal2-set-its-hash": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-literal-2",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedLiteral: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Map{
+									Map: &core.LiteralMap{
+										Literals: map[string]*core.Literal{
+											"literal1": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+											"literal2-set-its-hash": &core.Literal{
+												Value: nil,
+												Hash:  "literal-2-hash",
+											},
+											"literal3": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-literal-3",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							&core.Literal{
+								Value: &core.Literal_Map{
+									Map: &core.LiteralMap{
+										Literals: map[string]*core.Literal{
+											"another-literal-1": &core.Literal{
+												Value: nil,
+												Hash:  "another-literal-1-hash",
+											},
+											"another-literal2-set-its-hash": &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_StructuredDataset{
+															StructuredDataset: &core.StructuredDataset{
+																Uri: "my-blob-stora://some-address-for-literal-2",
+																Metadata: &core.StructuredDatasetMetadata{
+																	StructuredDatasetType: &core.StructuredDatasetType{
+																		Format: "my-columnar-data-format",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expectedLiteral, hashify(tt.literal))
+
+			// Double-check that generating a tag is successful
+			literalMap := &core.LiteralMap{Literals: map[string]*core.Literal{"o0": tt.literal}}
+			tag, err := GenerateArtifactTagName(context.TODO(), literalMap)
+			assert.NoError(t, err)
+			assert.NotEmpty(t, tag)
+		})
+	}
+}
