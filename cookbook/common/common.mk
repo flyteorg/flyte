@@ -37,6 +37,3 @@ setup: install-piptools # Install requirements
 .PHONY: lint
 lint:  # Run linters
 	flake8 .
-
-.PHONY: extra_images
-extra_images: ;

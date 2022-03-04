@@ -36,7 +36,7 @@ calculate_ellipse_area_shell = ContainerTask(
     output_data_dir="/var/outputs",
     inputs=kwtypes(a=float, b=float),
     outputs=kwtypes(area=float, metadata=str),
-    image="rawcontainers-shell:v1",
+    image="ghcr.io/flyteorg/rawcontainers-shell:v1",
     command=[
         "./calculate-ellipse-area.sh",
         "/var/inputs",
@@ -50,7 +50,7 @@ calculate_ellipse_area_python = ContainerTask(
     output_data_dir="/var/outputs",
     inputs=kwtypes(a=float, b=float),
     outputs=kwtypes(area=float, metadata=str),
-    image="rawcontainers-python:v1",
+    image="ghcr.io/flyteorg/rawcontainers-python:v1",
     command=[
         "python",
         "calculate-ellipse-area.py",
@@ -65,7 +65,7 @@ calculate_ellipse_area_r = ContainerTask(
     output_data_dir="/var/outputs",
     inputs=kwtypes(a=float, b=float),
     outputs=kwtypes(area=float, metadata=str),
-    image="rawcontainers-r:v1",
+    image="ghcr.io/flyteorg/rawcontainers-r:v1",
     command=[
         "Rscript",
         "--vanilla",
@@ -81,7 +81,7 @@ calculate_ellipse_area_haskell = ContainerTask(
     output_data_dir="/var/outputs",
     inputs=kwtypes(a=float, b=float),
     outputs=kwtypes(area=float, metadata=str),
-    image="rawcontainers-haskell:v1",
+    image="ghcr.io/flyteorg/rawcontainers-haskell:v1",
     command=[
         "./calculate-ellipse-area",
         "/var/inputs",
@@ -95,7 +95,7 @@ calculate_ellipse_area_julia = ContainerTask(
     output_data_dir="/var/outputs",
     inputs=kwtypes(a=float, b=float),
     outputs=kwtypes(area=float, metadata=str),
-    image="rawcontainers-julia:v1",
+    image="ghcr.io/flyteorg/rawcontainers-julia:v1",
     command=[
         "julia",
         "calculate-ellipse-area.jl",
