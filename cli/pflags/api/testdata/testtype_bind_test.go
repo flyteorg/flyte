@@ -144,7 +144,7 @@ func TestTestType_SetFlags(t *testing.T) {
 	t.Run("Test_ints", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_TestType([]int{12, 1}, ",")
+			testValue := join_TestType(DefaultTestType.IntArray, ",")
 
 			cmdFlags.Set("ints", testValue)
 			if vIntSlice, err := cmdFlags.GetIntSlice("ints"); err == nil {
@@ -158,7 +158,7 @@ func TestTestType_SetFlags(t *testing.T) {
 	t.Run("Test_strs", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_TestType([]string{"12", "1"}, ",")
+			testValue := join_TestType(DefaultTestType.StringArray, ",")
 
 			cmdFlags.Set("strs", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("strs"); err == nil {
@@ -172,7 +172,7 @@ func TestTestType_SetFlags(t *testing.T) {
 	t.Run("Test_complexArr", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1,1"
+			testValue := DefaultTestType.ComplexJSONArray
 
 			cmdFlags.Set("complexArr", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("complexArr"); err == nil {
