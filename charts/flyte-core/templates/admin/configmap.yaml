@@ -6,6 +6,9 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
+{{- with .Values.configmap.clusters }}
+  clusters: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- with .Values.db.admin }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
