@@ -342,6 +342,9 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 		case *types.Slice:
 			logger.Infof(ctx, "[%v] is of a slice type with default value [%v].", tag.Name, tag.DefaultValue)
 			defaultValue := tag.DefaultValue
+			if len(defaultValueAccessor) > 0 {
+				defaultValue = appendAccessors(defaultValueAccessor, fieldPath, variable.Name())
+			}
 
 			f, err := buildFieldForSlice(logger.WithIndent(ctx, indent), t, tag.Name, variable.Name(), tag.Usage, defaultValue, bindDefaultVar)
 			if err != nil {
