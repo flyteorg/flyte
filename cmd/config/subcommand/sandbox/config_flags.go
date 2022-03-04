@@ -54,6 +54,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), DefaultConfig.Version, "Version of flyte. Only supports flyte releases greater than v0.10.0")
 	cmdFlags.StringVar(&DefaultConfig.Image, fmt.Sprintf("%v%v", prefix, "image"), DefaultConfig.Image, "Optional. Provide a fully qualified path to a Flyte compliant docker image.")
 	cmdFlags.BoolVar(&DefaultConfig.Prerelease, fmt.Sprintf("%v%v", prefix, "pre"), DefaultConfig.Prerelease, "Optional. Pre release Version of flyte will be used for sandbox.")
+	cmdFlags.StringSliceVar(&DefaultConfig.Env, fmt.Sprintf("%v%v", prefix, "env"), DefaultConfig.Env, "Optional. Provide Env variable in key=value format which can be passed to sandbox container.")
 	cmdFlags.Var(&DefaultConfig.ImagePullPolicy, fmt.Sprintf("%v%v", prefix, "imagePullPolicy"), "Optional. Defines the image pull behavior [Always/IfNotPresent/Never]")
 	return cmdFlags
 }

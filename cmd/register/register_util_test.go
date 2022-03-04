@@ -276,8 +276,7 @@ func TestRegisterFile(t *testing.T) {
 		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
-		assert.Equal(t, "Error hydrating spec due to param values are missing on scheduled workflow for"+
-			" the following params [var1 var2]. Either specify them having a default or fixed value", results[0].Info)
+		assert.Contains(t, results[0].Info, "param values are missing on scheduled workflow for the following params")
 		assert.NotNil(t, err)
 	})
 	t.Run("Non existent file", func(t *testing.T) {
@@ -709,8 +708,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 		}
 		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
 		assert.NotNil(t, err)
-		assert.Equal(t, "param values are missing on scheduled workflow for the following params [var1 var2]."+
-			" Either specify them having a default or fixed value", err.Error())
+		assert.Contains(t, err.Error(), "param values are missing on scheduled workflow for the following params")
 	})
 	t.Run("launchplan spec non empty schedule required param success", func(t *testing.T) {
 		setup()

@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_env", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(DefaultConfig.Env, ",")
+
+			cmdFlags.Set("env", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("env"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.Env)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_imagePullPolicy", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

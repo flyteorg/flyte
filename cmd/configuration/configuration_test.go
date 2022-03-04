@@ -23,19 +23,22 @@ func TestCreateInitCommand(t *testing.T) {
 	assert.Equal(t, configCmd.Use, "config")
 	assert.Equal(t, configCmd.Short, "Runs various config commands, look at the help of this command to get a list of available commands..")
 	fmt.Println(configCmd.Commands())
-	assert.Equal(t, len(configCmd.Commands()), 3)
+	assert.Equal(t, 4, len(configCmd.Commands()))
 	cmdNouns := configCmd.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
 		return cmdNouns[i].Use < cmdNouns[j].Use
 	})
 
-	assert.Equal(t, cmdNouns[0].Use, "discover")
-	assert.Equal(t, cmdNouns[0].Short, "Searches for a config in one of the default search paths.")
-	assert.Equal(t, cmdNouns[1].Use, "init")
-	assert.Equal(t, cmdNouns[1].Short, initCmdShort)
-	assert.Equal(t, cmdNouns[2].Use, "validate")
-	assert.Equal(t, cmdNouns[2].Short, "Validates the loaded config.")
+	assert.Equal(t, "discover", cmdNouns[0].Use)
+	assert.Equal(t, "Searches for a config in one of the default search paths.", cmdNouns[0].Short)
+	assert.Equal(t, "docs", cmdNouns[1].Use)
+	assert.Equal(t, "Generate configuration documetation in rst format", cmdNouns[1].Short)
+
+	assert.Equal(t, "init", cmdNouns[2].Use)
+	assert.Equal(t, initCmdShort, cmdNouns[2].Short)
+	assert.Equal(t, "validate", cmdNouns[3].Use)
+	assert.Equal(t, "Validates the loaded config.", cmdNouns[3].Short)
 
 }
 

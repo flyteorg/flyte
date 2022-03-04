@@ -166,10 +166,40 @@ func TestStartContainer(t *testing.T) {
 			ID: "Hello",
 		}, nil)
 		mockDocker.OnContainerStart(context, "Hello", types.ContainerStartOptions{}).Return(nil)
-		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName)
+		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName, nil)
 		assert.Nil(t, err)
 		assert.Greater(t, len(id), 0)
 		assert.Equal(t, id, "Hello")
+	})
+
+	t.Run("Successfully create a container with Env", func(t *testing.T) {
+		setupSandbox()
+		mockDocker := &mocks.Docker{}
+		context := context.Background()
+		// Setup additional env
+		additionalEnv := []string{"a=1", "b=2"}
+		expectedEnv := append(Environment, "a=1")
+		expectedEnv = append(expectedEnv, "b=2")
+
+		// Verify the attributes
+		mockDocker.OnContainerCreate(context, &container.Config{
+			Env:          expectedEnv,
+			Image:        imageName,
+			Tty:          false,
+			ExposedPorts: p1,
+		}, &container.HostConfig{
+			Mounts:       Volumes,
+			PortBindings: p2,
+			Privileged:   true,
+		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+			ID: "Hello",
+		}, nil)
+		mockDocker.OnContainerStart(context, "Hello", types.ContainerStartOptions{}).Return(nil)
+		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName, additionalEnv)
+		assert.Nil(t, err)
+		assert.Greater(t, len(id), 0)
+		assert.Equal(t, id, "Hello")
+		assert.Equal(t, expectedEnv, Environment)
 	})
 
 	t.Run("Error in creating container", func(t *testing.T) {
@@ -191,7 +221,7 @@ func TestStartContainer(t *testing.T) {
 			ID: "",
 		}, fmt.Errorf("error"))
 		mockDocker.OnContainerStart(context, "Hello", types.ContainerStartOptions{}).Return(nil)
-		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName)
+		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName, nil)
 		assert.NotNil(t, err)
 		assert.Equal(t, len(id), 0)
 		assert.Equal(t, id, "")
@@ -216,7 +246,7 @@ func TestStartContainer(t *testing.T) {
 			ID: "Hello",
 		}, nil)
 		mockDocker.OnContainerStart(context, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("error"))
-		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName)
+		id, err := StartContainer(context, mockDocker, Volumes, p1, p2, "nginx", imageName, nil)
 		assert.NotNil(t, err)
 		assert.Equal(t, len(id), 0)
 		assert.Equal(t, id, "")
