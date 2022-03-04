@@ -70,6 +70,28 @@ Specify a Flyte Sandbox image pull policy. Possible pull policy values are Alway
 ::
 
  flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
+
+Start sandbox cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
+eg : for passing timeout value in secs for the sandbox container use the following.
+::
+
+ flytectl sandbox start --env FLYTE_TIMEOUT=700
+
+
+The DURATION can be a positive integer or a floating-point number, followed by an optional unit suffix::
+s - seconds (default)
+m - minutes
+h - hours
+d - days
+When no unit is used, it defaults to seconds. If the duration is set to zero, the associated timeout is disabled.
+
+
+eg : for passing multiple environment variables
+::
+
+ flytectl sandbox start --env USER=foo --env PASSWORD=bar
+
+
 Usage
 `
 	k8sEndpoint          = "https://127.0.0.1:30086"
@@ -161,7 +183,8 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	}
 
 	volumes := docker.Volumes
-	if vol, err := mountVolume(sandboxConfig.DefaultConfig.Source, docker.Source); err != nil {
+	sandboxDefaultConfig := sandboxConfig.DefaultConfig
+	if vol, err := mountVolume(sandboxDefaultConfig.Source, docker.Source); err != nil {
 		return nil, err
 	} else if vol != nil {
 		volumes = append(volumes, *vol)
@@ -182,7 +205,9 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 
 	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
 	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
-	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, sandboxImage)
+	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
+		sandboxImage, sandboxDefaultConfig.Env)
+
 	if err != nil {
 		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
 		return nil, err

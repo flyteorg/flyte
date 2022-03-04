@@ -47,6 +47,28 @@ Specify a Flyte Sandbox image pull policy. Possible pull policy values are Alway
 ::
 
  flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
+
+Start sandbox cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
+eg : for passing timeout value in secs for the sandbox container use the following.
+::
+
+ flytectl sandbox start --env FLYTE_TIMEOUT=700
+
+
+The DURATION can be a positive integer or a floating-point number, followed by an optional unit suffix::
+s - seconds (default)
+m - minutes
+h - hours
+d - days
+When no unit is used, it defaults to seconds. If the duration is set to zero, the associated timeout is disabled.
+
+
+eg : for passing multiple environment variables
+::
+
+ flytectl sandbox start --env USER=foo --env PASSWORD=bar
+
+
 Usage
 
 
@@ -59,6 +81,7 @@ Options
 
 ::
 
+      --env strings                       Optional. Provide Env variable in key=value format which can be passed to sandbox container.
   -h, --help                              help for start
       --image string                      Optional. Provide a fully qualified path to a Flyte compliant docker image.
       --imagePullPolicy ImagePullPolicy   Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
