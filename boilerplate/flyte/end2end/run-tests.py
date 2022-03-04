@@ -1,6 +1,6 @@
-
 #!/usr/bin/env python3
 
+import click
 import json
 import sys
 import time
@@ -60,7 +60,12 @@ def run_launch_plan(remote, version, workflow_name, inputs):
     return remote.execute(lp, inputs=inputs, wait=False)
 
 
-def schedule_workflow_group(tag: str, workflow_group: str, remote: FlyteRemote) -> bool:
+def schedule_workflow_group(
+    tag: str,
+    workflow_group: str,
+    remote: FlyteRemote,
+    terminate_workflow_on_failure: bool,
+) -> bool:
     """
     Schedule all workflows executions and return True if all executions succeed, otherwise
     return False.
@@ -105,6 +110,8 @@ def schedule_workflow_group(tag: str, workflow_group: str, remote: FlyteRemote) 
     # Report failing cases
     for lp in non_succeeded_lps:
         print(f"    workflow={lp.spec.launch_plan.name}, execution_id={lp.id.name}")
+        if terminate_workflow_on_failure:
+            remote.terminate(lp, "aborting execution scheduled in functional test")
     return False
 
 
@@ -116,7 +123,12 @@ def valid(workflow_group):
     return workflow_group in FLYTESNACKS_WORKFLOW_GROUPS.keys()
 
 
-def run(release_tag: str, priorities: List[str], config_file_path) -> List[Dict[str, str]]:
+def run(
+    flytesnacks_release_tag: str,
+    priorities: List[str],
+    config_file_path,
+    terminate_workflow_on_failure: bool,
+) -> List[Dict[str, str]]:
     remote = FlyteRemote.from_config(
         default_project="flytesnacks",
         default_domain="development",
@@ -125,26 +137,34 @@ def run(release_tag: str, priorities: List[str], config_file_path) -> List[Dict[
 
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks manifest file. For
     # example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
-    manifest_url = f"https://raw.githubusercontent.com/flyteorg/flytesnacks/{release_tag}/cookbook/flyte_tests_manifest.json"
+    manifest_url = f"https://raw.githubusercontent.com/flyteorg/flytesnacks/{flytesnacks_release_tag}/cookbook/flyte_tests_manifest.json"
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
 
-    workflow_groups = [group["name"] for group in parsed_manifest if group["priority"] in priorities]
+    workflow_groups = [
+        group["name"] for group in parsed_manifest if group["priority"] in priorities
+    ]
     results = []
     for workflow_group in workflow_groups:
         if not valid(workflow_group):
-            results.append({
-                "label": workflow_group,
-                "status": "coming soon",
-                "color": "grey",
-            })
+            results.append(
+                {
+                    "label": workflow_group,
+                    "status": "coming soon",
+                    "color": "grey",
+                }
+            )
             continue
 
         try:
-            workflows_succeeded = schedule_workflow_group(flytesnacks_release_tag, workflow_group, remote)
+            workflows_succeeded = schedule_workflow_group(
+                flytesnacks_release_tag,
+                workflow_group,
+                remote,
+                terminate_workflow_on_failure,
+            )
         except Exception:
             print(traceback.format_exc())
-
             workflows_succeeded = False
 
         if workflows_succeeded:
@@ -173,23 +193,43 @@ def run(release_tag: str, priorities: List[str], config_file_path) -> List[Dict[
     return results
 
 
-if __name__ == "__main__":
-    # Assume that the first argument passed to the script is a flytesnacks release tag and
-    # the second one is a comma-separated list of priorities, as defined in the flytesnacks
-    # tests manifest.
-    flytesnacks_release_tag = sys.argv[1]
-    priorities = sys.argv[2].split(',')
-    config_file = sys.argv[3]
-    return_non_zero_on_failure = sys.argv[4]
-
-    results = run(flytesnacks_release_tag, priorities, config_file)
+@click.command()
+@click.option(
+    "--return_non_zero_on_failure",
+    default=False,
+    is_flag=True,
+    help="Return a non-zero exit status if any workflow fails",
+)
+@click.option(
+    "--terminate_workflow_on_failure",
+    default=False,
+    is_flag=True,
+    help="Abort failing workflows upon exit",
+)
+@click.argument("flytesnacks_release_tag")
+@click.argument("priorities")
+@click.argument("config_file")
+def cli(
+    flytesnacks_release_tag,
+    priorities,
+    config_file,
+    return_non_zero_on_failure,
+    terminate_workflow_on_failure,
+):
+    print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
+    results = run(
+        flytesnacks_release_tag, priorities, config_file, terminate_workflow_on_failure
+    )
 
     # Write a json object in its own line describing the result of this run to stdout
     print(f"Result of run:\n{json.dumps(results)}")
 
     # Return a non-zero exit code if core fails
-    if return_non_zero_on_failure is not None:
-        # find the result
+    if return_non_zero_on_failure:
         for result in results:
-            if result['label'] == return_non_zero_on_failure and result['status'] != 'passing':
+            if result["status"] not in ("passing", "coming soon"):
                 sys.exit(1)
+
+
+if __name__ == "__main__":
+    cli()
