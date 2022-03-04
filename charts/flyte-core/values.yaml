@@ -18,6 +18,19 @@ flyteadmin:
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
     tag: v0.6.104 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
+  # -- Additional flyteadmin container environment variables
+  #
+  # e.g. SendGrid's API key
+  #  - name: SENDGRID_API_KEY
+  #    value: "<your sendgrid api key>"
+  #
+  # e.g. secret environment variable (you can combine it with .additionalVolumes):
+  # - name: SENDGRID_API_KEY
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: sendgrid-secret
+  #       key: api_key
+  env: []
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
