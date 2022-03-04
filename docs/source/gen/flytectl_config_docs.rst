@@ -1,24 +1,26 @@
-.. _flytectl_config:
+.. _flytectl_config_docs:
 
-flytectl config
----------------
+flytectl config docs
+--------------------
 
-Runs various config commands, look at the help of this command to get a list of available commands..
+Generate configuration documetation in rst format
 
 Synopsis
 ~~~~~~~~
 
 
-Runs various config commands, look at the help of this command to get a list of available commands..
+Generate configuration documetation in rst format
+
+::
+
+  flytectl config docs [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-      --file stringArray   Passes the config file to load.
-                           If empty, it'll first search for the config file path then, if found, will load config from there.
-  -h, --help               help for config
+  -h, --help   help for docs
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,6 +46,8 @@ Options inherited from parent commands
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
   -c, --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
+      --file stringArray                           Passes the config file to load.
+                                                   If empty, it'll first search for the config file path then, if found, will load config from there.
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -69,9 +73,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
-* :doc:`flytectl_config_discover` 	 - Searches for a config in one of the default search paths.
-* :doc:`flytectl_config_docs` 	 - Generate configuration documetation in rst format
-* :doc:`flytectl_config_init` 	 - Generates FlyteCTL config file in the user's home directory.
-* :doc:`flytectl_config_validate` 	 - Validates the loaded config.
+* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 
