@@ -187,6 +187,8 @@ datacatalog:
 flytepropeller:
   enabled: true
   manager: false
+  # -- Whether to install the flyteworkflows CRD with helm
+  createCRDs: true
   # -- Replicas count for Flytepropeller deployment
   replicaCount: 1
   image:
