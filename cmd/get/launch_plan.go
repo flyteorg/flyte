@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
@@ -39,6 +40,12 @@ Retrieve a particular version of the launch plan by name within the project and 
 ::
 
  flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --version v2
+
+Retrieve all launch plans for a given workflow name:
+
+::
+
+ flytectl get launchplan -p flytesnacks -d development --workflow core.flyte_basics.lp.go_greet
 
 Retrieve all the launch plans with filters:
 ::
@@ -168,6 +175,13 @@ func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 			return err
 		}
 		return nil
+	}
+
+	if len(launchplan.DefaultConfig.Workflow) > 0 {
+		if len(launchplan.DefaultConfig.Filter.FieldSelector) > 0 {
+			return fmt.Errorf("fieldSelector cannot be specified with workflow flag")
+		}
+		launchplan.DefaultConfig.Filter.FieldSelector = fmt.Sprintf("workflow.name=%s", launchplan.DefaultConfig.Workflow)
 	}
 
 	launchPlans, err := cmdCtx.AdminFetcherExt().FetchAllVerOfLP(ctx, "", config.GetConfig().Project, config.GetConfig().Domain, launchplan.DefaultConfig.Filter)

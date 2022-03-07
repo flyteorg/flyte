@@ -58,5 +58,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int32Var(&DefaultConfig.Filter.Limit, fmt.Sprintf("%v%v", prefix, "filter.limit"), DefaultConfig.Filter.Limit, "Specifies the limit")
 	cmdFlags.BoolVar(&DefaultConfig.Filter.Asc, fmt.Sprintf("%v%v", prefix, "filter.asc"), DefaultConfig.Filter.Asc, "Specifies the sorting order. By default flytectl sort result in descending order")
 	cmdFlags.Int32Var(&DefaultConfig.Filter.Page, fmt.Sprintf("%v%v", prefix, "filter.page"), DefaultConfig.Filter.Page, "Specifies the page number,  in case there are multiple pages of results")
+	cmdFlags.StringVar(&DefaultConfig.Workflow, fmt.Sprintf("%v%v", prefix, "workflow"), DefaultConfig.Workflow, "name of the workflow for which the launchplans need to be fetched.")
 	return cmdFlags
 }

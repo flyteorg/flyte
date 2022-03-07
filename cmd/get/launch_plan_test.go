@@ -23,14 +23,15 @@ import (
 )
 
 var (
-	resourceListRequest    *admin.ResourceListRequest
-	resourceGetRequest     *admin.ResourceListRequest
-	objectGetRequest       *admin.ObjectGetRequest
-	namedIDRequest         *admin.NamedEntityIdentifierListRequest
-	launchPlanListResponse *admin.LaunchPlanList
-	argsLp                 []string
-	namedIdentifierList    *admin.NamedEntityIdentifierList
-	launchPlan2            *admin.LaunchPlan
+	resourceListRequest            *admin.ResourceListRequest
+	resourceGetRequest             *admin.ResourceListRequest
+	objectGetRequest               *admin.ObjectGetRequest
+	namedIDRequest                 *admin.NamedEntityIdentifierListRequest
+	launchPlanListResponse         *admin.LaunchPlanList
+	filteredLaunchPlanListResponse *admin.LaunchPlanList
+	argsLp                         []string
+	namedIdentifierList            *admin.NamedEntityIdentifierList
+	launchPlan2                    *admin.LaunchPlan
 )
 
 func getLaunchPlanSetup() {
@@ -96,6 +97,9 @@ func getLaunchPlanSetup() {
 			Version: "v1",
 		},
 		Spec: &admin.LaunchPlanSpec{
+			WorkflowId: &core.Identifier{
+				Name: "workflow1",
+			},
 			DefaultInputs: &core.ParameterMap{
 				Parameters: parameterMap,
 			},
@@ -113,6 +117,9 @@ func getLaunchPlanSetup() {
 			Version: "v2",
 		},
 		Spec: &admin.LaunchPlanSpec{
+			WorkflowId: &core.Identifier{
+				Name: "workflow2",
+			},
 			DefaultInputs: &core.ParameterMap{
 				Parameters: parameterMap,
 			},
@@ -144,6 +151,10 @@ func getLaunchPlanSetup() {
 
 	launchPlanListResponse = &admin.LaunchPlanList{
 		LaunchPlans: launchPlans,
+	}
+
+	filteredLaunchPlanListResponse = &admin.LaunchPlanList{
+		LaunchPlans: []*admin.LaunchPlan{launchPlan2},
 	}
 
 	objectGetRequest = &admin.ObjectGetRequest{
@@ -249,178 +260,7 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "ListLaunchPlans", ctx, resourceGetRequest)
-	tearDownAndVerify(t, `[
-	{
-		"id": {
-			"name": "launchplan1",
-			"version": "v2"
-		},
-		"spec": {
-			"defaultInputs": {
-				"parameters": {
-					"numbers": {
-						"var": {
-							"type": {
-								"collectionType": {
-									"simple": "INTEGER"
-								}
-							},
-							"description": "short desc"
-						}
-					},
-					"numbers_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "long description will be truncated in table"
-						}
-					},
-					"run_local_at_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "run_local_at_count"
-						},
-						"default": {
-							"scalar": {
-								"primitive": {
-									"integer": "10"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"closure": {
-			"expectedInputs": {
-				"parameters": {
-					"numbers": {
-						"var": {
-							"type": {
-								"collectionType": {
-									"simple": "INTEGER"
-								}
-							},
-							"description": "short desc"
-						}
-					},
-					"numbers_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "long description will be truncated in table"
-						}
-					},
-					"run_local_at_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "run_local_at_count"
-						},
-						"default": {
-							"scalar": {
-								"primitive": {
-									"integer": "10"
-								}
-							}
-						}
-					}
-				}
-			},
-			"createdAt": "1970-01-01T00:00:01Z"
-		}
-	},
-	{
-		"id": {
-			"name": "launchplan1",
-			"version": "v1"
-		},
-		"spec": {
-			"defaultInputs": {
-				"parameters": {
-					"numbers": {
-						"var": {
-							"type": {
-								"collectionType": {
-									"simple": "INTEGER"
-								}
-							},
-							"description": "short desc"
-						}
-					},
-					"numbers_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "long description will be truncated in table"
-						}
-					},
-					"run_local_at_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "run_local_at_count"
-						},
-						"default": {
-							"scalar": {
-								"primitive": {
-									"integer": "10"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"closure": {
-			"expectedInputs": {
-				"parameters": {
-					"numbers": {
-						"var": {
-							"type": {
-								"collectionType": {
-									"simple": "INTEGER"
-								}
-							},
-							"description": "short desc"
-						}
-					},
-					"numbers_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "long description will be truncated in table"
-						}
-					},
-					"run_local_at_count": {
-						"var": {
-							"type": {
-								"simple": "INTEGER"
-							},
-							"description": "run_local_at_count"
-						},
-						"default": {
-							"scalar": {
-								"primitive": {
-									"integer": "10"
-								}
-							}
-						}
-					}
-				}
-			},
-			"createdAt": "1970-01-01T00:00:00Z"
-		}
-	}
-]`)
+	tearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"workflowId": {"name": "workflow1"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 }
 
 func TestGetLaunchPlanFuncLatest(t *testing.T) {
@@ -433,91 +273,7 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "ListLaunchPlans", ctx, resourceGetRequest)
-	tearDownAndVerify(t, `{
-	"id": {
-		"name": "launchplan1",
-		"version": "v2"
-	},
-	"spec": {
-		"defaultInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"closure": {
-		"expectedInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		},
-		"createdAt": "1970-01-01T00:00:01Z"
-	}
-}`)
+	tearDownAndVerify(t, `{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}}`)
 }
 
 func TestGetLaunchPlanWithVersion(t *testing.T) {
@@ -530,102 +286,40 @@ func TestGetLaunchPlanWithVersion(t *testing.T) {
 	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "GetLaunchPlan", ctx, objectGetRequest)
-	tearDownAndVerify(t, `{
-	"id": {
-		"name": "launchplan1",
-		"version": "v2"
-	},
-	"spec": {
-		"defaultInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"closure": {
-		"expectedInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		},
-		"createdAt": "1970-01-01T00:00:01Z"
-	}
-}`)
+	tearDownAndVerify(t, `{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}}`)
 }
 
 func TestGetLaunchPlans(t *testing.T) {
-	setup()
-	getLaunchPlanSetup()
-	mockClient.OnListLaunchPlansMatch(ctx, resourceListRequest).Return(launchPlanListResponse, nil)
-	mockClient.OnGetLaunchPlanMatch(ctx, objectGetRequest).Return(launchPlan2, nil)
-	argsLp = []string{}
-	err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
-	assert.Nil(t, err)
-	tearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	t.Run("no workflow filter", func(t *testing.T) {
+		setup()
+		getLaunchPlanSetup()
+		mockClient.OnListLaunchPlansMatch(ctx, resourceListRequest).Return(launchPlanListResponse, nil)
+		argsLp = []string{}
+		err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
+		assert.Nil(t, err)
+		tearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"workflowId": {"name": "workflow1"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	})
+	t.Run("workflow filter", func(t *testing.T) {
+		setup()
+		getLaunchPlanSetup()
+		resourceListRequest.Filters = "eq(workflow.name,workflow2)"
+		mockClient.OnListLaunchPlansMatch(ctx, resourceListRequest).Return(filteredLaunchPlanListResponse, nil)
+		argsLp = []string{}
+		launchplan.DefaultConfig.Workflow = "workflow2"
+		err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
+		assert.Nil(t, err)
+		tearDownAndVerify(t, `{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}}`)
+	})
+	t.Run("workflow filter error", func(t *testing.T) {
+		setup()
+		getLaunchPlanSetup()
+		argsLp = []string{}
+		launchplan.DefaultConfig.Workflow = "workflow2"
+		launchplan.DefaultConfig.Filter.FieldSelector = "workflow.name"
+		err = getLaunchPlanFunc(ctx, argsLp, cmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("fieldSelector cannot be specified with workflow flag"), err)
+	})
 }
 
 func TestGetLaunchPlansWithExecFile(t *testing.T) {
@@ -640,91 +334,7 @@ func TestGetLaunchPlansWithExecFile(t *testing.T) {
 	os.Remove(launchplan.DefaultConfig.ExecFile)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "GetLaunchPlan", ctx, objectGetRequest)
-	tearDownAndVerify(t, `{
-	"id": {
-		"name": "launchplan1",
-		"version": "v2"
-	},
-	"spec": {
-		"defaultInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"closure": {
-		"expectedInputs": {
-			"parameters": {
-				"numbers": {
-					"var": {
-						"type": {
-							"collectionType": {
-								"simple": "INTEGER"
-							}
-						},
-						"description": "short desc"
-					}
-				},
-				"numbers_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "long description will be truncated in table"
-					}
-				},
-				"run_local_at_count": {
-					"var": {
-						"type": {
-							"simple": "INTEGER"
-						},
-						"description": "run_local_at_count"
-					},
-					"default": {
-						"scalar": {
-							"primitive": {
-								"integer": "10"
-							}
-						}
-					}
-				}
-			}
-		},
-		"createdAt": "1970-01-01T00:00:01Z"
-	}
-}`)
+	tearDownAndVerify(t, `{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}}`)
 }
 
 func TestGetLaunchPlanTableFunc(t *testing.T) {
