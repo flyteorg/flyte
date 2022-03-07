@@ -24,7 +24,7 @@ export FLYTE_AWS_ACCESS_KEY_ID ?= minio
 # Used to authenticate to s3. For a production AWS S3, it's discouraged to use keys and key ids.
 export FLYTE_AWS_SECRET_ACCESS_KEY ?= miniostorage
 
-# Instructs flyte-cli commands to use insecure channel when communicating with Flyte's control plane.
+# Instructs flytectl commands to use insecure channel when communicating with Flyte's control plane.
 # If you're port-forwarding your service or running the sandbox Flyte deployment, specify INSECURE=1 before your make command.
 # If your Flyte Admin is behind SSL, don't specify anything.
 ifndef INSECURE

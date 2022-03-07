@@ -26,6 +26,6 @@ To make this work, it is essential that the examples are written with comments f
    ```rst
     .. prompt::bash
 
-       flyte-cli test
+       flytectl --version
    ```
 

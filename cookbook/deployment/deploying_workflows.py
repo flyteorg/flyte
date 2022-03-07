@@ -126,19 +126,19 @@ Under the hood this recipe again supplies some defaults you may find yourself wi
 
 .. code-block::
 
-   flyte-cli register-files -p flytetester -d development -v ${VERSION} --kubernetes-service-account demo \
-       --output-location-prefix s3://my-s3-bucket/raw_data -h flyte.example.com _pb_output/*
+   flytectl register files _pb_output/* -p flytetester -d development --version ${VERSION}  \
+       --k8sServiceAccount demo --outputLocationPrefix s3://my-s3-bucket/raw_data
 
 
 Of interest are the following args:
 
 - :code:`-p` specifies the project to register your entities. This project itself must already be registered on your Flyte deployment.
 - :code:`-d` specifies the domain to register your entities. This domain must already be configured in your Flyte deployment
-- :code:`-v` is a unique string used to identify this version of entities registered under a project and domain.
-- If required, you can specify a :code:`kubernetes-service-account` or :code:`assumable_iam_role` which your tasks will run with.
+- :code:`--version` is a unique string used to identify the version of your entities to be registered under a project and domain.
+- If required, you can specify a :code:`--k8sServiceAccount` and :code:`--assumableIamRole` which your tasks will run with.
 
 
-Fast(er) iteration
+Fast Registration
 ^^^^^^^^^^^^^^^^^^
 Re-building a new Docker container image for every code change you make can become cumbersome and slow.
 If you're making purely code changes that **do not** require updating your container definition, you can make use of
@@ -149,7 +149,7 @@ First, run the fast serialization target:
 
 .. code-block::
 
-   make fast_serialize
+   pyflyte --pkgs core package --image core:v1 --fast --force
 
 And then the fast register target:
 
@@ -161,8 +161,8 @@ and just like that you can update your code without requiring a rebuild of your 
 
 As fast registration serializes code from your local workstation and uploads it to the hosted flyte deployment, make sure to specify the following arguments correctly to ensure that the changes are picked up when the workflow is run.
 
-- :code:`pyflyte serialize` has a :code:`--local-source-root` option which specifies which code is uploaded during the fast registration step. This ensures that the files you want to modify are serialized. This is optional and should be used when your code lies outside of your current working directory.
-- :code:`flyte-cli fast-register-files` has a :code:`--dest-dir` option which specifies which folder (in the container) the fast serialization will dump the code in at execution time. This ensures that the running workflow loads the code changes that were uploaded via :code:`fast registration`.
+- :code:`pyflyte` has a flag :code:`--pkgs` that specifies the code to be packaged. The `fast` flag picks up the code from the local machine and provides it for execution without building and pushing a container.
+- :code:`pyflyte` also has a flag  :code:`--image` to specify the Docker image that has already been built.
 
 
 Building Images

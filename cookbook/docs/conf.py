@@ -85,7 +85,6 @@ class CustomSorter(FileNameSortKey):
         "deploying_workflows.py",
         "customizing_resources.py",
         "lp_notifications.py",
-        "fast_registration.py",
         "multiple_k8s.py",
         ## Cluster
         "config_flyte_deploy.py",
