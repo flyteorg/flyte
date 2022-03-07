@@ -27,7 +27,7 @@ Let's understand subworkflow with an example.
 
 # %%
 # Example
-# --------
+# ^^^^^^^^
 # We import the required dependencies into the environment.
 import typing
 from typing import Tuple
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
 # %%
 # External Workflow
-# ------------------
+# ^^^^^^^^^^^^^^^^^^
 #
 # When launch plans are used within a workflow to launch the execution of a previously defined workflow, a new
 # external execution is launched, with a separate execution ID and can be observed as a distinct entity in
