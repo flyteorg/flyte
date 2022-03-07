@@ -2,7 +2,7 @@
 Add Docstrings to Workflows
 ---------------------------
 
-Documented code helps in enhancing the code readability. Flyte supports docstrings to document your code.
+Documented code helps enhance the readability of the code. Flyte supports docstrings to document your code.
 Docstrings are stored in FlyteAdmin and shown on the UI in the launch form.
 
 This example demonstrates the various ways in which you can document your Flyte workflow.
@@ -10,7 +10,7 @@ The example workflow accepts a DataFrame and data class. We send a record that n
 """
 
 # %%
-# Let's first import the libraries.
+# Let's import the libraries.
 from dataclasses import dataclass
 
 import pandas as pd
@@ -27,7 +27,7 @@ class PandasData(object):
 
 
 # %%
-# Next, we define a task to append data to the DataFrame.
+# Next, we define a task that appends data to the DataFrame.
 @task
 def add_data(df: pd.DataFrame, data: PandasData) -> pd.DataFrame:
     df = df.append({"id": data.id, "name": data.name}, ignore_index=True)
@@ -38,7 +38,7 @@ def add_data(df: pd.DataFrame, data: PandasData) -> pd.DataFrame:
 # Sphinx-style Docstring
 # ======================
 #
-# An example to demonstrate sphinx-style docstring.
+# An example to demonstrate Sphinx-style docstring.
 #
 # The first block of the docstring is a one-liner about the workflow.
 # The second block of the docstring consists of a detailed description.
@@ -46,7 +46,7 @@ def add_data(df: pd.DataFrame, data: PandasData) -> pd.DataFrame:
 @workflow
 def sphinx_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.DataFrame:
     """
-    Showcase sphinx-style docstring.
+    Showcase Sphinx-style docstring.
 
     This workflow accepts a DataFrame and data class.
     It calls a task that appends the user-sent record to the DataFrame.
@@ -62,7 +62,7 @@ def sphinx_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.Da
 # NumPy-style Docstring
 # ======================
 #
-# An example to demonstrate numpy-style docstring.
+# An example to demonstrate NumPy-style docstring.
 #
 # The first block of the docstring is a one-liner about the workflow.
 # The second block of the docstring consists of a detailed description.
@@ -71,7 +71,7 @@ def sphinx_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.Da
 @workflow
 def numpy_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.DataFrame:
     """
-    Showcase numpy-style docstring.
+    Showcase NumPy-style docstring.
 
     This workflow accepts a DataFrame and data class.
     It calls a task that appends the user-sent record to the DataFrame.
@@ -95,7 +95,7 @@ def numpy_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.Dat
 # Google-style Docstring
 # ======================
 #
-# An example to demonstrate google-style docstring.
+# An example to demonstrate Google-style docstring.
 #
 # The first block of the docstring is a one-liner about the workflow.
 # The second block of the docstring consists of a detailed description.
@@ -103,7 +103,7 @@ def numpy_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.Dat
 @workflow
 def google_docstring(df: pd.DataFrame, data: PandasData = PandasData()) -> pd.DataFrame:
     """
-    Showcase google-style docstring.
+    Showcase Google-style docstring.
 
     This workflow accepts a DataFrame and data class.
     It calls a task that appends the user-sent record to the DataFrame.
