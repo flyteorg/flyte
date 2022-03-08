@@ -15,6 +15,8 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 
+	"github.com/imdario/mergo"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	v1 "k8s.io/api/core/v1"
@@ -163,15 +165,24 @@ func (m *Manager) createPods(ctx context.Context) error {
 	errs := stderrors.ErrorCollection{}
 	for i, podName := range podNames {
 		if exists := podExists[podName]; !exists {
+			baseObjectMeta := podTemplate.Template.ObjectMeta.DeepCopy()
+			objectMeta := metav1.ObjectMeta{
+				Annotations:     podAnnotations,
+				Name:            podName,
+				Namespace:       m.podNamespace,
+				Labels:          podLabels,
+				OwnerReferences: m.ownerReferences,
+			}
+
+			err = mergo.Merge(baseObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice)
+			if err != nil {
+				errs.Append(fmt.Errorf("failed to initialize pod ObjectMeta for '%s' [%v]", podName, err))
+				continue
+			}
+
 			pod := &v1.Pod{
-				ObjectMeta: metav1.ObjectMeta{
-					Annotations:     podAnnotations,
-					Name:            podName,
-					Namespace:       m.podNamespace,
-					Labels:          podLabels,
-					OwnerReferences: m.ownerReferences,
-				},
-				Spec: *podTemplate.Template.Spec.DeepCopy(),
+				ObjectMeta: *baseObjectMeta,
+				Spec:       *podTemplate.Template.Spec.DeepCopy(),
 			}
 
 			err := m.shardStrategy.UpdatePodSpec(&pod.Spec, m.podTemplateContainerName, i)

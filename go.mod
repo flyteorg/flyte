@@ -15,6 +15,7 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.2.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/magiconair/properties v1.8.4
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pkg/errors v0.9.1
