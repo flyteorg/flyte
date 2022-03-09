@@ -16812,6 +16812,34 @@ public final class ExecutionOuterClass {
      */
     int getMaxParallelism();
 
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    boolean hasRawOutputDataConfig();
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig();
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -16984,6 +17012,19 @@ public final class ExecutionOuterClass {
             case 144: {
 
               maxParallelism_ = input.readInt32();
+              break;
+            }
+            case 154: {
+              flyteidl.admin.Common.RawOutputDataConfig.Builder subBuilder = null;
+              if (rawOutputDataConfig_ != null) {
+                subBuilder = rawOutputDataConfig_.toBuilder();
+              }
+              rawOutputDataConfig_ = input.readMessage(flyteidl.admin.Common.RawOutputDataConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(rawOutputDataConfig_);
+                rawOutputDataConfig_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -17394,6 +17435,42 @@ public final class ExecutionOuterClass {
       return maxParallelism_;
     }
 
+    public static final int RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER = 19;
+    private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    public boolean hasRawOutputDataConfig() {
+      return rawOutputDataConfig_ != null;
+    }
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+      return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+    }
+    /**
+     * <pre>
+     * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+     * This should be a prefix like s3://my-bucket/my-data
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+      return getRawOutputDataConfig();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -17441,6 +17518,9 @@ public final class ExecutionOuterClass {
       }
       if (maxParallelism_ != 0) {
         output.writeInt32(18, maxParallelism_);
+      }
+      if (rawOutputDataConfig_ != null) {
+        output.writeMessage(19, getRawOutputDataConfig());
       }
       unknownFields.writeTo(output);
     }
@@ -17495,6 +17575,10 @@ public final class ExecutionOuterClass {
       if (maxParallelism_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(18, maxParallelism_);
+      }
+      if (rawOutputDataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, getRawOutputDataConfig());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -17553,6 +17637,11 @@ public final class ExecutionOuterClass {
       }
       if (getMaxParallelism()
           != other.getMaxParallelism()) return false;
+      if (hasRawOutputDataConfig() != other.hasRawOutputDataConfig()) return false;
+      if (hasRawOutputDataConfig()) {
+        if (!getRawOutputDataConfig()
+            .equals(other.getRawOutputDataConfig())) return false;
+      }
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -17611,6 +17700,10 @@ public final class ExecutionOuterClass {
       }
       hash = (37 * hash) + MAX_PARALLELISM_FIELD_NUMBER;
       hash = (53 * hash) + getMaxParallelism();
+      if (hasRawOutputDataConfig()) {
+        hash = (37 * hash) + RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getRawOutputDataConfig().hashCode();
+      }
       switch (notificationOverridesCase_) {
         case 5:
           hash = (37 * hash) + NOTIFICATIONS_FIELD_NUMBER;
@@ -17812,6 +17905,12 @@ public final class ExecutionOuterClass {
         }
         maxParallelism_ = 0;
 
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -17891,6 +17990,11 @@ public final class ExecutionOuterClass {
           result.qualityOfService_ = qualityOfServiceBuilder_.build();
         }
         result.maxParallelism_ = maxParallelism_;
+        if (rawOutputDataConfigBuilder_ == null) {
+          result.rawOutputDataConfig_ = rawOutputDataConfig_;
+        } else {
+          result.rawOutputDataConfig_ = rawOutputDataConfigBuilder_.build();
+        }
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -17966,6 +18070,9 @@ public final class ExecutionOuterClass {
         }
         if (other.getMaxParallelism() != 0) {
           setMaxParallelism(other.getMaxParallelism());
+        }
+        if (other.hasRawOutputDataConfig()) {
+          mergeRawOutputDataConfig(other.getRawOutputDataConfig());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -19522,6 +19629,168 @@ public final class ExecutionOuterClass {
         maxParallelism_ = 0;
         onChanged();
         return this;
+      }
+
+      private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> rawOutputDataConfigBuilder_;
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public boolean hasRawOutputDataConfig() {
+        return rawOutputDataConfigBuilder_ != null || rawOutputDataConfig_ != null;
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        } else {
+          return rawOutputDataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public Builder setRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          rawOutputDataConfig_ = value;
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public Builder setRawOutputDataConfig(
+          flyteidl.admin.Common.RawOutputDataConfig.Builder builderForValue) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public Builder mergeRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (rawOutputDataConfig_ != null) {
+            rawOutputDataConfig_ =
+              flyteidl.admin.Common.RawOutputDataConfig.newBuilder(rawOutputDataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            rawOutputDataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public Builder clearRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+          onChanged();
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig.Builder getRawOutputDataConfigBuilder() {
+        
+        onChanged();
+        return getRawOutputDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+        if (rawOutputDataConfigBuilder_ != null) {
+          return rawOutputDataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return rawOutputDataConfig_ == null ?
+              flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        }
+      }
+      /**
+       * <pre>
+       * User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+       * This should be a prefix like s3://my-bucket/my-data
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> 
+          getRawOutputDataConfigFieldBuilder() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder>(
+                  getRawOutputDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          rawOutputDataConfig_ = null;
+        }
+        return rawOutputDataConfigBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -25346,7 +25615,7 @@ public final class ExecutionOuterClass {
       "EDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CH" +
       "ILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notific" +
       "ationList\0223\n\rnotifications\030\001 \003(\0132\034.flyte" +
-      "idl.admin.Notification\"\260\004\n\rExecutionSpec" +
+      "idl.admin.Notification\"\365\004\n\rExecutionSpec" +
       "\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core.Id" +
       "entifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core" +
       ".LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyt" +
@@ -25359,30 +25628,32 @@ public final class ExecutionOuterClass {
       "re.SecurityContext\022/\n\tauth_role\030\020 \001(\0132\030." +
       "flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality_o" +
       "f_service\030\021 \001(\0132\037.flyteidl.core.QualityO" +
-      "fService\022\027\n\017max_parallelism\030\022 \001(\005B\030\n\026not" +
-      "ification_overridesJ\004\010\004\020\005\"b\n\031ExecutionTe" +
-      "rminateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.co" +
-      "re.WorkflowExecutionIdentifier\022\r\n\005cause\030" +
-      "\002 \001(\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037W" +
-      "orkflowExecutionGetDataRequest\0226\n\002id\030\001 \001" +
-      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
-      "tifier\"\336\001\n WorkflowExecutionGetDataRespo" +
-      "nse\022,\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.Ur" +
-      "lBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.adm" +
-      "in.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.fl" +
-      "yteidl.core.LiteralMap\022/\n\014full_outputs\030\004" +
-      " \001(\0132\031.flyteidl.core.LiteralMap\"\177\n\026Execu" +
-      "tionUpdateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl" +
-      ".core.WorkflowExecutionIdentifier\022-\n\005sta" +
-      "te\030\002 \001(\0162\036.flyteidl.admin.ExecutionState" +
-      "\"\220\001\n\033ExecutionStateChangeDetails\022-\n\005stat" +
-      "e\030\001 \001(\0162\036.flyteidl.admin.ExecutionState\022" +
-      "/\n\013occurred_at\030\002 \001(\0132\032.google.protobuf.T" +
-      "imestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027Execution" +
-      "UpdateResponse*>\n\016ExecutionState\022\024\n\020EXEC" +
-      "UTION_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7" +
-      "Z5github.com/flyteorg/flyteidl/gen/pb-go" +
-      "/flyteidl/adminb\006proto3"
+      "fService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw" +
+      "_output_data_config\030\023 \001(\0132#.flyteidl.adm" +
+      "in.RawOutputDataConfigB\030\n\026notification_o" +
+      "verridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateRequ" +
+      "est\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow" +
+      "ExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032Ex" +
+      "ecutionTerminateResponse\"Y\n\037WorkflowExec" +
+      "utionGetDataRequest\0226\n\002id\030\001 \001(\0132*.flytei" +
+      "dl.core.WorkflowExecutionIdentifier\"\336\001\n " +
+      "WorkflowExecutionGetDataResponse\022,\n\007outp" +
+      "uts\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022+" +
+      "\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB" +
+      "\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core" +
+      ".LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyt" +
+      "eidl.core.LiteralMap\"\177\n\026ExecutionUpdateR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\022-\n\005state\030\002 \001(\0162\036." +
+      "flyteidl.admin.ExecutionState\"\220\001\n\033Execut" +
+      "ionStateChangeDetails\022-\n\005state\030\001 \001(\0162\036.f" +
+      "lyteidl.admin.ExecutionState\022/\n\013occurred" +
+      "_at\030\002 \001(\0132\032.google.protobuf.Timestamp\022\021\n" +
+      "\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRespo" +
+      "nse*>\n\016ExecutionState\022\024\n\020EXECUTION_ACTIV" +
+      "E\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/a" +
+      "dminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -25486,7 +25757,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
