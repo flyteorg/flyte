@@ -23,6 +23,9 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      {{- if .Values.flytescheduler.priorityClassName }}
+      priorityClassName: {{ .Values.flytescheduler.priorityClassName }}
+      {{- end }}
       initContainers:
       - command:
         - flytescheduler

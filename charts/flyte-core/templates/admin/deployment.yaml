@@ -22,6 +22,9 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      {{- if .Values.flyteadmin.priorityClassName }}
+      priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
+      {{- end }}
       initContainers:
         {{- if .Values.db.checks }}
         - name: check-db-ready
@@ -101,10 +104,16 @@ spec:
         - flyteadmin
         - --config
         - {{ .Values.flyteadmin.configPath }}
-        {{- with .Values.flyteadmin.extraArgs }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         - serve
+        {{- with .Values.flyteadmin.extraArgs }}
+        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- end }}
+        {{- if .Values.flyteadmin.env }}
+        env:
+        {{- with .Values.flyteadmin.env -}}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- end }}
         image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin

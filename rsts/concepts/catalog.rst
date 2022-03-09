@@ -3,7 +3,7 @@
 What is Data Catalog?
 =====================
 
-Data Catalog (https://github.com/flyteorg/datacatalog) is a service for indexing parameterized, strongly-typed data artifacts across revisions. It allows for clients to query artifacts based on meta information and tags.
+`Data Catalog <https://github.com/flyteorg/datacatalog>`__ is a service for indexing parameterized, strongly-typed data artifacts across revisions. It allows for clients to query artifacts based on meta information and tags.
 
 
 How Flyte Memoizes Task Executions on Data Catalog
@@ -46,16 +46,16 @@ To retrieve the Artifact, we tag the Artifact with a hash of the input values fo
        Name: flyte_cached-<unique hash of the input values>
     }
 
-When caching an execution, Flyte propeller will:
+When caching an execution, FlytePropeller will:
 
-1. Create a dataset for the task
-2. Create an artifact that represents the execution, along with the artifact data that represents the execution output
-3. Tag the artifact with a unique hash of the input values
+1. Create a dataset for the task.
+2. Create an artifact that represents the execution, along with the artifact data that represents the execution output.
+3. Tag the artifact with a unique hash of the input values.
 
-When checking to see if the task execution is memoized Flyte Propeller will:
+When checking to see if the task execution is memoized, Flyte Propeller will:
 
-1. Compute the tag by computing the hash of the input
-2. Check if a tagged artifact exists with that hash
+1. Compute the tag by computing the hash of the input.
+2. Check if a tagged artifact exists with that hash.
 
-    a. If it does we have a cache hit and Propeller can skip the task execution.
+    a. If it does, we have a cache hit and the Propeller can skip the task execution.
     b. If an artifact is not associated with the tag, Flyte Propeller needs to run the task.

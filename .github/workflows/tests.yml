@@ -21,7 +21,7 @@ jobs:
       - name: Build the documentation
         run: make docs
 
-  end-to-end-kustomize:
+  generate_kustomize:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,50 +30,13 @@ jobs:
           go-version: "^1.17.6"
       - name: Kustomize and diff
         run: DELTA_CHECK=true make kustomize
-      - name: Helm and diff
-        run: DELTA_CHECK=true make helm
-      - uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.11.1"
-      - name: End2End
-        env:
-          DOCKER_USERNAME: ${{ github.actor }}
-          DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          # launch flyte end2end
-          kubectl apply -f "./deployment/test/flyte_generated.yaml"
-          make end2end_execute
 
-  end-to-end-helm:
+  generate_helm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: "^1.17.6"
-      - name: Kustomize and diff
-        run: DELTA_CHECK=true make kustomize
       - name: Helm and diff
         run: DELTA_CHECK=true make helm
-      - uses: unionai/flytectl-setup-action@v0.0.1
-        name: Setup flytectl
-      - name: Create Sandbox Cluster
-        run: |
-          flytectl config init
-          flytectl sandbox start --source=$(pwd)
-      - name: Upgrade Helm charts
-        run: flytectl sandbox exec -- helm upgrade flyte -n flyte --kubeconfig=/etc/rancher/k3s/k3s.yaml /root/charts/flyte/ -f /root/charts/flyte/values-sandbox.yaml
-      - name: End2End
-        env:
-          KUBECONFIG: /home/runner/.flyte/k3s/k3s.yaml
-        run: |
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          # launch flyte end2end
-          make end2end_execute
