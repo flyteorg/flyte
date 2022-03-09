@@ -34,6 +34,12 @@ Retrieve a particular version of the launch plan by name within the project and 
 
  flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --version v2
 
+Retrieve all launch plans for a given workflow name:
+
+::
+
+ flytectl get launchplan -p flytesnacks -d development --workflow core.flyte_basics.lp.go_greet
+
 Retrieve all the launch plans with filters:
 ::
 
@@ -112,6 +118,7 @@ Options
   -h, --help                          help for launchplan
       --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case
       --version string                version of the launchplan to be fetched.
+      --workflow string               name of the workflow for which the launchplans need to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
