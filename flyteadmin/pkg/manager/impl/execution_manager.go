@@ -1177,15 +1177,20 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 
 	wfExecPhase := core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])
 	// Subsequent queued events announcing a cluster reassignment are permitted.
-	if wfExecPhase == request.Event.Phase && request.Event.Phase != core.WorkflowExecution_QUEUED {
-		logger.Debugf(ctx, "This phase %s was already recorded for workflow execution %v",
-			wfExecPhase.String(), request.Event.ExecutionId)
-		return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
-			"This phase %s was already recorded for workflow execution %v",
-			wfExecPhase.String(), request.Event.ExecutionId)
-	} else if err := validation.ValidateCluster(ctx, executionModel.Cluster, request.Event.ProducerId); err != nil {
-		return nil, err
-	} else if common.IsExecutionTerminal(wfExecPhase) {
+	if request.Event.Phase != core.WorkflowExecution_QUEUED {
+		if wfExecPhase == request.Event.Phase {
+			logger.Debugf(ctx, "This phase %s was already recorded for workflow execution %v",
+				wfExecPhase.String(), request.Event.ExecutionId)
+			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
+				"This phase %s was already recorded for workflow execution %v",
+				wfExecPhase.String(), request.Event.ExecutionId)
+		} else if err := validation.ValidateCluster(ctx, executionModel.Cluster, request.Event.ProducerId); err != nil {
+			// Only perform event cluster validation **after** an execution has moved on from QUEUED.
+			return nil, err
+		}
+	}
+
+	if common.IsExecutionTerminal(wfExecPhase) {
 		// Cannot go backwards in time from a terminal state to anything else
 		curPhase := wfExecPhase.String()
 		errorMsg := fmt.Sprintf("Invalid phase change from %s to %s for workflow execution %v", curPhase, request.Event.Phase.String(), request.Event.ExecutionId)

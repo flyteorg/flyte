@@ -61,7 +61,6 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 
-
 	listResp, err := client.ListMatchableAttributes(ctx, &admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})
