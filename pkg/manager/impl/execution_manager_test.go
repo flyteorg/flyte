@@ -1626,6 +1626,58 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	occurredAt := time.Now().UTC()
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+			return models.Execution{
+				ExecutionKey: models.ExecutionKey{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				BaseModel: models.BaseModel{
+					ID: uint(8),
+				},
+				Spec:         specBytes,
+				Phase:        core.WorkflowExecution_UNDEFINED.String(),
+				Closure:      closureBytes,
+				LaunchPlanID: uint(1),
+				WorkflowID:   uint(2),
+				StartedAt:    &occurredAt,
+			}, nil
+		},
+	)
+	newCluster := "C2"
+	updateExecutionFunc := func(
+		context context.Context, execution models.Execution) error {
+		assert.Equal(t, core.WorkflowExecution_QUEUED.String(), execution.Phase)
+		assert.Equal(t, newCluster, execution.Cluster)
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
+
+	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
+	request := admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			OccurredAt:  occurredAtTimestamp,
+			Phase:       core.WorkflowExecution_QUEUED,
+			ProducerId:  newCluster,
+		},
+	}
+	mockDbEventWriter.On("Write", request)
+	execManager := NewExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, mockDbEventWriter)
+
+	resp, err := execManager.CreateWorkflowEvent(context.Background(), request)
+	assert.Nil(t, err)
+	assert.NotNil(t, resp)
+}
+
 func TestCreateWorkflowEvent_InvalidEvent(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startTime := time.Now()
