@@ -3102,6 +3102,8 @@ definitions:
         disable_all: true
         inputs:
           literals: {}
+        raw_output_data_config:
+          output_location_prefix: "output_location_prefix"
         annotations:
           values:
             key: "values"
@@ -3470,6 +3472,8 @@ definitions:
           disable_all: true
           inputs:
             literals: {}
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           annotations:
             values:
               key: "values"
@@ -3654,6 +3658,8 @@ definitions:
           disable_all: true
           inputs:
             literals: {}
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           annotations:
             values:
               key: "values"
@@ -3878,6 +3884,11 @@ definitions:
           \ parallel for the entire workflow.\nThis is useful to achieve fairness.\
           \ Note: MapTasks are regarded as one unit,\nand parallelism/concurrency\
           \ of MapTasks is independent from this."
+      raw_output_data_config:
+        title: "User setting to configure where to store offloaded data (i.e. Blobs,\
+          \ structured datasets, query data, etc.).\nThis should be a prefix like\
+          \ s3://my-bucket/my-data"
+        $ref: "#/definitions/adminRawOutputDataConfig"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes."
@@ -3912,6 +3923,8 @@ definitions:
       disable_all: true
       inputs:
         literals: {}
+      raw_output_data_config:
+        output_location_prefix: "output_location_prefix"
       annotations:
         values:
           key: "values"

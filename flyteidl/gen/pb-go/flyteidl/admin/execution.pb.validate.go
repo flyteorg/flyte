@@ -1342,6 +1342,16 @@ func (m *ExecutionSpec) Validate() error {
 
 	// no validation rules for MaxParallelism
 
+	if v, ok := interface{}(m.GetRawOutputDataConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionSpecValidationError{
+				field:  "RawOutputDataConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.NotificationOverrides.(type) {
 
 	case *ExecutionSpec_Notifications:
