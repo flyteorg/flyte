@@ -9484,6 +9484,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec maxParallelism */
             maxParallelism?: (number|null);
+
+            /** ExecutionSpec rawOutputDataConfig */
+            rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -9527,6 +9530,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec maxParallelism. */
             public maxParallelism: number;
+
+            /** ExecutionSpec rawOutputDataConfig. */
+            public rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");

@@ -17,19 +17,20 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_AuthRole_flyteidl_2fadmin_2fcommon_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RawOutputDataConfig_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_UrlBlob_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Annotations_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Labels_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_Notification_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_AbortMetadata_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_SystemMetadata_flyteidl_2fadmin_2fexecution_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_ExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ExecutionStateChangeDetails_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_LiteralMapBlob_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_NotificationList_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_Execution_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_ExecutionMetadata_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_ExecutionClosure_flyteidl_2fadmin_2fexecution_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_ExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionError_flyteidl_2fcore_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
@@ -355,8 +356,8 @@ static void InitDefaultsExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto() {
   ::flyteidl::admin::ExecutionSpec::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<9> scc_info_ExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 9, InitDefaultsExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto}, {
+::google::protobuf::internal::SCCInfo<10> scc_info_ExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 10, InitDefaultsExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto}, {
       &scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto.base,
       &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,
       &scc_info_ExecutionMetadata_flyteidl_2fadmin_2fexecution_2eproto.base,
@@ -365,7 +366,8 @@ static void InitDefaultsExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto() {
       &scc_info_Annotations_flyteidl_2fadmin_2fcommon_2eproto.base,
       &scc_info_SecurityContext_flyteidl_2fcore_2fsecurity_2eproto.base,
       &scc_info_AuthRole_flyteidl_2fadmin_2fcommon_2eproto.base,
-      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,}};
+      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,
+      &scc_info_RawOutputDataConfig_flyteidl_2fadmin_2fcommon_2eproto.base,}};
 
 static void InitDefaultsExecutionTerminateRequest_flyteidl_2fadmin_2fexecution_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -627,6 +629,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fexecution_2eprot
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, auth_role_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, quality_of_service_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, max_parallelism_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, raw_output_data_config_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, notification_overrides_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionTerminateRequest, _internal_metadata_),
@@ -691,13 +694,13 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 93, -1, sizeof(::flyteidl::admin::ExecutionMetadata)},
   { 105, -1, sizeof(::flyteidl::admin::NotificationList)},
   { 111, -1, sizeof(::flyteidl::admin::ExecutionSpec)},
-  { 128, -1, sizeof(::flyteidl::admin::ExecutionTerminateRequest)},
-  { 135, -1, sizeof(::flyteidl::admin::ExecutionTerminateResponse)},
-  { 140, -1, sizeof(::flyteidl::admin::WorkflowExecutionGetDataRequest)},
-  { 146, -1, sizeof(::flyteidl::admin::WorkflowExecutionGetDataResponse)},
-  { 155, -1, sizeof(::flyteidl::admin::ExecutionUpdateRequest)},
-  { 162, -1, sizeof(::flyteidl::admin::ExecutionStateChangeDetails)},
-  { 170, -1, sizeof(::flyteidl::admin::ExecutionUpdateResponse)},
+  { 129, -1, sizeof(::flyteidl::admin::ExecutionTerminateRequest)},
+  { 136, -1, sizeof(::flyteidl::admin::ExecutionTerminateResponse)},
+  { 141, -1, sizeof(::flyteidl::admin::WorkflowExecutionGetDataRequest)},
+  { 147, -1, sizeof(::flyteidl::admin::WorkflowExecutionGetDataResponse)},
+  { 156, -1, sizeof(::flyteidl::admin::ExecutionUpdateRequest)},
+  { 163, -1, sizeof(::flyteidl::admin::ExecutionStateChangeDetails)},
+  { 171, -1, sizeof(::flyteidl::admin::ExecutionUpdateResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -795,7 +798,7 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto[] =
   "EDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CH"
   "ILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notific"
   "ationList\0223\n\rnotifications\030\001 \003(\0132\034.flyte"
-  "idl.admin.Notification\"\260\004\n\rExecutionSpec"
+  "idl.admin.Notification\"\365\004\n\rExecutionSpec"
   "\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core.Id"
   "entifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core"
   ".LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyt"
@@ -808,35 +811,37 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto[] =
   "re.SecurityContext\022/\n\tauth_role\030\020 \001(\0132\030."
   "flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality_o"
   "f_service\030\021 \001(\0132\037.flyteidl.core.QualityO"
-  "fService\022\027\n\017max_parallelism\030\022 \001(\005B\030\n\026not"
-  "ification_overridesJ\004\010\004\020\005\"b\n\031ExecutionTe"
-  "rminateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.co"
-  "re.WorkflowExecutionIdentifier\022\r\n\005cause\030"
-  "\002 \001(\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037W"
-  "orkflowExecutionGetDataRequest\0226\n\002id\030\001 \001"
-  "(\0132*.flyteidl.core.WorkflowExecutionIden"
-  "tifier\"\336\001\n WorkflowExecutionGetDataRespo"
-  "nse\022,\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.Ur"
-  "lBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.adm"
-  "in.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.fl"
-  "yteidl.core.LiteralMap\022/\n\014full_outputs\030\004"
-  " \001(\0132\031.flyteidl.core.LiteralMap\"\177\n\026Execu"
-  "tionUpdateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl"
-  ".core.WorkflowExecutionIdentifier\022-\n\005sta"
-  "te\030\002 \001(\0162\036.flyteidl.admin.ExecutionState"
-  "\"\220\001\n\033ExecutionStateChangeDetails\022-\n\005stat"
-  "e\030\001 \001(\0162\036.flyteidl.admin.ExecutionState\022"
-  "/\n\013occurred_at\030\002 \001(\0132\032.google.protobuf.T"
-  "imestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027Execution"
-  "UpdateResponse*>\n\016ExecutionState\022\024\n\020EXEC"
-  "UTION_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7"
-  "Z5github.com/flyteorg/flyteidl/gen/pb-go"
-  "/flyteidl/adminb\006proto3"
+  "fService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw"
+  "_output_data_config\030\023 \001(\0132#.flyteidl.adm"
+  "in.RawOutputDataConfigB\030\n\026notification_o"
+  "verridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateRequ"
+  "est\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow"
+  "ExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032Ex"
+  "ecutionTerminateResponse\"Y\n\037WorkflowExec"
+  "utionGetDataRequest\0226\n\002id\030\001 \001(\0132*.flytei"
+  "dl.core.WorkflowExecutionIdentifier\"\336\001\n "
+  "WorkflowExecutionGetDataResponse\022,\n\007outp"
+  "uts\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022+"
+  "\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB"
+  "\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core"
+  ".LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyt"
+  "eidl.core.LiteralMap\"\177\n\026ExecutionUpdateR"
+  "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf"
+  "lowExecutionIdentifier\022-\n\005state\030\002 \001(\0162\036."
+  "flyteidl.admin.ExecutionState\"\220\001\n\033Execut"
+  "ionStateChangeDetails\022-\n\005state\030\001 \001(\0162\036.f"
+  "lyteidl.admin.ExecutionState\022/\n\013occurred"
+  "_at\030\002 \001(\0132\032.google.protobuf.Timestamp\022\021\n"
+  "\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRespo"
+  "nse*>\n\016ExecutionState\022\024\n\020EXECUTION_ACTIV"
+  "E\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5github.co"
+  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/a"
+  "dminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto,
-  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 4023,
+  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 4092,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto() {
@@ -6993,6 +6998,8 @@ void ExecutionSpec::InitAsDefaultInstance() {
       ::flyteidl::admin::AuthRole::internal_default_instance());
   ::flyteidl::admin::_ExecutionSpec_default_instance_._instance.get_mutable()->quality_of_service_ = const_cast< ::flyteidl::core::QualityOfService*>(
       ::flyteidl::core::QualityOfService::internal_default_instance());
+  ::flyteidl::admin::_ExecutionSpec_default_instance_._instance.get_mutable()->raw_output_data_config_ = const_cast< ::flyteidl::admin::RawOutputDataConfig*>(
+      ::flyteidl::admin::RawOutputDataConfig::internal_default_instance());
 }
 class ExecutionSpec::HasBitSetters {
  public:
@@ -7005,6 +7012,7 @@ class ExecutionSpec::HasBitSetters {
   static const ::flyteidl::core::SecurityContext& security_context(const ExecutionSpec* msg);
   static const ::flyteidl::admin::AuthRole& auth_role(const ExecutionSpec* msg);
   static const ::flyteidl::core::QualityOfService& quality_of_service(const ExecutionSpec* msg);
+  static const ::flyteidl::admin::RawOutputDataConfig& raw_output_data_config(const ExecutionSpec* msg);
 };
 
 const ::flyteidl::core::Identifier&
@@ -7042,6 +7050,10 @@ ExecutionSpec::HasBitSetters::auth_role(const ExecutionSpec* msg) {
 const ::flyteidl::core::QualityOfService&
 ExecutionSpec::HasBitSetters::quality_of_service(const ExecutionSpec* msg) {
   return *msg->quality_of_service_;
+}
+const ::flyteidl::admin::RawOutputDataConfig&
+ExecutionSpec::HasBitSetters::raw_output_data_config(const ExecutionSpec* msg) {
+  return *msg->raw_output_data_config_;
 }
 void ExecutionSpec::clear_launch_plan() {
   if (GetArenaNoVirtual() == nullptr && launch_plan_ != nullptr) {
@@ -7099,6 +7111,12 @@ void ExecutionSpec::clear_quality_of_service() {
   }
   quality_of_service_ = nullptr;
 }
+void ExecutionSpec::clear_raw_output_data_config() {
+  if (GetArenaNoVirtual() == nullptr && raw_output_data_config_ != nullptr) {
+    delete raw_output_data_config_;
+  }
+  raw_output_data_config_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ExecutionSpec::kLaunchPlanFieldNumber;
 const int ExecutionSpec::kInputsFieldNumber;
@@ -7111,6 +7129,7 @@ const int ExecutionSpec::kSecurityContextFieldNumber;
 const int ExecutionSpec::kAuthRoleFieldNumber;
 const int ExecutionSpec::kQualityOfServiceFieldNumber;
 const int ExecutionSpec::kMaxParallelismFieldNumber;
+const int ExecutionSpec::kRawOutputDataConfigFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ExecutionSpec::ExecutionSpec()
@@ -7162,6 +7181,11 @@ ExecutionSpec::ExecutionSpec(const ExecutionSpec& from)
   } else {
     quality_of_service_ = nullptr;
   }
+  if (from.has_raw_output_data_config()) {
+    raw_output_data_config_ = new ::flyteidl::admin::RawOutputDataConfig(*from.raw_output_data_config_);
+  } else {
+    raw_output_data_config_ = nullptr;
+  }
   max_parallelism_ = from.max_parallelism_;
   clear_has_notification_overrides();
   switch (from.notification_overrides_case()) {
@@ -7203,6 +7227,7 @@ void ExecutionSpec::SharedDtor() {
   if (this != internal_default_instance()) delete security_context_;
   if (this != internal_default_instance()) delete auth_role_;
   if (this != internal_default_instance()) delete quality_of_service_;
+  if (this != internal_default_instance()) delete raw_output_data_config_;
   if (has_notification_overrides()) {
     clear_notification_overrides();
   }
@@ -7274,6 +7299,10 @@ void ExecutionSpec::Clear() {
     delete quality_of_service_;
   }
   quality_of_service_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && raw_output_data_config_ != nullptr) {
+    delete raw_output_data_config_;
+  }
+  raw_output_data_config_ = nullptr;
   max_parallelism_ = 0;
   clear_notification_overrides();
   _internal_metadata_.Clear();
@@ -7421,6 +7450,19 @@ const char* ExecutionSpec::_InternalParse(const char* begin, const char* end, vo
         if (static_cast<::google::protobuf::uint8>(tag) != 144) goto handle_unusual;
         msg->set_max_parallelism(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;
+      case 19: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 154) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::RawOutputDataConfig::_InternalParse;
+        object = msg->mutable_raw_output_data_config();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -7579,6 +7621,17 @@ bool ExecutionSpec::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;
+      case 19: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (154 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_raw_output_data_config()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -7670,6 +7723,12 @@ void ExecutionSpec::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(18, this->max_parallelism(), output);
   }
 
+  // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;
+  if (this->has_raw_output_data_config()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      19, HasBitSetters::raw_output_data_config(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -7756,6 +7815,13 @@ void ExecutionSpec::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(18, this->max_parallelism(), target);
   }
 
+  // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;
+  if (this->has_raw_output_data_config()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        19, HasBitSetters::raw_output_data_config(this), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -7833,6 +7899,13 @@ size_t ExecutionSpec::ByteSizeLong() const {
         *quality_of_service_);
   }
 
+  // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 19;
+  if (this->has_raw_output_data_config()) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *raw_output_data_config_);
+  }
+
   // int32 max_parallelism = 18;
   if (this->max_parallelism() != 0) {
     total_size += 2 +
@@ -7908,6 +7981,9 @@ void ExecutionSpec::MergeFrom(const ExecutionSpec& from) {
   if (from.has_quality_of_service()) {
     mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
   }
+  if (from.has_raw_output_data_config()) {
+    mutable_raw_output_data_config()->::flyteidl::admin::RawOutputDataConfig::MergeFrom(from.raw_output_data_config());
+  }
   if (from.max_parallelism() != 0) {
     set_max_parallelism(from.max_parallelism());
   }
@@ -7959,6 +8035,7 @@ void ExecutionSpec::InternalSwap(ExecutionSpec* other) {
   swap(security_context_, other->security_context_);
   swap(auth_role_, other->auth_role_);
   swap(quality_of_service_, other->quality_of_service_);
+  swap(raw_output_data_config_, other->raw_output_data_config_);
   swap(max_parallelism_, other->max_parallelism_);
   swap(notification_overrides_, other->notification_overrides_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);

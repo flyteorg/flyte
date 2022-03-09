@@ -281,6 +281,10 @@ message ExecutionSpec {
     // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
     // and parallelism/concurrency of MapTasks is independent from this.
     int32 max_parallelism = 18;
+
+    // User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+    // This should be a prefix like s3://my-bucket/my-data
+    RawOutputDataConfig raw_output_data_config = 19;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.
