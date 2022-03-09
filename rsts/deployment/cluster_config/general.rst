@@ -23,8 +23,8 @@ Along these dimensions, the following settings are configurable:
 
 Task Resources
 ==============
-Configuring task resources includes setting default values for both task requests and limits, as well as
-the maximum allowed limit for the following resources:
+Configuring task resources includes setting default values for unspecified task requests and limits.
+Task resources also include limits which specify the maximum value either a task request or limit can have.
 
 - cpu
 - gpu
