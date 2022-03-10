@@ -109,7 +109,6 @@ It is possible to add extra configuration to your Flyte deployment by modifying 
 used by Opta. Refer to the possible values allowed in `Flyte Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte>`__
 and update the values field of Flyte module in the ``flyte.yaml`` file accordingly.
 
-
 Raw Helm Deployment
 -------------------
 It is certainly possible to deploy a production Flyte cluster directly using Helm chart if a user does not wish to
@@ -118,3 +117,5 @@ and then use `Helm <https://helm.sh/>`__ to deploy `Flyte Helm chart <https://gi
 
 .. role:: raw-html-m2r(raw)
    :format: html
+
+Once complete please run ``opta apply -c flyte.yaml`` and follow the prompts.
