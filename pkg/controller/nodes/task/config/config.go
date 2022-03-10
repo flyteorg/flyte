@@ -12,7 +12,7 @@ import (
 	"github.com/flyteorg/flytestdlib/config"
 )
 
-//go:generate pflags Config --default-var defaultConfig
+//go:generate pflags Config
 
 const SectionKey = "tasks"
 
@@ -50,7 +50,7 @@ type BarrierConfig struct {
 }
 
 type TaskPluginConfig struct {
-	EnabledPlugins []string `json:"enabled-plugins" pflag:",deprecated"`
+	EnabledPlugins []string `json:"enabled-plugins" pflag:",Plugins enabled currently"`
 	// Maps task types to their plugin handler (by ID).
 	DefaultForTaskTypes map[string]string `json:"default-for-task-types" pflag:"-,"`
 }

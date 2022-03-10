@@ -221,7 +221,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
-	enabledPlugins, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry)
+	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
@@ -244,7 +244,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
 		// static definition includes that task type as something it is registered to handle.
 		for _, tt := range p.RegisteredTaskTypes {
-			for _, defaultTaskType := range p.DefaultForTaskTypes {
+			for _, defaultTaskType := range defaultForTaskTypes[cp.GetID()] {
 				if defaultTaskType == tt {
 					if existingHandler, alreadyDefaulted := t.defaultPlugins[tt]; alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
 						logger.Errorf(ctx, "TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
