@@ -51,6 +51,9 @@ var (
 			Duration: time.Minute * 3,
 		},
 		GpuResourceName: ResourceNvidiaGPU,
+		DefaultPodTemplateResync: config2.Duration{
+			Duration: 30 * time.Second,
+		},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -148,6 +151,14 @@ type K8sPluginConfig struct {
 	// DefaultPodDNSConfig provides a default pod DNS config that that should be applied for the primary container launched and created by FlytePropeller. This may not be applicable to all plugins. For
 	//	// downstream plugins - i.e. TensorflowOperators may not support setting this.
 	DefaultPodDNSConfig *v1.PodDNSConfig `json:"default-pod-dns-config" pflag:"-,Optionally specify a default DNS config that should be applied to every Pod launched by FlytePropeller."`
+
+	// DefaultPodTemplateName that serves as the base PodTemplate for all k8s pods (including
+	// individual containers) that are creating by FlytePropeller.
+	DefaultPodTemplateName string `json:"default-pod-template-name" pflag:",Name of the PodTemplate to use as the base for all k8s pods created by FlytePropeller."`
+
+	// DefaultPodTemplateResync defines the frequency at which the k8s informer resyncs the default
+	// pod template resources.
+	DefaultPodTemplateResync config2.Duration `json:"default-pod-template-resync" pflag:",Frequency of resyncing default pod templates"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

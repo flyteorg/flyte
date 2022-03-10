@@ -6,16 +6,17 @@ import (
 	"strings"
 	"time"
 
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"github.com/flyteorg/flytestdlib/logger"
+
+	"github.com/imdario/mergo"
+
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 const PodKind = "pod"
@@ -146,16 +147,30 @@ func ToK8sPodSpecWithInterruptible(ctx context.Context, tCtx pluginsCore.TaskExe
 	return pod, nil
 }
 
-func BuildPodWithSpec(podSpec *v1.PodSpec) *v1.Pod {
+func BuildPodWithSpec(podTemplate *v1.PodTemplate, podSpec *v1.PodSpec) (*v1.Pod, error) {
 	pod := v1.Pod{
 		TypeMeta: v12.TypeMeta{
 			Kind:       PodKind,
 			APIVersion: v1.SchemeGroupVersion.String(),
 		},
-		Spec: *podSpec,
 	}
 
-	return &pod
+	if podTemplate != nil {
+		basePodSpec := podTemplate.Template.Spec.DeepCopy()
+		err := mergo.Merge(basePodSpec, podSpec, mergo.WithOverride, mergo.WithAppendSlice)
+		if err != nil {
+			return nil, err
+		}
+
+		basePodSpec.Containers = podSpec.Containers
+
+		pod.ObjectMeta = podTemplate.Template.ObjectMeta
+		pod.Spec = *basePodSpec
+	} else {
+		pod.Spec = *podSpec
+	}
+
+	return &pod, nil
 }
 
 func BuildIdentityPod() *v1.Pod {

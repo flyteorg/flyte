@@ -65,7 +65,12 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	}
 
 	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	pod := flytek8s.BuildPodWithSpec(podSpec)
+
+	podTemplate := flytek8s.DefaultPodTemplateStore.LoadOrDefault(taskCtx.TaskExecutionMetadata().GetNamespace())
+	pod, err := flytek8s.BuildPodWithSpec(podTemplate, podSpec)
+	if err != nil {
+		return nil, err
+	}
 
 	// update pod metadata
 	if err = builder.updatePodMetadata(ctx, pod, task, taskCtx); err != nil {
