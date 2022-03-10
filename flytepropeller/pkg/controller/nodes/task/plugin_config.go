@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
@@ -13,23 +14,21 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 )
 
-func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) ([]core.PluginEntry, error) {
+func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
+	if cfg == nil {
+		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")
+	}
+
+	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	allPluginsEnabled := false
-	pluginsConfigMeta := config.PluginsConfigMeta{
-		AllDefaultForTaskTypes: map[pluginID][]taskType{},
-	}
-	var err error
-	if cfg != nil {
-		pluginsConfigMeta, err = cfg.GetEnabledPlugins()
-		if err != nil {
-			return nil, err
-		}
-	}
 	if pluginsConfigMeta.EnabledPlugins.Len() == 0 {
 		allPluginsEnabled = true
 	}
 
-	var finalizedPlugins []core.PluginEntry
 	logger.Infof(ctx, "Enabled plugins: %v", pluginsConfigMeta.EnabledPlugins.List())
 	logger.Infof(ctx, "Loading core Plugins, plugin configuration [all plugins enabled: %v]", allPluginsEnabled)
 	for _, cpe := range pr.GetCorePlugins() {
@@ -38,10 +37,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 			logger.Infof(ctx, "Plugin [%s] is DISABLED (not found in enabled plugins list).", id)
 		} else {
 			logger.Infof(ctx, "Plugin [%s] ENABLED", id)
-			if defaults, ok := pluginsConfigMeta.AllDefaultForTaskTypes[id]; ok {
-				cpe.DefaultForTaskTypes = defaults
-			}
-			finalizedPlugins = append(finalizedPlugins, cpe)
+			enabledPlugins = append(enabledPlugins, cpe)
 		}
 	}
 
@@ -65,11 +61,10 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 				LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (plugin core.Plugin, e error) {
 					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController, monitorIndex)
 				},
-				IsDefault:           kpe.IsDefault,
-				DefaultForTaskTypes: pluginsConfigMeta.AllDefaultForTaskTypes[id],
+				IsDefault: kpe.IsDefault,
 			}
-			finalizedPlugins = append(finalizedPlugins, plugin)
+			enabledPlugins = append(enabledPlugins, plugin)
 		}
 	}
-	return finalizedPlugins, nil
+	return enabledPlugins, pluginsConfigMeta.AllDefaultForTaskTypes, nil
 }
