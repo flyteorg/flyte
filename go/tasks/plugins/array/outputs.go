@@ -66,6 +66,19 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 	finalOutputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{},
 	}
+
+	// Initialize the final output literal with empty output variable collections. Otherwise, if a
+	// task has no input values they will never be written.
+	for _, varName := range i.varNames {
+		finalOutputs.Literals[varName] = &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: make([]*core.Literal, 0),
+				},
+			},
+		}
+	}
+
 	for idx, subTaskPhaseIdx := range i.finalPhases.GetItems() {
 		existingPhase := pluginCore.Phases[subTaskPhaseIdx]
 		if existingPhase.IsSuccess() {

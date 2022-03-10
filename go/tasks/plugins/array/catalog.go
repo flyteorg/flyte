@@ -78,7 +78,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			return state, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
 		}
 
-		size := 0
+		size := -1
 		var literalCollection *idlCore.LiteralCollection
 		var discoveredInputName string
 		for inputName, literal := range inputs.Literals {
@@ -89,7 +89,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			}
 		}
 
-		if size == 0 {
+		if size < 0 {
 			// Something is wrong, we should have inferred the array size when it is not specified by the size of the
 			// input collection (for any input value). Non-collection type inputs are not currently supported for
 			// taskTypeVersion > 0.
