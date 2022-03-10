@@ -233,6 +233,10 @@ export const clientConfig: webpack.Configuration = {
         uglifyOptions: {
           compress: {
             collapse_vars: false,
+            // without 'inline: false' we can get 'Assignment to constant variable' error in production build
+            // discussed in: https://github.com/mishoo/UglifyJS/issues/2842 and https://github.com/mishoo/UglifyJS/issues/2854
+            // happens in uglify-es 3.3.8, 3.3.9
+            inline: false,
             warnings: false
           },
           output: { comments: false }

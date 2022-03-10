@@ -50,27 +50,32 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface TaskNamesProps {
   nodes: dNode[];
-  onToggle: (id: string, scopeId: string) => void;
+  onScroll: () => void;
+  onToggle: (id: string, scopeId: string, level: number) => void;
 }
 
 export const TaskNames = React.forwardRef<HTMLDivElement, TaskNamesProps>((props, ref) => {
   const state = React.useContext(NodeExecutionsTimelineContext);
-  const { nodes, onToggle } = props;
+  const { nodes, onScroll, onToggle } = props;
   const styles = useStyles();
 
   return (
-    <div className={styles.taskNamesList} ref={ref}>
+    <div className={styles.taskNamesList} ref={ref} onScroll={onScroll}>
       {nodes.map(node => {
         const templateName = getNodeTemplateName(node);
+        const nodeLevel = node?.level ?? 0;
         return (
           <div
             className={styles.namesContainer}
-            key={`task-name-${node.scopedId}`}
-            style={{ paddingLeft: (node?.level || 0) * 16 }}
+            key={`level=${nodeLevel}-id=${node.id}-name=${node.scopedId}`}
+            style={{ paddingLeft: nodeLevel * 16 }}
           >
             <div className={styles.namesContainerExpander}>
               {node.nodes?.length ? (
-                <RowExpander expanded={node.expanded || false} onClick={() => onToggle(node.id, node.scopedId)} />
+                <RowExpander
+                  expanded={node.expanded || false}
+                  onClick={() => onToggle(node.id, node.scopedId, nodeLevel)}
+                />
               ) : (
                 <div className={styles.leaf} />
               )}
@@ -79,7 +84,7 @@ export const TaskNames = React.forwardRef<HTMLDivElement, TaskNamesProps>((props
             <div className={styles.namesContainerBody}>
               <NodeExecutionName
                 name={node.name}
-                execution={node.execution!} //node.execution currently accessible only for root nodes
+                execution={node.execution!} // some nodes don't have associated execution
                 state={state}
               />
               <Typography variant="subtitle1" color="textSecondary" className={styles.displayName}>

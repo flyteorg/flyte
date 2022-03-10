@@ -206,10 +206,8 @@ async function fetchGroupsForParentNodeExecution(
     }
   };
 
-  /** @TODO there is likely a better way to do this; eg, in a previous call */
-  if (!nodeExecution.scopedId) {
-    nodeExecution.scopedId = nodeExecution.metadata?.specNodeId;
-  }
+  const parentScopeId = nodeExecution.scopedId ?? nodeExecution.metadata?.specNodeId;
+  nodeExecution.scopedId = parentScopeId;
 
   const children = await fetchNodeExecutionList(queryClient, nodeExecution.id.executionId, finalConfig);
   const groupsByName = children.reduce<Map<string, NodeExecutionGroup>>((out, child) => {
@@ -224,9 +222,8 @@ async function fetchGroupsForParentNodeExecution(
      * This builds a scopedId via parent nodeExecution
      * to enable mapping between graph and other components
      */
-    let scopedId: string | undefined = nodeExecution.metadata?.specNodeId;
+    let scopedId = parentScopeId;
     if (scopedId != undefined) {
-      child['parentId'] = scopedId;
       scopedId += `-${child.metadata?.retryGroup}-${child.metadata?.specNodeId}`;
       child['scopedId'] = scopedId;
     } else {

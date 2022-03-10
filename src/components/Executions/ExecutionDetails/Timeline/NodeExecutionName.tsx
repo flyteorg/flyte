@@ -23,8 +23,13 @@ export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({ nam
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
-  const isSelected = state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
+  if (!execution) {
+    // to avoid crash - disable items which do not have associated execution.
+    // as we won't be able to provide task info for them anyway.
+    return <Typography variant="body1">{name}</Typography>;
+  }
 
+  const isSelected = state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
   return isSelected ? (
     <Typography variant="body1" className={styles.selectedExecutionName}>
       {name}

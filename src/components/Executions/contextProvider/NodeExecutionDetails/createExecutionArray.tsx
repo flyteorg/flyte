@@ -1,119 +1,97 @@
-import { Core } from 'flyteidl';
-import {
-    NodeExecutionDetails,
-    NodeExecutionDisplayType
-} from 'components/Executions/types';
-import { flattenBranchNodes } from 'components/Executions/utils';
+import { transformerWorkflowToPlainNodes } from 'components/WorkflowGraph/transformerWorkflowToDag';
+import { NodeExecutionDetails, NodeExecutionDisplayType } from 'components/Executions/types';
 import { Workflow } from 'models/Workflow/types';
 import { Identifier } from 'models/Common/types';
-import { CompiledNode } from 'models/Node/types';
 import { CompiledTask } from 'models/Task/types';
-import { endNodeId, startNodeId } from 'models/Node/constants';
-import { isIdEqual, UNKNOWN_DETAILS } from './types';
+import { dNode } from 'models/Graph/types';
+import { isEndNode, isStartNode } from 'components/WorkflowGraph/utils';
+import { UNKNOWN_DETAILS } from './types';
 
 interface NodeExecutionInfo extends NodeExecutionDetails {
-    parentTemplate: Identifier;
+  scopedId?: string;
 }
 
 export interface CurrentExecutionDetails {
-    executionId: Identifier;
-    nodes: NodeExecutionInfo[];
+  executionId: Identifier;
+  nodes: NodeExecutionInfo[];
 }
 
-const isParentNode = (type: string) =>
-    type === NodeExecutionDisplayType.Workflow;
-
-const getNodeDetails = (
-    node: CompiledNode,
-    tasks: CompiledTask[]
-): NodeExecutionDetails => {
-    if (node.taskNode) {
-        const templateName = node.taskNode.referenceId.name;
-        const task = tasks.find(t => t.template.id.name === templateName);
-        return {
-            displayId: node.id,
-            displayName: templateName,
-            displayType:
-                task?.template.type ?? NodeExecutionDisplayType.UnknownTask,
-            taskTemplate: task?.template
-        };
+function convertToPlainNodes(nodes: dNode[], level = 0): dNode[] {
+  const result: dNode[] = [];
+  if (!nodes || nodes.length === 0) {
+    return result;
+  }
+  nodes.forEach(node => {
+    if (isStartNode(node) || isEndNode(node)) {
+      return;
     }
-
-    if (node.workflowNode) {
-        const info =
-            node.workflowNode.launchplanRef ?? node.workflowNode.subWorkflowRef;
-        return {
-            displayId: node.id,
-            displayName: info?.name ?? 'N/A',
-            displayType: NodeExecutionDisplayType.Workflow
-        };
+    result.push({ ...node, level });
+    if (node.nodes.length > 0) {
+      result.push(...convertToPlainNodes(node.nodes, level + 1));
     }
+  });
+  return result;
+}
 
-    // TODO: https://github.com/lyft/flyte/issues/655
-    if (node.branchNode) {
-        return {
-            displayId: node.id,
-            displayName: 'branchNode',
-            displayType: NodeExecutionDisplayType.BranchNode
-        };
-    }
+const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo => {
+  if (node.value.taskNode) {
+    const templateName = node.value.taskNode.referenceId.name ?? node.name;
+    const task = tasks.find(t => t.template.id.name === templateName);
+    return {
+      scopedId: node.scopedId,
+      displayId: node.value.id ?? node.id,
+      displayName: templateName,
+      displayType: task?.template.type ?? NodeExecutionDisplayType.UnknownTask,
+      taskTemplate: task?.template
+    };
+  }
 
-    return UNKNOWN_DETAILS;
+  if (node.value.workflowNode) {
+    const workflowNode = node.value.workflowNode;
+    const info = workflowNode.launchplanRef ?? workflowNode.subWorkflowRef;
+    return {
+      scopedId: node.scopedId,
+      displayId: node.value.id ?? node.id,
+      displayName: node.name ?? info?.name ?? 'N/A',
+      displayType: NodeExecutionDisplayType.Workflow
+    };
+  }
+
+  // TODO: https://github.com/lyft/flyte/issues/655
+  if (node.value.branchNode) {
+    return {
+      scopedId: node.scopedId,
+      displayId: node.value.id ?? node.id,
+      displayName: 'branchNode',
+      displayType: NodeExecutionDisplayType.BranchNode
+    };
+  }
+
+  return UNKNOWN_DETAILS;
 };
 
-export function createExecutionDetails(
-    workflow: Workflow
-): { nodes: CurrentExecutionDetails; map: Map<string, Core.IIdentifier> } {
-    const mapNodeIdToTemplate = new Map<string, Core.IIdentifier>();
-    const result: CurrentExecutionDetails = {
-        executionId: workflow.id,
-        nodes: []
-    };
+export function createExecutionDetails(workflow: Workflow): CurrentExecutionDetails {
+  const result: CurrentExecutionDetails = {
+    executionId: workflow.id,
+    nodes: []
+  };
 
-    if (!workflow.closure?.compiledWorkflow) {
-        return { nodes: result, map: mapNodeIdToTemplate };
-    }
+  if (!workflow.closure?.compiledWorkflow) {
+    return result;
+  }
 
-    const {
-        primary,
-        subWorkflows = [],
-        tasks = []
-    } = workflow.closure?.compiledWorkflow;
+  const compiledWorkflow = workflow.closure?.compiledWorkflow;
+  const { tasks = [] } = compiledWorkflow;
 
-    if (!isIdEqual(primary.template.id, workflow.id)) {
-        console.log('WRONG');
-    }
+  let dNodes = transformerWorkflowToPlainNodes(compiledWorkflow).nodes ?? [];
+  dNodes = convertToPlainNodes(dNodes);
 
-    const allWorkflows = [primary, ...subWorkflows];
-    allWorkflows.forEach(w => {
-        const nodes = w.template.nodes;
-        nodes
-            .map(flattenBranchNodes)
-            .flat()
-            .forEach(n => {
-                if (n.id === startNodeId || n.id === endNodeId) {
-                    // skip start and end nodes
-                    return;
-                }
-
-                const details = getNodeDetails(n, tasks);
-                if (
-                    details?.displayName &&
-                    isParentNode(details?.displayType)
-                ) {
-                    const info =
-                        n.workflowNode?.launchplanRef ??
-                        n.workflowNode?.subWorkflowRef;
-                    if (info) {
-                        mapNodeIdToTemplate.set(n.id, info);
-                    }
-                }
-                result.nodes.push({
-                    parentTemplate: w.template.id,
-                    ...details
-                });
-            });
+  dNodes.forEach(n => {
+    const details = getNodeDetails(n, tasks);
+    result.nodes.push({
+      ...details
     });
+  });
 
-    return { nodes: result, map: mapNodeIdToTemplate };
+  return result;
 }

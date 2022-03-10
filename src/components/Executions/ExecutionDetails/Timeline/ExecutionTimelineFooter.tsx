@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Theme, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
+import { Theme, Radio, RadioGroup, Slider } from '@material-ui/core';
 import { makeStyles, withStyles } from '@material-ui/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { COLOR_SPECTRUM } from 'components/Theme/colorSpectrum';
 import { TimeZone } from './helpers';
+import { useScaleContext } from './scaleContext';
 
 function valueText(value: number) {
   return `${value}s`;
@@ -64,49 +65,15 @@ const CustomSlider = withStyles({
   }
 })(Slider);
 
-const formatSeconds = t => {
-  const time = Math.floor(t);
-  if (time < 60) {
-    return `${time}s`;
-  }
-  if (time % 60 === 0) {
-    return `${Math.floor(time / 60)}m`;
-  }
-  return `${Math.floor(time / 60)}m ${time % 60}s`;
-};
-
-const percentage = [0, 0.1, 0.25, 0.5, 0.75, 1];
-
 interface ExecutionTimelineFooterProps {
-  maxTime: number;
   onTimezoneChange?: (timezone: string) => void;
-  onTimeIntervalChange?: (interval: number) => void;
 }
 
-export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = ({
-  maxTime,
-  onTimezoneChange,
-  onTimeIntervalChange
-}) => {
+export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = ({ onTimezoneChange }) => {
   const styles = useStyles();
   const [timezone, setTimezone] = React.useState(TimeZone.Local);
-  const [timeInterval, setTimeInterval] = React.useState(1);
 
-  const getTitle = React.useCallback(
-    value => {
-      return value === 0 ? '1s' : formatSeconds(maxTime * percentage[value]);
-    },
-    [maxTime]
-  );
-
-  const marks = React.useMemo(
-    () =>
-      percentage.map((_, index) => ({
-        value: index,
-        label: getTitle(index)
-      })),
-    [getTitle]
-  );
+  const timeScale = useScaleContext();
 
   const handleTimezoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTimezone = (event.target as HTMLInputElement).value;
@@ -117,24 +84,17 @@ export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = (
   };
 
   const handleTimeIntervalChange = (event, newValue) => {
-    setTimeInterval(newValue);
-    if (onTimeIntervalChange) {
-      onTimeIntervalChange(newValue === 0 ? 1 : Math.floor(maxTime * percentage[newValue]));
-    }
+    timeScale.setScaleFactor(newValue);
   };
 
   return (
     <div className={styles.container}>
       <CustomSlider
-        value={timeInterval}
+        value={timeScale.scaleFactor}
         onChange={handleTimeIntervalChange}
-        marks={marks}
-        max={5}
-        ValueLabelComponent={({ children, open, value }) => (
-          <Tooltip arrow open={open} enterTouchDelay={0} placement="top" title={getTitle(value)}>
-            {children}
-          </Tooltip>
-        )}
+        marks={timeScale.marks}
+        max={timeScale.marks.length - 1}
+        ValueLabelComponent={({ children }) => <>{children}</>}
         valueLabelDisplay="on"
         getAriaValueText={valueText}
       />

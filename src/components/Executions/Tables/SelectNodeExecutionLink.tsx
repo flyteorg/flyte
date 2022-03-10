@@ -12,7 +12,8 @@ export const SelectNodeExecutionLink: React.FC<{
   linkText: string;
   state: NodeExecutionsTableState;
 }> = ({ className, execution, linkText, state }) => {
-  const onClick = () => state.setSelectedExecution(execution.id);
+  // use null in case if there is no execution provied - to close panel
+  const onClick = () => state.setSelectedExecution(execution?.id ?? null);
   return (
     <Link component="button" className={className} onClick={onClick} variant="body1">
       {linkText}

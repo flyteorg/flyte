@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Core } from 'flyteidl';
 import { Identifier } from 'models/Common/types';
 import { NodeExecution } from 'models/Execution/types';
+import { CompiledWorkflowClosure } from 'models/Workflow/types';
 import { useQueryClient } from 'react-query';
 import { fetchWorkflow } from 'components/Workflow/workflowQueries';
 import { NodeExecutionDetails } from '../../types';
-import { isIdEqual, UNKNOWN_DETAILS } from './types';
+import { UNKNOWN_DETAILS } from './types';
 import { createExecutionDetails, CurrentExecutionDetails } from './createExecutionArray';
 import { getTaskThroughExecution } from './getTaskThroughExecution';
-import { CompiledWorkflowClosure } from 'models/Workflow/types';
 
 interface NodeExecutionDetailsState {
   getNodeExecutionDetails: (nodeExecution?: NodeExecution) => Promise<NodeExecutionDetails>;
@@ -53,13 +52,11 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
   const { resourceType, project, domain, name, version } = props.workflowId;
 
   const [executionTree, setExecutionTree] = useState<CurrentExecutionDetails | null>(null);
-  const [parentMap, setParentMap] = useState(new Map<string, Core.IIdentifier>());
   const [tasks, setTasks] = useState(new Map<string, NodeExecutionDetails>());
   const [closure, setClosure] = useState<CompiledWorkflowClosure | null>(null);
 
   const resetState = () => {
     setExecutionTree(null);
-    setParentMap(new Map<string, Core.IIdentifier>());
   };
 
   const queryClient = useQueryClient();
@@ -87,11 +84,10 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
         return;
       }
 
-      const { nodes: tree, map } = createExecutionDetails(workflow);
+      const tree = createExecutionDetails(workflow);
       if (isCurrent) {
         setClosure(workflow.closure?.compiledWorkflow ?? null);
         setExecutionTree(tree);
-        setParentMap(map);
       }
     }
 
@@ -121,19 +117,8 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
       return UNKNOWN_DETAILS;
     }
 
-    const specId = nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
-    const parentId = nodeExecution.parentId;
-
-    let nodeDetail = executionTree.nodes.filter(n => n.displayId === specId);
-    if (nodeDetail.length > 1) {
-      // more than one result - we will try to filter by parent info
-      // if there is no parent_id - we are dealing with the root.
-      const parentTemplate = parentId
-        ? parentMap.get(parentId) ?? executionTree.executionId
-        : executionTree.executionId;
-      nodeDetail = nodeDetail.filter(n => isIdEqual(n.parentTemplate, parentTemplate));
-    }
-
+    const specId = nodeExecution.scopedId || nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
+    const nodeDetail = executionTree.nodes.filter(n => n.scopedId === specId);
     if (nodeDetail.length === 0) {
       let details = tasks.get(nodeExecution.id.nodeId);
       if (details) {

@@ -15,6 +15,7 @@ import { TaskNames } from './taskNames';
 import { convertToPlainNodes, getBarOptions, TimeZone } from './helpers';
 import { ChartHeader } from './chartHeader';
 import { useChartDurationData } from './chartData';
+import { useScaleContext } from './scaleContext';
 
 // Register components to be usable by chart.js
 ChartJS.register(...registerables, ChartDataLabels);
@@ -72,11 +73,10 @@ const INTERVAL_LENGTH = 110;
 
 interface ExProps {
   nodeExecutions: NodeExecution[];
-  chartTimeInterval: number;
   chartTimezone: string;
 }
 
-export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTimeInterval, chartTimezone }) => {
+export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTimezone }) => {
   const [chartWidth, setChartWidth] = React.useState(0);
   const [labelInterval, setLabelInterval] = React.useState(INTERVAL_LENGTH);
   const durationsRef = React.useRef<HTMLDivElement>(null);
@@ -84,34 +84,43 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   const taskNamesRef = React.createRef<HTMLDivElement>();
 
   const [originalNodes, setOriginalNodes] = React.useState<dNode[]>([]);
+  const [showNodes, setShowNodes] = React.useState<dNode[]>([]);
 
   const { compiledWorkflowClosure } = useNodeExecutionContext();
 
-  // narusina - we need to propely merge executions with planeNodes instead of original Nodes
   React.useEffect(() => {
-    const { nodes: originalNodes } = transformerWorkflowToPlainNodes(compiledWorkflowClosure!);
-    setOriginalNodes(
-      originalNodes.map(node => {
-        const index = nodeExecutions.findIndex(exe => exe.id.nodeId === node.id && exe.scopedId === node.scopedId);
+    const nodes: dNode[] = compiledWorkflowClosure
+      ? transformerWorkflowToPlainNodes(compiledWorkflowClosure).nodes
+      : [];
+    // we remove start/end node info in the root dNode list during first assignment
+    const initializeNodes = convertToPlainNodes(nodes);
+    setOriginalNodes(initializeNodes);
+  }, [compiledWorkflowClosure]);
+
+  React.useEffect(() => {
+    const initializeNodes = convertToPlainNodes(originalNodes);
+    setShowNodes(
+      initializeNodes.map(node => {
+        const index = nodeExecutions.findIndex(exe => exe.scopedId === node.scopedId);
         return {
           ...node,
           execution: index >= 0 ? nodeExecutions[index] : undefined
         };
       })
     );
-  }, [compiledWorkflowClosure, nodeExecutions]);
+  }, [originalNodes, nodeExecutions]);
 
-  const nodes = convertToPlainNodes(originalNodes);
-
-  const { startedAt, totalDuration, durationLength, chartData } = useChartDurationData({ nodes: nodes });
+  const { startedAt, totalDuration, durationLength, chartData } = useChartDurationData({ nodes: showNodes });
+  const { chartInterval: chartTimeInterval, setMaxValue } = useScaleContext();
   const styles = useStyles({ chartWidth: chartWidth, durationLength: durationLength });
 
   React.useEffect(() => {
+    setMaxValue(totalDuration);
+  }, [totalDuration, setMaxValue]);
+
+  React.useEffect(() => {
     const calcWidth = Math.ceil(totalDuration / chartTimeInterval) * INTERVAL_LENGTH;
-    if (!durationsRef.current) {
-      setChartWidth(calcWidth);
-      setLabelInterval(INTERVAL_LENGTH);
-    } else if (calcWidth < durationsRef.current.clientWidth) {
+    if (durationsRef.current && calcWidth < durationsRef.current.clientWidth) {
       setLabelInterval(durationsRef.current.clientWidth / Math.ceil(totalDuration / chartTimeInterval));
       setChartWidth(durationsRef.current.clientWidth);
     } else {
@@ -120,52 +129,29 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     }
   }, [totalDuration, chartTimeInterval, durationsRef]);
 
-  React.useEffect(() => {
-    const durationsView = durationsRef?.current;
-    const labelsView = durationsLabelsRef?.current;
-    if (durationsView && labelsView) {
-      const handleScroll = e => {
-        durationsView.scrollTo({
-          left: durationsView.scrollLeft + e.deltaY,
-          behavior: 'smooth'
-        });
-        labelsView.scrollTo({
-          left: labelsView.scrollLeft + e.deltaY,
-          behavior: 'smooth'
-        });
-      };
-
-      durationsView.addEventListener('wheel', handleScroll);
-
-      return () => durationsView.removeEventListener('wheel', handleScroll);
+  const onGraphScroll = () => {
+    // cover horizontal scroll only
+    const scrollLeft = durationsRef?.current?.scrollLeft ?? 0;
+    const labelView = durationsLabelsRef?.current;
+    if (labelView) {
+      labelView.scrollTo({
+        left: scrollLeft
+      });
     }
+  };
 
-    return () => {};
-  }, [durationsRef, durationsLabelsRef]);
-
-  React.useEffect(() => {
-    const el = taskNamesRef.current;
-    if (el) {
-      const handleScroll = e => {
-        const canvasView = durationsRef?.current;
-        if (canvasView) {
-          canvasView.scrollTo({
-            top: e.srcElement.scrollTop
-            // behavior: 'smooth'
-          });
-        }
-      };
-
-      el.addEventListener('scroll', handleScroll);
-
-      return () => el.removeEventListener('scroll', handleScroll);
+  const onVerticalNodesScroll = () => {
+    const scrollTop = taskNamesRef?.current?.scrollTop ?? 0;
+    const graphView = durationsRef?.current;
+    if (graphView) {
+      graphView.scrollTo({
+        top: scrollTop
+      });
     }
+  };
 
-    return () => {};
-  }, [taskNamesRef, durationsRef]);
-
-  const toggleNode = (id: string, scopeId: string) => {
-    const searchNode = (nodes: dNode[]) => {
+  const toggleNode = (id: string, scopeId: string, level: number) => {
+    const searchNode = (nodes: dNode[], nodeLevel: number) => {
       if (!nodes || nodes.length === 0) {
         return;
       }
@@ -174,16 +160,16 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
         if (isStartNode(node) || isEndNode(node)) {
           continue;
         }
-        if (node.id === id && node.scopedId === scopeId) {
+        if (node.id === id && node.scopedId === scopeId && nodeLevel === level) {
           nodes[i].expanded = !nodes[i].expanded;
           return;
         }
         if (node.nodes.length > 0 && isExpanded(node)) {
-          searchNode(node.nodes);
+          searchNode(node.nodes, nodeLevel + 1);
         }
       }
     };
-    searchNode(originalNodes);
+    searchNode(originalNodes, 0);
     setOriginalNodes([...originalNodes]);
   };
 
@@ -200,13 +186,13 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     <>
       <div className={styles.taskNames}>
         <Typography className={styles.taskNamesHeader}>Task Name</Typography>
-        <TaskNames nodes={nodes} ref={taskNamesRef} onToggle={toggleNode} />
+        <TaskNames nodes={showNodes} ref={taskNamesRef} onToggle={toggleNode} onScroll={onVerticalNodesScroll} />
       </div>
       <div className={styles.taskDurations}>
         <div className={styles.taskDurationsLabelsView} ref={durationsLabelsRef}>
           <ChartHeader labels={labels} chartWidth={chartWidth} labelInterval={labelInterval} />
         </div>
-        <div className={styles.taskDurationsView} ref={durationsRef}>
+        <div className={styles.taskDurationsView} ref={durationsRef} onScroll={onGraphScroll}>
           <div className={styles.chartHeader}>
             <Bar options={getBarOptions(chartTimeInterval)} data={chartData} />
           </div>

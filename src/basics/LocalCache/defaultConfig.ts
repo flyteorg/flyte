@@ -1,11 +1,14 @@
 export enum LocalCacheItem {
-    // Test flag is created only for unit-tests
-    TestUndefined = 'test-undefined',
-    TestSettingBool = 'test-setting-bool',
-    TestObject = 'test-object',
+  // Test flag is created only for unit-tests
+  TestUndefined = 'test-undefined',
+  TestSettingBool = 'test-setting-bool',
+  TestObject = 'test-object',
 
-    // Production flags
-    ShowWorkflowVersions = 'flyte.show-workflow-versions'
+  // Production flags
+  ShowWorkflowVersions = 'flyte.show-workflow-versions',
+
+  // Feature flags - for prod testing
+  ffTimelineView = 'ff.timeline-view'
 }
 
 type LocalCacheConfig = { [k: string]: string };
@@ -15,10 +18,13 @@ type LocalCacheConfig = { [k: string]: string };
  * with all field names wrapped in double quotes
  **/
 export const defaultLocalCacheConfig: LocalCacheConfig = {
-    // Test
-    'test-setting-bool': 'false',
-    'test-object': '{"name":"Stella","age":"125"}',
+  // Test
+  'test-setting-bool': 'false',
+  'test-object': '{"name":"Stella","age":"125"}',
 
-    // Production
-    'flyte.show-workflow-versions': 'true'
+  // Production
+  'flyte.show-workflow-versions': 'true',
+
+  // Feature flags - for prod testing
+  'ff.timeline-view': 'false'
 };

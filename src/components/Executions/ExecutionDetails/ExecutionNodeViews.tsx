@@ -18,6 +18,7 @@ import { tabs } from './constants';
 import { ExecutionChildrenLoader } from './ExecutionChildrenLoader';
 import { useExecutionNodeViewsState } from './useExecutionNodeViewsState';
 import { ExecutionNodesTimeline } from './Timeline';
+import { LocalCacheItem, useLocalCache } from 'basics/LocalCache';
 
 const useStyles = makeStyles((theme: Theme) => ({
   filters: {
@@ -46,7 +47,10 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
   const styles = useStyles();
   const filterState = useNodeExecutionFiltersState();
   const tabState = useTabState(tabs, defaultTab);
-  const isTimelineEnabled = useFeatureFlag(FeatureFlag.TimelineView);
+
+  const timelineFlag = useFeatureFlag(FeatureFlag.TimelineView);
+  const [useTimelineFromCache] = useLocalCache(LocalCacheItem.ffTimelineView);
+  const isTimelineEnabled = useTimelineFromCache || timelineFlag;
 
   const {
     closure: { abortMetadata }
