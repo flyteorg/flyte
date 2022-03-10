@@ -17,6 +17,13 @@ However, these are only applied to the primary container.
 To customize other containers brought up during the execution, we can define a full-fledged pod spec.
 This is done using the `Kubernetes Python client library <https://github.com/kubernetes-client/python>`__'s,
 `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_pod_spec.py>`__.
+
+In order to use pod tasks, install the Flyte pod plugin first:
+
+.. prompt:: bash $
+
+    pip install flytekitplugins-pod
+
 """
 
 # %%
