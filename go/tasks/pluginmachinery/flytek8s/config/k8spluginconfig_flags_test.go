@@ -295,4 +295,32 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_default-pod-template-name", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("default-pod-template-name", testValue)
+			if vString, err := cmdFlags.GetString("default-pod-template-name"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultPodTemplateName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-pod-template-resync", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultK8sConfig.DefaultPodTemplateResync.String()
+
+			cmdFlags.Set("default-pod-template-resync", testValue)
+			if vString, err := cmdFlags.GetString("default-pod-template-resync"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultPodTemplateResync)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
