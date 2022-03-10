@@ -226,7 +226,14 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 		fallthrough
 
 	case PhaseWriteToDiscovery:
-		version := GetPhaseVersionOffset(p, state.GetOriginalArraySize()) + version
+		// If the array task has 0 inputs we need to ensure the phaseVersion changes so that the
+		// task can progess. Therefore we default to task length 1 to ensure phase updates.
+		length := int64(1)
+		if state.GetOriginalArraySize() != 0 {
+			length = state.GetOriginalArraySize()
+		}
+
+		version := GetPhaseVersionOffset(p, length) + version
 		phaseInfo = core.PhaseInfoRunning(version, nowTaskInfo)
 
 	case PhaseSuccess:

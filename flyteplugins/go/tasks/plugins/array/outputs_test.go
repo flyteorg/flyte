@@ -71,62 +71,110 @@ func init() {
 func Test_assembleOutputsWorker_Process(t *testing.T) {
 	ctx := context.Background()
 
-	memStore, err := storage.NewDataStore(&storage.Config{
-		Type: storage.TypeMemory,
-	}, promutils.NewTestScope())
-	assert.NoError(t, err)
+	t.Run("EmptyInputs", func(t *testing.T) {
+		memStore, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, promutils.NewTestScope())
+		assert.NoError(t, err)
 
-	// Write data to 1st and 3rd tasks only. Simulate a failed 2nd and 4th tasks.
-	l := coreutils.MustMakeLiteral(map[string]interface{}{
-		"var1": 5,
-		"var2": "hello world",
+		// Setup the expected data to be written to outputWriter.
+		ow := &mocks2.OutputWriter{}
+		ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
+		ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
+		ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
+
+		// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
+		phases := arrayCore.NewPhasesCompactArray(0)
+
+		item := &outputAssembleItem{
+			outputPaths:    ow,
+			varNames:       []string{"var1", "var2"},
+			finalPhases:    phases,
+			dataStore:      memStore,
+			isAwsSingleJob: false,
+		}
+
+		w := assembleOutputsWorker{}
+		actual, err := w.Process(ctx, item)
+		assert.NoError(t, err)
+		assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
+
+		actualOutputs := &core.LiteralMap{}
+		assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
+		expected := coreutils.MustMakeLiteral(map[string]interface{}{
+			"var1": []interface{}{},
+			"var2": []interface{}{},
+		}).GetMap()
+
+		expectedBytes, err := json.Marshal(expected)
+		assert.NoError(t, err)
+
+		actualBytes, err := json.Marshal(actualOutputs)
+		assert.NoError(t, err)
+
+		if diff := deep.Equal(string(actualBytes), string(expectedBytes)); diff != nil {
+			assert.FailNow(t, "Should be equal.", "Diff: %v", diff)
+		}
 	})
-	assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/0/outputs.pb", storage.Options{}, l.GetMap()))
-	assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/2/outputs.pb", storage.Options{}, l.GetMap()))
 
-	// Setup the expected data to be written to outputWriter.
-	ow := &mocks2.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
-	ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
-	ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
+	t.Run("MissingTasks", func(t *testing.T) {
+		memStore, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, promutils.NewTestScope())
+		assert.NoError(t, err)
 
-	// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
-	phases := arrayCore.NewPhasesCompactArray(4)
-	phases.SetItem(0, bitarray.Item(pluginCore.PhaseSuccess))
-	phases.SetItem(1, bitarray.Item(pluginCore.PhasePermanentFailure))
-	phases.SetItem(2, bitarray.Item(pluginCore.PhaseSuccess))
-	phases.SetItem(3, bitarray.Item(pluginCore.PhasePermanentFailure))
+		// Write data to 1st and 3rd tasks only. Simulate a failed 2nd and 4th tasks.
+		l := coreutils.MustMakeLiteral(map[string]interface{}{
+			"var1": 5,
+			"var2": "hello world",
+		})
+		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/0/outputs.pb", storage.Options{}, l.GetMap()))
+		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/2/outputs.pb", storage.Options{}, l.GetMap()))
 
-	item := &outputAssembleItem{
-		outputPaths:    ow,
-		varNames:       []string{"var1", "var2"},
-		finalPhases:    phases,
-		dataStore:      memStore,
-		isAwsSingleJob: false,
-	}
+		// Setup the expected data to be written to outputWriter.
+		ow := &mocks2.OutputWriter{}
+		ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
+		ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
+		ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
 
-	w := assembleOutputsWorker{}
-	actual, err := w.Process(ctx, item)
-	assert.NoError(t, err)
-	assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
+		// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
+		phases := arrayCore.NewPhasesCompactArray(4)
+		phases.SetItem(0, bitarray.Item(pluginCore.PhaseSuccess))
+		phases.SetItem(1, bitarray.Item(pluginCore.PhasePermanentFailure))
+		phases.SetItem(2, bitarray.Item(pluginCore.PhaseSuccess))
+		phases.SetItem(3, bitarray.Item(pluginCore.PhasePermanentFailure))
 
-	actualOutputs := &core.LiteralMap{}
-	assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
-	// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
-	expected := coreutils.MustMakeLiteral(map[string]interface{}{
-		"var1": []interface{}{5, nil, 5, nil},
-		"var2": []interface{}{"hello world", nil, "hello world", nil},
-	}).GetMap()
+		item := &outputAssembleItem{
+			outputPaths:    ow,
+			varNames:       []string{"var1", "var2"},
+			finalPhases:    phases,
+			dataStore:      memStore,
+			isAwsSingleJob: false,
+		}
 
-	expectedBytes, err := json.Marshal(expected)
-	assert.NoError(t, err)
+		w := assembleOutputsWorker{}
+		actual, err := w.Process(ctx, item)
+		assert.NoError(t, err)
+		assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
 
-	actualBytes, err := json.Marshal(actualOutputs)
-	assert.NoError(t, err)
+		actualOutputs := &core.LiteralMap{}
+		assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
+		// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
+		expected := coreutils.MustMakeLiteral(map[string]interface{}{
+			"var1": []interface{}{5, nil, 5, nil},
+			"var2": []interface{}{"hello world", nil, "hello world", nil},
+		}).GetMap()
 
-	if diff := deep.Equal(string(actualBytes), string(expectedBytes)); diff != nil {
-		assert.FailNow(t, "Should be equal.", "Diff: %v", diff)
-	}
+		expectedBytes, err := json.Marshal(expected)
+		assert.NoError(t, err)
+
+		actualBytes, err := json.Marshal(actualOutputs)
+		assert.NoError(t, err)
+
+		if diff := deep.Equal(string(actualBytes), string(expectedBytes)); diff != nil {
+			assert.FailNow(t, "Should be equal.", "Diff: %v", diff)
+		}
+	})
 }
 
 func Test_appendSubTaskOutput(t *testing.T) {
