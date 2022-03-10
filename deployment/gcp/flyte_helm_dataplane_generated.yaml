@@ -397,7 +397,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -450,7 +450,7 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.16.29
+        app.kubernetes.io/version: v0.16.32
       annotations:
         configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
     spec:
@@ -461,7 +461,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -484,7 +484,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
