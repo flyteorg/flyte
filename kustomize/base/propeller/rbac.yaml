@@ -75,7 +75,7 @@ metadata:
 ---
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: flytepropeller
   namespace: flyte
