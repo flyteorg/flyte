@@ -16,7 +16,14 @@ spec:
     - fly
     singular: flyteworkflow
   scope: Namespaced
-  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    served: true
+    storage: true
 ---
 apiVersion: v1
 kind: ServiceAccount
