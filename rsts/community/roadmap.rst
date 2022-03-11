@@ -71,13 +71,13 @@ Issues by Theme
 Issues by Components
 ---------------------
 
-+--------------+-----------------------------------------------+-----------------------------------------------------------------------------+---------------------------------------------+
-| Theme        | Description                                   | Open Issues                                                                 | Comment                                     |
-+--------------+-----------------------------------------------+-----------------------------------------------------------------------------+---------------------------------------------+
-| flyteconsole | Issues on FlyteConsole (Flyte's UI)           | `flyteconsole issues <https://github.com/flyteorg/flyte/labels/ui>`_        | These are great issues to get started with. |
-+--------------+-----------------------------------------------+-----------------------------------------------------------------------------+---------------------------------------------+
-| flytectl     | Issues on Flytectl (standalone CLI for Flyte) | `flytectl issues <https://github.com/flyteorg/flyte/labels/flytectl>`_      | Great issues to start with.                 |
-+--------------+-----------------------------------------------+-----------------------------------------------------------------------------+---------------------------------------------+
++---------------+---------------------------------------+------------------------------------------------------------------------+
+| Theme         | Description                           | Open Issues                                                            |
++===============+=======================================+========================================================================+
+| Flyte Console | Issues concerning our web UI.         | `Flyte Console issues <https://github.com/flyteorg/flyte/labels/ui>`_  |
++---------------+---------------------------------------+------------------------------------------------------------------------+
+| Flytectl      | Issues concerning our standalone CLI. | `Flytectl issues <https://github.com/flyteorg/flyte/labels/flytectl>`_ |
++---------------+---------------------------------------+------------------------------------------------------------------------+
 
 For an overview of what we're currently working on, check out our `live roadmap <https://github.com/orgs/flyteorg/projects/3>`__.
 
