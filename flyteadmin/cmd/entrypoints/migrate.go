@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
-
 	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/logger"
+
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
@@ -32,7 +32,6 @@ var migrateCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal(ctx, err)
 		}
-
 		sqlDB, err := db.DB()
 		if err != nil {
 			logger.Fatal(ctx, err)

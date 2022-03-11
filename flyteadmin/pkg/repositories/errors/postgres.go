@@ -104,3 +104,8 @@ func NewPostgresErrorTransformer(scope promutils.Scope) ErrorTransformer {
 		metrics: metrics,
 	}
 }
+
+type ConnectError interface {
+	Unwrap() error
+	Error() string
+}
