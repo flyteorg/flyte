@@ -35,7 +35,7 @@ we recommend using the ``flytectl sandbox exec -- ...`` mode to trigger a Docker
 
 The illustration below shows the architecture of flyte-sandbox in a single container. It is identical to a Flyte sandbox cluster, except that we have built one docker container, with Kubernetes and Flyte already installed.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte_sandbox_single_container.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_container.png
    :alt: Architecture of single container Flyte Sandbox
 
 
@@ -58,7 +58,7 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
     #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the :ref:`deployment` guides.
 
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte_sandbox_single_k8s_cluster.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_k8s_cluster.png
    :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
 
 

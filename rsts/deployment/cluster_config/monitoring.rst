@@ -18,7 +18,7 @@ We will be adding to this set of metrics as we implement the capabilities to pul
 
 At a high level, workflow execution goes through the following discrete steps:
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte_wf_timeline.svg?sanitize=true
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/monitoring/flyte_wf_timeline.svg?sanitize=true
 
 ===================================  ==================================================================================================================================
                        Description of main events for workflow execution

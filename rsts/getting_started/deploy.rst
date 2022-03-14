@@ -150,7 +150,7 @@ Execute on the Flyte Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Use the FlyteConsole to launch an execution and keep tabs on the window! 
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/getting_started_reg.gif
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/tutorial/getting_started_reg.gif
     :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
 
 **Alternatively, you can execute using the command line.** 

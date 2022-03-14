@@ -153,12 +153,12 @@ Let's now look at how to launch an execution to leverage AWS Batch to execute jo
 As soon as the task starts executing, a link for the AWS Array Job will appear in the log links section in Flyte Console. 
 As individual jobs start getting scheduled, links to their individual cloudWatch log streams will also appear in the UI.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/map_task_success.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/aws_plugin_setup/map_task_success.png
     :alt: A screenshot of Flyte Console displaying log links for a successful array job.
 
 A screenshot of Flyte Console displaying log links for a successful array job.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/map_task_failure.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/aws_plugin_setup/map_task_failure.png
     :alt: A screenshot of Flyte Console displaying log links for a failed array job.
 
 A screenshot of Flyte Console displaying log links for a failed array job.

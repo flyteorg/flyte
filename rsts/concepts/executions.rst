@@ -16,4 +16,4 @@ Typical Flow Using FlyteCTL
 * FlyteAdmin then fetches the previously validated and compiled workflow closure and translates it to an executable format with all the inputs.
 * This executable workflow is launched on Kubernetes with an execution record in the database.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte_wf_execution_overview.svg?sanitize=true
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/executions/flyte_wf_execution_overview.svg?sanitize=true
