@@ -1221,6 +1221,42 @@ Whether to enable gorm foreign keys when migrating the db
   "false"
   
 
+maxIdleConnections (int)
+--------------------------------------------------------------------------------
+
+maxIdleConnections sets the maximum number of connections in the idle connection pool.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+maxOpenConnections (int)
+--------------------------------------------------------------------------------
+
+maxOpenConnections sets the maximum number of open connections to the database.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+connMaxLifeTime (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+sets the maximum amount of time a connection may be reused
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
+  
+
 postgres (`interfaces.PostgresConfig`_)
 --------------------------------------------------------------------------------
 
