@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.44.0](http://github.com/lyft/flyteconsole/compare/v0.43.0...v0.44.0) (2022-03-14)
+
+
+### Bug Fixes
+
+* long node-id obscures task type ([#308](http://github.com/lyft/flyteconsole/issues/308)) ([50b5ef5](http://github.com/lyft/flyteconsole/commit/50b5ef51951301fb828ee0cf6f5bfc6cb1546920))
+
+
+### Features
+
+* Support for dynamic and nested workflows. ([#326](http://github.com/lyft/flyteconsole/issues/326)) ([5cd1ca5](http://github.com/lyft/flyteconsole/commit/5cd1ca57e9f5d64db96a1ebe9f8a19c1c14743fc))
+
 # [0.43.0](http://github.com/lyft/flyteconsole/compare/v0.42.1...v0.43.0) (2022-02-15)
 
 
