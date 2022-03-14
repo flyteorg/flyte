@@ -6,13 +6,13 @@ Registration
 
 During registration, Flyte validates the workflow structure and saves the workflow. The registration process also updates the workflow graph. 
 
-.. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_registration_overview.svg?sanitize=true
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte_wf_registration_overview.svg?sanitize=true
 
 Typical Flow Using Flytekit
 ---------------------------
 
  * A user defines tasks using the :py:mod:`Flytekit <flytekit:flytekit>` Task Definition language
- * A user defines a workflow using the :py:mod:`Flytekit <flytekit:flytekit>` Workflow definition lanugage.
+ * A user defines a workflow using the :py:mod:`Flytekit <flytekit:flytekit>` Workflow definition language.
  * The user then uses flytekit's register cli to compile the tasks into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. During this time the task representation is also bound to a container that contains the code for the task. This associated entity is registered with FlyteAdmin using the registerTask API.
  * The user then uses Flytekit's register CLI to compile the workflow into their serialized representation as described in :std:ref:`Flyte Specification language <flyteidl:flyteidltoc>`. The referenced tasks are replaced by their FlyteAdmin registered Identifier, obtained in the previous step. This associated entity is registered with FlyteAdmin using the registerWorkflow API.
  * The user can then launch an execution using the FlyteAdmin launch execution API, which requires the necessary inputs provided. This is automatically done if the user uses the Flytectl to launch the execution.
