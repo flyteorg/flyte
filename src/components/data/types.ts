@@ -2,6 +2,7 @@ import { InfiniteQueryObserverOptions, QueryObserverOptions } from 'react-query'
 
 export enum QueryType {
   NodeExecutionDetails = 'NodeExecutionDetails',
+  DynamicWorkflowFromNodeExecution = 'DynamicWorkflowFromNodeExecution',
   NodeExecution = 'nodeExecution',
   NodeExecutionList = 'nodeExecutionList',
   NodeExecutionChildList = 'nodeExecutionChildList',

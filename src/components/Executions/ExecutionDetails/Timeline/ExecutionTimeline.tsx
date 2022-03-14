@@ -6,7 +6,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { makeStyles, Typography } from '@material-ui/core';
 
 import { useNodeExecutionContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
-import { transformerWorkflowToPlainNodes } from 'components/WorkflowGraph/transformerWorkflowToDag';
+import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWorkflowToDag';
 import { isEndNode, isStartNode, isExpanded } from 'components/WorkflowGraph/utils';
 import { tableHeaderColor } from 'components/Theme/constants';
 import { NodeExecution } from 'models/Execution/types';
@@ -89,9 +89,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   const { compiledWorkflowClosure } = useNodeExecutionContext();
 
   React.useEffect(() => {
-    const nodes: dNode[] = compiledWorkflowClosure
-      ? transformerWorkflowToPlainNodes(compiledWorkflowClosure).nodes
-      : [];
+    const nodes: dNode[] = compiledWorkflowClosure ? transformerWorkflowToDag(compiledWorkflowClosure).dag.nodes : [];
     // we remove start/end node info in the root dNode list during first assignment
     const initializeNodes = convertToPlainNodes(nodes);
     setOriginalNodes(initializeNodes);

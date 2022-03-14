@@ -1,7 +1,6 @@
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import { dTypes } from 'models/Graph/types';
 import { CSSProperties } from 'react';
-import { Elements, isNode, Position } from 'react-flow-renderer';
 import { RFBackgroundProps } from './types';
 
 const dagre = require('dagre');
@@ -10,6 +9,7 @@ export const COLOR_EXECUTED = '#2892f4';
 export const COLOR_NOT_EXECUTED = '#c6c6c6';
 export const COLOR_TASK_TYPE = '#666666';
 export const COLOR_GRAPH_BACKGROUND = '#666666';
+export const GRAPH_PADDING_FACTOR = 50;
 
 export const DISPLAY_NAME_START = 'start';
 export const DISPLAY_NAME_END = 'end';
@@ -20,6 +20,17 @@ export const ReactFlowGraphConfig = {
     customNodePrefix: 'FlyteNode',
     arrowHeadType: 'arrowClosed',
     edgeType: 'default'
+};
+
+/**
+ * Function replaces all retry values with '0' to be used a key between static/runtime
+ * values.
+ * @param id   NodeExcution nodeId.
+ * @returns    nodeId with all retry values replaces with '0'
+ */
+export const retriesToZero = (id: string): string => {
+    const output = id.replace(/(-[0-9]-)/g, '-0-');
+    return output;
 };
 
 export const getGraphHandleStyle = (
@@ -133,7 +144,10 @@ export const getNestedContainerStyle = nodeExecutionStatus => {
     const style = {
         border: `1px dashed ${getStatusColor(nodeExecutionStatus)}`,
         borderRadius: '8px',
-        background: 'rgba(255,255,255,.9)'
+        background: 'rgba(255,255,255,.9)',
+        width: '100%',
+        height: '100%',
+        padding: '.25rem'
     } as React.CSSProperties;
     return style;
 };
@@ -154,7 +168,9 @@ export const getGraphNodeStyle = (
         minWidth: '.5rem',
         minHeight: '.5rem',
         height: 'auto',
-        width: 'auto'
+        width: 'auto',
+        zIndex: 100000,
+        position: 'relative'
     };
 
     const nestedPoint = {
@@ -237,43 +253,87 @@ export const getRFBackground = () => {
                 border: '1px solid #444',
                 backgroundColor: 'rgba(255,255,255,1)'
             },
-            gridColor: '#ccc',
-            gridSpacing: 20
+            gridColor: 'none'
         } as RFBackgroundProps,
         nested: {
-            gridColor: 'none',
-            gridSpacing: 1
+            gridColor: 'none'
         } as RFBackgroundProps,
         static: {
             background: {
                 border: 'none',
                 backgroundColor: 'rgb(255,255,255)'
             },
-            gridColor: 'none',
-            gridSpacing: 20
+            gridColor: 'none'
         } as RFBackgroundProps
     };
 };
 
+export interface PositionProps {
+    nodes: any;
+    edges: any;
+    parentMap?: any;
+    direction?: string;
+}
+
 /**
- * Uses dagree/graphlib to compute graph layout
- * @see https://github.com/dagrejs/dagre/wiki
- * @param elements      Graph elements (nodes/edges) in JSON format
- * @param direction     Direction to render graph
+ * Computes positions for provided nodes
+ * @param PositionProps
  * @returns
  */
-export const setReactFlowGraphLayout = (
-    elements: Elements,
-    direction: string,
-    estimate = false
-) => {
+export const computeChildNodePositions = ({
+    nodes,
+    edges,
+    direction = 'LR'
+}: PositionProps) => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
-    const isHorizontal = direction === 'LR';
+    dagreGraph.setGraph({
+        rankdir: direction,
+        edgesep: 60,
+        nodesep: 30,
+        ranker: 'longest-path',
+        acyclicer: 'greedy'
+    });
+    nodes.map(n => {
+        dagreGraph.setNode(n.id, n.dimensions);
+    });
+    edges.map(e => {
+        dagreGraph.setEdge(e.source, e.target);
+    });
+    dagre.layout(dagreGraph);
+    const dimensions = {
+        width: dagreGraph.graph().width,
+        height: dagreGraph.graph().height
+    };
+    const graph = nodes.map(el => {
+        const node = dagreGraph.node(el.id);
+        const x = node.x - node.width / 2;
+        const y = node.y - node.height / 2;
+        return {
+            ...el,
+            position: {
+                x: x,
+                y: y
+            }
+        };
+    });
+    return { graph, dimensions };
+};
 
-    const ESTIMATE_HEIGHT = 25;
-    const ESTIMATE_WIDTH_FACTOR = 6;
-
+/**
+ * Computes positions for root-level nodes in a graph by filtering out
+ * all children (nodes that have parents).
+ * @param PositionProps
+ * @returns
+ */
+export const computeRootNodePositions = ({
+    nodes,
+    edges,
+    parentMap,
+    direction = 'LR'
+}: PositionProps) => {
+    const dagreGraph = new dagre.graphlib.Graph();
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
     dagreGraph.setGraph({
         rankdir: direction,
         edgesep: 60,
@@ -282,69 +342,189 @@ export const setReactFlowGraphLayout = (
         acyclicer: 'greedy'
     });
 
-    /**
-     * Note: this waits/assumes rendered dimensions from ReactFlow as .__rf
-     */
-    elements.forEach(el => {
-        if (isNode(el)) {
-            const nodeWidth = estimate
-                ? el.data.text.length * ESTIMATE_WIDTH_FACTOR
-                : el.__rf.width;
-            const nodeHeight = estimate ? ESTIMATE_HEIGHT : el.__rf.height;
-            dagreGraph.setNode(el.id, { width: nodeWidth, height: nodeHeight });
-        } else {
-            dagreGraph.setEdge(el.source, el.target);
+    /* Filter all children from creating dagree nodes */
+    nodes.map(n => {
+        if (n.isRootParentNode) {
+            dagreGraph.setNode(n.id, {
+                width: parentMap[n.id].childGraphDimensions.width,
+                height: parentMap[n.id].childGraphDimensions.height
+            });
+        } else if (!n.parentNode) {
+            dagreGraph.setNode(n.id, n.dimensions);
         }
     });
 
-    dagre.layout(dagreGraph);
-    const graphWidth = dagreGraph.graph().width;
-    const graphHeight = dagreGraph.graph().height;
-    if (estimate) {
-        return {
-            estimatedDimensions: {
-                width: graphWidth,
-                height: graphHeight
-            }
-        };
-    } else {
-        return {
-            graph: elements.map(el => {
-                if (isNode(el)) {
-                    el.targetPosition = isHorizontal
-                        ? Position.Left
-                        : Position.Top;
-                    el.sourcePosition = isHorizontal
-                        ? Position.Right
-                        : Position.Bottom;
-                    const nodeWidth = estimate
-                        ? el.data.text.length * ESTIMATE_WIDTH_FACTOR
-                        : el.__rf.width;
-                    const nodeHeight = estimate
-                        ? ESTIMATE_HEIGHT
-                        : el.__rf.height;
-                    const nodeWithPosition = dagreGraph.node(el.id);
+    /* Filter all children from creating dagree edges */
+    edges.map(e => {
+        if (!e.parent) {
+            dagreGraph.setEdge(e.source, e.target);
+        }
+    });
 
-                    /** Keep both position and .__rf.position in sync */
-                    const x = nodeWithPosition.x - nodeWidth / 2;
-                    const y = nodeWithPosition.y - nodeHeight / 2;
-                    el.position = {
-                        x: x,
-                        y: y
-                    };
-                    el.__rf.position = {
-                        x: x,
-                        y: y
+    /* Compute graph posistions for root-level nodes */
+    dagre.layout(dagreGraph);
+    const dimensions = {
+        width: dagreGraph.graph().width,
+        height: dagreGraph.graph().height
+    };
+
+    /* Merge dagre positions to rf elements*/
+    const graph = nodes.map(el => {
+        const node = dagreGraph.node(el.id);
+        if (node) {
+            const x = node.x - node.width / 2;
+            const y = node.y - node.height / 2;
+            if (parentMap && el.isRootParentNode) {
+                el.style = parentMap[el.id].childGraphDimensions;
+            }
+            return {
+                ...el,
+                position: {
+                    x: x,
+                    y: y
+                }
+            };
+        } else if (parentMap) {
+            /* Case: Overwrite children positions with computed values */
+            const parent = parentMap[el.parentNode];
+            for (let i = 0; i < parent.nodes.length; i++) {
+                const node = parent.nodes[i];
+                if (node.id == el.id) {
+                    return {
+                        ...el,
+                        position: { ...node.position }
                     };
                 }
-                return el;
-            }),
-            dimensions: {
-                width: graphWidth,
-                height: graphHeight
             }
-        };
-    }
+        }
+    });
+    return { graph, dimensions };
 };
 
-export default setReactFlowGraphLayout;
+/**
+ * Returns positioned nodes and edges.
+ *
+ * Note: Handles nesting by first "rendering" all child graphs to calculate their rendered
+ * dimensions and setting those values as the dimentions (width/height) for parent/container.
+ * Once those dimensions have been set (for parent/container nodes) we can set root-level node
+ * positions.
+ *
+ * @param nodes
+ * @param edges
+ * @param currentNestedView
+ * @param direction
+ * @returns Array of ReactFlow nodes
+ */
+export const getPositionedNodes = (
+    nodes,
+    edges,
+    currentNestedView,
+    direction = 'LR'
+) => {
+    const parentMap = {};
+    /* (1) Collect all child graphs in parentMap */
+    nodes.forEach(node => {
+        if (node.isRootParentNode) {
+            parentMap[node.id] = {
+                nodes: [],
+                edges: [],
+                childGraphDimensions: {
+                    width: 0,
+                    height: 0
+                },
+                self: node
+            };
+        }
+        if (node.parentNode) {
+            if (parentMap[node.parentNode]) {
+                if (parentMap[node.parentNode].nodes) {
+                    parentMap[node.parentNode].nodes.push(node);
+                } else {
+                    parentMap[node.parentNode].nodes = [node];
+                }
+            }
+        }
+    });
+    edges.forEach(edge => {
+        if (edge.parent) {
+            if (parentMap[edge.parent]) {
+                if (parentMap[edge.parent].edges) {
+                    parentMap[edge.parent].edges.push(edge);
+                } else {
+                    parentMap[edge.parent].edges = [edge];
+                }
+            }
+        }
+    });
+
+    /* (2) Compute child graph positiions/dimensions */
+    for (const parentId in parentMap) {
+        const children = parentMap[parentId];
+        const childGraph = computeChildNodePositions({
+            nodes: children.nodes,
+            edges: children.edges,
+            direction: direction
+        });
+        let nestedDepth = 1;
+        if (
+            currentNestedView &&
+            currentNestedView[parentId] &&
+            currentNestedView[parentId].length > 0
+        ) {
+            nestedDepth = currentNestedView[parentId].length;
+        }
+        const borderPadding = GRAPH_PADDING_FACTOR * nestedDepth;
+        const width = childGraph.dimensions.width + borderPadding;
+        const height = childGraph.dimensions.height + borderPadding;
+
+        parentMap[parentId].childGraphDimensions = {
+            width: width,
+            height: height
+        };
+        const relativePosNodes = childGraph.graph.map(node => {
+            const position = node.position;
+            position.y = position.y + GRAPH_PADDING_FACTOR / 2;
+            position.x = position.x + GRAPH_PADDING_FACTOR / 2;
+            return {
+                ...node,
+                position
+            };
+        });
+        parentMap[parentId].nodes = relativePosNodes;
+        parentMap[parentId].self.dimensions.width = width;
+        parentMap[parentId].self.dimensions.height = height;
+    }
+    /* (3) Compute positions of root-level nodes */
+    const { graph, dimensions } = computeRootNodePositions({
+        nodes: nodes,
+        edges: edges,
+        direction: direction,
+        parentMap: parentMap
+    });
+    return graph;
+};
+
+export const ReactFlowIdHash = (nodes, edges) => {
+    const key = Math.floor(Math.random() * 10000).toString();
+    const properties = ['id', 'source', 'target', 'parent', 'parentNode'];
+    const hashGraph = nodes.map(node => {
+        const updates = {};
+        properties.forEach(prop => {
+            if (node[prop]) {
+                updates[prop] = `${key}-${node[prop]}`;
+            }
+        });
+        return { ...node, ...updates };
+    });
+
+    const hashEdges = edges.map(edge => {
+        const updates = {};
+        properties.forEach(prop => {
+            if (edge[prop]) {
+                updates[prop] = `${key}-${edge[prop]}`;
+            }
+        });
+        return { ...edge, ...updates };
+    });
+    return { hashGraph, hashEdges };
+};

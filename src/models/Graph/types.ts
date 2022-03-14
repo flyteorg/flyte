@@ -34,6 +34,7 @@ export enum dTypes {
  * @targetId    dNode.id
  */
 export interface dEdge {
+    id: string;
     sourceId: string;
     targetId: string;
 }

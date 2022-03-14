@@ -1,12 +1,14 @@
 import { NodeExecutionsById } from 'models/Execution/types';
 import { dNode, dTypes } from 'models/Graph/types';
-import { Elements, HandleProps } from 'react-flow-renderer';
+import { HandleProps } from 'react-flow-renderer';
 
 export interface RFWrapperProps {
-    rfGraphJson: Elements;
+    rfGraphJson: any;
     backgroundStyle: RFBackgroundProps;
-    type: RFGraphTypes;
+    type?: RFGraphTypes;
+    currentNestedView?: any;
     onNodeSelectionChanged?: any;
+    nodeExecutionsById?: any;
     version?: string;
 }
 
@@ -22,9 +24,9 @@ export enum RFGraphTypes {
 }
 
 export interface LayoutRCProps {
-    setElements: any;
-    setLayout: any;
-    hasLayout: boolean;
+    setPositionedElements: any;
+    graphData: any;
+    nodeExecutionsById: any;
 }
 
 /* React Flow params and styles (background is styles) */
@@ -40,6 +42,9 @@ export interface BuildRFNodeProps {
     nodeExecutionsById: any;
     typeOverride: dTypes | null;
     onNodeSelectionChanged: any;
+    onAddNestedView?: any;
+    onRemoveNestedView?: any;
+    currentNestedView?: any;
     isStaticGraph: boolean;
 }
 
@@ -47,12 +52,16 @@ export interface ConvertDagProps {
     root: dNode;
     nodeExecutionsById: any;
     onNodeSelectionChanged: any;
+    onRemoveNestedView?: any;
+    onAddNestedView?: any;
+    currentNestedView?: any;
     maxRenderDepth: number;
-    isStaticGraph: boolean;
+    isStaticGraph?: boolean;
 }
 
-export interface DagToFRProps extends ConvertDagProps {
+export interface DagToReactFlowProps extends ConvertDagProps {
     currentDepth: number;
+    parents: any;
 }
 
 export interface RFCustomData {
@@ -64,4 +73,6 @@ export interface RFCustomData {
     dag: any;
     taskType?: dTypes;
     onNodeSelectionChanged?: any;
+    onAddNestedView: any;
+    onRemoveNestedView: any;
 }

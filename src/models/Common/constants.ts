@@ -9,6 +9,7 @@ export const endpointPrefixes = {
     launchPlan: '/launch_plans',
     namedEntity: '/named_entities',
     nodeExecution: '/node_executions',
+    dynamicWorkflowExecution: '/data/node_executions',
     project: '/projects',
     relaunchExecution: '/executions/relaunch',
     recoverExecution: '/executions/recover',

@@ -256,7 +256,8 @@ export const getNodeExecution = (
         config
     );
 
-/** Fetches data URLs for a NodeExecution */
+/** Fetches data URLs for a NodeExecution (used when fetching Dynamicworkflows
+ *  from nodeExeecutions at runtime) */
 export const getNodeExecutionData = (
     id: NodeExecutionIdentifier,
     config?: RequestConfig

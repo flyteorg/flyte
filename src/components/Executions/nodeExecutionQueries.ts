@@ -1,5 +1,6 @@
 import { compareTimestampsAscending } from 'common/utils';
 import { QueryInput, QueryType } from 'components/data/types';
+import { retriesToZero } from 'components/flytegraph/ReactFlow/utils';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { isEqual } from 'lodash';
 import { PaginatedEntityResponse, RequestConfig } from 'models/AdminEntity/types';
@@ -75,15 +76,23 @@ export function makeNodeExecutionListQuery(
   id: WorkflowExecutionIdentifier,
   config?: RequestConfig
 ): QueryInput<NodeExecution[]> {
+  /**
+   * Note on scopedId:
+   * We use scopedId as a key between various UI elements built from static data
+   * (eg, CompiledWorkflowClosure for the graph) that need to be mapped to runtime
+   * values like nodeExecutions; rendering from a static entity has no way to know
+   * the actual retry value so we use '0' for this key -- the actual value of retries
+   * remains as the nodeId.
+   */
   return {
     queryKey: [QueryType.NodeExecutionList, id, config],
     queryFn: async () => {
       const nodeExecutions = removeSystemNodes((await listNodeExecutions(id, config)).entities);
       nodeExecutions.map(exe => {
-        if (exe.metadata) {
-          return (exe.scopedId = exe.metadata.specNodeId);
+        if (exe.metadata?.specNodeId) {
+          return (exe.scopedId = retriesToZero(exe.metadata.specNodeId));
         } else {
-          return (exe.scopedId = exe.id.nodeId);
+          return (exe.scopedId = retriesToZero(exe.id.nodeId));
         }
       });
       cacheNodeExecutions(queryClient, nodeExecutions);
@@ -210,6 +219,7 @@ async function fetchGroupsForParentNodeExecution(
   nodeExecution.scopedId = parentScopeId;
 
   const children = await fetchNodeExecutionList(queryClient, nodeExecution.id.executionId, finalConfig);
+
   const groupsByName = children.reduce<Map<string, NodeExecutionGroup>>((out, child) => {
     const retryAttempt = formatRetryAttempt(child.metadata?.retryGroup);
     let group = out.get(retryAttempt);
@@ -217,11 +227,9 @@ async function fetchGroupsForParentNodeExecution(
       group = { name: retryAttempt, nodeExecutions: [] };
       out.set(retryAttempt, group);
     }
-    /**
-     * GraphUX uses workflowClosure which uses scopedId
-     * This builds a scopedId via parent nodeExecution
-     * to enable mapping between graph and other components
-     */
+
+    /** GraphUX uses workflowClosure which uses scopedId. This builds a scopedId via parent
+     *  nodeExecution to enable mapping between graph and other components     */
     let scopedId = parentScopeId;
     if (scopedId != undefined) {
       scopedId += `-${child.metadata?.retryGroup}-${child.metadata?.specNodeId}`;
@@ -229,9 +237,11 @@ async function fetchGroupsForParentNodeExecution(
     } else {
       child['scopedId'] = child.metadata?.specNodeId;
     }
+    child['fromUniqueParentId'] = nodeExecution.id.nodeId;
     group.nodeExecutions.push(child);
     return out;
   }, new Map());
+
   return Array.from(groupsByName.values());
 }
 
@@ -253,20 +263,37 @@ function fetchChildNodeExecutionGroups(queryClient: QueryClient, nodeExecution: 
 
 /**
  * Query returns all children for a list of `nodeExecutions`
- * Note: diffrent from fetchGroupsForParentNodeExecution in that it expects a
- * list of nodeExecitions
+ * Will recursively gather all children for anyone that isParent()
  */
 async function fetchAllChildNodeExecutions(
   queryClient: QueryClient,
   nodeExecutions: NodeExecution[],
   config: RequestConfig
 ): Promise<Array<NodeExecutionGroup[]>> {
-  const executions: Array<NodeExecutionGroup[]> = await Promise.all(
-    nodeExecutions.map(exe => {
-      return fetchChildNodeExecutionGroups(queryClient, exe, config);
+  const executionGroups: Array<NodeExecutionGroup[]> = await Promise.all(
+    nodeExecutions.map(exe => fetchChildNodeExecutionGroups(queryClient, exe, config))
+  );
+
+  /** Recursive check for nested/dynamic nodes */
+  const childrenFromChildrenNodes: NodeExecution[] = [];
+  executionGroups.map(group =>
+    group.map(attempt => {
+      attempt.nodeExecutions.map(execution => {
+        if (isParentNode(execution)) {
+          childrenFromChildrenNodes.push(execution);
+        }
+      });
     })
   );
-  return executions;
+
+  /** Request and concact data from children */
+  if (childrenFromChildrenNodes.length > 0) {
+    const childGroups = await fetchAllChildNodeExecutions(queryClient, childrenFromChildrenNodes, config);
+    for (const group in childGroups) {
+      executionGroups.push(childGroups[group]);
+    }
+  }
+  return executionGroups;
 }
 
 /**
@@ -281,12 +308,10 @@ export function useAllChildNodeExecutionGroupsQuery(
 ): QueryObserverResult<Array<NodeExecutionGroup[]>, Error> {
   const queryClient = useQueryClient();
   const shouldEnableFn = groups => {
-    if (nodeExecutions[0] && groups.length > 0) {
-      if (!nodeExecutionIsTerminal(nodeExecutions[0])) {
-        return true;
-      }
+    if (groups.length > 0) {
       return groups.some(group => {
         if (group.nodeExecutions?.length > 0) {
+          /* Return true is any executions are not yet terminal (ie, they can change) */
           return group.nodeExecutions.some(ne => {
             return !nodeExecutionIsTerminal(ne);
           });
