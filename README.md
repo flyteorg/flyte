@@ -1,5 +1,5 @@
 <html>
-<p align="center"> 
+<p align="center">
   <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyte-and-lf.png" alt="Flyte and LF AI & Data Logo" width="300">
 </p>
 
@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b>, and <b>ML processes</b> at scale 
+  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b>, and <b>ML processes</b> at scale
 </p>
 
 <p align="center">
@@ -31,11 +31,11 @@
   <a href="https://flyte.rtfd.io">
     <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
   </a>
-  <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a> 
+  <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a>
   <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" />
   <a href="https://artifacthub.io/packages/search?repo=flyte">
     <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
-  </a> 
+  </a>
   <a href="https://slack.flyte.org">
     <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Join Flyte Slack" />
   </a>
@@ -75,8 +75,8 @@ producer-consumer order creates a workflow.
 Flyte was designed to manage the complexity that arises in Data and ML teams and ensure they keep up their high velocity of delivering business impacting features. One way it achieves this is by separating
 the control-plane from the user-plane. Thus, every organization can offer Flyte as a service to their end-users where the service is managed by folks who are more infrastructure-focused, while the users use the intuitive interface of Flytekit.
 
-
 ## ⏳ Five Reasons to Use Flyte
+
 - Kubernetes-Native Workflow Automation Platform
 - Ergonomic SDK's in Python, Java & Scala
 - Versioned, Auditable & Reproducible Pipelines
@@ -84,7 +84,7 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 - Resource Aware and deployed to scale with your organization
 
 <html>
-<h2 id="quickstart"> 
+<h2 id="quickstart">
   🚀 Quick Start
 </h2>
 </html>
@@ -97,11 +97,11 @@ With [Docker installed](https://docs.docker.com/get-docker/) and [Flytectl insta
 
 This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.
 
-Visit http://localhost:30081/console to view the Flyte dashboard.
+Visit <http://localhost:30081/console> to view the Flyte dashboard.
 
 Here is a quick visual tour of the console:
 
-![Flyte console Example](https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif)
+![Flyte console Example](hhttps://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/first-run-console-2.gif)
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
@@ -125,9 +125,8 @@ Please maintain an alphabetical order in the following list -->
 - [USU Group](https://www.usu.com/)
 - [Wolt](https://www.wolt.com)
 
-
 <html>
-<h2 id="roadmap"> 
+<h2 id="roadmap">
    🛣️  Live Roadmap
 </h2>
 </html>
@@ -135,7 +134,7 @@ Please maintain an alphabetical order in the following list -->
 Live roadmap for the project can be found @[Github Live Roadmap](https://github.com/orgs/flyteorg/projects/3).
 
 <html>
-<h2 id="features"> 
+<h2 id="features">
   🔥 Features
 </h2>
 </html>
@@ -197,15 +196,15 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
 - Papermill notebook execution ([Python](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/papermilltasks/index.html) and Spark)
 - [Type safe and data checking for Pandas dataframe](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/pandera_examples/index.html) using Pandera
 - Versioned datastores using DoltHub and Dolt
-- Use SQLAlchemy to query any relational database 
+- Use SQLAlchemy to query any relational database
 - Build your own plugins that use library containers
 - Snowflake queries
 
 </details>
 
 <html>
-<h2 id="component-repos"> 
-  📦 Component Repos 
+<h2 id="component-repos">
+  📦 Component Repos
 </h2>
 </html>
 
@@ -257,7 +256,7 @@ The table below has different release versions as the columns and the result of 
 </details>
 
 <html>
-<h2 id="rfc"> 
+<h2 id="rfc">
    🛣️  RFC's (Request for Commments) & Proposals
 </h2>
 </html>
@@ -266,7 +265,8 @@ Flyte is a Community Driven and Community Owned Software. It is managed using
 a steering committee and encourages collaboration. The community has a long
 roadmap for Flyte, but they know that there might be some other interesting
 ideas, extensions or additions that you may want to propose. This is done
-usually starting with a 
+usually starting with a
+
 - [Github Issue](https://github.com/flyteorg/flyte/issues) - We maintain issues for all repos in the main flyte repo.
 - Writing down your proposal using a [Documented RFC process](rfc/.)
 
@@ -274,9 +274,8 @@ For small changes, RFCs are not required, but for larger changes, RFC's are
   encouraged. You are welcome to drop into the Slack channel and talk to the community,
 if you want to test the waters, before proposing.
 
-
 <html>
-<h2 id="community--resources"> 
+<h2 id="community--resources">
   🤝 Community & Resources
 </h2>
 </html>
@@ -287,7 +286,7 @@ Here are some resources to help you learn more about Flyte.
 
 - [Slack](https://slack.flyte.org)
 - [Email list](https://groups.google.com/u/0/a/flyte.org/g/users)
-- [Twitter](https://twitter.com/flyteorg) 
+- [Twitter](https://twitter.com/flyteorg)
 - [LinkedIn Discussion Group](https://www.linkedin.com/groups/13962256/)
 - [GitHub Discussions](https://github.com/flyteorg/flyte/discussions)
 
@@ -300,6 +299,7 @@ Here are some resources to help you learn more about Flyte.
 ### Office Hours
 
 Ask us anything Flyte, weekly on Wednesdays:
+
 - 7:00-7:30 am PT ([Invite and Zoom Link](https://www.addevent.com/event/zF10349020/))
 - 9:00-9:30 pm PT ([Invite and Zoom link](https://www.addevent.com/event/dQ10349168/))
 
@@ -318,18 +318,21 @@ Ask us anything Flyte, weekly on Wednesdays:
 ### Conferences
 
 2019  
+
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
 - Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)
 - re:invent 2019 - Implementing ML workflows with Kubernetes and Amazon Sagemaker [video](https://youtu.be/G-wzIQQJKaE)
 - Cloud-native machine learning at Lyft with AWS Batch and Amazon EKS [video](https://youtu.be/n_rRb8u1GSM)
 
 2020  
+
 - OSS + ELC NA 2020 [splash](https://ossna2020.sched.com/event/313cec91aa38a430a25f9571039874b8)
 - Datacouncil [video](https://www.youtube.com/watch?v=1BjXC5TZAiI) | [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 - FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)
 - [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)
 
 2021  
+
 - OSPOCon 2021:
   - Building and Growing an Open Source Community for an Incubating Project [video](https://www.youtube.com/watch?v=DhXlTzCDeGI&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=37)
   - Enforcing Data Quality in Data Processing and ML Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=IB3KrIk4ics&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=84)
@@ -337,9 +340,10 @@ Ask us anything Flyte, weekly on Wednesdays:
   - Efficient Data Parallel Distributed Training with Flyte, Spark & Horovod [video](https://www.youtube.com/watch?v=gF3cVTdgLUY&list=PLbzoR-pLrL6q8QMGJ4dFnqejkHDm76kJV&index=77)
 - KubeCon+CloudNativeCon North America 2021 - How Spotify Leverages Flyte To Coordinate Financial Analytics Company-Wide [session](https://sched.co/lV59)
 - PyData Global 2021 - Robust, End-to-end Online Machine Learning Applications with Flytekit, Pandera and Streamlit [video](https://www.youtube.com/watch?v=yblbP7lI2IM)
-- ODSC West Reconnect - Deep Dive Into Flyte [workshop](https://odsc.com/speakers/deep-dive-into-flyte/) 
+- ODSC West Reconnect - Deep Dive Into Flyte [workshop](https://odsc.com/speakers/deep-dive-into-flyte/)
 
 2022
+
 - DataCouncil Austin - Type-Safe Data Processing and Machine Learning Pipelines with Flyte and Pandera [session](https://www.datacouncil.ai/talks/type-safe-data-processing-and-machine-learning-pipelines-with-flyte-and-pandera?hsLang=en)  
   
 ### Podcasts
@@ -350,7 +354,6 @@ Ask us anything Flyte, weekly on Wednesdays:
 - Open Data Science - [West Warm Up session with Ketan Umare - Creator of Flyte](https://twitter.com/odsc/status/1451594432369758212)
 
 </details>
-
 
 ## 💖 All Contributors
 

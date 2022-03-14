@@ -15,7 +15,7 @@ FlytePropeller is responsible for scheduling and tracking execution of Flyte wor
 
 This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flytepropeller_architecture.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_architecture.png
 
 Components
 ==========
