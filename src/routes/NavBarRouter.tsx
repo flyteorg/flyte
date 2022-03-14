@@ -7,17 +7,10 @@ const CustomNavBar = () => <NavBar useCustomContent={true} />;
 
 /** Handles the routing for content displayed in the NavBar */
 export const NavBarRouter: React.FC<{}> = () => (
-    <>
-        <Switch>
-            <Route
-                path={Routes.ExecutionDetails.path}
-                component={CustomNavBar}
-            />
-            <Route
-                path={Routes.TaskExecutionDetails.path}
-                component={CustomNavBar}
-            />
-            <Route component={NavBar} />
-        </Switch>
-    </>
+  <>
+    <Switch>
+      <Route path={Routes.ExecutionDetails.path} component={CustomNavBar} />
+      <Route component={NavBar} />
+    </Switch>
+  </>
 );
