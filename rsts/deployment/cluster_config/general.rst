@@ -68,7 +68,7 @@ To update individual project-domain attributes, use the following command for yo
 
 Cluster Resources
 =================
-These are free-form key-value pairs that are used when filling in the templates that the admin feeds into its cluster manager. The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyteadmin/tree/master/sampleresourcetemplates>`__ and the values are what you want to see filled in.
+These are free-form key-value pairs that are used when filling in the templates that the admin feeds into its cluster manager. The keys represent templatized variables in `cluster resource template YAML <:admin/sampleresourcetemplates>`__ and the values are what you want to see filled in.
 
 In the absence of custom override values, ``templateData`` from the `FlyteAdmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`__ is used as a default.
 

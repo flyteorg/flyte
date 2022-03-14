@@ -9,6 +9,7 @@
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment <deployment/index>
+   |plane| Integrations <https://docs.flyte.org/projects/cookbook/en/latest/integrations.html>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
@@ -261,13 +262,13 @@ Core Features
 
 * Container Native
 * Reproducibility
-* Extensible Backend & SDK’s
-* Ergonomic SDK’s in Python, Java & Scala
-* Versioned & Auditable - all actions are recorded
+* Extensible Backend and SDKs
+* Ergonomic SDKs in Python, Java and Scala
+* Versioned and Auditable - all actions are recorded
 * Matches your workflow - Start with one task, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
 * Battle-tested - millions of pipelines executed per month
 * Vertically-Integrated Compute - serverless experience
-* Deep understanding of data-lineage & provenance
+* Deep understanding of data-lineage and provenance
 * Operation Visibility - cost, performance, etc.
 * Cross-Cloud Portable Pipelines
 * Support for cross language workflows

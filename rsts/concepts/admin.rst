@@ -59,7 +59,7 @@ The managers utilize additional components to process requests. These additional
 Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
-`here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/admin>`__.
+`here <admin>`__.
 We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a Postgres
 implementation.  You can find the actual code for issuing queries with gorm in the
 `gormimpl <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
@@ -114,7 +114,7 @@ As the name implies, ``common`` houses shared components used across different F
 Data
 ----
 
-Data interfaces are primarily handled by the `storage <https://github.com/flyteorg/flytestdlib>`__ library implemented in flytestdlib. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support, so the data package in admin exists as the layer responsible for additional, remote data operations.
+Data interfaces are primarily handled by the `storage <https://github.com/flyteorg/flytestdlib>`__ library implemented in ``flytestdlib``. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support. Hence, the data package in admin exists as the layer responsible for additional, remote data operations.
 
 Errors
 ------
@@ -125,7 +125,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <admin/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
@@ -134,7 +134,7 @@ Workflow engine
 
 This directory contains interfaces to build and execute workflows leveraging FlytePropeller compiler and client components.
 
-.. [0] Unfortunately, given unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
+.. [0] Unfortunately, given the unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
 
 .. _divedeep-admin-service:
 

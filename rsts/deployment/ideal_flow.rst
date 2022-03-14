@@ -11,9 +11,9 @@ Before diving into an example use case that explains how DevOps could power Flyt
 
 - Every DAG can be versioned with Git commit's SHA or the hash of the code artifact; to know more about versioning, see :ref:`divedeep-versioning`
 - Tasks and workflows are immutable, i.e., a version is immutable; any mutation results in a new version
-- In the case of rapid iteration of code with no dependency modification, :ref:`deployment-fast-registration` can be used
+- In the case of rapid iteration of code with no dependency modification, :ref:`deployment-fast-registration<fast registration>` can be used
 - Multi-tenancy support through projects and domains
-- Executions can be monitored using logs on :ref:`Flyte UI <ui>`
+- Executions can be monitored using logs on :ref:`Flyte UI<ui>`
 
 Case Study: MLOps at Lyft
 =========================
