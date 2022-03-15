@@ -48,17 +48,9 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
   const filterState = useNodeExecutionFiltersState();
   const tabState = useTabState(tabs, defaultTab);
 
-  const timelineFlag = useFeatureFlag(FeatureFlag.TimelineView);
-  const [useTimelineFromCache] = useLocalCache(LocalCacheItem.ffTimelineView);
-  const isTimelineEnabled = useTimelineFromCache || timelineFlag;
-
   const {
     closure: { abortMetadata }
   } = execution;
-
-  if (!isTimelineEnabled && tabState.value === tabs.timeline.id) {
-    tabState.onChange(noop, defaultTab);
-  }
 
   /* We want to maintain the filter selection when switching away from the Nodes
     tab and back, but do not want to filter the nodes when viewing the graph. So,
@@ -86,7 +78,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
       <Tabs className={styles.tabs} {...tabState}>
         <Tab value={tabs.nodes.id} label={tabs.nodes.label} />
         <Tab value={tabs.graph.id} label={tabs.graph.label} />
-        {isTimelineEnabled && <Tab value={tabs.timeline.id} label={tabs.timeline.label} />}
+        <Tab value={tabs.timeline.id} label={tabs.timeline.label} />
       </Tabs>
       <NodeExecutionDetailsContextProvider workflowId={execution.closure.workflowId}>
         <div className={styles.nodesContainer}>
@@ -105,7 +97,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
               {renderExecutionLoader}
             </WaitForQuery>
           )}
-          {isTimelineEnabled && tabState.value === tabs.timeline.id && (
+          {tabState.value === tabs.timeline.id && (
             <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
               {renderExecutionsTimeline}
             </WaitForQuery>

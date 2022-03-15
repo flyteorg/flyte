@@ -5,10 +5,7 @@ export enum LocalCacheItem {
   TestObject = 'test-object',
 
   // Production flags
-  ShowWorkflowVersions = 'flyte.show-workflow-versions',
-
-  // Feature flags - for prod testing
-  ffTimelineView = 'ff.timeline-view'
+  ShowWorkflowVersions = 'flyte.show-workflow-versions'
 }
 
 type LocalCacheConfig = { [k: string]: string };
