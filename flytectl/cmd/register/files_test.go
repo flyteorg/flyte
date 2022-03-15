@@ -105,9 +105,32 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = s
 		assert.Nil(t, err)
 		args = []string{"testdata/flytesnacks-core.tgz"}
-		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-		mockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-		mockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		mockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		mockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		err = registerFromFilesFunc(ctx, args, cmdCtx)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("failed"), err)
+	})
+	t.Run("Failure registration of fast serialize continue on error", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		rconfig.DefaultFilesConfig.Archive = true
+
+		rconfig.DefaultFilesConfig.OutputLocationPrefix = s3Output
+		rconfig.DefaultFilesConfig.SourceUploadPath = s3Output
+		rconfig.DefaultFilesConfig.ContinueOnError = true
+		s, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		Client = s
+		assert.Nil(t, err)
+		args = []string{"testdata/flytesnacks-core.tgz"}
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(39)
+		mockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(21)
+		mockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(24)
 		err = registerFromFilesFunc(ctx, args, cmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed"), err)

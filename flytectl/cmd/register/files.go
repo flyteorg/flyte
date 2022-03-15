@@ -136,7 +136,7 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	}
 
 	var registerResults []Result
-	fastFail := rconfig.DefaultFilesConfig.ContinueOnError
+	fastFail := !rconfig.DefaultFilesConfig.ContinueOnError
 	for i := 0; i < len(validProto) && !(fastFail && regErr != nil); i++ {
 		registerResults, regErr = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
 	}
