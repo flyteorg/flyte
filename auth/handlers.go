@@ -12,7 +12,6 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteadmin/pkg/audit"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"google.golang.org/grpc/peer"
 
@@ -34,6 +33,13 @@ const (
 )
 
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
+
+type AuthenticatedClientMeta struct {
+	ClientIds     []string
+	TokenIssuedAt time.Time
+	ClientIP      string
+	Subject       string
+}
 
 func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer, authCtx interfaces.AuthenticationContext) {
 	// Add HTTP handlers for OAuth2 endpoints
@@ -180,7 +186,11 @@ func AuthenticationLoggingInterceptor(ctx context.Context, req interface{}, info
 	// Invoke 'handler' to use your gRPC server implementation and get
 	// the response.
 	identityContext := IdentityContextFromContext(ctx)
-	logger.Debugf(ctx, "gRPC server info in logging interceptor [%s] method [%s]\n", identityContext.UserID(), info.FullMethod)
+	var emailPlaceholder string
+	if len(identityContext.UserInfo().GetEmail()) > 0 {
+		emailPlaceholder = fmt.Sprintf(" (%s) ", identityContext.UserInfo().GetEmail())
+	}
+	logger.Debugf(ctx, "gRPC server info in logging interceptor [%s]%smethod [%s]\n", identityContext.UserID(), emailPlaceholder, info.FullMethod)
 	return handler(ctx, req)
 }
 
@@ -214,7 +224,7 @@ func SetContextForIdentity(ctx context.Context, identityContext interfaces.Ident
 	email := identityContext.UserInfo().GetEmail()
 	newCtx := identityContext.WithContext(ctx)
 	if len(email) > 0 {
-		newCtx = WithUserEmail(newCtx, identityContext.UserID())
+		newCtx = WithUserEmail(newCtx, email)
 	}
 
 	return WithAuditFields(newCtx, identityContext.UserID(), []string{identityContext.AppID()}, identityContext.AuthenticatedAt())
@@ -263,7 +273,7 @@ func WithAuditFields(ctx context.Context, subject string, clientIds []string, to
 	if ok {
 		clientIP = peerInfo.Addr.String()
 	}
-	return context.WithValue(ctx, common.AuditFieldsContextKey, audit.AuthenticatedClientMeta{
+	return context.WithValue(ctx, common.AuditFieldsContextKey, AuthenticatedClientMeta{
 		ClientIds:     clientIds,
 		TokenIssuedAt: tokenIssuedAt,
 		ClientIP:      clientIP,
