@@ -218,6 +218,7 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 					},
 				},
 			},
+			RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: "default_raw_output"},
 		},
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
