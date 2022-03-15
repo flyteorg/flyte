@@ -2,9 +2,6 @@ package adminservice
 
 import (
 	"context"
-	"time"
-
-	"github.com/flyteorg/flyteadmin/pkg/audit"
 
 	"github.com/flyteorg/flytestdlib/logger"
 
@@ -19,7 +16,6 @@ import (
 func (m *AdminService) CreateTaskEvent(
 	ctx context.Context, request *admin.TaskExecutionEventRequest) (*admin.TaskExecutionEventResponse, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -29,16 +25,6 @@ func (m *AdminService) CreateTaskEvent(
 	m.Metrics.taskExecutionEndpointMetrics.createEvent.Time(func() {
 		response, err = m.TaskExecutionManager.CreateTaskExecutionEvent(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"CreateTask",
-		audit.ParametersFromTaskExecutionIdentifier(&core.TaskExecutionIdentifier{
-			TaskId:          request.Event.TaskId,
-			NodeExecutionId: request.Event.ParentNodeExecutionId,
-			RetryAttempt:    request.Event.RetryAttempt,
-		}),
-		audit.ReadWrite,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.taskExecutionEndpointMetrics.createEvent)
 	}
@@ -49,7 +35,6 @@ func (m *AdminService) CreateTaskEvent(
 func (m *AdminService) GetTaskExecution(
 	ctx context.Context, request *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -68,12 +53,6 @@ func (m *AdminService) GetTaskExecution(
 	m.Metrics.taskExecutionEndpointMetrics.get.Time(func() {
 		response, err = m.TaskExecutionManager.GetTaskExecution(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"GetTaskExecution",
-		audit.ParametersFromTaskExecutionIdentifier(request.Id),
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.taskExecutionEndpointMetrics.get)
 	}
@@ -84,7 +63,6 @@ func (m *AdminService) GetTaskExecution(
 func (m *AdminService) ListTaskExecutions(
 	ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Nil request")
 	}
@@ -97,12 +75,6 @@ func (m *AdminService) ListTaskExecutions(
 	m.Metrics.taskExecutionEndpointMetrics.list.Time(func() {
 		response, err = m.TaskExecutionManager.ListTaskExecutions(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"ListTaskExecutions",
-		audit.ParametersFromNodeExecutionIdentifier(request.NodeExecutionId),
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.taskExecutionEndpointMetrics.list)
 	}
@@ -113,7 +85,6 @@ func (m *AdminService) ListTaskExecutions(
 func (m *AdminService) GetTaskExecutionData(
 	ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -128,12 +99,6 @@ func (m *AdminService) GetTaskExecutionData(
 	m.Metrics.taskExecutionEndpointMetrics.getData.Time(func() {
 		response, err = m.TaskExecutionManager.GetTaskExecutionData(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"GetTaskExecutionData",
-		audit.ParametersFromTaskExecutionIdentifier(request.Id),
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.taskExecutionEndpointMetrics.getData)
 	}

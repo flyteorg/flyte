@@ -2,9 +2,6 @@ package adminservice
 
 import (
 	"context"
-	"time"
-
-	"github.com/flyteorg/flyteadmin/pkg/audit"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -20,7 +17,6 @@ func (m *AdminService) CreateWorkflow(
 	ctx context.Context,
 	request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -29,12 +25,6 @@ func (m *AdminService) CreateWorkflow(
 	m.Metrics.workflowEndpointMetrics.create.Time(func() {
 		response, err = m.WorkflowManager.CreateWorkflow(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"CreateWorkflow",
-		audit.ParametersFromIdentifier(request.Id),
-		audit.ReadWrite,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.create)
 	}
@@ -44,7 +34,6 @@ func (m *AdminService) CreateWorkflow(
 
 func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -59,12 +48,6 @@ func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGet
 	m.Metrics.workflowEndpointMetrics.get.Time(func() {
 		response, err = m.WorkflowManager.GetWorkflow(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"GetWorkflow",
-		audit.ParametersFromIdentifier(request.Id),
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.get)
 	}
@@ -75,7 +58,6 @@ func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGet
 func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -85,15 +67,6 @@ func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.Named
 	m.Metrics.workflowEndpointMetrics.listIds.Time(func() {
 		response, err = m.WorkflowManager.ListWorkflowIdentifiers(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"ListWorkflowIds",
-		map[string]string{
-			audit.Project: request.Project,
-			audit.Domain:  request.Domain,
-		},
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.listIds)
 	}
@@ -104,7 +77,6 @@ func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.Named
 
 func (m *AdminService) ListWorkflows(ctx context.Context, request *admin.ResourceListRequest) (*admin.WorkflowList, error) {
 	defer m.interceptPanic(ctx, request)
-	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -113,12 +85,6 @@ func (m *AdminService) ListWorkflows(ctx context.Context, request *admin.Resourc
 	m.Metrics.workflowEndpointMetrics.list.Time(func() {
 		response, err = m.WorkflowManager.ListWorkflows(ctx, *request)
 	})
-	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"ListWorkflows",
-		audit.ParametersFromNamedEntityIdentifier(request.Id),
-		audit.ReadOnly,
-		requestedAt,
-	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.list)
 	}
