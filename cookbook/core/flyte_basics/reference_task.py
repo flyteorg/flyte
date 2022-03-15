@@ -26,7 +26,7 @@ from flytekit.types.file import JPEGImageFile
     name="core.flyte_basics.files.rotate",
     version="{{ registration.version }}",
 )
-def rotate(image_location: JPEGImageFile) -> JPEGImageFile:
+def rotate(image_location: JPEGImageFile, location: str) -> JPEGImageFile:
     ...
 
 
@@ -54,7 +54,8 @@ def rotate(image_location: JPEGImageFile) -> JPEGImageFile:
 @workflow
 def wf():
     return rotate(
-        image_location="https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"
+        image_location="https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg",
+        location= ""
     )
 
 
