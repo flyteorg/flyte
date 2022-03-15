@@ -5,13 +5,13 @@ import * as CompressionWebpackPlugin from 'compression-webpack-plugin';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
 import * as webpack from 'webpack';
+
 const { WebpackPluginServe: ServePlugin } = require('webpack-plugin-serve');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const FavIconWebpackPlugin = require('favicons-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const HTMLExternalsWebpackPlugin = require('html-webpack-externals-plugin');
 const nodeExternals = require('webpack-node-externals');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 import { processEnv as env } from './env';
 
 const packageJson: {
@@ -35,7 +35,7 @@ export const isDev = env.NODE_ENV === 'development';
 export const isProd = env.NODE_ENV === 'production';
 
 /** CSS module class name pattern */
-export const localIdentName = isDev ? '[local]_[hash:base64:3]' : '[hash:base64:6]';
+export const localIdentName = isDev ? '[local]_[fullhash:base64:3]' : '[fullhash:base64:6]';
 
 /** Sourcemap configuration */
 const devtool = isDev ? 'cheap-source-map' : undefined;
@@ -46,20 +46,8 @@ console.log(chalk.blue('Environment:'), chalk.green(env.NODE_ENV));
 console.log(chalk.blue('Output directory:'), chalk.green(path.resolve(dist)));
 console.log(chalk.blue('Public path:'), chalk.green(publicPath));
 
-/** SourceMap loader allows Source Map support in JavaScript files. */
-export const sourceMapLoader: webpack.Loader = 'source-map-loader';
-
-/** Load static files like images */
-export const fileLoader: webpack.Loader = {
-  loader: 'file-loader',
-  options: {
-    publicPath,
-    name: '[hash:8].[ext]'
-  }
-};
-
 /** Common webpack resolve options */
-export const resolve: webpack.Resolve = {
+export const resolve: webpack.ResolveOptions = {
   /** Base directories that Webpack will look to resolve absolutely imported modules */
   modules: ['src', 'node_modules'],
   /** Extension that are allowed to be omitted from import statements */
@@ -78,22 +66,16 @@ export function absoluteVersion(version: string) {
   return version.replace(/[^\d.\-a-z]/g, '');
 }
 
-/** Map of libraries that are loaded from CDN and are omitted from emitted JS */
-export const clientExternals: webpack.ExternalsElement = {
-  react: 'React',
-  'react-dom': 'ReactDOM'
-};
-
-/** A map of library names to their CDN values */
-export const clientExternalsCDNUrls: { [libName: string]: string } = {
-  react: `https://unpkg.com/react@${absoluteVersion(packageJson.devDependencies.react)}/umd/react.production.min.js`,
-  'react-dom': `https://unpkg.com/react-dom@${absoluteVersion(
-    packageJson.devDependencies['react-dom']
-  )}/umd/react-dom.production.min.js`
-};
+/** CDN path in case we would use minified react and react-DOM */
+const cdnReact = `https://unpkg.com/react@${absoluteVersion(
+  packageJson.devDependencies.react
+)}/umd/react.production.min.js`;
+const cdnReactDOM = `https://unpkg.com/react-dom@${absoluteVersion(
+  packageJson.devDependencies['react-dom']
+)}/umd/react-dom.production.min.js`;
 
 /** Minification options for HTMLWebpackPlugin */
-export const htmlMinifyConfig: HTMLWebpackPlugin.MinifyConfig = {
+export const htmlMinifyConfig: HTMLWebpackPlugin.MinifyOptions = {
   minifyCSS: true,
   minifyJS: false,
   removeComments: true,
@@ -101,32 +83,17 @@ export const htmlMinifyConfig: HTMLWebpackPlugin.MinifyConfig = {
   collapseWhitespace: true
 };
 
-/** FavIconWebpackPlugin icon options */
-export const favIconIconsOptions = {
-  persistentCache: isDev,
-  android: false,
-  appleIcon: false,
-  appleStartup: false,
-  coast: false,
-  favicons: true,
-  firefox: false,
-  opengraph: false,
-  twitter: false,
-  yandex: false,
-  windows: false
-};
-
 /** Adds sourcemap support */
-export const sourceMapRule: webpack.Rule = {
+export const sourceMapRule: webpack.RuleSetRule = {
   test: /\.js$/,
   enforce: 'pre',
-  use: sourceMapLoader
+  use: ['source-map-loader']
 };
 
 /** Rule for images, icons and fonts */
-export const imageAndFontsRule: webpack.Rule = {
+export const imageAndFontsRule: webpack.RuleSetRule = {
   test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-  use: fileLoader
+  type: 'asset/resource'
 };
 
 /** Generates HTML file that includes webpack assets */
@@ -138,27 +105,15 @@ export const htmlPlugin = new HTMLWebpackPlugin({
   showErrors: isDev
 });
 
-/** Generate all favorite icons based on one icon file */
 export const favIconPlugin = new FavIconWebpackPlugin({
-  logo: path.resolve(__dirname, 'src/assets/favicon.png'),
-  prefix: '[hash:8]/',
-  persistentCache: false,
-  icons: favIconIconsOptions
+  logo: path.resolve(__dirname, 'src/assets/favicon.png'), //'./src/assets/favicon.png', - narusina
+  prefix: '[fullhash:8]/'
 });
 
 /** Write client stats to a JSON file for production */
 export const statsWriterPlugin = new StatsWriterPlugin({
   filename: 'client-stats.json',
   fields: ['chunks', 'publicPath', 'assets', 'assetsByChunkName', 'assetsByChunkId']
-});
-
-/** Inject CDN URLs for externals */
-export const htmlExternalsPlugin = new HTMLExternalsWebpackPlugin({
-  externals: Object.keys(clientExternals).map(libName => ({
-    module: libName,
-    entry: clientExternalsCDNUrls[libName],
-    global: clientExternals[libName]
-  }))
 });
 
 /** Gzip assets */
@@ -186,9 +141,6 @@ export const getDefinePlugin = (isServer: boolean) =>
 
 /** Enables Webpack HMR */
 export const hmrPlugin = new webpack.HotModuleReplacementPlugin();
-
-/** Do not emit anything if there is an error */
-export const noErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
 
 /** Limit server chunks to be only one. No need to split code in server */
 export const limitChunksPlugin = new webpack.optimize.LimitChunkCountPlugin({
@@ -220,29 +172,12 @@ export const clientConfig: webpack.Configuration = {
 
     return entry;
   },
-  externals: isProd ? clientExternals : undefined,
+  mode: isDev ? 'development' : 'production',
   module: {
     rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
   },
   optimization: {
-    noEmitOnErrors: isDev,
-    minimizer: [
-      new UglifyJsPlugin({
-        parallel: true,
-        sourceMap: true,
-        uglifyOptions: {
-          compress: {
-            collapse_vars: false,
-            // without 'inline: false' we can get 'Assignment to constant variable' error in production build
-            // discussed in: https://github.com/mishoo/UglifyJS/issues/2842 and https://github.com/mishoo/UglifyJS/issues/2854
-            // happens in uglify-es 3.3.8, 3.3.9
-            inline: false,
-            warnings: false
-          },
-          output: { comments: false }
-        }
-      })
-    ],
+    emitOnErrors: isProd,
     splitChunks: {
       cacheGroups: {
         vendor: {
@@ -250,7 +185,7 @@ export const clientConfig: webpack.Configuration = {
           enforce: true,
           name: 'vendor',
           priority: 10,
-          test: /node_modules/
+          test: /[\\/]node_modules/
         }
       }
     }
@@ -258,14 +193,14 @@ export const clientConfig: webpack.Configuration = {
   output: {
     publicPath,
     path: dist,
-    filename: '[name]-[hash:8].js',
+    filename: '[name]-[fullhash:8].js',
     chunkFilename: '[name]-[chunkhash].chunk.js',
     crossOriginLoading: 'anonymous'
   },
   get plugins() {
-    const plugins: webpack.Plugin[] = [
+    const plugins: webpack.WebpackPluginInstance[] = [
       htmlPlugin,
-      new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+      new ForkTsCheckerWebpackPlugin(),
       favIconPlugin,
       statsWriterPlugin,
       getDefinePlugin(false),
@@ -281,16 +216,7 @@ export const clientConfig: webpack.Configuration = {
 
     // Apply production specific configs
     if (isProd) {
-      // plugins.push(uglifyPlugin);
-      plugins.push(htmlExternalsPlugin);
       plugins.push(compressionPlugin);
-    }
-
-    if (isDev) {
-      return [
-        ...plugins
-        // namedModulesPlugin,
-      ];
     }
 
     return plugins;
@@ -306,23 +232,20 @@ export const serverConfig: webpack.Configuration = {
   resolve,
   name: 'server',
   target: 'node',
+  mode: isDev ? 'development' : 'production',
   devtool: isProd ? devtool : undefined,
   entry: ['babel-polyfill', './src/server'],
   module: {
     rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
   },
-  externals: [nodeExternals({ whitelist: /lyft/ })],
+  externals: [nodeExternals({ allowlist: /lyft/ })],
   output: {
     path: dist,
     filename: 'server.js',
     libraryTarget: 'commonjs2'
+    // assetModuleFilename: `${publicPath}/[fullhash:8].[ext]`
   },
-  plugins: [
-    limitChunksPlugin,
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
-    getDefinePlugin(true)
-    // namedModulesPlugin,
-  ]
+  plugins: [limitChunksPlugin, new ForkTsCheckerWebpackPlugin(), getDefinePlugin(true)]
 };
 
 export default [clientConfig, serverConfig];
