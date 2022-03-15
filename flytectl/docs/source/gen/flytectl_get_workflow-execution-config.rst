@@ -10,7 +10,7 @@ Synopsis
 
 
 
-Retrieve workflow execution config for the given project and domain combination or additionally the workflow name.
+Retrieve workflow execution config for the given project and domain, in combination with the workflow name.
 
 For project flytectldemo and development domain:
 

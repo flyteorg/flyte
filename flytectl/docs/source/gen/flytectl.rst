@@ -67,7 +67,7 @@ SEE ALSO
 * :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 * :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 * :doc:`flytectl_register` 	 - Registers tasks, workflows, and launch plans from a list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
+* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
 * :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
 * :doc:`flytectl_upgrade` 	 - Upgrades/rollbacks to a Flyte version.
 * :doc:`flytectl_version` 	 - Fetches Flyte version

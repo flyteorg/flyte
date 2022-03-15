@@ -10,23 +10,20 @@ Synopsis
 
 
 
-Deletes task resource attributes for the given project and domain combination, or additionally the workflow name.
+Delete task resource attributes for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain:
+For project flytectldemo and development domain, run:
 ::
 
- flytectl delete task-resource-attribute -p flytectldemo -d development 
+ flytectl delete task-resource-attribute -p flytectldemo -d development
 
-
-Deletes task resource attribute using config file which was used to create it.
-Here, the config file is written to tra.yaml.
-The defaults/limits are optional in the file as they are unread during the delete command, but can be retained since the same file can be used for 'get', 'update' or 'delete' commands.
-Example: content of tra.yaml:
+To delete task resource attribute using the config file which was used to create it, run:
 
 ::
 
  flytectl delete task-resource-attribute --attrFile tra.yaml
 
+For example, here's the config file tra.yaml:
 
 .. code-block:: yaml
 
@@ -39,8 +36,9 @@ Example: content of tra.yaml:
       cpu: "2"
       memory: "450Mi"
 
-Delete task resource attribute for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort':
+The defaults/limits are optional in the file as they are unread during the delete command, but can be retained since the same file can be used for 'get', 'update' and 'delete' commands.
+
+To delete task resource attribute for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
 
 ::
 

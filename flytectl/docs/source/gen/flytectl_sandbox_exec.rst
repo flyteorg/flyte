@@ -3,14 +3,15 @@
 flytectl sandbox exec
 ---------------------
 
-Executes non-interactive command inside the Sandbox container
+Executes non-interactive command inside the sandbox container
 
 Synopsis
 ~~~~~~~~
 
 
 
-Runs non-interactive commands inside the Sandbox container and immediately returns the output. By default, "flytectl exec" is present in the /root directory inside the Sandbox container.
+Run non-interactive commands inside the sandbox container and immediately return the output.
+By default, "flytectl exec" is present in the /root directory inside the sandbox container.
 
 ::
 
@@ -78,5 +79,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
+* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
 

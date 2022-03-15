@@ -10,7 +10,7 @@ Synopsis
 
 
 
-Fetch Flyte resource; if a project:
+To fetch a project, use the following command:
 ::
 
  flytectl get project

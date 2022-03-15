@@ -10,23 +10,20 @@ Synopsis
 
 
 
-Delete execution queue attributes for the given project and domain combination or additionally the workflow name.
+Delete execution queue attributes for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain:
+For project flytectldemo and development domain, run:
 ::
 
- flytectl delete execution-queue-attribute -p flytectldemo -d development 
-
+ flytectl delete execution-queue-attribute -p flytectldemo -d development
 
 Delete execution queue attribute using the config file which was used to create it.
-Here, the config file is written to era.yaml.
-Value is optional in the file as it is unread during the delete command but it can be retained since the same file can be used for get, update or delete commands. 
-Example: content of era.yaml:
 
 ::
 
  flytectl delete execution-queue-attribute --attrFile era.yaml
 
+For example, here's the config file era.yaml:
 
 .. code-block:: yaml
 
@@ -38,8 +35,9 @@ Example: content of era.yaml:
       - buzz
       - lightyear
 
-Delete execution queue attribute for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort':
+Value is optional in the file as it is unread during the delete command but it can be retained since the same file can be used for get, update and delete commands.
+
+To delete the execution queue attribute for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
 
 ::
 
