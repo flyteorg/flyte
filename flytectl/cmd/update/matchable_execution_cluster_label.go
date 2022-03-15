@@ -12,11 +12,11 @@ import (
 const (
 	executionClusterLabelShort = "Update matchable resources of execution cluster label"
 	executionClusterLabelLong  = `
-Updates execution cluster label for the given project and domain combination or additionally with workflow name.
+Update execution cluster label for the given project and domain combination or additionally with workflow name.
 
 Updating to the execution cluster label is only available from a generated file. See the get section to generate this file.
 It takes input for execution cluster label from the config file ecl.yaml
-e.g., content of ecl.yaml:
+Example: content of ecl.yaml:
 
 .. code-block:: yaml
 
@@ -28,7 +28,7 @@ e.g., content of ecl.yaml:
 
  flytectl update execution-cluster-label --attrFile ecl.yaml
 
-Updates execution cluster label for project, domain and workflow combination. This will take precedence over any other
+Update execution cluster label for project, domain, and workflow combination. This will take precedence over any other
 execution cluster label defined at project domain level.
 For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
 

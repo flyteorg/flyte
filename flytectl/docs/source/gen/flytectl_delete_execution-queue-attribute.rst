@@ -3,25 +3,25 @@
 flytectl delete execution-queue-attribute
 -----------------------------------------
 
-Delete matchable resources of execution queue attributes
+Deletes matchable resources of execution queue attributes.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Deletes execution queue attributes for the given project and domain combination or additionally with workflow name.
+Delete execution queue attributes for the given project and domain combination or additionally the workflow name.
 
-For project flytectldemo and development domain, it is:
+For project flytectldemo and development domain:
 ::
 
  flytectl delete execution-queue-attribute -p flytectldemo -d development 
 
 
-Deletes execution queue attribute using config file which was used for creating it.
+Delete execution queue attribute using the config file which was used to create it.
 Here, the config file is written to era.yaml.
-Value is optional in the file as it is unread during the delete command but it can be kept since the same file can be used for get, update or delete commands. 
-e.g., content of era.yaml:
+Value is optional in the file as it is unread during the delete command but it can be retained since the same file can be used for get, update or delete commands. 
+Example: content of era.yaml:
 
 ::
 
@@ -38,8 +38,8 @@ e.g., content of era.yaml:
       - buzz
       - lightyear
 
-Deletes execution queue attribute for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Delete execution queue attribute for a workflow.
+For the workflow 'core.control_flow.run_merge_sort.merge_sort':
 
 ::
 
@@ -110,5 +110,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

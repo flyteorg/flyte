@@ -19,9 +19,9 @@ import (
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
-	versionCmdShort = `Fetch Flyte version`
+	versionCmdShort = `Fetches Flyte version`
 	versionCmdLong  = `
-For FlyteCTL version, it is:
+Fetch Flytectl version.
 ::
 
  flytectl version
@@ -55,11 +55,11 @@ func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContex
 	goos := platformutil.Platform(runtime.GOOS)
 	version, err := githubutil.FlytectlReleaseConfig.GetLatestVersion()
 	if err != nil {
-		logger.Error(ctx, "Not able to get latest version because %v", err)
+		logger.Error(ctx, "Unable to get the latest version because %v", err)
 	} else {
 		message, err := githubutil.GetUpgradeMessage(version, goos)
 		if err != nil {
-			logger.Error(ctx, "Not able to detect new version because %v", err)
+			logger.Error(ctx, "Unable to detect a new version because %v", err)
 		}
 		if len(message) > 0 {
 			fmt.Println(message)
@@ -97,14 +97,14 @@ func getControlPlaneVersion(ctx context.Context, cmdCtx cmdCore.CommandContext) 
 		logger.Debugf(ctx, "Failed to get version of control plane %v: \n", err)
 		return err
 	}
-	// Print Flyteadmin
+	// Print FlyteAdmin
 	if err := printVersion(versionOutput{
 		Build:     v.ControlPlaneVersion.Build,
 		BuildTime: v.ControlPlaneVersion.BuildTime,
 		Version:   v.ControlPlaneVersion.Version,
 		App:       controlPlanAppName,
 	}); err != nil {
-		return fmt.Errorf("not able to get control plane version..Please try again: %v", err)
+		return fmt.Errorf("Unable to get the control plane version. Please try again: %v", err)
 	}
 	return nil
 }

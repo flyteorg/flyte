@@ -3,50 +3,70 @@
 flytectl completion
 -------------------
 
-Generate completion script
+Generates completion script.
 
 Synopsis
 ~~~~~~~~
 
 
-To load completions:
+To load completion, run the following commands in accordance with the shell you are using:
 
-Bash:
+- Bash
+	::
 
-  $ source <(flytectl completion bash)
+	$ source <(flytectl completion bash)
 
-  # To load completions for each session, execute once:
-  # Linux:
-  $ flytectl completion bash > /etc/bash_completion.d/flytectl
-  # macOS:
-  $ flytectl completion bash > /usr/local/etc/bash_completion.d/flytectl
+	To load completions for each session:
 
-Zsh:
+	- Linux
+	::
 
-  # If shell completion is not already enabled in your environment,
-  # you will need to enable it. You can execute the following once:
+	$ flytectl completion bash > /etc/bash_completion.d/flytectl
 
-  $ echo "autoload -U compinit; compinit" >> ~/.zshrc
+	- macOS
+	::
 
-  # To load completions for each session, execute once:
-  $ flytectl completion zsh > "${fpath[1]}/_flytectl"
+	$ flytectl completion bash > /usr/local/etc/bash_completion.d/flytectl
 
-  # You will need to start a new shell for this setup to take effect.
+- Zsh
+	If shell completion is not already enabled in your environment, enable it:
 
-fish:
+	::
 
-  $ flytectl completion fish | source
+	$ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
-  # To load completions for each session, execute once:
-  $ flytectl completion fish > ~/.config/fish/completions/flytectl.fish
+	Once enabled, execute once:
 
-PowerShell:
+	::
 
-  PS> flytectl completion powershell | Out-String | Invoke-Expression
+	$ flytectl completion zsh > "${fpath[1]}/_flytectl"
 
-  # To load completions for every new session, run:
-  PS> flytectl completion powershell > flytectl.ps1
-  # and source this file from your PowerShell profile.
+	.. note::
+		Start a new shell for this setup to take effect.
+
+- fish
+	::
+
+	$ flytectl completion fish | source
+
+	To load completions for each session, run:
+
+	::
+
+	$ flytectl completion fish > ~/.config/fish/completions/flytectl.fish
+
+- PowerShell
+	::
+
+	 PS> flytectl completion powershell | Out-String | Invoke-Expression
+
+	To load completions for each session, run:
+
+	::
+
+	 PS> flytectl completion powershell > flytectl.ps1
+
+	and source this file from your PowerShell profile.
 
 
 ::
@@ -109,5 +129,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - Flytectl CLI tool
 

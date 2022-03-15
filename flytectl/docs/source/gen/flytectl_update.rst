@@ -11,8 +11,8 @@ Synopsis
 
 
 Currently, this command only provides subcommands to update project.
-Takes input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
-To update a project:
+Take input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
+Update Flyte resources; if a project:
 ::
 
  flytectl update project -p flytesnacks --activateProject
@@ -74,17 +74,17 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - Flytectl CLI tool
 * :doc:`flytectl_update_cluster-resource-attribute` 	 - Update matchable resources of cluster attributes
-* :doc:`flytectl_update_execution` 	 - Update execution status
+* :doc:`flytectl_update_execution` 	 - Updates the execution status
 * :doc:`flytectl_update_execution-cluster-label` 	 - Update matchable resources of execution cluster label
 * :doc:`flytectl_update_execution-queue-attribute` 	 - Update matchable resources of execution queue attributes
-* :doc:`flytectl_update_launchplan` 	 - Update launch plan status
-* :doc:`flytectl_update_launchplan-meta` 	 - Update launch plan metadata
+* :doc:`flytectl_update_launchplan` 	 - Updates launch plan status
+* :doc:`flytectl_update_launchplan-meta` 	 - Updates the launch plan metadata
 * :doc:`flytectl_update_plugin-override` 	 - Update matchable resources of plugin overrides
 * :doc:`flytectl_update_project` 	 - Update project resources
 * :doc:`flytectl_update_task-meta` 	 - Update task metadata
 * :doc:`flytectl_update_task-resource-attribute` 	 - Update matchable resources of task attributes
-* :doc:`flytectl_update_workflow-execution-config` 	 - Update matchable resources of workflow execution config
+* :doc:`flytectl_update_workflow-execution-config` 	 - Updates matchable resources of workflow execution config
 * :doc:`flytectl_update_workflow-meta` 	 - Update workflow metadata
 

@@ -3,24 +3,24 @@
 flytectl delete execution
 -------------------------
 
-Terminate/Delete execution resources.
+Terminates/deletes execution resources.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Terminate executions.(execution,executions can be used interchangeably in these commands)
-
-Task executions can be aborted only if they are in non-terminal state. If they are FAILED, ABORTED or SUCCEEDED, calling terminate on them has no effect.
-
+Task executions can be aborted only if they are in non-terminal state. If they are FAILED, ABORTED, or SUCCEEDED, calling terminate on them has no effect.
 Terminate a single execution with its name:
 
 ::
 
  flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
 
-Get executions to check its state:
+.. note::
+    The terms execution/executions are interchangeable in these commands.
+
+Get an execution to check its state:
 
 ::
 
@@ -36,7 +36,7 @@ Terminate multiple executions with their names:
 
  flytectl delete execution eeam9s8sny p4wv4hwgc4  -d development  -p flytesnacks
 
-Get executions to find the state of previously terminated executions:
+Get an execution to find the state of previously terminated executions:
 
 ::
 
@@ -115,5 +115,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

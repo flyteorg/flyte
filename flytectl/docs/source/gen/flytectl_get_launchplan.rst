@@ -3,17 +3,20 @@
 flytectl get launchplan
 -----------------------
 
-Get launch plan resources
+Gets the launch plan resources.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve all launch plans within the project and domain (launch plan, launch plans can be used interchangeably):
+Retrieve all launch plans within the project and domain:
 ::
 
  flytectl get launchplan -p flytesnacks -d development
+
+.. note::
+     The terms launch plan/launch plans are interchangeable in these commands.
 
  Retrieve a launch plan by name within the project and domain:
 
@@ -73,7 +76,7 @@ Retrieve all launch plans the within the project and domain in JSON format:
 
  flytectl get launchplan -p flytesnacks -d development -o json
 
-Retrieve a launch plan within the project and domain as per a version and generate the execution spec file; the file can be used to launch the execution using the 'create execution' command:
+Retrieve a launch plan within the project and domain as per a version and generates the execution spec file; the file can be used to launch the execution using the 'create execution' command:
 
 ::
 
@@ -95,8 +98,7 @@ The generated file would look similar to this:
 	 version: v3
 	 workflow: core.advanced.run_merge_sort.merge_sort
 
-Check the create execution section on how to launch one using the generated file.
-
+Check the :ref:`create execution section<flytectl_create_execution>` on how to launch one using the generated file.
 Usage
 
 
@@ -169,5 +171,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

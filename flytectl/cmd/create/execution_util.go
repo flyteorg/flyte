@@ -216,7 +216,7 @@ func readConfigAndValidate(project string, domain string) (ExecutionParams, erro
 	isTask := readExecutionConfig.Task != ""
 	isWorkflow := readExecutionConfig.Workflow != ""
 	if isTask == isWorkflow {
-		return executionParams, fmt.Errorf("either one of task or workflow name should be specified" +
+		return executionParams, fmt.Errorf("either task or workflow name should be specified" +
 			" to launch an execution")
 	}
 	name := readExecutionConfig.Task

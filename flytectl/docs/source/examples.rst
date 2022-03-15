@@ -1,6 +1,6 @@
 Examples
-------
-It specifies the actions to be performed on the resource 'examples'. 
+---------
+It specifies the actions to be performed on the 'examples' resource. 
 
 .. toctree::
     :maxdepth: 1

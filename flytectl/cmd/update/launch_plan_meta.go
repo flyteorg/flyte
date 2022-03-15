@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	updateLPMetaShort = "Update launch plan metadata"
+	updateLPMetaShort = "Updates the launch plan metadata"
 	updateLPMetaLong  = `
 Update the description on the launch plan:
 ::

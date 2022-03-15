@@ -3,7 +3,7 @@
 flytectl delete
 ---------------
 
-Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 
 Synopsis
 ~~~~~~~~
@@ -72,12 +72,12 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
-* :doc:`flytectl_delete_cluster-resource-attribute` 	 - Delete matchable resources of cluster attributes
-* :doc:`flytectl_delete_execution` 	 - Terminate/Delete execution resources.
-* :doc:`flytectl_delete_execution-cluster-label` 	 - Delete matchable resources of execution cluster label
-* :doc:`flytectl_delete_execution-queue-attribute` 	 - Delete matchable resources of execution queue attributes
-* :doc:`flytectl_delete_plugin-override` 	 - Delete matchable resources of plugin overrides
-* :doc:`flytectl_delete_task-resource-attribute` 	 - Delete matchable resources of task attributes
-* :doc:`flytectl_delete_workflow-execution-config` 	 - Delete matchable resources of workflow execution config
+* :doc:`flytectl` 	 - Flytectl CLI tool
+* :doc:`flytectl_delete_cluster-resource-attribute` 	 - Deletes matchable resources of cluster attributes.
+* :doc:`flytectl_delete_execution` 	 - Terminates/deletes execution resources.
+* :doc:`flytectl_delete_execution-cluster-label` 	 - Deletes matchable resources of execution cluster label.
+* :doc:`flytectl_delete_execution-queue-attribute` 	 - Deletes matchable resources of execution queue attributes.
+* :doc:`flytectl_delete_plugin-override` 	 - Deletes matchable resources of plugin overrides.
+* :doc:`flytectl_delete_task-resource-attribute` 	 - Deletes matchable resources of task attributes.
+* :doc:`flytectl_delete_workflow-execution-config` 	 - Deletes matchable resources of workflow execution config.
 

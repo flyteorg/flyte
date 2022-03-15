@@ -3,18 +3,22 @@
 flytectl get task
 -----------------
 
-Get task resources
+Gets task resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve all the tasks within project and domain(task,tasks can be used interchangeably in these commands):
+
+Retrieve all the tasks within project and domain:
 ::
 
  flytectl get task -p flytesnacks -d development
 
+.. note::
+	  The terms task/tasks are interchangeable in these commands.
+	  
 Retrieve task by name within project and domain:
 
 ::
@@ -159,5 +163,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

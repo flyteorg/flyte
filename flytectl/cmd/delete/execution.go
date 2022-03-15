@@ -13,19 +13,19 @@ import (
 
 // Long descriptions are whitespace sensitive when generating docs using Sphinx.
 const (
-	execCmdShort = `Terminate/Delete execution resources.`
+	execCmdShort = `Terminates/deletes execution resources.`
 	execCmdLong  = `
-Terminate executions.(execution,executions can be used interchangeably in these commands)
-
-Task executions can be aborted only if they are in non-terminal state. If they are FAILED, ABORTED or SUCCEEDED, calling terminate on them has no effect.
-
+Task executions can be aborted only if they are in non-terminal state. If they are FAILED, ABORTED, or SUCCEEDED, calling terminate on them has no effect.
 Terminate a single execution with its name:
 
 ::
 
  flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
 
-Get executions to check its state:
+.. note::
+    The terms execution/executions are interchangeable in these commands.
+
+Get an execution to check its state:
 
 ::
 
@@ -41,7 +41,7 @@ Terminate multiple executions with their names:
 
  flytectl delete execution eeam9s8sny p4wv4hwgc4  -d development  -p flytesnacks
 
-Get executions to find the state of previously terminated executions:
+Get an execution to find the state of previously terminated executions:
 
 ::
 
@@ -75,7 +75,7 @@ func terminateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.C
 				},
 			})
 			if err != nil {
-				logger.Errorf(ctx, "Failed in terminating execution of %v execution due to %v ", name, err)
+				logger.Errorf(ctx, "Failed to terminate execution of %v execution due to %v ", name, err)
 				return err
 			}
 		}

@@ -3,14 +3,14 @@
 flytectl sandbox teardown
 -------------------------
 
-Teardown cleans up the sandbox environment
+Cleans up the sandbox environment
 
 Synopsis
 ~~~~~~~~
 
 
 
-Teardown removes Sandbox cluster and all the Flyte config created by sandbox start:
+Removes the Sandbox cluster and all the Flyte config created by 'sandbox start':
 ::
 
  flytectl sandbox teardown 
@@ -79,5 +79,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
 

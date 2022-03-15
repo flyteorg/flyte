@@ -3,26 +3,28 @@
 flytectl upgrade
 ----------------
 
-Upgrade/rollback to a Flyte version
+Upgrades/rollbacks to a Flyte version.
 
 Synopsis
 ~~~~~~~~
 
 
 
-For FlyteCTL, it is:
+For Flytectl, it is:
 ::
 
  flytectl upgrade
 	
-Note: Please use upgrade with sudo. Without sudo it will cause permission issue.
+.. note::
+	Please upgrade with sudo. Failing to do so may result in a permission issues.
 	
-Rollback flytectl binary:
+Rollback Flytectl binary:
 ::
 
  flytectl upgrade rollback
 
-Note: Upgrade is not available on windows.
+.. note:: 
+	Upgrade is not available on Windows.
 
 
 ::
@@ -85,5 +87,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - Flytectl CLI tool
 

@@ -11,24 +11,22 @@ import (
 )
 
 const (
-	pluginOverrideShort = "Delete matchable resources of plugin overrides"
+	pluginOverrideShort = "Deletes matchable resources of plugin overrides."
 	pluginOverrideLong  = `
-Deletes plugin override for the given project and domain combination or additionally with workflow name.
+Delete plugin override for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain, it is:
+For project flytectldemo and development domain, run:
 ::
 
- flytectl delete plugin-override -p flytectldemo -d development 
+ flytectl delete plugin-override -p flytectldemo -d development
 
 
-Deletes plugin override using config file which was used to create it.
-Here, the config file is written to po.yaml.
-Overrides are optional in the file as they are unread during the delete command but can be kept since the same file can be used for get, update or delete commands. 
-e.g., content of po.yaml:
+To delete plugin override using the config file which was used to create it, run:
 ::
 
  flytectl delete plugin-override --attrFile po.yaml
 
+For example, here's the config file po.yaml:
 
 .. code-block:: yaml
 
@@ -41,8 +39,9 @@ e.g., content of po.yaml:
            - plugin_override2
          missing_plugin_behavior: 1 # Behavior when no specified plugin_id has an associated handler. 0 : FAIL , 1: DEFAULT
 
-Deletes plugin override for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Overrides are optional in the file as they are unread during the delete command but can be retained since the same file can be used for get, update and delete commands.
+
+To delete plugin override for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
 
 ::
 

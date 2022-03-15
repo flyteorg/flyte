@@ -190,4 +190,5 @@ texinfo_documents = [
 # intersphinx configuration
 intersphinx_mapping = {
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
+    "flyte": ("https://docs.flyte.org/en/latest", None),
 }

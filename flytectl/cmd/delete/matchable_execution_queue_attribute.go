@@ -11,25 +11,22 @@ import (
 )
 
 const (
-	executionQueueAttributesShort = "Delete matchable resources of execution queue attributes"
+	executionQueueAttributesShort = "Deletes matchable resources of execution queue attributes."
 	executionQueueAttributesLong  = `
-Deletes execution queue attributes for the given project and domain combination or additionally with workflow name.
+Delete execution queue attributes for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain, it is:
+For project flytectldemo and development domain, run:
 ::
 
- flytectl delete execution-queue-attribute -p flytectldemo -d development 
+ flytectl delete execution-queue-attribute -p flytectldemo -d development
 
-
-Deletes execution queue attribute using config file which was used for creating it.
-Here, the config file is written to era.yaml.
-Value is optional in the file as it is unread during the delete command but it can be kept since the same file can be used for get, update or delete commands. 
-e.g., content of era.yaml:
+Delete execution queue attribute using the config file which was used to create it.
 
 ::
 
  flytectl delete execution-queue-attribute --attrFile era.yaml
 
+For example, here's the config file era.yaml:
 
 .. code-block:: yaml
 
@@ -41,8 +38,9 @@ e.g., content of era.yaml:
       - buzz
       - lightyear
 
-Deletes execution queue attribute for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Value is optional in the file as it is unread during the delete command but it can be retained since the same file can be used for get, update and delete commands.
+
+To delete the execution queue attribute for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
 
 ::
 

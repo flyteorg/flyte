@@ -75,7 +75,7 @@ func TestActivateProjectFuncWithError(t *testing.T) {
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject failed to get updated due to Error Updating Project\n")
+	tearDownAndVerify(t, "Project dummyProject failed to update due to Error Updating Project\n")
 }
 
 func TestArchiveProjectFunc(t *testing.T) {
@@ -118,7 +118,7 @@ func TestArchiveProjectFuncWithError(t *testing.T) {
 	err = updateProjectsFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	mockClient.AssertCalled(t, "UpdateProject", ctx, projectUpdateRequest)
-	tearDownAndVerify(t, "Project dummyProject failed to get updated"+
+	tearDownAndVerify(t, "Project dummyProject failed to update"+
 		" due to Error Updating Project\n")
 }
 

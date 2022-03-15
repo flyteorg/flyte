@@ -3,16 +3,16 @@
 flytectl register
 -----------------
 
-Register tasks/workflows/launchplans from a list of generated serialized files.
+Registers tasks, workflows, and launch plans from a list of generated serialized files.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Takes input files as serialized versions of the tasks/workflows/launchplans and registers them with flyteadmin.
+Take input files as serialized versions of the tasks/workflows/launchplans and register them with FlyteAdmin.
 Currently, these input files are protobuf files generated as output from Flytekit serialize.
-Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1.
+Project and Domain are mandatory fields to be passed for registration and an optional version which defaults to v1.
 If the entities are already registered with Flyte for the same version, the registration would fail.
 
 
@@ -72,7 +72,7 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
-* :doc:`flytectl_register_examples` 	 - Register Flytesnacks example
-* :doc:`flytectl_register_files` 	 - Register file resources
+* :doc:`flytectl` 	 - Flytectl CLI tool
+* :doc:`flytectl_register_examples` 	 - Registers Flytesnacks example.
+* :doc:`flytectl_register_files` 	 - Registers file resources.
 

@@ -42,8 +42,8 @@ const (
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		PersistentPreRunE: initConfig,
-		Long:              "FlyteCTL is CLI tool written in go to interact with Flyteadmin service",
-		Short:             "FlyteCTL CLI tool",
+		Long:              "Flytectl is a CLI tool written in Go to interact with the FlyteAdmin service.",
+		Short:             "Flytectl CLI tool",
 		Use:               "flytectl",
 		DisableAutoGenTag: true,
 	}

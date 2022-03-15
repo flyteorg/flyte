@@ -1,6 +1,6 @@
 Workflow
 --------
-It specifies the actions to be performed on the resource 'workflow'. 
+It specifies the actions to be performed on the 'workflow' resource. 
 
 .. toctree::
     :maxdepth: 1

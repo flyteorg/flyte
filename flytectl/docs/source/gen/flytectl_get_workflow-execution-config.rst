@@ -3,22 +3,22 @@
 flytectl get workflow-execution-config
 --------------------------------------
 
-Get matchable resources of workflow execution config
+Gets matchable resources of workflow execution config.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves workflow execution config for the given project and domain combination or additionally with workflow name.
+Retrieve workflow execution config for the given project and domain combination or additionally the workflow name.
 
-For project flytectldemo and development domain, it is:
+For project flytectldemo and development domain:
 
 ::
 
  flytectl get workflow-execution-config -p flytectldemo -d development 
 
-e.g., output from the command
+Example: output from the command:
 
 .. code-block:: json
 
@@ -28,14 +28,14 @@ e.g., output from the command
 	"max_parallelism": 5
  }
 
-Retrieves workflow execution config for the project, domain and workflow.
-For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Retrieve workflow execution config for the project, domain, and workflow.
+For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort':
 
 ::
 
  flytectl get workflow-execution-config -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-e.g., output from the command
+Example: output from the command:
 
 .. code-block:: json
 
@@ -46,9 +46,9 @@ e.g., output from the command
 	"max_parallelism": 5
  }
 
-Writing the workflow execution config to a file. If there are no workflow execution config, the command would return an error.
-Here, the config file is written to wec.yaml,
-e.g., content of wec.yaml:
+Write the workflow execution config to a file. If there are no workflow execution config, the command throws an error.
+The config file is written to wec.yaml file.
+Example: content of wec.yaml:
 
 ::
 
@@ -125,5 +125,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

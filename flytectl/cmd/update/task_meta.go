@@ -13,7 +13,7 @@ import (
 const (
 	updateTaskShort = "Update task metadata"
 	updateTaskLong  = `
-Updates the description on the task:
+Update the description on the task:
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --description "Merge sort example"

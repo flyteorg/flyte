@@ -253,5 +253,5 @@ func TestCreateExecutionFuncInvalid(t *testing.T) {
 	executionConfig.ExecFile = testDataFolder + "invalid_execution_spec.yaml"
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("either one of task or workflow name should be specified to launch an execution"), err)
+	assert.Equal(t, fmt.Errorf("either task or workflow name should be specified to launch an execution"), err)
 }

@@ -3,7 +3,7 @@
 flytectl update launchplan-meta
 -------------------------------
 
-Update launch plan metadata
+Updates the launch plan metadata
 
 Synopsis
 ~~~~~~~~

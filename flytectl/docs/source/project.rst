@@ -1,6 +1,6 @@
 Project
-------
-It specifies the actions to be performed on the resource 'project'. 
+--------
+It specifies the actions to be performed on the 'project' resource. 
 
 
 .. toctree::

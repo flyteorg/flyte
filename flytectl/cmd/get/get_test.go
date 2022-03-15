@@ -40,7 +40,7 @@ const (
 func TestCreateGetCommand(t *testing.T) {
 	getCommand := CreateGetCommand()
 	assert.Equal(t, getCommand.Use, "get")
-	assert.Equal(t, getCommand.Short, "Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.")
+	assert.Equal(t, getCommand.Short, "Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.")
 	fmt.Println(getCommand.Commands())
 	assert.Equal(t, len(getCommand.Commands()), 11)
 	cmdNouns := getCommand.Commands()
