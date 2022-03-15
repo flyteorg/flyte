@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](http://github.com/lyft/flyteconsole/compare/v0.44.0...v0.45.0) (2022-03-15)
+
+
+### Features
+
+* enable timeline view ([#327](http://github.com/lyft/flyteconsole/issues/327)) ([5bd77c6](http://github.com/lyft/flyteconsole/commit/5bd77c600289954e487c3451b5e54fd3d8cb8e49))
+
 # [0.44.0](http://github.com/lyft/flyteconsole/compare/v0.43.0...v0.44.0) (2022-03-14)
 
 
