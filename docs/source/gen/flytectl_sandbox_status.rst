@@ -3,14 +3,14 @@
 flytectl sandbox status
 -----------------------
 
-Gets the status of the Sandbox environment.
+Gets the status of the sandbox environment.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves the status of the Sandbox environment. Currently, Flyte Sandbox runs as a local Docker container.
+Retrieves the status of the sandbox environment. Currently, Flyte sandbox runs as a local Docker container.
 
 Usage
 ::
@@ -79,5 +79,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
+* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
 

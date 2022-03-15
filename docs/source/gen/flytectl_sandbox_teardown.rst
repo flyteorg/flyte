@@ -79,5 +79,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
+* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
 
