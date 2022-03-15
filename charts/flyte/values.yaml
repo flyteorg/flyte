@@ -274,6 +274,10 @@ flyte:
         projectcontour.io/upstream-protocol.h2c: grpc
       type: ClusterIP
 
+  # It will enable the re doc route in ingress
+  redoc:
+    deployRedoc: true
+
   # ------------------------------------------------
   #
   # COMMON SETTINGS
@@ -732,6 +736,41 @@ minio:
   service:
     annotations: {}
     type: NodePort
+  # -- Annotations for Minio pods
+  podAnnotations: {}
+  # -- nodeSelector for Minio deployment
+  nodeSelector: {}
+  # -- tolerations for Minio deployment
+  tolerations: []
+  # -- affinity for Minio deployment
+  affinity: {}
+
+
+redoc:
+  # --- enable or disable Minio deployment installation
+  enabled: true
+  # -- Replicas count for Minio deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Minio deployment
+    repository: docker.io/redocly/redoc
+    # -- Docker image tag
+    tag: latest
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Minio deployment
+  resources:
+    # -- Requests are the minimum set of resources needed for this pod
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    # -- Limits are the maximum set of resources needed for this pod
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  # -- Service settings for Minio
+  service:
+    type: ClusterIP
   # -- Annotations for Minio pods
   podAnnotations: {}
   # -- nodeSelector for Minio deployment

@@ -133,7 +133,6 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>" e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
@@ -204,6 +203,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
 | flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
+| redoc.deployRedoc | bool | `false` |  |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
 | secrets.adminOauthClientCredentials.clientSecret | string | `"foobar"` |  |
 | secrets.adminOauthClientCredentials.enabled | bool | `true` | If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`. If enabled is false, it's up to the user to create `flyte-secret-auth` as described in https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server |

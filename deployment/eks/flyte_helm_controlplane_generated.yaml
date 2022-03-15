@@ -1057,14 +1057,6 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:

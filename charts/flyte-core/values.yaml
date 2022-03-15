@@ -75,8 +75,6 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
-  # -- Deploys a Redoc container in Flyteadmin's pod
-  deployRedoc: true
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
@@ -272,6 +270,11 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+
+
+# It will enable the redoc route in ingress
+redoc:
+  deployRedoc: false
 
 #
 # Common secret auth for propeller & scheduler
