@@ -3,14 +3,14 @@
 flytectl get workflow
 ---------------------
 
-Get workflow resources
+Gets workflow resources
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieve all the workflows within project and domain (workflow,workflows can be used interchangeably in these commands):
+Retrieve all the workflows within project and domain (workflow/workflows can be used interchangeably in these commands):
 ::
 
  flytectl get workflow -p flytesnacks -d development
@@ -147,5 +147,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

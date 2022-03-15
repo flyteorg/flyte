@@ -1,30 +1,30 @@
 # Introduction
 
-This document proposes, **flytectl** as one singular CLI that interacts with flyteadmin service. It is proposed to write the CLI in **Golang** and would support both gRPC and REST endpoints of
-FlyteAdmin. We will start with gRPC endpoint as the client is easily generated and in future we should investigate generation of a Swagger based REST client from the gRPC specification. As we build
-more SDK's in different languages we should support a common way of interacting with the API. This does no mean that some SDK's may provide native ways of interacting with the Admin API (for e.g.
-flytekit), but the intention is that we will eventually replace **flytekit/flyte-cli** with flytectl exclusively.
+This document proposes, **Flytectl** as a single CLI that interacts with FlyteAdmin service. It is proposed to write the CLI in **Golang** and would support both gRPC and REST endpoints of
+FlyteAdmin. We will start with gRPC endpoint since the client can be easily generated. In the future, we will work on generating a Swagger-based REST client from the gRPC specification. As we build
+more SDKs in different languages we will support a common way of interacting with the API. This doesn't mean that some SDKs may provide native ways of interacting with the Admin API (for e.g.
+Flytekit), but the intention is to eventually replace **Flytekit/Flytecli** with Flytectl exclusively.
 
-We also recommend that the design of FlyteCTL is careful and it could helps us with delivering user features faster without having to rely on the UI. FlyteCTL with follow standard oauth2 for
-authentication already supported by flyteAdmin. Moreover, FlyteCTL should be readily available on almost any platform - OSX, Linux and Windows. We will strive to keep it relatively lean and fast.
+Flytectl has been designed to deliver user features without having to rely on the UI. Flytectl will follow the standard oauth2 for
+authentication, supported by FlyteAdmin. Moreover, Flytectl should be readily available on almost any platform - OSX, Linux and Windows. We will strive to keep it relatively lean and fast.
 
 # Why One CLI?
 
-As we build multiple SDK's they need a native way of interacting with the API. Having multiple CLI's makes it hard to keep all of them in sync as we rapidly evolve the API and add more features.
+As we build multiple SDKs, we need a native way of interacting with the API. Having multiple CLIs makes it hard to keep all of them in sync as we rapidly evolve the API and add more features.
 
 *Diagram here*
 
 
 # Why Golang?
-- Most of Flytebackend is written in golang
-- Golang offers great CLI tooling support with viper and cobra
-- Golang toolchain to create cross-compiled small, light weight binary is really efficient and easy to use
-- We already generate golang proto and clients for all our IDL
-- we have multiple common libraries available to ease the development of this tool
-- kubectl is a stellar example of a cli done well
+- Most of Flyte backend is written in Golang.
+- Golang offers great CLI tooling support with viper and cobra.
+- Golang toolchain helps create cross-compiled small, light weight binary, which is efficient and easy to use.
+- We already generate Golang proto and clients for all our IDL.
+- We have multiple common libraries available to ease the development of this tool.
+- Kubectl is a stellar example of a CLI done well.
 
 ## Generating Swagger code
-We started exploring this (Flytetools)[https://github.com/lyft/flytetools#tools] has some work. We also got approached by the swagger code gen maintainer to see if they can help.
+We started exploring this (Flytetools)[https://github.com/lyft/flytetools#tools] has some work. The Swagger code-gen maintainer also approached us to see if they could help.
 
 # API
 
@@ -51,7 +51,7 @@ $ flytectl [options]
 returns the version of the CLI, version of Admin service and version of the Platform that is deployed
 
 ### configure
-Allows configuring FlyteCTL for your own usage (low pri). Needed for especially storing Auth tokens.
+Allows configuring Flytectl for your own usage (low pri). Needed for especially storing Auth tokens.
 
 ### get/delete
 Get retrieves a list of resources that is qualified by a further sub-command. for example
@@ -72,7 +72,7 @@ Create may need more information than can be easily passed in command line and w
 Eventually we may want to simplify the json and yaml representations but that is not required in first pass. We may also want to create just a separate option for that.
 
 The create for Task and Workflow is essential what is encompassed in the pyflyte as the registration process. We will decouple the registration process such that pyflyte, jflyte (other native cli's or
-code methods) can dump a serialized representations of the workflows and tasks that are directly consumed by **flytectl**. Thus flytectl is essential in every flow for the user.
+code methods) can dump a serialized representations of the workflows and tasks that are directly consumed by **Flytectl**. Thus Flytectl is essential in every flow for the user.
 
 
 #### Create Templatization

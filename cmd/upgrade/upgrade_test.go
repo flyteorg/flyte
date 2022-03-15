@@ -27,8 +27,8 @@ var (
 
 func TestUpgradeCommand(t *testing.T) {
 	rootCmd := &cobra.Command{
-		Long:              "FlyteCTL is CLI tool written in go to interact with flyteadmin service",
-		Short:             "FlyteCTL CLI tool",
+		Long:              "Flytectl is a CLI tool written in Go to interact with the FlyteAdmin service.",
+		Short:             "Flytectl CLI tool",
 		Use:               "flytectl",
 		DisableAutoGenTag: true,
 	}

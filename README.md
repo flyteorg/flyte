@@ -31,7 +31,7 @@ and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control 
 
 ## 🚀 Quick Start
 
-1. Install FlyteCTL with bash or shell script
+1. Install Flytectl with bash or shell script.
 
     * Bash
         ```bash
@@ -41,14 +41,14 @@ and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control 
         ```bash
         $ curl -sL https://ctl.flyte.org/install | bash
         ```
-2. (Optional) `flytectl upgrade` provides a general interface to upgrading FlyteCTL; run the command in the output
+2. (Optional) `flytectl upgrade` provides a general interface to upgrading Flytectl; run the command in the output.
 
-3. Start sandbox using FlyteCTL
+3. Start Sandbox using Flytectl.
     ```bash
     $ flytectl sandbox start 
     ```
 
-4. Register examples
+4. Register examples.
     ```bash
     # Register core workflows 
     $ flytectl register examples -d development -p flytesnacks
@@ -56,7 +56,7 @@ and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control 
 
 <html>
     <h2 id="contribution-guide"> 
-        📖 How to Contribute to FlyteCTL
+        📖 How to Contribute to Flytectl
     </h2>
 </html>
 

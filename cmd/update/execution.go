@@ -14,14 +14,14 @@ import (
 )
 
 const (
-	updateExecutionShort = "Update execution status"
+	updateExecutionShort = "Updates the execution status"
 	updateExecutionLong  = `
-Activating an execution shows it in the cli and UI:
+Activate an execution; and it shows up in the CLI and UI:
 ::
 
  flytectl update execution -p flytectldemo -d development  oeh94k9r2r --activate
 
-Archiving execution hides it from cli and UI:
+Archive an execution; and it is hidden from the CLI and UI:
 ::
 
  flytectl update execution -p flytectldemo -d development  oeh94k9r2r --archive

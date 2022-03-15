@@ -1,6 +1,6 @@
 Execution
 ---------
-It specifies the actions to be performed on the resource 'execution'. 
+It specifies the actions to be performed on the 'execution' resource. 
 
 .. toctree::
     :maxdepth: 1

@@ -13,18 +13,22 @@ import (
 )
 
 const (
-	projectShort = "Create project resources"
+	projectShort = "Creates project resources."
 	projectLong  = `
-Create projects.(project/projects can be used interchangeably in these commands)
+Create a project given its name and id.
 
 ::
 
- flytectl create project --name flytesnacks --id flytesnacks --description "flytesnacks description"  --labels app=flyte
+ flytectl create project --name flytesnacks --id flytesnacks --description "flytesnacks description" --labels app=flyte
 
-Create a project by definition file. Note: The name shouldn't contain any whitespace characters.
+.. note::
+   The terms project/projects are interchangeable in these commands.
+
+Create a project by definition file.
+
 ::
 
- flytectl create project --file project.yaml 
+ flytectl create project --file project.yaml
 
 .. code-block:: yaml
 
@@ -33,8 +37,10 @@ Create a project by definition file. Note: The name shouldn't contain any whites
     labels:
        values:
          app: flyte
-    description: "Some description for the project"
+    description: "Some description for the project."
 
+.. note::
+    The project name shouldn't contain any whitespace characters.
 `
 )
 
@@ -65,6 +71,6 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 			return err
 		}
 	}
-	fmt.Println("project Created successfully")
+	fmt.Println("project created successfully.")
 	return nil
 }

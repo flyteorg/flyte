@@ -1,6 +1,8 @@
+.. _nouns:
+
 Nouns
 ------
-FlyteCTL nouns specify the resource on which the action needs to be performed. Example of resources include project, workflow, task, execution.
+Flytectl nouns specify the resource on which the action needs to be performed. Examples of resources include project, workflow, task, and execution.
 
 .. toctree::
     :maxdepth: 1

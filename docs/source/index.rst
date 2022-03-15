@@ -11,10 +11,10 @@ This video will take you on a tour of Flytectl - how to install and configure it
 .. youtube:: cV8ezYnBANE
 
 
-Install
-=======
-Flytectl is a Golang binary and can be installed on any platform supported by
-golang
+Installation
+============
+
+Flytectl is a Golang binary that can be installed on any platform supported by Golang.
 
 .. tabbed:: OSX
 
@@ -40,19 +40,20 @@ golang
 
   flytectl version
 
-Configure
-=========
-Flytectl allows configuring using a YAML file or pass every configuration value
-on command-line. The following configuration is useful to setup.
+Configuration
+=============
+
+Flytectl allows you to communicate with FlyteAdmin using a YAML file or by passing every configuration value
+on the command-line. The following configuration can be used for the setup:
 
 Basic Configuration
 --------------------
 
-The full list of available configurable options can be found by running ``flytectl --help``, or alternately `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__
+The full list of available configurable options can be found by running ``flytectl --help``, or `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__.
 
 .. NOTE::
 
-    Currently, the Project ``-p``, Domain ``-d``, and Output ``-o`` flags cannot be used in config file
+    Currently, the Project ``-p``, Domain ``-d``, and Output ``-o`` flags cannot be used in the config file.
 
 .. tabbed:: Local Flyte Sandbox
 
@@ -63,7 +64,7 @@ The full list of available configurable options can be found by running ``flytec
         admin:
           # For GRPC endpoints you might want to use dns:///flyte.myexample.com
           endpoint: dns:///localhost:30081
-          insecure: true # Set to false to enable TLS/SSL connection (not recommended except on local sandbox deployment)
+          insecure: true # Set to false to enable TLS/SSL connection (not recommended except on local sandbox deployment).
           authType: Pkce # authType: Pkce # if using authentication or just drop this.
         storage:
           connection:
@@ -124,7 +125,7 @@ The full list of available configurable options can be found by running ``flytec
     * currDir from where you run flytectl
     * ``/etc/flyte/config``
     
-    You can pass the file name in the commandline using ``--config <config-file-path>`` as well!
+    You can also pass the file name in the command line using ``--config <config-file-path>``.
 
 
 .. toctree::

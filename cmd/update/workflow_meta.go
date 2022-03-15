@@ -13,7 +13,7 @@ import (
 const (
 	updateWorkflowShort = "Update workflow metadata"
 	updateWorkflowLong  = `
-Updates the description on the workflow:
+Update the description on the workflow:
 ::
 
  flytectl update workflow -p flytectldemo -d development core.advanced.run_merge_sort.merge_sort --description "Mergesort workflow example"

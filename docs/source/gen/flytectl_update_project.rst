@@ -10,7 +10,7 @@ Synopsis
 
 
 
-Updates the project according to the flags passed. Allows you to archive or activate a project.
+Update the project according to the flags passed. Allows you to archive or activate a project.
 Activate project flytesnacks:
 ::
 

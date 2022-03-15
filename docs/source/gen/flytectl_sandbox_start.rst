@@ -3,38 +3,39 @@
 flytectl sandbox start
 ----------------------
 
-Start the Flyte Sandbox cluster
+Starts the Flyte Sandbox cluster.
 
 Synopsis
 ~~~~~~~~
 
 
 
-The Flyte Sandbox is a fully standalone minimal environment for running Flyte. It provides a simplified way of running Flyte sandbox as a single Docker container locally.  
+Flyte Sandbox is a fully standalone minimal environment for running Flyte. It provides a simplified way of running Flyte Sandbox as a single Docker container locally.  
 
-Start sandbox cluster without any source code:
+Starts the Sandbox cluster without any source code:
 ::
 
  flytectl sandbox start
 	
-Mount your source code repository inside sandbox:
+Mounts your source code repository inside the Sandbox:
 ::
 
  flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
 	
-Run specific version of Flyte. FlyteCTL sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
+Runs a specific version of Flyte. Flytectl Sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
 ::
 
  flytectl sandbox start  --version=v0.14.0
 
-Note: FlyteCTL sandbox is only supported for Flyte versions > v0.10.0
+.. note::
+	  Flytectl Sandbox is only supported for Flyte versions > v0.10.0.
 
-Run latest pre release of  Flyte.
+Runs the latest pre release of  Flyte.
 ::
 
  flytectl sandbox start  --pre
 
-Note: pre release flag will be ignore if user pass version flag, In that case Flytectl will use specific version. 
+Note: The pre release flag will be ignored if the user passes the version flag. In that case, Flytectl will use a specific version. 
 
 Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
@@ -138,5 +139,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
 

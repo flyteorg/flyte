@@ -1,6 +1,6 @@
 Files
 ------
-It specifies the actions to be performed on the resource 'files'. 
+It specifies the actions to be performed on the 'file' resource. 
 
 .. toctree::
     :maxdepth: 1
@@ -8,4 +8,4 @@ It specifies the actions to be performed on the resource 'files'.
 
     gen/flytectl_register_files
 
-Note: It allows the user to register local files.
+Note: It allows the user to register local files. 

@@ -3,16 +3,16 @@
 flytectl delete task-resource-attribute
 ---------------------------------------
 
-Delete matchable resources of task attributes
+Deletes matchable resources of task attributes.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Deletes task resource attributes for the given project and domain combination, or additionally with workflow name.
+Deletes task resource attributes for the given project and domain combination, or additionally the workflow name.
 
-For project flytectldemo and development domain, it is:
+For project flytectldemo and development domain:
 ::
 
  flytectl delete task-resource-attribute -p flytectldemo -d development 
@@ -20,8 +20,8 @@ For project flytectldemo and development domain, it is:
 
 Deletes task resource attribute using config file which was used to create it.
 Here, the config file is written to tra.yaml.
-The defaults/limits are optional in the file as they are unread during the delete command but can be kept since the same file can be used for get, update or delete commands.
-e.g., content of tra.yaml:
+The defaults/limits are optional in the file as they are unread during the delete command, but can be retained since the same file can be used for 'get', 'update' or 'delete' commands.
+Example: content of tra.yaml:
 
 ::
 
@@ -39,8 +39,8 @@ e.g., content of tra.yaml:
       cpu: "2"
       memory: "450Mi"
 
-Deletes task resource attribute for a workflow.
-For the workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Delete task resource attribute for a workflow.
+For the workflow 'core.control_flow.run_merge_sort.merge_sort':
 
 ::
 
@@ -111,5 +111,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

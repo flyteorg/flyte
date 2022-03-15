@@ -1,6 +1,6 @@
 Plugin override
 ---------------
-It specifies the actions to be performed on the resource 'plugin-override'. 
+It specifies the actions to be performed on the 'plugin-override' resource. 
 
 .. toctree::
     :maxdepth: 1

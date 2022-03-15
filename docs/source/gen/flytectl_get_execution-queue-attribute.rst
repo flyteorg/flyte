@@ -3,40 +3,40 @@
 flytectl get execution-queue-attribute
 --------------------------------------
 
-Get matchable resources of execution queue attributes
+Gets matchable resources of execution queue attributes.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Retrieves the execution queue attribute for the given project and domain.
-For project flytectldemo and development domain, it is:
+Retrieve the execution queue attribute for the given project and domain.
+For project flytectldemo and development domain:
 ::
 
  flytectl get execution-queue-attribute -p flytectldemo -d development 
 
-e.g., output from the command
+Example: output from the command:
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","tags":["foo", "bar"]}
 
-Retrieves the execution queue attribute for the given project, domain, and workflow.
-For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Retrieve the execution queue attribute for the given project, domain, and workflow.
+For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort':
 ::
 
  flytectl get execution-queue-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-e.g., output from the command
+Example: output from the command:
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","tags":["foo", "bar"]}
 
 Write the execution queue attribute to a file. If there are no execution queue attributes, the command throws an error.
-Here, the config file is written to era.yaml,
-e.g., content of era.yaml:
+The config file is written to era.yaml file.
+Example: content of era.yaml:
 
 ::
 
@@ -117,5 +117,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 

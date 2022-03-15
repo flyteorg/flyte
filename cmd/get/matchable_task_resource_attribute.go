@@ -11,27 +11,27 @@ import (
 )
 
 const (
-	taskResourceAttributesShort = "Get matchable resources of task attributes"
+	taskResourceAttributesShort = "Gets matchable resources of task attributes."
 	taskResourceAttributesLong  = `
-Retrieves task resource attributes for the given project and domain.
-For project flytectldemo and development domain, it is:
+Retrieve task resource attributes for the given project and domain.
+For project flytectldemo and development domain:
 ::
 
  flytectl get task-resource-attribute -p flytectldemo -d development 
 
-e.g., output from the command:
+Example: output from the command:
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","workflow":"","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"450Mi"}}
 
-Retrieves task resource attributes for the given project, domain, and workflow.
-For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort', it is:
+Retrieve task resource attributes for the given project, domain, and workflow.
+For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort':
 ::
 
  flytectl get task-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
 
-e.g., output from the command:
+Example: output from the command:
 
 .. code-block:: json
 
@@ -39,8 +39,8 @@ e.g., output from the command:
 
 
 Write the task resource attributes to a file. If there are no task resource attributes, a file would be populated with the basic data.
-Here, the config file is written to tra.yaml,
-e.g., content of tra.yaml:
+The config file is written to tra.yaml file.
+Example: content of tra.yaml:
 
 ::
 

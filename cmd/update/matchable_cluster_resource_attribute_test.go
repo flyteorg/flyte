@@ -27,7 +27,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute"), err)
 		tearDownAndVerify(t, ``)
 	})
-	t.Run("successful update project domain attribute", func(t *testing.T) {
+	t.Run("successfully updated project domain attribute", func(t *testing.T) {
 		setup()
 		updateClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/valid_project_domain_cluster_attribute.yaml"
@@ -38,7 +38,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		assert.Nil(t, err)
 		tearDownAndVerify(t, ``)
 	})
-	t.Run("failed update project domain attribute", func(t *testing.T) {
+	t.Run("failed to update project domain attribute", func(t *testing.T) {
 		setup()
 		updateClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/valid_project_domain_cluster_attribute.yaml"
@@ -50,7 +50,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("failed to update attributes"), err)
 		tearDownAndVerify(t, ``)
 	})
-	t.Run("successful update workflow attribute", func(t *testing.T) {
+	t.Run("successfully updated workflow attribute", func(t *testing.T) {
 		setup()
 		updateClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/valid_workflow_cluster_attribute.yaml"
@@ -61,7 +61,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		assert.Nil(t, err)
 		tearDownAndVerify(t, ``)
 	})
-	t.Run("failed update workflow attribute", func(t *testing.T) {
+	t.Run("failed to update workflow attribute", func(t *testing.T) {
 		setup()
 		updateClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/valid_workflow_cluster_attribute.yaml"

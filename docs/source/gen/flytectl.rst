@@ -3,13 +3,13 @@
 flytectl
 --------
 
-FlyteCTL CLI tool
+Flytectl CLI tool
 
 Synopsis
 ~~~~~~~~
 
 
-FlyteCTL is CLI tool written in go to interact with Flyteadmin service
+Flytectl is a CLI tool written in Go to interact with the FlyteAdmin service.
 
 Options
 ~~~~~~~
@@ -61,14 +61,14 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_completion` 	 - Generate completion script
+* :doc:`flytectl_completion` 	 - Generates completion script.
 * :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
-* :doc:`flytectl_create` 	 - Create various Flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_delete` 	 - Terminate/delete various Flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_get` 	 - Fetch various Flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_register` 	 - Register tasks/workflows/launchplans from a list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Used for sandbox interactions like start/teardown/status/exec.
+* :doc:`flytectl_create` 	 - Creates various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_register` 	 - Registers tasks, workflows, and launch plans from a list of generated serialized files.
+* :doc:`flytectl_sandbox` 	 - Helps with Sandbox interactions like start, teardown, status, and exec.
 * :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
-* :doc:`flytectl_upgrade` 	 - Upgrade/rollback to a Flyte version
-* :doc:`flytectl_version` 	 - Fetch Flyte version
+* :doc:`flytectl_upgrade` 	 - Upgrades/rollbacks to a Flyte version.
+* :doc:`flytectl_version` 	 - Fetches Flyte version
 

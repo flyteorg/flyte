@@ -3,14 +3,14 @@
 flytectl version
 ----------------
 
-Fetch Flyte version
+Fetches Flyte version
 
 Synopsis
 ~~~~~~~~
 
 
 
-For FlyteCTL version, it is:
+Fetch Flytectl version.
 ::
 
  flytectl version
@@ -76,5 +76,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - FlyteCTL CLI tool
+* :doc:`flytectl` 	 - Flytectl CLI tool
 

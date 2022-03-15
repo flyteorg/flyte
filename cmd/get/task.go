@@ -14,13 +14,17 @@ import (
 )
 
 const (
-	taskShort = "Get task resources"
+	taskShort = "Gets task resources"
 	taskLong  = `
-Retrieve all the tasks within project and domain(task,tasks can be used interchangeably in these commands):
+
+Retrieve all the tasks within project and domain:
 ::
 
  flytectl get task -p flytesnacks -d development
 
+.. note::
+	  The terms task/tasks are interchangeable in these commands.
+	  
 Retrieve task by name within project and domain:
 
 ::

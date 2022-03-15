@@ -8,28 +8,27 @@ import (
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
-	sandboxShort = `Used for sandbox interactions like start/teardown/status/exec.`
+	sandboxShort = `Helps with sandbox interactions like start, teardown, status, and exec.`
 	sandboxLong  = `
-The Flyte Sandbox is a fully standalone minimal environment for running Flyte. It provides a simplified way of running Flyte sandbox as a single Docker container locally.
+Flyte Sandbox is a fully standalone minimal environment for running Flyte.
+It provides a simplified way of running Flyte sandbox as a single Docker container locally.
 	
-Create sandbox cluster:
+To create a sandbox cluster, run:
 ::
 
  flytectl sandbox start 
-	
-	
-Remove sandbox cluster:
+
+To remove a sandbox cluster, run:
 ::
 
- flytectl sandbox teardown 	
-	
+ flytectl sandbox teardown
 
-Check status of sandbox container:
+To check the status of the sandbox container, run:
 ::
 
- flytectl sandbox status 	
-	
-Execute command inside sandbox container:
+ flytectl sandbox status
+
+To execute commands inside the sandbox container, use exec:
 ::
 
  flytectl sandbox exec -- pwd 	
