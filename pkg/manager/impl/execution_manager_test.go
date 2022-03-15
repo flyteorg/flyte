@@ -162,6 +162,7 @@ func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 			"annotation4": "4",
 		},
 	}
+
 	lpSpecBytes, _ := proto.Marshal(&lpSpec)
 	lpClosure := admin.LaunchPlanClosure{
 		ExpectedInputs: lpSpec.DefaultInputs,
@@ -260,12 +261,14 @@ func TestCreateExecution(t *testing.T) {
 	}
 
 	principal := "principal"
+	rawOutput := "raw_output"
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
 			var spec admin.ExecutionSpec
 			err := proto.Unmarshal(input.Spec, &spec)
 			assert.NoError(t, err)
 			assert.Equal(t, principal, spec.Metadata.Principal)
+			assert.Equal(t, rawOutput, spec.RawOutputDataConfig.OutputLocationPrefix)
 			return nil
 		})
 	setDefaultLpCallbackForExecTest(repository)
@@ -334,6 +337,7 @@ func TestCreateExecution(t *testing.T) {
 	request.Spec.Metadata = &admin.ExecutionMetadata{
 		Principal: "unused - populated from authenticated context",
 	}
+	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
 
 	identity := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil)
 	ctx := identity.WithContext(context.Background())
@@ -406,7 +410,6 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			err := proto.Unmarshal(input.Spec, &spec)
 			assert.NoError(t, err)
 			assert.Equal(t, admin.ExecutionMetadata_CHILD_WORKFLOW, spec.Metadata.Mode)
-			assert.Equal(t, "feeny", spec.Metadata.Principal)
 			assert.True(t, proto.Equal(&parentNodeExecutionID, spec.Metadata.ParentNodeExecution))
 			assert.EqualValues(t, input.ParentNodeExecutionID, 1)
 			assert.EqualValues(t, input.SourceExecutionID, 2)
@@ -2925,6 +2928,7 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 		var spec admin.ExecutionSpec
 		err := proto.Unmarshal(input.Spec, &spec)
 		assert.Nil(t, err)
+		assert.Equal(t, "default_raw_output", spec.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, admin.ExecutionMetadata_RELAUNCH, spec.Metadata.Mode)
 		assert.Equal(t, int32(admin.ExecutionMetadata_RELAUNCH), input.Mode)
 		assert.True(t, proto.Equal(spec.Inputs, getLegacySpec().Inputs))
