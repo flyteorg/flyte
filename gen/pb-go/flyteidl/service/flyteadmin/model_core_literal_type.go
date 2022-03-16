@@ -24,8 +24,12 @@ type CoreLiteralType struct {
 	// Defines an enum with pre-defined string values.
 	EnumType *CoreEnumType `json:"enum_type,omitempty"`
 	StructuredDatasetType *CoreStructuredDatasetType `json:"structured_dataset_type,omitempty"`
+	// Defines an union type with pre-defined LiteralTypes.
+	UnionType *CoreUnionType `json:"union_type,omitempty"`
 	// This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by consumers to identify special behavior or display extended information for the type.
 	Metadata *ProtobufStruct `json:"metadata,omitempty"`
 	// This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior.
 	Annotation *CoreTypeAnnotation `json:"annotation,omitempty"`
+	// Hints to improve type matching.
+	Structure *CoreTypeStructure `json:"structure,omitempty"`
 }

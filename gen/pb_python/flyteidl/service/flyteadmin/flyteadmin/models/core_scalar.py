@@ -21,6 +21,7 @@ from flyteadmin.models.core_blob import CoreBlob  # noqa: F401,E501
 from flyteadmin.models.core_error import CoreError  # noqa: F401,E501
 from flyteadmin.models.core_primitive import CorePrimitive  # noqa: F401,E501
 from flyteadmin.models.core_structured_dataset import CoreStructuredDataset  # noqa: F401,E501
+from flyteadmin.models.core_union import CoreUnion  # noqa: F401,E501
 from flyteadmin.models.core_void import CoreVoid  # noqa: F401,E501
 from flyteadmin.models.flyteidlcore_schema import FlyteidlcoreSchema  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
@@ -47,7 +48,8 @@ class CoreScalar(object):
         'none_type': 'CoreVoid',
         'error': 'CoreError',
         'generic': 'ProtobufStruct',
-        'structured_dataset': 'CoreStructuredDataset'
+        'structured_dataset': 'CoreStructuredDataset',
+        'union': 'CoreUnion'
     }
 
     attribute_map = {
@@ -58,10 +60,11 @@ class CoreScalar(object):
         'none_type': 'none_type',
         'error': 'error',
         'generic': 'generic',
-        'structured_dataset': 'structured_dataset'
+        'structured_dataset': 'structured_dataset',
+        'union': 'union'
     }
 
-    def __init__(self, primitive=None, blob=None, binary=None, schema=None, none_type=None, error=None, generic=None, structured_dataset=None):  # noqa: E501
+    def __init__(self, primitive=None, blob=None, binary=None, schema=None, none_type=None, error=None, generic=None, structured_dataset=None, union=None):  # noqa: E501
         """CoreScalar - a model defined in Swagger"""  # noqa: E501
 
         self._primitive = None
@@ -72,6 +75,7 @@ class CoreScalar(object):
         self._error = None
         self._generic = None
         self._structured_dataset = None
+        self._union = None
         self.discriminator = None
 
         if primitive is not None:
@@ -90,6 +94,8 @@ class CoreScalar(object):
             self.generic = generic
         if structured_dataset is not None:
             self.structured_dataset = structured_dataset
+        if union is not None:
+            self.union = union
 
     @property
     def primitive(self):
@@ -258,6 +264,27 @@ class CoreScalar(object):
         """
 
         self._structured_dataset = structured_dataset
+
+    @property
+    def union(self):
+        """Gets the union of this CoreScalar.  # noqa: E501
+
+
+        :return: The union of this CoreScalar.  # noqa: E501
+        :rtype: CoreUnion
+        """
+        return self._union
+
+    @union.setter
+    def union(self, union):
+        """Sets the union of this CoreScalar.
+
+
+        :param union: The union of this CoreScalar.  # noqa: E501
+        :type: CoreUnion
+        """
+
+        self._union = union
 
     def to_dict(self):
         """Returns the model properties as a dict"""

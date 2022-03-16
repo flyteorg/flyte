@@ -4971,6 +4971,9 @@
         "map": {
           "$ref": "#/definitions/coreBindingDataMap",
           "description": "A map of bindings. The key is always a string."
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnionInfo"
         }
       },
       "description": "Specifies either a simple value or a reference to another output."
@@ -5557,6 +5560,10 @@
           "$ref": "#/definitions/coreStructuredDatasetType",
           "title": "Generalized schema support"
         },
+        "union_type": {
+          "$ref": "#/definitions/coreUnionType",
+          "description": "Defines an union type with pre-defined LiteralTypes."
+        },
         "metadata": {
           "$ref": "#/definitions/protobufStruct",
           "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
@@ -5564,6 +5571,10 @@
         "annotation": {
           "$ref": "#/definitions/coreTypeAnnotation",
           "description": "This field contains arbitrary data that might have special semantic\nmeaning for the client but does not effect internal flyte behavior."
+        },
+        "structure": {
+          "$ref": "#/definitions/coreTypeStructure",
+          "description": "Hints to improve type matching."
         }
       },
       "description": "Defines a strong type to allow type checking between interfaces."
@@ -5911,6 +5922,9 @@
         },
         "structured_dataset": {
           "$ref": "#/definitions/coreStructuredDataset"
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnion"
         }
       }
     },
@@ -6223,6 +6237,16 @@
       },
       "description": "TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs."
     },
+    "coreTypeStructure": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "Must exactly match for types to be castable"
+        }
+      },
+      "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
+    },
     "coreTypedInterface": {
       "type": "object",
       "properties": {
@@ -6234,6 +6258,39 @@
         }
       },
       "description": "Defines strongly typed inputs and outputs."
+    },
+    "coreUnion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      },
+      "description": "The runtime representation of a tagged union value. See `UnionType` for more details."
+    },
+    "coreUnionInfo": {
+      "type": "object",
+      "properties": {
+        "targetType": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      }
+    },
+    "coreUnionType": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "description": "Predefined set of variants in union."
+        }
+      },
+      "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
     },
     "coreVariable": {
       "type": "object",

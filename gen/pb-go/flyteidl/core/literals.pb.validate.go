@@ -499,6 +499,90 @@ var _ interface {
 	ErrorName() string
 } = SchemaValidationError{}
 
+// Validate checks the field values on Union with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Union) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UnionValidationError{
+				field:  "Value",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetType()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UnionValidationError{
+				field:  "Type",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UnionValidationError is the validation error returned by Union.Validate if
+// the designated constraints aren't met.
+type UnionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UnionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UnionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UnionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UnionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UnionValidationError) ErrorName() string { return "UnionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UnionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUnion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UnionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UnionValidationError{}
+
 // Validate checks the field values on StructuredDatasetMetadata with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -754,6 +838,18 @@ func (m *Scalar) Validate() error {
 			if err := v.Validate(); err != nil {
 				return ScalarValidationError{
 					field:  "StructuredDataset",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Scalar_Union:
+
+		if v, ok := interface{}(m.GetUnion()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ScalarValidationError{
+					field:  "Union",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1252,12 +1348,96 @@ var _ interface {
 	ErrorName() string
 } = BindingDataMapValidationError{}
 
+// Validate checks the field values on UnionInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *UnionInfo) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetTargetType()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UnionInfoValidationError{
+				field:  "TargetType",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UnionInfoValidationError is the validation error returned by
+// UnionInfo.Validate if the designated constraints aren't met.
+type UnionInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UnionInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UnionInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UnionInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UnionInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UnionInfoValidationError) ErrorName() string { return "UnionInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UnionInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUnionInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UnionInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UnionInfoValidationError{}
+
 // Validate checks the field values on BindingData with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
 func (m *BindingData) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if v, ok := interface{}(m.GetUnion()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BindingDataValidationError{
+				field:  "Union",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	switch m.Value.(type) {
