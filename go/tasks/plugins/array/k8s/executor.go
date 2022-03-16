@@ -3,20 +3,19 @@ package k8s
 import (
 	"context"
 
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const executorName = "k8s-array"
@@ -145,18 +144,21 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 }
 
 func (e Executor) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	return nil
-}
-
-func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	pluginConfig := GetConfig()
-
 	pluginState := &arrayCore.State{}
 	if _, err := tCtx.PluginStateReader().Get(pluginState); err != nil {
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
 
-	return TerminateSubTasks(ctx, tCtx, e.kubeClient, pluginConfig, pluginState)
+	return TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), abortSubtask, pluginState)
+}
+
+func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
+	pluginState := &arrayCore.State{}
+	if _, err := tCtx.PluginStateReader().Get(pluginState); err != nil {
+		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
+	}
+
+	return TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), finalizeSubtask, pluginState)
 }
 
 func (e Executor) Start(ctx context.Context) error {

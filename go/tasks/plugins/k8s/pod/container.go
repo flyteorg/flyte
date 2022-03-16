@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	containerTaskType = "container"
+	ContainerTaskType = "container"
 )
 
 type containerPodBuilder struct {
