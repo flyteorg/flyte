@@ -5,6 +5,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime/pprof"
 	"time"
 
@@ -38,10 +39,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/clock"
+	k8sInformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/record"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
@@ -55,8 +60,12 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
-const resourceLevelMonitorCycleDuration = 5 * time.Second
-const missing = "missing"
+const (
+	resourceLevelMonitorCycleDuration = 5 * time.Second
+	missing                           = "missing"
+	podDefaultNamespace               = "flyte"
+	podNamespaceEnvVar                = "POD_NAMESPACE"
+)
 
 type metrics struct {
 	Scope            promutils.Scope
@@ -303,7 +312,8 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, opt
 
 // New returns a new FlyteWorkflow controller
 func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
-	flyteworkflowInformerFactory informers.SharedInformerFactory, kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
+	flyteworkflowInformerFactory informers.SharedInformerFactory, informerFactory k8sInformers.SharedInformerFactory,
+	kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
 	adminClient, authOpts, err := getAdminClient(ctx)
 	if err != nil {
@@ -377,6 +387,16 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	flyteworkflowInformer := flyteworkflowInformerFactory.Flyteworkflow().V1alpha1().FlyteWorkflows()
 	controller.flyteworkflowSynced = flyteworkflowInformer.Informer().HasSynced
 
+	podTemplateInformer := informerFactory.Core().V1().PodTemplates()
+
+	// set default namespace for pod template store
+	podNamespace, found := os.LookupEnv(podNamespaceEnvVar)
+	if !found {
+		podNamespace = podDefaultNamespace
+	}
+
+	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
+
 	sCfg := storage.GetConfig()
 	if sCfg == nil {
 		logger.Errorf(ctx, "Storage configuration missing.")
@@ -424,6 +444,9 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	logger.Info(ctx, "Setting up event handlers")
 	// Set up an event handler for when FlyteWorkflow resources change
 	flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
+
+	updateHandler := flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateName)
+	podTemplateInformer.Informer().AddEventHandler(updateHandler)
 	return controller, nil
 }
 
@@ -486,6 +509,8 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	opts := SharedInformerOptions(cfg, defaultNamespace)
 	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
 
+	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration)
+
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 
@@ -517,7 +542,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 		}
 	}(ctx)
 
-	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, mgr, propellerScope)
+	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, mgr, propellerScope)
 	if err != nil {
 		return errors.Wrap(err, "failed to start FlytePropeller")
 	} else if c == nil {
@@ -525,6 +550,9 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	}
 
 	go flyteworkflowInformerFactory.Start(ctx.Done())
+	if flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateName != "" {
+		go informerFactory.Start(ctx.Done())
+	}
 
 	if err = c.Run(ctx); err != nil {
 		return errors.Wrapf(err, "Error running FlytePropeller.")
