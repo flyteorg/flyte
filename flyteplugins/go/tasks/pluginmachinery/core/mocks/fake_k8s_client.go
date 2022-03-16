@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/api/meta"
-
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -88,6 +88,20 @@ func (m *FakeKubeClient) List(ctx context.Context, list client.ObjectList, opts 
 func (m *FakeKubeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) (err error) {
 	m.syncObj.Lock()
 	defer m.syncObj.Unlock()
+
+	// if obj is a *v1.Pod then append a ContainerStatus for each Container
+	pod, ok := obj.(*v1.Pod)
+	if ok {
+		for i := range pod.Spec.Containers {
+			if len(pod.Status.ContainerStatuses) > i {
+				continue
+			}
+
+			pod.Status.ContainerStatuses = append(pod.Status.ContainerStatuses, v1.ContainerStatus{
+				ContainerID: "docker://container-name",
+			})
+		}
+	}
 
 	accessor, err := meta.Accessor(obj)
 	if err != nil {

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	sidecarTaskType = "sidecar"
+	SidecarTaskType = "sidecar"
 )
 
 // Why, you might wonder do we recreate the generated go struct generated from the plugins.SidecarJob proto? Because
@@ -80,13 +80,13 @@ func (sidecarPodBuilder) buildPodSpec(ctx context.Context, task *core.TaskTempla
 func getPrimaryContainerNameFromConfig(task *core.TaskTemplate) (string, error) {
 	if len(task.GetConfig()) == 0 {
 		return "", errors.Errorf(errors.BadTaskSpecification,
-			"invalid TaskSpecification, config needs to be non-empty and include missing [%s] key", primaryContainerKey)
+			"invalid TaskSpecification, config needs to be non-empty and include missing [%s] key", PrimaryContainerKey)
 	}
 
-	primaryContainerName, ok := task.GetConfig()[primaryContainerKey]
+	primaryContainerName, ok := task.GetConfig()[PrimaryContainerKey]
 	if !ok {
 		return "", errors.Errorf(errors.BadTaskSpecification,
-			"invalid TaskSpecification, config missing [%s] key in [%v]", primaryContainerKey, task.GetConfig())
+			"invalid TaskSpecification, config missing [%s] key in [%v]", PrimaryContainerKey, task.GetConfig())
 	}
 
 	return primaryContainerName, nil
@@ -144,7 +144,7 @@ func (sidecarPodBuilder) updatePodMetadata(ctx context.Context, pod *v1.Pod, tas
 		return err
 	}
 
-	pod.Annotations[primaryContainerKey] = primaryContainerName
+	pod.Annotations[PrimaryContainerKey] = primaryContainerName
 	return nil
 }
 

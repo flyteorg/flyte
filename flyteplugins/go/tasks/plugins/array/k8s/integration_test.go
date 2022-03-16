@@ -1,33 +1,29 @@
 package k8s
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 
-	"context"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/stretchr/testify/assert"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 )
 
 func init() {

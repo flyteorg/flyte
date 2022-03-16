@@ -15,29 +15,32 @@ import (
 const podName = "PodName"
 
 func TestGetLogsForContainerInPod_NoPlugins(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{}))
-	l, err := GetLogsForContainerInPod(context.TODO(), nil, 0, " Suffix")
+	logPlugin, err := InitializeLogPlugins(&LogConfig{})
+	assert.NoError(t, err)
+	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, nil, 0, " Suffix")
 	assert.NoError(t, err)
 	assert.Nil(t, l)
 }
 
 func TestGetLogsForContainerInPod_NoLogs(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	}))
-	p, err := GetLogsForContainerInPod(context.TODO(), nil, 0, " Suffix")
+	})
+	assert.NoError(t, err)
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, nil, 0, " Suffix")
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
 
 func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -57,17 +60,18 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), pod, 1, " Suffix")
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 1, " Suffix")
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
 
 func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -81,16 +85,17 @@ func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), pod, 1, " Suffix")
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 1, " Suffix")
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
 
 func TestGetLogsForContainerInPod_Cloudwatch(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{IsCloudwatchEnabled: true,
+	logPlugin, err := InitializeLogPlugins(&LogConfig{IsCloudwatchEnabled: true,
 		CloudwatchRegion:   "us-east-1",
 		CloudwatchLogGroup: "/kubernetes/flyte-production",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -110,16 +115,17 @@ func TestGetLogsForContainerInPod_Cloudwatch(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
 
 func TestGetLogsForContainerInPod_K8s(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsKubernetesEnabled: true,
 		KubernetesURL:       "k8s.com",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -139,19 +145,20 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
 
 func TestGetLogsForContainerInPod_All(t *testing.T) {
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsKubernetesEnabled: true,
 		KubernetesURL:       "k8s.com",
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -171,18 +178,18 @@ func TestGetLogsForContainerInPod_All(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
 	assert.Nil(t, err)
 	assert.Len(t, logs, 2)
 }
 
 func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
-
-	assert.NoError(t, SetLogConfig(&LogConfig{
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsStackDriverEnabled:       true,
 		GCPProjectName:             "myGCPProject",
 		StackdriverLogResourceName: "aws_ec2_instance",
-	}))
+	})
+	assert.NoError(t, err)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -202,7 +209,7 @@ func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -252,7 +259,8 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 }
 
 func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*core.TaskLog) {
-	assert.NoError(tb, SetLogConfig(config))
+	logPlugin, err := InitializeLogPlugins(config)
+	assert.NoError(tb, err)
 
 	pod := &v1.Pod{
 		ObjectMeta: v12.ObjectMeta{
@@ -275,7 +283,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*c
 		},
 	}
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " my-Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " my-Suffix")
 	assert.Nil(tb, err)
 	assert.Len(tb, logs, len(expectedTaskLogs))
 	if diff := deep.Equal(logs, expectedTaskLogs); len(diff) > 0 {

@@ -11,6 +11,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	v1 "k8s.io/api/core/v1"
 
@@ -19,13 +20,15 @@ import (
 
 const (
 	podTaskType         = "pod"
-	primaryContainerKey = "primary_container_name"
+	PrimaryContainerKey = "primary_container_name"
 )
 
 var (
-	defaultPodBuilder = containerPodBuilder{}
-	podBuilders       = map[string]podBuilder{
-		sidecarTaskType: sidecarPodBuilder{},
+	DefaultPodPlugin = plugin{
+		defaultPodBuilder: containerPodBuilder{},
+		podBuilders: map[string]podBuilder{
+			SidecarTaskType: sidecarPodBuilder{},
+		},
 	}
 )
 
@@ -80,7 +83,16 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	return pod, nil
 }
 
-func (plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
+func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
+	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, " (User)")
+}
+
+func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string) (pluginsCore.PhaseInfo, error) {
 	pod := r.(*v1.Pod)
 
 	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
@@ -89,7 +101,7 @@ func (plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext,
 	}
 
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, pod, 0, " (User)")
+		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, pod, 0, logSuffix)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
 		}
@@ -109,7 +121,7 @@ func (plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext,
 		return pluginsCore.PhaseInfoUndefined, nil
 	}
 
-	primaryContainerName, exists := r.GetAnnotations()[primaryContainerKey]
+	primaryContainerName, exists := r.GetAnnotations()[PrimaryContainerKey]
 	if !exists {
 		// if the primary container annotation dos not exist, then the task requires all containers
 		// to succeed to declare success. therefore, if the pod is not in one of the above states we
@@ -133,30 +145,25 @@ func (plugin) GetProperties() k8s.PluginProperties {
 }
 
 func init() {
-	podPlugin := plugin{
-		defaultPodBuilder: defaultPodBuilder,
-		podBuilders:       podBuilders,
-	}
-
-	// Register containerTaskType and sidecarTaskType plugin entries. These separate task types
+	// Register ContainerTaskType and SidecarTaskType plugin entries. These separate task types
 	// still exist within the system, only now both are evaluated using the same internal pod plugin
 	// instance. This simplifies migration as users may keep the same configuration but are
 	// seamlessly transitioned from separate container and sidecar plugins to a single pod plugin.
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
-			ID:                  containerTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{containerTaskType},
+			ID:                  ContainerTaskType,
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType},
 			ResourceToWatch:     &v1.Pod{},
-			Plugin:              podPlugin,
+			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,
 		})
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
-			ID:                  sidecarTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{sidecarTaskType},
+			ID:                  SidecarTaskType,
+			RegisteredTaskTypes: []pluginsCore.TaskType{SidecarTaskType},
 			ResourceToWatch:     &v1.Pod{},
-			Plugin:              podPlugin,
+			Plugin:              DefaultPodPlugin,
 			IsDefault:           false,
 		})
 
@@ -164,9 +171,9 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  podTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{containerTaskType, sidecarTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, SidecarTaskType},
 			ResourceToWatch:     &v1.Pod{},
-			Plugin:              podPlugin,
+			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,
 		})
 }
