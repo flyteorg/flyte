@@ -9,7 +9,7 @@ const baseProps = {
   collapsedText: 'show',
   expandedText: 'hide',
   onExpand: action('expand'),
-  renderContent: () => <p>This is the content.</p>
+  renderContent: () => <p>This is the content.</p>,
 };
 
 const stories = storiesOf('Common/ExpandableContentLink', module);

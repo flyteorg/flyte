@@ -8,12 +8,12 @@ import * as ReactDOM from 'react-dom';
  * rendered into the DetailsPanel, if it exists.
  */
 export const DetailsPanelContent: React.FC<{}> = ({ children }) => {
-    const detailsPanel = document.getElementById(detailsPanelId);
-    if (detailsPanel == null) {
-        log.warn(`
+  const detailsPanel = document.getElementById(detailsPanelId);
+  if (detailsPanel == null) {
+    log.warn(`
             Attempting to mount content into DetailsPanel but it does not exist.
             Did you mount an instance of DetailsPanel?`);
-        return null;
-    }
-    return ReactDOM.createPortal(children, detailsPanel);
+    return null;
+  }
+  return ReactDOM.createPortal(children, detailsPanel);
 };

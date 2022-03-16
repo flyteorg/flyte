@@ -8,13 +8,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.secondary.main,
     height: '100%',
     padding: theme.spacing(2),
-    width: '100%'
+    width: '100%',
   },
   lightContainer: {
     height: '100%',
     padding: theme.spacing(2),
-    width: '100%'
-  }
+    width: '100%',
+  },
 }));
 
 const stories = storiesOf('Common/FlyteLogo', module);

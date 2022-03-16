@@ -6,16 +6,16 @@ import { titleStrings } from './constants';
 
 /** A simple expand/collapse arrow to be rendered next to row items. */
 export const RowExpander: React.FC<{
-    expanded: boolean;
-    onClick: () => void;
+  expanded: boolean;
+  onClick: () => void;
 }> = ({ expanded, onClick }) => (
-    <IconButton
-        disableRipple={true}
-        disableTouchRipple={true}
-        size="small"
-        title={titleStrings.expandRow}
-        onClick={onClick}
-    >
-        {expanded ? <ExpandMore /> : <ChevronRight />}
-    </IconButton>
+  <IconButton
+    disableRipple={true}
+    disableTouchRipple={true}
+    size="small"
+    title={titleStrings.expandRow}
+    onClick={onClick}
+  >
+    {expanded ? <ExpandMore /> : <ChevronRight />}
+  </IconButton>
 );

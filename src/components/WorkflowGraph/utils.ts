@@ -85,13 +85,13 @@ export const getWorkflowId = (workflow: CompiledWorkflow): string => {
   return workflow.template.id.name;
 };
 
-export const createWorkflowNodeFromDynamic = dw => {
+export const createWorkflowNodeFromDynamic = (dw) => {
   return {
     subWorkflowRef: {
       domain: 'development',
       name: '',
-      project: ''
-    }
+      project: '',
+    },
   };
 };
 
@@ -160,7 +160,7 @@ export const transformWorkflowToKeyedDag = (workflow: Workflow) => {
 
   const { dag } = transformerWorkflowToDag(workflow.closure?.compiledWorkflow);
   const data = {};
-  dag.nodes.forEach(node => {
+  dag.nodes.forEach((node) => {
     data[`${node.id}`] = node;
   });
   return data;

@@ -1,11 +1,11 @@
 export function resolveAfter<T>(waitMs: number, value: T): Promise<T> {
-    return new Promise(resolve => {
-        setTimeout(() => resolve(value), waitMs);
-    });
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(value), waitMs);
+  });
 }
 
 export function rejectAfter<T>(waitMs: number, reason: string): Promise<T> {
-    return new Promise((_resolve, reject) => {
-        setTimeout(() => reject(reason), waitMs);
-    });
+  return new Promise((_resolve, reject) => {
+    setTimeout(() => reject(reason), waitMs);
+  });
 }

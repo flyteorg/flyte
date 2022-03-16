@@ -9,12 +9,9 @@ import { usePagination } from './usePagination';
  * @param scope
  * @param config
  */
-export function useWorkflowVersions(
-    scope: IdentifierScope,
-    config: RequestConfig
-) {
-    return usePagination<Workflow, IdentifierScope>(
-        { ...config, cacheItems: true, fetchArg: scope },
-        listWorkflows
-    );
+export function useWorkflowVersions(scope: IdentifierScope, config: RequestConfig) {
+  return usePagination<Workflow, IdentifierScope>(
+    { ...config, cacheItems: true, fetchArg: scope },
+    listWorkflows,
+  );
 }

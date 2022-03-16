@@ -8,51 +8,44 @@ import * as React from 'react';
 import { noLogsFoundString } from '../constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    logLink: {
-        margin: `${theme.spacing(0.5)} 0`
-    },
-    sectionHeader: {
-        marginTop: theme.spacing(1)
-    }
+  logLink: {
+    margin: `${theme.spacing(0.5)} 0`,
+  },
+  sectionHeader: {
+    marginTop: theme.spacing(1),
+  },
 }));
 
 const TaskLogList: React.FC<{ logs: TaskLog[] }> = ({ logs }) => {
-    const styles = useStyles();
-    const commonStyles = useCommonStyles();
-    if (!(logs && logs.length > 0)) {
-        return (
-            <span className={commonStyles.hintText}>{noLogsFoundString}</span>
-        );
-    }
-    return (
-        <>
-            {logs.map(({ name, uri }) => (
-                <NewTargetLink
-                    className={styles.logLink}
-                    key={name}
-                    external={true}
-                    href={uri}
-                >
-                    {name}
-                </NewTargetLink>
-            ))}
-        </>
-    );
+  const styles = useStyles();
+  const commonStyles = useCommonStyles();
+  if (!(logs && logs.length > 0)) {
+    return <span className={commonStyles.hintText}>{noLogsFoundString}</span>;
+  }
+  return (
+    <>
+      {logs.map(({ name, uri }) => (
+        <NewTargetLink className={styles.logLink} key={name} external={true} href={uri}>
+          {name}
+        </NewTargetLink>
+      ))}
+    </>
+  );
 };
 
 /** Renders log links from a `TaskExecution`, if they exist. Otherwise renders
  * a message indicating that no logs are available.
  */
 export const TaskExecutionLogs: React.FC<{ taskExecution: TaskExecution }> = ({
-    taskExecution
+  taskExecution,
 }) => {
-    const styles = useStyles();
-    return (
-        <section>
-            <header className={styles.sectionHeader}>
-                <Typography variant="h6">Logs</Typography>
-            </header>
-            <TaskLogList logs={taskExecution.closure.logs || []} />
-        </section>
-    );
+  const styles = useStyles();
+  return (
+    <section>
+      <header className={styles.sectionHeader}>
+        <Typography variant="h6">Logs</Typography>
+      </header>
+      <TaskLogList logs={taskExecution.closure.logs || []} />
+    </section>
+  );
 };

@@ -12,12 +12,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '100%',
     width: '100%',
     '& > *': {
-      marginBottom: theme.spacing(2)
-    }
+      marginBottom: theme.spacing(2),
+    },
   },
   errorContainer: {
-    padding: theme.spacing(2)
-  }
+    padding: theme.spacing(2),
+  },
 }));
 
 const ThrowError = () => {
@@ -40,8 +40,8 @@ stories.add('block', () => {
         <Typography variant="h2">Page Title</Typography>
       </header>
       <Typography variant="body1">
-        This is some page content. Below this, maybe there is a section that attempts to load some data and fails. We
-        don't want the ErrorBoundary to take up the entire screen in this case.
+        This is some page content. Below this, maybe there is a section that attempts to load some
+        data and fails. We don't want the ErrorBoundary to take up the entire screen in this case.
       </Typography>
       <Paper className={styles.errorContainer} elevation={1}>
         <ErrorBoundary>

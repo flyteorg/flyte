@@ -11,29 +11,24 @@ import { WorkflowExecutionsTableProps } from '../WorkflowExecutionsTable';
 /** Mocked, simpler version of WorkflowExecutionsTable which does not use a DataList since
  * that will not work in a test environment.
  */
-export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = props => {
-    const { value: executions, showWorkflowName = false } = props;
-    const state = useWorkflowExecutionsTableState();
-    const commonStyles = useCommonStyles();
-    const tableStyles = useExecutionTableStyles();
-    const columns = useWorkflowExecutionsTableColumns({});
+export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = (props) => {
+  const { value: executions, showWorkflowName = false } = props;
+  const state = useWorkflowExecutionsTableState();
+  const commonStyles = useCommonStyles();
+  const tableStyles = useExecutionTableStyles();
+  const columns = useWorkflowExecutionsTableColumns({});
 
-    return (
-        <div
-            className={classnames(
-                tableStyles.tableContainer,
-                commonStyles.flexFill
-            )}
-        >
-            <ExecutionsTableHeader columns={columns} />
-            {executions.map(execution => (
-                <WorkflowExecutionRow
-                    showWorkflowName={showWorkflowName}
-                    key={execution.id.name}
-                    execution={execution}
-                    state={state}
-                />
-            ))}
-        </div>
-    );
+  return (
+    <div className={classnames(tableStyles.tableContainer, commonStyles.flexFill)}>
+      <ExecutionsTableHeader columns={columns} />
+      {executions.map((execution) => (
+        <WorkflowExecutionRow
+          showWorkflowName={showWorkflowName}
+          key={execution.id.name}
+          execution={execution}
+          state={state}
+        />
+      ))}
+    </div>
+  );
 };

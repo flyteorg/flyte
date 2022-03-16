@@ -13,72 +13,66 @@ const startTimeTestId = `metadata-${ExecutionMetadataLabels.time}`;
 const durationTestId = `metadata-${ExecutionMetadataLabels.duration}`;
 
 jest.mock('models/Launch/api', () => ({
-    getLaunchPlan: jest.fn(() => Promise.resolve({ spec: {} }))
+  getLaunchPlan: jest.fn(() => Promise.resolve({ spec: {} })),
 }));
 
 describe('ExecutionMetadata', () => {
-    let execution: Execution;
-    beforeEach(() => {
-        execution = createMockExecution();
-    });
+  let execution: Execution;
+  beforeEach(() => {
+    execution = createMockExecution();
+  });
 
-    const renderMetadata = () =>
-        render(
-            <MemoryRouter>
-                <ExecutionMetadata execution={execution} />
-            </MemoryRouter>
-        );
+  const renderMetadata = () =>
+    render(
+      <MemoryRouter>
+        <ExecutionMetadata execution={execution} />
+      </MemoryRouter>,
+    );
 
-    it('shows cluster name if available', () => {
-        const { getByTestId } = renderMetadata();
+  it('shows cluster name if available', () => {
+    const { getByTestId } = renderMetadata();
 
-        expect(
-            execution.spec.metadata.systemMetadata?.executionCluster
-        ).toBeDefined();
-        expect(getByTestId(clusterTestId)).toHaveTextContent(
-            execution.spec.metadata.systemMetadata!.executionCluster!
-        );
-    });
+    expect(execution.spec.metadata.systemMetadata?.executionCluster).toBeDefined();
+    expect(getByTestId(clusterTestId)).toHaveTextContent(
+      execution.spec.metadata.systemMetadata!.executionCluster!,
+    );
+  });
 
-    it('shows empty string for cluster if no metadata', () => {
-        delete execution.spec.metadata.systemMetadata;
-        const { getByTestId } = renderMetadata();
-        expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
-    });
+  it('shows empty string for cluster if no metadata', () => {
+    delete execution.spec.metadata.systemMetadata;
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
+  });
 
-    it('shows empty string for cluster if no cluster name', () => {
-        delete execution.spec.metadata.systemMetadata?.executionCluster;
-        const { getByTestId } = renderMetadata();
-        expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
-    });
+  it('shows empty string for cluster if no cluster name', () => {
+    delete execution.spec.metadata.systemMetadata?.executionCluster;
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
+  });
 
-    it('shows empty string for start time if not available', () => {
-        delete execution.closure.startedAt;
-        const { getByTestId } = renderMetadata();
-        expect(getByTestId(startTimeTestId)).toHaveTextContent(
-            dashedValueString
-        );
-    });
+  it('shows empty string for start time if not available', () => {
+    delete execution.closure.startedAt;
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(startTimeTestId)).toHaveTextContent(dashedValueString);
+  });
 
-    it('shows empty string for duration if not available', () => {
-        delete execution.closure.duration;
-        const { getByTestId } = renderMetadata();
-        expect(getByTestId(durationTestId)).toHaveTextContent(
-            dashedValueString
-        );
-    });
+  it('shows empty string for duration if not available', () => {
+    delete execution.closure.duration;
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(durationTestId)).toHaveTextContent(dashedValueString);
+  });
 
-    it('shows reference execution if it exists', () => {
-        const referenceExecution: WorkflowExecutionIdentifier = {
-            project: 'project',
-            domain: 'domain',
-            name: '123abc'
-        };
-        execution.spec.metadata.referenceExecution = referenceExecution;
-        const { getByText } = renderMetadata();
-        expect(getByText(referenceExecution.name)).toHaveAttribute(
-            'href',
-            Routes.ExecutionDetails.makeUrl(referenceExecution)
-        );
-    });
+  it('shows reference execution if it exists', () => {
+    const referenceExecution: WorkflowExecutionIdentifier = {
+      project: 'project',
+      domain: 'domain',
+      name: '123abc',
+    };
+    execution.spec.metadata.referenceExecution = referenceExecution;
+    const { getByText } = renderMetadata();
+    expect(getByText(referenceExecution.name)).toHaveAttribute(
+      'href',
+      Routes.ExecutionDetails.makeUrl(referenceExecution),
+    );
+  });
 });

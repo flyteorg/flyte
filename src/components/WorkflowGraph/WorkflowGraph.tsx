@@ -1,4 +1,3 @@
-import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 import { dNode } from 'models/Graph/types';
 import { Workflow } from 'models/Workflow/types';
 import * as React from 'react';
@@ -12,6 +11,7 @@ import { useQuery, useQueryClient } from 'react-query';
 import { makeNodeExecutionDynamicWorkflowQuery } from 'components/Workflow/workflowQueries';
 import { createDebugLogger } from 'components/flytegraph/utils';
 import { CompiledNode } from 'models/Node/types';
+import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 
 export interface WorkflowGraphProps {
   onNodeSelectionChanged: (selectedNodes: string[]) => void;
@@ -42,7 +42,7 @@ function workflowToDag(workflow: Workflow): PrepareDAGResult {
   } catch (e) {
     return {
       dag: null,
-      error: e as Error
+      error: e as Error,
     };
   }
 }
@@ -52,7 +52,7 @@ export interface DynamicWorkflowMapping {
   dynamicWorkflow: any;
   dynamicExecutions: any[];
 }
-export const WorkflowGraph: React.FC<WorkflowGraphProps> = props => {
+export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
   const { onNodeSelectionChanged, nodeExecutionsById, workflow } = props;
   const { dag, staticExecutionIdsMap, error } = workflowToDag(workflow);
   /**
@@ -86,14 +86,19 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = props => {
 
   const dynamicParents = checkForDynamicExeuctions(nodeExecutionsById, staticExecutionIdsMap);
 
-  const dynamicWorkflowQuery = useQuery(makeNodeExecutionDynamicWorkflowQuery(useQueryClient(), dynamicParents));
-  const renderReactFlowGraph = dynamicWorkflows => {
+  const dynamicWorkflowQuery = useQuery(
+    makeNodeExecutionDynamicWorkflowQuery(useQueryClient(), dynamicParents),
+  );
+  const renderReactFlowGraph = (dynamicWorkflows) => {
     debug('DynamicWorkflows:', dynamicWorkflows);
     let mergedDag = dag;
     for (const dynamicId in dynamicWorkflows) {
       if (staticExecutionIdsMap[dynamicId]) {
         if (workflow.closure?.compiledWorkflow) {
-          const dynamicWorkflow = transformerWorkflowToDag(workflow.closure?.compiledWorkflow, dynamicWorkflows);
+          const dynamicWorkflow = transformerWorkflowToDag(
+            workflow.closure?.compiledWorkflow,
+            dynamicWorkflows,
+          );
           mergedDag = dynamicWorkflow.dag;
         }
       }

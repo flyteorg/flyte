@@ -13,8 +13,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     height: '100vh',
     padding: `${theme.spacing(2)}px 0`,
-    width: '100vw'
-  }
+    width: '100vw',
+  },
 }));
 
 const fixture = basicPythonWorkflow.generate();
@@ -26,18 +26,20 @@ const getNodeExecutionDetails = async () => {
   return {
     displayId: 'node0',
     displayName: 'basic.byton.workflow.unique.task_name',
-    displayType: 'Python-Task'
+    displayType: 'Python-Task',
   };
 };
 
 const stories = storiesOf('Tables/NodeExecutionsTable', module);
-stories.addDecorator(story => {
+stories.addDecorator((story) => {
   return <div className={useStyles().container}>{story()}</div>;
 });
 stories.add('Basic', () => {
   const query = useQuery(makeNodeExecutionListQuery(useQueryClient(), workflowExecution.id));
   return query.data ? (
-    <NodeExecutionDetailsContext.Provider value={{ getNodeExecutionDetails, workflowId, compiledWorkflowClosure }}>
+    <NodeExecutionDetailsContext.Provider
+      value={{ getNodeExecutionDetails, workflowId, compiledWorkflowClosure }}
+    >
       <NodeExecutionsTable nodeExecutions={query.data} />
     </NodeExecutionDetailsContext.Provider>
   ) : (
@@ -46,7 +48,9 @@ stories.add('Basic', () => {
 });
 stories.add('With no items', () => {
   return (
-    <NodeExecutionDetailsContext.Provider value={{ getNodeExecutionDetails, workflowId, compiledWorkflowClosure }}>
+    <NodeExecutionDetailsContext.Provider
+      value={{ getNodeExecutionDetails, workflowId, compiledWorkflowClosure }}
+    >
       <NodeExecutionsTable nodeExecutions={[]} />
     </NodeExecutionDetailsContext.Provider>
   );

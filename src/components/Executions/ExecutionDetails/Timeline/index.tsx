@@ -17,13 +17,13 @@ const useStyles = makeStyles(() => ({
   wrapper: {
     display: 'flex',
     flexDirection: 'column',
-    flex: '1 1 100%'
+    flex: '1 1 100%',
   },
   container: {
     display: 'flex',
     flex: '1 1 0',
-    overflowY: 'auto'
-  }
+    overflowY: 'auto',
+  },
 }));
 
 interface TimelineProps {
@@ -33,19 +33,21 @@ interface TimelineProps {
 export const ExecutionNodesTimeline = (props: TimelineProps) => {
   const styles = useStyles();
 
-  const [selectedExecution, setSelectedExecution] = React.useState<NodeExecutionIdentifier | null>(null);
+  const [selectedExecution, setSelectedExecution] = React.useState<NodeExecutionIdentifier | null>(
+    null,
+  );
   const [chartTimezone, setChartTimezone] = React.useState(TimeZone.Local);
 
   const onCloseDetailsPanel = () => setSelectedExecution(null);
-  const handleTimezoneChange = tz => setChartTimezone(tz);
+  const handleTimezoneChange = (tz) => setChartTimezone(tz);
 
   const requestConfig = React.useContext(NodeExecutionsRequestConfigContext);
   const childGroupsQuery = useAllTreeNodeExecutionGroupsQuery(props.nodeExecutions, requestConfig);
 
-  const timelineContext = React.useMemo(() => ({ selectedExecution, setSelectedExecution }), [
-    selectedExecution,
-    setSelectedExecution
-  ]);
+  const timelineContext = React.useMemo(
+    () => ({ selectedExecution, setSelectedExecution }),
+    [selectedExecution, setSelectedExecution],
+  );
 
   const renderExecutionsTimeline = (nodeExecutions: NodeExecution[]) => {
     return <ExecutionTimeline nodeExecutions={nodeExecutions} chartTimezone={chartTimezone} />;
@@ -67,7 +69,10 @@ export const ExecutionNodesTimeline = (props: TimelineProps) => {
       {/* Side panel, shows information for specific node */}
       <DetailsPanel open={selectedExecution !== null} onClose={onCloseDetailsPanel}>
         {selectedExecution && (
-          <NodeExecutionDetailsPanelContent onClose={onCloseDetailsPanel} nodeExecutionId={selectedExecution} />
+          <NodeExecutionDetailsPanelContent
+            onClose={onCloseDetailsPanel}
+            nodeExecutionId={selectedExecution}
+          />
         )}
       </DetailsPanel>
     </ScaleProvider>

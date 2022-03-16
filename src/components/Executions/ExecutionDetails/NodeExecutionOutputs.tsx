@@ -6,25 +6,23 @@ import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 
 /** Fetches and renders the output data for a given `NodeExecution` */
-export const NodeExecutionOutputs: React.FC<{ execution: NodeExecution }> = ({
-    execution
-}) => {
-    const commonStyles = useCommonStyles();
-    const executionData = useNodeExecutionData(execution.id);
-    return (
-        <WaitForData {...executionData}>
-            {() => (
-                <>
-                    <div className={commonStyles.detailsPanelCard}>
-                        <div className={commonStyles.detailsPanelCardContent}>
-                            <RemoteLiteralMapViewer
-                                map={executionData.value.fullOutputs}
-                                blob={executionData.value.outputs}
-                            />
-                        </div>
-                    </div>
-                </>
-            )}
-        </WaitForData>
-    );
+export const NodeExecutionOutputs: React.FC<{ execution: NodeExecution }> = ({ execution }) => {
+  const commonStyles = useCommonStyles();
+  const executionData = useNodeExecutionData(execution.id);
+  return (
+    <WaitForData {...executionData}>
+      {() => (
+        <>
+          <div className={commonStyles.detailsPanelCard}>
+            <div className={commonStyles.detailsPanelCardContent}>
+              <RemoteLiteralMapViewer
+                map={executionData.value.fullOutputs}
+                blob={executionData.value.outputs}
+              />
+            </div>
+          </div>
+        </>
+      )}
+    </WaitForData>
+  );
 };

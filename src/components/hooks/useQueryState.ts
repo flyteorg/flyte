@@ -8,30 +8,28 @@ import { history } from 'routes/history';
  * are updated whenever the path/query changes.
  */
 export const useQueryState = <T extends ParsedQuery>() => {
-    const [params, setParams] = useState<Partial<T>>(
-        parse(history.location.search) as Partial<T>
-    );
+  const [params, setParams] = useState<Partial<T>>(parse(history.location.search) as Partial<T>);
 
-    const setQueryState = (newState: T) => {
-        // Remove any undefined values before serializing
-        const finalState = pickBy(newState, v => v !== undefined);
-        history.replace({ ...history.location, search: stringify(finalState) });
-    };
+  const setQueryState = (newState: T) => {
+    // Remove any undefined values before serializing
+    const finalState = pickBy(newState, (v) => v !== undefined);
+    history.replace({ ...history.location, search: stringify(finalState) });
+  };
 
-    const setQueryStateValue = (key: string, value?: string) => {
-        const newParams = { ...params, [key]: value } as T;
-        setQueryState(newParams);
-    };
+  const setQueryStateValue = (key: string, value?: string) => {
+    const newParams = { ...params, [key]: value } as T;
+    setQueryState(newParams);
+  };
 
-    useEffect(() => {
-        return history.listen(location => {
-            setParams(parse(location.search) as Partial<T>);
-        });
-    }, [history]);
+  useEffect(() => {
+    return history.listen((location) => {
+      setParams(parse(location.search) as Partial<T>);
+    });
+  }, [history]);
 
-    return {
-        params,
-        setQueryState,
-        setQueryStateValue
-    };
+  return {
+    params,
+    setQueryState,
+    setQueryStateValue,
+  };
 };

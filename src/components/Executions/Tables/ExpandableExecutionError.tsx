@@ -8,24 +8,19 @@ import { useExecutionTableStyles } from './styles';
  * a button for copying the error string.
  */
 export const ExpandableExecutionError: React.FC<{
-    abortMetadata?: Admin.IAbortMetadata;
-    error?: ExecutionError;
-    initialExpansionState?: boolean;
-    onExpandCollapse?(expanded: boolean): void;
-}> = ({
-    abortMetadata,
-    error,
-    initialExpansionState = false,
-    onExpandCollapse
-}) => {
-    const styles = useExecutionTableStyles();
-    return (
-        <div className={styles.errorContainer}>
-            <ExpandableMonospaceText
-                onExpandCollapse={onExpandCollapse}
-                initialExpansionState={initialExpansionState}
-                text={abortMetadata?.cause ?? error?.message ?? ''}
-            />
-        </div>
-    );
+  abortMetadata?: Admin.IAbortMetadata;
+  error?: ExecutionError;
+  initialExpansionState?: boolean;
+  onExpandCollapse?(expanded: boolean): void;
+}> = ({ abortMetadata, error, initialExpansionState = false, onExpandCollapse }) => {
+  const styles = useExecutionTableStyles();
+  return (
+    <div className={styles.errorContainer}>
+      <ExpandableMonospaceText
+        onExpandCollapse={onExpandCollapse}
+        initialExpansionState={initialExpansionState}
+        text={abortMetadata?.cause ?? error?.message ?? ''}
+      />
+    </div>
+  );
 };

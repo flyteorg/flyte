@@ -8,23 +8,21 @@ import { useAPIContext } from './apiContext';
  * Note: Should be placed just below the QueryClient and ApiContext providers.
  */
 export const QueryAuthorizationObserver: React.FC = () => {
-    const queryCache = useQueryClient().getQueryCache();
-    const apiContext = useAPIContext();
-    React.useEffect(() => {
-        const unsubscribe = queryCache.subscribe(
-            (query?: Query | undefined) => {
-                if (!query || !query.state.error) {
-                    return;
-                }
-                if (query.state.error instanceof NotAuthorizedError) {
-                    // Stop all in-progress and future requests
-                    onlineManager.setOnline(false);
-                    // Trigger auth flow
-                    apiContext.loginStatus.setExpired(true);
-                }
-            }
-        );
-        return unsubscribe;
-    }, [queryCache, apiContext]);
-    return null;
+  const queryCache = useQueryClient().getQueryCache();
+  const apiContext = useAPIContext();
+  React.useEffect(() => {
+    const unsubscribe = queryCache.subscribe((query?: Query | undefined) => {
+      if (!query || !query.state.error) {
+        return;
+      }
+      if (query.state.error instanceof NotAuthorizedError) {
+        // Stop all in-progress and future requests
+        onlineManager.setOnline(false);
+        // Trigger auth flow
+        apiContext.loginStatus.setExpired(true);
+      }
+    });
+    return unsubscribe;
+  }, [queryCache, apiContext]);
+  return null;
 };

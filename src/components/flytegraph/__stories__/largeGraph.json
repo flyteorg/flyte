@@ -1,881 +1,1028 @@
 {
-  "subWorkflows": [],
-  "tasks": [
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "myworkflow",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "variable_a": {
-                "type": { "simple": 3 }
-              },
-              "variable_b": { "type": { "simple": 3 } },
-              "variable_c": {
-                "type": { "simple": 3 }
-              },
-              "variable_d": {
-                "type": { "simple": 3 }
-              },
-              "variable_u": { "type": { "simple": 3 } }
+    "subWorkflows": [],
+    "tasks": [
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "myworkflow",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "variable_a": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_b": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_c": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_d": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_u": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_e": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_v": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "tasknamec",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
             }
-          },
-          "outputs": {
-            "variables": {
-              "variable_e": { "type": { "simple": 3 } },
-              "variable_v": { "type": { "simple": 3 } }
-            }
-          }
         },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "tasknamec",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow_e",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {}
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_c": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_d": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "task_name",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
             }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow_f",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "env": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_w": {
+                                "type": {
+                                    "simple": 4
+                                }
+                            },
+                            "variable_f": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_g": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_b": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_h": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_a": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "my_task_name",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow_b",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "variable_i": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            },
+                            "variable_j": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_k": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            },
+                            "variable_l": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_m": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_n": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_o": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_p": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "mytaskname",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow_c",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {
+                        "retries": 3
+                    },
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "variable_q": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_o": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "mytaskname",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow_d",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "variable_r": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            },
+                            "variable_s": {
+                                "type": {
+                                    "simple": 3
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "variable_q": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "my.module.name",
+                        "--task-name",
+                        "taskname",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flyte.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
         }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow_e",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": { "variables": {} },
-          "outputs": {
-            "variables": {
-              "variable_c": {
-                "type": { "simple": 3 }
-              },
-              "variable_d": {
-                "type": { "simple": 3 }
-              }
+    ],
+    "primary": {
+        "template": {
+            "nodes": [
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "start-node"
+                },
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "end-node"
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_d",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_b",
+                                    "var": "variable_d"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_c",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_b",
+                                    "var": "variable_c"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_a",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_c",
+                                    "var": "variable_a"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_b",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_c",
+                                    "var": "variable_b"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_u",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myString"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["id_c", "id_b"],
+                    "outputAliases": [],
+                    "id": "id_d",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "myworkflow",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_n",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myStringValue"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_j",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_j"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_k",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_e",
+                                    "var": "variable_q"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_o",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_f",
+                                    "var": "variable_o"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_m",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myStringVar"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_i",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_a",
+                                    "var": "variable_q"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_l",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "MyStringB"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["id_e", "id_f", "id_a"],
+                    "outputAliases": [],
+                    "id": "id_g",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_b",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_n",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "mystringvarC"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_j",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_j"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_k",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_e",
+                                    "var": "variable_q"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_o",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": ""
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_m",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myStringD"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_i",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "id_a",
+                                    "var": "variable_q"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_l",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myStringE"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["id_e", "id_a"],
+                    "outputAliases": [],
+                    "id": "id_h",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_b",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_r",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_r"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_s",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_x"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "id_e",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_d",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_s",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_s"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "id_f",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {
+                            "retries": 3
+                        }
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_c",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "variable_r",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_r"
+                                }
+                            }
+                        },
+                        {
+                            "var": "variable_s",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "variable_t"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "id_a",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_d",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "env",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "stringValue": "myStringVar"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "id_c",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_f",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "id_b",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow_e",
+                            "version": "ABC123"
+                        }
+                    }
+                }
+            ],
+            "outputs": [],
+            "id": {
+                "resourceType": 2,
+                "project": "myflyteproject",
+                "domain": "development",
+                "name": "workflow_g",
+                "version": "ABC123"
+            },
+            "metadata": {},
+            "interface": {
+                "inputs": {
+                    "variables": {
+                        "variable_s": {
+                            "type": {
+                                "simple": 3
+                            },
+                            "description": "descriptionA"
+                        },
+                        "variable_t": {
+                            "type": {
+                                "simple": 3
+                            },
+                            "description": "descriptionB"
+                        },
+                        "variable_j": {
+                            "type": {
+                                "simple": 3
+                            },
+                            "description": "descriptionC"
+                        },
+                        "variable_x": {
+                            "type": {
+                                "simple": 3
+                            },
+                            "description": "descriptionD"
+                        },
+                        "variable_r": {
+                            "type": {
+                                "simple": 3
+                            },
+                            "description": "descriptionE"
+                        }
+                    }
+                },
+                "outputs": {
+                    "variables": {}
+                }
             }
-          }
         },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "task_name",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
+        "connections": {
+            "downstream": {
+                "id_c": {
+                    "ids": ["id_d"]
+                },
+                "id_g": {
+                    "ids": ["end-node"]
+                },
+                "id_h": {
+                    "ids": ["end-node"]
+                },
+                "start-node": {
+                    "ids": ["id_g", "id_h", "id_e", "id_f", "id_a", "id_c", "id_b"]
+                },
+                "id_d": {
+                    "ids": ["end-node"]
+                },
+                "id_e": {
+                    "ids": ["id_g", "id_h"]
+                },
+                "id_b": {
+                    "ids": ["id_d"]
+                },
+                "id_f": {
+                    "ids": ["id_g"]
+                },
+                "id_a": {
+                    "ids": ["id_g", "id_h"]
+                }
+            },
+            "upstream": {
+                "id_c": {
+                    "ids": ["start-node"]
+                },
+                "id_g": {
+                    "ids": ["id_e", "id_f", "id_a", "start-node"]
+                },
+                "id_a": {
+                    "ids": ["start-node"]
+                },
+                "end-node": {
+                    "ids": ["id_d", "id_g", "id_h"]
+                },
+                "id_h": {
+                    "ids": ["id_e", "id_a", "start-node"]
+                },
+                "id_b": {
+                    "ids": ["start-node"]
+                },
+                "id_d": {
+                    "ids": ["id_c", "id_b"]
+                },
+                "id_e": {
+                    "ids": ["start-node"]
+                },
+                "id_f": {
+                    "ids": ["start-node"]
+                }
             }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
         }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow_f",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": { "env": { "type": { "simple": 3 } } }
-          },
-          "outputs": {
-            "variables": {
-              "variable_w": { "type": { "simple": 4 } },
-              "variable_f": {
-                "type": { "simple": 3 }
-              },
-              "variable_g": {
-                "type": { "simple": 3 }
-              },
-              "variable_g": {
-                "type": { "simple": 3 }
-              },
-              "variable_b": { "type": { "simple": 3 } },
-              "variable_h": {
-                "type": { "simple": 3 }
-              },
-              "variable_a": {
-                "type": { "simple": 3 }
-              }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "my_task_name",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow_b",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "variable_i": { "type": { "simple": 1 } },
-              "variable_j": { "type": { "simple": 3 } },
-              "variable_k": { "type": { "simple": 1 } },
-              "variable_l": { "type": { "simple": 3 } },
-              "variable_m": { "type": { "simple": 3 } },
-              "variable_n": { "type": { "simple": 3 } },
-              "variable_o": { "type": { "simple": 3 } }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "variable_p": { "type": { "simple": 3 } }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "mytaskname",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow_c",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": { "retries": 3 },
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": { "variable_q": { "type": { "simple": 3 } } }
-          },
-          "outputs": {
-            "variables": {
-              "variable_o": { "type": { "simple": 3 } }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "mytaskname",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow_d",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "variable_r": { "type": { "simple": 3 } },
-              "variable_s": { "type": { "simple": 3 } }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "variable_q": { "type": { "simple": 1 } }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "my.module.name",
-            "--task-name",
-            "taskname",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flyte.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": { "requests": [], "limits": [] }
-        }
-      }
     }
-  ],
-  "primary": {
-    "template": {
-      "nodes": [
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "start-node"
-        },
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "end-node"
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_d",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_b",
-                  "var": "variable_d"
-                }
-              }
-            },
-            {
-              "var": "variable_c",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_b",
-                  "var": "variable_c"
-                }
-              }
-            },
-            {
-              "var": "variable_a",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_c",
-                  "var": "variable_a"
-                }
-              }
-            },
-            {
-              "var": "variable_b",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_c",
-                  "var": "variable_b"
-                }
-              }
-            },
-            {
-              "var": "variable_u",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myString"
-                  }
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["id_c", "id_b"],
-          "outputAliases": [],
-          "id": "id_d",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "myworkflow",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_n",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myStringValue"
-                  }
-                }
-              }
-            },
-            {
-              "var": "variable_j",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_j"
-                }
-              }
-            },
-            {
-              "var": "variable_k",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_e",
-                  "var": "variable_q"
-                }
-              }
-            },
-            {
-              "var": "variable_o",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_f",
-                  "var": "variable_o"
-                }
-              }
-            },
-            {
-              "var": "variable_m",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myStringVar"
-                  }
-                }
-              }
-            },
-            {
-              "var": "variable_i",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_a",
-                  "var": "variable_q"
-                }
-              }
-            },
-            {
-              "var": "variable_l",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "MyStringB"
-                  }
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["id_e", "id_f", "id_a"],
-          "outputAliases": [],
-          "id": "id_g",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_b",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_n",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "mystringvarC"
-                  }
-                }
-              }
-            },
-            {
-              "var": "variable_j",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_j"
-                }
-              }
-            },
-            {
-              "var": "variable_k",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_e",
-                  "var": "variable_q"
-                }
-              }
-            },
-            {
-              "var": "variable_o",
-              "binding": {
-                "scalar": {
-                  "primitive": { "stringValue": "" }
-                }
-              }
-            },
-            {
-              "var": "variable_m",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myStringD"
-                  }
-                }
-              }
-            },
-            {
-              "var": "variable_i",
-              "binding": {
-                "promise": {
-                  "nodeId": "id_a",
-                  "var": "variable_q"
-                }
-              }
-            },
-            {
-              "var": "variable_l",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myStringE"
-                  }
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["id_e", "id_a"],
-          "outputAliases": [],
-          "id": "id_h",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_b",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_r",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_r"
-                }
-              }
-            },
-            {
-              "var": "variable_s",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_x"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "id_e",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_d",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_s",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_s"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "id_f",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": { "retries": 3 }
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_c",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "variable_r",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_r"
-                }
-              }
-            },
-            {
-              "var": "variable_s",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "variable_t"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "id_a",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_d",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "env",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "stringValue": "myStringVar"
-                  }
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "id_c",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_f",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "id_b",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow_e",
-              "version": "ABC123"
-            }
-          }
-        }
-      ],
-      "outputs": [],
-      "id": {
-        "resourceType": 2,
-        "project": "myflyteproject",
-        "domain": "development",
-        "name": "workflow_g",
-        "version": "ABC123"
-      },
-      "metadata": {},
-      "interface": {
-        "inputs": {
-          "variables": {
-            "variable_s": {
-              "type": { "simple": 3 },
-              "description": "descriptionA"
-            },
-            "variable_t": {
-              "type": { "simple": 3 },
-              "description": "descriptionB"
-            },
-            "variable_j": {
-              "type": { "simple": 3 },
-              "description": "descriptionC"
-            },
-            "variable_x": {
-              "type": { "simple": 3 },
-              "description": "descriptionD"
-            },
-            "variable_r": {
-              "type": { "simple": 3 },
-              "description": "descriptionE"
-            }
-          }
-        },
-        "outputs": { "variables": {} }
-      }
-    },
-    "connections": {
-      "downstream": {
-        "id_c": {
-          "ids": ["id_d"]
-        },
-        "id_g": { "ids": ["end-node"] },
-        "id_h": { "ids": ["end-node"] },
-        "start-node": {
-          "ids": ["id_g", "id_h", "id_e", "id_f", "id_a", "id_c", "id_b"]
-        },
-        "id_d": {
-          "ids": ["end-node"]
-        },
-        "id_e": {
-          "ids": ["id_g", "id_h"]
-        },
-        "id_b": {
-          "ids": ["id_d"]
-        },
-        "id_f": {
-          "ids": ["id_g"]
-        },
-        "id_a": {
-          "ids": ["id_g", "id_h"]
-        }
-      },
-      "upstream": {
-        "id_c": {
-          "ids": ["start-node"]
-        },
-        "id_g": {
-          "ids": ["id_e", "id_f", "id_a", "start-node"]
-        },
-        "id_a": { "ids": ["start-node"] },
-        "end-node": {
-          "ids": ["id_d", "id_g", "id_h"]
-        },
-        "id_h": {
-          "ids": ["id_e", "id_a", "start-node"]
-        },
-        "id_b": {
-          "ids": ["start-node"]
-        },
-        "id_d": {
-          "ids": ["id_c", "id_b"]
-        },
-        "id_e": { "ids": ["start-node"] },
-        "id_f": { "ids": ["start-node"] }
-      }
-    }
-  }
 }

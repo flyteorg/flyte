@@ -17,47 +17,43 @@ const defaultRefresh = (fetchable: FetchableData<any>) => fetchable.fetch();
  * logic, fetch function, etc)
  */
 export function useDataRefresher<T, IDType extends object | string>(
-    id: IDType,
-    fetchable: FetchableData<T>,
-    refreshConfig: RefreshConfig<T>
+  id: IDType,
+  fetchable: FetchableData<T>,
+  refreshConfig: RefreshConfig<T>,
 ) {
-    const { interval } = refreshConfig;
-    const { debugName, state, value } = fetchable;
+  const { interval } = refreshConfig;
+  const { debugName, state, value } = fetchable;
 
-    const isFinal = refreshConfig.valueIsFinal(value);
+  const isFinal = refreshConfig.valueIsFinal(value);
 
-    // Default refresh implementation is just to fetch the current entity
-    const doRefresh = refreshConfig.doRefresh || defaultRefresh;
-    const stateIsRefreshable =
-        state.matches(fetchStates.LOADED) || isLoadingState(state);
+  // Default refresh implementation is just to fetch the current entity
+  const doRefresh = refreshConfig.doRefresh || defaultRefresh;
+  const stateIsRefreshable = state.matches(fetchStates.LOADED) || isLoadingState(state);
 
-    useEffect(() => {
-        if (isFinal) {
-            return;
-        }
+  useEffect(() => {
+    if (isFinal) {
+      return;
+    }
 
-        let timerId = 0;
+    let timerId = 0;
 
-        const clear = () => {
-            if (timerId === 0) {
-                return;
-            }
+    const clear = () => {
+      if (timerId === 0) {
+        return;
+      }
 
-            log(`${debugName} detaching data refresher`);
-            window.clearInterval(timerId);
-        };
+      log(`${debugName} detaching data refresher`);
+      window.clearInterval(timerId);
+    };
 
-        if (stateIsRefreshable) {
-            log(`${debugName} attaching data refresher`);
-            timerId = window.setInterval(() => doRefresh(fetchable), interval);
-        } else {
-            log(
-                `${debugName} not refreshing fetchable because it is in a failed/idle state`,
-                fetchable
-            );
-        }
+    if (stateIsRefreshable) {
+      log(`${debugName} attaching data refresher`);
+      timerId = window.setInterval(() => doRefresh(fetchable), interval);
+    } else {
+      log(`${debugName} not refreshing fetchable because it is in a failed/idle state`, fetchable);
+    }
 
-        // When this effect is cleaned up, we should stop refreshing
-        return clear;
-    }, [getCacheKey(id), stateIsRefreshable, isFinal, doRefresh]);
+    // When this effect is cleaned up, we should stop refreshing
+    return clear;
+  }, [getCacheKey(id), stateIsRefreshable, isFinal, doRefresh]);
 }

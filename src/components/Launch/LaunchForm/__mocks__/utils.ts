@@ -3,51 +3,51 @@ import { BlobDimensionality } from 'models/Common/types';
 import { InputType, InputTypeDefinition } from '../types';
 
 export function primitiveLiteral(primitive: Core.IPrimitive): Core.ILiteral {
-    return { scalar: { primitive } };
+  return { scalar: { primitive } };
 }
 
 export function blobLiteral({
-    uri,
-    format,
-    dimensionality
+  uri,
+  format,
+  dimensionality,
 }: {
-    uri?: string;
-    format?: string;
-    dimensionality?: BlobDimensionality;
+  uri?: string;
+  format?: string;
+  dimensionality?: BlobDimensionality;
 }): Core.ILiteral {
-    return {
-        scalar: {
-            blob: { uri, metadata: { type: { format, dimensionality } } }
-        }
-    };
+  return {
+    scalar: {
+      blob: { uri, metadata: { type: { format, dimensionality } } },
+    },
+  };
 }
 
 export function collectionInputTypeDefinition(
-    typeDefinition: InputTypeDefinition
+  typeDefinition: InputTypeDefinition,
 ): InputTypeDefinition {
-    return {
-        literalType: {
-            collectionType: typeDefinition.literalType
-        },
-        type: InputType.Collection,
-        subtype: typeDefinition
-    };
+  return {
+    literalType: {
+      collectionType: typeDefinition.literalType,
+    },
+    type: InputType.Collection,
+    subtype: typeDefinition,
+  };
 }
 
 export function nestedCollectionInputTypeDefinition(
-    typeDefinition: InputTypeDefinition
+  typeDefinition: InputTypeDefinition,
 ): InputTypeDefinition {
-    return {
-        literalType: {
-            collectionType: {
-                collectionType: typeDefinition.literalType
-            }
-        },
-        type: InputType.Collection,
-        subtype: {
-            literalType: { collectionType: typeDefinition.literalType },
-            type: InputType.Collection,
-            subtype: typeDefinition
-        }
-    };
+  return {
+    literalType: {
+      collectionType: {
+        collectionType: typeDefinition.literalType,
+      },
+    },
+    type: InputType.Collection,
+    subtype: {
+      literalType: { collectionType: typeDefinition.literalType },
+      type: InputType.Collection,
+      subtype: typeDefinition,
+    },
+  };
 }

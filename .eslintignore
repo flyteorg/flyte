@@ -2,7 +2,5 @@ src/generated/
 .dist/
 dist/
 node_modules/
-.vscode/
 tsd/
-package.json
 webpack.config.ts

@@ -1,153 +1,153 @@
 {
-  "primary": {
-    "template": {
-      "id": {
-        "resource_type": "WORKFLOW",
-        "project": "myflyteproject",
-        "domain": "development",
-        "name": "work-one-python-task-w-f",
-        "version": "ABC123"
-      },
-      "metadata": {},
-      "nodes": [
-        { "id": "start-node" },
-        { "id": "end-node" },
-        {
-          "id": "odd-nums-task",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": "0s",
-            "retries": {}
-          },
-          "inputs": [
-            {
-              "var": "list_of_nums",
-              "binding": {
-                "collection": {
-                  "bindings": [
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": "2"
-                        }
-                      }
+    "primary": {
+        "template": {
+            "id": {
+                "resource_type": "WORKFLOW",
+                "project": "myflyteproject",
+                "domain": "development",
+                "name": "work-one-python-task-w-f",
+                "version": "ABC123"
+            },
+            "metadata": {},
+            "nodes": [
+                { "id": "start-node" },
+                { "id": "end-node" },
+                {
+                    "id": "odd-nums-task",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": "0s",
+                        "retries": {}
                     },
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": "3"
+                    "inputs": [
+                        {
+                            "var": "list_of_nums",
+                            "binding": {
+                                "collection": {
+                                    "bindings": [
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": "2"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": "3"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": "4"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": "7"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
                         }
-                      }
-                    },
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": "4"
+                    ],
+                    "task_node": {
+                        "reference_id": {
+                            "resource_type": "TASK",
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "work-find-odd-numbers",
+                            "version": "ABC123"
                         }
-                      }
-                    },
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": "7"
-                        }
-                      }
                     }
-                  ]
                 }
-              }
+            ]
+        },
+        "connections": {
+            "downstream": {
+                "start-node": { "ids": ["odd-nums-task"] },
+                "odd-nums-task": { "ids": ["end-node"] }
+            },
+            "upstream": {
+                "odd-nums-task": { "ids": ["", "start-node"] },
+                "end-node": { "ids": ["odd-nums-task"] }
             }
-          ],
-          "task_node": {
-            "reference_id": {
-              "resource_type": "TASK",
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "work-find-odd-numbers",
-              "version": "ABC123"
-            }
-          }
         }
-      ]
     },
-    "connections": {
-      "downstream": {
-        "start-node": { "ids": ["odd-nums-task"] },
-        "odd-nums-task": { "ids": ["end-node"] }
-      },
-      "upstream": {
-        "odd-nums-task": { "ids": ["", "start-node"] },
-        "end-node": { "ids": ["odd-nums-task"] }
-      }
-    }
-  },
-  "tasks": [
-    {
-      "template": {
-        "id": {
-          "resource_type": "TASK",
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "work-find-odd-numbers",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": "FlyteSDK",
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": "0s",
-          "retries": {},
-          "discovery_version": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "list_of_nums": {
-                "type": {
-                  "collection_type": {
-                    "simple": "INTEGER"
-                  }
+    "tasks": [
+        {
+            "template": {
+                "id": {
+                    "resource_type": "TASK",
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "work-find-odd-numbers",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": "FlyteSDK",
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": "0s",
+                    "retries": {},
+                    "discovery_version": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "list_of_nums": {
+                                "type": {
+                                    "collection_type": {
+                                        "simple": "INTEGER"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "are_num_odd": {
+                                "type": {
+                                    "collection_type": {
+                                        "simple": "BOOLEAN"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "image": "myflyteproject:DEF123",
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "app.workflows.work",
+                        "--task-name",
+                        "find_odd_numbers",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "resources": {},
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ]
                 }
-              }
             }
-          },
-          "outputs": {
-            "variables": {
-              "are_num_odd": {
-                "type": {
-                  "collection_type": {
-                    "simple": "BOOLEAN"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "container": {
-          "image": "myflyteproject:DEF123",
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "app.workflows.work",
-            "--task-name",
-            "find_odd_numbers",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "resources": {},
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ]
         }
-      }
-    }
-  ]
+    ]
 }

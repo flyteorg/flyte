@@ -13,20 +13,20 @@ import { formatRetryAttempt } from './utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   detailsLink: {
-    fontWeight: 'normal'
+    fontWeight: 'normal',
   },
   header: {
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   title: {
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   showDetailsButton: {
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   section: {
-    marginBottom: theme.spacing(2)
-  }
+    marginBottom: theme.spacing(2),
+  },
 }));
 
 interface TaskExecutionsListItemProps {
@@ -34,7 +34,9 @@ interface TaskExecutionsListItemProps {
 }
 
 /** Renders an individual `TaskExecution` record as part of a list */
-export const TaskExecutionsListItem: React.FC<TaskExecutionsListItemProps> = ({ taskExecution }) => {
+export const TaskExecutionsListItem: React.FC<TaskExecutionsListItemProps> = ({
+  taskExecution,
+}) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
   const { closure } = taskExecution;

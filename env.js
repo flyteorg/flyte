@@ -28,22 +28,22 @@ const ENABLE_GA = process.env.ENABLE_GA || false;
 const GA_TRACKING_ID = process.env.GA_TRACKING_ID || 'G-0QW4DJWJ20';
 
 module.exports = {
+  ADMIN_API_URL,
+  ADMIN_API_USE_SSL,
+  BASE_URL,
+  CORS_PROXY_PREFIX,
+  NODE_ENV,
+  PLUGINS_MODULE,
+  STATUS_URL,
+  ENABLE_GA,
+  GA_TRACKING_ID,
+  processEnv: {
     ADMIN_API_URL,
-    ADMIN_API_USE_SSL,
     BASE_URL,
     CORS_PROXY_PREFIX,
-    NODE_ENV,
-    PLUGINS_MODULE,
-    STATUS_URL,
     ENABLE_GA,
     GA_TRACKING_ID,
-    processEnv: {
-        ADMIN_API_URL,
-        BASE_URL,
-        CORS_PROXY_PREFIX,
-        ENABLE_GA,
-        GA_TRACKING_ID,
-        NODE_ENV,
-        STATUS_URL
-    }
+    NODE_ENV,
+    STATUS_URL,
+  },
 };

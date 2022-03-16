@@ -20,24 +20,24 @@ import t from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   headerContainer: {
-    display: 'flex'
+    display: 'flex',
   },
   collapseButton: {
-    marginTop: theme.spacing(-0.5)
+    marginTop: theme.spacing(-0.5),
   },
   header: {
     flexGrow: 1,
     marginBottom: theme.spacing(1),
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   viewAll: {
     color: interactiveTextColor,
-    cursor: 'pointer'
+    cursor: 'pointer',
   },
   divider: {
     borderBottom: `1px solid ${theme.palette.divider}`,
-    marginBottom: theme.spacing(1)
-  }
+    marginBottom: theme.spacing(1),
+  },
 }));
 
 export interface EntityVersionsProps {
@@ -56,23 +56,33 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
   const styles = useStyles();
   const sort = {
     key: executionSortFields.createdAt,
-    direction: SortDirection.DESCENDING
+    direction: SortDirection.DESCENDING,
   };
 
-  const baseFilters = React.useMemo(() => executionFilterGenerator[resourceType](id), [id, resourceType]);
+  const baseFilters = React.useMemo(
+    () => executionFilterGenerator[resourceType](id),
+    [id, resourceType],
+  );
 
   const versions = useWorkflowVersions(
     { domain, project },
     {
       sort,
       filter: baseFilters,
-      limit: showAll ? 100 : WorkflowVersionsTablePageSize
-    }
+      limit: showAll ? 100 : WorkflowVersionsTablePageSize,
+    },
   );
 
-  const preventDefault = e => e.preventDefault();
+  const preventDefault = (e) => e.preventDefault();
   const handleViewAll = React.useCallback(() => {
-    history.push(Routes.WorkflowVersionDetails.makeUrl(project, domain, name, versions.value[0].id.version ?? ''));
+    history.push(
+      Routes.WorkflowVersionDetails.makeUrl(
+        project,
+        domain,
+        name,
+        versions.value[0].id.version ?? '',
+      ),
+    );
   }, [project, domain, name, versions]);
 
   return (
@@ -102,7 +112,11 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
       )}
       <WaitForData {...versions}>
         {showTable || showAll ? (
-          <WorkflowVersionsTable {...versions} isFetching={isLoadingState(versions.state)} versionView={showAll} />
+          <WorkflowVersionsTable
+            {...versions}
+            isFetching={isLoadingState(versions.state)}
+            versionView={showAll}
+          />
         ) : (
           <div className={styles.divider} />
         )}

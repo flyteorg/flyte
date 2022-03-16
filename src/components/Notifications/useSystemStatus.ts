@@ -8,9 +8,9 @@ import { SystemStatus } from 'models/Common/types';
  * indicating normal system status.
  */
 export function useSystemStatus(): FetchableData<SystemStatus> {
-    const { getSystemStatus } = useAPIContext();
-    return useFetchableData({
-        defaultValue: defaultSystemStatus,
-        doFetch: getSystemStatus
-    });
+  const { getSystemStatus } = useAPIContext();
+  return useFetchableData({
+    defaultValue: defaultSystemStatus,
+    doFetch: getSystemStatus,
+  });
 }

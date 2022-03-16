@@ -7,25 +7,25 @@ import { TaskTemplate } from 'models/Task/types';
  * additional task data needed for our custom rendering
  */
 export interface DAGNode {
-    execution?: NodeExecution;
-    id: string;
-    parentIds?: string[];
-    taskTemplate?: TaskTemplate;
+  execution?: NodeExecution;
+  id: string;
+  parentIds?: string[];
+  taskTemplate?: TaskTemplate;
 }
 
 /* Types of nodes */
 export enum dTypes {
-    task,
-    primary,
-    branch,
-    subworkflow,
-    start,
-    end,
-    nestedEnd,
-    nestedStart,
-    nestedMaxDepth,
-    staticNode,
-    staticNestedNode
+  task,
+  primary,
+  branch,
+  subworkflow,
+  start,
+  end,
+  nestedEnd,
+  nestedStart,
+  nestedMaxDepth,
+  staticNode,
+  staticNestedNode,
 }
 
 /**
@@ -34,9 +34,9 @@ export enum dTypes {
  * @targetId    dNode.id
  */
 export interface dEdge {
-    id: string;
-    sourceId: string;
-    targetId: string;
+  id: string;
+  sourceId: string;
+  targetId: string;
 }
 
 /**
@@ -49,14 +49,14 @@ export interface dEdge {
  * @edges   edges
  */
 export interface dNode {
-    id: string;
-    scopedId: string;
-    type: dTypes;
-    name: string;
-    value?: any;
-    nodes: Array<dNode>;
-    edges: Array<dEdge>;
-    expanded?: boolean;
-    level?: number;
-    execution?: NodeExecution;
+  id: string;
+  scopedId: string;
+  type: dTypes;
+  name: string;
+  value?: any;
+  nodes: Array<dNode>;
+  edges: Array<dEdge>;
+  expanded?: boolean;
+  level?: number;
+  execution?: NodeExecution;
 }

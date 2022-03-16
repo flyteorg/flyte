@@ -7,12 +7,12 @@ interface StyleProps {
   labelInterval: number;
 }
 
-const useStyles = makeStyles(_theme => ({
+const useStyles = makeStyles((_theme) => ({
   chartHeader: (props: StyleProps) => ({
     height: 41,
     display: 'flex',
     alignItems: 'center',
-    width: `${props.chartWidth}px`
+    width: `${props.chartWidth}px`,
   }),
   taskDurationsLabelItem: (props: StyleProps) => ({
     fontSize: 12,
@@ -20,8 +20,8 @@ const useStyles = makeStyles(_theme => ({
     fontWeight: 'bold',
     color: COLOR_SPECTRUM.gray40.color,
     paddingLeft: 10,
-    width: `${props.labelInterval}px`
-  })
+    width: `${props.labelInterval}px`,
+  }),
 }));
 
 interface HeaderProps extends StyleProps {

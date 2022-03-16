@@ -9,10 +9,7 @@ import { APIContext, useAPIState } from 'components/data/apiContext';
 import { QueryAuthorizationObserver } from 'components/data/QueryAuthorizationObserver';
 import { createQueryClient } from 'components/data/queryCache';
 import { SystemStatusBanner } from 'components/Notifications/SystemStatusBanner';
-import {
-    skeletonColor,
-    skeletonHighlightColor
-} from 'components/Theme/constants';
+import { skeletonColor, skeletonHighlightColor } from 'components/Theme/constants';
 import { muiTheme } from 'components/Theme/muiTheme';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
@@ -28,50 +25,44 @@ import { NavBarRouter } from 'routes/NavBarRouter';
 const queryClient = createQueryClient();
 
 export const AppComponent: React.FC = () => {
-    if (env.NODE_ENV === 'development') {
-        debug.enable(`${debugPrefix}*:*`);
-    }
-    const apiState = useAPIState();
+  if (env.NODE_ENV === 'development') {
+    debug.enable(`${debugPrefix}*:*`);
+  }
+  const apiState = useAPIState();
 
-    return (
-        <FeatureFlagsProvider>
-            <ThemeProvider theme={muiTheme}>
-                <SnackbarProvider
-                    // Notifications provider https://iamhosseindhv.com/notistack/demos
-                    maxSnack={2}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                    TransitionComponent={Collapse}
-                >
-                    <QueryClientProvider client={queryClient}>
-                        <APIContext.Provider value={apiState}>
-                            <QueryAuthorizationObserver />
-                            <SkeletonTheme
-                                color={skeletonColor}
-                                highlightColor={skeletonHighlightColor}
-                            >
-                                <CssBaseline />
-                                <Helmet>
-                                    <title>Flyte Console</title>
-                                    <meta
-                                        name="viewport"
-                                        content="width=device-width"
-                                    />
-                                </Helmet>
-                                <Router history={history}>
-                                    <ErrorBoundary fixed={true}>
-                                        <NavBarRouter />
-                                        <ApplicationRouter />
-                                    </ErrorBoundary>
-                                </Router>
-                                <SystemStatusBanner />
-                            </SkeletonTheme>
-                        </APIContext.Provider>
-                        <ReactQueryDevtools initialIsOpen={false} />
-                    </QueryClientProvider>
-                </SnackbarProvider>
-            </ThemeProvider>
-        </FeatureFlagsProvider>
-    );
+  return (
+    <FeatureFlagsProvider>
+      <ThemeProvider theme={muiTheme}>
+        <SnackbarProvider
+          // Notifications provider https://iamhosseindhv.com/notistack/demos
+          maxSnack={2}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          TransitionComponent={Collapse}
+        >
+          <QueryClientProvider client={queryClient}>
+            <APIContext.Provider value={apiState}>
+              <QueryAuthorizationObserver />
+              <SkeletonTheme color={skeletonColor} highlightColor={skeletonHighlightColor}>
+                <CssBaseline />
+                <Helmet>
+                  <title>Flyte Console</title>
+                  <meta name="viewport" content="width=device-width" />
+                </Helmet>
+                <Router history={history}>
+                  <ErrorBoundary fixed={true}>
+                    <NavBarRouter />
+                    <ApplicationRouter />
+                  </ErrorBoundary>
+                </Router>
+                <SystemStatusBanner />
+              </SkeletonTheme>
+            </APIContext.Provider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
+    </FeatureFlagsProvider>
+  );
 };
 
 export const App = hot(module)(AppComponent);

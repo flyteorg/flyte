@@ -6,51 +6,43 @@ import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 
 const useStyles = makeStyles({
-    externalBlockContainer: {
-        alignItems: 'center',
-        display: 'flex'
-    }
+  externalBlockContainer: {
+    alignItems: 'center',
+    display: 'flex',
+  },
 });
 
 interface NewTargetLinkProps extends LinkProps {
-    /** If set to true, will show an icon next to the link hinting to the user that they will be leaving the site */
-    external?: boolean;
-    /** If set to true, will be rendered as a <span> to preserve inline behavior */
-    inline?: boolean;
+  /** If set to true, will show an icon next to the link hinting to the user that they will be leaving the site */
+  external?: boolean;
+  /** If set to true, will be rendered as a <span> to preserve inline behavior */
+  inline?: boolean;
 }
 
 /** Renders a link which will be opened in a new tab while also including the required props to avoid
  * linter errors. Can be configured to show a special icon for external links as a hint to the user.
  */
-export const NewTargetLink: React.FC<NewTargetLinkProps> = props => {
-    const {
-        className,
-        children,
-        external = false,
-        inline = false,
-        ...otherProps
-    } = props;
-    const commonStyles = useCommonStyles();
-    const styles = useStyles();
+export const NewTargetLink: React.FC<NewTargetLinkProps> = (props) => {
+  const { className, children, external = false, inline = false, ...otherProps } = props;
+  const commonStyles = useCommonStyles();
+  const styles = useStyles();
 
-    const link = (
-        <Link {...otherProps} target="_blank" rel="noopener noreferrer">
-            {children}
-        </Link>
-    );
+  const link = (
+    <Link {...otherProps} target="_blank" rel="noopener noreferrer">
+      {children}
+    </Link>
+  );
 
-    const icon = external ? (
-        <OpenInNew className={commonStyles.iconRight} />
-    ) : null;
-    return inline ? (
-        <span>
-            {link}
-            {icon}
-        </span>
-    ) : (
-        <div className={classnames(styles.externalBlockContainer, className)}>
-            {link}
-            {icon}
-        </div>
-    );
+  const icon = external ? <OpenInNew className={commonStyles.iconRight} /> : null;
+  return inline ? (
+    <span>
+      {link}
+      {icon}
+    </span>
+  ) : (
+    <div className={classnames(styles.externalBlockContainer, className)}>
+      {link}
+      {icon}
+    </div>
+  );
 };

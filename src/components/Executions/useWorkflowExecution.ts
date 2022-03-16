@@ -4,11 +4,7 @@ import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { maxBlobDownloadSizeBytes } from 'components/Literals/constants';
 import { LiteralMap } from 'models/Common/types';
 import { getExecution } from 'models/Execution/api';
-import {
-    Execution,
-    ExecutionData,
-    WorkflowExecutionIdentifier
-} from 'models/Execution/types';
+import { Execution, ExecutionData, WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { QueryClient } from 'react-query';
 import { FetchableData } from '../hooks/types';
 import { useFetchableData } from '../hooks/useFetchableData';
@@ -16,49 +12,44 @@ import { executionRefreshIntervalMs } from './constants';
 import { executionIsTerminal } from './utils';
 
 function shouldRefreshExecution(execution: Execution): boolean {
-    const result = !executionIsTerminal(execution);
-    return result;
+  const result = !executionIsTerminal(execution);
+  return result;
 }
 
-export function makeWorkflowExecutionQuery(
-    id: WorkflowExecutionIdentifier
-): QueryInput<Execution> {
-    return {
-        queryKey: [QueryType.WorkflowExecution, id],
-        queryFn: () => getExecution(id)
-    };
+export function makeWorkflowExecutionQuery(id: WorkflowExecutionIdentifier): QueryInput<Execution> {
+  return {
+    queryKey: [QueryType.WorkflowExecution, id],
+    queryFn: () => getExecution(id),
+  };
 }
 
-export function fetchWorkflowExecution(
-    queryClient: QueryClient,
-    id: WorkflowExecutionIdentifier
-) {
-    return queryClient.fetchQuery(makeWorkflowExecutionQuery(id));
+export function fetchWorkflowExecution(queryClient: QueryClient, id: WorkflowExecutionIdentifier) {
+  return queryClient.fetchQuery(makeWorkflowExecutionQuery(id));
 }
 
 export function useWorkflowExecutionQuery(id: WorkflowExecutionIdentifier) {
-    return useConditionalQuery<Execution>(
-        {
-            ...makeWorkflowExecutionQuery(id),
-            refetchInterval: executionRefreshIntervalMs
-        },
-        shouldRefreshExecution
-    );
+  return useConditionalQuery<Execution>(
+    {
+      ...makeWorkflowExecutionQuery(id),
+      refetchInterval: executionRefreshIntervalMs,
+    },
+    shouldRefreshExecution,
+  );
 }
 
 /** Fetches the signed URLs for NodeExecution data (inputs/outputs) */
 export function useWorkflowExecutionData(
-    id: WorkflowExecutionIdentifier
+  id: WorkflowExecutionIdentifier,
 ): FetchableData<ExecutionData> {
-    const { getExecutionData } = useAPIContext();
-    return useFetchableData<ExecutionData, WorkflowExecutionIdentifier>(
-        {
-            debugName: 'ExecutionData',
-            defaultValue: {} as ExecutionData,
-            doFetch: id => getExecutionData(id)
-        },
-        id
-    );
+  const { getExecutionData } = useAPIContext();
+  return useFetchableData<ExecutionData, WorkflowExecutionIdentifier>(
+    {
+      debugName: 'ExecutionData',
+      defaultValue: {} as ExecutionData,
+      doFetch: (id) => getExecutionData(id),
+    },
+    id,
+  );
 }
 
 /** Fetches the inputs object for a given WorkflowExecution.
@@ -66,46 +57,41 @@ export function useWorkflowExecutionData(
  * If you're calling it from a component, consider using `useTaskExecutions` instead.
  */
 export const fetchWorkflowExecutionInputs = async (
-    execution: Execution,
-    apiContext: APIContextValue
+  execution: Execution,
+  apiContext: APIContextValue,
 ) => {
-    const { getExecutionData, getRemoteLiteralMap } = apiContext;
-    if (execution.closure.computedInputs) {
-        return execution.closure.computedInputs;
-    }
-    /** Note:
-     * getExecutionData will retun signed urls (`inputs`) as well as raw values
-     * (`fullInputs`) if input payload isn't too large.
-     *
-     * If a signed URL is returned `fullInputs` will be null; use `fullInputs`
-     * when available.
-     */
-    const { inputs, fullInputs } = await getExecutionData(execution.id);
-    if (fullInputs) {
-        return LiteralMap.create(fullInputs);
-    }
-    if (
-        !inputs.url ||
-        !inputs.bytes ||
-        inputs.bytes.gt(maxBlobDownloadSizeBytes)
-    ) {
-        return { literals: {} };
-    }
-    return getRemoteLiteralMap(inputs.url);
+  const { getExecutionData, getRemoteLiteralMap } = apiContext;
+  if (execution.closure.computedInputs) {
+    return execution.closure.computedInputs;
+  }
+  /** Note:
+   * getExecutionData will retun signed urls (`inputs`) as well as raw values
+   * (`fullInputs`) if input payload isn't too large.
+   *
+   * If a signed URL is returned `fullInputs` will be null; use `fullInputs`
+   * when available.
+   */
+  const { inputs, fullInputs } = await getExecutionData(execution.id);
+  if (fullInputs) {
+    return LiteralMap.create(fullInputs);
+  }
+  if (!inputs.url || !inputs.bytes || inputs.bytes.gt(maxBlobDownloadSizeBytes)) {
+    return { literals: {} };
+  }
+  return getRemoteLiteralMap(inputs.url);
 };
 
 /** A hook for fetching the inputs object associated with an Execution. Will
  * handle both the legacy (`computedInputs`) and current (externally stored) formats
  */
 export function useWorkflowExecutionInputs(execution: Execution) {
-    const apiContext = useAPIContext();
-    return useFetchableData<LiteralMap, WorkflowExecutionIdentifier>(
-        {
-            debugName: 'ExecutionInputs',
-            defaultValue: { literals: {} } as LiteralMap,
-            doFetch: async () =>
-                fetchWorkflowExecutionInputs(execution, apiContext)
-        },
-        execution.id
-    );
+  const apiContext = useAPIContext();
+  return useFetchableData<LiteralMap, WorkflowExecutionIdentifier>(
+    {
+      debugName: 'ExecutionInputs',
+      defaultValue: { literals: {} } as LiteralMap,
+      doFetch: async () => fetchWorkflowExecutionInputs(execution, apiContext),
+    },
+    execution.id,
+  );
 }

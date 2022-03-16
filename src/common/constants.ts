@@ -11,5 +11,5 @@ export const noWorkflowVersionsFoundString = 'No workflow versions found.';
 export const zeroSecondsString = '0s';
 
 export enum KeyCodes {
-    ESCAPE = 27
+  ESCAPE = 27,
 }

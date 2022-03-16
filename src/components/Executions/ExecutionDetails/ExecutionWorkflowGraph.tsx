@@ -13,75 +13,68 @@ import { NodeExecutionsContext } from '../contexts';
 import { NodeExecutionDetailsPanelContent } from './NodeExecutionDetailsPanelContent';
 
 export interface ExecutionWorkflowGraphProps {
-    nodeExecutions: NodeExecution[];
-    workflowId: WorkflowId;
+  nodeExecutions: NodeExecution[];
+  workflowId: WorkflowId;
 }
 
 /** Wraps a WorkflowGraph, customizing it to also show execution statuses */
 export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
-    nodeExecutions,
-    workflowId
+  nodeExecutions,
+  workflowId,
 }) => {
-    const workflowQuery = useQuery<Workflow, Error>(
-        makeWorkflowQuery(useQueryClient(), workflowId)
-    );
-    const nodeExecutionsById = React.useMemo(
-        () => keyBy(nodeExecutions, 'id.nodeId'),
-        [nodeExecutions]
-    );
+  const workflowQuery = useQuery<Workflow, Error>(makeWorkflowQuery(useQueryClient(), workflowId));
+  const nodeExecutionsById = React.useMemo(
+    () => keyBy(nodeExecutions, 'id.nodeId'),
+    [nodeExecutions],
+  );
 
-    const [selectedNodes, setSelectedNodes] = React.useState<string[]>([]);
-    const onNodeSelectionChanged = (newSelection: string[]) => {
-        const validSelection = newSelection.filter(nodeId => {
-            if (nodeId === startNodeId || nodeId === endNodeId) {
-                return false;
-            }
-            return true;
-        });
-        setSelectedNodes(validSelection);
-    };
+  const [selectedNodes, setSelectedNodes] = React.useState<string[]>([]);
+  const onNodeSelectionChanged = (newSelection: string[]) => {
+    const validSelection = newSelection.filter((nodeId) => {
+      if (nodeId === startNodeId || nodeId === endNodeId) {
+        return false;
+      }
+      return true;
+    });
+    setSelectedNodes(validSelection);
+  };
 
-    // Note: flytegraph allows multiple selection, but we only support showing
-    // a single item in the details panel
-    const selectedExecution = selectedNodes.length
-        ? nodeExecutionsById[selectedNodes[0]]
-            ? nodeExecutionsById[selectedNodes[0]].id
-            : {
-                  nodeId: selectedNodes[0],
-                  executionId:
-                      nodeExecutionsById[Object.keys(nodeExecutionsById)[0]].id
-                          .executionId
-              }
-        : null;
+  // Note: flytegraph allows multiple selection, but we only support showing
+  // a single item in the details panel
+  const selectedExecution = selectedNodes.length
+    ? nodeExecutionsById[selectedNodes[0]]
+      ? nodeExecutionsById[selectedNodes[0]].id
+      : {
+          nodeId: selectedNodes[0],
+          executionId: nodeExecutionsById[Object.keys(nodeExecutionsById)[0]].id.executionId,
+        }
+    : null;
 
-    const onCloseDetailsPanel = () => setSelectedNodes([]);
+  const onCloseDetailsPanel = () => setSelectedNodes([]);
 
-    const renderGraph = (workflow: Workflow) => (
-        <WorkflowGraph
-            onNodeSelectionChanged={onNodeSelectionChanged}
-            nodeExecutionsById={nodeExecutionsById}
-            workflow={workflow}
-        />
-    );
+  const renderGraph = (workflow: Workflow) => (
+    <WorkflowGraph
+      onNodeSelectionChanged={onNodeSelectionChanged}
+      nodeExecutionsById={nodeExecutionsById}
+      workflow={workflow}
+    />
+  );
 
-    return (
-        <>
-            <NodeExecutionsContext.Provider value={nodeExecutionsById}>
-                <WaitForQuery errorComponent={DataError} query={workflowQuery}>
-                    {renderGraph}
-                </WaitForQuery>
-            </NodeExecutionsContext.Provider>
-            <DetailsPanel
-                open={selectedExecution !== null}
-                onClose={onCloseDetailsPanel}
-            >
-                {selectedExecution && (
-                    <NodeExecutionDetailsPanelContent
-                        onClose={onCloseDetailsPanel}
-                        nodeExecutionId={selectedExecution}
-                    />
-                )}
-            </DetailsPanel>
-        </>
-    );
+  return (
+    <>
+      <NodeExecutionsContext.Provider value={nodeExecutionsById}>
+        <WaitForQuery errorComponent={DataError} query={workflowQuery}>
+          {renderGraph}
+        </WaitForQuery>
+      </NodeExecutionsContext.Provider>
+      <DetailsPanel open={selectedExecution !== null} onClose={onCloseDetailsPanel}>
+        {selectedExecution && (
+          <NodeExecutionDetailsPanelContent
+            onClose={onCloseDetailsPanel}
+            nodeExecutionId={selectedExecution}
+          />
+        )}
+      </DetailsPanel>
+    </>
+  );
 };

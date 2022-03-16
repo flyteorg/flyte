@@ -1,3 +1,3 @@
 export const launchSortFields = {
-    createdAt: 'created_at'
+  createdAt: 'created_at',
 };

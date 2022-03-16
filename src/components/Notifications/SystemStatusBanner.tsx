@@ -7,7 +7,12 @@ import Warning from '@material-ui/icons/Warning';
 import { Empty } from 'components/common/Empty';
 import { LinkifiedText } from 'components/common/LinkifiedText';
 import { WaitForData } from 'components/common/WaitForData';
-import { infoIconColor, mutedButtonColor, mutedButtonHoverColor, warningIconColor } from 'components/Theme/constants';
+import {
+  infoIconColor,
+  mutedButtonColor,
+  mutedButtonHoverColor,
+  warningIconColor,
+} from 'components/Theme/constants';
 import { StatusString, SystemStatus } from 'models/Common/types';
 import * as React from 'react';
 import { useSystemStatus } from './useSystemStatus';
@@ -23,45 +28,45 @@ const useStyles = makeStyles((theme: Theme) => ({
     pointerEvents: 'none',
     position: 'fixed',
     padding: theme.spacing(2),
-    right: 0
+    right: 0,
   },
   closeButton: {
     alignItems: 'center',
     color: mutedButtonColor,
     '&:hover': {
-      color: mutedButtonHoverColor
+      color: mutedButtonHoverColor,
     },
     display: 'flex',
-    height: theme.spacing(3)
+    height: theme.spacing(3),
   },
   statusPaper: {
     display: 'flex',
     padding: theme.spacing(2),
-    pointerEvents: 'initial'
+    pointerEvents: 'initial',
   },
   statusContentContainer: {
     alignItems: 'flex-start',
     display: 'flex',
-    maxWidth: theme.spacing(131)
+    maxWidth: theme.spacing(131),
   },
   statusClose: {
     alignItems: 'flex-start',
     display: 'flex',
-    flex: '0 0 auto'
+    flex: '0 0 auto',
   },
   statusIcon: {
     alignItems: 'center',
     display: 'flex',
     flex: '0 0 auto',
-    lineHeight: `${theme.spacing(3)}px`
+    lineHeight: `${theme.spacing(3)}px`,
   },
   statusMessage: {
     flex: '1 1 auto',
     fontWeight: 'normal',
     lineHeight: `${theme.spacing(3)}px`,
     marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2)
-  }
+    marginRight: theme.spacing(2),
+  },
 }));
 
 const InfoIcon = () => <Info data-testid="info-icon" htmlColor={infoIconColor} />;
@@ -71,7 +76,7 @@ const WarningIcon = () => <Warning data-testid="warning-icon" htmlColor={warning
 const statusIcons: Record<StatusString, React.ComponentType> = {
   normal: InfoIcon,
   degraded: WarningIcon,
-  down: WarningIcon
+  down: WarningIcon,
 };
 
 const StatusIcon: React.FC<{ status: StatusString }> = ({ status }) => {

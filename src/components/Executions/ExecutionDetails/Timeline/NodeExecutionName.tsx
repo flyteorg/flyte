@@ -15,11 +15,15 @@ interface NodeExecutionTimelineNameData {
 
 const useStyles = makeStyles((_theme: Theme) => ({
   selectedExecutionName: {
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 }));
 
-export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({ name, execution, state }) => {
+export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({
+  name,
+  execution,
+  state,
+}) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
@@ -29,12 +33,18 @@ export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({ nam
     return <Typography variant="body1">{name}</Typography>;
   }
 
-  const isSelected = state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
+  const isSelected =
+    state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
   return isSelected ? (
     <Typography variant="body1" className={styles.selectedExecutionName}>
       {name}
     </Typography>
   ) : (
-    <SelectNodeExecutionLink className={commonStyles.primaryLink} execution={execution} linkText={name} state={state} />
+    <SelectNodeExecutionLink
+      className={commonStyles.primaryLink}
+      execution={execution}
+      linkText={name}
+      state={state}
+    />
   );
 };

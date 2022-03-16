@@ -4,19 +4,19 @@ import { mockServer } from 'mocks/server';
 import { obj } from './utils';
 
 beforeAll(() => {
-    insertDefaultData(mockServer);
-    mockServer.listen({
-        onUnhandledRequest: req => {
-            const message = `Unexpected request: ${obj(req)}`;
-            throw new Error(message);
-        }
-    });
+  insertDefaultData(mockServer);
+  mockServer.listen({
+    onUnhandledRequest: (req) => {
+      const message = `Unexpected request: ${obj(req)}`;
+      throw new Error(message);
+    },
+  });
 });
 
 afterEach(() => {
-    mockServer.resetHandlers();
+  mockServer.resetHandlers();
 });
 
 afterAll(() => {
-    mockServer.close();
+  mockServer.close();
 });

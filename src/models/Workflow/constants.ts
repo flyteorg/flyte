@@ -1,4 +1,4 @@
 export const workflowSortFields = {
-    createdAt: 'created_at',
-    name: 'name'
+  createdAt: 'created_at',
+  name: 'name',
 };

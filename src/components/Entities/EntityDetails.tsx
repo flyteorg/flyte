@@ -18,27 +18,27 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     marginBottom: theme.spacing(5),
     marginTop: theme.spacing(2),
-    width: '100%'
+    width: '100%',
   },
   descriptionContainer: {
     flex: '2 1 auto',
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
   },
   executionsContainer: {
     display: 'flex',
     flex: '1 1 auto',
     flexDirection: 'column',
     margin: `0 -${theme.spacing(contentMarginGridUnits)}px`,
-    flexBasis: theme.spacing(80)
+    flexBasis: theme.spacing(80),
   },
   versionsContainer: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   schedulesContainer: {
     flex: '1 2 auto',
-    marginRight: theme.spacing(30)
-  }
+    marginRight: theme.spacing(30),
+  },
 }));
 
 interface EntityDetailsProps {

@@ -5,13 +5,13 @@ import { useFetchableData } from './useFetchableData';
 
 /** Fetches a LiteralMap from a given URL */
 export function useRemoteLiteralMap(url: string): FetchableData<LiteralMap> {
-    const { getRemoteLiteralMap } = useAPIContext();
-    return useFetchableData<LiteralMap, string>(
-        {
-            debugName: 'RemoteLiteralMap',
-            defaultValue: {} as LiteralMap,
-            doFetch: blobUrl => getRemoteLiteralMap(blobUrl)
-        },
-        url
-    );
+  const { getRemoteLiteralMap } = useAPIContext();
+  return useFetchableData<LiteralMap, string>(
+    {
+      debugName: 'RemoteLiteralMap',
+      defaultValue: {} as LiteralMap,
+      doFetch: (blobUrl) => getRemoteLiteralMap(blobUrl),
+    },
+    url,
+  );
 }

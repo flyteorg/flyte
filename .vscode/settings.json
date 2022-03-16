@@ -1,9 +1,12 @@
 {
-    "[html]": {
+    "[html][json]": {
+        "editor.detectIndentation": false,
         "editor.tabSize": 4
     },
     "[javascript][javascriptreact][typescript][typescriptreact]": {
         "editor.detectIndentation": false,
         "editor.tabSize": 2
     },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
 }

@@ -1,69 +1,69 @@
 {
-  "compiledTask": {
-    "template": {
-      "id": {
-        "resource_type": "TASK",
-        "project": "myflyteproject",
-        "domain": "development",
-        "name": "work-find-odd-numbers",
-        "version": "ABC123"
-      },
-      "type": "python-task",
-      "metadata": {
-        "runtime": {
-          "type": "FlyteSDK",
-          "version": "0.0.1a0",
-          "flavor": "python"
-        },
-        "timeout": "0s",
-        "retries": {},
-        "discovery_version": "1"
-      },
-      "interface": {
-        "inputs": {
-          "variables": {
-            "list_of_nums": {
-              "type": {
-                "collection_type": {
-                  "simple": "INTEGER"
+    "compiledTask": {
+        "template": {
+            "id": {
+                "resource_type": "TASK",
+                "project": "myflyteproject",
+                "domain": "development",
+                "name": "work-find-odd-numbers",
+                "version": "ABC123"
+            },
+            "type": "python-task",
+            "metadata": {
+                "runtime": {
+                    "type": "FlyteSDK",
+                    "version": "0.0.1a0",
+                    "flavor": "python"
+                },
+                "timeout": "0s",
+                "retries": {},
+                "discovery_version": "1"
+            },
+            "interface": {
+                "inputs": {
+                    "variables": {
+                        "list_of_nums": {
+                            "type": {
+                                "collection_type": {
+                                    "simple": "INTEGER"
+                                }
+                            }
+                        }
+                    }
+                },
+                "outputs": {
+                    "variables": {
+                        "are_num_odd": {
+                            "type": {
+                                "collection_type": {
+                                    "simple": "BOOLEAN"
+                                }
+                            }
+                        }
+                    }
                 }
-              }
+            },
+            "container": {
+                "image": "myflyteproject:DEF123",
+                "command": ["pyflyte-execute"],
+                "args": [
+                    "--task-module",
+                    "work",
+                    "--task-name",
+                    "find_odd_numbers",
+                    "--inputs",
+                    "{{.input}}",
+                    "--output-prefix",
+                    "{{.outputPrefix}}"
+                ],
+                "resources": {},
+                "env": [
+                    {
+                        "key": "FLYTE_CONFIGURATION_PATH",
+                        "value": "/myflyteproject/flytekit.config"
+                    }
+                ]
             }
-          }
-        },
-        "outputs": {
-          "variables": {
-            "are_num_odd": {
-              "type": {
-                "collection_type": {
-                  "simple": "BOOLEAN"
-                }
-              }
-            }
-          }
         }
-      },
-      "container": {
-        "image": "myflyteproject:DEF123",
-        "command": ["pyflyte-execute"],
-        "args": [
-          "--task-module",
-          "work",
-          "--task-name",
-          "find_odd_numbers",
-          "--inputs",
-          "{{.input}}",
-          "--output-prefix",
-          "{{.outputPrefix}}"
-        ],
-        "resources": {},
-        "env": [
-          {
-            "key": "FLYTE_CONFIGURATION_PATH",
-            "value": "/myflyteproject/flytekit.config"
-          }
-        ]
-      }
     }
-  }
 }

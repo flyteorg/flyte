@@ -6,57 +6,50 @@ import * as React from 'react';
 import { loadMoreRowGridHeight } from './constants';
 
 export const useStyles = makeStyles((theme: Theme) => ({
-    loadMoreRowContainer: {
-        alignItems: ' center',
-        display: ' flex',
-        flexDirection: 'column',
-        height: theme.spacing(loadMoreRowGridHeight),
-        justifyContent: ' center',
-        padding: `${theme.spacing(2)}px`,
-        width: '100%'
-    },
-    button: {
-        color: theme.palette.text.secondary
-    }
+  loadMoreRowContainer: {
+    alignItems: ' center',
+    display: ' flex',
+    flexDirection: 'column',
+    height: theme.spacing(loadMoreRowGridHeight),
+    justifyContent: ' center',
+    padding: `${theme.spacing(2)}px`,
+    width: '100%',
+  },
+  button: {
+    color: theme.palette.text.secondary,
+  },
 }));
 
 export interface LoadMoreRowContentProps {
-    className?: string;
-    lastError: string | Error | null;
-    isFetching: boolean;
-    style?: any;
-    loadMoreRows: () => void;
+  className?: string;
+  lastError: string | Error | null;
+  isFetching: boolean;
+  style?: any;
+  loadMoreRows: () => void;
 }
 
 /** Handles rendering the content below a table, which can be a "Load More"
  * button, or an error
  */
-export const LoadMoreRowContent: React.FC<LoadMoreRowContentProps> = props => {
-    const commonStyles = useCommonStyles();
-    const styles = useStyles();
-    const { loadMoreRows, lastError, isFetching, style } = props;
+export const LoadMoreRowContent: React.FC<LoadMoreRowContentProps> = (props) => {
+  const commonStyles = useCommonStyles();
+  const styles = useStyles();
+  const { loadMoreRows, lastError, isFetching, style } = props;
 
-    const button = (
-        <Button
-            onClick={loadMoreRows}
-            size="small"
-            variant="outlined"
-            disabled={isFetching}
-        >
-            Load More
-            {isFetching ? <ButtonCircularProgress /> : null}
-        </Button>
-    );
-    const errorContent = lastError ? (
-        <div className={commonStyles.errorText}>
-            Failed to load additional items
-        </div>
-    ) : null;
+  const button = (
+    <Button onClick={loadMoreRows} size="small" variant="outlined" disabled={isFetching}>
+      Load More
+      {isFetching ? <ButtonCircularProgress /> : null}
+    </Button>
+  );
+  const errorContent = lastError ? (
+    <div className={commonStyles.errorText}>Failed to load additional items</div>
+  ) : null;
 
-    return (
-        <div className={styles.loadMoreRowContainer} style={style}>
-            {errorContent}
-            {button}
-        </div>
-    );
+  return (
+    <div className={styles.loadMoreRowContainer} style={style}>
+      {errorContent}
+      {button}
+    </div>
+  );
 };

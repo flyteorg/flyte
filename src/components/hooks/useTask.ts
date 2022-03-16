@@ -11,25 +11,24 @@ import { usePagination } from './usePagination';
  * directly and read the template from there.
  */
 export function useTaskTemplate(id: Identifier): FetchableData<TaskTemplate> {
-    const { getTask } = useAPIContext();
-    return useFetchableData<TaskTemplate, Identifier>(
-        {
-            // Tasks are immutable
-            useCache: true,
-            debugName: 'TaskTemplate',
-            defaultValue: {} as TaskTemplate,
-            doFetch: async taskId =>
-                (await getTask(taskId)).closure.compiledTask.template
-        },
-        id
-    );
+  const { getTask } = useAPIContext();
+  return useFetchableData<TaskTemplate, Identifier>(
+    {
+      // Tasks are immutable
+      useCache: true,
+      debugName: 'TaskTemplate',
+      defaultValue: {} as TaskTemplate,
+      doFetch: async (taskId) => (await getTask(taskId)).closure.compiledTask.template,
+    },
+    id,
+  );
 }
 
 /** A hook for fetching a paginated list of tasks */
 export function useTaskList(scope: IdentifierScope, config: RequestConfig) {
-    const { listTasks } = useAPIContext();
-    return usePagination<Task, IdentifierScope>(
-        { ...config, cacheItems: true, fetchArg: scope },
-        listTasks
-    );
+  const { listTasks } = useAPIContext();
+  return usePagination<Task, IdentifierScope>(
+    { ...config, cacheItems: true, fetchArg: scope },
+    listTasks,
+  );
 }

@@ -28,9 +28,9 @@ export const NodeExecutionDetailsContext = createContext<NodeExecutionDetailsSta
     project: NOT_AVAILABLE,
     domain: NOT_AVAILABLE,
     name: NOT_AVAILABLE,
-    version: NOT_AVAILABLE
+    version: NOT_AVAILABLE,
   },
-  compiledWorkflowClosure: null
+  compiledWorkflowClosure: null,
 });
 
 /**  Should be used to get NodeExecutionDetails for a specific nodeExecution. */
@@ -38,14 +38,15 @@ export const useNodeExecutionDetails = (nodeExecution?: NodeExecution) =>
   useContext(NodeExecutionDetailsContext).getNodeExecutionDetails(nodeExecution);
 
 /** Could be used to access the whole NodeExecutionDetailsState */
-export const useNodeExecutionContext = (): NodeExecutionDetailsState => useContext(NodeExecutionDetailsContext);
+export const useNodeExecutionContext = (): NodeExecutionDetailsState =>
+  useContext(NodeExecutionDetailsContext);
 
 interface ProviderProps {
   workflowId: Identifier;
   children?: React.ReactNode;
 }
 
-/** Should wrap "top level" component in Execution view, will build a nodeExecutions tree for specific workflow*/
+/** Should wrap "top level" component in Execution view, will build a nodeExecutions tree for specific workflow */
 export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
   // workflow Identifier - separated to parameters, to minimize re-render count
   // as useEffect doesn't know how to do deep comparison
@@ -76,7 +77,7 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
         project,
         domain,
         name,
-        version
+        version,
       };
       const workflow = await fetchWorkflow(queryClient, workflowId);
       if (!workflow) {
@@ -117,8 +118,9 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
       return UNKNOWN_DETAILS;
     }
 
-    const specId = nodeExecution.scopedId || nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
-    const nodeDetail = executionTree.nodes.filter(n => n.scopedId === specId);
+    const specId =
+      nodeExecution.scopedId || nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
+    const nodeDetail = executionTree.nodes.filter((n) => n.scopedId === specId);
     if (nodeDetail.length === 0) {
       let details = tasks.get(nodeExecution.id.nodeId);
       if (details) {
@@ -136,7 +138,11 @@ export const NodeExecutionDetailsContextProvider = (props: ProviderProps) => {
 
   return (
     <NodeExecutionDetailsContext.Provider
-      value={{ getNodeExecutionDetails: getDetails, workflowId: props.workflowId, compiledWorkflowClosure: closure }}
+      value={{
+        getNodeExecutionDetails: getDetails,
+        workflowId: props.workflowId,
+        compiledWorkflowClosure: closure,
+      }}
     >
       {props.children}
     </NodeExecutionDetailsContext.Provider>

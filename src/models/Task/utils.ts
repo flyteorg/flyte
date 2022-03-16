@@ -9,11 +9,8 @@ import { Task } from './types';
  * given scope.
  */
 export function makeTaskPath(scope: IdentifierScope) {
-    return makeIdentifierPath(endpointPrefixes.task, scope);
+  return makeIdentifierPath(endpointPrefixes.task, scope);
 }
 
 /** Transformer to coerce an `Admin.TaskList` into a standard shape */
-export const taskListTransformer = createPaginationTransformer<
-    Task,
-    Admin.TaskList
->('tasks');
+export const taskListTransformer = createPaginationTransformer<Task, Admin.TaskList>('tasks');

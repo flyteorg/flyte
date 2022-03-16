@@ -10,7 +10,8 @@ import { NonIdealState } from '../NonIdealState';
 const baseProps = {
   icon: ErrorOutline,
   title: 'Things are not as they should be.',
-  description: 'If this were an actual problem, here is where we would tell you all the details of what happened.'
+  description:
+    'If this were an actual problem, here is where we would tell you all the details of what happened.',
 };
 
 const actionButton = (

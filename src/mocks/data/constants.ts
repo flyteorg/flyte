@@ -6,10 +6,7 @@ import { timeStampOffset } from 'mocks/utils';
 export const mockStartDate = new Date('2020-11-15T02:32:19.610Z');
 
 // entities will be created an hour before any executions have run
-export const entityCreationDate = timeStampOffset(
-    dateToTimestamp(mockStartDate),
-    -3600
-);
+export const entityCreationDate = timeStampOffset(dateToTimestamp(mockStartDate), -3600);
 
 // Workflow Execution duration in milliseconds
 export const defaultExecutionDuration = 1000 * 60 * 60 * 1.251;
@@ -22,15 +19,15 @@ export const testProject = 'flytetest';
 export const testDomain = 'development';
 
 export const testVersions = {
-    v1: 'v0001',
-    v2: 'v0002'
+  v1: 'v0001',
+  v2: 'v0002',
 };
 
 export const variableNames = {
-    basicString: 'basicString'
+  basicString: 'basicString',
 };
 
 export const nodeIds = {
-    dynamicTask: 'dynamicTask',
-    pythonTask: 'pythonTask'
+  dynamicTask: 'dynamicTask',
+  pythonTask: 'pythonTask',
 };

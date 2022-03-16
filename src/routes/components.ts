@@ -16,5 +16,5 @@ export const components = {
   selectProject: SelectProject,
   taskDetails: TaskDetails,
   workflowDetails: WorkflowDetails,
-  workflowVersionDetails: WorkflowVersionDetails
+  workflowVersionDetails: WorkflowVersionDetails,
 };

@@ -16,8 +16,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '20px 24px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 }));
 
 const CustomSlider = withStyles({
@@ -25,7 +25,7 @@ const CustomSlider = withStyles({
     color: COLOR_SPECTRUM.indigo60.color,
     height: 4,
     padding: '15px 0',
-    width: 360
+    width: 360,
   },
   active: {},
   valueLabel: {
@@ -34,42 +34,44 @@ const CustomSlider = withStyles({
     top: -22,
     '& *': {
       background: 'transparent',
-      color: COLOR_SPECTRUM.black.color
-    }
+      color: COLOR_SPECTRUM.black.color,
+    },
   },
   track: {
-    height: 4
+    height: 4,
   },
   rail: {
     height: 4,
     opacity: 0.5,
-    backgroundColor: COLOR_SPECTRUM.gray20.color
+    backgroundColor: COLOR_SPECTRUM.gray20.color,
   },
   mark: {
     backgroundColor: COLOR_SPECTRUM.gray20.color,
     height: 8,
     width: 2,
-    marginTop: -2
+    marginTop: -2,
   },
   markLabel: {
     top: -6,
     fontSize: 12,
-    color: COLOR_SPECTRUM.gray40.color
+    color: COLOR_SPECTRUM.gray40.color,
   },
   markActive: {
     opacity: 1,
-    backgroundColor: 'currentColor'
+    backgroundColor: 'currentColor',
   },
   marked: {
-    marginBottom: 0
-  }
+    marginBottom: 0,
+  },
 })(Slider);
 
 interface ExecutionTimelineFooterProps {
   onTimezoneChange?: (timezone: string) => void;
 }
 
-export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = ({ onTimezoneChange }) => {
+export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = ({
+  onTimezoneChange,
+}) => {
   const styles = useStyles();
   const [timezone, setTimezone] = React.useState(TimeZone.Local);
 
@@ -98,7 +100,13 @@ export const ExecutionTimelineFooter: React.FC<ExecutionTimelineFooterProps> = (
         valueLabelDisplay="on"
         getAriaValueText={valueText}
       />
-      <RadioGroup row aria-label="timezone" name="timezone" value={timezone} onChange={handleTimezoneChange}>
+      <RadioGroup
+        row
+        aria-label="timezone"
+        name="timezone"
+        value={timezone}
+        onChange={handleTimezoneChange}
+      >
         <FormControlLabel value={TimeZone.Local} control={<Radio />} label="Local Time" />
         <FormControlLabel value={TimeZone.UTC} control={<Radio />} label="UTC" />
       </RadioGroup>

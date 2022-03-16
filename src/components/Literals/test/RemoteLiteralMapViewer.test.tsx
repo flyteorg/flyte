@@ -10,64 +10,54 @@ import { RemoteLiteralMapViewer } from '../RemoteLiteralMapViewer';
 jest.mock('components/hooks/useRemoteLiteralMap');
 
 describe('RemoteLiteralMapViewer', () => {
-    it('renders no data available', () => {
-        const blob = {
-            url: '',
-            bytes: Long.fromInt(0)
-        };
+  it('renders no data available', () => {
+    const blob = {
+      url: '',
+      bytes: Long.fromInt(0),
+    };
 
-        const { getAllByText } = render(
-            <RemoteLiteralMapViewer map={null} blob={blob} />
-        );
+    const { getAllByText } = render(<RemoteLiteralMapViewer map={null} blob={blob} />);
 
-        const items = getAllByText('No data is available.');
-        expect(items.length).toBe(1);
-    });
+    const items = getAllByText('No data is available.');
+    expect(items.length).toBe(1);
+  });
 
-    it('renders map if it is defined', () => {
-        const blob = {
-            url: 'http://url',
-            bytes: Long.fromInt(1337)
-        };
+  it('renders map if it is defined', () => {
+    const blob = {
+      url: 'http://url',
+      bytes: Long.fromInt(1337),
+    };
 
-        const map: LiteralMap = {
-            literals: {
-                input1: {}
-            }
-        };
+    const map: LiteralMap = {
+      literals: {
+        input1: {},
+      },
+    };
 
-        const { getAllByText } = render(
-            <RemoteLiteralMapViewer map={map} blob={blob} />
-        );
+    const { getAllByText } = render(<RemoteLiteralMapViewer map={map} blob={blob} />);
 
-        const items = getAllByText('input1:');
-        expect(items.length).toBe(1);
-    });
+    const items = getAllByText('input1:');
+    expect(items.length).toBe(1);
+  });
 
-    it('fetches blob if map is null', () => {
-        const map: LiteralMap = {
-            literals: {
-                input1: {}
-            }
-        };
+  it('fetches blob if map is null', () => {
+    const map: LiteralMap = {
+      literals: {
+        input1: {},
+      },
+    };
 
-        const mockUseRemoteLiteralMap = useRemoteLiteralMap as jest.Mock<
-            FetchableData<LiteralMap>
-        >;
-        mockUseRemoteLiteralMap.mockReturnValue(
-            loadedFetchable(map, () => null)
-        );
+    const mockUseRemoteLiteralMap = useRemoteLiteralMap as jest.Mock<FetchableData<LiteralMap>>;
+    mockUseRemoteLiteralMap.mockReturnValue(loadedFetchable(map, () => null));
 
-        const blob = {
-            url: 'http://url',
-            bytes: Long.fromInt(1337)
-        };
+    const blob = {
+      url: 'http://url',
+      bytes: Long.fromInt(1337),
+    };
 
-        const { getAllByText } = render(
-            <RemoteLiteralMapViewer map={null} blob={blob} />
-        );
+    const { getAllByText } = render(<RemoteLiteralMapViewer map={null} blob={blob} />);
 
-        const items = getAllByText('input1:');
-        expect(items.length).toBe(1);
-    });
+    const items = getAllByText('input1:');
+    expect(items.length).toBe(1);
+  });
 });

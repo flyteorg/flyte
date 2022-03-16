@@ -1,8 +1,8 @@
 module.exports = {
   globals: {
     'ts-jest': {
-      babelConfig: true
-    }
+      babelConfig: true,
+    },
   },
   verbose: false,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'node'],
@@ -13,15 +13,15 @@ module.exports = {
     '<rootDir>/.storybook',
     '<rootDir>/node_modules',
     '<rootDir>/dist',
-    '<rootDir>/build'
+    '<rootDir>/build',
   ],
   transform: {
-    '^.+\\.(j|t)sx?$': 'ts-jest'
+    '^.+\\.(j|t)sx?$': 'ts-jest',
   },
   transformIgnorePatterns: ['<rootDir>/node_modules/(?!@flyteorg/flyteidl)'],
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-      '<rootDir>/assetsTransformer.js'
+      '<rootDir>/assetsTransformer.js',
   },
   coverageDirectory: '.coverage',
   collectCoverageFrom: ['**/*.{ts,tsx}'],
@@ -33,11 +33,11 @@ module.exports = {
     '<rootDir>/build',
     '<rootDir>/src/tsd',
     '<rootDir>/.eslintrc.js',
-    '\\.config.js$'
+    '\\.config.js$',
   ],
   coverageReporters: ['text', 'json', 'html'],
   clearMocks: true,
   setupFiles: ['<rootDir>/node_modules/regenerator-runtime/runtime'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],
-  preset: 'ts-jest'
+  preset: 'ts-jest',
 };

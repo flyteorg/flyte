@@ -1,6 +1,6 @@
 import { FilterOperationName } from 'models/AdminEntity/types';
-import { FilterMap } from './types';
 import moment from 'moment';
+import { FilterMap } from './types';
 
 const workflowExecutionStartTimeKey = 'execution_created_at';
 const nodeExecutionStartTimeKey = 'node_execution_created_at';
@@ -29,12 +29,9 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .subtract(1, 'hour')
-              .toISOString()
-        }
-      ]
+          value: () => moment().subtract(1, 'hour').toISOString(),
+        },
+      ],
     },
     today: {
       label: 'Last 24 hours',
@@ -43,12 +40,9 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .subtract(24, 'hour')
-              .toISOString()
-        }
-      ]
+          value: () => moment().subtract(24, 'hour').toISOString(),
+        },
+      ],
     },
     yesterday: {
       label: 'Last 48 hours',
@@ -57,20 +51,14 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .subtract(48, 'hour')
-              .toISOString()
+          value: () => moment().subtract(48, 'hour').toISOString(),
         },
         {
           key,
           operation: FilterOperationName.LTE,
-          value: () =>
-            moment()
-              .startOf('day')
-              .toISOString()
-        }
-      ]
+          value: () => moment().startOf('day').toISOString(),
+        },
+      ],
     },
     thisWeek: {
       label: 'This Week',
@@ -79,12 +67,9 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .startOf('week')
-              .toISOString()
-        }
-      ]
+          value: () => moment().startOf('week').toISOString(),
+        },
+      ],
     },
     thisMonth: {
       label: 'This Month',
@@ -93,12 +78,9 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .startOf('month')
-              .toISOString()
-        }
-      ]
+          value: () => moment().startOf('month').toISOString(),
+        },
+      ],
     },
     lastMonth: {
       label: 'Last Month',
@@ -107,21 +89,14 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .startOf('month')
-              .subtract(1, 'month')
-              .toISOString()
+          value: () => moment().startOf('month').subtract(1, 'month').toISOString(),
         },
         {
           key,
           operation: FilterOperationName.LTE,
-          value: () =>
-            moment()
-              .startOf('month')
-              .toISOString()
-        }
-      ]
+          value: () => moment().startOf('month').toISOString(),
+        },
+      ],
     },
     thisYear: {
       label: 'This Year',
@@ -130,12 +105,9 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .startOf('year')
-              .toISOString()
-        }
-      ]
+          value: () => moment().startOf('year').toISOString(),
+        },
+      ],
     },
     lastYear: {
       label: 'Last Year',
@@ -144,22 +116,15 @@ export function startTimeFilters(key: string): FilterMap<StartTimeFilterKey> {
         {
           key,
           operation: FilterOperationName.GTE,
-          value: () =>
-            moment()
-              .startOf('year')
-              .subtract(1, 'year')
-              .toISOString()
+          value: () => moment().startOf('year').subtract(1, 'year').toISOString(),
         },
         {
           key,
           operation: FilterOperationName.LTE,
-          value: () =>
-            moment()
-              .startOf('year')
-              .toISOString()
-        }
-      ]
-    }
+          value: () => moment().startOf('year').toISOString(),
+        },
+      ],
+    },
   };
 }
 

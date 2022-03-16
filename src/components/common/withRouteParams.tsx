@@ -5,9 +5,9 @@ import { RouteComponentProps } from 'react-router-dom';
 // ParamsType and returns a HoC which will extract the params from props.match.params
 // and render the passed component with those params as top-level props.
 export function withRouteParams<ParamsType>(
-    Component: React.ComponentType<ParamsType>
+  Component: React.ComponentType<ParamsType>,
 ): React.FunctionComponent<RouteComponentProps<ParamsType>> {
-    return ({ match }) => {
-        return <Component {...match.params} />;
-    };
+  return ({ match }) => {
+    return <Component {...match.params} />;
+  };
 }

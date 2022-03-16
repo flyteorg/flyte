@@ -13,22 +13,22 @@ import { ExecutionNodesTimeline } from '../Timeline';
 // We don't need to verify the content of the graph component here and it is
 // difficult to make it work correctly in a test environment.
 jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
-  ExecutionWorkflowGraph: () => null
+  ExecutionWorkflowGraph: () => null,
 }));
 
 jest.mock('chart.js', () => ({
   Chart: { register: () => null },
-  registerables: []
+  registerables: [],
 }));
 
 jest.mock('chartjs-plugin-datalabels', () => ({
-  ChartDataLabels: null
+  ChartDataLabels: null,
 }));
 
 const baseQueryParams = {
   filters: '',
   'sort_by.direction': 'ASCENDING',
-  'sort_by.key': 'created_at'
+  'sort_by.key': 'created_at',
 };
 
 describe('ExecutionDetails > Timeline', () => {
@@ -45,11 +45,11 @@ describe('ExecutionDetails > Timeline', () => {
     mockServer.insertNodeExecutionList(
       execution.id,
       Object.values(nodeExecutions).map(({ data }) => data),
-      baseQueryParams
+      baseQueryParams,
     );
     mockServer.insertNodeExecutionList(execution.id, [nodeExecutions.failedNode.data], {
       ...baseQueryParams,
-      filters: 'value_in(phase,FAILED)'
+      filters: 'value_in(phase,FAILED)',
     });
     queryClient = createTestQueryClient();
   });
@@ -60,7 +60,7 @@ describe('ExecutionDetails > Timeline', () => {
         <QueryClientProvider client={queryClient}>
           <ExecutionNodesTimeline nodeExecutions={[]} />
         </QueryClientProvider>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
   it('Render Timeline with empty nodeExecution info will not crash', async () => {

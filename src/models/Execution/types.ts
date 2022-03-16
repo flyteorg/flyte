@@ -1,7 +1,12 @@
 import { Admin, Core, Protobuf } from 'flyteidl';
 import { Identifier, LiteralMap, LiteralMapBlob, TaskLog, UrlBlob } from 'models/Common/types';
 import { CompiledWorkflow } from 'models/Workflow/types';
-import { ExecutionMode, NodeExecutionPhase, TaskExecutionPhase, WorkflowExecutionPhase } from './enums';
+import {
+  ExecutionMode,
+  NodeExecutionPhase,
+  TaskExecutionPhase,
+  WorkflowExecutionPhase,
+} from './enums';
 
 export type WorkflowExecutionIdentifier = RequiredNonNullable<Core.IWorkflowExecutionIdentifier>;
 export type ExecutionError = RequiredNonNullable<Core.IExecutionError>;
@@ -48,7 +53,7 @@ export interface Execution extends Admin.IExecution {
   spec: ExecutionSpec;
 }
 
-/** Node executions **/
+/** Node executions */
 export interface WorkflowNodeMetadata {
   executionId: WorkflowExecutionIdentifier;
 }
@@ -97,7 +102,7 @@ export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
   workflowNodeMetadata?: WorkflowNodeMetadata;
 }
 
-/** Task executions **/
+/** Task executions */
 
 export interface TaskExecutionIdentifier extends Core.ITaskExecutionIdentifier {
   taskId: Identifier;

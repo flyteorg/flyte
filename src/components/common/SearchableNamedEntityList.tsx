@@ -7,109 +7,99 @@ import { SearchableList, SearchResult } from './SearchableList';
 import { useCommonStyles } from './styles';
 
 export const useNamedEntityListStyles = makeStyles((theme: Theme) => ({
-    container: {
-        marginBottom: theme.spacing(2),
-        width: '100%'
+  container: {
+    marginBottom: theme.spacing(2),
+    width: '100%',
+  },
+  itemName: {
+    flex: '1 1 auto',
+    padding: `${theme.spacing(2)}px 0`,
+  },
+  itemChevron: {
+    color: theme.palette.grey[500],
+    flex: '0 0 auto',
+  },
+  noResults: {
+    color: theme.palette.text.disabled,
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(6),
+  },
+  searchResult: {
+    alignItems: 'center',
+    borderBottom: `1px solid ${separatorColor}`,
+    display: 'flex',
+    flexDirection: 'row',
+    padding: `0 ${theme.spacing(3)}px`,
+    '&:first-of-type': {
+      borderTop: `1px solid ${separatorColor}`,
     },
-    itemName: {
-        flex: '1 1 auto',
-        padding: `${theme.spacing(2)}px 0`
+    '&:hover': {
+      backgroundColor: listhoverColor,
     },
-    itemChevron: {
-        color: theme.palette.grey[500],
-        flex: '0 0 auto'
+    '& mark': {
+      backgroundColor: 'unset',
+      color: theme.palette.primary.main,
+      fontWeight: 'bold',
     },
-    noResults: {
-        color: theme.palette.text.disabled,
-        display: 'flex',
-        justifyContent: 'center',
-        marginTop: theme.spacing(6)
-    },
-    searchResult: {
-        alignItems: 'center',
-        borderBottom: `1px solid ${separatorColor}`,
-        display: 'flex',
-        flexDirection: 'row',
-        padding: `0 ${theme.spacing(3)}px`,
-        '&:first-of-type': {
-            borderTop: `1px solid ${separatorColor}`
-        },
-        '&:hover': {
-            backgroundColor: listhoverColor
-        },
-        '& mark': {
-            backgroundColor: 'unset',
-            color: theme.palette.primary.main,
-            fontWeight: 'bold'
-        }
-    }
+  },
 }));
 
 export interface SearchableNamedEntity extends NamedEntity {
-    key: string;
+  key: string;
 }
 
-const nameKey = ({ id: { domain, name, project } }: NamedEntity) =>
-    `${domain}/${name}/${project}`;
+const nameKey = ({ id: { domain, name, project } }: NamedEntity) => `${domain}/${name}/${project}`;
 
 const NoResults: React.FC = () => (
-    <Typography
-        className={useNamedEntityListStyles().noResults}
-        variant="h6"
-        component="div"
-    >
-        No matching results
-    </Typography>
+  <Typography className={useNamedEntityListStyles().noResults} variant="h6" component="div">
+    No matching results
+  </Typography>
 );
 
-type ItemRenderer = (
-    item: SearchResult<SearchableNamedEntity>
-) => React.ReactNode;
+type ItemRenderer = (item: SearchResult<SearchableNamedEntity>) => React.ReactNode;
 
 interface SearchResultsProps {
-    results: SearchResult<SearchableNamedEntity>[];
-    renderItem: ItemRenderer;
+  results: SearchResult<SearchableNamedEntity>[];
+  renderItem: ItemRenderer;
 }
-const SearchResults: React.FC<SearchResultsProps> = ({
-    renderItem,
-    results
-}) => {
-    const commonStyles = useCommonStyles();
-    return results.length === 0 ? (
-        <NoResults />
-    ) : (
-        <ul className={commonStyles.listUnstyled}>{results.map(renderItem)}</ul>
-    );
+const SearchResults: React.FC<SearchResultsProps> = ({ renderItem, results }) => {
+  const commonStyles = useCommonStyles();
+  return results.length === 0 ? (
+    <NoResults />
+  ) : (
+    <ul className={commonStyles.listUnstyled}>{results.map(renderItem)}</ul>
+  );
 };
 
 export interface SearchableNamedEntityListProps {
-    names: NamedEntity[];
-    renderItem: ItemRenderer;
+  names: NamedEntity[];
+  renderItem: ItemRenderer;
 }
 
 const nameSearchPropertyGetter = ({ id }: SearchableNamedEntity) => id.name;
 /** Base component functionalityfor rendering NamedEntities (Workflow/Task/LaunchPlan) */
 export const SearchableNamedEntityList: React.FC<SearchableNamedEntityListProps> = ({
-    names,
-    renderItem
+  names,
+  renderItem,
 }) => {
-    const styles = useNamedEntityListStyles();
-    const searchValues = names.map(name => ({
-        ...name,
-        key: nameKey(name)
-    }));
+  const styles = useNamedEntityListStyles();
+  const searchValues = names.map((name) => ({
+    ...name,
+    key: nameKey(name),
+  }));
 
-    const renderItems = (results: SearchResult<SearchableNamedEntity>[]) => (
-        <SearchResults results={results} renderItem={renderItem} />
-    );
+  const renderItems = (results: SearchResult<SearchableNamedEntity>[]) => (
+    <SearchResults results={results} renderItem={renderItem} />
+  );
 
-    return (
-        <div className={styles.container}>
-            <SearchableList
-                items={searchValues}
-                propertyGetter={nameSearchPropertyGetter}
-                renderContent={renderItems}
-            />
-        </div>
-    );
+  return (
+    <div className={styles.container}>
+      <SearchableList
+        items={searchValues}
+        propertyGetter={nameSearchPropertyGetter}
+        renderContent={renderItems}
+      />
+    </div>
+  );
 };

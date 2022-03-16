@@ -11,8 +11,8 @@ import { muiTheme } from '../src/components/Theme/muiTheme';
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     display: 'flex',
-    padding: theme.spacing(1)
-  }
+    padding: theme.spacing(1),
+  },
 }));
 
 export const StorybookContainer: React.FC = ({ children }) => {

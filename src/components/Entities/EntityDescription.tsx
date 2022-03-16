@@ -13,43 +13,36 @@ import t from './strings';
 const Skeleton = reactLoadingSkeleton;
 
 const useStyles = makeStyles((theme: Theme) => ({
-    description: {
-        marginTop: theme.spacing(1)
-    }
+  description: {
+    marginTop: theme.spacing(1),
+  },
 }));
 
 /** Fetches and renders the description for a given Entity (LaunchPlan,Workflow,Task) ID */
 export const EntityDescription: React.FC<{
-    id: ResourceIdentifier;
+  id: ResourceIdentifier;
 }> = ({ id }) => {
-    const commonStyles = useCommonStyles();
-    const styles = useStyles();
-    const namedEntity = useNamedEntity(id);
-    const { metadata = {} as NamedEntityMetadata } = namedEntity.value;
-    const hasDescription = !!metadata.description;
-    return (
-        <>
-            <Typography variant="h6">Description</Typography>
-            <Typography variant="body2" className={styles.description}>
-                <WaitForData
-                    {...namedEntity}
-                    spinnerVariant="none"
-                    loadingComponent={Skeleton}
-                >
-                    <span
-                        className={classnames({
-                            [commonStyles.hintText]: !hasDescription
-                        })}
-                    >
-                        {hasDescription
-                            ? metadata.description
-                            : t(
-                                  'noDescription',
-                                  entityStrings[id.resourceType]
-                              )}
-                    </span>
-                </WaitForData>
-            </Typography>
-        </>
-    );
+  const commonStyles = useCommonStyles();
+  const styles = useStyles();
+  const namedEntity = useNamedEntity(id);
+  const { metadata = {} as NamedEntityMetadata } = namedEntity.value;
+  const hasDescription = !!metadata.description;
+  return (
+    <>
+      <Typography variant="h6">Description</Typography>
+      <Typography variant="body2" className={styles.description}>
+        <WaitForData {...namedEntity} spinnerVariant="none" loadingComponent={Skeleton}>
+          <span
+            className={classnames({
+              [commonStyles.hintText]: !hasDescription,
+            })}
+          >
+            {hasDescription
+              ? metadata.description
+              : t('noDescription', entityStrings[id.resourceType])}
+          </span>
+        </WaitForData>
+      </Typography>
+    </>
+  );
 };

@@ -13,54 +13,56 @@ import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes/routes';
 import {
-    cacheStatusMessages,
-    unknownCacheStatusString,
-    viewSourceExecutionString
+  cacheStatusMessages,
+  unknownCacheStatusString,
+  viewSourceExecutionString,
 } from './constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    cacheStatus: {
-        alignItems: 'center',
-        display: 'flex',
-        marginTop: theme.spacing(1)
-    },
-    sourceExecutionLink: {
-        fontWeight: 'normal'
-    }
+  cacheStatus: {
+    alignItems: 'center',
+    display: 'flex',
+    marginTop: theme.spacing(1),
+  },
+  sourceExecutionLink: {
+    fontWeight: 'normal',
+  },
 }));
 
 /** Renders the appropriate icon for a given `Core.CatalogCacheStatus` */
-export const NodeExecutionCacheStatusIcon: React.FC<SvgIconProps & {
+export const NodeExecutionCacheStatusIcon: React.FC<
+  SvgIconProps & {
     status: Core.CatalogCacheStatus;
-}> = React.forwardRef(({ status, ...props }, ref) => {
-    switch (status) {
-        case Core.CatalogCacheStatus.CACHE_DISABLED:
-        case Core.CatalogCacheStatus.CACHE_MISS: {
-            return <InfoOutlined {...props} ref={ref} />;
-        }
-        case Core.CatalogCacheStatus.CACHE_HIT: {
-            return <CachedOutlined {...props} ref={ref} />;
-        }
-        case Core.CatalogCacheStatus.CACHE_POPULATED: {
-            return <PublishedWithChangesOutlined {...props} ref={ref} />;
-        }
-        case Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE:
-        case Core.CatalogCacheStatus.CACHE_PUT_FAILURE: {
-            return <ErrorOutlined {...props} ref={ref} />;
-        }
-        default: {
-            assertNever(status);
-            return null;
-        }
+  }
+> = React.forwardRef(({ status, ...props }, ref) => {
+  switch (status) {
+    case Core.CatalogCacheStatus.CACHE_DISABLED:
+    case Core.CatalogCacheStatus.CACHE_MISS: {
+      return <InfoOutlined {...props} ref={ref} />;
     }
+    case Core.CatalogCacheStatus.CACHE_HIT: {
+      return <CachedOutlined {...props} ref={ref} />;
+    }
+    case Core.CatalogCacheStatus.CACHE_POPULATED: {
+      return <PublishedWithChangesOutlined {...props} ref={ref} />;
+    }
+    case Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE:
+    case Core.CatalogCacheStatus.CACHE_PUT_FAILURE: {
+      return <ErrorOutlined {...props} ref={ref} />;
+    }
+    default: {
+      assertNever(status);
+      return null;
+    }
+  }
 });
 
 export interface NodeExecutionCacheStatusProps {
-    taskNodeMetadata?: TaskNodeMetadata;
-    /** `normal` will render an icon with description message beside it
-     *  `iconOnly` will render just the icon with the description as a tooltip
-     */
-    variant?: 'normal' | 'iconOnly';
+  taskNodeMetadata?: TaskNodeMetadata;
+  /** `normal` will render an icon with description message beside it
+   *  `iconOnly` will render just the icon with the description as a tooltip
+   */
+  variant?: 'normal' | 'iconOnly';
 }
 /** For a given `NodeExecution.closure.taskNodeMetadata` object, will render
  * the cache status with a descriptive message. For `Core.CacheCatalogStatus.CACHE_HIT`,
@@ -68,62 +70,48 @@ export interface NodeExecutionCacheStatusProps {
  * variant only).
  */
 export const NodeExecutionCacheStatus: React.FC<NodeExecutionCacheStatusProps> = ({
-    taskNodeMetadata,
-    variant = 'normal'
+  taskNodeMetadata,
+  variant = 'normal',
 }) => {
-    const commonStyles = useCommonStyles();
-    const styles = useStyles();
-    if (taskNodeMetadata == null || taskNodeMetadata.cacheStatus == null) {
-        return null;
-    }
+  const commonStyles = useCommonStyles();
+  const styles = useStyles();
+  if (taskNodeMetadata == null || taskNodeMetadata.cacheStatus == null) {
+    return null;
+  }
 
-    const message =
-        cacheStatusMessages[taskNodeMetadata.cacheStatus] ||
-        unknownCacheStatusString;
+  const message = cacheStatusMessages[taskNodeMetadata.cacheStatus] || unknownCacheStatusString;
 
-    const sourceExecutionId = taskNodeMetadata.catalogKey?.sourceTaskExecution;
-    const sourceExecutionLink = sourceExecutionId ? (
-        <RouterLink
-            className={classnames(
-                commonStyles.primaryLink,
-                styles.sourceExecutionLink
-            )}
-            to={Routes.ExecutionDetails.makeUrl(
-                sourceExecutionId.nodeExecutionId.executionId
-            )}
-        >
-            {viewSourceExecutionString}
-        </RouterLink>
-    ) : null;
+  const sourceExecutionId = taskNodeMetadata.catalogKey?.sourceTaskExecution;
+  const sourceExecutionLink = sourceExecutionId ? (
+    <RouterLink
+      className={classnames(commonStyles.primaryLink, styles.sourceExecutionLink)}
+      to={Routes.ExecutionDetails.makeUrl(sourceExecutionId.nodeExecutionId.executionId)}
+    >
+      {viewSourceExecutionString}
+    </RouterLink>
+  ) : null;
 
-    return variant === 'iconOnly' ? (
-        <Tooltip title={message} aria-label="cache status">
-            <NodeExecutionCacheStatusIcon
-                className={classnames(
-                    commonStyles.iconLeft,
-                    commonStyles.iconRight,
-                    commonStyles.iconSecondary
-                )}
-                status={taskNodeMetadata.cacheStatus}
-            />
-        </Tooltip>
-    ) : (
-        <div>
-            <Typography
-                className={styles.cacheStatus}
-                variant="subtitle1"
-                color="textSecondary"
-            >
-                <NodeExecutionCacheStatusIcon
-                    status={taskNodeMetadata.cacheStatus}
-                    className={classnames(
-                        commonStyles.iconSecondary,
-                        commonStyles.iconLeft
-                    )}
-                />
-                {message}
-            </Typography>
-            {sourceExecutionLink}
-        </div>
-    );
+  return variant === 'iconOnly' ? (
+    <Tooltip title={message} aria-label="cache status">
+      <NodeExecutionCacheStatusIcon
+        className={classnames(
+          commonStyles.iconLeft,
+          commonStyles.iconRight,
+          commonStyles.iconSecondary,
+        )}
+        status={taskNodeMetadata.cacheStatus}
+      />
+    </Tooltip>
+  ) : (
+    <div>
+      <Typography className={styles.cacheStatus} variant="subtitle1" color="textSecondary">
+        <NodeExecutionCacheStatusIcon
+          status={taskNodeMetadata.cacheStatus}
+          className={classnames(commonStyles.iconSecondary, commonStyles.iconLeft)}
+        />
+        {message}
+      </Typography>
+      {sourceExecutionLink}
+    </div>
+  );
 };

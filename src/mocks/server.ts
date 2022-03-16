@@ -4,6 +4,6 @@ import { AdminServer, createAdminServer } from './createAdminServer';
 const { handlers, server } = createAdminServer();
 export type MockServer = SetupServerApi & AdminServer;
 export const mockServer: MockServer = {
-    ...setupServer(...handlers),
-    ...server
+  ...setupServer(...handlers),
+  ...server,
 };

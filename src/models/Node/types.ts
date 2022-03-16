@@ -10,14 +10,14 @@ export type BranchNode = Core.IBranchNode;
  * node type in a Flyte graph.
  */
 export interface TaskNode extends Core.ITaskNode {
-    referenceId: Identifier;
+  referenceId: Identifier;
 }
 
 /** Additional, optional metadata attached to a `CompiledNode` instance */
 export interface CompiledNodeMetadata extends Core.INodeMetadata {
-    name: string;
-    timeout?: any;
-    retries?: any;
+  name: string;
+  timeout?: any;
+  retries?: any;
 }
 
 /** The shared properties used by all node types in a compiled Workflow graph
@@ -25,33 +25,33 @@ export interface CompiledNodeMetadata extends Core.INodeMetadata {
  * `branchNode`/`taskNode`/`workflowNode`.
  */
 export interface CompiledNode extends Core.INode {
-    branchNode?: BranchNode;
-    id: string;
-    inputs?: Binding[];
-    metadata?: CompiledNodeMetadata;
-    outputAliases?: Alias[];
-    taskNode?: TaskNode;
-    upstreamNodeIds?: string[];
-    workflowNode?: WorkflowNode;
+  branchNode?: BranchNode;
+  id: string;
+  inputs?: Binding[];
+  metadata?: CompiledNodeMetadata;
+  outputAliases?: Alias[];
+  taskNode?: TaskNode;
+  upstreamNodeIds?: string[];
+  workflowNode?: WorkflowNode;
 }
 
 /** Holds all connections/edges for a given `CompiledNode` */
 export interface CompiledNodeConnection {
-    ids: string[];
+  ids: string[];
 }
 
 /** Contains all connections in a given workflow graph template */
 export interface ConnectionSet extends Core.IConnectionSet {
-    downstream: Record<string, CompiledNodeConnection>;
-    upstream: Record<string, CompiledNodeConnection>;
+  downstream: Record<string, CompiledNodeConnection>;
+  upstream: Record<string, CompiledNodeConnection>;
 }
 
 export interface NodeId {
-    workflowId: Identifier;
-    nodeId: string;
+  workflowId: Identifier;
+  nodeId: string;
 }
 
 export interface GloballyUniqueNode {
-    id: NodeId;
-    node: CompiledNode;
+  id: NodeId;
+  node: CompiledNode;
 }

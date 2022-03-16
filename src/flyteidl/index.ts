@@ -8,9 +8,4 @@ import service = flyteidl.service;
 /** Message classes for built-in Protobuf types */
 import protobuf = google.protobuf;
 
-export {
-    admin as Admin,
-    core as Core,
-    service as Service,
-    protobuf as Protobuf
-};
+export { admin as Admin, core as Core, service as Service, protobuf as Protobuf };

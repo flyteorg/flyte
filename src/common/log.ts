@@ -4,6 +4,5 @@ import debug from 'debug';
 export const log = window.console;
 export const debugPrefix = 'flyte';
 
-export const createDebugLogger = (namespace: string) =>
-    debug(`${debugPrefix}:${namespace}`);
+export const createDebugLogger = (namespace: string) => debug(`${debugPrefix}:${namespace}`);
 export { debug };

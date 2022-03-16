@@ -21,7 +21,7 @@ function convertToPlainNodes(nodes: dNode[], level = 0): dNode[] {
   if (!nodes || nodes.length === 0) {
     return result;
   }
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     if (isStartNode(node) || isEndNode(node)) {
       return;
     }
@@ -36,13 +36,13 @@ function convertToPlainNodes(nodes: dNode[], level = 0): dNode[] {
 const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo => {
   if (node.value.taskNode) {
     const templateName = node.value.taskNode.referenceId.name ?? node.name;
-    const task = tasks.find(t => t.template.id.name === templateName);
+    const task = tasks.find((t) => t.template.id.name === templateName);
     return {
       scopedId: node.scopedId,
       displayId: node.value.id ?? node.id,
       displayName: templateName,
       displayType: task?.template.type ?? NodeExecutionDisplayType.UnknownTask,
-      taskTemplate: task?.template
+      taskTemplate: task?.template,
     };
   }
 
@@ -53,7 +53,7 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
       scopedId: node.scopedId,
       displayId: node.value.id ?? node.id,
       displayName: node.name ?? info?.name ?? 'N/A',
-      displayType: NodeExecutionDisplayType.Workflow
+      displayType: NodeExecutionDisplayType.Workflow,
     };
   }
 
@@ -63,7 +63,7 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
       scopedId: node.scopedId,
       displayId: node.value.id ?? node.id,
       displayName: 'branchNode',
-      displayType: NodeExecutionDisplayType.BranchNode
+      displayType: NodeExecutionDisplayType.BranchNode,
     };
   }
 
@@ -73,7 +73,7 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
 export function createExecutionDetails(workflow: Workflow): CurrentExecutionDetails {
   const result: CurrentExecutionDetails = {
     executionId: workflow.id,
-    nodes: []
+    nodes: [],
   };
 
   if (!workflow.closure?.compiledWorkflow) {
@@ -86,10 +86,10 @@ export function createExecutionDetails(workflow: Workflow): CurrentExecutionDeta
   let dNodes = transformerWorkflowToDag(compiledWorkflow).dag.nodes ?? [];
   dNodes = convertToPlainNodes(dNodes);
 
-  dNodes.forEach(n => {
+  dNodes.forEach((n) => {
     const details = getNodeDetails(n, tasks);
     result.nodes.push({
-      ...details
+      ...details,
     });
   });
 

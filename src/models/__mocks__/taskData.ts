@@ -6,32 +6,28 @@ import { Task, TaskClosure } from 'models/Task/types';
 import * as simpleClosure from './simpleTaskClosure.json';
 
 const decodedClosure = Admin.TaskClosure.create(
-    (simpleClosure as unknown) as Admin.ITaskClosure
+  simpleClosure as unknown as Admin.ITaskClosure,
 ) as TaskClosure;
 
-const taskId: (name: string, version: string) => Identifier = (
-    name,
-    version
-) => ({
-    name,
-    version,
-    project: 'flyte',
-    domain: 'development'
+const taskId: (name: string, version: string) => Identifier = (name, version) => ({
+  name,
+  version,
+  project: 'flyte',
+  domain: 'development',
 });
 
 export const createMockTask: (name: string, version?: string) => Task = (
-    name: string,
-    version = 'abcdefg'
+  name: string,
+  version = 'abcdefg',
 ) => ({
-    id: taskId(name, version),
-    closure: createMockTaskClosure()
+  id: taskId(name, version),
+  closure: createMockTaskClosure(),
 });
 
-export const createMockTaskClosure: () => TaskClosure = () =>
-    cloneDeep(decodedClosure);
+export const createMockTaskClosure: () => TaskClosure = () => cloneDeep(decodedClosure);
 
 export const createMockTaskVersions = (name: string, length: number) => {
-    return Array.from({ length }, (_, idx) => {
-        return createMockTask(name, getCacheKey({ idx }));
-    });
+  return Array.from({ length }, (_, idx) => {
+    return createMockTask(name, getCacheKey({ idx }));
+  });
 };

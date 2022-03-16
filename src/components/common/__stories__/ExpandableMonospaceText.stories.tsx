@@ -4,10 +4,8 @@ import * as React from 'react';
 import { ExpandableMonospaceText } from '../ExpandableMonospaceText';
 
 const baseProps = {
-    text: sampleError
+  text: sampleError,
 };
 
 const stories = storiesOf('Common', module);
-stories.add('ExpandableMonospaceText', () => (
-    <ExpandableMonospaceText {...baseProps} />
-));
+stories.add('ExpandableMonospaceText', () => <ExpandableMonospaceText {...baseProps} />);

@@ -14,11 +14,10 @@ import { executionSortFields } from 'models/Execution/constants';
 import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { useInfiniteQuery } from 'react-query';
-import { failedToLoadExecutionsString } from './constants';
 import { BarChart } from 'components/common/BarChart';
 import {
-    getExecutionTimeData,
-    getStartExecutionTime
+  getExecutionTimeData,
+  getStartExecutionTime,
 } from 'components/Entities/EntityExecutionsBarChart';
 import classNames from 'classnames';
 import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
@@ -27,155 +26,141 @@ import { WaitForData } from 'components/common/WaitForData';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
 import { compact } from 'lodash';
+import { failedToLoadExecutionsString } from './constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    container: {
-        display: 'flex',
-        flex: '1 1 auto',
-        flexDirection: 'column'
-    },
-    header: {
-        paddingBottom: theme.spacing(1),
-        paddingLeft: theme.spacing(1),
-        borderBottom: `1px solid ${theme.palette.divider}`
-    },
-    marginTop: {
-        marginTop: theme.spacing(2)
-    },
-    chartContainer: {
-        paddingLeft: theme.spacing(1),
-        paddingRight: theme.spacing(3),
-        paddingTop: theme.spacing(1)
-    }
+  container: {
+    display: 'flex',
+    flex: '1 1 auto',
+    flexDirection: 'column',
+  },
+  header: {
+    paddingBottom: theme.spacing(1),
+    paddingLeft: theme.spacing(1),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  marginTop: {
+    marginTop: theme.spacing(2),
+  },
+  chartContainer: {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(3),
+    paddingTop: theme.spacing(1),
+  },
 }));
 export interface ProjectExecutionsProps {
-    projectId: string;
-    domainId: string;
+  projectId: string;
+  domainId: string;
 }
 
 const defaultSort = {
-    key: executionSortFields.createdAt,
-    direction: SortDirection.DESCENDING
+  key: executionSortFields.createdAt,
+  direction: SortDirection.DESCENDING,
 };
 
 /** A listing of all executions across a project/domain combination. */
 export const ProjectExecutions: React.FC<ProjectExecutionsProps> = ({
-    domainId: domain,
-    projectId: project
+  domainId: domain,
+  projectId: project,
 }) => {
-    const styles = useStyles();
-    const archivedFilter = useExecutionShowArchivedState();
-    const filtersState = useWorkflowExecutionFiltersState();
+  const styles = useStyles();
+  const archivedFilter = useExecutionShowArchivedState();
+  const filtersState = useWorkflowExecutionFiltersState();
 
-    const allFilters = compact([
-        ...filtersState.appliedFilters,
-        archivedFilter.getFilter()
-    ]);
-    const config = {
-        sort: defaultSort,
-        filter: allFilters
-    };
+  const allFilters = compact([...filtersState.appliedFilters, archivedFilter.getFilter()]);
+  const config = {
+    sort: defaultSort,
+    filter: allFilters,
+  };
 
-    // Remount the table whenever we change project/domain/filters to ensure
-    // things are virtualized correctly.
-    const tableKey = React.useMemo(
-        () =>
-            getCacheKey({
-                domain,
-                project,
-                filters: allFilters
-            }),
-        [domain, project, allFilters]
-    );
+  // Remount the table whenever we change project/domain/filters to ensure
+  // things are virtualized correctly.
+  const tableKey = React.useMemo(
+    () =>
+      getCacheKey({
+        domain,
+        project,
+        filters: allFilters,
+      }),
+    [domain, project, allFilters],
+  );
 
-    const query = useInfiniteQuery({
-        ...makeWorkflowExecutionListQuery({ domain, project }, config)
-    });
+  const query = useInfiniteQuery({
+    ...makeWorkflowExecutionListQuery({ domain, project }, config),
+  });
 
-    // useInfiniteQuery returns pages of items, but the table would like a single
-    // flat list.
-    const executions = React.useMemo(
-        () =>
-            query.data?.pages
-                ? query.data.pages.reduce<Execution[]>(
-                      (acc, { data }) => acc.concat(data),
-                      []
-                  )
-                : [],
-        [query.data?.pages]
-    );
+  // useInfiniteQuery returns pages of items, but the table would like a single
+  // flat list.
+  const executions = React.useMemo(
+    () =>
+      query.data?.pages
+        ? query.data.pages.reduce<Execution[]>((acc, { data }) => acc.concat(data), [])
+        : [],
+    [query.data?.pages],
+  );
 
-    const handleBarChartItemClick = React.useCallback(item => {
-        history.push(Routes.ExecutionDetails.makeUrl(item.metadata));
-    }, []);
+  const handleBarChartItemClick = React.useCallback((item) => {
+    history.push(Routes.ExecutionDetails.makeUrl(item.metadata));
+  }, []);
 
-    // to show only in bar chart view
-    const last100Executions = useWorkflowExecutions(
-        { domain, project },
-        {
-            sort: defaultSort,
-            filter: allFilters,
-            limit: 100
-        }
-    );
+  // to show only in bar chart view
+  const last100Executions = useWorkflowExecutions(
+    { domain, project },
+    {
+      sort: defaultSort,
+      filter: allFilters,
+      limit: 100,
+    },
+  );
 
-    const fetch = React.useCallback(() => query.fetchNextPage(), [query]);
+  const fetch = React.useCallback(() => query.fetchNextPage(), [query]);
 
-    const content = query.isLoadingError ? (
-        <DataError
-            error={query.error}
-            errorTitle={failedToLoadExecutionsString}
-            retry={fetch}
+  const content = query.isLoadingError ? (
+    <DataError error={query.error} errorTitle={failedToLoadExecutionsString} retry={fetch} />
+  ) : query.isLoading ? (
+    <LargeLoadingSpinner />
+  ) : (
+    <WorkflowExecutionsTable
+      key={tableKey}
+      fetch={fetch}
+      value={executions}
+      lastError={query.error}
+      moreItemsAvailable={!!query.hasNextPage}
+      showWorkflowName={true}
+      isFetching={query.isFetching}
+    />
+  );
+
+  /** Don't render component until finish fetching user profile */
+  const lastIndex = filtersState.filters.length - 1;
+  if (filtersState.filters[lastIndex].status === fetchStates.LOADED) {
+    return (
+      <div className={styles.container}>
+        <Typography className={classNames(styles.header, styles.marginTop)} variant="h6">
+          Last 100 Executions in the Project
+        </Typography>
+        <div className={styles.chartContainer}>
+          <WaitForData {...last100Executions}>
+            <BarChart
+              chartIds={[]}
+              data={getExecutionTimeData(last100Executions.value)}
+              startDate={getStartExecutionTime(last100Executions.value)}
+              onClickItem={handleBarChartItemClick}
+            />
+          </WaitForData>
+        </div>
+        <Typography className={styles.header} variant="h6">
+          All Executions in the Project
+        </Typography>
+        <ExecutionFilters
+          {...filtersState}
+          showArchived={archivedFilter.showArchived}
+          onArchiveFilterChange={archivedFilter.setShowArchived}
         />
-    ) : query.isLoading ? (
-        <LargeLoadingSpinner />
-    ) : (
-        <WorkflowExecutionsTable
-            key={tableKey}
-            fetch={fetch}
-            value={executions}
-            lastError={query.error}
-            moreItemsAvailable={!!query.hasNextPage}
-            showWorkflowName={true}
-            isFetching={query.isFetching}
-        />
+        <ErrorBoundary>{content}</ErrorBoundary>
+      </div>
     );
-
-    /** Don't render component until finish fetching user profile */
-    const lastIndex = filtersState.filters.length - 1;
-    if (filtersState.filters[lastIndex].status === fetchStates.LOADED) {
-        return (
-            <div className={styles.container}>
-                <Typography
-                    className={classNames(styles.header, styles.marginTop)}
-                    variant="h6"
-                >
-                    Last 100 Executions in the Project
-                </Typography>
-                <div className={styles.chartContainer}>
-                    <WaitForData {...last100Executions}>
-                        <BarChart
-                            chartIds={[]}
-                            data={getExecutionTimeData(last100Executions.value)}
-                            startDate={getStartExecutionTime(
-                                last100Executions.value
-                            )}
-                            onClickItem={handleBarChartItemClick}
-                        />
-                    </WaitForData>
-                </div>
-                <Typography className={styles.header} variant="h6">
-                    All Executions in the Project
-                </Typography>
-                <ExecutionFilters
-                    {...filtersState}
-                    showArchived={archivedFilter.showArchived}
-                    onArchiveFilterChange={archivedFilter.setShowArchived}
-                />
-                <ErrorBoundary>{content}</ErrorBoundary>
-            </div>
-        );
-    } else {
-        return null;
-    }
+  } else {
+    return null;
+  }
 };

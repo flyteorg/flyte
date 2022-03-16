@@ -1,11 +1,13 @@
 class Timer {
-    public readonly startTime = window.performance.now();
-    public get time() {
-        return window.performance.now() - this.startTime;
-    }
-    public get timeStringMS() {
-        return `${this.time.toFixed(2)}ms`;
-    }
+  public readonly startTime = window.performance.now();
+
+  public get time() {
+    return window.performance.now() - this.startTime;
+  }
+
+  public get timeStringMS() {
+    return `${this.time.toFixed(2)}ms`;
+  }
 }
 
 /** Returns a simple object to allow precision timing based on
@@ -14,5 +16,5 @@ class Timer {
  * `startTime` was sampled.
  */
 export function createTimer() {
-    return new Timer();
+  return new Timer();
 }

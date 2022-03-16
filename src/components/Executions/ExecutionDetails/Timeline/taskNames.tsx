@@ -2,15 +2,15 @@ import * as React from 'react';
 import { makeStyles, Theme, Typography } from '@material-ui/core';
 
 import { RowExpander } from 'components/Executions/Tables/RowExpander';
-import { NodeExecutionName } from './NodeExecutionName';
-import { NodeExecutionsTimelineContext } from './context';
 import { getNodeTemplateName } from 'components/WorkflowGraph/utils';
 import { dNode } from 'models/Graph/types';
+import { NodeExecutionName } from './NodeExecutionName';
+import { NodeExecutionsTimelineContext } from './context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   taskNamesList: {
     overflowY: 'scroll',
-    flex: 1
+    flex: 1,
   },
   namesContainer: {
     display: 'flex',
@@ -21,12 +21,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: 56,
     width: 256,
     borderBottom: `1px solid ${theme.palette.divider}`,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
   },
   namesContainerExpander: {
     display: 'flex',
     marginTop: 'auto',
-    marginBottom: 'auto'
+    marginBottom: 'auto',
   },
   namesContainerBody: {
     display: 'flex',
@@ -35,17 +35,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center',
     whiteSpace: 'nowrap',
     height: '100%',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   displayName: {
     marginTop: 4,
     textOverflow: 'ellipsis',
     width: '100%',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   leaf: {
-    width: 30
-  }
+    width: 30,
+  },
 }));
 
 interface TaskNamesProps {
@@ -61,7 +61,7 @@ export const TaskNames = React.forwardRef<HTMLDivElement, TaskNamesProps>((props
 
   return (
     <div className={styles.taskNamesList} ref={ref} onScroll={onScroll}>
-      {nodes.map(node => {
+      {nodes.map((node) => {
         const templateName = getNodeTemplateName(node);
         const nodeLevel = node?.level ?? 0;
         return (

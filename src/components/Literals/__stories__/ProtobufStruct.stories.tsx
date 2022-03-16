@@ -9,47 +9,45 @@ const stories = storiesOf('Literals/ProtobufStruct', module);
 stories.addDecorator(CardDecorator);
 
 function renderStruct(label: string, struct: ProtobufStruct) {
-    return (
-        <LiteralValue
-            label={label}
-            literal={{
-                scalar: { value: 'generic', generic: struct },
-                value: 'scalar'
-            }}
-        />
-    );
+  return (
+    <LiteralValue
+      label={label}
+      literal={{
+        scalar: { value: 'generic', generic: struct },
+        value: 'scalar',
+      }}
+    />
+  );
 }
 
-stories.add('basic', () =>
-    renderStruct('basic_struct', { fields: protobufValues })
-);
+stories.add('basic', () => renderStruct('basic_struct', { fields: protobufValues }));
 
 stories.add('list', () =>
-    renderStruct('struct_with_list', {
-        fields: {
-            list_value: {
-                kind: 'listValue',
-                listValue: {
-                    values: [
-                        ...Object.values(protobufValues),
-                        {
-                            kind: 'structValue',
-                            structValue: { fields: protobufValues }
-                        }
-                    ]
-                } as ProtobufListValue
-            }
-        }
-    })
+  renderStruct('struct_with_list', {
+    fields: {
+      list_value: {
+        kind: 'listValue',
+        listValue: {
+          values: [
+            ...Object.values(protobufValues),
+            {
+              kind: 'structValue',
+              structValue: { fields: protobufValues },
+            },
+          ],
+        } as ProtobufListValue,
+      },
+    },
+  }),
 );
 
 stories.add('nested', () =>
-    renderStruct('struct_with_nested', {
-        fields: {
-            struct_value: {
-                kind: 'structValue',
-                structValue: { fields: protobufValues }
-            }
-        }
-    })
+  renderStruct('struct_with_nested', {
+    fields: {
+      struct_value: {
+        kind: 'structValue',
+        structValue: { fields: protobufValues },
+      },
+    },
+  }),
 );

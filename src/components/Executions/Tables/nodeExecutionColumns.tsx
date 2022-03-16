@@ -21,7 +21,7 @@ const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, sta
 
   React.useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then(res => {
+    detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
         setDisplayName(res.displayName);
       }
@@ -34,7 +34,8 @@ const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, sta
   const commonStyles = useCommonStyles();
   const styles = useColumnStyles();
 
-  const isSelected = state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
+  const isSelected =
+    state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
 
   const name = displayName ?? execution.id.nodeId;
   const truncatedName = name?.split('.').pop() || name;
@@ -69,7 +70,7 @@ const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
 
   React.useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then(res => {
+    detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
         setDisplayId(res.displayId);
       }
@@ -93,7 +94,7 @@ const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => 
 
   React.useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then(res => {
+    detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
         setType(res.displayType);
       }
@@ -106,7 +107,10 @@ const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => 
   return <Typography color="textSecondary">{type}</Typography>;
 };
 
-const hiddenCacheStatuses = [Core.CatalogCacheStatus.CACHE_MISS, Core.CatalogCacheStatus.CACHE_DISABLED];
+const hiddenCacheStatuses = [
+  Core.CatalogCacheStatus.CACHE_MISS,
+  Core.CatalogCacheStatus.CACHE_DISABLED,
+];
 function hasCacheStatus(taskNodeMetadata?: TaskNodeMetadata): taskNodeMetadata is TaskNodeMetadata {
   if (!taskNodeMetadata) {
     return false;
@@ -115,31 +119,33 @@ function hasCacheStatus(taskNodeMetadata?: TaskNodeMetadata): taskNodeMetadata i
   return !hiddenCacheStatuses.includes(cacheStatus);
 }
 
-export function generateColumns(styles: ReturnType<typeof useColumnStyles>): NodeExecutionColumnDefinition[] {
+export function generateColumns(
+  styles: ReturnType<typeof useColumnStyles>,
+): NodeExecutionColumnDefinition[] {
   return [
     {
-      cellRenderer: props => <ExecutionName {...props} />,
+      cellRenderer: (props) => <ExecutionName {...props} />,
       className: styles.columnName,
       key: 'name',
-      label: 'task name'
+      label: 'task name',
     },
     {
-      cellRenderer: props => <DisplayId {...props} />,
+      cellRenderer: (props) => <DisplayId {...props} />,
       className: styles.columnNodeId,
       key: 'nodeId',
-      label: 'node id'
+      label: 'node id',
     },
     {
-      cellRenderer: props => <DisplayType {...props} />,
+      cellRenderer: (props) => <DisplayType {...props} />,
       className: styles.columnType,
       key: 'type',
-      label: 'type'
+      label: 'type',
     },
     {
       cellRenderer: ({
         execution: {
-          closure: { phase = NodeExecutionPhase.UNDEFINED, taskNodeMetadata }
-        }
+          closure: { phase = NodeExecutionPhase.UNDEFINED, taskNodeMetadata },
+        },
       }) => (
         <>
           <ExecutionStatusBadge phase={phase} type="node" />
@@ -150,7 +156,7 @@ export function generateColumns(styles: ReturnType<typeof useColumnStyles>): Nod
       ),
       className: styles.columnStatus,
       key: 'phase',
-      label: 'status'
+      label: 'status',
     },
     {
       cellRenderer: ({ execution: { closure } }) => {
@@ -170,7 +176,7 @@ export function generateColumns(styles: ReturnType<typeof useColumnStyles>): Nod
       },
       className: styles.columnStartedAt,
       key: 'startedAt',
-      label: 'start time'
+      label: 'start time',
     },
     {
       cellRenderer: ({ execution }) => {
@@ -195,7 +201,7 @@ export function generateColumns(styles: ReturnType<typeof useColumnStyles>): Nod
             Queued Time
           </Typography>
         </>
-      )
+      ),
     },
     {
       cellRenderer: ({ execution, state }) => (
@@ -203,7 +209,7 @@ export function generateColumns(styles: ReturnType<typeof useColumnStyles>): Nod
       ),
       className: styles.columnLogs,
       key: 'logs',
-      label: 'logs'
-    }
+      label: 'logs',
+    },
   ];
 }

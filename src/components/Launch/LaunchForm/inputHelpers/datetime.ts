@@ -7,35 +7,33 @@ import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function parseDate(value: InputValue) {
-    return value instanceof Date
-        ? value
-        : moment(value.toString(), allowedDateFormats).toDate();
+  return value instanceof Date ? value : moment(value.toString(), allowedDateFormats).toDate();
 }
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
-    const value = extractLiteralWithCheck<Protobuf.ITimestamp>(
-        literal,
-        primitiveLiteralPaths.scalarDatetime
-    );
-    return timestampToDate(value).toISOString();
+  const value = extractLiteralWithCheck<Protobuf.ITimestamp>(
+    literal,
+    primitiveLiteralPaths.scalarDatetime,
+  );
+  return timestampToDate(value).toISOString();
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
-    const datetime = dateToTimestamp(parseDate(value));
-    return {
-        scalar: { primitive: { datetime } }
-    };
+  const datetime = dateToTimestamp(parseDate(value));
+  return {
+    scalar: { primitive: { datetime } },
+  };
 }
 
 function validate({ value }: InputValidatorParams) {
-    const parsed = parseDate(value);
-    if (Number.isNaN(parsed.getTime())) {
-        throw new Error('Value is not a valid Date');
-    }
+  const parsed = parseDate(value);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error('Value is not a valid Date');
+  }
 }
 
 export const datetimeHelper: InputHelper = {
-    fromLiteral,
-    toLiteral,
-    validate
+  fromLiteral,
+  toLiteral,
+  validate,
 };

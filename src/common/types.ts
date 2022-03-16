@@ -2,5 +2,5 @@
  * all fields in nested objects are also optional.
  */
 export type DeepPartial<T> = {
-    [P in keyof T]?: DeepPartial<T[P]>;
+  [P in keyof T]?: DeepPartial<T[P]>;
 };

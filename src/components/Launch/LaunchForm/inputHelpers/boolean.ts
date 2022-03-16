@@ -9,53 +9,48 @@ import { extractLiteralWithCheck } from './utils';
  * a 0/1 integer value.
  */
 function isValidBoolean(value: InputValue) {
-    if (typeof value === 'boolean') {
-        return true;
-    }
-    if (typeof value === 'string') {
-        return ['t', 'f', '0', '1', 'true', 'false'].includes(
-            value.toLowerCase()
-        );
-    }
-    if (typeof value === 'number') {
-        return value === 1 || value === 0;
-    }
-    return false;
+  if (typeof value === 'boolean') {
+    return true;
+  }
+  if (typeof value === 'string') {
+    return ['t', 'f', '0', '1', 'true', 'false'].includes(value.toLowerCase());
+  }
+  if (typeof value === 'number') {
+    return value === 1 || value === 0;
+  }
+  return false;
 }
 
 /** Converts any of our acceptable values to an actual boolean. Assumes value
  * has been pre-validated.
  */
 function parseBoolean(value: InputValue) {
-    if (typeof value === 'boolean') {
-        return value;
-    }
-    if (typeof value === 'string') {
-        return ['f', 'false', '0'].includes(value.toLowerCase()) ? false : true;
-    }
-    return !!value;
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return ['f', 'false', '0'].includes(value.toLowerCase()) ? false : true;
+  }
+  return !!value;
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
-    return { scalar: { primitive: { boolean: parseBoolean(value) } } };
+  return { scalar: { primitive: { boolean: parseBoolean(value) } } };
 }
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
-    return extractLiteralWithCheck<boolean>(
-        literal,
-        primitiveLiteralPaths.scalarBoolean
-    );
+  return extractLiteralWithCheck<boolean>(literal, primitiveLiteralPaths.scalarBoolean);
 }
 
 function validate({ value }: InputValidatorParams) {
-    if (!isValidBoolean(value)) {
-        throw new Error('Value is not a valid boolean');
-    }
+  if (!isValidBoolean(value)) {
+    throw new Error('Value is not a valid boolean');
+  }
 }
 
 export const booleanHelper: InputHelper = {
-    fromLiteral,
-    toLiteral,
-    validate,
-    defaultValue: false
+  fromLiteral,
+  toLiteral,
+  validate,
+  defaultValue: false,
 };

@@ -7,11 +7,11 @@ import { useLiteralStyles } from '../styles';
  * we can't really show a byte array in a meaningful way
  */
 export const BinaryValue: React.FC<{ binary: Binary }> = ({ binary }) => {
-    const literalStyles = useLiteralStyles();
-    return (
-        <div className={literalStyles.nestedContainer}>
-            <PrintValue label="tag" value={binary.tag} />
-            <em>(binary data not shown)</em>
-        </div>
-    );
+  const literalStyles = useLiteralStyles();
+  return (
+    <div className={literalStyles.nestedContainer}>
+      <PrintValue label="tag" value={binary.tag} />
+      <em>(binary data not shown)</em>
+    </div>
+  );
 };

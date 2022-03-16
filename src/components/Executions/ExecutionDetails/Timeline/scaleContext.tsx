@@ -30,7 +30,7 @@ export const ScaleContext = createContext<TimelineScaleState>({
   },
   setScaleFactor: () => {
     console.error('ERROR: No ScaleContextProvider was found in parent components.');
-  }
+  },
 });
 
 /** Could be used to access the whole TimelineScaleState */
@@ -50,7 +50,7 @@ interface ScaleProviderProps {
   children?: React.ReactNode;
 }
 
-/** Should wrap "top level" component in Execution view, will build a nodeExecutions tree for specific workflow*/
+/** Should wrap "top level" component in Execution view, will build a nodeExecutions tree for specific workflow */
 export const ScaleProvider = (props: ScaleProviderProps) => {
   const [maxValue, setMaxValue] = React.useState(DEFAULT_MAX);
   const [scaleFactor, setScaleFactor] = React.useState<number>(DEFAULT_SCALE_FACTOR);
@@ -69,7 +69,7 @@ export const ScaleProvider = (props: ScaleProviderProps) => {
     for (let i = 0; i < percentage.length; ++i) {
       newMarks.push({
         value: i,
-        label: formatSeconds(getIntervalValue(i))
+        label: formatSeconds(getIntervalValue(i)),
       });
     }
     setMarks(newMarks);
@@ -77,7 +77,12 @@ export const ScaleProvider = (props: ScaleProviderProps) => {
 
   const setMaxTimeValue = (newMax: number) => {
     // use min and max caps
-    let newValue = newMax < MIN_SCALE_VALUE ? MIN_SCALE_VALUE : newMax > MAX_SCALE_VALUE ? MAX_SCALE_VALUE : newMax;
+    let newValue =
+      newMax < MIN_SCALE_VALUE
+        ? MIN_SCALE_VALUE
+        : newMax > MAX_SCALE_VALUE
+        ? MAX_SCALE_VALUE
+        : newMax;
     // round a value to have full amount of minutes:
     newValue = Math.ceil(newValue / 60) * 60;
     setMaxValue(newValue);
@@ -90,7 +95,13 @@ export const ScaleProvider = (props: ScaleProviderProps) => {
 
   return (
     <ScaleContext.Provider
-      value={{ scaleFactor, chartInterval, marks, setMaxValue: setMaxTimeValue, setScaleFactor: setNewScaleFactor }}
+      value={{
+        scaleFactor,
+        chartInterval,
+        marks,
+        setMaxValue: setMaxTimeValue,
+        setScaleFactor: setNewScaleFactor,
+      }}
     >
       {props.children}
     </ScaleContext.Provider>

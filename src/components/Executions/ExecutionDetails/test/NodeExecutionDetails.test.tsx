@@ -40,7 +40,7 @@ describe('NodeExecutionDetails', () => {
             <NodeExecutionDetailsPanelContent nodeExecutionId={execution.id} />
           </NodeExecutionDetailsContextProvider>
         </QueryClientProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('renders name for task nodes', async () => {
@@ -56,10 +56,10 @@ describe('NodeExecutionDetails', () => {
         cacheStatus: Core.CatalogCacheStatus.CACHE_MISS,
         catalogKey: {
           datasetId: makeIdentifier({
-            resourceType: Core.ResourceType.DATASET
+            resourceType: Core.ResourceType.DATASET,
           }),
-          sourceTaskExecution: { ...mockTaskExecution.id }
-        }
+          sourceTaskExecution: { ...mockTaskExecution.id },
+        },
       };
       execution.closure.taskNodeMetadata = taskNodeMetadata;
       mockServer.insertNodeExecution(execution);
@@ -71,22 +71,25 @@ describe('NodeExecutionDetails', () => {
       Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
       Core.CatalogCacheStatus.CACHE_MISS,
       Core.CatalogCacheStatus.CACHE_POPULATED,
-      Core.CatalogCacheStatus.CACHE_PUT_FAILURE
-    ].forEach(cacheStatusValue =>
+      Core.CatalogCacheStatus.CACHE_PUT_FAILURE,
+    ].forEach((cacheStatusValue) =>
       it(`renders correct status for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
         taskNodeMetadata.cacheStatus = cacheStatusValue;
         mockServer.insertNodeExecution(execution);
         const { getByText } = renderComponent();
         await waitFor(() => expect(getByText(cacheStatusMessages[cacheStatusValue])));
-      })
+      }),
     );
 
     it('renders source execution link for cache hits', async () => {
       taskNodeMetadata.cacheStatus = Core.CatalogCacheStatus.CACHE_HIT;
-      const sourceWorkflowExecutionId = taskNodeMetadata.catalogKey!.sourceTaskExecution.nodeExecutionId.executionId;
+      const sourceWorkflowExecutionId =
+        taskNodeMetadata.catalogKey!.sourceTaskExecution.nodeExecutionId.executionId;
       const { getByText } = renderComponent();
       const linkEl = await waitFor(() => getByText(viewSourceExecutionString));
-      expect(linkEl.getAttribute('href')).toBe(Routes.ExecutionDetails.makeUrl(sourceWorkflowExecutionId));
+      expect(linkEl.getAttribute('href')).toBe(
+        Routes.ExecutionDetails.makeUrl(sourceWorkflowExecutionId),
+      );
     });
   });
 });

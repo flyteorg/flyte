@@ -4,11 +4,11 @@ import { useFetchableData } from './useFetchableData';
 
 /** State hook that returns the version information */
 export function useVersion() {
-    const { getVersion } = useAPIContext();
-    return useFetchableData<GetVersionResponse | null>({
-        debugName: 'Version',
-        defaultValue: null,
-        doFetch: getVersion,
-        useCache: true
-    });
+  const { getVersion } = useAPIContext();
+  return useFetchableData<GetVersionResponse | null>({
+    debugName: 'Version',
+    defaultValue: null,
+    doFetch: getVersion,
+    useCache: true,
+  });
 }

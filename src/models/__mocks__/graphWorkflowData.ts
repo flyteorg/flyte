@@ -1,20 +1,13 @@
 import { CompiledNode } from 'models/Node/types';
-import {
-    WorkflowTemplate,
-    CompiledWorkflow,
-    CompiledWorkflowClosure
-} from 'models/Workflow/types';
+import { WorkflowTemplate, CompiledWorkflow, CompiledWorkflowClosure } from 'models/Workflow/types';
 
 export const workflowData = require('models/__mocks__/simpleWorkflowClosure.json');
 
-export const mockCompiledWorkflowClosure: CompiledWorkflowClosure =
-    workflowData.compiledWorkflow;
+export const mockCompiledWorkflowClosure: CompiledWorkflowClosure = workflowData.compiledWorkflow;
 
-export const mockCompiledWorkflow: CompiledWorkflow =
-    mockCompiledWorkflowClosure.primary;
+export const mockCompiledWorkflow: CompiledWorkflow = mockCompiledWorkflowClosure.primary;
 
-export const mockTemplate: WorkflowTemplate =
-    mockCompiledWorkflowClosure.primary.template;
+export const mockTemplate: WorkflowTemplate = mockCompiledWorkflowClosure.primary.template;
 
 export const mockNodesList: CompiledNode[] = mockTemplate.nodes;
 export const mockCompiledStartNode: CompiledNode = mockNodesList[0];

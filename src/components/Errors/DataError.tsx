@@ -7,49 +7,43 @@ import { NotAuthorizedError, NotFoundError } from 'errors/fetchErrors';
 import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    container: {
-        margin: `${theme.spacing(2)}px 0`
-    }
+  container: {
+    margin: `${theme.spacing(2)}px 0`,
+  },
 }));
 
 export interface DataErrorProps {
-    errorTitle: string;
-    error?: Error;
-    retry?: () => void;
+  errorTitle: string;
+  error?: Error;
+  retry?: () => void;
 }
 
 /** A shared error component to be used when data fails to load. */
-export const DataError: React.FC<DataErrorProps> = ({
-    error,
-    errorTitle,
-    retry
-}) => {
-    const styles = useStyles();
-    if (error instanceof NotFoundError) {
-        return <NotFound />;
-    }
-    // For NotAuthorized, we will be displaying a global error.
-    if (error instanceof NotAuthorizedError) {
-        return null;
-    }
+export const DataError: React.FC<DataErrorProps> = ({ error, errorTitle, retry }) => {
+  const styles = useStyles();
+  if (error instanceof NotFoundError) {
+    return <NotFound />;
+  }
+  // For NotAuthorized, we will be displaying a global error.
+  if (error instanceof NotAuthorizedError) {
+    return null;
+  }
 
-    const description = error ? error.message : undefined;
+  const description = error ? error.message : undefined;
 
-    const action = retry ? (
-        <Button variant="contained" color="primary" onClick={retry}>
-            Retry
-        </Button>
-    ) : (
-        undefined
-    );
-    return (
-        <NonIdealState
-            className={styles.container}
-            description={description}
-            title={errorTitle}
-            icon={ErrorOutline}
-        >
-            {action}
-        </NonIdealState>
-    );
+  const action = retry ? (
+    <Button variant="contained" color="primary" onClick={retry}>
+      Retry
+    </Button>
+  ) : undefined;
+  return (
+    <NonIdealState
+      className={styles.container}
+      description={description}
+      title={errorTitle}
+      icon={ErrorOutline}
+    >
+      {action}
+    </NonIdealState>
+  );
 };

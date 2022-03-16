@@ -31,8 +31,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(
     `${env.BASE_URL}/assets`,
     expressStaticGzip(distPath, {
-      maxAge: '1d'
-    })
+      maxAge: '1d',
+    }),
   );
   app.use(serverRenderer({ clientStats, currentDirectory: __dirname }));
 } else {
@@ -45,22 +45,22 @@ if (process.env.NODE_ENV === 'production') {
 
   require('ts-node').register({
     compilerOptions: { module: 'commonjs' },
-    cacheDirectory: '/tmp'
+    cacheDirectory: '/tmp',
   });
   const { default: configs, clientConfig } = require('./webpack.config');
 
   const compiler = webpack(
-    configs.map(c =>
+    configs.map((c) =>
       Object.assign({}, c, {
-        mode: 'development'
-      })
-    )
+        mode: 'development',
+      }),
+    ),
   );
   const clientCompiler = compiler.compilers.find(({ name }) => name === 'client');
 
   const devMiddleware = webpackDevMiddleware(compiler, {
     serverSideRender: true,
-    publicPath: clientConfig.output.publicPath
+    publicPath: clientConfig.output.publicPath,
   });
 
   app.use(devMiddleware);
@@ -71,9 +71,9 @@ if (process.env.NODE_ENV === 'production') {
         // Send client compiler FS for reading index.html for emitted assets
         fileSystem: clientCompiler.outputFileSystem,
         // Helps with finding the output folder in memory-fs
-        currentDirectory: __dirname
-      }
-    })
+        currentDirectory: __dirname,
+      },
+    }),
   );
 }
 
@@ -90,14 +90,14 @@ if (env.ADMIN_API_USE_SSL == 'https') {
     .createServer(
       {
         key: privateKey,
-        cert: certificate
+        cert: certificate,
       },
-      app
+      app,
     )
     .listen(port);
   console.log(`Server started with SSL: https://localhost:${port}/`);
 } else {
-  server = app.listen(port, error => {
+  server = app.listen(port, (error) => {
     if (error) {
       throw error;
     }
@@ -107,7 +107,7 @@ if (env.ADMIN_API_USE_SSL == 'https') {
 
 process.on('SIGTERM', () => {
   console.info('SIGTERM signal received. Shutting down.');
-  server.close(error => {
+  server.close((error) => {
     if (error) {
       console.error('Failed to close server:', error);
       process.exit(1);

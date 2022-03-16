@@ -5,5 +5,5 @@ import { projects } from './data/projects';
  * mock data fixtures.
  */
 export function insertDefaultData(server: AdminServer): void {
-    server.insertProjects([projects.flyteTest]);
+  server.insertProjects([projects.flyteTest]);
 }

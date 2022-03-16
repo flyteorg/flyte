@@ -8,28 +8,25 @@ import { history } from 'routes/history';
 
 /** A simple component to render a link to a specific WorkflowExecution */
 export const WorkflowExecutionLink: React.FC<{
-    className?: string;
-    color?: 'primary' | 'disabled';
-    id: WorkflowExecutionIdentifier;
+  className?: string;
+  color?: 'primary' | 'disabled';
+  id: WorkflowExecutionIdentifier;
 }> = ({ className, color = 'primary', id }) => {
-    const commonStyles = useCommonStyles();
-    const {
-        location: { pathname }
-    } = history;
-    const fromExecutionNav = pathname.split('/').pop() === 'executions';
+  const commonStyles = useCommonStyles();
+  const {
+    location: { pathname },
+  } = history;
+  const fromExecutionNav = pathname.split('/').pop() === 'executions';
 
-    const linkColor =
-        color == 'disabled'
-            ? commonStyles.secondaryLink
-            : commonStyles.primaryLink;
-    return (
-        <RouterLink
-            className={classnames(linkColor, className)}
-            to={`${Routes.ExecutionDetails.makeUrl(id)}${
-                fromExecutionNav ? '?fromExecutionNav=true' : ''
-            }`}
-        >
-            {id.name}
-        </RouterLink>
-    );
+  const linkColor = color == 'disabled' ? commonStyles.secondaryLink : commonStyles.primaryLink;
+  return (
+    <RouterLink
+      className={classnames(linkColor, className)}
+      to={`${Routes.ExecutionDetails.makeUrl(id)}${
+        fromExecutionNav ? '?fromExecutionNav=true' : ''
+      }`}
+    >
+      {id.name}
+    </RouterLink>
+  );
 };

@@ -5,6 +5,6 @@ import { useLiteralStyles } from './styles';
  * including support for themes.
  */
 export const ValueLabel: React.FC<{ label: React.ReactNode }> = ({ label }) => {
-    const literalStyles = useLiteralStyles();
-    return <span className={literalStyles.valueLabel}>{label}:</span>;
+  const literalStyles = useLiteralStyles();
+  return <span className={literalStyles.valueLabel}>{label}:</span>;
 };

@@ -1,5 +1,5 @@
 export interface IconProps {
-    size?: number;
-    className?: string;
-    onClick?: () => void;
+  size?: number;
+  className?: string;
+  onClick?: () => void;
 }

@@ -2,7 +2,7 @@ import {
   mockCompiledWorkflow,
   mockCompiledEndNode,
   mockCompiledStartNode,
-  mockCompiledTaskNode
+  mockCompiledTaskNode,
 } from 'models/__mocks__/graphWorkflowData';
 import { dTypes } from 'models/Graph/types';
 import {
@@ -12,8 +12,8 @@ import {
   getDisplayName,
   getNodeTypeFromCompiledNode,
   isStartNode,
-  isEndNode
-} from '../../WorkflowGraph/utils';
+  isEndNode,
+} from '../utils';
 
 describe('getDisplayName', () => {
   it('should return correct name', () => {
@@ -28,22 +28,22 @@ describe('checkIfObjectsAreSame', () => {
   const a = {
     red: 'red',
     blue: 'blue',
-    green: 'green'
+    green: 'green',
   };
   const b = {
     red: 'red',
     blue: 'blue',
-    green: 'green'
+    green: 'green',
   };
   const fail_a = {
     red: 'red',
     blue: 'not blue',
-    green: 'green'
+    green: 'green',
   };
   const fail_b = {
     red: 'red',
     green: 'green',
-    orange: 'orange'
+    orange: 'orange',
   };
   it('should return true when a-keys match b-values', () => {
     expect(checkIfObjectsAreSame(a, b)).toEqual(true);
@@ -56,10 +56,10 @@ describe('checkIfObjectsAreSame', () => {
 
 describe('getNodeTypeFromCompiledNode', () => {
   const branchNode = {
-    branchNode: {}
+    branchNode: {},
   };
   const workflowNode = {
-    workflowNode: {}
+    workflowNode: {},
   };
   const mockBranchNode = { ...mockCompiledTaskNode, ...branchNode };
   const mockWorkflowNode = { ...mockCompiledTaskNode, ...workflowNode };

@@ -11,47 +11,45 @@ import { createWorkflowName } from 'test/modelUtils';
 import { ProjectWorkflows } from '../ProjectWorkflows';
 
 describe('ProjectWorkflows', () => {
-    const project = 'TestProject';
-    const domain = 'TestDomain';
-    let workflowNames: NamedEntity[];
-    let mockListNamedEntities: jest.Mock<ReturnType<typeof listNamedEntities>>;
+  const project = 'TestProject';
+  const domain = 'TestDomain';
+  let workflowNames: NamedEntity[];
+  let mockListNamedEntities: jest.Mock<ReturnType<typeof listNamedEntities>>;
 
-    beforeEach(() => {
-        workflowNames = ['MyWorkflow', 'MyOtherWorkflow'].map(name =>
-            createWorkflowName({ domain, name, project })
-        );
-        mockListNamedEntities = jest
-            .fn()
-            .mockResolvedValue({ entities: workflowNames });
-    });
+  beforeEach(() => {
+    workflowNames = ['MyWorkflow', 'MyOtherWorkflow'].map((name) =>
+      createWorkflowName({ domain, name, project }),
+    );
+    mockListNamedEntities = jest.fn().mockResolvedValue({ entities: workflowNames });
+  });
 
-    const renderComponent = () =>
-        render(
-            <APIContext.Provider
-                value={mockAPIContextValue({
-                    listNamedEntities: mockListNamedEntities
-                })}
-            >
-                <ProjectWorkflows projectId={project} domainId={domain} />
-            </APIContext.Provider>,
-            { wrapper: MemoryRouter }
-        );
+  const renderComponent = () =>
+    render(
+      <APIContext.Provider
+        value={mockAPIContextValue({
+          listNamedEntities: mockListNamedEntities,
+        })}
+      >
+        <ProjectWorkflows projectId={project} domainId={domain} />
+      </APIContext.Provider>,
+      { wrapper: MemoryRouter },
+    );
 
-    it('does not show archived workflows', async () => {
-        renderComponent();
-        await waitFor(() => {});
+  it('does not show archived workflows', async () => {
+    renderComponent();
+    await waitFor(() => {});
 
-        expect(mockListNamedEntities).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({
-                filter: [
-                    {
-                        key: 'state',
-                        operation: FilterOperationName.EQ,
-                        value: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE
-                    }
-                ]
-            })
-        );
-    });
+    expect(mockListNamedEntities).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        filter: [
+          {
+            key: 'state',
+            operation: FilterOperationName.EQ,
+            value: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE,
+          },
+        ],
+      }),
+    );
+  });
 });

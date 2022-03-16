@@ -8,30 +8,30 @@ import * as React from 'react';
 
 const textWidths: Dictionary<number> = {};
 function getTextWidthForLabel(label: string, fontSize: number) {
-    const key = `${fontSize}:${label}`;
-    if (textWidths[key] != null) {
-        return textWidths[key];
-    }
-    const computed = measureText(fontSize, label).width;
-    textWidths[key] = computed;
-    return computed;
+  const key = `${fontSize}:${label}`;
+  if (textWidths[key] != null) {
+    return textWidths[key];
+  }
+  const computed = measureText(fontSize, label).width;
+  textWidths[key] = computed;
+  return computed;
 }
 
 interface InputOutputNodeRendererProps extends NodeRendererProps<DAGNode> {
-    label: string;
+  label: string;
 }
 
 /** Special case renderer for the start/end nodes in a graph */
-export const InputOutputNodeRenderer: React.FC<InputOutputNodeRendererProps> = props => {
-    const { node, config, label } = props;
-    const fillColor = taskColors[TaskType.UNKNOWN];
-    const textWidth = getTextWidthForLabel(label, config.fontSize);
+export const InputOutputNodeRenderer: React.FC<InputOutputNodeRendererProps> = (props) => {
+  const { node, config, label } = props;
+  const fillColor = taskColors[TaskType.UNKNOWN];
+  const textWidth = getTextWidthForLabel(label, config.fontSize);
 
-    return (
-        <Node
-            {...props}
-            config={{ ...config, fillColor, cornerRounding: 0 }}
-            node={{ ...node, textWidth, id: label }}
-        />
-    );
+  return (
+    <Node
+      {...props}
+      config={{ ...config, fillColor, cornerRounding: 0 }}
+      node={{ ...node, textWidth, id: label }}
+    />
+  );
 };

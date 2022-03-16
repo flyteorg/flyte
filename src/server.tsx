@@ -44,7 +44,9 @@ export default function serverRenderer({ fileSystem, currentDirectory }: ServerR
 
     // populate Helmet content
     const helmet = Helmet.renderStatic();
-    $('head').append($.parseHTML(`${helmet.title.toString()} ${helmet.meta.toString()} ${helmet.link.toString()}`));
+    $('head').append(
+      $.parseHTML(`${helmet.title.toString()} ${helmet.meta.toString()} ${helmet.link.toString()}`),
+    );
 
     // Populate process.env into window.env
     $('head').append($(`<script>window.env = ${JSON.stringify(processEnv)}</script>`));

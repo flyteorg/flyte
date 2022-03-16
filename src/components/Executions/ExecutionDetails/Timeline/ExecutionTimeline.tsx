@@ -25,18 +25,18 @@ interface StyleProps {
   durationLength: number;
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   chartHeader: (props: StyleProps) => ({
     marginTop: -10,
     marginLeft: -15,
     width: `${props.chartWidth + 20}px`,
-    height: `${56 * props.durationLength + 20}px`
+    height: `${56 * props.durationLength + 20}px`,
   }),
   taskNames: {
     display: 'flex',
     flexDirection: 'column',
     borderRight: `1px solid ${theme.palette.divider}`,
-    overflowY: 'auto'
+    overflowY: 'auto',
   },
   taskNamesHeader: {
     textTransform: 'uppercase',
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     borderBottom: `4px solid ${theme.palette.divider}`,
-    paddingLeft: 30
+    paddingLeft: 30,
   },
   taskDurations: {
     borderLeft: `1px solid ${theme.palette.divider}`,
@@ -57,16 +57,16 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     overflow: 'hidden',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   taskDurationsLabelsView: {
     overflow: 'hidden',
-    borderBottom: `4px solid ${theme.palette.divider}`
+    borderBottom: `4px solid ${theme.palette.divider}`,
   },
   taskDurationsView: {
     flex: 1,
-    overflowY: 'hidden'
-  }
+    overflowY: 'hidden',
+  },
 }));
 
 const INTERVAL_LENGTH = 110;
@@ -89,7 +89,9 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   const { compiledWorkflowClosure } = useNodeExecutionContext();
 
   React.useEffect(() => {
-    const nodes: dNode[] = compiledWorkflowClosure ? transformerWorkflowToDag(compiledWorkflowClosure).dag.nodes : [];
+    const nodes: dNode[] = compiledWorkflowClosure
+      ? transformerWorkflowToDag(compiledWorkflowClosure).dag.nodes
+      : [];
     // we remove start/end node info in the root dNode list during first assignment
     const initializeNodes = convertToPlainNodes(nodes);
     setOriginalNodes(initializeNodes);
@@ -98,17 +100,19 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   React.useEffect(() => {
     const initializeNodes = convertToPlainNodes(originalNodes);
     setShowNodes(
-      initializeNodes.map(node => {
-        const index = nodeExecutions.findIndex(exe => exe.scopedId === node.scopedId);
+      initializeNodes.map((node) => {
+        const index = nodeExecutions.findIndex((exe) => exe.scopedId === node.scopedId);
         return {
           ...node,
-          execution: index >= 0 ? nodeExecutions[index] : undefined
+          execution: index >= 0 ? nodeExecutions[index] : undefined,
         };
-      })
+      }),
     );
   }, [originalNodes, nodeExecutions]);
 
-  const { startedAt, totalDuration, durationLength, chartData } = useChartDurationData({ nodes: showNodes });
+  const { startedAt, totalDuration, durationLength, chartData } = useChartDurationData({
+    nodes: showNodes,
+  });
   const { chartInterval: chartTimeInterval, setMaxValue } = useScaleContext();
   const styles = useStyles({ chartWidth: chartWidth, durationLength: durationLength });
 
@@ -119,7 +123,9 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   React.useEffect(() => {
     const calcWidth = Math.ceil(totalDuration / chartTimeInterval) * INTERVAL_LENGTH;
     if (durationsRef.current && calcWidth < durationsRef.current.clientWidth) {
-      setLabelInterval(durationsRef.current.clientWidth / Math.ceil(totalDuration / chartTimeInterval));
+      setLabelInterval(
+        durationsRef.current.clientWidth / Math.ceil(totalDuration / chartTimeInterval),
+      );
       setChartWidth(durationsRef.current.clientWidth);
     } else {
       setChartWidth(calcWidth);
@@ -133,7 +139,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     const labelView = durationsLabelsRef?.current;
     if (labelView) {
       labelView.scrollTo({
-        left: scrollLeft
+        left: scrollLeft,
       });
     }
   };
@@ -143,7 +149,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     const graphView = durationsRef?.current;
     if (graphView) {
       graphView.scrollTo({
-        top: scrollTop
+        top: scrollTop,
       });
     }
   };
@@ -176,7 +182,9 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     const lbs = len > 0 ? new Array(len).fill(0) : [];
     return lbs.map((_, idx) => {
       const time = moment.utc(new Date(startedAt.getTime() + idx * chartTimeInterval * 1000));
-      return chartTimezone === TimeZone.UTC ? time.format('hh:mm:ss A') : time.local().format('hh:mm:ss A');
+      return chartTimezone === TimeZone.UTC
+        ? time.format('hh:mm:ss A')
+        : time.local().format('hh:mm:ss A');
     });
   }, [chartTimezone, startedAt, chartTimeInterval, totalDuration]);
 
@@ -184,7 +192,12 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     <>
       <div className={styles.taskNames}>
         <Typography className={styles.taskNamesHeader}>Task Name</Typography>
-        <TaskNames nodes={showNodes} ref={taskNamesRef} onToggle={toggleNode} onScroll={onVerticalNodesScroll} />
+        <TaskNames
+          nodes={showNodes}
+          ref={taskNamesRef}
+          onToggle={toggleNode}
+          onScroll={onVerticalNodesScroll}
+        />
       </div>
       <div className={styles.taskDurations}>
         <div className={styles.taskDurationsLabelsView} ref={durationsLabelsRef}>

@@ -5,7 +5,7 @@ export enum LocalCacheItem {
   TestObject = 'test-object',
 
   // Production flags
-  ShowWorkflowVersions = 'flyte.show-workflow-versions'
+  ShowWorkflowVersions = 'flyte.show-workflow-versions',
 }
 
 type LocalCacheConfig = { [k: string]: string };
@@ -13,7 +13,7 @@ type LocalCacheConfig = { [k: string]: string };
 /*
  * THe default value could be present as any simple type or as a valid JSON object
  * with all field names wrapped in double quotes
- **/
+ */
 export const defaultLocalCacheConfig: LocalCacheConfig = {
   // Test
   'test-setting-bool': 'false',
@@ -23,5 +23,5 @@ export const defaultLocalCacheConfig: LocalCacheConfig = {
   'flyte.show-workflow-versions': 'true',
 
   // Feature flags - for prod testing
-  'ff.timeline-view': 'false'
+  'ff.timeline-view': 'false',
 };

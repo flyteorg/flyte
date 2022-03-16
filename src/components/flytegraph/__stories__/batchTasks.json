@@ -1,267 +1,267 @@
 {
-  "subWorkflows": [],
-  "tasks": [
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow-print-every-time",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "strings_to_print": {
-                "type": {
-                  "collectionType": {
-                    "simple": 3
-                  }
-                }
-              },
-              "ints_to_print": {
-                "type": {
-                  "collectionType": {
-                    "collectionType": {
-                      "simple": 1
+    "subWorkflows": [],
+    "tasks": [
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow-print-every-time",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "strings_to_print": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 3
+                                    }
+                                }
+                            },
+                            "ints_to_print": {
+                                "type": {
+                                    "collectionType": {
+                                        "collectionType": {
+                                            "simple": 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {}
                     }
-                  }
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {}
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "batch_workflow",
-            "--task-name",
-            "print_every_time",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "workflow-sample-batch-task-no-i",
-          "version": "ABC123"
-        },
-        "category": 1,
-        "type": "batch-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {}
-        },
-        "interface": {
-          "inputs": {
-            "variables": {}
-          },
-          "outputs": {
-            "variables": {
-              "out_str": {
-                "type": {
-                  "collectionType": {
-                    "simple": 3
-                  }
-                }
-              },
-              "out_ints": {
-                "type": {
-                  "collectionType": {
-                    "collectionType": {
-                      "simple": 1
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "batch_workflow",
+                        "--task-name",
+                        "print_every_time",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
                     }
-                  }
                 }
-              }
             }
-          }
         },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "batch_workflow",
-            "--task-name",
-            "sample_batch_task_no_inputs",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "workflow-sample-batch-task-no-i",
+                    "version": "ABC123"
+                },
+                "category": 1,
+                "type": "batch-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {}
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {}
+                    },
+                    "outputs": {
+                        "variables": {
+                            "out_str": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 3
+                                    }
+                                }
+                            },
+                            "out_ints": {
+                                "type": {
+                                    "collectionType": {
+                                        "collectionType": {
+                                            "simple": 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "batch_workflow",
+                        "--task-name",
+                        "sample_batch_task_no_inputs",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
             }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
         }
-      }
-    }
-  ],
-  "primary": {
-    "template": {
-      "nodes": [
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "start-node"
-        },
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "end-node"
-        },
-        {
-          "inputs": [
-            {
-              "var": "ints_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "task1",
-                  "var": "out_ints"
+    ],
+    "primary": {
+        "template": {
+            "nodes": [
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "start-node"
+                },
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "end-node"
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "ints_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "task1",
+                                    "var": "out_ints"
+                                }
+                            }
+                        },
+                        {
+                            "var": "strings_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "task1",
+                                    "var": "out_str"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["task1"],
+                    "outputAliases": [],
+                    "id": "t",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow-print-every-time",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "task1",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "workflow-sample-batch-task-no-i",
+                            "version": "ABC123"
+                        }
+                    }
                 }
-              }
+            ],
+            "outputs": [],
+            "id": {
+                "resourceType": 2,
+                "project": "myflyteproject",
+                "domain": "development",
+                "name": "workflow-batch-tasks-workflow",
+                "version": "ABC123"
             },
-            {
-              "var": "strings_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "task1",
-                  "var": "out_str"
+            "metadata": {},
+            "interface": {
+                "inputs": {
+                    "variables": {}
+                },
+                "outputs": {
+                    "variables": {}
                 }
-              }
             }
-          ],
-          "upstreamNodeIds": ["task1"],
-          "outputAliases": [],
-          "id": "t",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow-print-every-time",
-              "version": "ABC123"
+        },
+        "connections": {
+            "downstream": {
+                "t": {
+                    "ids": ["end-node"]
+                },
+                "task1": {
+                    "ids": ["t"]
+                },
+                "start-node": {
+                    "ids": ["task1"]
+                }
+            },
+            "upstream": {
+                "end-node": { "ids": ["t"] },
+                "t": {
+                    "ids": ["", "task1", "task1", "task1"]
+                },
+                "task1": {
+                    "ids": ["", "start-node"]
+                }
             }
-          }
-        },
-        {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "task1",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "workflow-sample-batch-task-no-i",
-              "version": "ABC123"
-            }
-          }
         }
-      ],
-      "outputs": [],
-      "id": {
-        "resourceType": 2,
-        "project": "myflyteproject",
-        "domain": "development",
-        "name": "workflow-batch-tasks-workflow",
-        "version": "ABC123"
-      },
-      "metadata": {},
-      "interface": {
-        "inputs": {
-          "variables": {}
-        },
-        "outputs": {
-          "variables": {}
-        }
-      }
-    },
-    "connections": {
-      "downstream": {
-        "t": {
-          "ids": ["end-node"]
-        },
-        "task1": {
-          "ids": ["t"]
-        },
-        "start-node": {
-          "ids": ["task1"]
-        }
-      },
-      "upstream": {
-        "end-node": { "ids": ["t"] },
-        "t": {
-          "ids": ["", "task1", "task1", "task1"]
-        },
-        "task1": {
-          "ids": ["", "start-node"]
-        }
-      }
     }
-  }
 }

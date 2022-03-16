@@ -1,1023 +1,1016 @@
 {
-  "subWorkflows": [],
-  "tasks": [
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-add-one-and-print",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "value_to_print": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "out": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "add_one_and_print",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-print-every-time",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "date_triggered": {
-                "type": {
-                  "simple": 5
-                }
-              },
-              "value_to_print": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {}
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "print_every_time",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-print-int",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "value_to_print": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {}
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "print_int",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-simple-batch-task",
-          "version": "ABC123"
-        },
-        "category": 1,
-        "type": "batch-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "iterations": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "out": {
-                "type": {
-                  "collectionType": {
-                    "simple": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "simple_batch_task",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-sum-and-print",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "values_to_add": {
-                "type": {
-                  "collectionType": {
-                    "simple": 1
-                  }
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "out": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "sum_and_print",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-sum-ints",
-          "version": "ABC123"
-        },
-        "type": "spark",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "ints": {
-                "type": {
-                  "collectionType": {
-                    "simple": 1
-                  }
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "sum": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          }
-        },
-        "custom": {
-          "fields": {
-            "mainApplicationFile": {
-              "stringValue": "local:///myfile"
-            }
-          }
-        },
-        "container": {
-          "command": [""],
-          "args": [
-            "execute_spark_task",
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "sum_ints",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": 1,
-          "project": "myflyteproject",
-          "domain": "development",
-          "name": "sample-tasks-sum-non-none",
-          "version": "ABC123"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": 1,
-            "version": "0.0.1a0",
-            "flavor": "python"
-          },
-          "timeout": {},
-          "retries": {},
-          "discoveryVersion": "1"
-        },
-        "interface": {
-          "inputs": {
-            "variables": {
-              "values_to_print": {
-                "type": {
-                  "collectionType": {
-                    "simple": 1
-                  }
-                }
-              }
-            }
-          },
-          "outputs": {
-            "variables": {
-              "out": {
-                "type": {
-                  "simple": 1
-                }
-              }
-            }
-          }
-        },
-        "container": {
-          "command": ["pyflyte-execute"],
-          "args": [
-            "--task-module",
-            "sample_tasks",
-            "--task-name",
-            "sum_non_none",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}"
-          ],
-          "env": [
-            {
-              "key": "FLYTE_CONFIGURATION_PATH",
-              "value": "/myflyteproject/flytekit.config"
-            }
-          ],
-          "config": [],
-          "ports": [],
-          "image": "myflyteproject:DEF123",
-          "resources": {
-            "requests": [],
-            "limits": []
-          }
-        }
-      }
-    }
-  ],
-  "primary": {
-    "template": {
-      "nodes": [
+    "subWorkflows": [],
+    "tasks": [
         {
-          "inputs": [],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "start-node"
-        },
-        {
-          "inputs": [
-            {
-              "var": "iterations",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "integer": {
-                      "low": 10,
-                      "high": 0,
-                      "unsigned": false
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-add-one-and-print",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "value_to_print": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "out": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
                     }
-                  }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "add_one_and_print",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
                 }
-              }
             }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "batch-test",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-simple-batch-task",
-              "version": "ABC123"
-            }
-          }
         },
         {
-          "inputs": [
-            {
-              "var": "date_triggered",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "triggered_date"
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-print-every-time",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "date_triggered": {
+                                "type": {
+                                    "simple": 5
+                                }
+                            },
+                            "value_to_print": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {}
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "print_every_time",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
                 }
-              }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-print-int",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "value_to_print": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {}
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "print_int",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-simple-batch-task",
+                    "version": "ABC123"
+                },
+                "category": 1,
+                "type": "batch-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "iterations": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "out": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "simple_batch_task",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-sum-and-print",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "values_to_add": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "out": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "sum_and_print",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-sum-ints",
+                    "version": "ABC123"
+                },
+                "type": "spark",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "ints": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "sum": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "custom": {
+                    "fields": {
+                        "mainApplicationFile": {
+                            "stringValue": "local:///myfile"
+                        }
+                    }
+                },
+                "container": {
+                    "command": [""],
+                    "args": [
+                        "execute_spark_task",
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "sum_ints",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        },
+        {
+            "template": {
+                "id": {
+                    "resourceType": 1,
+                    "project": "myflyteproject",
+                    "domain": "development",
+                    "name": "sample-tasks-sum-non-none",
+                    "version": "ABC123"
+                },
+                "type": "python-task",
+                "metadata": {
+                    "runtime": {
+                        "type": 1,
+                        "version": "0.0.1a0",
+                        "flavor": "python"
+                    },
+                    "timeout": {},
+                    "retries": {},
+                    "discoveryVersion": "1"
+                },
+                "interface": {
+                    "inputs": {
+                        "variables": {
+                            "values_to_print": {
+                                "type": {
+                                    "collectionType": {
+                                        "simple": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "variables": {
+                            "out": {
+                                "type": {
+                                    "simple": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "container": {
+                    "command": ["pyflyte-execute"],
+                    "args": [
+                        "--task-module",
+                        "sample_tasks",
+                        "--task-name",
+                        "sum_non_none",
+                        "--inputs",
+                        "{{.input}}",
+                        "--output-prefix",
+                        "{{.outputPrefix}}"
+                    ],
+                    "env": [
+                        {
+                            "key": "FLYTE_CONFIGURATION_PATH",
+                            "value": "/myflyteproject/flytekit.config"
+                        }
+                    ],
+                    "config": [],
+                    "ports": [],
+                    "image": "myflyteproject:DEF123",
+                    "resources": {
+                        "requests": [],
+                        "limits": []
+                    }
+                }
+            }
+        }
+    ],
+    "primary": {
+        "template": {
+            "nodes": [
+                {
+                    "inputs": [],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "start-node"
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "iterations",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "integer": {
+                                            "low": 10,
+                                            "high": 0,
+                                            "unsigned": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "batch-test",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-simple-batch-task",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "date_triggered",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "triggered_date"
+                                }
+                            }
+                        },
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "print-sum",
+                                    "var": "out"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print-sum"],
+                    "outputAliases": [],
+                    "id": "print-always",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-print-every-time",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "sparky",
+                                    "var": "sum"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["sparky"],
+                    "outputAliases": [],
+                    "id": "print-spark",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-print-int",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "values_to_add",
+                            "binding": {
+                                "collection": {
+                                    "bindings": [
+                                        {
+                                            "promise": {
+                                                "nodeId": "print2",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "promise": {
+                                                "nodeId": "print3",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "promise": {
+                                                "nodeId": "print4",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": {
+                                                        "low": 100,
+                                                        "high": 0,
+                                                        "unsigned": false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print2", "print3", "print4"],
+                    "outputAliases": [],
+                    "id": "print-sum",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-sum-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "values_to_add",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "batch-test",
+                                    "var": "out"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["batch-test"],
+                    "outputAliases": [],
+                    "id": "print-sum2",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-sum-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "integer": {
+                                            "low": 3,
+                                            "high": 0,
+                                            "unsigned": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "print1a",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-add-one-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "scalar": {
+                                    "primitive": {
+                                        "integer": {
+                                            "low": 101,
+                                            "high": 0,
+                                            "unsigned": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": [],
+                    "outputAliases": [],
+                    "id": "print1b",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-add-one-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "values_to_print",
+                            "binding": {
+                                "collection": {
+                                    "bindings": [
+                                        {
+                                            "promise": {
+                                                "nodeId": "print1a",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "promise": {
+                                                "nodeId": "print1b",
+                                                "var": "out"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print1a", "print1b"],
+                    "outputAliases": [],
+                    "id": "print2",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-sum-non-none",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "print2",
+                                    "var": "out"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print2"],
+                    "outputAliases": [],
+                    "id": "print3",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-add-one-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "value_to_print",
+                            "binding": {
+                                "promise": {
+                                    "nodeId": "print3",
+                                    "var": "out"
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print3"],
+                    "outputAliases": [],
+                    "id": "print4",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-add-one-and-print",
+                            "version": "ABC123"
+                        }
+                    }
+                },
+                {
+                    "inputs": [
+                        {
+                            "var": "ints",
+                            "binding": {
+                                "collection": {
+                                    "bindings": [
+                                        {
+                                            "promise": {
+                                                "nodeId": "print2",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "promise": {
+                                                "nodeId": "print3",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "promise": {
+                                                "nodeId": "print4",
+                                                "var": "out"
+                                            }
+                                        },
+                                        {
+                                            "scalar": {
+                                                "primitive": {
+                                                    "integer": {
+                                                        "low": 100,
+                                                        "high": 0,
+                                                        "unsigned": false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "upstreamNodeIds": ["print2", "print3", "print4"],
+                    "outputAliases": [],
+                    "id": "sparky",
+                    "metadata": {
+                        "name": "DEADBEEF",
+                        "timeout": {},
+                        "retries": {}
+                    },
+                    "taskNode": {
+                        "referenceId": {
+                            "resourceType": 1,
+                            "project": "myflyteproject",
+                            "domain": "development",
+                            "name": "sample-tasks-sum-ints",
+                            "version": "ABC123"
+                        }
+                    }
+                }
+            ],
+            "outputs": [],
+            "id": {
+                "resourceType": 2,
+                "project": "myflyteproject",
+                "domain": "development",
+                "name": "rich-workflow-rich-workflow",
+                "version": "ABC123"
             },
-            {
-              "var": "value_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "print-sum",
-                  "var": "out"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["print-sum"],
-          "outputAliases": [],
-          "id": "print-always",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-print-every-time",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "value_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "sparky",
-                  "var": "sum"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["sparky"],
-          "outputAliases": [],
-          "id": "print-spark",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-print-int",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "values_to_add",
-              "binding": {
-                "collection": {
-                  "bindings": [
-                    {
-                      "promise": {
-                        "nodeId": "print2",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "promise": {
-                        "nodeId": "print3",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "promise": {
-                        "nodeId": "print4",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": {
-                            "low": 100,
-                            "high": 0,
-                            "unsigned": false
-                          }
+            "metadata": {},
+            "interface": {
+                "inputs": {
+                    "variables": {
+                        "triggered_date": {
+                            "type": {
+                                "simple": 5
+                            }
                         }
-                      }
                     }
-                  ]
+                },
+                "outputs": {
+                    "variables": {}
                 }
-              }
             }
-          ],
-          "upstreamNodeIds": ["print2", "print3", "print4"],
-          "outputAliases": [],
-          "id": "print-sum",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-sum-and-print",
-              "version": "ABC123"
-            }
-          }
         },
-        {
-          "inputs": [
-            {
-              "var": "values_to_add",
-              "binding": {
-                "promise": {
-                  "nodeId": "batch-test",
-                  "var": "out"
+        "connections": {
+            "downstream": {
+                "batch-test": {
+                    "ids": ["print-sum2", "print-sum2"]
+                },
+                "print-sum": {
+                    "ids": ["print-always", "print-always"]
+                },
+                "print2": {
+                    "ids": ["print-sum", "print3", "print3", "sparky"]
+                },
+                "print1a": {
+                    "ids": ["print2"]
+                },
+                "print4": {
+                    "ids": ["print-sum", "print-sum", "sparky", "sparky"]
+                },
+                "sparky": {
+                    "ids": ["print-spark", "print-spark"]
+                },
+                "print3": {
+                    "ids": ["print-sum", "print-sum", "sparky", "sparky", "print4", "print4"]
+                },
+                "print1b": {
+                    "ids": ["print2", "print2"]
+                },
+                "start-node": {
+                    "ids": ["print-always", "batch-test", "print1a", "print1b"]
                 }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["batch-test"],
-          "outputAliases": [],
-          "id": "print-sum2",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-sum-and-print",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "value_to_print",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "integer": {
-                      "low": 3,
-                      "high": 0,
-                      "unsigned": false
-                    }
-                  }
+            },
+            "upstream": {
+                "print3": {
+                    "ids": ["", "print2", "print2"]
+                },
+                "print-sum2": {
+                    "ids": ["", "batch-test", "batch-test"]
+                },
+                "print2": {
+                    "ids": ["", "print1a", "print1b", "print1b"]
+                },
+                "sparky": {
+                    "ids": ["", "print2", "print3", "print4", "print3", "print4"]
+                },
+                "print-always": {
+                    "ids": ["", "print-sum", "start-node", "print-sum"]
+                },
+                "print-spark": {
+                    "ids": ["", "sparky", "sparky"]
+                },
+                "print4": {
+                    "ids": ["", "print3", "print3"]
+                },
+                "batch-test": {
+                    "ids": ["", "start-node"]
+                },
+                "print-sum": {
+                    "ids": ["", "print2", "print3", "print4", "print3", "print4"]
+                },
+                "print1a": {
+                    "ids": ["", "start-node"]
+                },
+                "print1b": {
+                    "ids": ["", "start-node"]
                 }
-              }
             }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "print1a",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-add-one-and-print",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "value_to_print",
-              "binding": {
-                "scalar": {
-                  "primitive": {
-                    "integer": {
-                      "low": 101,
-                      "high": 0,
-                      "unsigned": false
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [],
-          "outputAliases": [],
-          "id": "print1b",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-add-one-and-print",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "values_to_print",
-              "binding": {
-                "collection": {
-                  "bindings": [
-                    {
-                      "promise": {
-                        "nodeId": "print1a",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "promise": {
-                        "nodeId": "print1b",
-                        "var": "out"
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["print1a", "print1b"],
-          "outputAliases": [],
-          "id": "print2",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-sum-non-none",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "value_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "print2",
-                  "var": "out"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["print2"],
-          "outputAliases": [],
-          "id": "print3",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-add-one-and-print",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "value_to_print",
-              "binding": {
-                "promise": {
-                  "nodeId": "print3",
-                  "var": "out"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["print3"],
-          "outputAliases": [],
-          "id": "print4",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-add-one-and-print",
-              "version": "ABC123"
-            }
-          }
-        },
-        {
-          "inputs": [
-            {
-              "var": "ints",
-              "binding": {
-                "collection": {
-                  "bindings": [
-                    {
-                      "promise": {
-                        "nodeId": "print2",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "promise": {
-                        "nodeId": "print3",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "promise": {
-                        "nodeId": "print4",
-                        "var": "out"
-                      }
-                    },
-                    {
-                      "scalar": {
-                        "primitive": {
-                          "integer": {
-                            "low": 100,
-                            "high": 0,
-                            "unsigned": false
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": ["print2", "print3", "print4"],
-          "outputAliases": [],
-          "id": "sparky",
-          "metadata": {
-            "name": "DEADBEEF",
-            "timeout": {},
-            "retries": {}
-          },
-          "taskNode": {
-            "referenceId": {
-              "resourceType": 1,
-              "project": "myflyteproject",
-              "domain": "development",
-              "name": "sample-tasks-sum-ints",
-              "version": "ABC123"
-            }
-          }
         }
-      ],
-      "outputs": [],
-      "id": {
-        "resourceType": 2,
-        "project": "myflyteproject",
-        "domain": "development",
-        "name": "rich-workflow-rich-workflow",
-        "version": "ABC123"
-      },
-      "metadata": {},
-      "interface": {
-        "inputs": {
-          "variables": {
-            "triggered_date": {
-              "type": {
-                "simple": 5
-              }
-            }
-          }
-        },
-        "outputs": {
-          "variables": {}
-        }
-      }
-    },
-    "connections": {
-      "downstream": {
-        "batch-test": {
-          "ids": ["print-sum2", "print-sum2"]
-        },
-        "print-sum": {
-          "ids": ["print-always", "print-always"]
-        },
-        "print2": {
-          "ids": ["print-sum", "print3", "print3", "sparky"]
-        },
-        "print1a": {
-          "ids": ["print2"]
-        },
-        "print4": {
-          "ids": ["print-sum", "print-sum", "sparky", "sparky"]
-        },
-        "sparky": {
-          "ids": ["print-spark", "print-spark"]
-        },
-        "print3": {
-          "ids": [
-            "print-sum",
-            "print-sum",
-            "sparky",
-            "sparky",
-            "print4",
-            "print4"
-          ]
-        },
-        "print1b": {
-          "ids": ["print2", "print2"]
-        },
-        "start-node": {
-          "ids": ["print-always", "batch-test", "print1a", "print1b"]
-        }
-      },
-      "upstream": {
-        "print3": {
-          "ids": ["", "print2", "print2"]
-        },
-        "print-sum2": {
-          "ids": ["", "batch-test", "batch-test"]
-        },
-        "print2": {
-          "ids": ["", "print1a", "print1b", "print1b"]
-        },
-        "sparky": {
-          "ids": ["", "print2", "print3", "print4", "print3", "print4"]
-        },
-        "print-always": {
-          "ids": ["", "print-sum", "start-node", "print-sum"]
-        },
-        "print-spark": {
-          "ids": ["", "sparky", "sparky"]
-        },
-        "print4": {
-          "ids": ["", "print3", "print3"]
-        },
-        "batch-test": {
-          "ids": ["", "start-node"]
-        },
-        "print-sum": {
-          "ids": ["", "print2", "print3", "print4", "print3", "print4"]
-        },
-        "print1a": {
-          "ids": ["", "start-node"]
-        },
-        "print1b": {
-          "ids": ["", "start-node"]
-        }
-      }
     }
-  }
 }

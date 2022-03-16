@@ -4,7 +4,7 @@ import { dNode } from 'models/Graph/types';
 
 export const TimeZone = {
   Local: 'local',
-  UTC: 'utc'
+  UTC: 'utc',
 };
 
 export function isTransitionNode(node: dNode) {
@@ -17,7 +17,7 @@ export function convertToPlainNodes(nodes: dNode[], level = 0): dNode[] {
   if (!nodes || nodes.length === 0) {
     return result;
   }
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     if (isTransitionNode(node)) {
       return;
     }
@@ -35,23 +35,23 @@ export const getBarOptions = (chartTimeInterval: number) => {
     indexAxis: 'y' as const,
     elements: {
       bar: {
-        borderWidth: 2
-      }
+        borderWidth: 2,
+      },
     },
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: false,
       },
       title: {
-        display: false
+        display: false,
       },
       tooltip: {
-        filter: function(tooltipItem) {
+        filter: function (tooltipItem) {
           return tooltipItem.datasetIndex === 1;
-        }
-      }
+        },
+      },
     },
     scales: {
       x: {
@@ -60,13 +60,13 @@ export const getBarOptions = (chartTimeInterval: number) => {
         ticks: {
           display: false,
           autoSkip: false,
-          stepSize: chartTimeInterval
+          stepSize: chartTimeInterval,
         },
-        stacked: true
+        stacked: true,
       },
       y: {
-        stacked: true
-      }
-    }
+        stacked: true,
+      },
+    },
   };
 };
