@@ -90,6 +90,32 @@ message EnumType {
     repeated string values = 1;
 }
 
+// Defines a tagged union type, also known as a variant (and formally as the sum type).
+//
+// A sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag
+// A value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by
+// storing the varaint's tag with the literal value and can be examined in runtime.
+//
+// Type S is typically written as
+// S := Apple A | Banana B | Cantaloupe C | ...
+//
+// Notably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:
+// Optional X := X | Null
+//
+// See also: https://en.wikipedia.org/wiki/Tagged_union
+message UnionType {
+    // Predefined set of variants in union.
+    repeated LiteralType variants = 1;
+}
+
+// Hints to improve type matching
+// e.g. allows distinguishing output from custom type transformers
+// even if the underlying IDL serialization matches.
+message TypeStructure {
+    // Must exactly match for types to be castable
+    string tag = 1;
+}
+
 // TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
 message TypeAnnotation {
     // A arbitrary JSON payload to describe a type.
@@ -119,6 +145,9 @@ message LiteralType {
 
         // Generalized schema support
         StructuredDatasetType structured_dataset_type = 8;
+
+        // Defines an union type with pre-defined LiteralTypes.
+        UnionType union_type = 10;
     }
 
     // This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by
@@ -128,6 +157,9 @@ message LiteralType {
     // This field contains arbitrary data that might have special semantic
     // meaning for the client but does not effect internal flyte behavior.
     TypeAnnotation annotation = 9;
+
+    // Hints to improve type matching.
+    TypeStructure structure = 11;
 }
 
 // A reference to an output produced by a node. The type can be retrieved -and validated- from

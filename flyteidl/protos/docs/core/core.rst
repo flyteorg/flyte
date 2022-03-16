@@ -1216,6 +1216,7 @@ Specifies either a simple value or a reference to another output.
    "collection", ":ref:`ref_flyteidl.core.BindingDataCollection`", "", "A collection of binding data. This allows nesting of binding data to any number of levels."
    "promise", ":ref:`ref_flyteidl.core.OutputReference`", "", "References an output promised by another node."
    "map", ":ref:`ref_flyteidl.core.BindingDataMap`", "", "A map of bindings. The key is always a string."
+   "union", ":ref:`ref_flyteidl.core.UnionInfo`", "", ""
 
 
 
@@ -1509,6 +1510,7 @@ Scalar
    "error", ":ref:`ref_flyteidl.core.Error`", "", ""
    "generic", ":ref:`ref_google.protobuf.Struct`", "", ""
    "structured_dataset", ":ref:`ref_flyteidl.core.StructuredDataset`", "", ""
+   "union", ":ref:`ref_flyteidl.core.Union`", "", ""
 
 
 
@@ -1574,6 +1576,49 @@ StructuredDatasetMetadata
    :widths: auto
 
    "structured_dataset_type", ":ref:`ref_flyteidl.core.StructuredDatasetType`", "", "Bundle the type information along with the literal. This is here because StructuredDatasets can often be more defined at run time than at compile time. That is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset, without any column information, but at run time, you might have that column information. flytekit python will copy this type information into the literal, from the type information, if not provided by the various plugins (encoders). Since this field is run time generated, it&#39;s not used for any type checking."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.Union:
+
+Union
+------------------------------------------------------------------
+
+The runtime representation of a tagged union value. See `UnionType` for more details.
+
+
+
+.. csv-table:: Union type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_flyteidl.core.Literal`", "", ""
+   "type", ":ref:`ref_flyteidl.core.LiteralType`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.UnionInfo:
+
+UnionInfo
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: UnionInfo type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "targetType", ":ref:`ref_flyteidl.core.LiteralType`", "", ""
 
 
 
@@ -2383,8 +2428,10 @@ Defines a strong type to allow type checking between interfaces.
    "blob", ":ref:`ref_flyteidl.core.BlobType`", "", "A blob might have specialized implementation details depending on associated metadata."
    "enum_type", ":ref:`ref_flyteidl.core.EnumType`", "", "Defines an enum with pre-defined string values."
    "structured_dataset_type", ":ref:`ref_flyteidl.core.StructuredDatasetType`", "", "Generalized schema support"
+   "union_type", ":ref:`ref_flyteidl.core.UnionType`", "", "Defines an union type with pre-defined LiteralTypes."
    "metadata", ":ref:`ref_google.protobuf.Struct`", "", "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking. This might be used by consumers to identify special behavior or display extended information for the type."
    "annotation", ":ref:`ref_flyteidl.core.TypeAnnotation`", "", "This field contains arbitrary data that might have special semantic meaning for the client but does not effect internal flyte behavior."
+   "structure", ":ref:`ref_flyteidl.core.TypeStructure`", "", "Hints to improve type matching."
 
 
 
@@ -2518,6 +2565,62 @@ TypeAnnotation encapsulates registration time information about a type. This can
    :widths: auto
 
    "annotations", ":ref:`ref_google.protobuf.Struct`", "", "A arbitrary JSON payload to describe a type."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.TypeStructure:
+
+TypeStructure
+------------------------------------------------------------------
+
+Hints to improve type matching
+e.g. allows distinguishing output from custom type transformers
+even if the underlying IDL serialization matches.
+
+
+
+.. csv-table:: TypeStructure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "tag", ":ref:`ref_string`", "", "Must exactly match for types to be castable"
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.UnionType:
+
+UnionType
+------------------------------------------------------------------
+
+Defines a tagged union type, also known as a variant (and formally as the sum type).
+
+A sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag
+A value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by
+storing the varaint&#39;s tag with the literal value and can be examined in runtime.
+
+Type S is typically written as
+S := Apple A | Banana B | Cantaloupe C | ...
+
+Notably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:
+Optional X := X | Null
+
+See also: https://en.wikipedia.org/wiki/Tagged_union
+
+
+
+.. csv-table:: UnionType type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "variants", ":ref:`ref_flyteidl.core.LiteralType`", "repeated", "Predefined set of variants in union."
 
 
 

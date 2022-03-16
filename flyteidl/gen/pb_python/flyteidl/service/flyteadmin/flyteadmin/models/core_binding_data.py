@@ -20,6 +20,7 @@ from flyteadmin.models.core_binding_data_collection import CoreBindingDataCollec
 from flyteadmin.models.core_binding_data_map import CoreBindingDataMap  # noqa: F401,E501
 from flyteadmin.models.core_output_reference import CoreOutputReference  # noqa: F401,E501
 from flyteadmin.models.core_scalar import CoreScalar  # noqa: F401,E501
+from flyteadmin.models.core_union_info import CoreUnionInfo  # noqa: F401,E501
 
 
 class CoreBindingData(object):
@@ -39,23 +40,26 @@ class CoreBindingData(object):
         'scalar': 'CoreScalar',
         'collection': 'CoreBindingDataCollection',
         'promise': 'CoreOutputReference',
-        'map': 'CoreBindingDataMap'
+        'map': 'CoreBindingDataMap',
+        'union': 'CoreUnionInfo'
     }
 
     attribute_map = {
         'scalar': 'scalar',
         'collection': 'collection',
         'promise': 'promise',
-        'map': 'map'
+        'map': 'map',
+        'union': 'union'
     }
 
-    def __init__(self, scalar=None, collection=None, promise=None, map=None):  # noqa: E501
+    def __init__(self, scalar=None, collection=None, promise=None, map=None, union=None):  # noqa: E501
         """CoreBindingData - a model defined in Swagger"""  # noqa: E501
 
         self._scalar = None
         self._collection = None
         self._promise = None
         self._map = None
+        self._union = None
         self.discriminator = None
 
         if scalar is not None:
@@ -66,6 +70,8 @@ class CoreBindingData(object):
             self.promise = promise
         if map is not None:
             self.map = map
+        if union is not None:
+            self.union = union
 
     @property
     def scalar(self):
@@ -158,6 +164,27 @@ class CoreBindingData(object):
         """
 
         self._map = map
+
+    @property
+    def union(self):
+        """Gets the union of this CoreBindingData.  # noqa: E501
+
+
+        :return: The union of this CoreBindingData.  # noqa: E501
+        :rtype: CoreUnionInfo
+        """
+        return self._union
+
+    @union.setter
+    def union(self, union):
+        """Sets the union of this CoreBindingData.
+
+
+        :param union: The union of this CoreBindingData.  # noqa: E501
+        :type: CoreUnionInfo
+        """
+
+        self._union = union
 
     def to_dict(self):
         """Returns the model properties as a dict"""

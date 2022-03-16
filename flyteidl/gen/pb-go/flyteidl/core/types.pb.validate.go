@@ -335,6 +335,152 @@ var _ interface {
 	ErrorName() string
 } = EnumTypeValidationError{}
 
+// Validate checks the field values on UnionType with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *UnionType) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetVariants() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UnionTypeValidationError{
+					field:  fmt.Sprintf("Variants[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// UnionTypeValidationError is the validation error returned by
+// UnionType.Validate if the designated constraints aren't met.
+type UnionTypeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UnionTypeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UnionTypeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UnionTypeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UnionTypeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UnionTypeValidationError) ErrorName() string { return "UnionTypeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UnionTypeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUnionType.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UnionTypeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UnionTypeValidationError{}
+
+// Validate checks the field values on TypeStructure with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *TypeStructure) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Tag
+
+	return nil
+}
+
+// TypeStructureValidationError is the validation error returned by
+// TypeStructure.Validate if the designated constraints aren't met.
+type TypeStructureValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TypeStructureValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TypeStructureValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TypeStructureValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TypeStructureValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TypeStructureValidationError) ErrorName() string { return "TypeStructureValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TypeStructureValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTypeStructure.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TypeStructureValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TypeStructureValidationError{}
+
 // Validate checks the field values on TypeAnnotation with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -438,6 +584,16 @@ func (m *LiteralType) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetStructure()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LiteralTypeValidationError{
+				field:  "Structure",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.Type.(type) {
 
 	case *LiteralType_Simple:
@@ -509,6 +665,18 @@ func (m *LiteralType) Validate() error {
 			if err := v.Validate(); err != nil {
 				return LiteralTypeValidationError{
 					field:  "StructuredDatasetType",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *LiteralType_UnionType:
+
+		if v, ok := interface{}(m.GetUnionType()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LiteralTypeValidationError{
+					field:  "UnionType",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

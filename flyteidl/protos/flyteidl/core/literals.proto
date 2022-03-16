@@ -52,6 +52,12 @@ message Schema {
     SchemaType type = 3;
 }
 
+// The runtime representation of a tagged union value. See `UnionType` for more details.
+message Union {
+    Literal value = 1;
+    LiteralType type = 2;
+}
+
 message StructuredDatasetMetadata {
     // Bundle the type information along with the literal.
     // This is here because StructuredDatasets can often be more defined at run time than at compile time.
@@ -81,6 +87,7 @@ message Scalar {
         Error error = 6;
         google.protobuf.Struct generic = 7;
         StructuredDataset structured_dataset = 8;
+        Union union = 9;
     }
 }
 
@@ -123,6 +130,10 @@ message BindingDataMap {
     map<string, BindingData> bindings = 1;
 }
 
+message UnionInfo {
+  LiteralType targetType = 1;
+}
+
 // Specifies either a simple value or a reference to another output.
 message BindingData {
     oneof value {
@@ -139,6 +150,8 @@ message BindingData {
         // A map of bindings. The key is always a string.
         BindingDataMap map = 4;
     }
+
+    UnionInfo union = 5;
 }
 
 // An input/output binding of a variable to either static value or a node output.
