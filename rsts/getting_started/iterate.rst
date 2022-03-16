@@ -144,7 +144,7 @@ Modify Code and Test Locally
 
 #. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/flyte.workflows.example.my_wf>`__, click launch, and give your name as the input.
 
-   .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/getting_started_fastreg.gif
+   .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/getting_started/getting_started_fastreg.gif
       :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
 
    Alternatively, use ``flytectl``. To pass arguments to the workflow, update the execution spec file (previously generated).

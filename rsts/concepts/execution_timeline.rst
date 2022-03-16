@@ -6,7 +6,7 @@ Timeline of a workflow execution
 
 The illustration below shows the timeline view of a workflow execution. 
 
-.. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_timeline.svg?sanitize=true
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/monitoring/flyte_wf_timeline.svg?sanitize=true
 
 
 The illustration above refers to a simple workflow, with 2 nodes N1 & N2. This can be represented as follows,
