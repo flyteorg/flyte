@@ -265,7 +265,7 @@ Flyte is a Community Driven and Community Owned Software. It is managed using
 a steering committee and encourages collaboration. The community has a long
 roadmap for Flyte, but they know that there might be some other interesting
 ideas, extensions or additions that you may want to propose. This is done
-usually starting with a
+usually done by starting with:
 
 - [Github Issue](https://github.com/flyteorg/flyte/issues) - We maintain issues for all repos in the main flyte repo.
 - Writing down your proposal using a [Documented RFC process](rfc/.)
