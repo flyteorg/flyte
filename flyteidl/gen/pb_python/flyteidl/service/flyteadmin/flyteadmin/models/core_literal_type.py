@@ -23,6 +23,8 @@ from flyteadmin.models.core_schema_type import CoreSchemaType  # noqa: F401,E501
 from flyteadmin.models.core_simple_type import CoreSimpleType  # noqa: F401,E501
 from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType  # noqa: F401,E501
 from flyteadmin.models.core_type_annotation import CoreTypeAnnotation  # noqa: F401,E501
+from flyteadmin.models.core_type_structure import CoreTypeStructure  # noqa: F401,E501
+from flyteadmin.models.core_union_type import CoreUnionType  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -47,8 +49,10 @@ class CoreLiteralType(object):
         'blob': 'CoreBlobType',
         'enum_type': 'CoreEnumType',
         'structured_dataset_type': 'CoreStructuredDatasetType',
+        'union_type': 'CoreUnionType',
         'metadata': 'ProtobufStruct',
-        'annotation': 'CoreTypeAnnotation'
+        'annotation': 'CoreTypeAnnotation',
+        'structure': 'CoreTypeStructure'
     }
 
     attribute_map = {
@@ -59,11 +63,13 @@ class CoreLiteralType(object):
         'blob': 'blob',
         'enum_type': 'enum_type',
         'structured_dataset_type': 'structured_dataset_type',
+        'union_type': 'union_type',
         'metadata': 'metadata',
-        'annotation': 'annotation'
+        'annotation': 'annotation',
+        'structure': 'structure'
     }
 
-    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, metadata=None, annotation=None):  # noqa: E501
+    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, union_type=None, metadata=None, annotation=None, structure=None):  # noqa: E501
         """CoreLiteralType - a model defined in Swagger"""  # noqa: E501
 
         self._simple = None
@@ -73,8 +79,10 @@ class CoreLiteralType(object):
         self._blob = None
         self._enum_type = None
         self._structured_dataset_type = None
+        self._union_type = None
         self._metadata = None
         self._annotation = None
+        self._structure = None
         self.discriminator = None
 
         if simple is not None:
@@ -91,10 +99,14 @@ class CoreLiteralType(object):
             self.enum_type = enum_type
         if structured_dataset_type is not None:
             self.structured_dataset_type = structured_dataset_type
+        if union_type is not None:
+            self.union_type = union_type
         if metadata is not None:
             self.metadata = metadata
         if annotation is not None:
             self.annotation = annotation
+        if structure is not None:
+            self.structure = structure
 
     @property
     def simple(self):
@@ -256,6 +268,29 @@ class CoreLiteralType(object):
         self._structured_dataset_type = structured_dataset_type
 
     @property
+    def union_type(self):
+        """Gets the union_type of this CoreLiteralType.  # noqa: E501
+
+        Defines an union type with pre-defined LiteralTypes.  # noqa: E501
+
+        :return: The union_type of this CoreLiteralType.  # noqa: E501
+        :rtype: CoreUnionType
+        """
+        return self._union_type
+
+    @union_type.setter
+    def union_type(self, union_type):
+        """Sets the union_type of this CoreLiteralType.
+
+        Defines an union type with pre-defined LiteralTypes.  # noqa: E501
+
+        :param union_type: The union_type of this CoreLiteralType.  # noqa: E501
+        :type: CoreUnionType
+        """
+
+        self._union_type = union_type
+
+    @property
     def metadata(self):
         """Gets the metadata of this CoreLiteralType.  # noqa: E501
 
@@ -300,6 +335,29 @@ class CoreLiteralType(object):
         """
 
         self._annotation = annotation
+
+    @property
+    def structure(self):
+        """Gets the structure of this CoreLiteralType.  # noqa: E501
+
+        Hints to improve type matching.  # noqa: E501
+
+        :return: The structure of this CoreLiteralType.  # noqa: E501
+        :rtype: CoreTypeStructure
+        """
+        return self._structure
+
+    @structure.setter
+    def structure(self, structure):
+        """Sets the structure of this CoreLiteralType.
+
+        Hints to improve type matching.  # noqa: E501
+
+        :param structure: The structure of this CoreLiteralType.  # noqa: E501
+        :type: CoreTypeStructure
+        """
+
+        self._structure = structure
 
     def to_dict(self):
         """Returns the model properties as a dict"""

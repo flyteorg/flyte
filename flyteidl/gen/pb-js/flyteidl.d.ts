@@ -2177,6 +2177,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an Union. */
+        interface IUnion {
+
+            /** Union value */
+            value?: (flyteidl.core.ILiteral|null);
+
+            /** Union type */
+            type?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents an Union. */
+        class Union implements IUnion {
+
+            /**
+             * Constructs a new Union.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IUnion);
+
+            /** Union value. */
+            public value?: (flyteidl.core.ILiteral|null);
+
+            /** Union type. */
+            public type?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new Union instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Union instance
+             */
+            public static create(properties?: flyteidl.core.IUnion): flyteidl.core.Union;
+
+            /**
+             * Encodes the specified Union message. Does not implicitly {@link flyteidl.core.Union.verify|verify} messages.
+             * @param message Union message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IUnion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Union message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Union
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Union;
+
+            /**
+             * Verifies an Union message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a StructuredDatasetMetadata. */
         interface IStructuredDatasetMetadata {
 
@@ -2313,6 +2371,9 @@ export namespace flyteidl {
 
             /** Scalar structuredDataset */
             structuredDataset?: (flyteidl.core.IStructuredDataset|null);
+
+            /** Scalar union */
+            union?: (flyteidl.core.IUnion|null);
         }
 
         /** Represents a Scalar. */
@@ -2348,8 +2409,11 @@ export namespace flyteidl {
             /** Scalar structuredDataset. */
             public structuredDataset?: (flyteidl.core.IStructuredDataset|null);
 
+            /** Scalar union. */
+            public union?: (flyteidl.core.IUnion|null);
+
             /** Scalar value. */
-            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset");
+            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union");
 
             /**
              * Creates a new Scalar instance using the specified properties.
@@ -2665,6 +2729,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an UnionInfo. */
+        interface IUnionInfo {
+
+            /** UnionInfo targetType */
+            targetType?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents an UnionInfo. */
+        class UnionInfo implements IUnionInfo {
+
+            /**
+             * Constructs a new UnionInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IUnionInfo);
+
+            /** UnionInfo targetType. */
+            public targetType?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new UnionInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UnionInfo instance
+             */
+            public static create(properties?: flyteidl.core.IUnionInfo): flyteidl.core.UnionInfo;
+
+            /**
+             * Encodes the specified UnionInfo message. Does not implicitly {@link flyteidl.core.UnionInfo.verify|verify} messages.
+             * @param message UnionInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IUnionInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an UnionInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UnionInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.UnionInfo;
+
+            /**
+             * Verifies an UnionInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a BindingData. */
         interface IBindingData {
 
@@ -2679,6 +2795,9 @@ export namespace flyteidl {
 
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
+
+            /** BindingData union */
+            union?: (flyteidl.core.IUnionInfo|null);
         }
 
         /** Represents a BindingData. */
@@ -2701,6 +2820,9 @@ export namespace flyteidl {
 
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
+
+            /** BindingData union. */
+            public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
             public value?: ("scalar"|"collection"|"promise"|"map");
@@ -3296,6 +3418,110 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an UnionType. */
+        interface IUnionType {
+
+            /** UnionType variants */
+            variants?: (flyteidl.core.ILiteralType[]|null);
+        }
+
+        /** Represents an UnionType. */
+        class UnionType implements IUnionType {
+
+            /**
+             * Constructs a new UnionType.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IUnionType);
+
+            /** UnionType variants. */
+            public variants: flyteidl.core.ILiteralType[];
+
+            /**
+             * Creates a new UnionType instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UnionType instance
+             */
+            public static create(properties?: flyteidl.core.IUnionType): flyteidl.core.UnionType;
+
+            /**
+             * Encodes the specified UnionType message. Does not implicitly {@link flyteidl.core.UnionType.verify|verify} messages.
+             * @param message UnionType message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IUnionType, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an UnionType message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UnionType
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.UnionType;
+
+            /**
+             * Verifies an UnionType message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TypeStructure. */
+        interface ITypeStructure {
+
+            /** TypeStructure tag */
+            tag?: (string|null);
+        }
+
+        /** Represents a TypeStructure. */
+        class TypeStructure implements ITypeStructure {
+
+            /**
+             * Constructs a new TypeStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITypeStructure);
+
+            /** TypeStructure tag. */
+            public tag: string;
+
+            /**
+             * Creates a new TypeStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TypeStructure instance
+             */
+            public static create(properties?: flyteidl.core.ITypeStructure): flyteidl.core.TypeStructure;
+
+            /**
+             * Encodes the specified TypeStructure message. Does not implicitly {@link flyteidl.core.TypeStructure.verify|verify} messages.
+             * @param message TypeStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITypeStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TypeStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TypeStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TypeStructure;
+
+            /**
+             * Verifies a TypeStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TypeAnnotation. */
         interface ITypeAnnotation {
 
@@ -3372,11 +3598,17 @@ export namespace flyteidl {
             /** LiteralType structuredDatasetType */
             structuredDatasetType?: (flyteidl.core.IStructuredDatasetType|null);
 
+            /** LiteralType unionType */
+            unionType?: (flyteidl.core.IUnionType|null);
+
             /** LiteralType metadata */
             metadata?: (google.protobuf.IStruct|null);
 
             /** LiteralType annotation */
             annotation?: (flyteidl.core.ITypeAnnotation|null);
+
+            /** LiteralType structure */
+            structure?: (flyteidl.core.ITypeStructure|null);
         }
 
         /** Represents a LiteralType. */
@@ -3409,14 +3641,20 @@ export namespace flyteidl {
             /** LiteralType structuredDatasetType. */
             public structuredDatasetType?: (flyteidl.core.IStructuredDatasetType|null);
 
+            /** LiteralType unionType. */
+            public unionType?: (flyteidl.core.IUnionType|null);
+
             /** LiteralType metadata. */
             public metadata?: (google.protobuf.IStruct|null);
 
             /** LiteralType annotation. */
             public annotation?: (flyteidl.core.ITypeAnnotation|null);
 
+            /** LiteralType structure. */
+            public structure?: (flyteidl.core.ITypeStructure|null);
+
             /** LiteralType type. */
-            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType");
+            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType");
 
             /**
              * Creates a new LiteralType instance using the specified properties.

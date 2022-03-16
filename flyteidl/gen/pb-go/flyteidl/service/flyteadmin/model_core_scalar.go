@@ -18,4 +18,5 @@ type CoreScalar struct {
 	Error_ *CoreError `json:"error,omitempty"`
 	Generic *ProtobufStruct `json:"generic,omitempty"`
 	StructuredDataset *CoreStructuredDataset `json:"structured_dataset,omitempty"`
+	Union *CoreUnion `json:"union,omitempty"`
 }
