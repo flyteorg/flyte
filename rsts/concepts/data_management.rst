@@ -160,7 +160,7 @@ Between Flytepropeller and Tasks
 Between Tasks
 ~~~~~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/cocncepts/data_movement/flyte_data_transfer.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/flyte_data_transfer.png
 
 
 Bringing in Your Own Datastores for Raw Data
