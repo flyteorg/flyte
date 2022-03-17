@@ -1,6 +1,6 @@
 flyte Components
 
-<img src="https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_execution_overview.svg?sanitize=true" >
+<img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/executions/flyte_wf_execution_overview.svg?sanitize=true" >
 
 # Component Repos 
 Repo | Language | Purpose | Status

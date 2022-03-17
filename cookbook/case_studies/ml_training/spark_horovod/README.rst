@@ -20,7 +20,7 @@ The goal of Horovod is to make distributed deep learning fast and easy to use.
 It uses the all-reduce algorithm for fast distributed training rather than a parameter server approach (`all-reduce vs. parameter server <https://www.run.ai/guides/gpu-deep-learning/distributed-training/#Deep>`__).
 It builds on top of low-level frameworks like MPI and NCCL and provides optimized algorithms for sharing data between parallel training processes.
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/horovod/all_reduce.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/tutorials/horovod/all_reduce.png
     :alt: Parameter server vs. all-reduce
 
     Parameter server vs. all-reduce
@@ -66,7 +66,7 @@ To install the Spark plugin on Flyte, we use the following command:
 
     pip install flytekitplugins-spark
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/horovod/flyte_spark.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/tutorials/horovod/flyte_spark.png
     :alt: Flyte-Spark plugin
 
     Flyte-Spark plugin

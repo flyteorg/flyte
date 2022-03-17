@@ -77,7 +77,7 @@ The ``docs`` folder in ``flytesnacks`` houses the required documentation configu
 
 4. Add the code for panel and TOC in the required RST file.
 
-     .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/contribution-guide/panel_and_toc.png
+     .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/panel_and_toc.png
          :alt: panel and TOC
 
 5. Add the name and path to ``.github/workflows/ghcr_push.yml`` if you're adding an integration or a tutorial.
@@ -97,7 +97,7 @@ The ``docs`` folder in ``flytesnacks`` houses the required documentation configu
 
 8. After creating the pull request, ensure that the docs are rendered correctly by clicking on the documentation check. 
    
-   .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/contribution-guide/test_docs_link.png
+   .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/test_docs_link.png
        :alt: Docs link in a PR
 
 You can refer to `this PR <https://github.com/flyteorg/flytesnacks/pull/332>`__ for the exact changes required.

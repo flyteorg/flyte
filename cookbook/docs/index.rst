@@ -104,7 +104,7 @@ below to get started.
 
    #. Take a minute to explore Flyte Console through the provided URL.
 
-      .. figure:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
+      .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif
          :alt: A quick visual tour for launching your first Workflow.
 
          A quick visual tour for launching your first Workflow.
@@ -123,7 +123,7 @@ below to get started.
 
    #. Give it a minute and once it's done, check out "Inputs/Outputs" on the top right corner to see your greeting.
 
-      .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/exercise.gif
+      .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/exercise.gif
          :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
 
          A quick visual tour for launching a workflow and checking the outputs when they're done.
