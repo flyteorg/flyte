@@ -208,7 +208,7 @@ data:
   ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-dk5mbchdmt
+  name: clusterresource-template-m2kccc465f
   namespace: flyte
 ---
 apiVersion: v1
@@ -245,7 +245,9 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-64k8dg9gck
+  annotations: {}
+  labels: {}
+  name: datacatalog-config-dcg96ktb98
   namespace: flyte
 ---
 apiVersion: v1
@@ -358,7 +360,9 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-hc64g2ct6h
+  annotations: {}
+  labels: {}
+  name: flyte-admin-config-khgfght7mm
   namespace: flyte
 ---
 apiVersion: v1
@@ -462,7 +466,9 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-hhtmttc8b4
+  annotations: {}
+  labels: {}
+  name: flyte-propeller-config-dtdc6f9527
   namespace: flyte
 ---
 apiVersion: v1
@@ -502,7 +508,7 @@ data:
   pass.txt: YXdlc29tZXNhdWNl
 kind: Secret
 metadata:
-  name: db-pass-9dgchhk2bm
+  name: db-pass-8mb4h2b9hf
   namespace: flyte
 type: Opaque
 ---
@@ -574,10 +580,6 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
   - name: http
     port: 80
     protocol: TCP
@@ -586,6 +588,10 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
   selector:
     app: flyteadmin
 ---
@@ -679,11 +685,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-64k8dg9gck
+          name: datacatalog-config-dcg96ktb98
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-9dgchhk2bm
+          secretName: db-pass-8mb4h2b9hf
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -763,7 +769,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-hhtmttc8b4
+          name: flyte-propeller-config-dtdc6f9527
         name: config-volume
       - name: webhook-certs
         secret:
@@ -840,14 +846,6 @@ spec:
             memory: 200Mi
       initContainers:
       - command:
-        - sh
-        - -c
-        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
-        name: check-db-ready
-        securityContext:
-          runAsUser: 999
-      - command:
         - flyteadmin
         - --config
         - /etc/flyte/config/*.yaml
@@ -911,25 +909,31 @@ spec:
           name: config-volume
         - mountPath: /etc/scratch
           name: scratch
+      - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+        name: check-db-ready
+        securityContext:
+          runAsUser: 999
       securityContext:
         fsGroup: 65534
         fsGroupChangePolicy: Always
         runAsUser: 1001
       serviceAccountName: flyteadmin
       volumes:
+      - name: shared-data
+      - name: scratch
       - configMap:
-          name: clusterresource-template-dk5mbchdmt
-        name: resource-templates
-      - emptyDir: {}
-        name: shared-data
-      - emptyDir: {}
-        name: scratch
-      - configMap:
-          name: flyte-admin-config-hc64g2ct6h
+          name: flyte-admin-config-khgfght7mm
         name: config-volume
+      - configMap:
+          name: clusterresource-template-m2kccc465f
+        name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-9dgchhk2bm
+          secretName: db-pass-8mb4h2b9hf
       - name: auth
         secret:
           secretName: flyte-admin-auth
@@ -967,6 +971,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         image: cr.flyte.org/flyteorg/flytepropeller:v0.16.32
         imagePullPolicy: IfNotPresent
         name: flytepropeller
@@ -984,7 +992,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-hhtmttc8b4
+          name: flyte-propeller-config-dtdc6f9527
         name: config-volume
       - name: auth
         secret:
@@ -1057,7 +1065,7 @@ spec:
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-9dgchhk2bm
+          secretName: db-pass-8mb4h2b9hf
       - name: auth
         secret:
           secretName: flyte-secret-auth
