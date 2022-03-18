@@ -7,7 +7,7 @@ import (
 
 func main() {
 	glog.V(2).Info("Starting Flyte")
-	err := entrypoints.Execute()
+	err := single.Execute()
 	if err != nil {
 		panic(err)
 	}
