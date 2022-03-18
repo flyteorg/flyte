@@ -63,23 +63,23 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
 	}
-	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
-		var cfg string
-		for key, val := range storageConfig.Stow.Config {
-			cfg += fmt.Sprintf("%s=%s,", key, val)
-		}
-		commands = append(commands, []string{
-			fmt.Sprintf("--storage.stow.config %s", cfg),
-			fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind),
-		}...)
-	}
 	if storageConfig.MultiContainerEnabled {
 		commands = append(commands, "--storage.enable-multicontainer")
 	}
+	if len(storageConfig.InitContainer) > 0 {
+		commands = append(commands, fmt.Sprintf("--storage.container=%s", storageConfig.InitContainer))
+
+	}
+	commands = append(commands, fmt.Sprintf("--storage.type=%s", storageConfig.Type))
+
+	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
+		for key, val := range storageConfig.Stow.Config {
+			commands = append(commands, "--storage.stow.config")
+			commands = append(commands, fmt.Sprintf("%s=%s", key, val))
+		}
+		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind))
+	}
 	return append(commands, []string{
-		fmt.Sprintf("--storage.type=%s", storageConfig.Type),
-		fmt.Sprintf("--storage.enable-multicontainer=%v", storageConfig.MultiContainerEnabled),
-		fmt.Sprintf("--storage.container=%s", storageConfig.InitContainer),
 		fmt.Sprintf("--storage.connection.secret-key=%s", storageConfig.Connection.SecretKey),
 		fmt.Sprintf("--storage.connection.access-key=%s", storageConfig.Connection.AccessKey),
 		fmt.Sprintf("--storage.connection.auth-type=%s", storageConfig.Connection.AuthType),
