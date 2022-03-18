@@ -80,6 +80,18 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, 1, len(c.VolumeMounts))
 	})
 
+	t.Run("happy stow GCP backend", func(t *testing.T) {
+		storage.GetConfig().Type = storage.TypeStow
+		storage.GetConfig().InitContainer = "bucket"
+		storage.GetConfig().Stow.Kind = "google"
+		storage.GetConfig().Stow.Config = map[string]string{
+			"json":       "",
+			"project_id": "flyte-gcp",
+			"scope":      "read_write",
+		}
+		assert.Equal(t, 11, len(CopilotCommandArgs(storage.GetConfig())))
+	})
+
 	t.Run("bad-res-cpu", func(t *testing.T) {
 		old := cfg.CPU
 		cfg.CPU = "x"
