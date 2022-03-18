@@ -166,4 +166,7 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.116-0.20220318183949-4492d035af95
+// replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.116-0.20220318183949-4492d035af95
+replace github.com/flyteorg/flyteadmin => ../flyteadmin
+
+replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84

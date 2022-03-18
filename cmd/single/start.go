@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"net/http"
+	"sync"
 
 	_ "github.com/golang/glog"
 	"github.com/spf13/cobra"
@@ -76,21 +77,27 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
+		wg := sync.WaitGroup{}
+		wg.Add(1)
 		go func(ctx context.Context) {
+			defer wg.Done()
 			err := startAdmin(ctx)
 			if err != nil {
+				logger.Errorf(ctx, "Failed to start Admin, err: %v", err)
 				return
 			}
 		}(childCtx)
 
 		go func(ctx context.Context) {
+			defer wg.Done()
 			err := startPropeller(ctx)
 			if err != nil {
+				logger.Errorf(ctx, "Failed to start Propeller, err: %v", err)
 				return
 			}
 		}(childCtx)
 
-		<-ctx.Done()
+		wg.Wait()
 		return nil
 	},
 }
