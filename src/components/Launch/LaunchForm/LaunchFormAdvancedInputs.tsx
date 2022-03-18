@@ -85,10 +85,10 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
         setMaxParallelism(`${other.maxParallelism}`);
       }
       if (
-        launchPlan?.spec.rawOutputDataConfig?.outputLocationPrefix !== undefined &&
-        launchPlan?.spec.rawOutputDataConfig.outputLocationPrefix !== null
+        other?.rawOutputDataConfig?.outputLocationPrefix !== undefined &&
+          other.rawOutputDataConfig.outputLocationPrefix !== null
       ) {
-        setRawOutputDataConfig(launchPlan.spec.rawOutputDataConfig.outputLocationPrefix);
+        setRawOutputDataConfig(other.rawOutputDataConfig.outputLocationPrefix);
       }
       const newLabels = {
         ...(other.labels?.values || {}),
@@ -100,7 +100,7 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
       };
       setLabelsParamData(newLabels);
       setAnnotationsParamData(newAnnotations);
-    }, [other.disableAll, other.maxParallelism, other.labels, other.annotations, launchPlan?.spec]);
+    }, [other.disableAll, other.maxParallelism, other.rawOutputDataConfig, other.labels, other.annotations, launchPlan?.spec]);
 
     React.useImperativeHandle(
       ref,
@@ -108,6 +108,9 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
         getValues: () => {
           return {
             disableAll,
+            rawOutputDataConfig: {
+              outputLocationPrefix: rawOutputDataConfig
+            },
             maxParallelism: parseInt(maxParallelism || '', 10),
             labels: {
               values: labelsParamData,
@@ -121,7 +124,7 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
           return true;
         },
       }),
-      [disableAll, maxParallelism, labelsParamData, annotationsParamData],
+      [disableAll, maxParallelism, rawOutputDataConfig, labelsParamData, annotationsParamData],
     );
 
     const handleDisableAllChange = React.useCallback(() => {

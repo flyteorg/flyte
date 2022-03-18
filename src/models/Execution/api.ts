@@ -84,6 +84,7 @@ export interface CreateWorkflowExecutionArguments {
   disableAll?: boolean | null;
   labels?: Admin.ILabels | null;
   maxParallelism?: number | null;
+  rawOutputDataConfig?: Admin.IRawOutputDataConfig | null;
   inputs: Core.ILiteralMap;
   launchPlanId: Identifier;
   project: string;
@@ -102,6 +103,7 @@ export const createWorkflowExecution = (
     disableAll,
     labels,
     maxParallelism,
+    rawOutputDataConfig,
     inputs,
     launchPlanId: launchPlan,
     project,
@@ -134,6 +136,10 @@ export const createWorkflowExecution = (
 
   if (maxParallelism !== undefined) {
     spec.maxParallelism = maxParallelism;
+  }
+
+  if (rawOutputDataConfig?.outputLocationPrefix) {
+    spec.rawOutputDataConfig = rawOutputDataConfig;
   }
 
   return postAdminEntity<Admin.IExecutionCreateRequest, Admin.ExecutionCreateResponse>(

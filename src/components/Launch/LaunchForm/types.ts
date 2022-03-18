@@ -57,6 +57,7 @@ export interface WorkflowInitialLaunchParameters extends BaseInitialLaunchParame
   securityContext?: Core.ISecurityContext;
   disableAll?: boolean | null;
   maxParallelism?: number | null;
+  rawOutputDataConfig?: Admin.IRawOutputDataConfig | null;
   labels?: Admin.ILabels | null;
   annotations?: Admin.IAnnotations | null;
 }

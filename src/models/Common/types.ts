@@ -63,10 +63,11 @@ export type UrlBlob = Admin.IUrlBlob;
 export type Error = RequiredNonNullable<Core.IError>;
 
 export interface Literal extends Core.Literal {
-  value: keyof Core.ILiteral;
+  value: 'scalar' | 'collection' | 'map';
   collection?: Core.ILiteralCollection;
   map?: Core.ILiteralMap;
   scalar?: Scalar;
+  hash: string;
 }
 
 /** A Core.ILiteral guaranteed to have all subproperties necessary to specify

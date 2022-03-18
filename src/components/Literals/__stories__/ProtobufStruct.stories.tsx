@@ -15,6 +15,7 @@ function renderStruct(label: string, struct: ProtobufStruct) {
       literal={{
         scalar: { value: 'generic', generic: struct },
         value: 'scalar',
+        hash: '',
       }}
     />
   );

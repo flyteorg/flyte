@@ -1731,10 +1731,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@flyteorg/flyteidl@0.21.24":
-  version "0.21.24"
-  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-0.21.24.tgz#08e2c53a56d09ddcf2d6a2c3c183ce4d8231c23e"
-  integrity sha512-1gcbmTKS3sppPqE61zgYhk93DQh6vf36qHftjQ6bdMMeozM6JRwbYk/cKbyrc3DCk+PGoxf46jjSXSK1NJhASQ==
+"@flyteorg/flyteidl@0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-0.23.1.tgz#da88166e1c0bd404a4f00db425fe07afaaa76a8e"
+  integrity sha512-3M6o3EObbE35cFoY88/DNPcKEp+g2mOuFc2DNlCFntKH1lsB+EEl9k+chuWy8F8iWe7DHkCKJvM5AeEjSseahg==
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"

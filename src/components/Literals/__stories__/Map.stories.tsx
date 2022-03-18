@@ -16,7 +16,7 @@ const stories = storiesOf('Literals/Map', module);
 stories.addDecorator(CardDecorator);
 
 function renderMap(label: string, map: LiteralMap) {
-  return <LiteralValue label={label} literal={{ map, value: 'map' }} />;
+  return <LiteralValue label={label} literal={{ map, value: 'map', hash: '' }} />;
 }
 
 stories.add('Binary', () =>

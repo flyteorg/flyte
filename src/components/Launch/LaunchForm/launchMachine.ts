@@ -78,6 +78,7 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
   defaultAuthRole?: Admin.IAuthRole;
   disableAll?: boolean | null;
   maxParallelism?: number | null;
+  rawOutputDataConfig?: Admin.IRawOutputDataConfig | null;
   labels?: Admin.ILabels | null;
   annotations?: Admin.IAnnotations | null;
   securityContext?: Core.ISecurityContext | null;

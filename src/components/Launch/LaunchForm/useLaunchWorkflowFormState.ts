@@ -168,7 +168,7 @@ async function submit(
 
   const { authRole, securityContext } = roleInputRef.current?.getValue() as LaunchRoles;
   const literals = formInputsRef.current.getValues();
-  const { disableAll, labels, annotations, maxParallelism } =
+  const { disableAll, labels, annotations, maxParallelism, rawOutputDataConfig } =
     advancedOptionsRef.current?.getValues() || {};
   const launchPlanId = launchPlan.id;
   const { domain, project } = workflowVersion;
@@ -179,6 +179,7 @@ async function submit(
     securityContext,
     disableAll,
     maxParallelism,
+    rawOutputDataConfig,
     domain,
     labels,
     launchPlanId,
@@ -241,6 +242,7 @@ export function useLaunchWorkflowFormState({
     values: defaultInputValues,
     disableAll,
     maxParallelism,
+    rawOutputDataConfig,
     labels,
     annotations,
     securityContext,
@@ -273,6 +275,7 @@ export function useLaunchWorkflowFormState({
       sourceId,
       disableAll,
       maxParallelism,
+      rawOutputDataConfig,
       labels,
       annotations,
     },

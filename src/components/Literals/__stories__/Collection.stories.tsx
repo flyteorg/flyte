@@ -16,7 +16,7 @@ const stories = storiesOf('Literals/Collection', module);
 stories.addDecorator(CardDecorator);
 
 function renderCollection(label: string, collection: LiteralCollection) {
-  return <LiteralValue label={label} literal={{ collection, value: 'collection' }} />;
+  return <LiteralValue label={label} literal={{ collection, value: 'collection', hash: '' }} />;
 }
 
 stories.add('Binary', () =>

@@ -34,7 +34,7 @@ export const ExecutionMetadataExtra: React.FC<{
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
-  const { launchPlan: launchPlanId, maxParallelism, authRole } = execution.spec;
+  const { launchPlan: launchPlanId, maxParallelism, rawOutputDataConfig, authRole } = execution.spec;
 
   const [launchPlanSpec, setLaunchPlanSpec] = React.useState<Partial<LaunchPlanSpec>>({});
 
@@ -53,7 +53,7 @@ export const ExecutionMetadataExtra: React.FC<{
     },
     {
       label: ExecutionMetadataLabels.rawOutputPrefix,
-      value: launchPlanSpec?.rawOutputDataConfig?.outputLocationPrefix,
+      value: rawOutputDataConfig?.outputLocationPrefix || launchPlanSpec?.rawOutputDataConfig?.outputLocationPrefix,
     },
     {
       label: ExecutionMetadataLabels.parallelism,
