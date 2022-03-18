@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.46.0](http://github.com/lyft/flyteconsole/compare/v0.45.0...v0.46.0) (2022-03-18)
+
+
+### Features
+
+* added RawOutputDataConfig in ExecutionSpec #patch ([#329](http://github.com/lyft/flyteconsole/issues/329)) ([24bdaee](http://github.com/lyft/flyteconsole/commit/24bdaeefcf32c079d1aaeb54b28cc6bf7395b42f))
+
 # [0.45.0](http://github.com/lyft/flyteconsole/compare/v0.44.0...v0.45.0) (2022-03-15)
 
 
