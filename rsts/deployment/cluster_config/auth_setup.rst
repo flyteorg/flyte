@@ -102,7 +102,12 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
 .. tabbed:: KeyCloak
 
     `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others).
-    KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.
+    KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.Here we configure to use it for OpenID Connect.
+
+    1. If you don't have a Keycloak installation then you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides quick way to deploy Keycloak cluster on AWS.
+    2. Create a realm in keycloak installation using its `admin console<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    3. Create an OIDC client with client secret and note them down. Use the following `instructions<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
+    4. Add Login redirect URIs (e.g. http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``)
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
@@ -145,6 +150,7 @@ Apply Configuration
         userAuth:
           openId:
             # 2. Put the URL of the OpenID Connect provider.
+            #    baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
             #    baseUrl: https://accounts.google.com # Uncomment for Google
             baseUrl: https://dev-14186422.okta.com/oauth2/default # Okta with a custom Authorization Server
             scopes:
@@ -157,7 +163,7 @@ Apply Configuration
           # 4. Update with public domain name (for non-sandbox deployments)
           # - https://example.foobar.com:443
           # Or uncomment this line for sandbox deployment
-          # - https://localhost:30081
+          # - http://localhost:30081
           - http://flyteadmin:80
           - http://flyteadmin.flyte.svc.cluster.local:80
 
@@ -205,8 +211,15 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
 
 .. tabbed:: KeyCloak
 
-   `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others).
-   KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
+    `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others).
+    KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.Here we use it as OAuth2 Authorization Server.
+
+    1. If you don't have a Keycloak installation then you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides quick way to deploy Keycloak cluster on AWS.
+    2. Create a realm in keycloak installation using its `admin console<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    3. Under `Client Scopes`, click `Add Create` inside the admin console
+    4. Create 2 clients (for flytectl and flytepropeller) to enable these clients to communicate with the service.
+      Flytectl should be created with `Access Type Public` and standard flow enabled.
+      FlytePropeller should be created as an `Access Type Confidential`, standard flow enabled and note the client ID and client Secrets provided.
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
@@ -225,13 +238,16 @@ Apply Configuration
                 # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
                 externalAuthServer:
                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+                    #baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for keycloak
+                    #metadataUrl: .well-known/openid-configuration #Uncomment for keycloak
+
             thirdPartyConfig:
                 flyteClient:
-                    # 3. Replace with a new Native Client ID provisioned in the custom authorization server
+                    # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server
                     clientId: flytectl
 
                     # This should not change
-                    redirectUri: https://localhost:53593/callback
+                    redirectUri: http://localhost:53593/callback
 
                     # 4. "all" is a required scope and must be configured in the custom authorization server
                     scopes:
