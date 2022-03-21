@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"sync"
+	"time"
+
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/externalprocess"
 
@@ -124,7 +128,8 @@ func GetPKCEAuthTokenSource(ctx context.Context, tokenOrchestrator pkce.TokenOrc
 }
 
 type ClientCredentialsTokenSourceProvider struct {
-	ccConfig clientcredentials.Config
+	ccConfig           clientcredentials.Config
+	TokenRefreshWindow time.Duration
 }
 
 func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config,
@@ -141,15 +146,67 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config,
 	if len(scopes) == 0 {
 		scopes = clientMetadata.Scopes
 	}
-
 	return ClientCredentialsTokenSourceProvider{
 		ccConfig: clientcredentials.Config{
 			ClientID:     cfg.ClientID,
 			ClientSecret: secret,
 			TokenURL:     tokenURL,
-			Scopes:       scopes}}, nil
+			Scopes:       scopes},
+		TokenRefreshWindow: cfg.TokenRefreshWindow.Duration}, nil
 }
 
 func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+	if p.TokenRefreshWindow > 0 {
+		source := p.ccConfig.TokenSource(ctx)
+		return &customTokenSource{
+			new:                source,
+			mu:                 sync.Mutex{},
+			t:                  nil,
+			tokenRefreshWindow: p.TokenRefreshWindow,
+		}, nil
+	}
 	return p.ccConfig.TokenSource(ctx), nil
+}
+
+type customTokenSource struct {
+	new                oauth2.TokenSource
+	mu                 sync.Mutex // guards everything else
+	t                  *oauth2.Token
+	refreshTime        time.Time
+	failedToRefresh    bool
+	tokenRefreshWindow time.Duration
+}
+
+func (s *customTokenSource) Token() (*oauth2.Token, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.t.Valid() {
+		if time.Now().After(s.refreshTime) && !s.failedToRefresh {
+			t, err := s.new.Token()
+			if err != nil {
+				s.failedToRefresh = true // don't try to refresh again before expiry
+				return s.t, nil
+			}
+			s.t = t
+			s.refreshTime = s.t.Expiry.Add(-getRandomDuration(s.tokenRefreshWindow))
+			s.failedToRefresh = false
+			return s.t, nil
+		}
+		return s.t, nil
+	}
+	t, err := s.new.Token()
+	if err != nil {
+		return nil, err
+	}
+	s.t = t
+	s.failedToRefresh = false
+	s.refreshTime = s.t.Expiry.Add(-getRandomDuration(s.tokenRefreshWindow))
+	return t, nil
+}
+
+// Get random duration between 0 and maxDuration
+func getRandomDuration(maxDuration time.Duration) time.Duration {
+	// d is 1.0 to 2.0 times maxDuration
+	d := wait.Jitter(maxDuration, 1)
+	return d - maxDuration
 }
