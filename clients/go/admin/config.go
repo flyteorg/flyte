@@ -45,6 +45,7 @@ type Config struct {
 	PerRetryTimeout       config.Duration `json:"perRetryTimeout" pflag:",gRPC per retry timeout"`
 	MaxRetries            int             `json:"maxRetries" pflag:",Max number of gRPC retries"`
 	AuthType              AuthType        `json:"authType" pflag:"-,Type of OAuth2 flow used for communicating with admin."`
+	TokenRefreshWindow    config.Duration `json:"tokenRefreshWindow" pflag:",Max duration between token refresh attempt and token expiry."`
 	// Deprecated: settings will be discovered dynamically
 	DeprecatedUseAuth    bool     `json:"useAuth" pflag:",Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information."`
 	ClientID             string   `json:"clientId" pflag:",Client ID"`
@@ -81,6 +82,7 @@ var (
 			TokenRefreshGracePeriod: config.Duration{Duration: 5 * time.Minute},
 			BrowserSessionTimeout:   config.Duration{Duration: 15 * time.Second},
 		},
+		TokenRefreshWindow: config.Duration{Duration: 0},
 	}
 
 	configSection = config.MustRegisterSectionWithUpdates(configSectionKey, &defaultConfig, func(ctx context.Context, newValue config.Config) {
