@@ -48,7 +48,7 @@ For minor edits that don’t require a local setup, you can edit the GitHub page
 
 The edit option can be found at the bottom of a page, as shown below.
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/docs_edit.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/docs_edit.png
     :alt: GitHub edit option for Documentation
     :align: center
     :figclass: align-center
@@ -139,7 +139,7 @@ Output:
 🧱 Component Reference
 ======================
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/dependency_graph.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
     :align: center
     :figclass: align-center

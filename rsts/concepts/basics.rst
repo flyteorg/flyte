@@ -131,7 +131,7 @@ Concepts
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
 
-.. image:: ./flyte_wf_tasks_high_level.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/basics/flyte_wf_tasks_high_level.png
 
 
 .. toctree::
