@@ -368,7 +368,6 @@ storage:
 
 # Database configuration
 db:
-  checks: true
   datacatalog:
     database:
       port: 5432
