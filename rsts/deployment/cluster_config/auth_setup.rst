@@ -218,8 +218,8 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
     2. Create a realm in keycloak installation using its `admin console<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
     3. Under `Client Scopes`, click `Add Create` inside the admin console
     4. Create 2 clients (for flytectl and flytepropeller) to enable these clients to communicate with the service.
-      Flytectl should be created with `Access Type Public` and standard flow enabled.
-      FlytePropeller should be created as an `Access Type Confidential`, standard flow enabled and note the client ID and client Secrets provided.
+       * Flytectl should be created with `Access Type Public` and standard flow enabled.
+       * FlytePropeller should be created as an `Access Type Confidential`, standard flow enabled and note the client ID and client Secrets provided.
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
