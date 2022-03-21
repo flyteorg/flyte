@@ -48,7 +48,6 @@ flyteadmin:
             matchLabels:
               app.kubernetes.io/name: flyteadmin
           topologyKey: kubernetes.io/hostname
-  deployRedoc: false
 
 #
 # FLYTESCHEDULER

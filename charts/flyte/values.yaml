@@ -74,8 +74,6 @@ flyte:
     secrets: {}
     additionalVolumes: []
     additionalVolumeMounts: []
-    # -- Deploys a Redoc container in Flyteadmin's pod
-    deployRedoc: true
 
   #
   # FLYTESCHEDULER SETTINGS
@@ -275,8 +273,7 @@ flyte:
       type: ClusterIP
 
   # It will enable the re doc route in ingress
-  redoc:
-    deployRedoc: true
+  deployRedoc: true
 
   # ------------------------------------------------
   #

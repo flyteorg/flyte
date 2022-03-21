@@ -127,6 +127,7 @@ helm install gateway bitnami/contour -n flyte
 | db.datacatalog.database.host | string | `"postgres"` |  |
 | db.datacatalog.database.port | int | `5432` |  |
 | db.datacatalog.database.username | string | `"postgres"` |  |
+| deployRedoc | bool | `false` |  |
 | external_events | object | `{"aws":{"region":"us-east-2"},"enable":false,"eventsPublisher":{"eventTypes":["all"],"topicName":"arn:aws:sns:us-east-2:123456:123-my-topic"},"type":"aws"}` | **Optional Component** External events are used to send events (unprocessed, as Admin see them) to an SNS topic (or gcp equivalent) The config is here as an example only - if not enabled, it won't be used. |
 | flyteadmin.additionalVolumeMounts | list | `[]` |  |
 | flyteadmin.additionalVolumes | list | `[]` |  |
@@ -202,7 +203,6 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
 | flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
-| redoc.deployRedoc | bool | `false` |  |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
 | secrets.adminOauthClientCredentials.clientSecret | string | `"foobar"` |  |
 | secrets.adminOauthClientCredentials.enabled | bool | `true` | If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`. If enabled is false, it's up to the user to create `flyte-secret-auth` as described in https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server |

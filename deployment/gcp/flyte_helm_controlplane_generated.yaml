@@ -1006,7 +1006,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: redoc
                 port:
                   number: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml

@@ -149,11 +149,11 @@ spec:
             backend:
 {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
-                name: flyteadmin
+                name: redoc
                 port:
                   number: 87
 {{- else }}
-              serviceName: flyteadmin
+              serviceName: redoc
               servicePort: 87
 {{- end }}
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml

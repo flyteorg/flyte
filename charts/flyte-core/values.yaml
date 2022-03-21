@@ -273,8 +273,7 @@ flyteconsole:
 
 
 # It will enable the redoc route in ingress
-redoc:
-  deployRedoc: false
+deployRedoc: false
 
 #
 # Common secret auth for propeller & scheduler
