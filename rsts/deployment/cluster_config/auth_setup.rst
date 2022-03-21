@@ -105,8 +105,8 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.Here we configure to use it for OpenID Connect.
 
     1. If you don't have a Keycloak installation then you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides quick way to deploy Keycloak cluster on AWS.
-    2. Create a realm in keycloak installation using its `admin console<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
-    3. Create an OIDC client with client secret and note them down. Use the following `instructions<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
+    2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
     4. Add Login redirect URIs (e.g. http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``)
 
 Apply Configuration
@@ -215,7 +215,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
     KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.Here we use it as OAuth2 Authorization Server.
 
     1. If you don't have a Keycloak installation then you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides quick way to deploy Keycloak cluster on AWS.
-    2. Create a realm in keycloak installation using its `admin console<https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
     3. Under `Client Scopes`, click `Add Create` inside the admin console
     4. Create 2 clients (for flytectl and flytepropeller) to enable these clients to communicate with the service.
        * Flytectl should be created with `Access Type Public` and standard flow enabled.
