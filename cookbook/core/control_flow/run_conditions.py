@@ -3,12 +3,12 @@ Conditions
 --------------
 Flytekit supports conditions as a first class construct in the language. Conditions offer a way to selectively execute
 branches of a workflow based on static or dynamic data produced by other tasks or come in as workflow inputs.
-Conditions are very performant to be evaluated however, they are limited to certain binary and logical operators and can
+Conditions are very performant to be evaluated. However, they are limited to certain binary and logical operators and can
 only be performed on primitive values.
 """
 
 # %%
-# To start off, import `conditional` module
+# Import the necessary modules.
 import random
 
 from flytekit import conditional, task, workflow
@@ -17,16 +17,16 @@ from flytekit import conditional, task, workflow
 # %%
 # Example 1
 # ^^^^^^^^^
-# In the following example we define two tasks `square` and `double` and depending on whether the workflow input is a
-# fraction (0-1) or not, it decided which to execute.
+# In this example, we define two tasks `square` and `double`. Depending on whether the workflow input is a
+# fraction (0-1) or not, the respective task is executed.
 @task
 def square(n: float) -> float:
     """
     Parameters:
-        n (float): name of the parameter for the task will be derived from the name of the input variable
-               the type will be automatically deduced to be Types.Integer
+        n (float): name of the parameter for the task is derived from the name of the input variable, and
+               the type is automatically mapped to Types.Integer
     Return:
-        float: The label for the output will be automatically assigned and type will be deduced from the annotation
+        float: The label for the output is automatically assigned and the type is deduced from the annotation
     """
     return n * n
 
@@ -35,10 +35,10 @@ def square(n: float) -> float:
 def double(n: float) -> float:
     """
     Parameters:
-        n (float): name of the parameter for the task will be derived from the name of the input variable
-               the type will be automatically deduced to be Types.Integer
+        n (float): name of the parameter for the task is derived from the name of the input variable
+               and the type is mapped to ``Types.Integer``
     Return:
-        float: The label for the output will be automatically assigned and type will be deduced from the annotation
+        float: The label for the output is auto-assigned and the type is deduced from the annotation
     """
     return 2 * n
 
@@ -62,12 +62,12 @@ if __name__ == "__main__":
 # %%
 # Example 2
 # ^^^^^^^^^
-# In the following example we have an if condition with multiple branches and we fail if no conditions are met. Flyte
-# expects any conditional() statement to be _complete_ meaning all possible branches have to be handled.
+# In this example, we define an ``if`` condition with multiple branches. It fails if none of the conditions is met. Flyte
+# expects any ``conditional()`` statement to be **complete**. This means all possible branches should be handled.
 #
 # .. note::
 #
-#   Notice the use of bitwise (&). Python (PEP-335) does not allow overloading of Logical ``and, or, not`` operators. Flytekit uses bitwise `&` and `|` as logical and and or. This is a common practice in other libraries as well.
+#   Notice the use of bitwise (&). Python (PEP-335) doesn't allow overloading of the logical ``and``, ``or``, and ``not`` operators. Flytekit uses bitwise `&` and `|` as logical ``and`` and ``or`` operators. This is a common practice in other libraries too.
 #
 @workflow
 def multiplier_2(my_input: float) -> float:
@@ -89,10 +89,10 @@ if __name__ == "__main__":
 # %%
 # Example 3
 # ^^^^^^^^^
-# In the following example we consume the output returned by the conditional() in a subsequent task.
+# In this example, we consume the output returned by the ``conditional()`` in the subsequent task.
 @workflow
 def multiplier_3(my_input: float) -> float:
-    d = (
+    result = (
         conditional("fractions")
             .if_((my_input > 0.1) & (my_input < 1.0))
             .then(double(n=my_input))
@@ -102,9 +102,9 @@ def multiplier_3(my_input: float) -> float:
             .fail("The input must be between 0 and 10")
     )
 
-    # d will be either the output of `double` or t he output of `square`. If the conditional() falls through the fail
-    # branch, execution will not reach here.
-    return double(n=d)
+    # the 'result' will either be the output of `double` or `square`. If none of the conditions is true,
+    # it gives a failure message.
+    return double(n=result)
 
 
 if __name__ == "__main__":
@@ -114,18 +114,19 @@ if __name__ == "__main__":
 # %%
 # Example 4
 # ^^^^^^^^^^
-# It is possible to test if a boolean returned from previous tasks is True or False. But, unary operations are not
-# supported. Instead, please use the `is_true`, `is_false` or `is_` on the result.
+# It is possible to test if a boolean returned from the previous task is True. But unary operations are not
+# supported. Use the `is_true`, `is_false` or `is_` on the result instead.
 #
 # .. note::
 #
-#    Wondering how output values get these methods. In a workflow no output value is available to access directly. The inputs and outputs are auto-wrapped in a special object called :py:class:`flytekit.extend.Promise`.
+#    How do output values get these methods? 
+#    In a workflow, no output can be accessed directly. The inputs and outputs are auto-wrapped in a special object called :py:class:`flytekit.extend.Promise`.
 #
-# In this contrived example for ease of testing, we are creating a biased coin whose seed we can control.
+# In this example, we create a biased coin whose seed can be controlled.
 @task
 def coin_toss(seed: int) -> bool:
     """
-    Mimic some condition checking to see if something ran correctly
+    Mimic some condition to check if the operation was successfully executed.
     """
     r = random.Random(seed)
     if r.random() < 0.5:
@@ -136,7 +137,7 @@ def coin_toss(seed: int) -> bool:
 @task
 def failed() -> int:
     """
-    Mimic a task that handles a failure case
+    Mimic a task that handles failure
     """
     return -1
 
@@ -144,7 +145,7 @@ def failed() -> int:
 @task
 def success() -> int:
     """
-    Mimic a task that handles a success case
+    Mimic a task that handles success
     """
     return 0
 
@@ -160,20 +161,20 @@ def basic_boolean_wf(seed: int = 5) -> int:
 # %%
 # Example 5
 # ^^^^^^^^^^
-# It is also possible to pass a boolean directly to a workflow as follows
+# It is possible to pass a boolean directly to a workflow.
 #
 # .. note::
 #
-#   Note that the boolean passed in automagically has a method called `is_true`. This is because the boolean is within
-#   the workflow context and hence is actually wrapped in a flytekit special object, which allows it to have additional
-#   behavior
+#   Note that the boolean passed has a method named `is_true`. This boolean is present within
+#   the workflow context and is wrapped in a Flytekit special object. This special object allows it to have the additional
+#   behavior.
 @workflow
 def bool_input_wf(b: bool) -> int:
     return conditional("test").if_(b.is_true()).then(success()).else_().then(failed())
 
 
 # %%
-# these workflows can be locally executed
+# The workflow can be executed locally.
 if __name__ == "__main__":
     print("Running basic_boolean_wf a few times")
     for i in range(0, 5):
@@ -184,11 +185,9 @@ if __name__ == "__main__":
 # %%
 # Example 6
 # ^^^^^^^^^
-# It is possible to arbitrarily nest conditional sections, inside other
-# conditional sections. Remember - conditional sections can only be in the
-# `then` part for a previous conditional block
-# The follow example shows how you can use float comparisons to create
-# a multi-level nested workflow
+# It is possible to arbitrarily nest conditional sections inside other conditional sections. The conditional sections can only be in the
+# ``then`` part of the previous conditional block.
+# This example shows how float comparisons can be used to create a multi-level nested workflow.
 @workflow
 def nested_conditions(my_input: float) -> float:
     return (
@@ -211,33 +210,33 @@ def nested_conditions(my_input: float) -> float:
 
 
 # %%
-# As usual you can execute nested conditionals locally
+# The nested conditionals can be executed locally.
 if __name__ == "__main__":
     print(f"nested_conditions(0.4) -> {nested_conditions(my_input=0.4)}")
 
 
 # %%
-#  Example 7
-# ^^^^^^^^^^^
-# It is also possible to consume the outputs from conditional nodes as shown in the following example.
-# In the case of conditionals though, the outputs are computed
-# to be the subset of outputs that all then-nodes produce. In the following example, we call square() in one condition
-# and call double in another.
+# Example 7
+# ^^^^^^^^^^
+# It is possible to consume the outputs from conditional nodes.
+# In the case of conditionals, the outputs are computed
+# as a subset of outputs produced by ``then`` nodes. In this example, we call ``square()`` in one condition
+# and ``double()`` in another.
 @task
 def calc_sum(a: float, b: float) -> float:
     """
-    calc_sum returns the sum of a and b.
+    returns the sum of a and b.
     """
     return a + b
 
 
 # %%
-# Putting it together, the workflow that consumes outputs from conditionals can be constructed as follows.
+# Altogether, the workflow that consumes outputs from conditionals can be constructed as shown.
 #
 # .. tip::
 #
-#   A useful mental model for consuming outputs of conditions is to think of them like ternary operators in programming
-#   languages. The only difference being they can be n-ary. In python this is equivalent to
+#   A useful mental model to consume outputs of conditions is to think of them as ternary operators in programming
+#   languages. The only difference is that they can be n-ary. In Python, this is equivalent to
 #
 #   .. code-block:: python
 #
@@ -253,13 +252,13 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
             .then(calc_sum(a=my_input, b=my_input))
     )
 
-    # Regardless of the result, always double before returning
-    # the variable `res` in this case will carry the value of either square or double of the variable `my_input`
+    # Regardless of the result, call ``double`` before
+    # the variable `res` is returned. In this case, ``res`` stores the value of the ``square`` or ``double`` of the variable `my_input`
     return double(n=res)
 
 
 # %%
-# As usual local execution does not change
+# The workflow can be executed locally.
 if __name__ == "__main__":
     print(
         f"consume_outputs(0.4) with default seed=5. This should return output of calc_sum => {consume_outputs(my_input=0.4)}")
