@@ -11,7 +11,7 @@ package flyteadmin
 
 // Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables. Each expression results in a boolean result.
 type CoreComparisonExpression struct {
-	Operator *ComparisonExpressionOperator `json:"operator,omitempty"`
+	Operator *CoreComparisonExpressionOperator `json:"operator,omitempty"`
 	LeftValue *CoreOperand `json:"left_value,omitempty"`
 	RightValue *CoreOperand `json:"right_value,omitempty"`
 }

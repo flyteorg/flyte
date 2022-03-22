@@ -35,6 +35,7 @@
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/cluster_assignment.pb.h"
 #include "flyteidl/core/execution.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -145,12 +146,13 @@ enum MatchableResource {
   QUALITY_OF_SERVICE_SPECIFICATION = 4,
   PLUGIN_OVERRIDE = 5,
   WORKFLOW_EXECUTION_CONFIG = 6,
+  CLUSTER_ASSIGNMENT = 7,
   MatchableResource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   MatchableResource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool MatchableResource_IsValid(int value);
 const MatchableResource MatchableResource_MIN = TASK_RESOURCE;
-const MatchableResource MatchableResource_MAX = WORKFLOW_EXECUTION_CONFIG;
+const MatchableResource MatchableResource_MAX = CLUSTER_ASSIGNMENT;
 const int MatchableResource_ARRAYSIZE = MatchableResource_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor();
@@ -1309,6 +1311,7 @@ class MatchingAttributes final :
     kQualityOfService = 5,
     kPluginOverrides = 6,
     kWorkflowExecutionConfig = 7,
+    kClusterAssignment = 8,
     TARGET_NOT_SET = 0,
   };
 
@@ -1438,6 +1441,15 @@ class MatchingAttributes final :
   ::flyteidl::admin::WorkflowExecutionConfig* mutable_workflow_execution_config();
   void set_allocated_workflow_execution_config(::flyteidl::admin::WorkflowExecutionConfig* workflow_execution_config);
 
+  // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+  bool has_cluster_assignment() const;
+  void clear_cluster_assignment();
+  static const int kClusterAssignmentFieldNumber = 8;
+  const ::flyteidl::admin::ClusterAssignment& cluster_assignment() const;
+  ::flyteidl::admin::ClusterAssignment* release_cluster_assignment();
+  ::flyteidl::admin::ClusterAssignment* mutable_cluster_assignment();
+  void set_allocated_cluster_assignment(::flyteidl::admin::ClusterAssignment* cluster_assignment);
+
   void clear_target();
   TargetCase target_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.MatchingAttributes)
@@ -1450,6 +1462,7 @@ class MatchingAttributes final :
   void set_has_quality_of_service();
   void set_has_plugin_overrides();
   void set_has_workflow_execution_config();
+  void set_has_cluster_assignment();
 
   inline bool has_target() const;
   inline void clear_has_target();
@@ -1464,6 +1477,7 @@ class MatchingAttributes final :
     ::flyteidl::core::QualityOfService* quality_of_service_;
     ::flyteidl::admin::PluginOverrides* plugin_overrides_;
     ::flyteidl::admin::WorkflowExecutionConfig* workflow_execution_config_;
+    ::flyteidl::admin::ClusterAssignment* cluster_assignment_;
   } target_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -2886,6 +2900,41 @@ inline ::flyteidl::admin::WorkflowExecutionConfig* MatchingAttributes::mutable_w
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.workflow_execution_config)
   return target_.workflow_execution_config_;
+}
+
+// .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+inline bool MatchingAttributes::has_cluster_assignment() const {
+  return target_case() == kClusterAssignment;
+}
+inline void MatchingAttributes::set_has_cluster_assignment() {
+  _oneof_case_[0] = kClusterAssignment;
+}
+inline ::flyteidl::admin::ClusterAssignment* MatchingAttributes::release_cluster_assignment() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.cluster_assignment)
+  if (has_cluster_assignment()) {
+    clear_has_target();
+      ::flyteidl::admin::ClusterAssignment* temp = target_.cluster_assignment_;
+    target_.cluster_assignment_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::ClusterAssignment& MatchingAttributes::cluster_assignment() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.cluster_assignment)
+  return has_cluster_assignment()
+      ? *target_.cluster_assignment_
+      : *reinterpret_cast< ::flyteidl::admin::ClusterAssignment*>(&::flyteidl::admin::_ClusterAssignment_default_instance_);
+}
+inline ::flyteidl::admin::ClusterAssignment* MatchingAttributes::mutable_cluster_assignment() {
+  if (!has_cluster_assignment()) {
+    clear_target();
+    set_has_cluster_assignment();
+    target_.cluster_assignment_ = CreateMaybeMessage< ::flyteidl::admin::ClusterAssignment >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.cluster_assignment)
+  return target_.cluster_assignment_;
 }
 
 inline bool MatchingAttributes::has_target() const {

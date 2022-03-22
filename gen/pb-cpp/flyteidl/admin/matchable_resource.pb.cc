@@ -16,6 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ClusterResourceAttributes_AttributesEntry_DoNotUse_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
@@ -26,7 +27,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_MatchableAttributesConfiguration_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_PluginOverrides_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TaskResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<7> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
 namespace flyteidl {
 namespace admin {
@@ -76,6 +77,7 @@ class MatchingAttributesDefaultTypeInternal {
   const ::flyteidl::core::QualityOfService* quality_of_service_;
   const ::flyteidl::admin::PluginOverrides* plugin_overrides_;
   const ::flyteidl::admin::WorkflowExecutionConfig* workflow_execution_config_;
+  const ::flyteidl::admin::ClusterAssignment* cluster_assignment_;
 } _MatchingAttributes_default_instance_;
 class MatchableAttributesConfigurationDefaultTypeInternal {
  public:
@@ -230,15 +232,16 @@ static void InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresour
   ::flyteidl::admin::MatchingAttributes::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<7> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 7, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
+::google::protobuf::internal::SCCInfo<8> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 8, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
       &scc_info_TaskResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,
       &scc_info_PluginOverrides_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
-      &scc_info_WorkflowExecutionConfig_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,}};
+      &scc_info_WorkflowExecutionConfig_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
+      &scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,}};
 
 static void InitDefaultsMatchableAttributesConfiguration_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -381,6 +384,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5freso
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, quality_of_service_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, plugin_overrides_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, workflow_execution_config_),
+  offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, cluster_assignment_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, target_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchableAttributesConfiguration, _internal_metadata_),
@@ -416,9 +420,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 52, -1, sizeof(::flyteidl::admin::PluginOverrides)},
   { 58, -1, sizeof(::flyteidl::admin::WorkflowExecutionConfig)},
   { 64, -1, sizeof(::flyteidl::admin::MatchingAttributes)},
-  { 77, -1, sizeof(::flyteidl::admin::MatchableAttributesConfiguration)},
-  { 87, -1, sizeof(::flyteidl::admin::ListMatchableAttributesRequest)},
-  { 93, -1, sizeof(::flyteidl::admin::ListMatchableAttributesResponse)},
+  { 78, -1, sizeof(::flyteidl::admin::MatchableAttributesConfiguration)},
+  { 88, -1, sizeof(::flyteidl::admin::ListMatchableAttributesRequest)},
+  { 94, -1, sizeof(::flyteidl::admin::ListMatchableAttributesResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -445,70 +449,74 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[] =
   "\n\'flyteidl/admin/matchable_resource.prot"
-  "o\022\016flyteidl.admin\032\035flyteidl/core/executi"
-  "on.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001("
-  "\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storag"
-  "e\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026Ta"
-  "skResourceAttributes\0222\n\010defaults\030\001 \001(\0132 "
-  ".flyteidl.admin.TaskResourceSpec\0220\n\006limi"
-  "ts\030\002 \001(\0132 .flyteidl.admin.TaskResourceSp"
-  "ec\"\235\001\n\031ClusterResourceAttributes\022M\n\nattr"
-  "ibutes\030\001 \003(\01329.flyteidl.admin.ClusterRes"
-  "ourceAttributes.AttributesEntry\0321\n\017Attri"
-  "butesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002"
-  "8\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030\001"
-  " \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030\001"
-  " \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 \001"
-  "(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin_"
-  "behavior\030\004 \001(\01624.flyteidl.admin.PluginOv"
-  "erride.MissingPluginBehavior\"2\n\025MissingP"
-  "luginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020\001"
-  "\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132\036"
-  ".flyteidl.admin.PluginOverride\"2\n\027Workfl"
-  "owExecutionConfig\022\027\n\017max_parallelism\030\001 \001"
-  "(\005\"\240\004\n\022MatchingAttributes\022J\n\030task_resour"
-  "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas"
-  "kResourceAttributesH\000\022P\n\033cluster_resourc"
-  "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus"
-  "terResourceAttributesH\000\022N\n\032execution_que"
-  "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe"
-  "cutionQueueAttributesH\000\022H\n\027execution_clu"
-  "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut"
-  "ionClusterLabelH\000\022=\n\022quality_of_service\030"
-  "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000"
-  "\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.ad"
-  "min.PluginOverridesH\000\022L\n\031workflow_execut"
-  "ion_config\030\007 \001(\0132\'.flyteidl.admin.Workfl"
-  "owExecutionConfigH\000B\010\n\006target\"\242\001\n Matcha"
-  "bleAttributesConfiguration\0226\n\nattributes"
-  "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut"
-  "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w"
-  "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li"
-  "stMatchableAttributesRequest\0228\n\rresource"
-  "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe"
-  "source\"k\n\037ListMatchableAttributesRespons"
-  "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm"
-  "in.MatchableAttributesConfiguration*\310\001\n\021"
-  "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020"
-  "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022"
-  "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_"
-  "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE"
-  "RRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION_CONFIG\020\006B7"
-  "Z5github.com/flyteorg/flyteidl/gen/pb-go"
-  "/flyteidl/adminb\006proto3"
+  "o\022\016flyteidl.admin\032\'flyteidl/admin/cluste"
+  "r_assignment.proto\032\035flyteidl/core/execut"
+  "ion.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001"
+  "(\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007stora"
+  "ge\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026T"
+  "askResourceAttributes\0222\n\010defaults\030\001 \001(\0132"
+  " .flyteidl.admin.TaskResourceSpec\0220\n\006lim"
+  "its\030\002 \001(\0132 .flyteidl.admin.TaskResourceS"
+  "pec\"\235\001\n\031ClusterResourceAttributes\022M\n\natt"
+  "ributes\030\001 \003(\01329.flyteidl.admin.ClusterRe"
+  "sourceAttributes.AttributesEntry\0321\n\017Attr"
+  "ibutesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:"
+  "\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030"
+  "\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030"
+  "\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 "
+  "\001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin"
+  "_behavior\030\004 \001(\01624.flyteidl.admin.PluginO"
+  "verride.MissingPluginBehavior\"2\n\025Missing"
+  "PluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020"
+  "\001\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132"
+  "\036.flyteidl.admin.PluginOverride\"2\n\027Workf"
+  "lowExecutionConfig\022\027\n\017max_parallelism\030\001 "
+  "\001(\005\"\341\004\n\022MatchingAttributes\022J\n\030task_resou"
+  "rce_attributes\030\001 \001(\0132&.flyteidl.admin.Ta"
+  "skResourceAttributesH\000\022P\n\033cluster_resour"
+  "ce_attributes\030\002 \001(\0132).flyteidl.admin.Clu"
+  "sterResourceAttributesH\000\022N\n\032execution_qu"
+  "eue_attributes\030\003 \001(\0132(.flyteidl.admin.Ex"
+  "ecutionQueueAttributesH\000\022H\n\027execution_cl"
+  "uster_label\030\004 \001(\0132%.flyteidl.admin.Execu"
+  "tionClusterLabelH\000\022=\n\022quality_of_service"
+  "\030\005 \001(\0132\037.flyteidl.core.QualityOfServiceH"
+  "\000\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.a"
+  "dmin.PluginOverridesH\000\022L\n\031workflow_execu"
+  "tion_config\030\007 \001(\0132\'.flyteidl.admin.Workf"
+  "lowExecutionConfigH\000\022\?\n\022cluster_assignme"
+  "nt\030\010 \001(\0132!.flyteidl.admin.ClusterAssignm"
+  "entH\000B\010\n\006target\"\242\001\n MatchableAttributesC"
+  "onfiguration\0226\n\nattributes\030\001 \001(\0132\".flyte"
+  "idl.admin.MatchingAttributes\022\016\n\006domain\030\002"
+  " \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022"
+  "\023\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAtt"
+  "ributesRequest\0228\n\rresource_type\030\001 \001(\0162!."
+  "flyteidl.admin.MatchableResource\"k\n\037List"
+  "MatchableAttributesResponse\022H\n\016configura"
+  "tions\030\001 \003(\01320.flyteidl.admin.MatchableAt"
+  "tributesConfiguration*\340\001\n\021MatchableResou"
+  "rce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOUR"
+  "CE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_C"
+  "LUSTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPE"
+  "CIFICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005\022\035\n\031WOR"
+  "KFLOW_EXECUTION_CONFIG\020\006\022\026\n\022CLUSTER_ASSI"
+  "GNMENT\020\007B7Z5github.com/flyteorg/flyteidl"
+  "/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
-  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 2063,
+  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 2193,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
   {
+    ::AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, deps, 1);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, deps, 2);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -549,6 +557,7 @@ bool MatchableResource_IsValid(int value) {
     case 4:
     case 5:
     case 6:
+    case 7:
       return true;
     default:
       return false;
@@ -3482,6 +3491,8 @@ void MatchingAttributes::InitAsDefaultInstance() {
       ::flyteidl::admin::PluginOverrides::internal_default_instance());
   ::flyteidl::admin::_MatchingAttributes_default_instance_.workflow_execution_config_ = const_cast< ::flyteidl::admin::WorkflowExecutionConfig*>(
       ::flyteidl::admin::WorkflowExecutionConfig::internal_default_instance());
+  ::flyteidl::admin::_MatchingAttributes_default_instance_.cluster_assignment_ = const_cast< ::flyteidl::admin::ClusterAssignment*>(
+      ::flyteidl::admin::ClusterAssignment::internal_default_instance());
 }
 class MatchingAttributes::HasBitSetters {
  public:
@@ -3492,6 +3503,7 @@ class MatchingAttributes::HasBitSetters {
   static const ::flyteidl::core::QualityOfService& quality_of_service(const MatchingAttributes* msg);
   static const ::flyteidl::admin::PluginOverrides& plugin_overrides(const MatchingAttributes* msg);
   static const ::flyteidl::admin::WorkflowExecutionConfig& workflow_execution_config(const MatchingAttributes* msg);
+  static const ::flyteidl::admin::ClusterAssignment& cluster_assignment(const MatchingAttributes* msg);
 };
 
 const ::flyteidl::admin::TaskResourceAttributes&
@@ -3521,6 +3533,10 @@ MatchingAttributes::HasBitSetters::plugin_overrides(const MatchingAttributes* ms
 const ::flyteidl::admin::WorkflowExecutionConfig&
 MatchingAttributes::HasBitSetters::workflow_execution_config(const MatchingAttributes* msg) {
   return *msg->target_.workflow_execution_config_;
+}
+const ::flyteidl::admin::ClusterAssignment&
+MatchingAttributes::HasBitSetters::cluster_assignment(const MatchingAttributes* msg) {
+  return *msg->target_.cluster_assignment_;
 }
 void MatchingAttributes::set_allocated_task_resource_attributes(::flyteidl::admin::TaskResourceAttributes* task_resource_attributes) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
@@ -3626,6 +3642,26 @@ void MatchingAttributes::set_allocated_workflow_execution_config(::flyteidl::adm
   }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchingAttributes.workflow_execution_config)
 }
+void MatchingAttributes::set_allocated_cluster_assignment(::flyteidl::admin::ClusterAssignment* cluster_assignment) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_target();
+  if (cluster_assignment) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      cluster_assignment = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, cluster_assignment, submessage_arena);
+    }
+    set_has_cluster_assignment();
+    target_.cluster_assignment_ = cluster_assignment;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchingAttributes.cluster_assignment)
+}
+void MatchingAttributes::clear_cluster_assignment() {
+  if (has_cluster_assignment()) {
+    delete target_.cluster_assignment_;
+    clear_has_target();
+  }
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int MatchingAttributes::kTaskResourceAttributesFieldNumber;
 const int MatchingAttributes::kClusterResourceAttributesFieldNumber;
@@ -3634,6 +3670,7 @@ const int MatchingAttributes::kExecutionClusterLabelFieldNumber;
 const int MatchingAttributes::kQualityOfServiceFieldNumber;
 const int MatchingAttributes::kPluginOverridesFieldNumber;
 const int MatchingAttributes::kWorkflowExecutionConfigFieldNumber;
+const int MatchingAttributes::kClusterAssignmentFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MatchingAttributes::MatchingAttributes()
@@ -3673,6 +3710,10 @@ MatchingAttributes::MatchingAttributes(const MatchingAttributes& from)
     }
     case kWorkflowExecutionConfig: {
       mutable_workflow_execution_config()->::flyteidl::admin::WorkflowExecutionConfig::MergeFrom(from.workflow_execution_config());
+      break;
+    }
+    case kClusterAssignment: {
+      mutable_cluster_assignment()->::flyteidl::admin::ClusterAssignment::MergeFrom(from.cluster_assignment());
       break;
     }
     case TARGET_NOT_SET: {
@@ -3737,6 +3778,10 @@ void MatchingAttributes::clear_target() {
     }
     case kWorkflowExecutionConfig: {
       delete target_.workflow_execution_config_;
+      break;
+    }
+    case kClusterAssignment: {
+      delete target_.cluster_assignment_;
       break;
     }
     case TARGET_NOT_SET: {
@@ -3861,6 +3906,19 @@ const char* MatchingAttributes::_InternalParse(const char* begin, const char* en
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+      case 8: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 66) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::ClusterAssignment::_InternalParse;
+        object = msg->mutable_cluster_assignment();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -3968,6 +4026,17 @@ bool MatchingAttributes::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (66 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_cluster_assignment()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -4037,6 +4106,12 @@ void MatchingAttributes::SerializeWithCachedSizes(
       7, HasBitSetters::workflow_execution_config(this), output);
   }
 
+  // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+  if (has_cluster_assignment()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      8, HasBitSetters::cluster_assignment(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -4097,6 +4172,13 @@ void MatchingAttributes::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         7, HasBitSetters::workflow_execution_config(this), target);
+  }
+
+  // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+  if (has_cluster_assignment()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        8, HasBitSetters::cluster_assignment(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4170,6 +4252,13 @@ size_t MatchingAttributes::ByteSizeLong() const {
           *target_.workflow_execution_config_);
       break;
     }
+    // .flyteidl.admin.ClusterAssignment cluster_assignment = 8;
+    case kClusterAssignment: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *target_.cluster_assignment_);
+      break;
+    }
     case TARGET_NOT_SET: {
       break;
     }
@@ -4228,6 +4317,10 @@ void MatchingAttributes::MergeFrom(const MatchingAttributes& from) {
     }
     case kWorkflowExecutionConfig: {
       mutable_workflow_execution_config()->::flyteidl::admin::WorkflowExecutionConfig::MergeFrom(from.workflow_execution_config());
+      break;
+    }
+    case kClusterAssignment: {
+      mutable_cluster_assignment()->::flyteidl::admin::ClusterAssignment::MergeFrom(from.cluster_assignment());
       break;
     }
     case TARGET_NOT_SET: {

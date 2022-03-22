@@ -6986,6 +6986,186 @@ export namespace flyteidl {
     /** Namespace admin. */
     namespace admin {
 
+        /** Properties of a ClusterAssignment. */
+        interface IClusterAssignment {
+
+            /** ClusterAssignment affinity */
+            affinity?: (flyteidl.admin.IAffinity|null);
+        }
+
+        /** Represents a ClusterAssignment. */
+        class ClusterAssignment implements IClusterAssignment {
+
+            /**
+             * Constructs a new ClusterAssignment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IClusterAssignment);
+
+            /** ClusterAssignment affinity. */
+            public affinity?: (flyteidl.admin.IAffinity|null);
+
+            /**
+             * Creates a new ClusterAssignment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ClusterAssignment instance
+             */
+            public static create(properties?: flyteidl.admin.IClusterAssignment): flyteidl.admin.ClusterAssignment;
+
+            /**
+             * Encodes the specified ClusterAssignment message. Does not implicitly {@link flyteidl.admin.ClusterAssignment.verify|verify} messages.
+             * @param message ClusterAssignment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IClusterAssignment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ClusterAssignment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ClusterAssignment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ClusterAssignment;
+
+            /**
+             * Verifies a ClusterAssignment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Affinity. */
+        interface IAffinity {
+
+            /** Affinity selectors */
+            selectors?: (flyteidl.admin.ISelector[]|null);
+        }
+
+        /** Represents an Affinity. */
+        class Affinity implements IAffinity {
+
+            /**
+             * Constructs a new Affinity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAffinity);
+
+            /** Affinity selectors. */
+            public selectors: flyteidl.admin.ISelector[];
+
+            /**
+             * Creates a new Affinity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Affinity instance
+             */
+            public static create(properties?: flyteidl.admin.IAffinity): flyteidl.admin.Affinity;
+
+            /**
+             * Encodes the specified Affinity message. Does not implicitly {@link flyteidl.admin.Affinity.verify|verify} messages.
+             * @param message Affinity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAffinity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Affinity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Affinity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Affinity;
+
+            /**
+             * Verifies an Affinity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Selector. */
+        interface ISelector {
+
+            /** Selector key */
+            key?: (string|null);
+
+            /** Selector value */
+            value?: (string[]|null);
+
+            /** Selector operator */
+            operator?: (flyteidl.admin.Selector.Operator|null);
+        }
+
+        /** Represents a Selector. */
+        class Selector implements ISelector {
+
+            /**
+             * Constructs a new Selector.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISelector);
+
+            /** Selector key. */
+            public key: string;
+
+            /** Selector value. */
+            public value: string[];
+
+            /** Selector operator. */
+            public operator: flyteidl.admin.Selector.Operator;
+
+            /**
+             * Creates a new Selector instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Selector instance
+             */
+            public static create(properties?: flyteidl.admin.ISelector): flyteidl.admin.Selector;
+
+            /**
+             * Encodes the specified Selector message. Does not implicitly {@link flyteidl.admin.Selector.verify|verify} messages.
+             * @param message Selector message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISelector, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Selector message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Selector
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Selector;
+
+            /**
+             * Verifies a Selector message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Selector {
+
+            /** Operator enum. */
+            enum Operator {
+                EQUALS = 0,
+                NOT_EQUALS = 1,
+                IN = 2,
+                NOT_IN = 3,
+                EXISTS = 4
+            }
+        }
+
         /** Properties of a NamedEntityIdentifier. */
         interface INamedEntityIdentifier {
 
@@ -9725,6 +9905,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec rawOutputDataConfig */
             rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
+
+            /** ExecutionSpec clusterAssignment */
+            clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -9771,6 +9954,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec rawOutputDataConfig. */
             public rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
+
+            /** ExecutionSpec clusterAssignment. */
+            public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -11192,7 +11378,8 @@ export namespace flyteidl {
             EXECUTION_CLUSTER_LABEL = 3,
             QUALITY_OF_SERVICE_SPECIFICATION = 4,
             PLUGIN_OVERRIDE = 5,
-            WORKFLOW_EXECUTION_CONFIG = 6
+            WORKFLOW_EXECUTION_CONFIG = 6,
+            CLUSTER_ASSIGNMENT = 7
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -11685,6 +11872,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes workflowExecutionConfig */
             workflowExecutionConfig?: (flyteidl.admin.IWorkflowExecutionConfig|null);
+
+            /** MatchingAttributes clusterAssignment */
+            clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -11717,8 +11907,11 @@ export namespace flyteidl {
             /** MatchingAttributes workflowExecutionConfig. */
             public workflowExecutionConfig?: (flyteidl.admin.IWorkflowExecutionConfig|null);
 
+            /** MatchingAttributes clusterAssignment. */
+            public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.

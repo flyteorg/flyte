@@ -80,6 +80,14 @@ public final class MatchableResourceOuterClass {
      * <code>WORKFLOW_EXECUTION_CONFIG = 6;</code>
      */
     WORKFLOW_EXECUTION_CONFIG(6),
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>CLUSTER_ASSIGNMENT = 7;</code>
+     */
+    CLUSTER_ASSIGNMENT(7),
     UNRECOGNIZED(-1),
     ;
 
@@ -139,6 +147,14 @@ public final class MatchableResourceOuterClass {
      * <code>WORKFLOW_EXECUTION_CONFIG = 6;</code>
      */
     public static final int WORKFLOW_EXECUTION_CONFIG_VALUE = 6;
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>CLUSTER_ASSIGNMENT = 7;</code>
+     */
+    public static final int CLUSTER_ASSIGNMENT_VALUE = 7;
 
 
     public final int getNumber() {
@@ -166,6 +182,7 @@ public final class MatchableResourceOuterClass {
         case 4: return QUALITY_OF_SERVICE_SPECIFICATION;
         case 5: return PLUGIN_OVERRIDE;
         case 6: return WORKFLOW_EXECUTION_CONFIG;
+        case 7: return CLUSTER_ASSIGNMENT;
         default: return null;
       }
     }
@@ -6685,6 +6702,19 @@ public final class MatchableResourceOuterClass {
      */
     flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfigOrBuilder getWorkflowExecutionConfigOrBuilder();
 
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    boolean hasClusterAssignment();
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment();
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder();
+
     public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.TargetCase getTargetCase();
   }
   /**
@@ -6828,6 +6858,20 @@ public final class MatchableResourceOuterClass {
               targetCase_ = 7;
               break;
             }
+            case 66: {
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder subBuilder = null;
+              if (targetCase_ == 8) {
+                subBuilder = ((flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 8;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -6871,6 +6915,7 @@ public final class MatchableResourceOuterClass {
       QUALITY_OF_SERVICE(5),
       PLUGIN_OVERRIDES(6),
       WORKFLOW_EXECUTION_CONFIG(7),
+      CLUSTER_ASSIGNMENT(8),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -6893,6 +6938,7 @@ public final class MatchableResourceOuterClass {
           case 5: return QUALITY_OF_SERVICE;
           case 6: return PLUGIN_OVERRIDES;
           case 7: return WORKFLOW_EXECUTION_CONFIG;
+          case 8: return CLUSTER_ASSIGNMENT;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -7090,6 +7136,32 @@ public final class MatchableResourceOuterClass {
       return flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig.getDefaultInstance();
     }
 
+    public static final int CLUSTER_ASSIGNMENT_FIELD_NUMBER = 8;
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    public boolean hasClusterAssignment() {
+      return targetCase_ == 8;
+    }
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment() {
+      if (targetCase_ == 8) {
+         return (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_;
+      }
+      return flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder() {
+      if (targetCase_ == 8) {
+         return (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_;
+      }
+      return flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -7124,6 +7196,9 @@ public final class MatchableResourceOuterClass {
       }
       if (targetCase_ == 7) {
         output.writeMessage(7, (flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig) target_);
+      }
+      if (targetCase_ == 8) {
+        output.writeMessage(8, (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_);
       }
       unknownFields.writeTo(output);
     }
@@ -7161,6 +7236,10 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 7) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, (flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig) target_);
+      }
+      if (targetCase_ == 8) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7207,6 +7286,10 @@ public final class MatchableResourceOuterClass {
           if (!getWorkflowExecutionConfig()
               .equals(other.getWorkflowExecutionConfig())) return false;
           break;
+        case 8:
+          if (!getClusterAssignment()
+              .equals(other.getClusterAssignment())) return false;
+          break;
         case 0:
         default:
       }
@@ -7249,6 +7332,10 @@ public final class MatchableResourceOuterClass {
         case 7:
           hash = (37 * hash) + WORKFLOW_EXECUTION_CONFIG_FIELD_NUMBER;
           hash = (53 * hash) + getWorkflowExecutionConfig().hashCode();
+          break;
+        case 8:
+          hash = (37 * hash) + CLUSTER_ASSIGNMENT_FIELD_NUMBER;
+          hash = (53 * hash) + getClusterAssignment().hashCode();
           break;
         case 0:
         default:
@@ -7467,6 +7554,13 @@ public final class MatchableResourceOuterClass {
             result.target_ = workflowExecutionConfigBuilder_.build();
           }
         }
+        if (targetCase_ == 8) {
+          if (clusterAssignmentBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = clusterAssignmentBuilder_.build();
+          }
+        }
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -7543,6 +7637,10 @@ public final class MatchableResourceOuterClass {
           }
           case WORKFLOW_EXECUTION_CONFIG: {
             mergeWorkflowExecutionConfig(other.getWorkflowExecutionConfig());
+            break;
+          }
+          case CLUSTER_ASSIGNMENT: {
+            mergeClusterAssignment(other.getClusterAssignment());
             break;
           }
           case TARGET_NOT_SET: {
@@ -8543,6 +8641,142 @@ public final class MatchableResourceOuterClass {
         targetCase_ = 7;
         onChanged();;
         return workflowExecutionConfigBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder> clusterAssignmentBuilder_;
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public boolean hasClusterAssignment() {
+        return targetCase_ == 8;
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment() {
+        if (clusterAssignmentBuilder_ == null) {
+          if (targetCase_ == 8) {
+            return (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_;
+          }
+          return flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+        } else {
+          if (targetCase_ == 8) {
+            return clusterAssignmentBuilder_.getMessage();
+          }
+          return flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public Builder setClusterAssignment(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment value) {
+        if (clusterAssignmentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          clusterAssignmentBuilder_.setMessage(value);
+        }
+        targetCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public Builder setClusterAssignment(
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder builderForValue) {
+        if (clusterAssignmentBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          clusterAssignmentBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public Builder mergeClusterAssignment(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment value) {
+        if (clusterAssignmentBuilder_ == null) {
+          if (targetCase_ == 8 &&
+              target_ != flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance()) {
+            target_ = flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.newBuilder((flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 8) {
+            clusterAssignmentBuilder_.mergeFrom(value);
+          }
+          clusterAssignmentBuilder_.setMessage(value);
+        }
+        targetCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public Builder clearClusterAssignment() {
+        if (clusterAssignmentBuilder_ == null) {
+          if (targetCase_ == 8) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 8) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          clusterAssignmentBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder getClusterAssignmentBuilder() {
+        return getClusterAssignmentFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder() {
+        if ((targetCase_ == 8) && (clusterAssignmentBuilder_ != null)) {
+          return clusterAssignmentBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 8) {
+            return (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_;
+          }
+          return flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 8;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder> 
+          getClusterAssignmentFieldBuilder() {
+        if (clusterAssignmentBuilder_ == null) {
+          if (!(targetCase_ == 8)) {
+            target_ = flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance();
+          }
+          clusterAssignmentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder>(
+                  (flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 8;
+        onChanged();;
+        return clusterAssignmentBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11183,57 +11417,60 @@ public final class MatchableResourceOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/matchable_resource.prot" +
-      "o\022\016flyteidl.admin\032\035flyteidl/core/executi" +
-      "on.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001(" +
-      "\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storag" +
-      "e\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026Ta" +
-      "skResourceAttributes\0222\n\010defaults\030\001 \001(\0132 " +
-      ".flyteidl.admin.TaskResourceSpec\0220\n\006limi" +
-      "ts\030\002 \001(\0132 .flyteidl.admin.TaskResourceSp" +
-      "ec\"\235\001\n\031ClusterResourceAttributes\022M\n\nattr" +
-      "ibutes\030\001 \003(\01329.flyteidl.admin.ClusterRes" +
-      "ourceAttributes.AttributesEntry\0321\n\017Attri" +
-      "butesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
-      "8\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030\001" +
-      " \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030\001" +
-      " \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 \001" +
-      "(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin_" +
-      "behavior\030\004 \001(\01624.flyteidl.admin.PluginOv" +
-      "erride.MissingPluginBehavior\"2\n\025MissingP" +
-      "luginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020\001" +
-      "\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132\036" +
-      ".flyteidl.admin.PluginOverride\"2\n\027Workfl" +
-      "owExecutionConfig\022\027\n\017max_parallelism\030\001 \001" +
-      "(\005\"\240\004\n\022MatchingAttributes\022J\n\030task_resour" +
-      "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas" +
-      "kResourceAttributesH\000\022P\n\033cluster_resourc" +
-      "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus" +
-      "terResourceAttributesH\000\022N\n\032execution_que" +
-      "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe" +
-      "cutionQueueAttributesH\000\022H\n\027execution_clu" +
-      "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut" +
-      "ionClusterLabelH\000\022=\n\022quality_of_service\030" +
-      "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000" +
-      "\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.ad" +
-      "min.PluginOverridesH\000\022L\n\031workflow_execut" +
-      "ion_config\030\007 \001(\0132\'.flyteidl.admin.Workfl" +
-      "owExecutionConfigH\000B\010\n\006target\"\242\001\n Matcha" +
-      "bleAttributesConfiguration\0226\n\nattributes" +
-      "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut" +
-      "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w" +
-      "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li" +
-      "stMatchableAttributesRequest\0228\n\rresource" +
-      "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe" +
-      "source\"k\n\037ListMatchableAttributesRespons" +
-      "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm" +
-      "in.MatchableAttributesConfiguration*\310\001\n\021" +
-      "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020" +
-      "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022" +
-      "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_" +
-      "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE" +
-      "RRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION_CONFIG\020\006B7" +
-      "Z5github.com/flyteorg/flyteidl/gen/pb-go" +
-      "/flyteidl/adminb\006proto3"
+      "o\022\016flyteidl.admin\032\'flyteidl/admin/cluste" +
+      "r_assignment.proto\032\035flyteidl/core/execut" +
+      "ion.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001" +
+      "(\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007stora" +
+      "ge\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026T" +
+      "askResourceAttributes\0222\n\010defaults\030\001 \001(\0132" +
+      " .flyteidl.admin.TaskResourceSpec\0220\n\006lim" +
+      "its\030\002 \001(\0132 .flyteidl.admin.TaskResourceS" +
+      "pec\"\235\001\n\031ClusterResourceAttributes\022M\n\natt" +
+      "ributes\030\001 \003(\01329.flyteidl.admin.ClusterRe" +
+      "sourceAttributes.AttributesEntry\0321\n\017Attr" +
+      "ibutesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
+      "\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030" +
+      "\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030" +
+      "\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 " +
+      "\001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin" +
+      "_behavior\030\004 \001(\01624.flyteidl.admin.PluginO" +
+      "verride.MissingPluginBehavior\"2\n\025Missing" +
+      "PluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020" +
+      "\001\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132" +
+      "\036.flyteidl.admin.PluginOverride\"2\n\027Workf" +
+      "lowExecutionConfig\022\027\n\017max_parallelism\030\001 " +
+      "\001(\005\"\341\004\n\022MatchingAttributes\022J\n\030task_resou" +
+      "rce_attributes\030\001 \001(\0132&.flyteidl.admin.Ta" +
+      "skResourceAttributesH\000\022P\n\033cluster_resour" +
+      "ce_attributes\030\002 \001(\0132).flyteidl.admin.Clu" +
+      "sterResourceAttributesH\000\022N\n\032execution_qu" +
+      "eue_attributes\030\003 \001(\0132(.flyteidl.admin.Ex" +
+      "ecutionQueueAttributesH\000\022H\n\027execution_cl" +
+      "uster_label\030\004 \001(\0132%.flyteidl.admin.Execu" +
+      "tionClusterLabelH\000\022=\n\022quality_of_service" +
+      "\030\005 \001(\0132\037.flyteidl.core.QualityOfServiceH" +
+      "\000\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.a" +
+      "dmin.PluginOverridesH\000\022L\n\031workflow_execu" +
+      "tion_config\030\007 \001(\0132\'.flyteidl.admin.Workf" +
+      "lowExecutionConfigH\000\022?\n\022cluster_assignme" +
+      "nt\030\010 \001(\0132!.flyteidl.admin.ClusterAssignm" +
+      "entH\000B\010\n\006target\"\242\001\n MatchableAttributesC" +
+      "onfiguration\0226\n\nattributes\030\001 \001(\0132\".flyte" +
+      "idl.admin.MatchingAttributes\022\016\n\006domain\030\002" +
+      " \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022" +
+      "\023\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAtt" +
+      "ributesRequest\0228\n\rresource_type\030\001 \001(\0162!." +
+      "flyteidl.admin.MatchableResource\"k\n\037List" +
+      "MatchableAttributesResponse\022H\n\016configura" +
+      "tions\030\001 \003(\01320.flyteidl.admin.MatchableAt" +
+      "tributesConfiguration*\340\001\n\021MatchableResou" +
+      "rce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOUR" +
+      "CE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_C" +
+      "LUSTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPE" +
+      "CIFICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005\022\035\n\031WOR" +
+      "KFLOW_EXECUTION_CONFIG\020\006\022\026\n\022CLUSTER_ASSI" +
+      "GNMENT\020\007B7Z5github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11246,6 +11483,7 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_TaskResourceSpec_descriptor =
@@ -11307,7 +11545,7 @@ public final class MatchableResourceOuterClass {
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchingAttributes_descriptor,
-        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "PluginOverrides", "WorkflowExecutionConfig", "Target", });
+        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "PluginOverrides", "WorkflowExecutionConfig", "ClusterAssignment", "Target", });
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_fieldAccessorTable = new
@@ -11326,6 +11564,7 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor,
         new java.lang.String[] { "Configurations", });
+    flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
   }
 
