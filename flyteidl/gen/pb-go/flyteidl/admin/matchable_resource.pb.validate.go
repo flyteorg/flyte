@@ -715,6 +715,18 @@ func (m *MatchingAttributes) Validate() error {
 			}
 		}
 
+	case *MatchingAttributes_ClusterAssignment:
+
+		if v, ok := interface{}(m.GetClusterAssignment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchingAttributesValidationError{
+					field:  "ClusterAssignment",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

@@ -1093,7 +1093,9 @@ paths:
           \ - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service\
           \ when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable\
           \ plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG:\
-          \ Adds defaults for customizable workflow-execution specifications and overrides."
+          \ Adds defaults for customizable workflow-execution specifications and overrides.\n\
+          \ - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which\
+          \ this execution should run."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1105,6 +1107,7 @@ paths:
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
         - "WORKFLOW_EXECUTION_CONFIG"
+        - "CLUSTER_ASSIGNMENT"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1478,7 +1481,9 @@ paths:
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
           \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
-          \ customizable workflow-execution specifications and overrides."
+          \ customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT:\
+          \ Controls how to select an available cluster on which this execution should\
+          \ run."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1490,6 +1495,7 @@ paths:
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
         - "WORKFLOW_EXECUTION_CONFIG"
+        - "CLUSTER_ASSIGNMENT"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2206,7 +2212,9 @@ paths:
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
           \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
-          \ customizable workflow-execution specifications and overrides."
+          \ customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT:\
+          \ Controls how to select an available cluster on which this execution should\
+          \ run."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -2218,6 +2226,7 @@ paths:
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
         - "WORKFLOW_EXECUTION_CONFIG"
+        - "CLUSTER_ASSIGNMENT"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2600,18 +2609,6 @@ definitions:
     - "RESERVATION_RELEASED"
     - "RESERVATION_FAILURE"
     default: "RESERVATION_DISABLED"
-  ComparisonExpressionOperator:
-    type: "string"
-    title: "Binary Operator for each expression"
-    description: "- GT: Greater Than\n - LT: Less Than"
-    enum:
-    - "EQ"
-    - "NEQ"
-    - "GT"
-    - "GTE"
-    - "LT"
-    - "LTE"
-    default: "EQ"
   ConjunctionExpressionLogicalOperator:
     type: "string"
     title: "Nested conditions. They can be conjoined using AND / OR\nOrder of evaluation\
@@ -2881,6 +2878,29 @@ definitions:
     example:
       principal: "principal"
       cause: "cause"
+  adminAffinity:
+    type: "object"
+    properties:
+      selectors:
+        type: "array"
+        description: "Multiples selectors are 'and'-ed together to produce the list\
+          \ of matching, eligible objects."
+        items:
+          $ref: "#/definitions/adminSelector"
+    description: "Defines a set of constraints used to select eligible objects based\
+      \ on labels they possess."
+    example:
+      selectors:
+      - value:
+        - "value"
+        - "value"
+        key: "key"
+        operator: {}
+      - value:
+        - "value"
+        - "value"
+        key: "key"
+        operator: {}
   adminAnnotations:
     type: "object"
     properties:
@@ -2929,6 +2949,26 @@ definitions:
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
+  adminClusterAssignment:
+    type: "object"
+    properties:
+      affinity:
+        $ref: "#/definitions/adminAffinity"
+    description: "Encapsulates specifications for routing an execution onto a specific\
+      \ cluster."
+    example:
+      affinity:
+        selectors:
+        - value:
+          - "value"
+          - "value"
+          key: "key"
+          operator: {}
+        - value:
+          - "value"
+          - "value"
+          key: "key"
+          operator: {}
   adminClusterResourceAttributes:
     type: "object"
     properties:
@@ -3072,12 +3112,6 @@ definitions:
             - "recipients_email"
             - "recipients_email"
       spec:
-        launch_plan:
-          domain: "domain"
-          resource_type: {}
-          name: "name"
-          project: "project"
-          version: "version"
         metadata:
           mode: {}
           principal: "principal"
@@ -3095,19 +3129,41 @@ definitions:
           nesting: 0
           system_metadata:
             execution_cluster: "execution_cluster"
-        quality_of_service:
-          tier: {}
-          spec:
-            queueing_budget: "queueing_budget"
         disable_all: true
         inputs:
           literals: {}
-        raw_output_data_config:
-          output_location_prefix: "output_location_prefix"
         annotations:
           values:
             key: "values"
         max_parallelism: 6
+        labels:
+          values:
+            key: "values"
+        launch_plan:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
+        raw_output_data_config:
+          output_location_prefix: "output_location_prefix"
+        cluster_assignment:
+          affinity:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
         notifications:
           notifications:
           - pager_duty:
@@ -3183,9 +3239,6 @@ definitions:
             group_version: "group_version"
             key: "key"
             group: "group"
-        labels:
-          values:
-            key: "values"
         auth_role:
           kubernetes_service_account: "kubernetes_service_account"
           assumable_iam_role: "assumable_iam_role"
@@ -3442,12 +3495,6 @@ definitions:
               - "recipients_email"
               - "recipients_email"
         spec:
-          launch_plan:
-            domain: "domain"
-            resource_type: {}
-            name: "name"
-            project: "project"
-            version: "version"
           metadata:
             mode: {}
             principal: "principal"
@@ -3465,19 +3512,41 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
-          quality_of_service:
-            tier: {}
-            spec:
-              queueing_budget: "queueing_budget"
           disable_all: true
           inputs:
             literals: {}
-          raw_output_data_config:
-            output_location_prefix: "output_location_prefix"
           annotations:
             values:
               key: "values"
           max_parallelism: 6
+          labels:
+            values:
+              key: "values"
+          launch_plan:
+            domain: "domain"
+            resource_type: {}
+            name: "name"
+            project: "project"
+            version: "version"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           notifications:
             notifications:
             - pager_duty:
@@ -3553,9 +3622,6 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
-          labels:
-            values:
-              key: "values"
           auth_role:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -3628,12 +3694,6 @@ definitions:
               - "recipients_email"
               - "recipients_email"
         spec:
-          launch_plan:
-            domain: "domain"
-            resource_type: {}
-            name: "name"
-            project: "project"
-            version: "version"
           metadata:
             mode: {}
             principal: "principal"
@@ -3651,19 +3711,41 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
-          quality_of_service:
-            tier: {}
-            spec:
-              queueing_budget: "queueing_budget"
           disable_all: true
           inputs:
             literals: {}
-          raw_output_data_config:
-            output_location_prefix: "output_location_prefix"
           annotations:
             values:
               key: "values"
           max_parallelism: 6
+          labels:
+            values:
+              key: "values"
+          launch_plan:
+            domain: "domain"
+            resource_type: {}
+            name: "name"
+            project: "project"
+            version: "version"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           notifications:
             notifications:
             - pager_duty:
@@ -3739,9 +3821,6 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
-          labels:
-            values:
-              key: "values"
           auth_role:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -3889,16 +3968,14 @@ definitions:
           \ structured datasets, query data, etc.).\nThis should be a prefix like\
           \ s3://my-bucket/my-data"
         $ref: "#/definitions/adminRawOutputDataConfig"
+      cluster_assignment:
+        description: "Controls how to select an available cluster on which this execution\
+          \ should run."
+        $ref: "#/definitions/adminClusterAssignment"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes."
     example:
-      launch_plan:
-        domain: "domain"
-        resource_type: {}
-        name: "name"
-        project: "project"
-        version: "version"
       metadata:
         mode: {}
         principal: "principal"
@@ -3916,19 +3993,41 @@ definitions:
         nesting: 0
         system_metadata:
           execution_cluster: "execution_cluster"
-      quality_of_service:
-        tier: {}
-        spec:
-          queueing_budget: "queueing_budget"
       disable_all: true
       inputs:
         literals: {}
-      raw_output_data_config:
-        output_location_prefix: "output_location_prefix"
       annotations:
         values:
           key: "values"
       max_parallelism: 6
+      labels:
+        values:
+          key: "values"
+      launch_plan:
+        domain: "domain"
+        resource_type: {}
+        name: "name"
+        project: "project"
+        version: "version"
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
+      raw_output_data_config:
+        output_location_prefix: "output_location_prefix"
+      cluster_assignment:
+        affinity:
+          selectors:
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
       notifications:
         notifications:
         - pager_duty:
@@ -4004,9 +4103,6 @@ definitions:
           group_version: "group_version"
           key: "key"
           group: "group"
-      labels:
-        values:
-          key: "values"
       auth_role:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"
@@ -6389,6 +6485,19 @@ definitions:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
             max_parallelism: 0
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -6434,6 +6543,19 @@ definitions:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
             max_parallelism: 0
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -6512,6 +6634,19 @@ definitions:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
           max_parallelism: 0
+        cluster_assignment:
+          affinity:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -6557,7 +6692,8 @@ definitions:
       \ Configures default quality of service when undefined in an execution spec.\n\
       \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for\
       \ a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable\
-      \ workflow-execution specifications and overrides."
+      \ workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls\
+      \ how to select an available cluster on which this execution should run."
     enum:
     - "TASK_RESOURCE"
     - "CLUSTER_RESOURCE"
@@ -6566,6 +6702,7 @@ definitions:
     - "QUALITY_OF_SERVICE_SPECIFICATION"
     - "PLUGIN_OVERRIDE"
     - "WORKFLOW_EXECUTION_CONFIG"
+    - "CLUSTER_ASSIGNMENT"
     default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
@@ -6584,6 +6721,8 @@ definitions:
         $ref: "#/definitions/adminPluginOverrides"
       workflow_execution_config:
         $ref: "#/definitions/adminWorkflowExecutionConfig"
+      cluster_assignment:
+        $ref: "#/definitions/adminClusterAssignment"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
@@ -6593,6 +6732,19 @@ definitions:
           queueing_budget: "queueing_budget"
       workflow_execution_config:
         max_parallelism: 0
+      cluster_assignment:
+        affinity:
+          selectors:
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
       cluster_resource_attributes:
         attributes:
           key: "attributes"
@@ -13264,6 +13416,19 @@ definitions:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
           max_parallelism: 0
+        cluster_assignment:
+          affinity:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -13333,6 +13498,19 @@ definitions:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
             max_parallelism: 0
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -13471,6 +13649,40 @@ definitions:
       rate:
         unit: {}
         value: 0
+  adminSelector:
+    type: "object"
+    properties:
+      key:
+        type: "string"
+        description: "The label key."
+      value:
+        type: "array"
+        description: "One or more values used to match labels.\nFor equality (or inequality)\
+          \ requirements, values must contain a single element.\nFor set-based requirements,\
+          \ values may contain one or more elements."
+        items:
+          type: "string"
+      operator:
+        $ref: "#/definitions/adminSelectorOperator"
+    description: "A Selector is a specification for identifying a set of objects with\
+      \ corresponding labels."
+    example:
+      value:
+      - "value"
+      - "value"
+      key: "key"
+      operator: {}
+  adminSelectorOperator:
+    type: "string"
+    description: "Defines how a label with a corresponding key and value is selected\
+      \ or excluded."
+    enum:
+    - "EQUALS"
+    - "NOT_EQUALS"
+    - "IN"
+    - "NOT_IN"
+    - "EXISTS"
+    default: "EQUALS"
   adminSlackNotification:
     type: "object"
     properties:
@@ -21030,6 +21242,19 @@ definitions:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
           max_parallelism: 0
+        cluster_assignment:
+          affinity:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -21102,6 +21327,19 @@ definitions:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
             max_parallelism: 0
+          cluster_assignment:
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -39926,7 +40164,7 @@ definitions:
     type: "object"
     properties:
       operator:
-        $ref: "#/definitions/ComparisonExpressionOperator"
+        $ref: "#/definitions/coreComparisonExpressionOperator"
       left_value:
         $ref: "#/definitions/coreOperand"
       right_value:
@@ -39954,6 +40192,18 @@ definitions:
           integer: "integer"
         var: "var"
       operator: {}
+  coreComparisonExpressionOperator:
+    type: "string"
+    title: "Binary Operator for each expression"
+    description: "- GT: Greater Than\n - LT: Less Than"
+    enum:
+    - "EQ"
+    - "NEQ"
+    - "GT"
+    - "GTE"
+    - "LT"
+    - "LTE"
+    default: "EQ"
   coreCompiledTask:
     type: "object"
     properties:

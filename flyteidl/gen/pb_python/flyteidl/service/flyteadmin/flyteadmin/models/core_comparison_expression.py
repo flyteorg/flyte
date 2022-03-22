@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.comparison_expression_operator import ComparisonExpressionOperator  # noqa: F401,E501
+from flyteadmin.models.core_comparison_expression_operator import CoreComparisonExpressionOperator  # noqa: F401,E501
 from flyteadmin.models.core_operand import CoreOperand  # noqa: F401,E501
 
 
@@ -34,7 +34,7 @@ class CoreComparisonExpression(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'operator': 'ComparisonExpressionOperator',
+        'operator': 'CoreComparisonExpressionOperator',
         'left_value': 'CoreOperand',
         'right_value': 'CoreOperand'
     }
@@ -66,7 +66,7 @@ class CoreComparisonExpression(object):
 
 
         :return: The operator of this CoreComparisonExpression.  # noqa: E501
-        :rtype: ComparisonExpressionOperator
+        :rtype: CoreComparisonExpressionOperator
         """
         return self._operator
 
@@ -76,7 +76,7 @@ class CoreComparisonExpression(object):
 
 
         :param operator: The operator of this CoreComparisonExpression.  # noqa: E501
-        :type: ComparisonExpressionOperator
+        :type: CoreComparisonExpressionOperator
         """
 
         self._operator = operator

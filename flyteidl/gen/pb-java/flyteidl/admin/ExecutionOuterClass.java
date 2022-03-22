@@ -16840,6 +16840,31 @@ public final class ExecutionOuterClass {
      */
     flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
 
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    boolean hasClusterAssignment();
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment();
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -17023,6 +17048,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(rawOutputDataConfig_);
                 rawOutputDataConfig_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 162: {
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder subBuilder = null;
+              if (clusterAssignment_ != null) {
+                subBuilder = clusterAssignment_.toBuilder();
+              }
+              clusterAssignment_ = input.readMessage(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(clusterAssignment_);
+                clusterAssignment_ = subBuilder.buildPartial();
               }
 
               break;
@@ -17471,6 +17509,39 @@ public final class ExecutionOuterClass {
       return getRawOutputDataConfig();
     }
 
+    public static final int CLUSTER_ASSIGNMENT_FIELD_NUMBER = 20;
+    private flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment clusterAssignment_;
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    public boolean hasClusterAssignment() {
+      return clusterAssignment_ != null;
+    }
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment() {
+      return clusterAssignment_ == null ? flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance() : clusterAssignment_;
+    }
+    /**
+     * <pre>
+     * Controls how to select an available cluster on which this execution should run.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder() {
+      return getClusterAssignment();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -17521,6 +17592,9 @@ public final class ExecutionOuterClass {
       }
       if (rawOutputDataConfig_ != null) {
         output.writeMessage(19, getRawOutputDataConfig());
+      }
+      if (clusterAssignment_ != null) {
+        output.writeMessage(20, getClusterAssignment());
       }
       unknownFields.writeTo(output);
     }
@@ -17579,6 +17653,10 @@ public final class ExecutionOuterClass {
       if (rawOutputDataConfig_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(19, getRawOutputDataConfig());
+      }
+      if (clusterAssignment_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, getClusterAssignment());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -17642,6 +17720,11 @@ public final class ExecutionOuterClass {
         if (!getRawOutputDataConfig()
             .equals(other.getRawOutputDataConfig())) return false;
       }
+      if (hasClusterAssignment() != other.hasClusterAssignment()) return false;
+      if (hasClusterAssignment()) {
+        if (!getClusterAssignment()
+            .equals(other.getClusterAssignment())) return false;
+      }
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -17703,6 +17786,10 @@ public final class ExecutionOuterClass {
       if (hasRawOutputDataConfig()) {
         hash = (37 * hash) + RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER;
         hash = (53 * hash) + getRawOutputDataConfig().hashCode();
+      }
+      if (hasClusterAssignment()) {
+        hash = (37 * hash) + CLUSTER_ASSIGNMENT_FIELD_NUMBER;
+        hash = (53 * hash) + getClusterAssignment().hashCode();
       }
       switch (notificationOverridesCase_) {
         case 5:
@@ -17911,6 +17998,12 @@ public final class ExecutionOuterClass {
           rawOutputDataConfig_ = null;
           rawOutputDataConfigBuilder_ = null;
         }
+        if (clusterAssignmentBuilder_ == null) {
+          clusterAssignment_ = null;
+        } else {
+          clusterAssignment_ = null;
+          clusterAssignmentBuilder_ = null;
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -17995,6 +18088,11 @@ public final class ExecutionOuterClass {
         } else {
           result.rawOutputDataConfig_ = rawOutputDataConfigBuilder_.build();
         }
+        if (clusterAssignmentBuilder_ == null) {
+          result.clusterAssignment_ = clusterAssignment_;
+        } else {
+          result.clusterAssignment_ = clusterAssignmentBuilder_.build();
+        }
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -18073,6 +18171,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasRawOutputDataConfig()) {
           mergeRawOutputDataConfig(other.getRawOutputDataConfig());
+        }
+        if (other.hasClusterAssignment()) {
+          mergeClusterAssignment(other.getClusterAssignment());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -19791,6 +19892,159 @@ public final class ExecutionOuterClass {
           rawOutputDataConfig_ = null;
         }
         return rawOutputDataConfigBuilder_;
+      }
+
+      private flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment clusterAssignment_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder> clusterAssignmentBuilder_;
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public boolean hasClusterAssignment() {
+        return clusterAssignmentBuilder_ != null || clusterAssignment_ != null;
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment getClusterAssignment() {
+        if (clusterAssignmentBuilder_ == null) {
+          return clusterAssignment_ == null ? flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance() : clusterAssignment_;
+        } else {
+          return clusterAssignmentBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public Builder setClusterAssignment(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment value) {
+        if (clusterAssignmentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          clusterAssignment_ = value;
+          onChanged();
+        } else {
+          clusterAssignmentBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public Builder setClusterAssignment(
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder builderForValue) {
+        if (clusterAssignmentBuilder_ == null) {
+          clusterAssignment_ = builderForValue.build();
+          onChanged();
+        } else {
+          clusterAssignmentBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public Builder mergeClusterAssignment(flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment value) {
+        if (clusterAssignmentBuilder_ == null) {
+          if (clusterAssignment_ != null) {
+            clusterAssignment_ =
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.newBuilder(clusterAssignment_).mergeFrom(value).buildPartial();
+          } else {
+            clusterAssignment_ = value;
+          }
+          onChanged();
+        } else {
+          clusterAssignmentBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public Builder clearClusterAssignment() {
+        if (clusterAssignmentBuilder_ == null) {
+          clusterAssignment_ = null;
+          onChanged();
+        } else {
+          clusterAssignment_ = null;
+          clusterAssignmentBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder getClusterAssignmentBuilder() {
+        
+        onChanged();
+        return getClusterAssignmentFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder() {
+        if (clusterAssignmentBuilder_ != null) {
+          return clusterAssignmentBuilder_.getMessageOrBuilder();
+        } else {
+          return clusterAssignment_ == null ?
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance() : clusterAssignment_;
+        }
+      }
+      /**
+       * <pre>
+       * Controls how to select an available cluster on which this execution should run.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.ClusterAssignment cluster_assignment = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder> 
+          getClusterAssignmentFieldBuilder() {
+        if (clusterAssignmentBuilder_ == null) {
+          clusterAssignmentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.Builder, flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder>(
+                  getClusterAssignment(),
+                  getParentForChildren(),
+                  isClean());
+          clusterAssignment_ = null;
+        }
+        return clusterAssignmentBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -25552,108 +25806,110 @@ public final class ExecutionOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\036flyteidl/admin/execution.proto\022\016flytei" +
-      "dl.admin\032\033flyteidl/admin/common.proto\032\034f" +
-      "lyteidl/core/literals.proto\032\035flyteidl/co" +
-      "re/execution.proto\032\036flyteidl/core/identi" +
-      "fier.proto\032\034flyteidl/core/security.proto" +
-      "\032\036google/protobuf/duration.proto\032\037google" +
-      "/protobuf/timestamp.proto\"\237\001\n\026ExecutionC" +
-      "reateRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030" +
-      "\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.flyt" +
-      "eidl.admin.ExecutionSpec\022)\n\006inputs\030\005 \001(\013" +
-      "2\031.flyteidl.core.LiteralMap\"`\n\030Execution" +
-      "RelaunchRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.c" +
-      "ore.WorkflowExecutionIdentifier\022\014\n\004name\030" +
-      "\003 \001(\t\"\224\001\n\027ExecutionRecoverRequest\0226\n\002id\030" +
-      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
-      "dentifier\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003 \001(" +
-      "\0132!.flyteidl.admin.ExecutionMetadata\"Q\n\027" +
-      "ExecutionCreateResponse\0226\n\002id\030\001 \001(\0132*.fl" +
-      "yteidl.core.WorkflowExecutionIdentifier\"" +
-      "U\n\033WorkflowExecutionGetRequest\0226\n\002id\030\001 \001" +
-      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
-      "tifier\"\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.flyte" +
-      "idl.core.WorkflowExecutionIdentifier\022+\n\004" +
-      "spec\030\002 \001(\0132\035.flyteidl.admin.ExecutionSpe" +
-      "c\0221\n\007closure\030\003 \001(\0132 .flyteidl.admin.Exec" +
-      "utionClosure\"M\n\rExecutionList\022-\n\nexecuti" +
-      "ons\030\001 \003(\0132\031.flyteidl.admin.Execution\022\r\n\005" +
-      "token\030\002 \001(\t\"X\n\016LiteralMapBlob\022/\n\006values\030" +
-      "\001 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\022\r" +
-      "\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbortMetadata\022\r" +
-      "\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020Exe" +
-      "cutionClosure\0225\n\007outputs\030\001 \001(\0132\036.flyteid" +
-      "l.admin.LiteralMapBlobB\002\030\001H\000\022.\n\005error\030\002 " +
-      "\001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\031\n\013" +
-      "abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_metadat" +
-      "a\030\014 \001(\0132\035.flyteidl.admin.AbortMetadataH\000" +
-      "\0224\n\013output_data\030\r \001(\0132\031.flyteidl.core.Li" +
-      "teralMapB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001(\0132" +
-      "\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005phase\030" +
-      "\004 \001(\0162&.flyteidl.core.WorkflowExecution." +
-      "Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google.proto" +
-      "buf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.google" +
-      ".protobuf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032" +
-      ".google.protobuf.Timestamp\022.\n\nupdated_at" +
-      "\030\010 \001(\0132\032.google.protobuf.Timestamp\0223\n\rno" +
-      "tifications\030\t \003(\0132\034.flyteidl.admin.Notif" +
-      "ication\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl." +
-      "core.Identifier\022I\n\024state_change_details\030" +
-      "\016 \001(\0132+.flyteidl.admin.ExecutionStateCha" +
-      "ngeDetailsB\017\n\routput_result\"+\n\016SystemMet" +
-      "adata\022\031\n\021execution_cluster\030\001 \001(\t\"\332\003\n\021Exe" +
-      "cutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl." +
-      "admin.ExecutionMetadata.ExecutionMode\022\021\n" +
-      "\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014sch" +
-      "eduled_at\030\004 \001(\0132\032.google.protobuf.Timest" +
-      "amp\022E\n\025parent_node_execution\030\005 \001(\0132&.fly" +
-      "teidl.core.NodeExecutionIdentifier\022G\n\023re" +
-      "ference_execution\030\020 \001(\0132*.flyteidl.core." +
-      "WorkflowExecutionIdentifier\0227\n\017system_me" +
-      "tadata\030\021 \001(\0132\036.flyteidl.admin.SystemMeta" +
-      "data\"g\n\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCH" +
-      "EDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CH" +
-      "ILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notific" +
-      "ationList\0223\n\rnotifications\030\001 \003(\0132\034.flyte" +
-      "idl.admin.Notification\"\365\004\n\rExecutionSpec" +
-      "\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core.Id" +
-      "entifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core" +
-      ".LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyt" +
-      "eidl.admin.ExecutionMetadata\0229\n\rnotifica" +
-      "tions\030\005 \001(\0132 .flyteidl.admin.Notificatio" +
-      "nListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006labels" +
-      "\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013annota" +
-      "tions\030\010 \001(\0132\033.flyteidl.admin.Annotations" +
-      "\0228\n\020security_context\030\n \001(\0132\036.flyteidl.co" +
-      "re.SecurityContext\022/\n\tauth_role\030\020 \001(\0132\030." +
-      "flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality_o" +
-      "f_service\030\021 \001(\0132\037.flyteidl.core.QualityO" +
-      "fService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw" +
-      "_output_data_config\030\023 \001(\0132#.flyteidl.adm" +
-      "in.RawOutputDataConfigB\030\n\026notification_o" +
-      "verridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateRequ" +
+      "dl.admin\032\'flyteidl/admin/cluster_assignm" +
+      "ent.proto\032\033flyteidl/admin/common.proto\032\034" +
+      "flyteidl/core/literals.proto\032\035flyteidl/c" +
+      "ore/execution.proto\032\036flyteidl/core/ident" +
+      "ifier.proto\032\034flyteidl/core/security.prot" +
+      "o\032\036google/protobuf/duration.proto\032\037googl" +
+      "e/protobuf/timestamp.proto\"\237\001\n\026Execution" +
+      "CreateRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain" +
+      "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.fly" +
+      "teidl.admin.ExecutionSpec\022)\n\006inputs\030\005 \001(" +
+      "\0132\031.flyteidl.core.LiteralMap\"`\n\030Executio" +
+      "nRelaunchRequest\0226\n\002id\030\001 \001(\0132*.flyteidl." +
+      "core.WorkflowExecutionIdentifier\022\014\n\004name" +
+      "\030\003 \001(\t\"\224\001\n\027ExecutionRecoverRequest\0226\n\002id" +
+      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
+      "Identifier\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003 \001" +
+      "(\0132!.flyteidl.admin.ExecutionMetadata\"Q\n" +
+      "\027ExecutionCreateResponse\0226\n\002id\030\001 \001(\0132*.f" +
+      "lyteidl.core.WorkflowExecutionIdentifier" +
+      "\"U\n\033WorkflowExecutionGetRequest\0226\n\002id\030\001 " +
+      "\001(\0132*.flyteidl.core.WorkflowExecutionIde" +
+      "ntifier\"\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.flyt" +
+      "eidl.core.WorkflowExecutionIdentifier\022+\n" +
+      "\004spec\030\002 \001(\0132\035.flyteidl.admin.ExecutionSp" +
+      "ec\0221\n\007closure\030\003 \001(\0132 .flyteidl.admin.Exe" +
+      "cutionClosure\"M\n\rExecutionList\022-\n\nexecut" +
+      "ions\030\001 \003(\0132\031.flyteidl.admin.Execution\022\r\n" +
+      "\005token\030\002 \001(\t\"X\n\016LiteralMapBlob\022/\n\006values" +
+      "\030\001 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\022" +
+      "\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbortMetadata\022" +
+      "\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020Ex" +
+      "ecutionClosure\0225\n\007outputs\030\001 \001(\0132\036.flytei" +
+      "dl.admin.LiteralMapBlobB\002\030\001H\000\022.\n\005error\030\002" +
+      " \001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\031\n" +
+      "\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_metada" +
+      "ta\030\014 \001(\0132\035.flyteidl.admin.AbortMetadataH" +
+      "\000\0224\n\013output_data\030\r \001(\0132\031.flyteidl.core.L" +
+      "iteralMapB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001(\013" +
+      "2\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005phase" +
+      "\030\004 \001(\0162&.flyteidl.core.WorkflowExecution" +
+      ".Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.googl" +
+      "e.protobuf.Duration\022.\n\ncreated_at\030\007 \001(\0132" +
+      "\032.google.protobuf.Timestamp\022.\n\nupdated_a" +
+      "t\030\010 \001(\0132\032.google.protobuf.Timestamp\0223\n\rn" +
+      "otifications\030\t \003(\0132\034.flyteidl.admin.Noti" +
+      "fication\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl" +
+      ".core.Identifier\022I\n\024state_change_details" +
+      "\030\016 \001(\0132+.flyteidl.admin.ExecutionStateCh" +
+      "angeDetailsB\017\n\routput_result\"+\n\016SystemMe" +
+      "tadata\022\031\n\021execution_cluster\030\001 \001(\t\"\332\003\n\021Ex" +
+      "ecutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl" +
+      ".admin.ExecutionMetadata.ExecutionMode\022\021" +
+      "\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014sc" +
+      "heduled_at\030\004 \001(\0132\032.google.protobuf.Times" +
+      "tamp\022E\n\025parent_node_execution\030\005 \001(\0132&.fl" +
+      "yteidl.core.NodeExecutionIdentifier\022G\n\023r" +
+      "eference_execution\030\020 \001(\0132*.flyteidl.core" +
+      ".WorkflowExecutionIdentifier\0227\n\017system_m" +
+      "etadata\030\021 \001(\0132\036.flyteidl.admin.SystemMet" +
+      "adata\"g\n\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSC" +
+      "HEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016C" +
+      "HILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notifi" +
+      "cationList\0223\n\rnotifications\030\001 \003(\0132\034.flyt" +
+      "eidl.admin.Notification\"\264\005\n\rExecutionSpe" +
+      "c\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core.I" +
+      "dentifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.cor" +
+      "e.LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.fly" +
+      "teidl.admin.ExecutionMetadata\0229\n\rnotific" +
+      "ations\030\005 \001(\0132 .flyteidl.admin.Notificati" +
+      "onListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006label" +
+      "s\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013annot" +
+      "ations\030\010 \001(\0132\033.flyteidl.admin.Annotation" +
+      "s\0228\n\020security_context\030\n \001(\0132\036.flyteidl.c" +
+      "ore.SecurityContext\022/\n\tauth_role\030\020 \001(\0132\030" +
+      ".flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality_" +
+      "of_service\030\021 \001(\0132\037.flyteidl.core.Quality" +
+      "OfService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026ra" +
+      "w_output_data_config\030\023 \001(\0132#.flyteidl.ad" +
+      "min.RawOutputDataConfig\022=\n\022cluster_assig" +
+      "nment\030\024 \001(\0132!.flyteidl.admin.ClusterAssi" +
+      "gnmentB\030\n\026notification_overridesJ\004\010\004\020\005\"b" +
+      "\n\031ExecutionTerminateRequest\0226\n\002id\030\001 \001(\0132" +
+      "*.flyteidl.core.WorkflowExecutionIdentif" +
+      "ier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminate" +
+      "Response\"Y\n\037WorkflowExecutionGetDataRequ" +
       "est\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow" +
-      "ExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032Ex" +
-      "ecutionTerminateResponse\"Y\n\037WorkflowExec" +
-      "utionGetDataRequest\0226\n\002id\030\001 \001(\0132*.flytei" +
-      "dl.core.WorkflowExecutionIdentifier\"\336\001\n " +
-      "WorkflowExecutionGetDataResponse\022,\n\007outp" +
-      "uts\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022+" +
-      "\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB" +
-      "\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core" +
-      ".LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyt" +
-      "eidl.core.LiteralMap\"\177\n\026ExecutionUpdateR" +
-      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
-      "lowExecutionIdentifier\022-\n\005state\030\002 \001(\0162\036." +
-      "flyteidl.admin.ExecutionState\"\220\001\n\033Execut" +
-      "ionStateChangeDetails\022-\n\005state\030\001 \001(\0162\036.f" +
-      "lyteidl.admin.ExecutionState\022/\n\013occurred" +
-      "_at\030\002 \001(\0132\032.google.protobuf.Timestamp\022\021\n" +
-      "\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRespo" +
-      "nse*>\n\016ExecutionState\022\024\n\020EXECUTION_ACTIV" +
-      "E\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/a" +
-      "dminb\006proto3"
+      "ExecutionIdentifier\"\336\001\n WorkflowExecutio" +
+      "nGetDataResponse\022,\n\007outputs\030\001 \001(\0132\027.flyt" +
+      "eidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027" +
+      ".flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_inpu" +
+      "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014f" +
+      "ull_outputs\030\004 \001(\0132\031.flyteidl.core.Litera" +
+      "lMap\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001" +
+      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
+      "tifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.E" +
+      "xecutionState\"\220\001\n\033ExecutionStateChangeDe" +
+      "tails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Ex" +
+      "ecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.goog" +
+      "le.protobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t" +
+      "\"\031\n\027ExecutionUpdateResponse*>\n\016Execution" +
+      "State\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXECUTION" +
+      "_ARCHIVED\020\001B7Z5github.com/flyteorg/flyte" +
+      "idl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -25666,6 +25922,7 @@ public final class ExecutionOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor(),
           flyteidl.admin.Common.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
@@ -25757,7 +26014,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
@@ -25800,6 +26057,7 @@ public final class ExecutionOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionUpdateResponse_descriptor,
         new java.lang.String[] { });
+    flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor();
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Execution.getDescriptor();

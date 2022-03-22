@@ -16,9 +16,11 @@ from __future__ import absolute_import
 
 # import models into model package
 from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata
+from flyteadmin.models.admin_affinity import AdminAffinity
 from flyteadmin.models.admin_annotations import AdminAnnotations
 from flyteadmin.models.admin_auth import AdminAuth
 from flyteadmin.models.admin_auth_role import AdminAuthRole
+from flyteadmin.models.admin_cluster_assignment import AdminClusterAssignment
 from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes
 from flyteadmin.models.admin_cron_schedule import AdminCronSchedule
 from flyteadmin.models.admin_domain import AdminDomain
@@ -91,6 +93,8 @@ from flyteadmin.models.admin_project_update_response import AdminProjectUpdateRe
 from flyteadmin.models.admin_projects import AdminProjects
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig
 from flyteadmin.models.admin_schedule import AdminSchedule
+from flyteadmin.models.admin_selector import AdminSelector
+from flyteadmin.models.admin_selector_operator import AdminSelectorOperator
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort
 from flyteadmin.models.admin_system_metadata import AdminSystemMetadata
@@ -127,7 +131,6 @@ from flyteadmin.models.admin_workflow_list import AdminWorkflowList
 from flyteadmin.models.admin_workflow_spec import AdminWorkflowSpec
 from flyteadmin.models.blob_type_blob_dimensionality import BlobTypeBlobDimensionality
 from flyteadmin.models.catalog_reservation_status import CatalogReservationStatus
-from flyteadmin.models.comparison_expression_operator import ComparisonExpressionOperator
 from flyteadmin.models.conjunction_expression_logical_operator import ConjunctionExpressionLogicalOperator
 from flyteadmin.models.connection_set_id_list import ConnectionSetIdList
 from flyteadmin.models.container_architecture import ContainerArchitecture
@@ -146,6 +149,7 @@ from flyteadmin.models.core_catalog_artifact_tag import CoreCatalogArtifactTag
 from flyteadmin.models.core_catalog_cache_status import CoreCatalogCacheStatus
 from flyteadmin.models.core_catalog_metadata import CoreCatalogMetadata
 from flyteadmin.models.core_comparison_expression import CoreComparisonExpression
+from flyteadmin.models.core_comparison_expression_operator import CoreComparisonExpressionOperator
 from flyteadmin.models.core_compiled_task import CoreCompiledTask
 from flyteadmin.models.core_compiled_workflow import CoreCompiledWorkflow
 from flyteadmin.models.core_compiled_workflow_closure import CoreCompiledWorkflowClosure

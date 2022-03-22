@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/core/execution.proto";
 
 // Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
@@ -28,6 +29,9 @@ enum MatchableResource {
 
   // Adds defaults for customizable workflow-execution specifications and overrides.
   WORKFLOW_EXECUTION_CONFIG = 6;
+
+  // Controls how to select an available cluster on which this execution should run.
+  CLUSTER_ASSIGNMENT = 7;
 }
 
 // Defines a set of overridable task resource attributes set during task registration.
@@ -116,6 +120,8 @@ message MatchingAttributes {
     PluginOverrides plugin_overrides = 6;
 
     WorkflowExecutionConfig workflow_execution_config = 7;
+
+    ClusterAssignment cluster_assignment = 8;
   }
 }
 
