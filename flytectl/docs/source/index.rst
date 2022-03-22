@@ -26,13 +26,19 @@ Flytectl is a Golang binary that can be installed on any platform supported by G
 
   .. prompt:: bash $
 
-      brew update && brew upgrade flytectl
+      flytectl upgrade
 
 .. tabbed:: Other Operating systems
 
   .. prompt:: bash $
 
       curl -sL https://ctl.flyte.org/install | bash
+
+  *Upgrade* existing installation using the following command:
+
+  .. prompt:: bash $
+
+      flytectl upgrade
 
 **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
 
