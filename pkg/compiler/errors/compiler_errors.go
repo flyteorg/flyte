@@ -84,6 +84,12 @@ const (
 
 	// Given value is not a legal Enum value (or not part of the defined set of enum values)
 	IllegalEnumValue ErrorCode = "IllegalEnumValue"
+
+	// Given value cannot be unambiguously assigned to a union variant in a binding
+	AmbiguousBindingUnionValue ErrorCode = "AmbiguousBindingUnionValue"
+
+	// Given value cannot be assigned to any union variant in a binding
+	IncompatibleBindingUnionValue ErrorCode = "IncompatibleBindingUnionValue"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -287,6 +293,26 @@ func NewNoNodesFoundErr(graphID string) *CompileError {
 		NoNodesFound,
 		fmt.Sprintf("Can't find any nodes in workflow [%v].", graphID),
 		graphID,
+	)
+}
+
+func NewAmbiguousBindingUnionValue(nodeID, sinkParam, expectedType, binding, match1, match2 string) *CompileError {
+	return newError(
+		AmbiguousBindingUnionValue,
+		fmt.Sprintf(
+			"Input [%v] on node [%v] expects bindings of union type [%v].  Received [%v] which is ambiguous as both variants [%v] and [%v] match.",
+			sinkParam, nodeID, expectedType, binding, match1, match2),
+		nodeID,
+	)
+}
+
+func NewIncompatibleBindingUnionValue(nodeID, sinkParam, expectedType, binding string) *CompileError {
+	return newError(
+		IncompatibleBindingUnionValue,
+		fmt.Sprintf(
+			"Input [%v] on node [%v] expects bindings of union type [%v].  Received [%v] which does not match any of the variants.",
+			sinkParam, nodeID, expectedType, binding),
+		nodeID,
 	)
 }
 

@@ -12,8 +12,45 @@ import (
 )
 
 func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
-	expectedType *flyte.LiteralType, errs errors.CompileErrors) (
+	expectedType *flyte.LiteralType, errs errors.CompileErrors, validateParamTypes bool) (
 	resolvedType *flyte.LiteralType, upstreamNodes []c.NodeID, ok bool) {
+
+	// Non-scalar bindings will fail to introspect the type through a union type so we resolve them beforehand
+	switch binding.GetValue().(type) {
+	case *flyte.BindingData_Scalar:
+		// Goes through union-aware AreTypesCastable
+		break
+	case *flyte.BindingData_Promise:
+		// Goes through union-aware AreTypesCastable
+		break
+	default:
+		if expectedType.GetUnionType() != nil {
+			var matchingType *flyte.LiteralType
+			var resolvedType *flyte.LiteralType
+			var nodeIds []c.NodeID
+			var ok bool
+
+			for _, t := range expectedType.GetUnionType().GetVariants() {
+				resolvedType1, nodeIds1, ok1 := validateBinding(w, nodeID, nodeParam, binding, t, errors.NewCompileErrors(), validateParamTypes)
+				if ok1 {
+					if ok {
+						errs.Collect(errors.NewAmbiguousBindingUnionValue(nodeID, nodeParam, expectedType.String(), binding.String(), matchingType.String(), t.String()))
+						return nil, nil, !errs.HasErrors()
+					}
+
+					matchingType = t
+					resolvedType, nodeIds, ok = resolvedType1, nodeIds1, ok1
+				}
+			}
+
+			if ok {
+				return resolvedType, nodeIds, ok
+			}
+
+			errs.Collect(errors.NewIncompatibleBindingUnionValue(nodeID, nodeParam, expectedType.String(), binding.String()))
+			return nil, nil, !errs.HasErrors()
+		}
+	}
 
 	switch val := binding.GetValue().(type) {
 	case *flyte.BindingData_Collection:
@@ -26,7 +63,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			allNodeIds := make([]c.NodeID, 0, len(val.Collection.GetBindings()))
 			var subType *flyte.LiteralType
 			for _, v := range val.Collection.GetBindings() {
-				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope()); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope(), validateParamTypes); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
 				}
@@ -50,7 +87,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			allNodeIds := make([]c.NodeID, 0, len(val.Map.GetBindings()))
 			var subType *flyte.LiteralType
 			for _, v := range val.Map.GetBindings() {
-				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope()); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope(), validateParamTypes); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
 				}
@@ -88,7 +125,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 					}
 				}
 
-				if AreTypesCastable(sourceType, expectedType) {
+				if !validateParamTypes || AreTypesCastable(sourceType, expectedType) {
 					val.Promise.NodeId = upNode.GetId()
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
@@ -107,7 +144,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 		literalType := literalTypeForScalar(val.Scalar)
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
-		} else if !AreTypesCastable(literalType, expectedType) {
+		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
 		}
 
@@ -162,9 +199,10 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 					},
 				}
 			}
+
 			providedBindings.Insert(binding.GetVar())
 			if resolvedType, upstreamNodes, bindingOk := validateBinding(w, node.GetId(), binding.GetVar(), binding.GetBinding(),
-				param.Type, errs.NewScope()); bindingOk {
+				param.Type, errs.NewScope(), validateParamTypes); bindingOk {
 				for _, upNode := range upstreamNodes {
 					// Add implicit Edges
 					switch edgeDirection {
