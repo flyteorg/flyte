@@ -107,7 +107,7 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     1. If you don't have a Keycloak installation, you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides a quick way to deploy Keycloak cluster on AWS.
     2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
     3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
-    4. Add Login redirect URIs (e.g, http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``)
+    4. Add Login redirect URIs (e.g, http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``).
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
@@ -207,7 +207,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
    3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
    4. Create 2 apps (for Flytectl and Flytepropeller) to enable these clients to communicate with the service.
       Flytectl should be created as a `native client`.
-      FlytePropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
+      Flytepropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
 
 .. tabbed:: Keycloak
 
