@@ -29,17 +29,16 @@ type schemaTypeChecker struct {
 	literalType *flyte.LiteralType
 }
 
+type unionTypeChecker struct {
+	literalType *flyte.LiteralType
+}
+
 type structuredDatasetChecker struct {
 	literalType *flyte.LiteralType
 }
 
 // The trivial type checker merely checks if types match exactly.
 func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
-	// Everything is nullable currently
-	if isVoid(upstreamType) {
-		return true
-	}
-
 	// If upstream is an enum, it can be consumed as a string downstream
 	if upstreamType.GetEnumType() != nil {
 		if t.literalType.GetSimple() == flyte.SimpleType_STRING {
@@ -53,9 +52,15 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 		}
 	}
 
+	if GetTagForType(upstreamType) != "" && GetTagForType(t.literalType) != GetTagForType(upstreamType) {
+		return false
+	}
+
 	// Ignore metadata when comparing types.
 	upstreamTypeCopy := *upstreamType
 	downstreamTypeCopy := *t.literalType
+	upstreamTypeCopy.Structure = &flyte.TypeStructure{}
+	downstreamTypeCopy.Structure = &flyte.TypeStructure{}
 	upstreamTypeCopy.Metadata = &structpb.Struct{}
 	downstreamTypeCopy.Metadata = &structpb.Struct{}
 	upstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
@@ -63,18 +68,13 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	return upstreamTypeCopy.String() == downstreamTypeCopy.String()
 }
 
-// The void type matches everything
+// The void type matches only void
 func (t voidChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
-	return true
+	return isVoid(upstreamType)
 }
 
 // For a map type checker, we need to ensure both the key types and value types match.
 func (t mapTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
-	// Maps are nullable
-	if isVoid(upstreamType) {
-		return true
-	}
-
 	mapLiteralType := upstreamType.GetMapValueType()
 	if mapLiteralType != nil {
 		return getTypeChecker(t.literalType.GetMapValueType()).CastsFrom(mapLiteralType)
@@ -84,11 +84,6 @@ func (t mapTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 
 // For a collection type, we need to ensure that the nesting is correct and the final sub-types match.
 func (t collectionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
-	// Collections are nullable
-	if isVoid(upstreamType) {
-		return true
-	}
-
 	collectionType := upstreamType.GetCollectionType()
 	if collectionType != nil {
 		return getTypeChecker(t.literalType.GetCollectionType()).CastsFrom(collectionType)
@@ -107,11 +102,6 @@ func (t collectionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 //    3. The upstream type can be Schema type or structured dataset type
 //
 func (t schemaTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
-	// Schemas are nullable
-	if isVoid(upstreamType) {
-		return true
-	}
-
 	schemaType := upstreamType.GetSchema()
 	structuredDatasetType := upstreamType.GetStructuredDatasetType()
 	if structuredDatasetType == nil && schemaType == nil {
@@ -185,6 +175,49 @@ func schemaCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.SchemaTy
 		}
 	}
 	return true
+}
+
+func GetTagForType(x *flyte.LiteralType) string {
+	if x.GetStructure() == nil {
+		return ""
+	}
+	return x.GetStructure().GetTag()
+}
+
+func (t unionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
+	unionType := t.literalType.GetUnionType()
+
+	upstreamUnionType := upstreamType.GetUnionType()
+	if upstreamUnionType != nil {
+		// For each upstream variant we must find a compatible downstream variant
+		for _, u := range upstreamUnionType.GetVariants() {
+			found := false
+			for _, d := range unionType.GetVariants() {
+				if AreTypesCastable(u, d) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	// Matches iff we can unambiguously select a variant
+	foundOne := false
+	for _, x := range unionType.GetVariants() {
+		if AreTypesCastable(upstreamType, x) {
+			if foundOne {
+				return false
+			}
+			foundOne = true
+		}
+	}
+
+	return foundOne
 }
 
 // Upstream (structuredDatasetType) -> downstream (structuredDatasetType)
@@ -296,6 +329,10 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 		}
 	case *flyte.LiteralType_Schema:
 		return schemaTypeChecker{
+			literalType: t,
+		}
+	case *flyte.LiteralType_UnionType:
+		return unionTypeChecker{
 			literalType: t,
 		}
 	case *flyte.LiteralType_StructuredDatasetType:
