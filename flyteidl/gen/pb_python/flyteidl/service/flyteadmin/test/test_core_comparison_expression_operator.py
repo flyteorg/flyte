@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.comparison_expression_operator import ComparisonExpressionOperator  # noqa: E501
+from flyteadmin.models.core_comparison_expression_operator import CoreComparisonExpressionOperator  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestComparisonExpressionOperator(unittest.TestCase):
-    """ComparisonExpressionOperator unit test stubs"""
+class TestCoreComparisonExpressionOperator(unittest.TestCase):
+    """CoreComparisonExpressionOperator unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestComparisonExpressionOperator(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testComparisonExpressionOperator(self):
-        """Test ComparisonExpressionOperator"""
+    def testCoreComparisonExpressionOperator(self):
+        """Test CoreComparisonExpressionOperator"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.comparison_expression_operator.ComparisonExpressionOperator()  # noqa: E501
+        # model = flyteadmin.models.core_comparison_expression_operator.CoreComparisonExpressionOperator()  # noqa: E501
         pass
 
 

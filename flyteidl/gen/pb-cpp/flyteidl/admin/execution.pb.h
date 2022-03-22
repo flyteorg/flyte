@@ -32,6 +32,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/cluster_assignment.pb.h"
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/execution.pb.h"
@@ -2328,6 +2329,15 @@ class ExecutionSpec final :
   ::flyteidl::admin::RawOutputDataConfig* mutable_raw_output_data_config();
   void set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config);
 
+  // .flyteidl.admin.ClusterAssignment cluster_assignment = 20;
+  bool has_cluster_assignment() const;
+  void clear_cluster_assignment();
+  static const int kClusterAssignmentFieldNumber = 20;
+  const ::flyteidl::admin::ClusterAssignment& cluster_assignment() const;
+  ::flyteidl::admin::ClusterAssignment* release_cluster_assignment();
+  ::flyteidl::admin::ClusterAssignment* mutable_cluster_assignment();
+  void set_allocated_cluster_assignment(::flyteidl::admin::ClusterAssignment* cluster_assignment);
+
   // int32 max_parallelism = 18;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 18;
@@ -2373,6 +2383,7 @@ class ExecutionSpec final :
   ::flyteidl::admin::AuthRole* auth_role_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
+  ::flyteidl::admin::ClusterAssignment* cluster_assignment_;
   ::google::protobuf::int32 max_parallelism_;
   union NotificationOverridesUnion {
     NotificationOverridesUnion() {}
@@ -5830,6 +5841,51 @@ inline void ExecutionSpec::set_allocated_raw_output_data_config(::flyteidl::admi
   }
   raw_output_data_config_ = raw_output_data_config;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.raw_output_data_config)
+}
+
+// .flyteidl.admin.ClusterAssignment cluster_assignment = 20;
+inline bool ExecutionSpec::has_cluster_assignment() const {
+  return this != internal_default_instance() && cluster_assignment_ != nullptr;
+}
+inline const ::flyteidl::admin::ClusterAssignment& ExecutionSpec::cluster_assignment() const {
+  const ::flyteidl::admin::ClusterAssignment* p = cluster_assignment_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.cluster_assignment)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::ClusterAssignment*>(
+      &::flyteidl::admin::_ClusterAssignment_default_instance_);
+}
+inline ::flyteidl::admin::ClusterAssignment* ExecutionSpec::release_cluster_assignment() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionSpec.cluster_assignment)
+  
+  ::flyteidl::admin::ClusterAssignment* temp = cluster_assignment_;
+  cluster_assignment_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::ClusterAssignment* ExecutionSpec::mutable_cluster_assignment() {
+  
+  if (cluster_assignment_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::ClusterAssignment>(GetArenaNoVirtual());
+    cluster_assignment_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.cluster_assignment)
+  return cluster_assignment_;
+}
+inline void ExecutionSpec::set_allocated_cluster_assignment(::flyteidl::admin::ClusterAssignment* cluster_assignment) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(cluster_assignment_);
+  }
+  if (cluster_assignment) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      cluster_assignment = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, cluster_assignment, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  cluster_assignment_ = cluster_assignment;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.cluster_assignment)
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {
