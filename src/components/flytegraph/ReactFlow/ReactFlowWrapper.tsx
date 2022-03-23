@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import ReactFlow, { Background } from 'react-flow-renderer';
+import { createDebugLogger } from 'common/log';
 import { RFWrapperProps } from './types';
 import {
   ReactFlowCustomEndNode,
@@ -13,7 +14,6 @@ import {
   ReactFlowStaticNode,
 } from './customNodeComponents';
 import { getPositionedNodes, ReactFlowIdHash } from './utils';
-import { createDebugLogger } from '../utils';
 
 const debug = createDebugLogger('@ReactFlowWrapper');
 

@@ -1,8 +1,4 @@
-import debug from 'debug';
-import { logPrefix } from './constants';
 import { Point } from './types';
-
-export const createDebugLogger = (namespace: string) => debug(`${logPrefix}:${namespace}`);
 
 /** Simple helper to get the midpoint between two points a & b */
 export function getMidpoint(a: Point, b: Point) {

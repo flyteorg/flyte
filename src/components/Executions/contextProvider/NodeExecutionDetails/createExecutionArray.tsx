@@ -1,4 +1,5 @@
 import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWorkflowToDag';
+import { getTaskDisplayType } from 'components/Executions/utils';
 import { NodeExecutionDetails, NodeExecutionDisplayType } from 'components/Executions/types';
 import { Workflow } from 'models/Workflow/types';
 import { Identifier } from 'models/Common/types';
@@ -37,11 +38,13 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
   if (node.value.taskNode) {
     const templateName = node.value.taskNode.referenceId.name ?? node.name;
     const task = tasks.find((t) => t.template.id.name === templateName);
+    const taskType = getTaskDisplayType(task?.template.type);
+
     return {
       scopedId: node.scopedId,
       displayId: node.value.id ?? node.id,
       displayName: templateName,
-      displayType: task?.template.type ?? NodeExecutionDisplayType.UnknownTask,
+      displayType: taskType,
       taskTemplate: task?.template,
     };
   }

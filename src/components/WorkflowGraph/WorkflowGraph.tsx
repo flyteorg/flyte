@@ -9,7 +9,7 @@ import { NodeExecutionsContext } from 'components/Executions/contexts';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { useQuery, useQueryClient } from 'react-query';
 import { makeNodeExecutionDynamicWorkflowQuery } from 'components/Workflow/workflowQueries';
-import { createDebugLogger } from 'components/flytegraph/utils';
+import { createDebugLogger } from 'common/log';
 import { CompiledNode } from 'models/Node/types';
 import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 

@@ -7,7 +7,7 @@ import { DataError } from '../DataError';
 
 const retryAction = action('retry');
 
-const stories = storiesOf('Errors/DataError', module);
+const stories = storiesOf('Common/DataError', module);
 stories.add('Title Only', () => (
   <DataError errorTitle="Something went wrong" retry={retryAction} />
 ));

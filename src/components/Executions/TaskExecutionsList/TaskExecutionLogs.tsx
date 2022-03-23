@@ -1,10 +1,9 @@
+import * as React from 'react';
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { NewTargetLink } from 'components/common/NewTargetLink';
 import { useCommonStyles } from 'components/common/styles';
 import { TaskLog } from 'models/Common/types';
-import { TaskExecution } from 'models/Execution/types';
-import * as React from 'react';
 import { noLogsFoundString } from '../constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -33,19 +32,17 @@ const TaskLogList: React.FC<{ logs: TaskLog[] }> = ({ logs }) => {
   );
 };
 
-/** Renders log links from a `TaskExecution`, if they exist. Otherwise renders
- * a message indicating that no logs are available.
+/** Renders log links from a `taskLogs`(aka taskExecution.closure.logs), if they exist.
+ *  Otherwise renders a message indicating that no logs are available.
  */
-export const TaskExecutionLogs: React.FC<{ taskExecution: TaskExecution }> = ({
-  taskExecution,
-}) => {
+export const TaskExecutionLogs: React.FC<{ taskLogs: TaskLog[] }> = ({ taskLogs }) => {
   const styles = useStyles();
   return (
     <section>
       <header className={styles.sectionHeader}>
         <Typography variant="h6">Logs</Typography>
       </header>
-      <TaskLogList logs={taskExecution.closure.logs || []} />
+      <TaskLogList logs={taskLogs} />
     </section>
   );
 };

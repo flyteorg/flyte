@@ -63,7 +63,7 @@ export const TaskExecutionsListItem: React.FC<TaskExecutionsListItemProps> = ({
         {taskHasStarted && (
           <>
             <section className={styles.section}>
-              <TaskExecutionLogs taskExecution={taskExecution} />
+              <TaskExecutionLogs taskLogs={taskExecution.closure.logs || []} />
             </section>
             <section className={styles.section}>
               <TaskExecutionDetails taskExecution={taskExecution} />

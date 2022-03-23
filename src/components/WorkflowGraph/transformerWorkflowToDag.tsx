@@ -1,5 +1,5 @@
 import { DISPLAY_NAME_END, DISPLAY_NAME_START } from 'components/flytegraph/ReactFlow/utils';
-import { createDebugLogger } from 'components/flytegraph/utils';
+import { createDebugLogger } from 'common/log';
 import { dTypes, dEdge, dNode } from 'models/Graph/types';
 import { startNodeId, endNodeId } from 'models/Node/constants';
 import { CompiledNode, ConnectionSet, TaskNode } from 'models/Node/types';

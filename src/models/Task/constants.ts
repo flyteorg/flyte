@@ -12,6 +12,10 @@ export enum TaskType {
   UNKNOWN = 'unknown',
   WAITABLE = 'waitable',
   MPI = 'mpi',
+
+  // plugins
+  ARRAY_AWS = 'aws-batch',
+  ARRAY_K8S = 'k8s-array',
 }
 
 export const taskSortFields = {

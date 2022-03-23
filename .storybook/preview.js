@@ -9,6 +9,11 @@ export const parameters = {
       date: /Date$/,
     },
   },
+  options: {
+    storySort: {
+      order: ['Primitives', 'Common'],
+    },
+  },
 };
 
 export const decorators = [

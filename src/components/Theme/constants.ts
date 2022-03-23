@@ -58,16 +58,19 @@ export const statusColors = {
 
 export type TaskColorMap = Record<TaskType, string>;
 export const taskColors: TaskColorMap = {
+  [TaskType.PYTHON]: '#7157D9',
+  [TaskType.SPARK]: '#00B3A4',
+  [TaskType.MPI]: '#00B3A4',
   [TaskType.BATCH_HIVE]: '#E1E8ED',
   [TaskType.DYNAMIC]: '#E1E8ED',
   [TaskType.HIVE]: '#E1E8ED',
-  [TaskType.PYTHON]: '#7157D9',
-  [TaskType.SPARK]: '#00B3A4',
-  [TaskType.ARRAY]: '#E1E8ED',
   [TaskType.SIDECAR]: '#E1E8ED',
   [TaskType.UNKNOWN]: '#E1E8ED',
   [TaskType.WAITABLE]: '#E1E8ED',
-  [TaskType.MPI]: '#00B3A4',
+  [TaskType.ARRAY]: '#E1E8ED',
+  // plugins
+  [TaskType.ARRAY_AWS]: '#E1E8ED',
+  [TaskType.ARRAY_K8S]: '#E1E8ED',
 };
 
 export const bodyFontSize = '0.875rem';

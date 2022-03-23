@@ -1,9 +1,9 @@
 import { dEdge, dNode, dTypes } from 'models/Graph/types';
 import { Edge, Node, Position } from 'react-flow-renderer';
 import { NodeExecutionPhase } from 'models/Execution/enums';
+import { createDebugLogger } from 'common/log';
 import { ReactFlowGraphConfig } from './utils';
 import { ConvertDagProps } from './types';
-import { createDebugLogger } from '../utils';
 
 interface rfNode extends Node {
   isRootParentNode?: boolean;

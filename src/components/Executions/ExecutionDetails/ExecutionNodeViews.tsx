@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { noop } from 'lodash';
-
-import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { DataError } from 'components/Errors/DataError';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
 import { Execution, NodeExecution } from 'models/Execution/types';
-import { LocalCacheItem, useLocalCache } from 'basics/LocalCache';
 import { NodeExecutionDetailsContextProvider } from '../contextProvider/NodeExecutionDetails';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';

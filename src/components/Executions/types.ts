@@ -13,7 +13,7 @@ export interface ExecutionPhaseConstants {
 }
 
 export enum NodeExecutionDisplayType {
-  ArrayTask = 'Array Task',
+  MapTask = 'Map Task',
   BatchHiveTask = 'Hive Batch Task',
   BranchNode = 'Branch Node',
   DynamicTask = 'Dynamic Task',
@@ -26,6 +26,9 @@ export enum NodeExecutionDisplayType {
   UnknownTask = 'Unknown Task',
   WaitableTask = 'Waitable Task',
   MpiTask = 'MPI Task',
+  // plugins
+  ARRAY_AWS = 'AWS Map Task',
+  ARRAY_K8S = 'K8S Map Task',
 }
 
 export interface ParentNodeExecution extends NodeExecution {

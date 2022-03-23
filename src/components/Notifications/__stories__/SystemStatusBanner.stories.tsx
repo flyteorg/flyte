@@ -32,7 +32,7 @@ const renderBanner = (status: SystemStatus) => (
   <RenderSystemStatusBanner systemStatus={status} onClose={action('onClose')} />
 );
 
-const stories = storiesOf('Notifications/SystemStatusBanner', module);
+const stories = storiesOf('Common/SystemStatusBanner', module);
 stories.add('Normal Status', () => renderBanner(normalStatus));
 stories.add('Degraded Status', () => renderBanner(degradedStatus));
 stories.add('Down Status', () => renderBanner(downStatus));

@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformDAGToReactFlowV2';
 import { useState, useEffect } from 'react';
+import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformDAGToReactFlowV2';
+import { createDebugLogger } from 'common/log';
 import { RFWrapperProps, RFGraphTypes, ConvertDagProps } from './types';
 import { getRFBackground } from './utils';
 import { ReactFlowWrapper } from './ReactFlowWrapper';
 import { Legend } from './NodeStatusLegend';
-import { createDebugLogger } from '../utils';
 
 const debug = createDebugLogger('@ReactFlowGraphComponent');
 

@@ -21,9 +21,10 @@ import { CompiledNode } from 'models/Node/types';
 import {
   nodeExecutionPhaseConstants,
   taskExecutionPhaseConstants,
+  taskTypeToNodeExecutionDisplayType,
   workflowExecutionPhaseConstants,
 } from './constants';
-import { ExecutionPhaseConstants, ParentNodeExecution } from './types';
+import { ExecutionPhaseConstants, NodeExecutionDisplayType, ParentNodeExecution } from './types';
 
 /** Given an execution phase, returns a set of constants (i.e. color, display
  * string) used to represent it in various UI components.
@@ -53,6 +54,17 @@ export function getTaskExecutionPhaseConstants(phase: TaskExecutionPhase): Execu
   return (
     taskExecutionPhaseConstants[phase] || taskExecutionPhaseConstants[TaskExecutionPhase.UNDEFINED]
   );
+}
+
+/**
+ * Transforms taskType value to more convinient readable display Type
+ */
+export function getTaskDisplayType(taskType?: string): string {
+  if (taskType) {
+    return taskTypeToNodeExecutionDisplayType[taskType] ?? taskType;
+  }
+
+  return NodeExecutionDisplayType.Unknown;
 }
 
 /** Determines if a workflow execution can be considered finalized and will not

@@ -2,6 +2,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { storiesOf } from '@storybook/react';
 import { NodeExecutionDetailsContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
 import { makeNodeExecutionListQuery } from 'components/Executions/nodeExecutionQueries';
+import { NodeExecutionDisplayType } from 'components/Executions/types';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import * as React from 'react';
 import { useQuery, useQueryClient } from 'react-query';
@@ -26,7 +27,7 @@ const getNodeExecutionDetails = async () => {
   return {
     displayId: 'node0',
     displayName: 'basic.byton.workflow.unique.task_name',
-    displayType: 'Python-Task',
+    displayType: NodeExecutionDisplayType.PythonTask,
   };
 };
 
