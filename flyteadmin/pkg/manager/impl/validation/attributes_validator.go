@@ -31,6 +31,8 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 		return admin.MatchableResource_PLUGIN_OVERRIDE, nil
 	} else if attributes.GetWorkflowExecutionConfig() != nil {
 		return admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, nil
+	} else if attributes.GetClusterAssignment() != nil {
+		return admin.MatchableResource_CLUSTER_ASSIGNMENT, nil
 	}
 	return defaultMatchableResource, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 		"Unrecognized matching attributes type for request %s", identifier)

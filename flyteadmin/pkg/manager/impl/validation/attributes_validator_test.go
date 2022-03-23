@@ -97,6 +97,25 @@ func TestValidateMatchingAttributes(t *testing.T) {
 			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
 			nil,
 		},
+		{
+			&admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ClusterAssignment{
+					ClusterAssignment: &admin.ClusterAssignment{
+						Affinity: &admin.Affinity{
+							Selectors: []*admin.Selector{
+								{
+									Key:      "bar",
+									Operator: admin.Selector_EXISTS,
+								},
+							},
+						},
+					},
+				},
+			},
+			"foo",
+			admin.MatchableResource_CLUSTER_ASSIGNMENT,
+			nil,
+		},
 	}
 	for _, tc := range testCases {
 		matchableResource, err := validateMatchingAttributes(tc.attributes, tc.identifier)
