@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.47.1](http://github.com/lyft/flyteconsole/compare/v0.47.0...v0.47.1) (2022-03-23)
+
+
+### Bug Fixes
+
+* **bug_339:** show tooltip on chart bars hover ([#340](http://github.com/lyft/flyteconsole/issues/340)) ([1006239](http://github.com/lyft/flyteconsole/commit/1006239d6aca9498c6a90cd4f7f10d57213b1c87))
+
 # [0.47.0](http://github.com/lyft/flyteconsole/compare/v0.46.0...v0.47.0) (2022-03-23)
 
 
