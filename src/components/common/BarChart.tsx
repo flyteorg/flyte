@@ -48,7 +48,7 @@ interface BarChartData {
   value: number;
   color: string;
   metadata?: any;
-  tooltip?: string;
+  tooltip?: React.ReactChild;
 }
 
 interface BarChartItemProps extends BarChartData {
@@ -69,7 +69,7 @@ interface BarChartProps {
  * @param color
  * @constructor
  */
-const BarChartItem: React.FC<BarChartItemProps> = ({
+export const BarChartItem: React.FC<BarChartItemProps> = ({
   value,
   color,
   isSelected,
@@ -80,41 +80,21 @@ const BarChartItem: React.FC<BarChartItemProps> = ({
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
   const content = (
-    <>
-      <div
-        className={styles.itemBar}
-        style={{
-          backgroundColor: color,
-          height: `${value}%`,
-          opacity: isSelected ? '100%' : '50%',
-        }}
-        onClick={onClick}
-      />
-    </>
+    <div
+      className={styles.itemBar}
+      style={{
+        backgroundColor: color,
+        height: `${value}%`,
+        opacity: isSelected ? '100%' : '50%',
+      }}
+      onClick={onClick}
+    />
   );
 
   return (
     <div className={styles.item}>
       {tooltip ? (
-        <Tooltip
-          title={tooltip}
-          TransitionComponent={Zoom}
-          onMouseMove={(e) => setPosition({ x: e.pageX, y: e.pageY - window.scrollY })}
-          PopperProps={{
-            anchorEl: {
-              clientHeight: 0,
-              clientWidth: 0,
-              getBoundingClientRect: () => ({
-                top: position.y,
-                left: position.x,
-                right: position.x,
-                bottom: position.y,
-                width: 0,
-                height: 0,
-              }),
-            },
-          }}
-        >
+        <Tooltip title={<>{tooltip}</>} TransitionComponent={Zoom}>
           {content}
         </Tooltip>
       ) : (

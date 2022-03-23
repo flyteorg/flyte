@@ -61,7 +61,7 @@ function createFetchFn<T extends object, DataType>({
 
     try {
       const response = await doFetch(data, context.value);
-      let mergedValue = response;
+      let mergedValue: T = response;
       if (useCache) {
         if (cacheKey === undefined) {
           log(`${debugName} failed to cache value. Unexpected empty cache key`);
@@ -75,7 +75,7 @@ function createFetchFn<T extends object, DataType>({
         // Trigger auth flow
         apiContext.loginStatus.setExpired(true);
       }
-      return Promise.reject(error instanceof Error ? error : new Error(error));
+      return Promise.reject(error instanceof Error ? error : new Error(JSON.stringify(error)));
     }
   };
 }
