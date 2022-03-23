@@ -3,6 +3,7 @@
 # Look in the artifacts directory in the flyte repo for what's actually run
 # https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
 propeller:
+  rawoutput-prefix: "s3://my-s3-bucket/test/"
   kube-config: "$HOME/.kube/config"
 tasks:
   task-plugins:
@@ -18,14 +19,14 @@ server:
 flyteadmin:
   runScheduler: false
 database:
-  sqlite:
-    file: admin.db
-#  postgres:
-#    port: 5432
-#    username: postgres
-#    host: localhost
-#    dbname: flyteadmin
-#    options: "sslmode=disable"
+#  sqlite:
+#    file: admin.db
+  postgres:
+    port: 5432
+    username: postgres
+    host: localhost
+    dbname: flyteadmin
+    options: "sslmode=disable"
 storage:
   type: minio
   connection:
