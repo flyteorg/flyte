@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](http://github.com/lyft/flyteconsole/compare/v0.46.0...v0.47.0) (2022-03-23)
+
+
+### Features
+
+* 'Only Mine' toggle for execution tasks list ([#343](http://github.com/lyft/flyteconsole/issues/343)) ([3b62b27](http://github.com/lyft/flyteconsole/commit/3b62b27aedb99f78a1ce4d6ba4f5af9986dc4992))
+
 # [0.46.0](http://github.com/lyft/flyteconsole/compare/v0.45.0...v0.46.0) (2022-03-18)
 
 
