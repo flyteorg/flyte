@@ -29,6 +29,7 @@ type Clientset struct {
 	authMetadataServiceClient service.AuthMetadataServiceClient
 	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
+	dataProxyServiceClient    service.DataProxyClient
 	authOpt                   grpc.DialOption
 }
 
@@ -53,6 +54,10 @@ func (c Clientset) HealthServiceClient() grpc_health_v1.HealthClient {
 
 func (c Clientset) IdentityClient() service.IdentityServiceClient {
 	return c.identityServiceClient
+}
+
+func (c Clientset) DataProxyClient() service.DataProxyClient {
+	return c.dataProxyServiceClient
 }
 
 func NewAdminClient(ctx context.Context, conn *grpc.ClientConn) service.AdminServiceClient {
@@ -197,6 +202,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 	cs.authMetadataServiceClient = service.NewAuthMetadataServiceClient(adminConnection)
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
+	cs.dataProxyServiceClient = service.NewDataProxyClient(adminConnection)
 	if authOpt != nil {
 		cs.authOpt = authOpt
 	}

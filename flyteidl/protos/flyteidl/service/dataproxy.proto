@@ -1,0 +1,54 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message CreateUploadLocationResponse {
+  // SignedUrl specifies the url to use to upload content to (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+  string signed_url = 1;
+
+  // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+  string native_url = 2;
+
+  // ExpiresAt defines when will the signed URL expires.
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+// CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+message CreateUploadLocationRequest {
+  // Project to create the upload location for
+  // +required
+  string project = 1;
+
+  // Domain to create the upload location for.
+  // +required
+  string domain = 2;
+
+  // Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
+  // +optional. By default, the service will generate a random file name.
+  string suffix = 3;
+
+  // ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+  // exceeds the platform allowed max.
+  // +optional. The default value comes from a global config.
+  google.protobuf.Duration expires_in = 4;
+}
+
+// DataProxy defines an RPC Service that allows access to user-data in a controlled manner.
+service DataProxy {
+  // Retrieves user information about the currently logged in user.
+  rpc CreateUploadLocation (CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/dataproxy/artifact_urn"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Creates a write-only http location that is accessible for tasks at runtime."
+    };
+  }
+}
