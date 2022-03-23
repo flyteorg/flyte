@@ -16904,6 +16904,185 @@ export namespace flyteidl {
             type GetPublicClientConfigCallback = (error: (Error|null), response?: flyteidl.service.PublicClientAuthConfigResponse) => void;
         }
 
+        /** Properties of a CreateUploadLocationResponse. */
+        interface ICreateUploadLocationResponse {
+
+            /** CreateUploadLocationResponse signedUrl */
+            signedUrl?: (string|null);
+
+            /** CreateUploadLocationResponse nativeUrl */
+            nativeUrl?: (string|null);
+
+            /** CreateUploadLocationResponse expiresAt */
+            expiresAt?: (google.protobuf.ITimestamp|null);
+        }
+
+        /** Represents a CreateUploadLocationResponse. */
+        class CreateUploadLocationResponse implements ICreateUploadLocationResponse {
+
+            /**
+             * Constructs a new CreateUploadLocationResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ICreateUploadLocationResponse);
+
+            /** CreateUploadLocationResponse signedUrl. */
+            public signedUrl: string;
+
+            /** CreateUploadLocationResponse nativeUrl. */
+            public nativeUrl: string;
+
+            /** CreateUploadLocationResponse expiresAt. */
+            public expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /**
+             * Creates a new CreateUploadLocationResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateUploadLocationResponse instance
+             */
+            public static create(properties?: flyteidl.service.ICreateUploadLocationResponse): flyteidl.service.CreateUploadLocationResponse;
+
+            /**
+             * Encodes the specified CreateUploadLocationResponse message. Does not implicitly {@link flyteidl.service.CreateUploadLocationResponse.verify|verify} messages.
+             * @param message CreateUploadLocationResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ICreateUploadLocationResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateUploadLocationResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateUploadLocationResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.CreateUploadLocationResponse;
+
+            /**
+             * Verifies a CreateUploadLocationResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateUploadLocationRequest. */
+        interface ICreateUploadLocationRequest {
+
+            /** CreateUploadLocationRequest project */
+            project?: (string|null);
+
+            /** CreateUploadLocationRequest domain */
+            domain?: (string|null);
+
+            /** CreateUploadLocationRequest suffix */
+            suffix?: (string|null);
+
+            /** CreateUploadLocationRequest expiresIn */
+            expiresIn?: (google.protobuf.IDuration|null);
+        }
+
+        /** Represents a CreateUploadLocationRequest. */
+        class CreateUploadLocationRequest implements ICreateUploadLocationRequest {
+
+            /**
+             * Constructs a new CreateUploadLocationRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ICreateUploadLocationRequest);
+
+            /** CreateUploadLocationRequest project. */
+            public project: string;
+
+            /** CreateUploadLocationRequest domain. */
+            public domain: string;
+
+            /** CreateUploadLocationRequest suffix. */
+            public suffix: string;
+
+            /** CreateUploadLocationRequest expiresIn. */
+            public expiresIn?: (google.protobuf.IDuration|null);
+
+            /**
+             * Creates a new CreateUploadLocationRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateUploadLocationRequest instance
+             */
+            public static create(properties?: flyteidl.service.ICreateUploadLocationRequest): flyteidl.service.CreateUploadLocationRequest;
+
+            /**
+             * Encodes the specified CreateUploadLocationRequest message. Does not implicitly {@link flyteidl.service.CreateUploadLocationRequest.verify|verify} messages.
+             * @param message CreateUploadLocationRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ICreateUploadLocationRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateUploadLocationRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateUploadLocationRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.CreateUploadLocationRequest;
+
+            /**
+             * Verifies a CreateUploadLocationRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Represents a DataProxy */
+        class DataProxy extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new DataProxy service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new DataProxy service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): DataProxy;
+
+            /**
+             * Calls CreateUploadLocation.
+             * @param request CreateUploadLocationRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and CreateUploadLocationResponse
+             */
+            public createUploadLocation(request: flyteidl.service.ICreateUploadLocationRequest, callback: flyteidl.service.DataProxy.CreateUploadLocationCallback): void;
+
+            /**
+             * Calls CreateUploadLocation.
+             * @param request CreateUploadLocationRequest message or plain object
+             * @returns Promise
+             */
+            public createUploadLocation(request: flyteidl.service.ICreateUploadLocationRequest): Promise<flyteidl.service.CreateUploadLocationResponse>;
+        }
+
+        namespace DataProxy {
+
+            /**
+             * Callback as used by {@link flyteidl.service.DataProxy#createUploadLocation}.
+             * @param error Error, if any
+             * @param [response] CreateUploadLocationResponse
+             */
+            type CreateUploadLocationCallback = (error: (Error|null), response?: flyteidl.service.CreateUploadLocationResponse) => void;
+        }
+
         /** Properties of a UserInfoRequest. */
         interface IUserInfoRequest {
         }

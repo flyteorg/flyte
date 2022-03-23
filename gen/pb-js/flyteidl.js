@@ -39331,6 +39331,383 @@ export const flyteidl = $root.flyteidl = (() => {
             return AuthMetadataService;
         })();
 
+        service.CreateUploadLocationResponse = (function() {
+
+            /**
+             * Properties of a CreateUploadLocationResponse.
+             * @memberof flyteidl.service
+             * @interface ICreateUploadLocationResponse
+             * @property {string|null} [signedUrl] CreateUploadLocationResponse signedUrl
+             * @property {string|null} [nativeUrl] CreateUploadLocationResponse nativeUrl
+             * @property {google.protobuf.ITimestamp|null} [expiresAt] CreateUploadLocationResponse expiresAt
+             */
+
+            /**
+             * Constructs a new CreateUploadLocationResponse.
+             * @memberof flyteidl.service
+             * @classdesc Represents a CreateUploadLocationResponse.
+             * @implements ICreateUploadLocationResponse
+             * @constructor
+             * @param {flyteidl.service.ICreateUploadLocationResponse=} [properties] Properties to set
+             */
+            function CreateUploadLocationResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CreateUploadLocationResponse signedUrl.
+             * @member {string} signedUrl
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @instance
+             */
+            CreateUploadLocationResponse.prototype.signedUrl = "";
+
+            /**
+             * CreateUploadLocationResponse nativeUrl.
+             * @member {string} nativeUrl
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @instance
+             */
+            CreateUploadLocationResponse.prototype.nativeUrl = "";
+
+            /**
+             * CreateUploadLocationResponse expiresAt.
+             * @member {google.protobuf.ITimestamp|null|undefined} expiresAt
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @instance
+             */
+            CreateUploadLocationResponse.prototype.expiresAt = null;
+
+            /**
+             * Creates a new CreateUploadLocationResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @static
+             * @param {flyteidl.service.ICreateUploadLocationResponse=} [properties] Properties to set
+             * @returns {flyteidl.service.CreateUploadLocationResponse} CreateUploadLocationResponse instance
+             */
+            CreateUploadLocationResponse.create = function create(properties) {
+                return new CreateUploadLocationResponse(properties);
+            };
+
+            /**
+             * Encodes the specified CreateUploadLocationResponse message. Does not implicitly {@link flyteidl.service.CreateUploadLocationResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @static
+             * @param {flyteidl.service.ICreateUploadLocationResponse} message CreateUploadLocationResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CreateUploadLocationResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signedUrl != null && message.hasOwnProperty("signedUrl"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.signedUrl);
+                if (message.nativeUrl != null && message.hasOwnProperty("nativeUrl"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.nativeUrl);
+                if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
+                    $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a CreateUploadLocationResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.service.CreateUploadLocationResponse} CreateUploadLocationResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CreateUploadLocationResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.signedUrl = reader.string();
+                        break;
+                    case 2:
+                        message.nativeUrl = reader.string();
+                        break;
+                    case 3:
+                        message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CreateUploadLocationResponse message.
+             * @function verify
+             * @memberof flyteidl.service.CreateUploadLocationResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CreateUploadLocationResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signedUrl != null && message.hasOwnProperty("signedUrl"))
+                    if (!$util.isString(message.signedUrl))
+                        return "signedUrl: string expected";
+                if (message.nativeUrl != null && message.hasOwnProperty("nativeUrl"))
+                    if (!$util.isString(message.nativeUrl))
+                        return "nativeUrl: string expected";
+                if (message.expiresAt != null && message.hasOwnProperty("expiresAt")) {
+                    let error = $root.google.protobuf.Timestamp.verify(message.expiresAt);
+                    if (error)
+                        return "expiresAt." + error;
+                }
+                return null;
+            };
+
+            return CreateUploadLocationResponse;
+        })();
+
+        service.CreateUploadLocationRequest = (function() {
+
+            /**
+             * Properties of a CreateUploadLocationRequest.
+             * @memberof flyteidl.service
+             * @interface ICreateUploadLocationRequest
+             * @property {string|null} [project] CreateUploadLocationRequest project
+             * @property {string|null} [domain] CreateUploadLocationRequest domain
+             * @property {string|null} [suffix] CreateUploadLocationRequest suffix
+             * @property {google.protobuf.IDuration|null} [expiresIn] CreateUploadLocationRequest expiresIn
+             */
+
+            /**
+             * Constructs a new CreateUploadLocationRequest.
+             * @memberof flyteidl.service
+             * @classdesc Represents a CreateUploadLocationRequest.
+             * @implements ICreateUploadLocationRequest
+             * @constructor
+             * @param {flyteidl.service.ICreateUploadLocationRequest=} [properties] Properties to set
+             */
+            function CreateUploadLocationRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CreateUploadLocationRequest project.
+             * @member {string} project
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @instance
+             */
+            CreateUploadLocationRequest.prototype.project = "";
+
+            /**
+             * CreateUploadLocationRequest domain.
+             * @member {string} domain
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @instance
+             */
+            CreateUploadLocationRequest.prototype.domain = "";
+
+            /**
+             * CreateUploadLocationRequest suffix.
+             * @member {string} suffix
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @instance
+             */
+            CreateUploadLocationRequest.prototype.suffix = "";
+
+            /**
+             * CreateUploadLocationRequest expiresIn.
+             * @member {google.protobuf.IDuration|null|undefined} expiresIn
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @instance
+             */
+            CreateUploadLocationRequest.prototype.expiresIn = null;
+
+            /**
+             * Creates a new CreateUploadLocationRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @static
+             * @param {flyteidl.service.ICreateUploadLocationRequest=} [properties] Properties to set
+             * @returns {flyteidl.service.CreateUploadLocationRequest} CreateUploadLocationRequest instance
+             */
+            CreateUploadLocationRequest.create = function create(properties) {
+                return new CreateUploadLocationRequest(properties);
+            };
+
+            /**
+             * Encodes the specified CreateUploadLocationRequest message. Does not implicitly {@link flyteidl.service.CreateUploadLocationRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @static
+             * @param {flyteidl.service.ICreateUploadLocationRequest} message CreateUploadLocationRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CreateUploadLocationRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.project != null && message.hasOwnProperty("project"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.project);
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                if (message.suffix != null && message.hasOwnProperty("suffix"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.suffix);
+                if (message.expiresIn != null && message.hasOwnProperty("expiresIn"))
+                    $root.google.protobuf.Duration.encode(message.expiresIn, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a CreateUploadLocationRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.service.CreateUploadLocationRequest} CreateUploadLocationRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CreateUploadLocationRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.project = reader.string();
+                        break;
+                    case 2:
+                        message.domain = reader.string();
+                        break;
+                    case 3:
+                        message.suffix = reader.string();
+                        break;
+                    case 4:
+                        message.expiresIn = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CreateUploadLocationRequest message.
+             * @function verify
+             * @memberof flyteidl.service.CreateUploadLocationRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CreateUploadLocationRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.project != null && message.hasOwnProperty("project"))
+                    if (!$util.isString(message.project))
+                        return "project: string expected";
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    if (!$util.isString(message.domain))
+                        return "domain: string expected";
+                if (message.suffix != null && message.hasOwnProperty("suffix"))
+                    if (!$util.isString(message.suffix))
+                        return "suffix: string expected";
+                if (message.expiresIn != null && message.hasOwnProperty("expiresIn")) {
+                    let error = $root.google.protobuf.Duration.verify(message.expiresIn);
+                    if (error)
+                        return "expiresIn." + error;
+                }
+                return null;
+            };
+
+            return CreateUploadLocationRequest;
+        })();
+
+        service.DataProxy = (function() {
+
+            /**
+             * Constructs a new DataProxy service.
+             * @memberof flyteidl.service
+             * @classdesc Represents a DataProxy
+             * @extends $protobuf.rpc.Service
+             * @constructor
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             */
+            function DataProxy(rpcImpl, requestDelimited, responseDelimited) {
+                $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+            }
+
+            (DataProxy.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = DataProxy;
+
+            /**
+             * Creates new DataProxy service using the specified rpc implementation.
+             * @function create
+             * @memberof flyteidl.service.DataProxy
+             * @static
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             * @returns {DataProxy} RPC service. Useful where requests and/or responses are streamed.
+             */
+            DataProxy.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                return new this(rpcImpl, requestDelimited, responseDelimited);
+            };
+
+            /**
+             * Callback as used by {@link flyteidl.service.DataProxy#createUploadLocation}.
+             * @memberof flyteidl.service.DataProxy
+             * @typedef CreateUploadLocationCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.service.CreateUploadLocationResponse} [response] CreateUploadLocationResponse
+             */
+
+            /**
+             * Calls CreateUploadLocation.
+             * @function createUploadLocation
+             * @memberof flyteidl.service.DataProxy
+             * @instance
+             * @param {flyteidl.service.ICreateUploadLocationRequest} request CreateUploadLocationRequest message or plain object
+             * @param {flyteidl.service.DataProxy.CreateUploadLocationCallback} callback Node-style callback called with the error, if any, and CreateUploadLocationResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(DataProxy.prototype.createUploadLocation = function createUploadLocation(request, callback) {
+                return this.rpcCall(createUploadLocation, $root.flyteidl.service.CreateUploadLocationRequest, $root.flyteidl.service.CreateUploadLocationResponse, request, callback);
+            }, "name", { value: "CreateUploadLocation" });
+
+            /**
+             * Calls CreateUploadLocation.
+             * @function createUploadLocation
+             * @memberof flyteidl.service.DataProxy
+             * @instance
+             * @param {flyteidl.service.ICreateUploadLocationRequest} request CreateUploadLocationRequest message or plain object
+             * @returns {Promise<flyteidl.service.CreateUploadLocationResponse>} Promise
+             * @variation 2
+             */
+
+            return DataProxy;
+        })();
+
         service.UserInfoRequest = (function() {
 
             /**
