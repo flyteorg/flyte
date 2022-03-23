@@ -30,6 +30,7 @@ type ExecutionParameters struct {
 	EventVersion        int
 	RoleNameKey         string
 	RawOutputDataConfig *admin.RawOutputDataConfig
+	ClusterAssignment   *admin.ClusterAssignment
 }
 
 // ExecutionData includes all parameters required to create an execution CRD object.
