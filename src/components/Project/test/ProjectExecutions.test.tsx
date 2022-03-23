@@ -1,4 +1,4 @@
-import { render, waitFor, fireEvent } from '@testing-library/react';
+import { render, waitFor, fireEvent, within, getByText } from '@testing-library/react';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
 import { insertFixture } from 'mocks/data/insertFixture';
@@ -21,6 +21,7 @@ import { ProjectExecutions } from '../ProjectExecutions';
 import { failedToLoadExecutionsString } from '../constants';
 
 jest.mock('components/Executions/Tables/WorkflowExecutionsTable');
+// jest.mock('components/common/LoadingSpinner');
 jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
@@ -35,7 +36,7 @@ describe('ProjectExecutions', () => {
   let mockGetUserProfile: jest.Mock<ReturnType<typeof getUserProfile>>;
 
   const sampleUserProfile: UserProfile = {
-    sub: 'sub',
+    subject: 'subject',
   } as UserProfile;
 
   const defaultQueryParams1 = {
@@ -44,7 +45,7 @@ describe('ProjectExecutions', () => {
   };
 
   const defaultQueryParams2 = {
-    filters: 'eq(user,sub)',
+    filters: 'eq(user,subject)',
     [sortQueryKeys.direction]: SortDirection[SortDirection.DESCENDING],
     [sortQueryKeys.key]: executionSortFields.createdAt,
   };
@@ -81,6 +82,20 @@ describe('ProjectExecutions', () => {
       { wrapper: MemoryRouter },
     );
 
+  it('should show loading spinner', async () => {
+    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    const { queryByTestId } = renderView();
+    await waitFor(() => {});
+    expect(queryByTestId(/loading-spinner/i)).toBeDefined();
+  });
+
+  it('should display WorkflowExecutionsTable and BarChart ', async () => {
+    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    const { queryByTestId } = renderView();
+    await waitFor(() => {});
+    expect(queryByTestId('workflow-table')).toBeDefined();
+  });
+
   it('should not display checkbox if user does not login', async () => {
     const { queryByTestId } = renderView();
     await waitFor(() => {});
@@ -88,28 +103,32 @@ describe('ProjectExecutions', () => {
     expect(queryByTestId(/checkbox/i)).toBeNull();
   });
 
-  it('should display checkbox if user login', async () => {
+  it('should display checkboxes if user login', async () => {
     mockGetUserProfile.mockResolvedValue(sampleUserProfile);
-    const { queryByTestId } = renderView();
+    const { getAllByRole } = renderView();
     await waitFor(() => {});
     expect(mockGetUserProfile).toHaveBeenCalled();
-    const checkbox = queryByTestId(/checkbox/i) as HTMLInputElement;
-    expect(checkbox).toBeTruthy();
+    // There are 2 checkboxes on a page: 1 - onlyMyExecutions, 2 - show archived, both unchecked by default
+    const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).toBeTruthy();
+    expect(checkboxes[1]).toBeTruthy();
   });
 
   /** user doesn't have its own workflow */
-  it('should not display workflow if user does not have workflow', async () => {
+  it('should not display workflow if the user does not have one when filtered onlyMyExecutions', async () => {
     mockGetUserProfile.mockResolvedValue(sampleUserProfile);
-    const { getByText, queryByText, queryByTestId } = renderView();
+    const { getByText, queryByText, getAllByRole } = renderView();
     await waitFor(() => {});
     expect(mockGetUserProfile).toHaveBeenCalled();
-    const checkbox = queryByTestId(/checkbox/i)?.querySelector('input') as HTMLInputElement;
-    expect(checkbox).toBeTruthy();
-    expect(checkbox?.checked).toEqual(true);
-    await waitFor(() => expect(queryByText(executions1[0].closure.workflowId.name)).toBeNull());
-    fireEvent.click(checkbox);
-    // in case that user uncheck checkbox, table should display all executions
+    // There are 2 checkboxes on a page: 1 - onlyMyExecutions, 2 - show archived, both unchecked by default
+    const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];
+    expect(checkboxes[0]).toBeTruthy();
+    expect(checkboxes[0]?.checked).toEqual(false);
     await waitFor(() => expect(getByText(executions1[0].closure.workflowId.name)));
+    fireEvent.click(checkboxes[0]);
+    // when user selects checkbox, table should have no executions to display
+    await waitFor(() => expect(queryByText(executions1[0].closure.workflowId.name)).toBeNull());
   });
 
   describe('when initial load fails', () => {

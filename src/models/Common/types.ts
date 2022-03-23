@@ -185,7 +185,7 @@ export type IdentifierScope =
   | Identifier;
 
 export interface UserProfile {
-  sub: string;
+  subject: string;
   name: string;
   preferredUsername: string;
   givenName: string;

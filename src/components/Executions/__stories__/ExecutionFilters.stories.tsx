@@ -29,6 +29,11 @@ stories.add('Workflow executions - all', () => (
     clearCharts={action('clearCharts')}
     showArchived={false}
     onArchiveFilterChange={action('onArchiveFilterChange')}
+    onlyMyExecutionsFilterState={{
+      isFilterDisabled: false,
+      onlyMyExecutionsValue: false,
+      onOnlyMyExecutionsFilterChange: action('onOnlyMyExecutionsFilterChange'),
+    }}
   />
 ));
 stories.add('Workflow executions - minimal', () => (

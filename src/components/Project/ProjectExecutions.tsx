@@ -22,6 +22,7 @@ import {
 import classNames from 'classnames';
 import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
 import { useExecutionShowArchivedState } from 'components/Executions/filters/useExecutionArchiveState';
+import { useOnlyMyExecutionsFilterState } from 'components/Executions/filters/useOnlyMyExecutionsFilterState';
 import { WaitForData } from 'components/common/WaitForData';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
@@ -66,8 +67,13 @@ export const ProjectExecutions: React.FC<ProjectExecutionsProps> = ({
   const styles = useStyles();
   const archivedFilter = useExecutionShowArchivedState();
   const filtersState = useWorkflowExecutionFiltersState();
+  const onlyMyExecutionsFilterState = useOnlyMyExecutionsFilterState({});
 
-  const allFilters = compact([...filtersState.appliedFilters, archivedFilter.getFilter()]);
+  const allFilters = compact([
+    ...filtersState.appliedFilters,
+    archivedFilter.getFilter(),
+    onlyMyExecutionsFilterState.getFilter(),
+  ]);
   const config = {
     sort: defaultSort,
     filter: allFilters,
@@ -128,39 +134,35 @@ export const ProjectExecutions: React.FC<ProjectExecutionsProps> = ({
       moreItemsAvailable={!!query.hasNextPage}
       showWorkflowName={true}
       isFetching={query.isFetching}
+      data-testid={'workflow-table'}
     />
   );
 
-  /** Don't render component until finish fetching user profile */
-  const lastIndex = filtersState.filters.length - 1;
-  if (filtersState.filters[lastIndex].status === fetchStates.LOADED) {
-    return (
-      <div className={styles.container}>
-        <Typography className={classNames(styles.header, styles.marginTop)} variant="h6">
-          Last 100 Executions in the Project
-        </Typography>
-        <div className={styles.chartContainer}>
-          <WaitForData {...last100Executions}>
-            <BarChart
-              chartIds={[]}
-              data={getExecutionTimeData(last100Executions.value)}
-              startDate={getStartExecutionTime(last100Executions.value)}
-              onClickItem={handleBarChartItemClick}
-            />
-          </WaitForData>
-        </div>
-        <Typography className={styles.header} variant="h6">
-          All Executions in the Project
-        </Typography>
-        <ExecutionFilters
-          {...filtersState}
-          showArchived={archivedFilter.showArchived}
-          onArchiveFilterChange={archivedFilter.setShowArchived}
-        />
-        <ErrorBoundary>{content}</ErrorBoundary>
+  return (
+    <div className={styles.container}>
+      <Typography className={classNames(styles.header, styles.marginTop)} variant="h6">
+        Last 100 Executions in the Project
+      </Typography>
+      <div className={styles.chartContainer}>
+        <WaitForData {...last100Executions}>
+          <BarChart
+            chartIds={[]}
+            data={getExecutionTimeData(last100Executions.value)}
+            startDate={getStartExecutionTime(last100Executions.value)}
+            onClickItem={handleBarChartItemClick}
+          />
+        </WaitForData>
       </div>
-    );
-  } else {
-    return null;
-  }
+      <Typography className={styles.header} variant="h6">
+        All Executions in the Project
+      </Typography>
+      <ExecutionFilters
+        {...filtersState}
+        showArchived={archivedFilter.showArchived}
+        onArchiveFilterChange={archivedFilter.setShowArchived}
+        onlyMyExecutionsFilterState={onlyMyExecutionsFilterState}
+      />
+      <ErrorBoundary>{content}</ErrorBoundary>
+    </div>
+  );
 };

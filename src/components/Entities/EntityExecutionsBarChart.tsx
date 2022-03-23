@@ -121,12 +121,6 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
     [onToggle],
   );
 
-  /** Don't render component until finish fetching user profile */
-  const lastIndex = filtersState.filters.length - 1;
-  if (filtersState.filters[lastIndex].status !== fetchStates.LOADED) {
-    return null;
-  }
-
   return (
     <WaitForData {...executions}>
       <Typography className={styles.header} variant="h6">

@@ -22,10 +22,8 @@ export type FilterStateType = 'single' | 'multi' | 'search' | 'boolean';
 export interface FilterState {
   active: boolean;
   button: FilterButtonState;
-  hidden?: boolean;
   label: string;
   type: FilterStateType;
-  status?: string;
   getFilter: () => FilterOperation[];
   onReset: () => void;
   onChange?: (value) => void;

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
-import { fetchStates } from 'components/hooks/types';
 import { WaitForData } from 'components/common/WaitForData';
 import { ExecutionFilters } from 'components/Executions/ExecutionFilters';
 import { useExecutionShowArchivedState } from 'components/Executions/filters/useExecutionArchiveState';
@@ -14,6 +13,7 @@ import { SortDirection } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
 import { executionSortFields } from 'models/Execution/constants';
 import { compact } from 'lodash';
+import { useOnlyMyExecutionsFilterState } from 'components/Executions/filters/useOnlyMyExecutionsFilterState';
 import { executionFilterGenerator } from './generators';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,6 +42,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
   const styles = useStyles();
   const filtersState = useWorkflowExecutionFiltersState();
   const archivedFilter = useExecutionShowArchivedState();
+  const onlyMyExecutionsFilterState = useOnlyMyExecutionsFilterState({});
 
   const sort = {
     key: executionSortFields.createdAt,
@@ -57,7 +58,9 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
     ...baseFilters,
     ...filtersState.appliedFilters,
     archivedFilter.getFilter(),
+    onlyMyExecutionsFilterState.getFilter(),
   ]);
+
   const executions = useWorkflowExecutions(
     { domain, project },
     {
@@ -69,12 +72,6 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
 
   if (chartIds.length > 0) {
     executions.value = executions.value.filter((item) => chartIds.includes(item.id.name));
-  }
-
-  /** Don't render component until finish fetching user profile */
-  const lastIndex = filtersState.filters.length - 1;
-  if (filtersState.filters[lastIndex].status !== fetchStates.LOADED) {
-    return null;
   }
 
   return (
@@ -89,6 +86,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({
           clearCharts={clearCharts}
           showArchived={archivedFilter.showArchived}
           onArchiveFilterChange={archivedFilter.setShowArchived}
+          onlyMyExecutionsFilterState={onlyMyExecutionsFilterState}
         />
       </div>
       <WaitForData {...executions}>

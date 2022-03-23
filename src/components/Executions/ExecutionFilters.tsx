@@ -31,6 +31,21 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+interface OnlyMyExecutionsFilterState {
+  onlyMyExecutionsValue: boolean;
+  isFilterDisabled: boolean;
+  onOnlyMyExecutionsFilterChange: (filterOnlyMyExecutions: boolean) => void;
+}
+
+export interface ExecutionFiltersProps {
+  filters: (FilterState | BooleanFilterState)[];
+  chartIds?: string[];
+  clearCharts?: () => void;
+  showArchived?: boolean;
+  onArchiveFilterChange?: (showArchievedItems: boolean) => void;
+  onlyMyExecutionsFilterState?: OnlyMyExecutionsFilterState;
+}
+
 const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
   const searchFilterState = filter as SearchFilterState;
   switch (filter.type) {
@@ -51,13 +66,14 @@ const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
  * This allows for the consuming code to have direct access to the
  * current filters without relying on complicated callback arrangements
  */
-export const ExecutionFilters: React.FC<{
-  filters: (FilterState | BooleanFilterState)[];
-  chartIds?: string[];
-  clearCharts?: () => void;
-  showArchived?: boolean;
-  onArchiveFilterChange?: (showArchievedItems: boolean) => void;
-}> = ({ filters, chartIds, clearCharts, showArchived, onArchiveFilterChange }) => {
+export const ExecutionFilters: React.FC<ExecutionFiltersProps> = ({
+  filters,
+  chartIds,
+  clearCharts,
+  showArchived,
+  onArchiveFilterChange,
+  onlyMyExecutionsFilterState,
+}) => {
   const styles = useStyles();
 
   filters = filters.map((filter) => {
@@ -111,14 +127,32 @@ export const ExecutionFilters: React.FC<{
           buttonText="Clear Manually Selected Executions"
           onReset={clearCharts}
           key="charts"
+          data-testId="clear-charts"
         />
+      )}
+      {!!onlyMyExecutionsFilterState && (
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={onlyMyExecutionsFilterState.onlyMyExecutionsValue}
+                disabled={onlyMyExecutionsFilterState.isFilterDisabled}
+                onChange={(_, checked) =>
+                  onlyMyExecutionsFilterState.onOnlyMyExecutionsFilterChange(checked)
+                }
+              />
+            }
+            className={styles.checkbox}
+            label="Only my executions"
+          />
+        </FormGroup>
       )}
       {!!onArchiveFilterChange && (
         <FormGroup>
           <FormControlLabel
             control={
               <Checkbox
-                value={showArchived}
+                checked={showArchived}
                 onChange={(_, checked) => onArchiveFilterChange(checked)}
               />
             }
