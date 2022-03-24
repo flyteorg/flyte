@@ -1,8 +1,9 @@
 package single
 
 import (
+	"context"
 	"embed"
-	"fmt"
+	"github.com/flyteorg/flytestdlib/logger"
 	"net/http"
 	"strings"
 )
@@ -25,25 +26,24 @@ func WriteIndex(writer http.ResponseWriter) {
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
 	// Serves console
-	fs := http.FS(console)
-	rawFS := http.FileServer(fs)
+	rawFS := http.FileServer(http.FS(console))
 	consoleFS := http.StripPrefix("/console/", rawFS)
 	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Printf("all files under console returning, %s\n", request.URL.Path)
+		logger.Infof(context.TODO(), "Returning assets, %s", request.URL.Path)
 		consoleFS.ServeHTTP(writer, request)
 	}
 
 	handlers["/console/"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Printf("all files under console returning, %s\n", request.URL.Path)
 		newPath := strings.TrimLeft(request.URL.Path, "/console")
 		if strings.Contains(newPath, "/") {
+			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
 			WriteIndex(writer)
 		} else {
 			consoleFS.ServeHTTP(writer, request)
 		}
 	}
 	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Println("returning index.html")
+		logger.Infof(context.TODO(), "Returning index.html")
 		WriteIndex(writer)
 	}
 
