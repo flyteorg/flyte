@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 	"sync"
 	"time"
 
@@ -274,6 +275,35 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 
 func (s *StowStore) GetBaseContainerFQN(ctx context.Context) DataReference {
 	return s.baseContainerFQN
+}
+
+func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference, properties SignedURLProperties) (SignedURLResponse, error) {
+	_, container, key, err := reference.Split()
+	if err != nil {
+		return SignedURLResponse{}, err
+	}
+
+	c, err := s.getContainer(ctx, container)
+	if err != nil {
+		return SignedURLResponse{}, err
+	}
+
+	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
+		ExpiresIn: properties.ExpiresIn,
+	})
+
+	if err != nil {
+		return SignedURLResponse{}, err
+	}
+
+	urlVal, err := url.Parse(urlStr)
+	if err != nil {
+		return SignedURLResponse{}, err
+	}
+
+	return SignedURLResponse{
+		URL: *urlVal,
+	}, nil
 }
 
 func NewStowRawStore(baseContainerFQN DataReference, loc stow.Location, enableDynamicContainerLoading bool, metricsScope promutils.Scope) (*StowStore, error) {

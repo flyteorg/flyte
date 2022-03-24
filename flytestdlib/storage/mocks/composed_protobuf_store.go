@@ -50,6 +50,45 @@ func (_m *ComposedProtobufStore) CopyRaw(ctx context.Context, source storage.Dat
 	return r0
 }
 
+type ComposedProtobufStore_CreateSignedURL struct {
+	*mock.Call
+}
+
+func (_m ComposedProtobufStore_CreateSignedURL) Return(_a0 storage.SignedURLResponse, _a1 error) *ComposedProtobufStore_CreateSignedURL {
+	return &ComposedProtobufStore_CreateSignedURL{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ComposedProtobufStore) OnCreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) *ComposedProtobufStore_CreateSignedURL {
+	c := _m.On("CreateSignedURL", ctx, reference, properties)
+	return &ComposedProtobufStore_CreateSignedURL{Call: c}
+}
+
+func (_m *ComposedProtobufStore) OnCreateSignedURLMatch(matchers ...interface{}) *ComposedProtobufStore_CreateSignedURL {
+	c := _m.On("CreateSignedURL", matchers...)
+	return &ComposedProtobufStore_CreateSignedURL{Call: c}
+}
+
+// CreateSignedURL provides a mock function with given fields: ctx, reference, properties
+func (_m *ComposedProtobufStore) CreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) (storage.SignedURLResponse, error) {
+	ret := _m.Called(ctx, reference, properties)
+
+	var r0 storage.SignedURLResponse
+	if rf, ok := ret.Get(0).(func(context.Context, storage.DataReference, storage.SignedURLProperties) storage.SignedURLResponse); ok {
+		r0 = rf(ctx, reference, properties)
+	} else {
+		r0 = ret.Get(0).(storage.SignedURLResponse)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, storage.DataReference, storage.SignedURLProperties) error); ok {
+		r1 = rf(ctx, reference, properties)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ComposedProtobufStore_GetBaseContainerFQN struct {
 	*mock.Call
 }

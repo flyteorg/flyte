@@ -1,4 +1,4 @@
-// Defines extensible storage interface.
+// Package storage defines extensible storage interface.
 // This package registers "storage" config section that maps to Config struct. Use NewDataStore(cfg) to initialize a
 // DataStore with the provided config. The package provides default implementation to access local, S3 (and minio),
 // and In-Memory storage. Use NewCompositeDataStore to swap any portions of the DataStore interface with an external
@@ -9,6 +9,9 @@ package storage
 import (
 	"context"
 	"strings"
+	"time"
+
+	"github.com/graymeta/stow"
 
 	"io"
 	"net/url"
@@ -16,77 +19,92 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-// Defines a reference to data location.
+// DataReference defines a reference to data location.
 type DataReference string
 
 var emptyStore = DataStore{}
 
-// Holder for recording storage options. It is used to pass Metadata (like headers for S3) and also tags or labels for
+// Options holds storage options. It is used to pass Metadata (like headers for S3) and also tags or labels for
 // objects
 type Options struct {
 	Metadata map[string]interface{}
 }
 
-// Placeholder for data reference metadata.
+// Metadata is a placeholder for data reference metadata.
 type Metadata interface {
 	Exists() bool
 	Size() int64
 }
 
-// A simplified interface for accessing and storing data in one of the Cloud stores.
+// DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
 // Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {
 	ComposedProtobufStore
 	ReferenceConstructor
 }
 
+type SignedURLProperties struct {
+	Scope     stow.ClientMethod
+	ExpiresIn time.Duration
+}
+
+type SignedURLResponse struct {
+	URL url.URL
+}
+
 //go:generate mockery -name RawStore -case=underscore
 
-// Defines a low level interface for accessing and storing bytes.
+// RawStore defines a low level interface for accessing and storing bytes.
 type RawStore interface {
-	// returns a FQN DataReference with the configured base init container
+	// GetBaseContainerFQN returns a FQN DataReference with the configured base init container
 	GetBaseContainerFQN(ctx context.Context) DataReference
 
-	// Gets metadata about the reference. This should generally be a light weight operation.
+	// CreateSignedURL creates a signed url with the provided properties.
+	CreateSignedURL(ctx context.Context, reference DataReference, properties SignedURLProperties) (SignedURLResponse, error)
+
+	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
 
-	// Retrieves a byte array from the Blob store or an error
+	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
 
-	// Stores a raw byte array.
+	// WriteRaw stores a raw byte array.
 	WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error
 
-	// Copies from source to destination.
+	// CopyRaw copies from source to destination.
 	CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error
 }
 
 //go:generate mockery -name ReferenceConstructor -case=underscore
 
-// Defines an interface for building data reference paths.
+// ReferenceConstructor defines an interface for building data reference paths.
 type ReferenceConstructor interface {
-	// Creates a new dataReference that matches the storage structure.
+	// ConstructReference creates a new dataReference that matches the storage structure.
 	ConstructReference(ctx context.Context, reference DataReference, nestedKeys ...string) (DataReference, error)
+
+	// FromSignedURL constructs a data reference from a signed URL
+	//FromSignedURL(ctx context.Context, signedURL string) (DataReference, error)
 }
 
-// Defines an interface for reading and writing protobuf messages
+// ProtobufStore defines an interface for reading and writing protobuf messages
 type ProtobufStore interface {
-	// Retrieves the entire blob from blobstore and unmarshals it to the passed protobuf
+	// ReadProtobuf retrieves the entire blob from blobstore and unmarshals it to the passed protobuf
 	ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error
 
-	// Serializes and stores the protobuf.
+	// WriteProtobuf serializes and stores the protobuf.
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
 
 //go:generate mockery -name ComposedProtobufStore -case=underscore
 
-// A ProtobufStore needs a RawStore to get the RawData. This interface provides all the necessary components to make
-// Protobuf fetching work
+// ComposedProtobufStore interface includes all the necessary data to allow a ProtobufStore to interact with storage
+// through a RawStore.
 type ComposedProtobufStore interface {
 	RawStore
 	ProtobufStore
 }
 
-// Splits the data reference into parts.
+// Split splits the data reference into parts.
 func (r DataReference) Split() (scheme, container, key string, err error) {
 	u, err := url.Parse(string(r))
 	if err != nil {

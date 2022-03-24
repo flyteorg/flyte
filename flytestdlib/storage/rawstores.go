@@ -54,7 +54,7 @@ func createHTTPClient(cfg HTTPClientConfig) *http.Client {
 	return c
 }
 
-// Creates a new Data Store with the supplied config.
+// NewDataStore creates a new Data Store with the supplied config.
 func NewDataStore(cfg *Config, metricsScope promutils.Scope) (s *DataStore, err error) {
 	defaultClient := http.DefaultClient
 	defer func() {
@@ -71,13 +71,13 @@ func NewDataStore(cfg *Config, metricsScope promutils.Scope) (s *DataStore, err 
 		}
 
 		protoStore := NewDefaultProtobufStore(newCachedRawStore(cfg, rawStore, metricsScope), metricsScope)
-		return NewCompositeDataStore(URLPathConstructor{}, protoStore), nil
+		return NewCompositeDataStore(NewURLPathConstructor(), protoStore), nil
 	}
 
 	return &emptyStore, fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 }
 
-// Composes a new DataStore.
+// NewCompositeDataStore composes a new DataStore.
 func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobufStore ComposedProtobufStore) *DataStore {
 	return &DataStore{
 		ReferenceConstructor:  refConstructor,
