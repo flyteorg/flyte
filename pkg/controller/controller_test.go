@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
+
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -82,4 +84,8 @@ func TestResourceLevelMonitor_collect(t *testing.T) {
 
 	err := testutil.CollectAndCompare(g.GaugeVec, strings.NewReader(expected))
 	assert.NoError(t, err)
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 }

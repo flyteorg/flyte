@@ -1159,8 +1159,3 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	exec.nodeHandlerFactory = nodeHandlerFactory
 	return exec, err
 }
-
-func init() {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
-		contextutils.TaskIDKey)
-}
