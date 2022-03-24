@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
+
 	"github.com/golang/protobuf/proto"
 
 	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -2412,4 +2414,8 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 			}
 		})
 	}
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 }
