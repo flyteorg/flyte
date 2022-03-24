@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	repoErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"gorm.io/driver/sqlite"
+
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/jackc/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -66,7 +67,7 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 }
 
 // Produces the DSN (data source name) for opening a postgres db connection.
-func getPostgresDsn(ctx context.Context, pgConfig runtimeInterfaces.PostgresConfig) string {
+func getPostgresDsn(ctx context.Context, pgConfig *runtimeInterfaces.PostgresConfig) string {
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
@@ -80,7 +81,7 @@ func getPostgresDsn(ctx context.Context, pgConfig runtimeInterfaces.PostgresConf
 // GetDB uses the dbConfig to create gorm DB object. If the db doesn't exist for the dbConfig then a new one is created
 // using the default db for the provider. eg : postgres has default dbName as postgres
 func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig *logger.Config) (
-	gormDb *gorm.DB, err error) {
+	*gorm.DB, error) {
 	if dbConfig == nil {
 		panic("Cannot initialize database repository from empty db config")
 	}
@@ -89,17 +90,26 @@ func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig 
 		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
 	}
 
-	// TODO: add other gorm-supported db type handling in further case blocks.
+	var gormDb *gorm.DB
+	var err error
+
 	switch {
-	// TODO: Figure out a better proxy for a non-empty postgres config
-	case len(dbConfig.PostgresConfig.Host) > 0 || len(dbConfig.PostgresConfig.User) > 0 || len(dbConfig.PostgresConfig.DbName) > 0:
+	case dbConfig.SQLiteConfig != nil:
+		if dbConfig.SQLiteConfig.File == "" {
+			return nil, fmt.Errorf("illegal sqlite database configuration. `file` is a required parameter and should be a path")
+		}
+		gormDb, err = gorm.Open(sqlite.Open(dbConfig.SQLiteConfig.File), gormConfig)
+		if err != nil {
+			return nil, err
+		}
+	case dbConfig.PostgresConfig != nil && (len(dbConfig.PostgresConfig.Host) > 0 || len(dbConfig.PostgresConfig.User) > 0 || len(dbConfig.PostgresConfig.DbName) > 0):
 		gormDb, err = createPostgresDbIfNotExists(ctx, gormConfig, dbConfig.PostgresConfig)
 		if err != nil {
 			return nil, err
 		}
 
 	case len(dbConfig.DeprecatedHost) > 0 || len(dbConfig.DeprecatedUser) > 0 || len(dbConfig.DeprecatedDbName) > 0:
-		pgConfig := runtimeInterfaces.PostgresConfig{
+		pgConfig := &runtimeInterfaces.PostgresConfig{
 			Host:         dbConfig.DeprecatedHost,
 			Port:         dbConfig.DeprecatedPort,
 			DbName:       dbConfig.DeprecatedDbName,
@@ -114,7 +124,7 @@ func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig 
 			return nil, err
 		}
 	default:
-		panic(fmt.Sprintf("Unrecognized database config %v", dbConfig))
+		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfig)
 	}
 
 	// Setup connection pool settings
@@ -122,7 +132,7 @@ func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig 
 }
 
 // Creates DB if it doesn't exist for the passed in config
-func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig runtimeInterfaces.PostgresConfig) (*gorm.DB, error) {
+func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig *runtimeInterfaces.PostgresConfig) (*gorm.DB, error) {
 
 	dialector := postgres.Open(getPostgresDsn(ctx, pgConfig))
 	gormDb, err := gorm.Open(dialector, gormConfig)

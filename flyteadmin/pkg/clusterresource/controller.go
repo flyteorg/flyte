@@ -12,6 +12,14 @@ import (
 	"strings"
 	"time"
 
+	impl2 "github.com/flyteorg/flyteadmin/pkg/clusterresource/impl"
+	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	errors2 "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
@@ -633,13 +641,55 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 }
 
 func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataProvider, listTargets executionclusterIfaces.ListTargetsInterface, scope promutils.Scope) Controller {
-	config := runtime.NewConfigurationProvider()
+	cfg := runtime.NewConfigurationProvider()
 	return &controller{
 		adminDataProvider: adminDataProvider,
-		config:            config,
+		config:            cfg,
 		listTargets:       listTargets,
 		poller:            make(chan struct{}),
 		metrics:           newMetrics(scope),
 		appliedTemplates:  make(map[string]map[string]time.Time),
 	}
+}
+
+func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils.Scope, configuration runtimeInterfaces.Configuration) (Controller, error) {
+	initializationErrorCounter := scope.MustNewCounter(
+		"flyteclient_initialization_error",
+		"count of errors encountered initializing a flyte client from kube config")
+	var listTargetsProvider executionclusterIfaces.ListTargetsInterface
+	var err error
+	if len(configuration.ClusterConfiguration().GetClusterConfigs()) == 0 {
+		serverConfig := config.GetConfig()
+		listTargetsProvider, err = impl.NewInCluster(initializationErrorCounter, serverConfig.KubeConfig, serverConfig.Master)
+	} else {
+		listTargetsProvider, err = impl.NewListTargets(initializationErrorCounter, impl.NewExecutionTargetProvider(), configuration.ClusterConfiguration())
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	var adminDataProvider interfaces.FlyteAdminDataProvider
+	if configuration.ClusterResourceConfiguration().IsStandaloneDeployment() {
+		clientSet, err := admin2.ClientSetBuilder().WithConfig(admin2.GetConfig(ctx)).Build(ctx)
+		if err != nil {
+			return nil, err
+		}
+		adminDataProvider = impl2.NewAdminServiceDataProvider(clientSet.AdminClient())
+	} else {
+		dbConfig := runtime.NewConfigurationProvider().ApplicationConfiguration().GetDbConfig()
+		logConfig := logger.GetConfig()
+
+		db, err := repositories.GetDB(ctx, dbConfig, logConfig)
+		if err != nil {
+			return nil, err
+		}
+		dbScope := scope.NewSubScope("db")
+
+		repo := repositories.NewGormRepo(
+			db, errors2.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
+
+		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resources.NewResourceManager(repo, configuration.ApplicationConfiguration()))
+	}
+
+	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope), nil
 }

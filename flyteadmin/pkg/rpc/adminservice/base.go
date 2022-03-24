@@ -24,7 +24,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine"
 	workflowengineImpl "github.com/flyteorg/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
@@ -153,15 +152,6 @@ func NewAdminServer(ctx context.Context, kubeConfig, master string) *AdminServic
 	go func() {
 		logger.Info(ctx, "Starting the scheduled workflow executor")
 		scheduledWorkflowExecutor.Run()
-	}()
-
-	// Serve profiling endpoints.
-	go func() {
-		err := profutils.StartProfilingServerWithDefaultHandlers(
-			ctx, applicationConfiguration.GetProfilerPort(), nil)
-		if err != nil {
-			logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
-		}
 	}()
 
 	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(repo, applicationConfiguration.GetAsyncEventsBufferSize())
