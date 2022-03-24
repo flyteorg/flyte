@@ -72,6 +72,11 @@ type dummyStore struct {
 	WriteRawCb func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error
 }
 
+// CreateSignedURL creates a signed url with the provided properties.
+func (d *dummyStore) CreateSignedURL(ctx context.Context, reference DataReference, properties SignedURLProperties) (SignedURLResponse, error) {
+	return SignedURLResponse{}, fmt.Errorf("unsupported")
+}
+
 func (d *dummyStore) GetBaseContainerFQN(ctx context.Context) DataReference {
 	return "dummy"
 }

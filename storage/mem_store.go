@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -62,6 +63,11 @@ func (s *InMemoryStore) Clear(ctx context.Context) error {
 
 func (s *InMemoryStore) GetBaseContainerFQN(ctx context.Context) DataReference {
 	return DataReference("")
+}
+
+// CreateSignedURL creates a signed url with the provided properties.
+func (s *InMemoryStore) CreateSignedURL(ctx context.Context, reference DataReference, properties SignedURLProperties) (SignedURLResponse, error) {
+	return SignedURLResponse{}, fmt.Errorf("unsupported")
 }
 
 func NewInMemoryRawStore(_ *Config, scope promutils.Scope) (RawStore, error) {

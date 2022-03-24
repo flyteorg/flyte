@@ -12,9 +12,11 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
-const separator = "/"
+const (
+	separator = "/"
+)
 
-// Implements ReferenceConstructor that assumes paths are URL-compatible.
+// URLPathConstructor implements ReferenceConstructor that assumes paths are URL-compatible.
 type URLPathConstructor struct {
 }
 
@@ -44,4 +46,8 @@ func (URLPathConstructor) ConstructReference(ctx context.Context, reference Data
 	u = u.ResolveReference(rel)
 
 	return DataReference(u.String()), nil
+}
+
+func NewURLPathConstructor() URLPathConstructor {
+	return URLPathConstructor{}
 }

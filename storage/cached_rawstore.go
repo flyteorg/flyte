@@ -35,7 +35,7 @@ type cachedRawStore struct {
 	metrics *cacheMetrics
 }
 
-// Gets metadata about the reference. This should generally be a light weight operation.
+// Head gets metadata about the reference. This should generally be a light weight operation.
 func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -49,7 +49,7 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 	return s.RawStore.Head(ctx, reference)
 }
 
-// Retrieves a byte array from the Blob store or an error
+// ReadRaw retrieves a byte array from the Blob store or an error
 func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -84,7 +84,7 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 	return ioutils.NewBytesReadCloser(b), err
 }
 
-// Stores a raw byte array.
+// WriteRaw stores a raw byte array.
 func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 	var buf bytes.Buffer
 	teeReader := io.TeeReader(raw, &buf)

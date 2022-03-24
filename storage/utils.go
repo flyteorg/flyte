@@ -20,7 +20,7 @@ const (
 	genericFailureTypeLabel = "Generic"
 )
 
-// Gets a value indicating whether the underlying error is a Not Found error.
+// IsNotFound gets a value indicating whether the underlying error is a Not Found error.
 func IsNotFound(err error) bool {
 	if root := errors.Cause(err); os.IsNotExist(root) {
 		return true
@@ -33,7 +33,7 @@ func IsNotFound(err error) bool {
 	return false
 }
 
-// Gets a value indicating whether the underlying error is "already exists" error.
+// IsExists gets a value indicating whether the underlying error is "already exists" error.
 func IsExists(err error) bool {
 	if root := errors.Cause(err); os.IsExist(root) {
 		return true
@@ -42,7 +42,7 @@ func IsExists(err error) bool {
 	return false
 }
 
-// Gets a value indicating whether the root cause of error is a "limit exceeded" error.
+// IsExceedsLimit gets a value indicating whether the root cause of error is a "limit exceeded" error.
 func IsExceedsLimit(err error) bool {
 	return stdErrs.IsCausedBy(err, ErrExceedsLimit)
 }
