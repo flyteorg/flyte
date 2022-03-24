@@ -10,9 +10,14 @@ Synopsis
 
 
 
-Create execution resources for a given workflow or task in a project and domain.
+Create execution resources for a given workflow or task in a project and domain. 
+
 
 There are three steps to generate an execution, as outlined below:
+
+
+Create execution for a task
+===========================
 
 1. Generate the execution spec file using the :ref:`get task <flytectl_get_task>` command.
 ::
@@ -62,6 +67,53 @@ It is worth noting that the source's and target's project and domain can be diff
 ::
 
 	flytectl create execution --execFile execution_spec.yaml -p flytesnacks -d staging --targetProject flytesnacks
+
+Create execution for a workflow
+===============================
+
+1. Generate an execution spec file.
+::
+
+  flytectl get launchplan --project flytesnacks --domain development flyte.workflows.example.my_wf --latest --execFile exec_spec.yaml
+
+The generated file would look similar to the following:
+
+.. code-block:: yaml
+
+  iamRoleARN: ""
+  inputs: {}
+  kubeServiceAcct: ""
+  targetDomain: ""
+  targetProject: ""
+  version: v1
+  workflow: flyte.workflows.example.my_wf
+
+2. [Optional] Update the inputs for the execution, if needed. The generated spec file can be modified to change the input values, as shown below:
+
+.. code-block:: yaml
+
+  iamRoleARN: 'arn:aws:iam::12345678:role/defaultrole'
+  inputs:
+  sorted_list1:
+  - 2
+  - 4
+  - 6
+  sorted_list2:
+  - 1
+  - 3
+  - 5
+  kubeServiceAcct: ""
+  targetDomain: ""
+  targetProject: ""
+  version: "v1"
+  workflow: flyte.workflows.example.my_wf
+
+3. Run the execution using the exec spec file. The file can then be passed through the command line. It is worth noting that the source’s and target’s project and domain can be different.
+::
+
+  flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+
+The following commands are common to both task and worflow:
 
 To relaunch an execution, pass the current execution ID as follows:
 
@@ -122,7 +174,6 @@ Modified file with struct data populated for 'x' and 'y' parameters for the task
   version: v3
 
 Usage
-
 
 ::
 
