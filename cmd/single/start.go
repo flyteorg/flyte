@@ -2,12 +2,13 @@ package single
 
 import (
 	"context"
-	"fmt"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyteadmin/pkg/server"
 	adminScheduler "github.com/flyteorg/flyteadmin/scheduler"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/k8s"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -18,39 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"net/http"
-	"strings"
-
-	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/k8s"
-	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 )
-
-func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
-	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
-	// Serves console
-	rawFs := http.FileServer(http.Dir("./dist"))
-	consoleFS := http.StripPrefix("/console/", rawFs)
-	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Printf("all files under console returning, %s\n", request.URL.Path)
-		consoleFS.ServeHTTP(writer, request)
-	}
-
-	handlers["/console/"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Printf("all files under console returning, %s\n", request.URL.Path)
-		newPath := strings.TrimLeft(request.URL.Path, "/console")
-		if strings.Contains(newPath, "/") {
-			http.ServeFile(writer, request, "./dist/index.html")
-		} else {
-			consoleFS.ServeHTTP(writer, request)
-		}
-	}
-	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Println("returning index.html")
-		http.ServeFile(writer, request, "./dist/index.html")
-	}
-
-	return handlers
-}
 
 func startClusterResourceController(ctx context.Context) error {
 	configuration := runtime.NewConfigurationProvider()
