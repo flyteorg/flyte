@@ -1,7 +1,7 @@
 import { Button, Link } from '@material-ui/core';
 import * as React from 'react';
 
-export interface ExpandableContentLinkProps {
+interface ExpandableContentLinkProps {
   /** Set to true to allow hiding the content after it is initially expanded */
   allowCollapse?: boolean;
   /** Use a button instead of a link */
@@ -37,10 +37,6 @@ export class ExpandableContentLink extends React.Component<ExpandableContentLink
   state = {
     showContent: false,
   };
-
-  public render() {
-    return this.state.showContent ? this.renderExpanded() : this.renderCollapsed();
-  }
 
   private renderToggleComponent = () => {
     const { button, collapsedText, expandedText, toggleClassName } = this.props;
@@ -95,4 +91,8 @@ export class ExpandableContentLink extends React.Component<ExpandableContentLink
       onExpand();
     }
   };
+
+  public render() {
+    return this.state.showContent ? this.renderExpanded() : this.renderCollapsed();
+  }
 }

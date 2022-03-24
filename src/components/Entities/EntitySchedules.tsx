@@ -5,6 +5,7 @@ import { useCommonStyles } from 'components/common/styles';
 import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowSchedules } from 'components/hooks/useWorkflowSchedules';
 import { ResourceIdentifier } from 'models/Common/types';
+import { identifierToString } from 'models/Common/utils';
 import { LaunchPlan } from 'models/Launch/types';
 import * as React from 'react';
 import { entityStrings } from './constants';
@@ -22,14 +23,14 @@ const RenderSchedules: React.FC<{
   const commonStyles = useCommonStyles();
   return (
     <ul className={commonStyles.listUnstyled}>
-      {launchPlans.map((launchPlan, idx) => {
+      {launchPlans.map((launchPlan) => {
         const { schedule } = launchPlan.spec.entityMetadata;
         const frequencyString = getScheduleFrequencyString(schedule);
         const offsetString = getScheduleOffsetString(schedule);
         const scheduleString = offsetString
           ? `${frequencyString} (offset by ${offsetString})`
           : frequencyString;
-        return <li key={idx}>{scheduleString}</li>;
+        return <li key={identifierToString(launchPlan.id)}>{scheduleString}</li>;
       })}
     </ul>
   );

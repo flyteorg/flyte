@@ -26,6 +26,52 @@ export class RenderedGraph<T> extends React.Component<RenderedGraphProps<T>, Ren
     this.containerClickHandler = new DragFilteringClickHandler(this.onContainerClick);
   }
 
+  private clearSelection = () => {
+    // Don't need to trigger a re-render if selection is already empty
+    if (!this.props.selectedNodes || this.props.selectedNodes.length === 0) {
+      return;
+    }
+    this.props.onNodeSelectionChanged && this.props.onNodeSelectionChanged([]);
+  };
+
+  private onNodeEnter = (id: string) => {
+    const hoveredNodes: Dictionary<boolean> = {
+      ...this.state.hoveredNodes,
+      [id]: true,
+    };
+    this.setState({ hoveredNodes });
+    this.props.onNodeEnter && this.props.onNodeEnter(id);
+  };
+
+  private onNodeLeave = (id: string) => {
+    const hoveredNodes: Dictionary<boolean> = {
+      ...this.state.hoveredNodes,
+    };
+    delete hoveredNodes[id];
+    this.setState({ hoveredNodes });
+    this.props.onNodeLeave && this.props.onNodeLeave(id);
+  };
+
+  private onNodeSelect = (id: string) => {
+    // Only supporting single-select at the moment. So if we clicked
+    // a selected node, reset it. Otherwise, the clicked node is the
+    // new selection
+    if (this.props.selectedNodes && this.props.selectedNodes.includes(id)) {
+      return this.clearSelection();
+    }
+
+    this.props.onNodeSelectionChanged && this.props.onNodeSelectionChanged([id]);
+  };
+
+  private onNodeClick = (id: string) => {
+    this.props.onNodeClick && this.props.onNodeClick(id);
+    this.onNodeSelect(id);
+  };
+
+  private onContainerClick = () => {
+    this.clearSelection();
+  };
+
   public render() {
     const {
       config,
@@ -104,50 +150,4 @@ export class RenderedGraph<T> extends React.Component<RenderedGraphProps<T>, Ren
       </svg>
     );
   }
-
-  private clearSelection = () => {
-    // Don't need to trigger a re-render if selection is already empty
-    if (!this.props.selectedNodes || this.props.selectedNodes.length === 0) {
-      return;
-    }
-    this.props.onNodeSelectionChanged && this.props.onNodeSelectionChanged([]);
-  };
-
-  private onNodeEnter = (id: string) => {
-    const hoveredNodes: Dictionary<boolean> = {
-      ...this.state.hoveredNodes,
-      [id]: true,
-    };
-    this.setState({ hoveredNodes });
-    this.props.onNodeEnter && this.props.onNodeEnter(id);
-  };
-
-  private onNodeLeave = (id: string) => {
-    const hoveredNodes: Dictionary<boolean> = {
-      ...this.state.hoveredNodes,
-    };
-    delete hoveredNodes[id];
-    this.setState({ hoveredNodes });
-    this.props.onNodeLeave && this.props.onNodeLeave(id);
-  };
-
-  private onNodeSelect = (id: string) => {
-    // Only supporting single-select at the moment. So if we clicked
-    // a selected node, reset it. Otherwise, the clicked node is the
-    // new selection
-    if (this.props.selectedNodes && this.props.selectedNodes.includes(id)) {
-      return this.clearSelection();
-    }
-
-    this.props.onNodeSelectionChanged && this.props.onNodeSelectionChanged([id]);
-  };
-
-  private onNodeClick = (id: string) => {
-    this.props.onNodeClick && this.props.onNodeClick(id);
-    this.onNodeSelect(id);
-  };
-
-  private onContainerClick = () => {
-    this.clearSelection();
-  };
 }

@@ -37,7 +37,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface ErrorBoundaryState {
   error?: Error;
-  hasError: boolean;
 }
 
 const RenderError: React.FC<{ error: Error; fixed: boolean }> = ({ error, fixed }) => {
@@ -70,10 +69,7 @@ const RenderError: React.FC<{ error: Error; fixed: boolean }> = ({ error, fixed 
 export class ErrorBoundary extends React.Component<{ fixed?: boolean }, ErrorBoundaryState> {
   constructor(props: object) {
     super(props);
-    this.state = {
-      error: undefined,
-      hasError: false,
-    };
+    this.state = { error: undefined };
   }
 
   componentDidCatch(error: Error, info: unknown) {

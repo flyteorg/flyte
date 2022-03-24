@@ -80,7 +80,7 @@ export const Legend = () => {
             />
           );
         })}
-        <LegendItem color={'#aaa'} text={'Nested'} />
+        <LegendItem color="#aaa" text="Nested" />
       </div>
     );
   };

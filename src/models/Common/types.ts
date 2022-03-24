@@ -4,11 +4,27 @@ import { Admin, Core, Protobuf } from 'flyteidl';
 /** These are types shared across multiple sections of the data model. Most of
  * map to types found in `flyteidl.core`.
  */
+
+/* It's an ENUM exports, and as such need to be exported as both type and const value */
+/* eslint-disable @typescript-eslint/no-redeclare */
+export type SimpleType = Core.SimpleType;
+export const SimpleType = Core.SimpleType;
+export type EnumType = Core.EnumType;
+export const EnumType = Core.EnumType;
+export type FixedRateUnit = Admin.FixedRateUnit;
+export const FixedRateUnit = Admin.FixedRateUnit;
+export type ResourceType = Core.ResourceType;
+export const ResourceType = Core.ResourceType;
+export type BlobDimensionality = Core.BlobType.BlobDimensionality;
+export const BlobDimensionality = Core.BlobType.BlobDimensionality;
+export type SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
+export const SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
+/* eslint-enable @typescript-eslint/no-redeclare */
+
 export type Alias = Core.IAlias;
 export type Binding = Core.IBinding;
 export type Container = Core.IContainer;
-export type FixedRateUnit = Admin.FixedRateUnit;
-export const FixedRateUnit = Admin.FixedRateUnit;
+
 export interface Identifier extends Core.IIdentifier {
   resourceType?: ResourceType;
   project: string;
@@ -30,8 +46,6 @@ export interface NamedEntity extends Admin.INamedEntity {
   metadata: NamedEntityMetadata;
 }
 export type Notification = Admin.INotification;
-export type ResourceType = Core.ResourceType;
-export const ResourceType = Core.ResourceType;
 export type RetryStrategy = Core.IRetryStrategy;
 export type RuntimeMetadata = Core.IRuntimeMetadata;
 export type Schedule = Admin.ISchedule;
@@ -48,8 +62,6 @@ export interface Blob extends Core.IBlob {
   metadata: BlobMetadata;
   uri: string;
 }
-export type BlobDimensionality = Core.BlobType.BlobDimensionality;
-export const BlobDimensionality = Core.BlobType.BlobDimensionality;
 
 export interface BlobMetadata extends Core.IBlobMetadata {
   type: BlobType;
@@ -103,9 +115,6 @@ export interface SchemaColumn extends Core.SchemaType.ISchemaColumn {
   type: SchemaColumnType;
 }
 
-export type SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
-export const SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
-
 export interface SchemaType extends Core.ISchemaType {
   columns: SchemaColumn[];
 }
@@ -140,11 +149,6 @@ export interface LiteralType extends Core.ILiteralType {
   simple?: SimpleType;
   enumType?: EnumType;
 }
-
-export type SimpleType = Core.SimpleType;
-export const SimpleType = Core.SimpleType;
-export type EnumType = Core.EnumType;
-export const EnumType = Core.EnumType;
 
 export interface Variable extends Core.IVariable {
   type: LiteralType;

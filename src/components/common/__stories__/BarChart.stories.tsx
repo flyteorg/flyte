@@ -28,10 +28,10 @@ stories.add('BarChartItem', () => {
   const styles = useStyles();
   return (
     <div className={styles.body} style={{ width: '150px' }}>
-      <BarChartItem isSelected={false} value={50} color={'green'} />
-      <BarChartItem isSelected={true} value={100} color={'green'} tooltip={tooltipMock} />
-      <BarChartItem isSelected={false} value={75} color={'red'} tooltip={tooltipMock} />
-      <BarChartItem isSelected={false} value={12} color={'red'} tooltip={tooltipMock} />
+      <BarChartItem isSelected={false} value={50} color="green" />
+      <BarChartItem isSelected={true} value={100} color="green" tooltip={tooltipMock} />
+      <BarChartItem isSelected={false} value={75} color="red" tooltip={tooltipMock} />
+      <BarChartItem isSelected={false} value={12} color="red" tooltip={tooltipMock} />
     </div>
   );
 });

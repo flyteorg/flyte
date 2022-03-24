@@ -13,10 +13,15 @@ export enum FilterOperationName {
   VALUE_IN = 'value_in',
 }
 
+/* It's an ENUM exports, and as such need to be exported as both type and const value */
+/* eslint-disable @typescript-eslint/no-redeclare */
+export type SortDirection = Admin.Sort.Direction;
+export const SortDirection = Admin.Sort.Direction;
+/* eslint-enable @typescript-eslint/no-redeclare */
+
 /** Represents a query filter for collection endpoints. Multiple filters can be combined into a single
  * query string.
  */
-
 export type FilterOperationValue = string | number;
 export type FilterOperationValueList = FilterOperationValue[];
 export type FilterOperationValueGenerator = () => FilterOperationValue | FilterOperationValueList;
@@ -27,9 +32,6 @@ export interface FilterOperation {
 }
 
 export type FilterOperationList = FilterOperation[];
-
-export type SortDirection = Admin.Sort.Direction;
-export const SortDirection = Admin.Sort.Direction;
 export type Sort = RequiredNonNullable<Admin.ISort>;
 
 /** Generic interface for any class which can be used to decode a protobuf message. */

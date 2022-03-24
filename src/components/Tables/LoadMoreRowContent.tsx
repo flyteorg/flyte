@@ -5,7 +5,7 @@ import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { loadMoreRowGridHeight } from './constants';
 
-export const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   loadMoreRowContainer: {
     alignItems: ' center',
     display: ' flex',
@@ -20,8 +20,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export interface LoadMoreRowContentProps {
-  className?: string;
+interface LoadMoreRowContentProps {
   lastError: string | Error | null;
   isFetching: boolean;
   style?: any;

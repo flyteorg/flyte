@@ -34,5 +34,9 @@ export interface LaunchPlan extends Admin.ILaunchPlan {
 }
 
 export type LaunchPlanId = Identifier;
+
+/* It's an ENUM exports, and as such need to be exported as both type and const value */
+/* eslint-disable @typescript-eslint/no-redeclare */
 export type LaunchPlanState = Admin.LaunchPlanState;
 export const LaunchPlanState = Admin.LaunchPlanState;
+/* eslint-enable @typescript-eslint/no-redeclare */

@@ -21,11 +21,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   spacer: theme.mixins.toolbar as CSSProperties,
 }));
 
-interface DetailsPanelProps extends React.Props<{}> {
+interface DetailsPanelProps {
   onClose?: () => void;
   open?: boolean;
-  /** Width of this container, accepts any valid CSS width value */
-  width?: string | number;
 }
 
 /** A shared panel rendered along the right side of the UI. Content can be

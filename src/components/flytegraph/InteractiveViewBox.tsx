@@ -6,12 +6,12 @@ const viewBoxStyles = {
   width: '100%',
 };
 
-export interface InteractiveViewBoxChildrenProps {
+interface InteractiveViewBoxChildrenProps {
   /** An SVG viewbox string, suitable for use in a `<svg />` element */
   viewBox: string;
 }
 
-export interface InteractiveViewBoxProps {
+interface InteractiveViewBoxProps {
   /** A single function component which will accept the current viewBox
    * string and render arbitrary content
    */
@@ -111,17 +111,6 @@ class InteractiveViewBoxImpl extends React.Component<InteractiveViewBoxProps> {
     }
   }
 
-  private updateViewBox(viewBox: ViewBoxRect) {
-    this.viewBox = viewBox;
-    if (!this.updating) {
-      this.updating = true;
-      window.requestAnimationFrame(() => {
-        this.forceUpdate();
-        this.updating = false;
-      });
-    }
-  }
-
   private onWheel = (event: WheelEvent) => {
     event.preventDefault();
     // Make the zooming less twitchy
@@ -180,6 +169,17 @@ class InteractiveViewBoxImpl extends React.Component<InteractiveViewBoxProps> {
     this.dragData = { xPos: event.clientX, yPos: event.clientY };
     this.updateViewBox(translateViewBox(this.viewBox, deltaX, deltaY));
   };
+
+  private updateViewBox(viewBox: ViewBoxRect) {
+    this.viewBox = viewBox;
+    if (!this.updating) {
+      this.updating = true;
+      window.requestAnimationFrame(() => {
+        this.forceUpdate();
+        this.updating = false;
+      });
+    }
+  }
 
   public render() {
     const { x, y, width, height } = this.viewBox;

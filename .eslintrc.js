@@ -22,7 +22,10 @@ module.exports = {
     },
   },
   rules: {
-    // "off" or 0: turn off the rule completely; "warn" or 1;  "error" or 2
+    /**
+     * Rules we don't want to be enabled
+     * "off" or 0: turn off the rule completely; "warn" or 1;  "error" or 2
+     */
     'arrow-body-style': 'off',
     'import/extensions': 'off',
     'import/prefer-default-export': 'off',
@@ -30,7 +33,15 @@ module.exports = {
     'react/jsx-filename-extension': [2, { extensions: ['.jsx', '.tsx'] }],
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
 
-    // up for discussion
+    // disabled to let "@typescript-eslint/*" rules do it's job
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-redeclare': 'off',
+    '@typescript-eslint/no-redeclare': ['warn', { ignoreDeclarationMerge: true }], // still will warn on exporting enums :(
+
+    /**
+     * Up for discussion
+     * */
     'react/function-component-definition': 'off',
     'react/destructuring-assignment': 'off',
 
@@ -44,10 +55,8 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off', // 119
 
     // classic
-    'no-unused-vars': 'off', // 364
-    'no-use-before-define': 'warn', // 49
+    'no-use-before-define': 'off', // 49
     'no-shadow': 'off', // 104
-    'no-redeclare': 'warn', // 16
     'no-param-reassign': 'off', // 28
     'no-unused-expressions': 'warn', // 6
     'prefer-destructuring': 'off', // 34
@@ -57,7 +66,6 @@ module.exports = {
     'no-useless-computed-key': 'off',
     'no-restricted-syntax': 'off',
     'no-else-return': 'off',
-    'no-console': 'warn',
     'no-plusplus': 'off',
     'no-var': 'off',
     'no-continue': 'off',
@@ -89,7 +97,6 @@ module.exports = {
     'prefer-arrow-callback': 'off',
     'func-names': 'off',
     eqeqeq: 'warn',
-    camelcase: 'warn',
 
     // import
     'import/no-dynamic-require': 'warn', // 1
@@ -99,36 +106,35 @@ module.exports = {
     'react/jsx-no-useless-fragment': 'off', // 15
     'react/no-access-state-in-setstate': 'warn', // 2
     'react/jsx-no-bind': 'warn', // 3
-    'react/prop-types': 'off',
-    'react/jsx-curly-brace-presence': 'off',
+    'react/prop-types': 'off', // 69
     'react/self-closing-comp': 'off',
     'react/jsx-no-constructed-context-values': 'off',
     'react/no-unstable-nested-components': 'off',
     'react/no-unescaped-entities': 'off',
     'react/require-default-props': 'off',
-    'react/no-unused-prop-types': 'off',
-    'react/no-array-index-key': 'off',
-    'react/no-unused-state': 'off',
-    'react/static-property-placement': 'off',
-    'react/state-in-constructor': 'off',
-    'react/no-children-prop': 'off',
-    'react/sort-comp': 'off',
+    'react/no-unused-prop-types': 'off', // 15
+    'react/no-array-index-key': 'warn', // 5
+    'react/static-property-placement': 'off', // 1
+    'react/state-in-constructor': 'off', // 2
+    'react/no-children-prop': 'off', // 1
 
     // jsx-a11y
-    'jsx-a11y/aria-role': 'off',
-    'jsx-a11y/anchor-is-valid': 'off',
-    'jsx-a11y/click-events-have-key-events': 'off',
-    'jsx-a11y/no-noninteractive-element-interactions': 'off',
-    'jsx-a11y/no-static-element-interactions': 'off',
-    'jsx-a11y/control-has-associated-label': 'off',
+    'jsx-a11y/anchor-is-valid': 'off', // 4
+    'jsx-a11y/no-noninteractive-element-interactions': 'off', // 1
+    'jsx-a11y/click-events-have-key-events': 'off', // 7
+    'jsx-a11y/no-static-element-interactions': 'off', // 6
   },
   overrides: [
     {
       // overrides for test files
       files: ['*.spec.*', '*.test.*', 'src/**/test/*'],
       rules: {
+        camelcase: 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         'import/no-extraneous-dependencies': 'off',
+
+        'jsx-a11y/aria-role': 'off',
+        'jsx-a11y/control-has-associated-label': 'off',
       },
     },
   ],

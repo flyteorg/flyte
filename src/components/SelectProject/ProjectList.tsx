@@ -22,8 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export interface ProjectListProps {
-  error?: string;
+interface ProjectListProps {
   projects: Project[];
 }
 

@@ -171,7 +171,7 @@ const ExecutionTypeDetails: React.FC<{
         <div className={classnames(commonStyles.microHeader, commonStyles.textMuted)}>Type</div>
         <div>{details ? details.displayType : <Skeleton />}</div>
       </div>
-      {<NodeExecutionLinkContent execution={execution} />}
+      <NodeExecutionLinkContent execution={execution} />
     </div>
   );
 };

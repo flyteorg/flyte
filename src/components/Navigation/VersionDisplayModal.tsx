@@ -112,7 +112,7 @@ export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({ onClos
         <div className={styles.versionWrapper}>
           <span>Google Analytics</span>
           <Link
-            href={`https://github.com/flyteorg/flyteconsole#google-analytics`}
+            href="https://github.com/flyteorg/flyteconsole#google-analytics"
             className={styles.version}
             target="_blank"
           >
