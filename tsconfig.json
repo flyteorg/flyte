@@ -9,7 +9,7 @@
         "experimentalDecorators": true,
         "importHelpers": true,
         "jsx": "react",
-        "lib": ["es2015", "es2017", "es2019", "dom", "dom.iterable"],
+        "lib": ["es6", "es2021", "dom", "dom.iterable"],
         "module": "commonjs",
         "moduleResolution": "node",
         "noFallthroughCasesInSwitch": true,

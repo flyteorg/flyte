@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: 16
       - uses: bahmutov/npm-install@v1
       - name: Run tests and generate coverage
         run: make test_unit_codecov
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: 16
       - uses: bahmutov/npm-install@v1
       - name: Run linter
         run: make lint
@@ -54,7 +54,7 @@ jobs:
   release:
     name: Generate Release
     if: ${{ github.event_name != 'pull_request' }}
-    needs: [ unit_tests_with_coverage, lint_project, build_docker_image ]
+    needs: [unit_tests_with_coverage, lint_project, build_docker_image]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -62,7 +62,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Release
@@ -99,7 +99,7 @@ jobs:
 
   push_docker_image:
     name: Build & Push Flyteconsole Image
-    needs: [ check_for_tag ]
+    needs: [check_for_tag]
     uses: flyteorg/flytetools/.github/workflows/publish.yml@master
     with:
       version: ${{ needs.check_for_tag.outputs.currentTag }}

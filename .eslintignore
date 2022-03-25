@@ -1,4 +1,5 @@
 src/generated/
+.github/
 .dist/
 dist/
 node_modules/
