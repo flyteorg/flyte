@@ -9,8 +9,6 @@ load robustly and securely.
 * The Kubernetes cluster needs to run securely and robustly
 * The sandbox's object store must be replaced with a production-grade storage system
 * The sandbox's PostgreSQL database must be replaced with a production-grade deployment of PostgreSQL
-* A production-grade task queueing system must be provisioned and configured
-* A production-grade notification system must be provisioned and configured
 * All the above have to be done in a secure manner
 * (Optionally) An official DNS domain must be created
 * (Optionally) A production-grade email sending system must be provisioned and configured
@@ -85,48 +83,18 @@ Production-grade Object Store
 The aws-s3 module in ``flyte.yaml`` creates a new S3 bucket for Flyte, including disk encryption. You can read more about it
 `here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-s3>`__.
 
-Production-grade Notification System
-************************************
-Flyte uses a combination of the AWS' Simple Notification Service (SNS) and Simple Queue Service (SQS) for the notification
-system. ``flyte.yaml`` creates both the SNS topic and SQS queue (via the notifcationsQueue and topic modules), which are
-encrypted with unique KMS keys and only the Flyte roles can access them. You can read more about the queues
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sqs>`__ and the topics
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sns>`__.
-
-Production-grade Queueing System
-********************************
-Flyte uses SQS to power its task scheduling system, and ``flyte.yaml`` creates said queue (via the schedulesQueue
-module) with encryption and principle of least privilege RBAC access like the SQS queue mentioned above.
-
 Secure IAM Roles for Data and Control Planes
 ********************************************
 The aws-iam-role module in ``flyte.yaml`` creates IAM roles for the data and control planes of the Flyte service. You can read more about it
 `here <https://docs.opta.dev/reference/aws/service_modules/aws-iam-role/>`__.
+
+Once complete please run ``opta apply -c env.yaml`` and follow the prompts.
 
 Additional Setup
 ----------------
 
 By now, you should be set up for most production deployments, but there are some extra steps that we recommend that
 most users consider.
-
-Email Setup
-***********
-
-Flyte has the power to send email notifications, which can be enabled in Opta via
-`AWS' Simple Email Service <https://aws.amazon.com/ses/>`__ with a few extra steps (NOTE: make sure to have completed DNS
-delegation first):
-
-1. Go to ``env.yaml`` and uncomment the last line ( `- type: aws-ses` )
-2. Run ``opta apply -c env.yaml`` (again)
-
-   This will enable SES on your account and environment domain -- you may be prompted to fill in some user-specific input to take your account out of SES sandbox if not done already.
-   It may take a day for AWS to enable production SES on your account (you will be kept notified via email addresses inputted on the user
-   prompt) but that should not prevent you from moving forward.
-
-3. Lastly, go ahead and uncomment the 'Uncomment out for SES' line in the ``flyte.yaml`` and rerun ``opta apply -c flyte.yaml``.
-
-   You will now be able to receive emails sent by Flyte as soon as AWS approves your account. You may also specify other
-   non-default email senders via the Heml chart values.
 
 Flyte RBAC
 **********
@@ -141,7 +109,6 @@ It is possible to add extra configuration to your Flyte deployment by modifying 
 used by Opta. Refer to the possible values allowed in `Flyte Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte>`__
 and update the values field of Flyte module in the ``flyte.yaml`` file accordingly.
 
-
 Raw Helm Deployment
 -------------------
 It is certainly possible to deploy a production Flyte cluster directly using Helm chart if a user does not wish to
@@ -150,3 +117,5 @@ and then use `Helm <https://helm.sh/>`__ to deploy `Flyte Helm chart <https://gi
 
 .. role:: raw-html-m2r(raw)
    :format: html
+
+Once complete please run ``opta apply -c flyte.yaml`` and follow the prompts.
