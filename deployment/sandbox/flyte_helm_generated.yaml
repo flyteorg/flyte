@@ -4077,6 +4077,28 @@ spec:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/redoc/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redoc
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+  selector: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
@@ -4522,26 +4544,6 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
       serviceAccountName: flyteadmin
       volumes:
         
@@ -5138,6 +5140,56 @@ spec:
         - name: postgres-storage
           emptyDir: {}
 ---
+# Source: flyte/templates/redoc/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redoc
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: redoc
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: redoc
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+      - image: "docker.io/redocly/redoc:latest"
+        imagePullPolicy: "IfNotPresent"
+        name: redoc
+        command:
+          - sh
+          - -c
+          - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+          - name: PAGE_TITLE
+            value: Flyte Admin OpenAPI
+          - name: SPEC_URL
+            value: /api/v1/openapi
+          - name: PORT
+            value: "8087"
+        ports:
+          - containerPort: 8087
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
+---
 # Source: flyte/charts/flyte/templates/clusterresourcesync/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -5202,14 +5254,6 @@ spec:
                 name: flyteconsole
                 port:
                   number: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
@@ -5254,11 +5298,19 @@ spec:
                 port:
                   number: 80
           # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: redoc
+                port:
+                  number: 87
+          # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: redoc
                 port:
                   number: 87
           - path: /.well-known

@@ -122,28 +122,6 @@ spec:
         {{- with .Values.flyteadmin.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
-      {{- if .Values.flyteadmin.deployRedoc }}
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
-      {{- end }}
       serviceAccountName: {{ template "flyteadmin.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
