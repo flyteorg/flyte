@@ -3,8 +3,10 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/admin/common.proto";
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/security.proto";
 
 // Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 // based on matching tags.
@@ -102,6 +104,18 @@ message PluginOverrides {
 message WorkflowExecutionConfig {
   // Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
   int32 max_parallelism = 1;
+
+  // Indicates security context permissions for executions triggered with this matchable attribute. 
+  core.SecurityContext security_context = 2;
+
+  // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+  RawOutputDataConfig raw_output_data_config = 3;
+
+  // Custom labels to be applied to a triggered execution resource.
+  Labels labels = 4;
+
+  // Custom annotations to be applied to a triggered execution resource.
+  Annotations annotations = 5;
 }
 
 // Generic container for encapsulating all types of the above attributes messages.

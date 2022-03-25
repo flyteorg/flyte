@@ -16,13 +16,13 @@ jobs:
         with:
           fetch-depth: "0"
       - name: Unit Tests
-        uses: cedrickring/golang-action@1.6.0
+        uses: cedrickring/golang-action@1.7.0
         env:
           GO111MODULE: "on"
         with:
           args: make install && make test_unit
       - name: Lint
-        uses: cedrickring/golang-action@1.6.0
+        uses: cedrickring/golang-action@1.7.0
         env:
           GO111MODULE: "on"
         with:

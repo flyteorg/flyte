@@ -6117,6 +6117,106 @@ public final class MatchableResourceOuterClass {
      * <code>int32 max_parallelism = 1;</code>
      */
     int getMaxParallelism();
+
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    boolean hasSecurityContext();
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    flyteidl.core.Security.SecurityContext getSecurityContext();
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    flyteidl.core.Security.SecurityContextOrBuilder getSecurityContextOrBuilder();
+
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    boolean hasRawOutputDataConfig();
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig();
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
+
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    boolean hasLabels();
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    flyteidl.admin.Common.Labels getLabels();
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder();
+
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    boolean hasAnnotations();
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    flyteidl.admin.Common.Annotations getAnnotations();
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    flyteidl.admin.Common.AnnotationsOrBuilder getAnnotationsOrBuilder();
   }
   /**
    * <pre>
@@ -6166,6 +6266,58 @@ public final class MatchableResourceOuterClass {
               maxParallelism_ = input.readInt32();
               break;
             }
+            case 18: {
+              flyteidl.core.Security.SecurityContext.Builder subBuilder = null;
+              if (securityContext_ != null) {
+                subBuilder = securityContext_.toBuilder();
+              }
+              securityContext_ = input.readMessage(flyteidl.core.Security.SecurityContext.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(securityContext_);
+                securityContext_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              flyteidl.admin.Common.RawOutputDataConfig.Builder subBuilder = null;
+              if (rawOutputDataConfig_ != null) {
+                subBuilder = rawOutputDataConfig_.toBuilder();
+              }
+              rawOutputDataConfig_ = input.readMessage(flyteidl.admin.Common.RawOutputDataConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(rawOutputDataConfig_);
+                rawOutputDataConfig_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 34: {
+              flyteidl.admin.Common.Labels.Builder subBuilder = null;
+              if (labels_ != null) {
+                subBuilder = labels_.toBuilder();
+              }
+              labels_ = input.readMessage(flyteidl.admin.Common.Labels.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(labels_);
+                labels_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              flyteidl.admin.Common.Annotations.Builder subBuilder = null;
+              if (annotations_ != null) {
+                subBuilder = annotations_.toBuilder();
+              }
+              annotations_ = input.readMessage(flyteidl.admin.Common.Annotations.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(annotations_);
+                annotations_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -6211,6 +6363,138 @@ public final class MatchableResourceOuterClass {
       return maxParallelism_;
     }
 
+    public static final int SECURITY_CONTEXT_FIELD_NUMBER = 2;
+    private flyteidl.core.Security.SecurityContext securityContext_;
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    public boolean hasSecurityContext() {
+      return securityContext_ != null;
+    }
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    public flyteidl.core.Security.SecurityContext getSecurityContext() {
+      return securityContext_ == null ? flyteidl.core.Security.SecurityContext.getDefaultInstance() : securityContext_;
+    }
+    /**
+     * <pre>
+     * Indicates security context permissions for executions triggered with this matchable attribute. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+     */
+    public flyteidl.core.Security.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+      return getSecurityContext();
+    }
+
+    public static final int RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER = 3;
+    private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    public boolean hasRawOutputDataConfig() {
+      return rawOutputDataConfig_ != null;
+    }
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+      return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+    }
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+      return getRawOutputDataConfig();
+    }
+
+    public static final int LABELS_FIELD_NUMBER = 4;
+    private flyteidl.admin.Common.Labels labels_;
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    public boolean hasLabels() {
+      return labels_ != null;
+    }
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    public flyteidl.admin.Common.Labels getLabels() {
+      return labels_ == null ? flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+    }
+    /**
+     * <pre>
+     * Custom labels to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 4;</code>
+     */
+    public flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder() {
+      return getLabels();
+    }
+
+    public static final int ANNOTATIONS_FIELD_NUMBER = 5;
+    private flyteidl.admin.Common.Annotations annotations_;
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    public boolean hasAnnotations() {
+      return annotations_ != null;
+    }
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    public flyteidl.admin.Common.Annotations getAnnotations() {
+      return annotations_ == null ? flyteidl.admin.Common.Annotations.getDefaultInstance() : annotations_;
+    }
+    /**
+     * <pre>
+     * Custom annotations to be applied to a triggered execution resource.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+     */
+    public flyteidl.admin.Common.AnnotationsOrBuilder getAnnotationsOrBuilder() {
+      return getAnnotations();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6228,6 +6512,18 @@ public final class MatchableResourceOuterClass {
       if (maxParallelism_ != 0) {
         output.writeInt32(1, maxParallelism_);
       }
+      if (securityContext_ != null) {
+        output.writeMessage(2, getSecurityContext());
+      }
+      if (rawOutputDataConfig_ != null) {
+        output.writeMessage(3, getRawOutputDataConfig());
+      }
+      if (labels_ != null) {
+        output.writeMessage(4, getLabels());
+      }
+      if (annotations_ != null) {
+        output.writeMessage(5, getAnnotations());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -6240,6 +6536,22 @@ public final class MatchableResourceOuterClass {
       if (maxParallelism_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, maxParallelism_);
+      }
+      if (securityContext_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getSecurityContext());
+      }
+      if (rawOutputDataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getRawOutputDataConfig());
+      }
+      if (labels_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getLabels());
+      }
+      if (annotations_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getAnnotations());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6258,6 +6570,26 @@ public final class MatchableResourceOuterClass {
 
       if (getMaxParallelism()
           != other.getMaxParallelism()) return false;
+      if (hasSecurityContext() != other.hasSecurityContext()) return false;
+      if (hasSecurityContext()) {
+        if (!getSecurityContext()
+            .equals(other.getSecurityContext())) return false;
+      }
+      if (hasRawOutputDataConfig() != other.hasRawOutputDataConfig()) return false;
+      if (hasRawOutputDataConfig()) {
+        if (!getRawOutputDataConfig()
+            .equals(other.getRawOutputDataConfig())) return false;
+      }
+      if (hasLabels() != other.hasLabels()) return false;
+      if (hasLabels()) {
+        if (!getLabels()
+            .equals(other.getLabels())) return false;
+      }
+      if (hasAnnotations() != other.hasAnnotations()) return false;
+      if (hasAnnotations()) {
+        if (!getAnnotations()
+            .equals(other.getAnnotations())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6271,6 +6603,22 @@ public final class MatchableResourceOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + MAX_PARALLELISM_FIELD_NUMBER;
       hash = (53 * hash) + getMaxParallelism();
+      if (hasSecurityContext()) {
+        hash = (37 * hash) + SECURITY_CONTEXT_FIELD_NUMBER;
+        hash = (53 * hash) + getSecurityContext().hashCode();
+      }
+      if (hasRawOutputDataConfig()) {
+        hash = (37 * hash) + RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getRawOutputDataConfig().hashCode();
+      }
+      if (hasLabels()) {
+        hash = (37 * hash) + LABELS_FIELD_NUMBER;
+        hash = (53 * hash) + getLabels().hashCode();
+      }
+      if (hasAnnotations()) {
+        hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getAnnotations().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6410,6 +6758,30 @@ public final class MatchableResourceOuterClass {
         super.clear();
         maxParallelism_ = 0;
 
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
+        if (labelsBuilder_ == null) {
+          labels_ = null;
+        } else {
+          labels_ = null;
+          labelsBuilder_ = null;
+        }
+        if (annotationsBuilder_ == null) {
+          annotations_ = null;
+        } else {
+          annotations_ = null;
+          annotationsBuilder_ = null;
+        }
         return this;
       }
 
@@ -6437,6 +6809,26 @@ public final class MatchableResourceOuterClass {
       public flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig buildPartial() {
         flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig result = new flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig(this);
         result.maxParallelism_ = maxParallelism_;
+        if (securityContextBuilder_ == null) {
+          result.securityContext_ = securityContext_;
+        } else {
+          result.securityContext_ = securityContextBuilder_.build();
+        }
+        if (rawOutputDataConfigBuilder_ == null) {
+          result.rawOutputDataConfig_ = rawOutputDataConfig_;
+        } else {
+          result.rawOutputDataConfig_ = rawOutputDataConfigBuilder_.build();
+        }
+        if (labelsBuilder_ == null) {
+          result.labels_ = labels_;
+        } else {
+          result.labels_ = labelsBuilder_.build();
+        }
+        if (annotationsBuilder_ == null) {
+          result.annotations_ = annotations_;
+        } else {
+          result.annotations_ = annotationsBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -6487,6 +6879,18 @@ public final class MatchableResourceOuterClass {
         if (other == flyteidl.admin.MatchableResourceOuterClass.WorkflowExecutionConfig.getDefaultInstance()) return this;
         if (other.getMaxParallelism() != 0) {
           setMaxParallelism(other.getMaxParallelism());
+        }
+        if (other.hasSecurityContext()) {
+          mergeSecurityContext(other.getSecurityContext());
+        }
+        if (other.hasRawOutputDataConfig()) {
+          mergeRawOutputDataConfig(other.getRawOutputDataConfig());
+        }
+        if (other.hasLabels()) {
+          mergeLabels(other.getLabels());
+        }
+        if (other.hasAnnotations()) {
+          mergeAnnotations(other.getAnnotations());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6553,6 +6957,618 @@ public final class MatchableResourceOuterClass {
         maxParallelism_ = 0;
         onChanged();
         return this;
+      }
+
+      private flyteidl.core.Security.SecurityContext securityContext_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Security.SecurityContext, flyteidl.core.Security.SecurityContext.Builder, flyteidl.core.Security.SecurityContextOrBuilder> securityContextBuilder_;
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public boolean hasSecurityContext() {
+        return securityContextBuilder_ != null || securityContext_ != null;
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public flyteidl.core.Security.SecurityContext getSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          return securityContext_ == null ? flyteidl.core.Security.SecurityContext.getDefaultInstance() : securityContext_;
+        } else {
+          return securityContextBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public Builder setSecurityContext(flyteidl.core.Security.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          securityContext_ = value;
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public Builder setSecurityContext(
+          flyteidl.core.Security.SecurityContext.Builder builderForValue) {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = builderForValue.build();
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public Builder mergeSecurityContext(flyteidl.core.Security.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (securityContext_ != null) {
+            securityContext_ =
+              flyteidl.core.Security.SecurityContext.newBuilder(securityContext_).mergeFrom(value).buildPartial();
+          } else {
+            securityContext_ = value;
+          }
+          onChanged();
+        } else {
+          securityContextBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public Builder clearSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+          onChanged();
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public flyteidl.core.Security.SecurityContext.Builder getSecurityContextBuilder() {
+        
+        onChanged();
+        return getSecurityContextFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      public flyteidl.core.Security.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+        if (securityContextBuilder_ != null) {
+          return securityContextBuilder_.getMessageOrBuilder();
+        } else {
+          return securityContext_ == null ?
+              flyteidl.core.Security.SecurityContext.getDefaultInstance() : securityContext_;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates security context permissions for executions triggered with this matchable attribute. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.SecurityContext security_context = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Security.SecurityContext, flyteidl.core.Security.SecurityContext.Builder, flyteidl.core.Security.SecurityContextOrBuilder> 
+          getSecurityContextFieldBuilder() {
+        if (securityContextBuilder_ == null) {
+          securityContextBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Security.SecurityContext, flyteidl.core.Security.SecurityContext.Builder, flyteidl.core.Security.SecurityContextOrBuilder>(
+                  getSecurityContext(),
+                  getParentForChildren(),
+                  isClean());
+          securityContext_ = null;
+        }
+        return securityContextBuilder_;
+      }
+
+      private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> rawOutputDataConfigBuilder_;
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public boolean hasRawOutputDataConfig() {
+        return rawOutputDataConfigBuilder_ != null || rawOutputDataConfig_ != null;
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        } else {
+          return rawOutputDataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public Builder setRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          rawOutputDataConfig_ = value;
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public Builder setRawOutputDataConfig(
+          flyteidl.admin.Common.RawOutputDataConfig.Builder builderForValue) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public Builder mergeRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (rawOutputDataConfig_ != null) {
+            rawOutputDataConfig_ =
+              flyteidl.admin.Common.RawOutputDataConfig.newBuilder(rawOutputDataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            rawOutputDataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public Builder clearRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+          onChanged();
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig.Builder getRawOutputDataConfigBuilder() {
+        
+        onChanged();
+        return getRawOutputDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+        if (rawOutputDataConfigBuilder_ != null) {
+          return rawOutputDataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return rawOutputDataConfig_ == null ?
+              flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        }
+      }
+      /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> 
+          getRawOutputDataConfigFieldBuilder() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder>(
+                  getRawOutputDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          rawOutputDataConfig_ = null;
+        }
+        return rawOutputDataConfigBuilder_;
+      }
+
+      private flyteidl.admin.Common.Labels labels_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> labelsBuilder_;
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public boolean hasLabels() {
+        return labelsBuilder_ != null || labels_ != null;
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public flyteidl.admin.Common.Labels getLabels() {
+        if (labelsBuilder_ == null) {
+          return labels_ == null ? flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+        } else {
+          return labelsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public Builder setLabels(flyteidl.admin.Common.Labels value) {
+        if (labelsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          labels_ = value;
+          onChanged();
+        } else {
+          labelsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public Builder setLabels(
+          flyteidl.admin.Common.Labels.Builder builderForValue) {
+        if (labelsBuilder_ == null) {
+          labels_ = builderForValue.build();
+          onChanged();
+        } else {
+          labelsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public Builder mergeLabels(flyteidl.admin.Common.Labels value) {
+        if (labelsBuilder_ == null) {
+          if (labels_ != null) {
+            labels_ =
+              flyteidl.admin.Common.Labels.newBuilder(labels_).mergeFrom(value).buildPartial();
+          } else {
+            labels_ = value;
+          }
+          onChanged();
+        } else {
+          labelsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public Builder clearLabels() {
+        if (labelsBuilder_ == null) {
+          labels_ = null;
+          onChanged();
+        } else {
+          labels_ = null;
+          labelsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public flyteidl.admin.Common.Labels.Builder getLabelsBuilder() {
+        
+        onChanged();
+        return getLabelsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      public flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder() {
+        if (labelsBuilder_ != null) {
+          return labelsBuilder_.getMessageOrBuilder();
+        } else {
+          return labels_ == null ?
+              flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+        }
+      }
+      /**
+       * <pre>
+       * Custom labels to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> 
+          getLabelsFieldBuilder() {
+        if (labelsBuilder_ == null) {
+          labelsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder>(
+                  getLabels(),
+                  getParentForChildren(),
+                  isClean());
+          labels_ = null;
+        }
+        return labelsBuilder_;
+      }
+
+      private flyteidl.admin.Common.Annotations annotations_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Annotations, flyteidl.admin.Common.Annotations.Builder, flyteidl.admin.Common.AnnotationsOrBuilder> annotationsBuilder_;
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public boolean hasAnnotations() {
+        return annotationsBuilder_ != null || annotations_ != null;
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public flyteidl.admin.Common.Annotations getAnnotations() {
+        if (annotationsBuilder_ == null) {
+          return annotations_ == null ? flyteidl.admin.Common.Annotations.getDefaultInstance() : annotations_;
+        } else {
+          return annotationsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public Builder setAnnotations(flyteidl.admin.Common.Annotations value) {
+        if (annotationsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          annotations_ = value;
+          onChanged();
+        } else {
+          annotationsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public Builder setAnnotations(
+          flyteidl.admin.Common.Annotations.Builder builderForValue) {
+        if (annotationsBuilder_ == null) {
+          annotations_ = builderForValue.build();
+          onChanged();
+        } else {
+          annotationsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public Builder mergeAnnotations(flyteidl.admin.Common.Annotations value) {
+        if (annotationsBuilder_ == null) {
+          if (annotations_ != null) {
+            annotations_ =
+              flyteidl.admin.Common.Annotations.newBuilder(annotations_).mergeFrom(value).buildPartial();
+          } else {
+            annotations_ = value;
+          }
+          onChanged();
+        } else {
+          annotationsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public Builder clearAnnotations() {
+        if (annotationsBuilder_ == null) {
+          annotations_ = null;
+          onChanged();
+        } else {
+          annotations_ = null;
+          annotationsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public flyteidl.admin.Common.Annotations.Builder getAnnotationsBuilder() {
+        
+        onChanged();
+        return getAnnotationsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      public flyteidl.admin.Common.AnnotationsOrBuilder getAnnotationsOrBuilder() {
+        if (annotationsBuilder_ != null) {
+          return annotationsBuilder_.getMessageOrBuilder();
+        } else {
+          return annotations_ == null ?
+              flyteidl.admin.Common.Annotations.getDefaultInstance() : annotations_;
+        }
+      }
+      /**
+       * <pre>
+       * Custom annotations to be applied to a triggered execution resource.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Annotations annotations = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Annotations, flyteidl.admin.Common.Annotations.Builder, flyteidl.admin.Common.AnnotationsOrBuilder> 
+          getAnnotationsFieldBuilder() {
+        if (annotationsBuilder_ == null) {
+          annotationsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Annotations, flyteidl.admin.Common.Annotations.Builder, flyteidl.admin.Common.AnnotationsOrBuilder>(
+                  getAnnotations(),
+                  getParentForChildren(),
+                  isClean());
+          annotations_ = null;
+        }
+        return annotationsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11417,60 +12433,67 @@ public final class MatchableResourceOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/matchable_resource.prot" +
-      "o\022\016flyteidl.admin\032\'flyteidl/admin/cluste" +
-      "r_assignment.proto\032\035flyteidl/core/execut" +
-      "ion.proto\"h\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001" +
-      "(\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007stora" +
-      "ge\030\004 \001(\t\022\031\n\021ephemeral_storage\030\005 \001(\t\"~\n\026T" +
-      "askResourceAttributes\0222\n\010defaults\030\001 \001(\0132" +
-      " .flyteidl.admin.TaskResourceSpec\0220\n\006lim" +
-      "its\030\002 \001(\0132 .flyteidl.admin.TaskResourceS" +
-      "pec\"\235\001\n\031ClusterResourceAttributes\022M\n\natt" +
-      "ributes\030\001 \003(\01329.flyteidl.admin.ClusterRe" +
-      "sourceAttributes.AttributesEntry\0321\n\017Attr" +
-      "ibutesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
-      "\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags\030" +
-      "\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value\030" +
-      "\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001 " +
-      "\001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugin" +
-      "_behavior\030\004 \001(\01624.flyteidl.admin.PluginO" +
-      "verride.MissingPluginBehavior\"2\n\025Missing" +
-      "PluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT\020" +
-      "\001\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\0132" +
-      "\036.flyteidl.admin.PluginOverride\"2\n\027Workf" +
-      "lowExecutionConfig\022\027\n\017max_parallelism\030\001 " +
-      "\001(\005\"\341\004\n\022MatchingAttributes\022J\n\030task_resou" +
-      "rce_attributes\030\001 \001(\0132&.flyteidl.admin.Ta" +
-      "skResourceAttributesH\000\022P\n\033cluster_resour" +
-      "ce_attributes\030\002 \001(\0132).flyteidl.admin.Clu" +
-      "sterResourceAttributesH\000\022N\n\032execution_qu" +
-      "eue_attributes\030\003 \001(\0132(.flyteidl.admin.Ex" +
-      "ecutionQueueAttributesH\000\022H\n\027execution_cl" +
-      "uster_label\030\004 \001(\0132%.flyteidl.admin.Execu" +
-      "tionClusterLabelH\000\022=\n\022quality_of_service" +
-      "\030\005 \001(\0132\037.flyteidl.core.QualityOfServiceH" +
-      "\000\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.a" +
-      "dmin.PluginOverridesH\000\022L\n\031workflow_execu" +
-      "tion_config\030\007 \001(\0132\'.flyteidl.admin.Workf" +
-      "lowExecutionConfigH\000\022?\n\022cluster_assignme" +
-      "nt\030\010 \001(\0132!.flyteidl.admin.ClusterAssignm" +
-      "entH\000B\010\n\006target\"\242\001\n MatchableAttributesC" +
-      "onfiguration\0226\n\nattributes\030\001 \001(\0132\".flyte" +
-      "idl.admin.MatchingAttributes\022\016\n\006domain\030\002" +
-      " \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022" +
-      "\023\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAtt" +
-      "ributesRequest\0228\n\rresource_type\030\001 \001(\0162!." +
-      "flyteidl.admin.MatchableResource\"k\n\037List" +
-      "MatchableAttributesResponse\022H\n\016configura" +
-      "tions\030\001 \003(\01320.flyteidl.admin.MatchableAt" +
-      "tributesConfiguration*\340\001\n\021MatchableResou" +
-      "rce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOUR" +
-      "CE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_C" +
-      "LUSTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPE" +
-      "CIFICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005\022\035\n\031WOR" +
-      "KFLOW_EXECUTION_CONFIG\020\006\022\026\n\022CLUSTER_ASSI" +
-      "GNMENT\020\007B7Z5github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "o\022\016flyteidl.admin\032\033flyteidl/admin/common" +
+      ".proto\032\'flyteidl/admin/cluster_assignmen" +
+      "t.proto\032\035flyteidl/core/execution.proto\032\034" +
+      "flyteidl/core/security.proto\"h\n\020TaskReso" +
+      "urceSpec\022\013\n\003cpu\030\001 \001(\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006me" +
+      "mory\030\003 \001(\t\022\017\n\007storage\030\004 \001(\t\022\031\n\021ephemeral" +
+      "_storage\030\005 \001(\t\"~\n\026TaskResourceAttributes" +
+      "\0222\n\010defaults\030\001 \001(\0132 .flyteidl.admin.Task" +
+      "ResourceSpec\0220\n\006limits\030\002 \001(\0132 .flyteidl." +
+      "admin.TaskResourceSpec\"\235\001\n\031ClusterResour" +
+      "ceAttributes\022M\n\nattributes\030\001 \003(\01329.flyte" +
+      "idl.admin.ClusterResourceAttributes.Attr" +
+      "ibutesEntry\0321\n\017AttributesEntry\022\013\n\003key\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQueue" +
+      "Attributes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionClu" +
+      "sterLabel\022\r\n\005value\030\001 \001(\t\"\301\001\n\016PluginOverr" +
+      "ide\022\021\n\ttask_type\030\001 \001(\t\022\021\n\tplugin_id\030\002 \003(" +
+      "\t\022U\n\027missing_plugin_behavior\030\004 \001(\01624.fly" +
+      "teidl.admin.PluginOverride.MissingPlugin" +
+      "Behavior\"2\n\025MissingPluginBehavior\022\010\n\004FAI" +
+      "L\020\000\022\017\n\013USE_DEFAULT\020\001\"D\n\017PluginOverrides\022" +
+      "1\n\toverrides\030\001 \003(\0132\036.flyteidl.admin.Plug" +
+      "inOverride\"\213\002\n\027WorkflowExecutionConfig\022\027" +
+      "\n\017max_parallelism\030\001 \001(\005\0228\n\020security_cont" +
+      "ext\030\002 \001(\0132\036.flyteidl.core.SecurityContex" +
+      "t\022C\n\026raw_output_data_config\030\003 \001(\0132#.flyt" +
+      "eidl.admin.RawOutputDataConfig\022&\n\006labels" +
+      "\030\004 \001(\0132\026.flyteidl.admin.Labels\0220\n\013annota" +
+      "tions\030\005 \001(\0132\033.flyteidl.admin.Annotations" +
+      "\"\341\004\n\022MatchingAttributes\022J\n\030task_resource" +
+      "_attributes\030\001 \001(\0132&.flyteidl.admin.TaskR" +
+      "esourceAttributesH\000\022P\n\033cluster_resource_" +
+      "attributes\030\002 \001(\0132).flyteidl.admin.Cluste" +
+      "rResourceAttributesH\000\022N\n\032execution_queue" +
+      "_attributes\030\003 \001(\0132(.flyteidl.admin.Execu" +
+      "tionQueueAttributesH\000\022H\n\027execution_clust" +
+      "er_label\030\004 \001(\0132%.flyteidl.admin.Executio" +
+      "nClusterLabelH\000\022=\n\022quality_of_service\030\005 " +
+      "\001(\0132\037.flyteidl.core.QualityOfServiceH\000\022;" +
+      "\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.admi" +
+      "n.PluginOverridesH\000\022L\n\031workflow_executio" +
+      "n_config\030\007 \001(\0132\'.flyteidl.admin.Workflow" +
+      "ExecutionConfigH\000\022?\n\022cluster_assignment\030" +
+      "\010 \001(\0132!.flyteidl.admin.ClusterAssignment" +
+      "H\000B\010\n\006target\"\242\001\n MatchableAttributesConf" +
+      "iguration\0226\n\nattributes\030\001 \001(\0132\".flyteidl" +
+      ".admin.MatchingAttributes\022\016\n\006domain\030\002 \001(" +
+      "\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023\n\013" +
+      "launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAttrib" +
+      "utesRequest\0228\n\rresource_type\030\001 \001(\0162!.fly" +
+      "teidl.admin.MatchableResource\"k\n\037ListMat" +
+      "chableAttributesResponse\022H\n\016configuratio" +
+      "ns\030\001 \003(\01320.flyteidl.admin.MatchableAttri" +
+      "butesConfiguration*\340\001\n\021MatchableResource" +
+      "\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020" +
+      "\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_CLUS" +
+      "TER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPECIF" +
+      "ICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005\022\035\n\031WORKFL" +
+      "OW_EXECUTION_CONFIG\020\006\022\026\n\022CLUSTER_ASSIGNM" +
+      "ENT\020\007B7Z5github.com/flyteorg/flyteidl/ge" +
+      "n/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11483,8 +12506,10 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.Common.getDescriptor(),
           flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
+          flyteidl.core.Security.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_TaskResourceSpec_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -11539,7 +12564,7 @@ public final class MatchableResourceOuterClass {
     internal_static_flyteidl_admin_WorkflowExecutionConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowExecutionConfig_descriptor,
-        new java.lang.String[] { "MaxParallelism", });
+        new java.lang.String[] { "MaxParallelism", "SecurityContext", "RawOutputDataConfig", "Labels", "Annotations", });
     internal_static_flyteidl_admin_MatchingAttributes_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
@@ -11564,8 +12589,10 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor,
         new java.lang.String[] { "Configurations", });
+    flyteidl.admin.Common.getDescriptor();
     flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
+    flyteidl.core.Security.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

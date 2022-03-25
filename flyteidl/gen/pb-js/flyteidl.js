@@ -28184,6 +28184,10 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.admin
              * @interface IWorkflowExecutionConfig
              * @property {number|null} [maxParallelism] WorkflowExecutionConfig maxParallelism
+             * @property {flyteidl.core.ISecurityContext|null} [securityContext] WorkflowExecutionConfig securityContext
+             * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] WorkflowExecutionConfig rawOutputDataConfig
+             * @property {flyteidl.admin.ILabels|null} [labels] WorkflowExecutionConfig labels
+             * @property {flyteidl.admin.IAnnotations|null} [annotations] WorkflowExecutionConfig annotations
              */
 
             /**
@@ -28208,6 +28212,38 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             WorkflowExecutionConfig.prototype.maxParallelism = 0;
+
+            /**
+             * WorkflowExecutionConfig securityContext.
+             * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.securityContext = null;
+
+            /**
+             * WorkflowExecutionConfig rawOutputDataConfig.
+             * @member {flyteidl.admin.IRawOutputDataConfig|null|undefined} rawOutputDataConfig
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.rawOutputDataConfig = null;
+
+            /**
+             * WorkflowExecutionConfig labels.
+             * @member {flyteidl.admin.ILabels|null|undefined} labels
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.labels = null;
+
+            /**
+             * WorkflowExecutionConfig annotations.
+             * @member {flyteidl.admin.IAnnotations|null|undefined} annotations
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.annotations = null;
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.
@@ -28235,6 +28271,14 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxParallelism);
+                if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                    $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
+                    $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.labels != null && message.hasOwnProperty("labels"))
+                    $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                if (message.annotations != null && message.hasOwnProperty("annotations"))
+                    $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 return writer;
             };
 
@@ -28259,6 +28303,18 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 1:
                         message.maxParallelism = reader.int32();
                         break;
+                    case 2:
+                        message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.rawOutputDataConfig = $root.flyteidl.admin.RawOutputDataConfig.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.labels = $root.flyteidl.admin.Labels.decode(reader, reader.uint32());
+                        break;
+                    case 5:
+                        message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -28281,6 +28337,26 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
                     if (!$util.isInteger(message.maxParallelism))
                         return "maxParallelism: integer expected";
+                if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                    let error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                    if (error)
+                        return "securityContext." + error;
+                }
+                if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig")) {
+                    let error = $root.flyteidl.admin.RawOutputDataConfig.verify(message.rawOutputDataConfig);
+                    if (error)
+                        return "rawOutputDataConfig." + error;
+                }
+                if (message.labels != null && message.hasOwnProperty("labels")) {
+                    let error = $root.flyteidl.admin.Labels.verify(message.labels);
+                    if (error)
+                        return "labels." + error;
+                }
+                if (message.annotations != null && message.hasOwnProperty("annotations")) {
+                    let error = $root.flyteidl.admin.Annotations.verify(message.annotations);
+                    if (error)
+                        return "annotations." + error;
+                }
                 return null;
             };
 
