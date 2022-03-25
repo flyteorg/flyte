@@ -2,10 +2,10 @@ package update
 
 import (
 	"context"
+	"fmt"
 
 	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flytectl/pkg/ext"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func DecorateAndUpdateMatchableAttr(ctx context.Context, project, domain, workflowName string,
@@ -14,25 +14,25 @@ func DecorateAndUpdateMatchableAttr(ctx context.Context, project, domain, workfl
 	if len(workflowName) > 0 {
 		// Update the workflow attribute using the admin.
 		if dryRun {
-			logger.Infof(ctx, "skipping UpdateWorkflowAttributes request (dryRun)")
+			fmt.Printf("skipping UpdateWorkflowAttributes request (dryRun)\n")
 		} else {
 			err := updater.UpdateWorkflowAttributes(ctx, project, domain, workflowName, matchingAttr)
 			if err != nil {
 				return err
 			}
 		}
-		logger.Debugf(ctx, "Updated attributes from %v project and domain %v and workflow %v", project, domain, workflowName)
+		fmt.Printf("Updated attributes from %v project and domain %v and workflow %v\n", project, domain, workflowName)
 	} else {
 		// Update the project domain attribute using the admin.
 		if dryRun {
-			logger.Infof(ctx, "skipping UpdateProjectDomainAttributes request (dryRun)")
+			fmt.Printf("skipping UpdateProjectDomainAttributes request (dryRun)\n")
 		} else {
 			err := updater.UpdateProjectDomainAttributes(ctx, project, domain, matchingAttr)
 			if err != nil {
 				return err
 			}
 		}
-		logger.Debugf(ctx, "Updated attributes from %v project and domain %v", project, domain)
+		fmt.Printf("Updated attributes from %v project and domain %v\n", project, domain)
 	}
 	return nil
 }

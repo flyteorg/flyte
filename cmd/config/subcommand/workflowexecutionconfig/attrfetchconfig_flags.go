@@ -51,5 +51,6 @@ func (AttrFetchConfig) mustMarshalJSON(v json.Marshaler) string {
 func (cfg AttrFetchConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("AttrFetchConfig", pflag.ExitOnError)
 	cmdFlags.StringVar(&DefaultFetchConfig.AttrFile, fmt.Sprintf("%v%v", prefix, "attrFile"), DefaultFetchConfig.AttrFile, "attribute file name to be used for generating attribute for the resource type.")
+	cmdFlags.BoolVar(&DefaultFetchConfig.Gen, fmt.Sprintf("%v%v", prefix, "gen"), DefaultFetchConfig.Gen, "generates an empty workflow execution config file with conformance to the api format.")
 	return cmdFlags
 }
