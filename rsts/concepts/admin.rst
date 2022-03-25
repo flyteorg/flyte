@@ -59,7 +59,7 @@ The managers utilize additional components to process requests. These additional
 Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
-`here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/admin>`__.
+`here <admin>`__.
 We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a Postgres
 implementation.  You can find the actual code for issuing queries with gorm in the
 `gormimpl <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
@@ -112,9 +112,9 @@ As the name implies, ``common`` houses shared components used across different F
 .. _divedeep-admin-data:
 
 Data
-----
+-----
 
-Data interfaces are primarily handled by the `storage <https://github.com/flyteorg/flytestdlib>`__ library implemented in flytestdlib. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support, so the data package in admin exists as the layer responsible for additional, remote data operations.
+Data interfaces are primarily handled by the `storage <https://github.com/flyteorg/flytestdlib>`__ library implemented in ``flytestdlib``. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support. Hence, the data package in admin exists as the layer responsible for additional, remote data operations.
 
 Errors
 ------
@@ -125,7 +125,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <admin/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
@@ -134,7 +134,7 @@ Workflow engine
 
 This directory contains interfaces to build and execute workflows leveraging FlytePropeller compiler and client components.
 
-.. [0] Unfortunately, given unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
+.. [0] Given the unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
 
 .. _divedeep-admin-service:
 
@@ -278,224 +278,223 @@ This can be done through the :std:ref:`flyteadmin config <deployment/cluster_con
 Using the Admin Service
 -----------------------
 
-Adding request filters	
-++++++++++++++++++++++	
+Adding request filters  
+++++++++++++++++++++++  
 
-We use `gRPC Gateway <https://github.com/grpc-ecosystem/grpc-gateway>`_ to reverse proxy HTTP requests into gRPC.	
-While this allows for a single implementation for both HTTP and gRPC, an important limitation is that fields mapped to the path pattern cannot be	
-repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead, they use	
-the internal syntax shown below::	
+We use `gRPC Gateway <https://github.com/grpc-ecosystem/grpc-gateway>`_ to reverse proxy HTTP requests into gRPC. 
+While this allows for a single implementation for both HTTP and gRPC, an important limitation is that fields mapped to the path pattern cannot be 
+repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead, they use  
+the internal syntax shown below:: 
 
- func(field,value) or func(field, value)	
+ func(field,value) or func(field, value)  
 
-For example, multiple filters would be appended to an http request like::	
+For example, multiple filters would be appended to an http request like:: 
 
- ?filters=ne(version, TheWorst)+eq(workflow.name, workflow)	
+ ?filters=ne(version, TheWorst)+eq(workflow.name, workflow) 
 
-Timestamp fields use the ``RFC3339Nano`` spec (e.g., "2006-01-02T15:04:05.999999999Z07:00")	
+Timestamp fields use the ``RFC3339Nano`` spec (e.g., "2006-01-02T15:04:05.999999999Z07:00") 
 
-The fully supported set of filter functions are	
+The fully supported set of filter functions are 
 
-- contains	
-- gt (greater than)	
-- gte (greter than or equal to)	
-- lt (less than)	
-- lte (less than or equal to)	
-- eq (equal)	
-- ne (not equal)	
-- value_in (for repeated sets of values)	
+- contains  
+- gt (greater than) 
+- gte (greter than or equal to) 
+- lt (less than)  
+- lte (less than or equal to) 
+- eq (equal)  
+- ne (not equal)  
+- value_in (for repeated sets of values)  
 
-"value_in" is a special case where multiple values are passed to the filter expression. For example::	
+"value_in" is a special case where multiple values are passed to the filter expression. For example:: 
 
- value_in(phase, RUNNING;SUCCEEDED;FAILED)	
+ value_in(phase, RUNNING;SUCCEEDED;FAILED)  
 
 .. note::
    If you're issuing your requests over http(s), be sure to URL encode the ";" semicolon using ``%3B`` like so: ``value_in(phase, RUNNING%3BSUCCEEDED%3BFAILED)``
 
-Filterable fields vary based on entity types:	
+Filterable fields vary based on entity types: 
 
-- Task	
+- Task  
 
-  - project	
-  - domain	
-  - name	
-  - version	
-  - created_at	
+  - project 
+  - domain  
+  - name  
+  - version 
+  - created_at  
   
-- Workflow	
+- Workflow  
 
-  - project	
-  - domain	
-  - name	
-  - version	
+  - project 
+  - domain  
+  - name  
+  - version 
   - created_at
   
-- Launch plans	
+- Launch plans  
 
-  - project	
-  - domain	
-  - name	
-  - version	
-  - created_at	
-  - updated_at	
-  - workflows.{any workflow field above} (for example: workflow.domain)	
-  - state (you must use the integer enum, e.g., 1)	
+  - project 
+  - domain  
+  - name  
+  - version 
+  - created_at  
+  - updated_at  
+  - workflows.{any workflow field above} (for example: workflow.domain) 
+  - state (you must use the integer enum, e.g., 1)  
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - Named Entity Metadata
 
-  - state (you must use the integer enum, e.g., 1)	
+  - state (you must use the integer enum, e.g., 1)  
      - States are defined in :std:ref:`namedentitystate <protos/docs/admin/admin:namedentitystate>`.
      
-- Executions (Workflow executions)	
+- Executions (Workflow executions)  
 
-  - project	
-  - domain	
-  - name	
-  - workflow.{any workflow field above} (for example: workflow.domain)	
-  - launch_plan.{any launch plan field above} (for example: launch_plan.name)	
-  - phase (you must use the upper-cased string name, e.g., ``RUNNING``)	
+  - project 
+  - domain  
+  - name  
+  - workflow.{any workflow field above} (for example: workflow.domain)  
+  - launch_plan.{any launch plan field above} (for example: launch_plan.name) 
+  - phase (you must use the upper-cased string name, e.g., ``RUNNING``) 
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
-  - execution_created_at	
-  - execution_updated_at	
-  - duration (in seconds)	
-  - mode (you must use the integer enum e.g., 1)	
+  - execution_created_at  
+  - execution_updated_at  
+  - duration (in seconds) 
+  - mode (you must use the integer enum e.g., 1)  
      - Modes are defined in :std:ref:`executionmode <protos/docs/admin/admin:executionmetadata.executionmode>`.
   - user (authenticated user or role from flytekit config)
 
-- Node Executions	
+- Node Executions 
 
-  - node_id	
-  - execution.{any execution field above} (for example: execution.domain)	
-  - phase (you must use the upper-cased string name e.g., ``QUEUED``)	
+  - node_id 
+  - execution.{any execution field above} (for example: execution.domain) 
+  - phase (you must use the upper-cased string name e.g., ``QUEUED``) 
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
-  - started_at	
-  - node_execution_created_at	
-  - node_execution_updated_at	
+  - started_at  
+  - node_execution_created_at 
+  - node_execution_updated_at 
   - duration (in seconds)
   
-- Task Executions	
+- Task Executions 
 
-  - retry_attempt	
-  - task.{any task field above} (for example: task.version)	
-  - execution.{any execution field above} (for example: execution.domain)	
-  - node_execution.{any node execution field above} (for example: node_execution.phase)	
-  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)	
+  - retry_attempt 
+  - task.{any task field above} (for example: task.version) 
+  - execution.{any execution field above} (for example: execution.domain) 
+  - node_execution.{any node execution field above} (for example: node_execution.phase) 
+  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)  
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
-  - started_at	
-  - task_execution_created_at	
-  - task_execution_updated_at	
-  - duration (in seconds)	
+  - started_at  
+  - task_execution_created_at 
+  - task_execution_updated_at 
+  - duration (in seconds) 
 
-Putting It All Together	
------------------------	
+Putting It All Together 
+----------------------- 
 
 If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, you coul something like:
 
-::	
+::  
 
-   gte(duration, 100)+value_in(phase,RUNNING;SUCCEEDED;FAILED)+eq(lauch_plan.project, foo)	
-   +eq(launch_plan.domain, bar)+eq(launch_plan.name, baz)	
-   +eq(launch_plan.version, 1234)	
-   +lte(workflow.created_at,2018-11-29T17:34:05.000000000Z07:00)	
-   	
-   	
+   gte(duration, 100)+value_in(phase,RUNNING;SUCCEEDED;FAILED)+eq(lauch_plan.project, foo)  
+   +eq(launch_plan.domain, bar)+eq(launch_plan.name, baz) 
+   +eq(launch_plan.version, 1234) 
+   +lte(workflow.created_at,2018-11-29T17:34:05.000000000Z07:00)  
+    
+    
 
-Adding sorting to requests	
-++++++++++++++++++++++++++	
+Adding sorting to requests  
+++++++++++++++++++++++++++  
 
-Only a subset of fields are supported for sorting list queries. The explicit list is shown below:	
+Only a subset of fields are supported for sorting list queries. The explicit list is shown below: 
 
-- ListTasks	
+- ListTasks 
 
-  - project	
-  - domain	
-  - name	
-  - version	
+  - project 
+  - domain  
+  - name  
+  - version 
   - created_at
   
-- ListTaskIds	
+- ListTaskIds 
 
-  - project	
-  - domain	
+  - project 
+  - domain  
   
-- ListWorkflows	
+- ListWorkflows 
 
-  - project	
-  - domain	
-  - name	
-  - version	
-  - created_at	
+  - project 
+  - domain  
+  - name  
+  - version 
+  - created_at  
   
-- ListWorkflowIds	
+- ListWorkflowIds 
 
-  - project	
-  - domain	
+  - project 
+  - domain  
   
-- ListLaunchPlans	
+- ListLaunchPlans 
 
-  - project	
-  - domain	
-  - name	
-  - version	
-  - created_at	
-  - updated_at	
-  - state (you must use the integer enum e.g., 1)	
+  - project 
+  - domain  
+  - name  
+  - version 
+  - created_at  
+  - updated_at  
+  - state (you must use the integer enum e.g., 1) 
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
-- ListWorkflowIds	
+- ListWorkflowIds 
 
-  - project	
-  - domain	
+  - project 
+  - domain  
   
-- ListExecutions	
+- ListExecutions  
 
-  - project	
-  - domain	
-  - name	
-  - phase (you must use the upper-cased string name e.g., ``RUNNING``)	
+  - project 
+  - domain  
+  - name  
+  - phase (you must use the upper-cased string name e.g., ``RUNNING``)  
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
-  - execution_created_at	
-  - execution_updated_at	
-  - duration (in seconds)	
-  - mode (you must use the integer enum e.g., 1)	
+  - execution_created_at  
+  - execution_updated_at  
+  - duration (in seconds) 
+  - mode (you must use the integer enum e.g., 1)  
      - Modes are defined :std:ref:`execution.proto <protos/docs/admin/admin:executionmetadata.executionmode>`.
      
-- ListNodeExecutions	
+- ListNodeExecutions  
 
-  - node_id	
-  - retry_attempt	
-  - phase (you must use the upper-cased string name e.g., ``QUEUED``)	
+  - node_id 
+  - retry_attempt 
+  - phase (you must use the upper-cased string name e.g., ``QUEUED``) 
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
-  - started_at	
-  - node_execution_created_at	
-  - node_execution_updated_at	
-  - duration (in seconds)	
+  - started_at  
+  - node_execution_created_at 
+  - node_execution_updated_at 
+  - duration (in seconds) 
   
-- ListTaskExecutions	
+- ListTaskExecutions  
 
-  - retry_attempt	
-  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)	
+  - retry_attempt 
+  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)  
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
-  - started_at	
-  - task_execution_created_at	
-  - task_execution_updated_at	
-  - duration (in seconds)	
+  - started_at  
+  - task_execution_created_at 
+  - task_execution_updated_at 
+  - duration (in seconds) 
 
-Sorting syntax	
---------------	
+Sorting syntax  
+--------------  
 
-Adding sorting to a request requires specifying the ``key``, e.g., the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default.	
+Adding sorting to a request requires specifying the ``key``, e.g., the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default. 
 
-Example sorting HTTP parameter:	
+Example sorting HTTP parameter: 
 
-::	
+::  
 
-   sort_by.key=created_at&sort_by.direction=DESCENDING	
-   	
-Alternatively, since ``DESCENDING`` is the default sorting direction, the above could be written as	
+   sort_by.key=created_at&sort_by.direction=DESCENDING  
+    
+Alternatively, since ``DESCENDING`` is the default sorting direction, the above could be written as 
 
-::	
+::  
 
    sort_by.key=created_at
-

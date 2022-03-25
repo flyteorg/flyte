@@ -11,7 +11,7 @@ Before diving into an example use case that explains how DevOps could power Flyt
 
 - Every DAG can be versioned with Git commit's SHA or the hash of the code artifact; to know more about versioning, see :ref:`divedeep-versioning`
 - Tasks and workflows are immutable, i.e., a version is immutable; any mutation results in a new version
-- In the case of rapid iteration of code with no dependency modification, fast registration can be used
+- In the case of rapid iteration of code with no dependency modification, :ref:`fast registration <Fast Registration>` can be used
 - Multi-tenancy support through projects and domains
 - Executions can be monitored using logs on :ref:`Flyte UI <ui>`
 
@@ -40,4 +40,4 @@ Thus, everything is automatically tracked. In fact, multiple users can create is
 Implementing DevOps when running Flyte pipelines could be essential when Flyte is deployed to production.
 You could have a team of engineers working on various pipelines with continuous code iteration and deployment.
 In such a case, we highly encourage you to incorporate automation to build Flyte pipelines.
-This could help speed up your development, iteration, and deployment time!
+This could help reduce the time consumed by development, iteration, and deployment time!
