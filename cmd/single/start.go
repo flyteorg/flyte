@@ -2,6 +2,9 @@ package single
 
 import (
 	"context"
+	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
+	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
+	datacatalog "github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
@@ -20,6 +23,14 @@ import (
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
+
+func startDataCatalog(ctx context.Context) error {
+	if err := datacatalogRepo.Migrate(ctx); err != nil {
+		return err
+	}
+	cfg := datacatalogConfig.GetConfig()
+	return datacatalog.ServeInsecure(ctx, cfg)
+}
 
 func startClusterResourceController(ctx context.Context) error {
 	configuration := runtime.NewConfigurationProvider()
@@ -78,6 +89,15 @@ var startCmd = &cobra.Command{
 		})
 
 		g.Go(func() error {
+			err := startDataCatalog(childCtx)
+			if err != nil {
+				logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
+				return err
+			}
+			return nil
+		})
+
+		g.Go(func() error {
 			err := startPropeller(childCtx)
 			if err != nil {
 				logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
@@ -85,7 +105,6 @@ var startCmd = &cobra.Command{
 			}
 			return nil
 		})
-
 		return g.Wait()
 	},
 }
