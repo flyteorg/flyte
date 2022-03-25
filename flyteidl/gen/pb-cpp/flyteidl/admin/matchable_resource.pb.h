@@ -35,8 +35,10 @@
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/common.pb.h"
 #include "flyteidl/admin/cluster_assignment.pb.h"
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/security.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto
@@ -1254,6 +1256,42 @@ class WorkflowExecutionConfig final :
 
   // accessors -------------------------------------------------------
 
+  // .flyteidl.core.SecurityContext security_context = 2;
+  bool has_security_context() const;
+  void clear_security_context();
+  static const int kSecurityContextFieldNumber = 2;
+  const ::flyteidl::core::SecurityContext& security_context() const;
+  ::flyteidl::core::SecurityContext* release_security_context();
+  ::flyteidl::core::SecurityContext* mutable_security_context();
+  void set_allocated_security_context(::flyteidl::core::SecurityContext* security_context);
+
+  // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;
+  bool has_raw_output_data_config() const;
+  void clear_raw_output_data_config();
+  static const int kRawOutputDataConfigFieldNumber = 3;
+  const ::flyteidl::admin::RawOutputDataConfig& raw_output_data_config() const;
+  ::flyteidl::admin::RawOutputDataConfig* release_raw_output_data_config();
+  ::flyteidl::admin::RawOutputDataConfig* mutable_raw_output_data_config();
+  void set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config);
+
+  // .flyteidl.admin.Labels labels = 4;
+  bool has_labels() const;
+  void clear_labels();
+  static const int kLabelsFieldNumber = 4;
+  const ::flyteidl::admin::Labels& labels() const;
+  ::flyteidl::admin::Labels* release_labels();
+  ::flyteidl::admin::Labels* mutable_labels();
+  void set_allocated_labels(::flyteidl::admin::Labels* labels);
+
+  // .flyteidl.admin.Annotations annotations = 5;
+  bool has_annotations() const;
+  void clear_annotations();
+  static const int kAnnotationsFieldNumber = 5;
+  const ::flyteidl::admin::Annotations& annotations() const;
+  ::flyteidl::admin::Annotations* release_annotations();
+  ::flyteidl::admin::Annotations* mutable_annotations();
+  void set_allocated_annotations(::flyteidl::admin::Annotations* annotations);
+
   // int32 max_parallelism = 1;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 1;
@@ -1265,6 +1303,10 @@ class WorkflowExecutionConfig final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::SecurityContext* security_context_;
+  ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
+  ::flyteidl::admin::Labels* labels_;
+  ::flyteidl::admin::Annotations* annotations_;
   ::google::protobuf::int32 max_parallelism_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
@@ -2615,6 +2657,186 @@ inline void WorkflowExecutionConfig::set_max_parallelism(::google::protobuf::int
   
   max_parallelism_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowExecutionConfig.max_parallelism)
+}
+
+// .flyteidl.core.SecurityContext security_context = 2;
+inline bool WorkflowExecutionConfig::has_security_context() const {
+  return this != internal_default_instance() && security_context_ != nullptr;
+}
+inline const ::flyteidl::core::SecurityContext& WorkflowExecutionConfig::security_context() const {
+  const ::flyteidl::core::SecurityContext* p = security_context_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.security_context)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::SecurityContext*>(
+      &::flyteidl::core::_SecurityContext_default_instance_);
+}
+inline ::flyteidl::core::SecurityContext* WorkflowExecutionConfig::release_security_context() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionConfig.security_context)
+  
+  ::flyteidl::core::SecurityContext* temp = security_context_;
+  security_context_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::SecurityContext* WorkflowExecutionConfig::mutable_security_context() {
+  
+  if (security_context_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::SecurityContext>(GetArenaNoVirtual());
+    security_context_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.security_context)
+  return security_context_;
+}
+inline void WorkflowExecutionConfig::set_allocated_security_context(::flyteidl::core::SecurityContext* security_context) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(security_context_);
+  }
+  if (security_context) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      security_context = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, security_context, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  security_context_ = security_context;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.security_context)
+}
+
+// .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 3;
+inline bool WorkflowExecutionConfig::has_raw_output_data_config() const {
+  return this != internal_default_instance() && raw_output_data_config_ != nullptr;
+}
+inline const ::flyteidl::admin::RawOutputDataConfig& WorkflowExecutionConfig::raw_output_data_config() const {
+  const ::flyteidl::admin::RawOutputDataConfig* p = raw_output_data_config_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.raw_output_data_config)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::RawOutputDataConfig*>(
+      &::flyteidl::admin::_RawOutputDataConfig_default_instance_);
+}
+inline ::flyteidl::admin::RawOutputDataConfig* WorkflowExecutionConfig::release_raw_output_data_config() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionConfig.raw_output_data_config)
+  
+  ::flyteidl::admin::RawOutputDataConfig* temp = raw_output_data_config_;
+  raw_output_data_config_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::RawOutputDataConfig* WorkflowExecutionConfig::mutable_raw_output_data_config() {
+  
+  if (raw_output_data_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::RawOutputDataConfig>(GetArenaNoVirtual());
+    raw_output_data_config_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.raw_output_data_config)
+  return raw_output_data_config_;
+}
+inline void WorkflowExecutionConfig::set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(raw_output_data_config_);
+  }
+  if (raw_output_data_config) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      raw_output_data_config = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, raw_output_data_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  raw_output_data_config_ = raw_output_data_config;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.raw_output_data_config)
+}
+
+// .flyteidl.admin.Labels labels = 4;
+inline bool WorkflowExecutionConfig::has_labels() const {
+  return this != internal_default_instance() && labels_ != nullptr;
+}
+inline const ::flyteidl::admin::Labels& WorkflowExecutionConfig::labels() const {
+  const ::flyteidl::admin::Labels* p = labels_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.labels)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Labels*>(
+      &::flyteidl::admin::_Labels_default_instance_);
+}
+inline ::flyteidl::admin::Labels* WorkflowExecutionConfig::release_labels() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionConfig.labels)
+  
+  ::flyteidl::admin::Labels* temp = labels_;
+  labels_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Labels* WorkflowExecutionConfig::mutable_labels() {
+  
+  if (labels_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Labels>(GetArenaNoVirtual());
+    labels_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.labels)
+  return labels_;
+}
+inline void WorkflowExecutionConfig::set_allocated_labels(::flyteidl::admin::Labels* labels) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(labels_);
+  }
+  if (labels) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      labels = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, labels, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  labels_ = labels;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.labels)
+}
+
+// .flyteidl.admin.Annotations annotations = 5;
+inline bool WorkflowExecutionConfig::has_annotations() const {
+  return this != internal_default_instance() && annotations_ != nullptr;
+}
+inline const ::flyteidl::admin::Annotations& WorkflowExecutionConfig::annotations() const {
+  const ::flyteidl::admin::Annotations* p = annotations_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.annotations)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Annotations*>(
+      &::flyteidl::admin::_Annotations_default_instance_);
+}
+inline ::flyteidl::admin::Annotations* WorkflowExecutionConfig::release_annotations() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionConfig.annotations)
+  
+  ::flyteidl::admin::Annotations* temp = annotations_;
+  annotations_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Annotations* WorkflowExecutionConfig::mutable_annotations() {
+  
+  if (annotations_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Annotations>(GetArenaNoVirtual());
+    annotations_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.annotations)
+  return annotations_;
+}
+inline void WorkflowExecutionConfig::set_allocated_annotations(::flyteidl::admin::Annotations* annotations) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(annotations_);
+  }
+  if (annotations) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      annotations = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, annotations, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  annotations_ = annotations;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.annotations)
 }
 
 // -------------------------------------------------------------------
