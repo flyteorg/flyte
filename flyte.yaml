@@ -25,7 +25,7 @@ database:
     port: 5432
     username: postgres
     host: localhost
-    dbname: flyte
+    dbname: flyteadmin
     options: "sslmode=disable"
 storage:
   type: minio

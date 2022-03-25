@@ -11,6 +11,14 @@ import (
 //go:embed dist/*
 var console embed.FS
 
+type consoleFS struct {
+	fs http.FileSystem
+}
+
+func (f consoleFS) Open(name string) (http.File, error) {
+	return f.fs.Open("dist" + name)
+}
+
 func WriteIndex(writer http.ResponseWriter) {
 	b, err := console.ReadFile("dist/index.html")
 	if err != nil {
@@ -26,22 +34,22 @@ func WriteIndex(writer http.ResponseWriter) {
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
 	// Serves console
-	rawFS := http.FileServer(http.Dir("dist"))
+	// rawFS := http.FileServer(http.Dir("dist"))
+	rawFS := http.FileServer(consoleFS{fs: http.FS(console)})
+	consoleHandler := http.StripPrefix("/console", rawFS)
 
 	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
 		logger.Infof(context.TODO(), "Returning assets, %s", request.URL.Path)
-		consoleFS := http.StripPrefix("/console/assets/", rawFS)
-		consoleFS.ServeHTTP(writer, request)
+		consoleHandler.ServeHTTP(writer, request)
 	}
 
 	handlers["/console/"] = func(writer http.ResponseWriter, request *http.Request) {
 		newPath := strings.TrimLeft(request.URL.Path, "/console")
 		if strings.Contains(newPath, "/") {
 			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
-			WriteIndex(writer)
+			WriteIndegit statx(writer)
 		} else {
-			consoleFS := http.StripPrefix("/console/", rawFS)
-			consoleFS.ServeHTTP(writer, request)
+			consoleHandler.ServeHTTP(writer, request)
 		}
 	}
 	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
