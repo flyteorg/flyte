@@ -29,9 +29,7 @@ Below you’ll find instructions that will hopefully guide you through how to co
 
 3. Add the example to CI.
 
-   Examples are references in `this github workflow <https://github.com/flyteorg/flytesnacks/blob/master/.github/workflows/ghcr_push.yml>`__.
-   Add a new entry under ``strategy -> matrix -> directory`` with the name of your directory as well as its relative path. 
-   Also, add the example to `flyte_tests_manifest.json <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/flyte_tests_manifest.json>`__.
+   Add the example to `flyte_tests_manifest.json <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/flyte_tests_manifest.json>`__.
 
 4. Test your code!
 
