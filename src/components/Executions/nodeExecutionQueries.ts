@@ -244,7 +244,7 @@ async function fetchGroupsForParentNodeExecution(
      *  nodeExecution to enable mapping between graph and other components     */
     let scopedId = parentScopeId;
     if (scopedId != undefined) {
-      scopedId += `-${child.metadata?.retryGroup}-${child.metadata?.specNodeId}`;
+      scopedId += `-0-${child.metadata?.specNodeId}`;
       child['scopedId'] = scopedId;
     } else {
       child['scopedId'] = child.metadata?.specNodeId;

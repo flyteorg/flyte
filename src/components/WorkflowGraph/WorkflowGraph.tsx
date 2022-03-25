@@ -38,6 +38,9 @@ function workflowToDag(workflow: Workflow): PrepareDAGResult {
     }
     const { compiledWorkflow } = workflow.closure;
     const { dag, staticExecutionIdsMap } = transformerWorkflowToDag(compiledWorkflow);
+
+    debug('workflowToDag:dag', dag);
+
     return { dag, staticExecutionIdsMap };
   } catch (e) {
     return {
@@ -70,10 +73,12 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
         const dynamicExecution = allExecutions[executionId];
         const dynamicExecutionId = dynamicExecution.metadata.specNodeId || dynamicExecution.id;
         const uniqueParentId = dynamicExecution.fromUniqueParentId;
-        if (parentsToFetch[uniqueParentId]) {
-          parentsToFetch[uniqueParentId].push(dynamicExecutionId);
-        } else {
-          parentsToFetch[uniqueParentId] = [dynamicExecutionId];
+        if (uniqueParentId) {
+          if (parentsToFetch[uniqueParentId]) {
+            parentsToFetch[uniqueParentId].push(dynamicExecutionId);
+          } else {
+            parentsToFetch[uniqueParentId] = [dynamicExecutionId];
+          }
         }
       }
     }
@@ -85,7 +90,6 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
   };
 
   const dynamicParents = checkForDynamicExeuctions(nodeExecutionsById, staticExecutionIdsMap);
-
   const dynamicWorkflowQuery = useQuery(
     makeNodeExecutionDynamicWorkflowQuery(useQueryClient(), dynamicParents),
   );

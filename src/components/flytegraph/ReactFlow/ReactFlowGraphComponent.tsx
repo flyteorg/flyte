@@ -40,7 +40,6 @@ const ReactFlowGraphComponent = (props) => {
   });
 
   const onAddNestedView = (view) => {
-    debug('@addNestedView:', view);
     const currentView = state.currentNestedView[view.parent] || [];
     const newView = {
       [view.parent]: [...currentView, view.view],

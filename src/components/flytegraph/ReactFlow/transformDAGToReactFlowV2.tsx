@@ -63,6 +63,7 @@ export const buildReactFlowDataProps = (props: BuildDataProps) => {
 
   const taskType = node.value?.template ? node.value.template.type : null;
   const displayName = node.name;
+
   const mapNodeExecutionStatus = () => {
     if (nodeExecutionsById) {
       if (nodeExecutionsById[node.scopedId]) {
