@@ -1,6 +1,8 @@
 package interfaces
 
 import (
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
 
 	"golang.org/x/time/rate"
@@ -65,6 +67,19 @@ type ApplicationConfig struct {
 	// This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
 	// and parallelism/concurrency of MapTasks is independent from this.
 	MaxParallelism int32 `json:"maxParallelism"`
+	// Labels to apply to the execution resource.
+	Labels map[string]string `json:"labels,omitempty"`
+	// Annotations to apply to the execution resource.
+	Annotations map[string]string `json:"annotations,omitempty"`
+
+	// Optional: security context override to apply this execution.
+	// iam_role references the fully qualified name of Identity & Access Management role to impersonate.
+	AssumableIamRole string `json:"assumableIamRole"`
+	// k8s_service_account references a kubernetes service account to impersonate.
+	K8SServiceAccount string `json:"k8sServiceAccount"`
+
+	// Prefix for where offloaded data from user workflows will be written
+	OutputLocationPrefix string `json:"outputLocationPrefix"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -93,6 +108,33 @@ func (a *ApplicationConfig) GetAsyncEventsBufferSize() int {
 
 func (a *ApplicationConfig) GetMaxParallelism() int32 {
 	return a.MaxParallelism
+}
+
+func (a *ApplicationConfig) GetRawOutputDataConfig() *admin.RawOutputDataConfig {
+	return &admin.RawOutputDataConfig{
+		OutputLocationPrefix: a.OutputLocationPrefix,
+	}
+}
+
+func (a *ApplicationConfig) GetSecurityContext() *core.SecurityContext {
+	return &core.SecurityContext{
+		RunAs: &core.Identity{
+			IamRole:           a.AssumableIamRole,
+			K8SServiceAccount: a.K8SServiceAccount,
+		},
+	}
+}
+
+func (a *ApplicationConfig) GetAnnotations() *admin.Annotations {
+	return &admin.Annotations{
+		Values: a.Annotations,
+	}
+}
+
+func (a *ApplicationConfig) GetLabels() *admin.Labels {
+	return &admin.Labels{
+		Values: a.Labels,
+	}
 }
 
 // This section holds common config for AWS
