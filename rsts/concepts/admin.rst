@@ -59,7 +59,7 @@ The managers utilize additional components to process requests. These additional
 Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
-`here <admin>`__.
+`here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/admin>`__.
 We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a Postgres
 implementation.  You can find the actual code for issuing queries with gorm in the
 `gormimpl <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
@@ -125,7 +125,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <admin/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the FlyteAdmin application, including task, workflow registration, and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
