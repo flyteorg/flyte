@@ -6,17 +6,19 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
@@ -473,4 +475,66 @@ func TestListActiveLaunchPlanVersionsFilters(t *testing.T) {
 	assert.Equal(t, domainExpr.Query, testutils.DomainQueryPattern)
 	assert.Equal(t, activeExpr.Args, int32(admin.LaunchPlanState_ACTIVE))
 	assert.Equal(t, activeExpr.Query, testutils.StateQueryPattern)
+}
+
+func TestGetMatchableResource(t *testing.T) {
+	resourceType := admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG
+	project := "dummyProject"
+	domain := "dummyDomain"
+	t.Run("successful fetch", func(t *testing.T) {
+		resourceManager := &managerMocks.MockResourceManager{}
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      project,
+				Domain:       domain,
+				ResourceType: resourceType,
+			})
+			return &managerInterfaces.ResourceResponse{
+				Attributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+						WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+							MaxParallelism: 12,
+						},
+					},
+				},
+			}, nil
+		}
+
+		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain)
+		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
+		assert.Nil(t, err)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		resourceManager := &managerMocks.MockResourceManager{}
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      project,
+				Domain:       domain,
+				ResourceType: resourceType,
+			})
+			return nil, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "resource not found")
+		}
+
+		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain)
+		assert.Nil(t, err)
+	})
+
+	t.Run("internal error", func(t *testing.T) {
+		resourceManager := &managerMocks.MockResourceManager{}
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      project,
+				Domain:       domain,
+				ResourceType: resourceType,
+			})
+			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
+		}
+
+		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain)
+		assert.NotNil(t, err)
+	})
 }

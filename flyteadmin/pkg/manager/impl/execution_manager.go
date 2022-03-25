@@ -428,41 +428,91 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 	return parentNodeExecutionID, sourceExecutionID, nil
 }
 
+// WorkflowExecutionConfigInterface is used as common interface for capturing the common behavior catering to the needs
+// of fetching the WorkflowExecutionConfig across LaunchPlanSpec, ExecutionCreateRequest
+// MatchableResource_WORKFLOW_EXECUTION_CONFIG and ApplicationConfig
+type WorkflowExecutionConfigInterface interface {
+	// GetMaxParallelism Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
+	GetMaxParallelism() int32
+	// GetRawOutputDataConfig Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+	GetRawOutputDataConfig() *admin.RawOutputDataConfig
+	// GetSecurityContext Indicates security context permissions for executions triggered with this matchable attribute.
+	GetSecurityContext() *core.SecurityContext
+	// GetAnnotations Custom annotations to be applied to a triggered execution resource.
+	GetAnnotations() *admin.Annotations
+	// GetLabels Custom labels to be applied to a triggered execution resource.
+	GetLabels() *admin.Labels
+}
+
+// Merge into workflowExecConfig from spec and return true if any value has been changed
+func mergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec WorkflowExecutionConfigInterface) bool {
+	isChanged := false
+	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
+		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
+		isChanged = true
+	}
+	if workflowExecConfig.GetSecurityContext() == nil && spec.GetSecurityContext() != nil {
+		workflowExecConfig.SecurityContext = spec.GetSecurityContext()
+		isChanged = true
+	}
+	// Launchplan spec has label, annotation and rawOutputDataConfig initialized with empty values.
+	// Hence we do a deep check in the following conditions before assignment
+	if (workflowExecConfig.GetRawOutputDataConfig() == nil ||
+		len(workflowExecConfig.GetRawOutputDataConfig().GetOutputLocationPrefix()) == 0) &&
+		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().OutputLocationPrefix) > 0) {
+		workflowExecConfig.RawOutputDataConfig = spec.GetRawOutputDataConfig()
+		isChanged = true
+	}
+	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().Values) == 0) &&
+		(spec.GetLabels() != nil && len(spec.GetLabels().Values) > 0) {
+		workflowExecConfig.Labels = spec.GetLabels()
+		isChanged = true
+	}
+	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().Values) == 0) &&
+		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().Values) > 0) {
+		workflowExecConfig.Annotations = spec.GetAnnotations()
+		isChanged = true
+	}
+	return isChanged
+}
+
 // Produces execution-time attributes for workflow execution.
 // Defaults to overridable execution values set in the execution create request, then looks at the launch plan values
 // (if any) before defaulting to values set in the matchable resource db and further if matchable resources don't
 // exist then defaults to one set in application configuration
 func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admin.ExecutionCreateRequest,
 	launchPlan *admin.LaunchPlan) (*admin.WorkflowExecutionConfig, error) {
-	if request.Spec.MaxParallelism > 0 {
-		return &admin.WorkflowExecutionConfig{
-			MaxParallelism: request.Spec.MaxParallelism,
-		}, nil
-	}
-	if launchPlan != nil && launchPlan.Spec.MaxParallelism > 0 {
-		return &admin.WorkflowExecutionConfig{
-			MaxParallelism: launchPlan.Spec.MaxParallelism,
-		}, nil
+
+	workflowExecConfig := &admin.WorkflowExecutionConfig{}
+	// merge the request spec into workflowExecConfig
+	if isChanged := mergeIntoExecConfig(workflowExecConfig, request.Spec); isChanged {
+		return workflowExecConfig, nil
 	}
 
-	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      request.Project,
-		Domain:       request.Domain,
-		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			logger.Errorf(ctx, "Failed to get workflow execution config overrides with error: %v", err)
-			return nil, err
+	if launchPlan != nil && launchPlan.Spec != nil {
+		// merge the launch plan spec into workflowExecConfig
+		if isChanged := mergeIntoExecConfig(workflowExecConfig, launchPlan.Spec); isChanged {
+			return workflowExecConfig, nil
 		}
 	}
-	if resource != nil && resource.Attributes.GetWorkflowExecutionConfig() != nil {
-		return resource.Attributes.GetWorkflowExecutionConfig(), nil
+
+	matchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain)
+	if err != nil {
+		return nil, err
 	}
+
+	if matchableResource != nil && matchableResource.Attributes.GetWorkflowExecutionConfig() != nil {
+		// merge the matchable resource workflow execution config into workflowExecConfig
+		if isChanged := mergeIntoExecConfig(workflowExecConfig,
+			matchableResource.Attributes.GetWorkflowExecutionConfig()); isChanged {
+			return workflowExecConfig, nil
+		}
+	}
+	//  merge the application config into workflowExecConfig
+	mergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
 	// Defaults to one from the application config
-	return &admin.WorkflowExecutionConfig{
-		MaxParallelism: m.config.ApplicationConfiguration().GetTopLevelConfig().GetMaxParallelism(),
-	}, nil
+	return workflowExecConfig, nil
 }
 
 func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *admin.ExecutionCreateRequest) (
@@ -579,21 +629,23 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	var labels map[string]string
-	if requestSpec.Labels != nil {
-		labels = requestSpec.Labels.Values
+	if executionConfig.Labels != nil {
+		labels = executionConfig.Labels.Values
 	}
+
 	labels, err = m.addProjectLabels(ctx, request.Project, labels)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	var annotations map[string]string
-	if requestSpec.Annotations != nil {
-		annotations = requestSpec.Annotations.Values
+	if executionConfig.Annotations != nil {
+		annotations = executionConfig.Annotations.Values
 	}
 
-	rawOutputDataConfig := launchPlan.Spec.RawOutputDataConfig
-	if requestSpec.RawOutputDataConfig != nil {
-		rawOutputDataConfig = requestSpec.RawOutputDataConfig
+	var rawOutputDataConfig *admin.RawOutputDataConfig
+	if executionConfig.RawOutputDataConfig != nil {
+		rawOutputDataConfig = executionConfig.RawOutputDataConfig
 	}
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, &request)
@@ -817,7 +869,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	namespace := common.GetNamespaceName(
 		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
 
-	labels, err := resolveStringMap(requestSpec.GetLabels(), launchPlan.Spec.Labels, "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
+	labels, err := resolveStringMap(executionConfig.GetLabels(), launchPlan.Spec.Labels, "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -825,11 +877,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, err
 	}
-	annotations, err := resolveStringMap(requestSpec.GetAnnotations(), launchPlan.Spec.Annotations, "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
+	annotations, err := resolveStringMap(executionConfig.GetAnnotations(), launchPlan.Spec.Annotations, "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
 	if err != nil {
 		return nil, nil, err
 	}
-	rawOutputDataConfig := launchPlan.Spec.RawOutputDataConfig
+	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if requestSpec.RawOutputDataConfig != nil {
 		rawOutputDataConfig = requestSpec.RawOutputDataConfig
 	}
