@@ -101,7 +101,7 @@ Visit <http://localhost:30081/console> to view the Flyte dashboard.
 
 Here is a quick visual tour of the console:
 
-![Flyte console Example](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first-run-console-2.gif)
+![Flyte console Example](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif)
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
