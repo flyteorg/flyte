@@ -113,4 +113,18 @@ func TestAttrFetchConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_gen", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("gen", testValue)
+			if vBool, err := cmdFlags.GetBool("gen"); err == nil {
+				testDecodeJson_AttrFetchConfig(t, fmt.Sprintf("%v", vBool), &actual.Gen)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

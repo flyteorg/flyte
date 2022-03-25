@@ -2,10 +2,10 @@ package delete
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func deleteMatchableAttr(ctx context.Context, project, domain, workflowName string,
@@ -13,25 +13,25 @@ func deleteMatchableAttr(ctx context.Context, project, domain, workflowName stri
 	if len(workflowName) > 0 {
 		// Delete the workflow attribute from the admin. If the attribute doesn't exist , admin deesn't return an error and same behavior is followed here
 		if dryRun {
-			logger.Infof(ctx, "skipping DeleteWorkflowAttributes request (dryRun)")
+			fmt.Print("skipping DeleteWorkflowAttributes request (dryRun)\n")
 		} else {
 			err := deleter.DeleteWorkflowAttributes(ctx, project, domain, workflowName, rsType)
 			if err != nil {
 				return err
 			}
 		}
-		logger.Debugf(ctx, "Deleted matchable resources from %v project and domain %v and workflow %v", project, domain, workflowName)
+		fmt.Printf("Deleted matchable resources from %v project and domain %v and workflow %v\n", project, domain, workflowName)
 	} else {
 		// Delete the project domain attribute from the admin. If the attribute doesn't exist , admin deesn't return an error and same behavior is followed here
 		if dryRun {
-			logger.Infof(ctx, "skipping DeleteProjectDomainAttributes request (dryRun)")
+			fmt.Print("skipping DeleteProjectDomainAttributes request (dryRun)\n")
 		} else {
 			err := deleter.DeleteProjectDomainAttributes(ctx, project, domain, rsType)
 			if err != nil {
 				return err
 			}
 		}
-		logger.Debugf(ctx, "Deleted matchable resources from %v project and domain %v", project, domain)
+		fmt.Printf("Deleted matchable resources from %v project and domain %v\n", project, domain)
 	}
 	return nil
 }

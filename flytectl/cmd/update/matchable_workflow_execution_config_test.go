@@ -37,7 +37,7 @@ func TestWorkflowExecutionConfigs(t *testing.T) {
 			mock.Anything).Return(nil)
 		err = updateWorkflowExecutionConfigFunc(ctx, args, cmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, `Updated attributes from flytectldemo project and domain development`)
 	})
 	t.Run("failed update project domain attribute", func(t *testing.T) {
 		setup()
@@ -60,7 +60,7 @@ func TestWorkflowExecutionConfigs(t *testing.T) {
 			mock.Anything, mock.Anything).Return(nil)
 		err = updateWorkflowExecutionConfigFunc(ctx, nil, cmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, `Updated attributes from flytectldemo project and domain development and workflow core.control_flow.run_merge_sort.merge_sort`)
 	})
 	t.Run("failed update workflow attribute", func(t *testing.T) {
 		setup()
