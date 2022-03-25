@@ -4886,6 +4886,22 @@
           "type": "integer",
           "format": "int32",
           "description": "Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness."
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "description": "Indicates security context permissions for executions triggered with this matchable attribute."
+        },
+        "raw_output_data_config": {
+          "$ref": "#/definitions/adminRawOutputDataConfig",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+        },
+        "labels": {
+          "$ref": "#/definitions/adminLabels",
+          "description": "Custom labels to be applied to a triggered execution resource."
+        },
+        "annotations": {
+          "$ref": "#/definitions/adminAnnotations",
+          "description": "Custom annotations to be applied to a triggered execution resource."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."

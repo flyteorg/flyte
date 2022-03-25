@@ -6484,7 +6484,58 @@ definitions:
             spec:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
+            raw_output_data_config:
+              output_location_prefix: "output_location_prefix"
             max_parallelism: 0
+            annotations:
+              values:
+                key: "values"
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+            labels:
+              values:
+                key: "values"
           cluster_assignment:
             affinity:
               selectors:
@@ -6542,7 +6593,58 @@ definitions:
             spec:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
+            raw_output_data_config:
+              output_location_prefix: "output_location_prefix"
             max_parallelism: 0
+            annotations:
+              values:
+                key: "values"
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+            labels:
+              values:
+                key: "values"
           cluster_assignment:
             affinity:
               selectors:
@@ -6633,7 +6735,58 @@ definitions:
           spec:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           max_parallelism: 0
+          annotations:
+            values:
+              key: "values"
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+          labels:
+            values:
+              key: "values"
         cluster_assignment:
           affinity:
             selectors:
@@ -6731,7 +6884,58 @@ definitions:
         spec:
           queueing_budget: "queueing_budget"
       workflow_execution_config:
+        raw_output_data_config:
+          output_location_prefix: "output_location_prefix"
         max_parallelism: 0
+        annotations:
+          values:
+            key: "values"
+        security_context:
+          run_as:
+            iam_role: "iam_role"
+            oauth2_client:
+              client_secret:
+                mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              client_id: "client_id"
+            k8s_service_account: "k8s_service_account"
+          tokens:
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          secrets:
+          - mount_requirement: {}
+            group_version: "group_version"
+            key: "key"
+            group: "group"
+          - mount_requirement: {}
+            group_version: "group_version"
+            key: "key"
+            group: "group"
+        labels:
+          values:
+            key: "values"
       cluster_assignment:
         affinity:
           selectors:
@@ -13415,7 +13619,58 @@ definitions:
           spec:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           max_parallelism: 0
+          annotations:
+            values:
+              key: "values"
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+          labels:
+            values:
+              key: "values"
         cluster_assignment:
           affinity:
             selectors:
@@ -13497,7 +13752,58 @@ definitions:
             spec:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
+            raw_output_data_config:
+              output_location_prefix: "output_location_prefix"
             max_parallelism: 0
+            annotations:
+              values:
+                key: "values"
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+            labels:
+              values:
+                key: "values"
           cluster_assignment:
             affinity:
               selectors:
@@ -21241,7 +21547,58 @@ definitions:
           spec:
             queueing_budget: "queueing_budget"
         workflow_execution_config:
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           max_parallelism: 0
+          annotations:
+            values:
+              key: "values"
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+          labels:
+            values:
+              key: "values"
         cluster_assignment:
           affinity:
             selectors:
@@ -21326,7 +21683,58 @@ definitions:
             spec:
               queueing_budget: "queueing_budget"
           workflow_execution_config:
+            raw_output_data_config:
+              output_location_prefix: "output_location_prefix"
             max_parallelism: 0
+            annotations:
+              values:
+                key: "values"
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+            labels:
+              values:
+                key: "values"
           cluster_assignment:
             affinity:
               selectors:
@@ -27420,10 +27828,75 @@ definitions:
         format: "int32"
         description: "Can be used to control the number of parallel nodes to run within\
           \ the workflow. This is useful to achieve fairness."
+      security_context:
+        description: "Indicates security context permissions for executions triggered\
+          \ with this matchable attribute."
+        $ref: "#/definitions/coreSecurityContext"
+      raw_output_data_config:
+        description: "Encapsulates user settings pertaining to offloaded data (i.e.\
+          \ Blobs, Schema, query data, etc.)."
+        $ref: "#/definitions/adminRawOutputDataConfig"
+      labels:
+        description: "Custom labels to be applied to a triggered execution resource."
+        $ref: "#/definitions/adminLabels"
+      annotations:
+        description: "Custom annotations to be applied to a triggered execution resource."
+        $ref: "#/definitions/adminAnnotations"
     description: "Adds defaults for customizable workflow-execution specifications\
       \ and overrides."
     example:
+      raw_output_data_config:
+        output_location_prefix: "output_location_prefix"
       max_parallelism: 0
+      annotations:
+        values:
+          key: "values"
+      security_context:
+        run_as:
+          iam_role: "iam_role"
+          oauth2_client:
+            client_secret:
+              mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            client_id: "client_id"
+          k8s_service_account: "k8s_service_account"
+        tokens:
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        secrets:
+        - mount_requirement: {}
+          group_version: "group_version"
+          key: "key"
+          group: "group"
+        - mount_requirement: {}
+          group_version: "group_version"
+          key: "key"
+          group: "group"
+      labels:
+        values:
+          key: "values"
   adminWorkflowExecutionEventRequest:
     type: "object"
     properties:
