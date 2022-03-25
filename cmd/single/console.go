@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//go:embed dist/index.html dist/*.html dist/assets
+//go:embed dist/*
 var console embed.FS
 
 func WriteIndex(writer http.ResponseWriter) {
@@ -26,10 +26,11 @@ func WriteIndex(writer http.ResponseWriter) {
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
 	// Serves console
-	rawFS := http.FileServer(http.FS(console))
-	consoleFS := http.StripPrefix("/console/", rawFS)
+	rawFS := http.FileServer(http.Dir("dist"))
+
 	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
 		logger.Infof(context.TODO(), "Returning assets, %s", request.URL.Path)
+		consoleFS := http.StripPrefix("/console/assets/", rawFS)
 		consoleFS.ServeHTTP(writer, request)
 	}
 
@@ -39,6 +40,7 @@ func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
 			WriteIndex(writer)
 		} else {
+			consoleFS := http.StripPrefix("/console/", rawFS)
 			consoleFS.ServeHTTP(writer, request)
 		}
 	}

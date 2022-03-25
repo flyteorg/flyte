@@ -3,7 +3,6 @@ module github.com/flyteorg/flyte
 go 1.17
 
 require (
-	github.com/flyteorg/datacatalog v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyteadmin v0.6.118
 	github.com/flyteorg/flyteplugins v0.10.16
 	github.com/flyteorg/flytepropeller v0.16.37
@@ -122,7 +121,6 @@ require (
 	github.com/prometheus/common v0.19.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sendgrid/rest v2.6.4+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -170,4 +168,4 @@ require (
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
 
-replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog v0.3.20-0.20220323201102-676b4a12a650
+replace github.com/flyteorg/datacatalog => /Users/kevin/git/datacatalog

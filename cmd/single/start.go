@@ -2,9 +2,6 @@ package single
 
 import (
 	"context"
-	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
-	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
-	datacatalog "github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
@@ -24,13 +21,13 @@ import (
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
 
-func startDataCatalog(ctx context.Context) error {
-	if err := datacatalogRepo.Migrate(ctx); err != nil {
-		return err
-	}
-	cfg := datacatalogConfig.GetConfig()
-	return datacatalog.ServeInsecure(ctx, cfg)
-}
+//func startDataCatalog(ctx context.Context) error {
+//	if err := datacatalogRepo.Migrate(ctx); err != nil {
+//		return err
+//	}
+//	cfg := datacatalogConfig.GetConfig()
+//	return datacatalog.ServeInsecure(ctx, cfg)
+//}
 
 func startClusterResourceController(ctx context.Context) error {
 	configuration := runtime.NewConfigurationProvider()
@@ -75,7 +72,7 @@ func startPropeller(ctx context.Context) error {
 
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "This command will start the flyte native scheduler and periodically get new schedules from the db for scheduling",
+	Short: "This command will start Flyte cluster locally",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
@@ -88,14 +85,14 @@ var startCmd = &cobra.Command{
 			return nil
 		})
 
-		g.Go(func() error {
-			err := startDataCatalog(childCtx)
-			if err != nil {
-				logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
-				return err
-			}
-			return nil
-		})
+		//g.Go(func() error {
+		//	err := startDataCatalog(childCtx)
+		//	if err != nil {
+		//		logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
+		//		return err
+		//	}
+		//	return nil
+		//})
 
 		g.Go(func() error {
 			err := startPropeller(childCtx)
