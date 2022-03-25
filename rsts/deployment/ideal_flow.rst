@@ -40,4 +40,4 @@ Thus, everything is automatically tracked. In fact, multiple users can create is
 Implementing DevOps when running Flyte pipelines could be essential when Flyte is deployed to production.
 You could have a team of engineers working on various pipelines with continuous code iteration and deployment.
 In such a case, we highly encourage you to incorporate automation to build Flyte pipelines.
-This could help reduce the time consumed by development, iteration, and deployment time!
+This could help reduce the time consumed by development, iteration, and deployment!
