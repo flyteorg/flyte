@@ -47,7 +47,7 @@ func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 		newPath := strings.TrimLeft(request.URL.Path, "/console")
 		if strings.Contains(newPath, "/") {
 			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
-			WriteIndegit statx(writer)
+			WriteIndex(writer)
 		} else {
 			consoleHandler.ServeHTTP(writer, request)
 		}
