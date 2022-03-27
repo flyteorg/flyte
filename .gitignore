@@ -26,3 +26,4 @@ bin/
 dist/
 dist
 *.db
+flyte

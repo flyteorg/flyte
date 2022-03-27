@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte
 
-go 1.17
+go 1.18
 
 require (
 	github.com/flyteorg/flyteadmin v0.6.118
@@ -167,5 +167,3 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
-
-replace github.com/flyteorg/datacatalog => /Users/kevin/git/datacatalog

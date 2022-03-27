@@ -38,25 +38,25 @@ func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	rawFS := http.FileServer(consoleFS{fs: http.FS(console)})
 	consoleHandler := http.StripPrefix("/console", rawFS)
 
+	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
+		logger.Infof(context.TODO(), "Returning index.html")
+		WriteIndex(writer)
+	}
+
 	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
 		logger.Infof(context.TODO(), "Returning assets, %s", request.URL.Path)
 		consoleHandler.ServeHTTP(writer, request)
 	}
 
 	handlers["/console/"] = func(writer http.ResponseWriter, request *http.Request) {
-		newPath := strings.TrimLeft(request.URL.Path, "/console")
-		if strings.Contains(newPath, "/") {
+		newPath := strings.TrimPrefix(request.URL.Path, "/console/")
+		if newPath == "" || strings.Contains(newPath, "/") {
 			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
 			WriteIndex(writer)
 		} else {
 			consoleHandler.ServeHTTP(writer, request)
 		}
 	}
-	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
-		logger.Infof(context.TODO(), "Returning index.html")
-		WriteIndex(writer)
-	}
-
 	return handlers
 }
 

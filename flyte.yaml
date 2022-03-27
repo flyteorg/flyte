@@ -42,7 +42,7 @@ storage:
   container: "my-s3-bucket"
 Logger:
   show-source: true
-  level: 3
+  level: 4
 admin:
   endpoint: localhost:8089
   insecure: true
