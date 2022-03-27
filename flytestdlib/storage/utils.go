@@ -7,7 +7,7 @@ import (
 	stdErrs "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/graymeta/stow"
+	"github.com/flyteorg/stow"
 	"github.com/pkg/errors"
 )
 

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	flyteerrors "github.com/flyteorg/flytestdlib/errors"
-	"github.com/graymeta/stow"
+	"github.com/flyteorg/stow"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )

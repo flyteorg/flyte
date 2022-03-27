@@ -9,11 +9,11 @@ require (
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.10.0
 	github.com/fatih/structtag v1.2.0
+	github.com/flyteorg/stow v0.3.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.4.3
-	github.com/graymeta/stow v0.2.7
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/magiconair/properties v1.8.4
 	github.com/mitchellh/mapstructure v1.4.1
@@ -97,5 +97,3 @@ require (
 	k8s.io/klog/v2 v2.5.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.3 // indirect
 )
-
-replace github.com/graymeta/stow => github.com/flyteorg/stow v0.3.0
