@@ -12,12 +12,12 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/graymeta/stow/azure"
-	"github.com/graymeta/stow/google"
-	"github.com/graymeta/stow/local"
-	"github.com/graymeta/stow/oracle"
-	"github.com/graymeta/stow/s3"
-	"github.com/graymeta/stow/swift"
+	"github.com/flyteorg/stow/azure"
+	"github.com/flyteorg/stow/google"
+	"github.com/flyteorg/stow/local"
+	"github.com/flyteorg/stow/oracle"
+	"github.com/flyteorg/stow/s3"
+	"github.com/flyteorg/stow/swift"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -25,7 +25,7 @@ import (
 
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/graymeta/stow"
+	"github.com/flyteorg/stow"
 	errs "github.com/pkg/errors"
 )
 

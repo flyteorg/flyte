@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/graymeta/stow"
+	"github.com/flyteorg/stow"
 
 	"io"
 	"net/url"

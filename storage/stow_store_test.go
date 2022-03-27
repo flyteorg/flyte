@@ -16,11 +16,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/graymeta/stow/google"
-	"github.com/graymeta/stow/local"
+	"github.com/flyteorg/stow/google"
+	"github.com/flyteorg/stow/local"
 	"github.com/pkg/errors"
 
-	"github.com/graymeta/stow"
+	"github.com/flyteorg/stow"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flytestdlib/config"
