@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "redoc.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "redoc.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.redoc.replicaCount }}
+  selector:
+    matchLabels: {{ include "redoc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.redoc.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      labels: {{ include "redoc.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.redoc.image.repository }}:{{ .Values.redoc.image.tag }}"
+        imagePullPolicy: "{{ .Values.redoc.image.pullPolicy }}"
+        name: redoc
+        command:
+          - sh
+          - -c
+          - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+          - name: PAGE_TITLE
+            value: Flyte Admin OpenAPI
+          - name: SPEC_URL
+            value: /api/v1/openapi
+          - name: PORT
+            value: "8087"
+        ports:
+          - containerPort: 8087
+        resources: {{ toYaml .Values.redoc.resources | nindent 10 }}
+      {{- with .Values.minio.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.redoc.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.redoc.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+

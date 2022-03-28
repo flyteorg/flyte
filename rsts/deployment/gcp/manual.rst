@@ -344,7 +344,12 @@ Then apply it to your cluster:
 
   kubectl apply -f flyte-certificate.yaml
 
-An alternative is to use the certificate manager:
+.. note::
+
+  ManagedCertificate will only work with GKE ingress, For other ingress please use cert-manager
+
+
+For nginx ingress please use the certificate manager:
 
 * Install the cert manager
 

@@ -1,4 +1,4 @@
-FROM alpine:3.13.5 AS base_
+FROM alpine:3.13.5 AS base
 
 # Install dependencies
 RUN apk add --no-cache openssl
@@ -45,7 +45,7 @@ FROM docker:20.10.11-dind AS dind
 RUN apk add --no-cache bash git make tini curl jq
 
 # Copy artifacts from base
-COPY --from=base_ /flyteorg/ /flyteorg/
+COPY --from=base /flyteorg/ /flyteorg/
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh

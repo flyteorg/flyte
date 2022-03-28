@@ -123,17 +123,16 @@ helm install gateway bitnami/contour -n flyte
 | db.admin.database.host | string | `"postgres"` |  |
 | db.admin.database.port | int | `5432` |  |
 | db.admin.database.username | string | `"postgres"` |  |
-| db.checks | bool | `true` |  |
 | db.datacatalog.database.dbname | string | `"datacatalog"` |  |
 | db.datacatalog.database.host | string | `"postgres"` |  |
 | db.datacatalog.database.port | int | `5432` |  |
 | db.datacatalog.database.username | string | `"postgres"` |  |
+| deployRedoc | bool | `false` |  |
 | external_events | object | `{"aws":{"region":"us-east-2"},"enable":false,"eventsPublisher":{"eventTypes":["all"],"topicName":"arn:aws:sns:us-east-2:123456:123-my-topic"},"type":"aws"}` | **Optional Component** External events are used to send events (unprocessed, as Admin see them) to an SNS topic (or gcp equivalent) The config is here as an example only - if not enabled, it won't be used. |
 | flyteadmin.additionalVolumeMounts | list | `[]` |  |
 | flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>" e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
