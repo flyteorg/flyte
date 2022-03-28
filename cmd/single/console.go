@@ -1,9 +1,7 @@
 package single
 
 import (
-	"context"
 	"embed"
-	"github.com/flyteorg/flytestdlib/logger"
 	"net/http"
 	"strings"
 )
@@ -11,51 +9,55 @@ import (
 //go:embed dist/*
 var console embed.FS
 
+const consoleRoot = "/console"
+const assetsDir = "assets"
+const packageDir = "dist"
+const indexHTML = "/index.html"
+
+// GetConsoleFile returns the console file that should be used for the given path.
+// Every path has a '/console' as the prefix. After dropping this prefix, the following 3 rules are checked
+// Rule 1: If path is now "" or "/" then return index.html
+// Rule 2: If path contains no "assets" sub-string and has an additional substring "/", then return "index.html".
+//         This is to allow vanity urls in React
+// Rule 3: Finally return every file path as is
+// For every file add a "dist" as the prefix, as every file is assumed to be packaged in "dist" folder fv
+func GetConsoleFile(name string) string {
+	name = strings.TrimPrefix(name, consoleRoot)
+	if name == "" || name == "/" {
+		name = indexHTML
+	} else if !strings.Contains(name, assetsDir) {
+		if strings.Contains(name[1:], "/") {
+			name = indexHTML
+		}
+	}
+	return packageDir + name
+}
+
 type consoleFS struct {
 	fs http.FileSystem
 }
 
+// Open Implements a specific handler for Console - SinglePage React App
+// the path re-writing is critical
 func (f consoleFS) Open(name string) (http.File, error) {
-	return f.fs.Open("dist" + name)
-}
-
-func WriteIndex(writer http.ResponseWriter) {
-	b, err := console.ReadFile("dist/index.html")
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, err = writer.Write(b)
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
-	}
+	return f.fs.Open(GetConsoleFile(name))
 }
 
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
 	// Serves console
-	// rawFS := http.FileServer(http.Dir("dist"))
-	rawFS := http.FileServer(consoleFS{fs: http.FS(console)})
-	consoleHandler := http.StripPrefix("/console", rawFS)
+	consoleHandler := http.FileServer(consoleFS{fs: http.FS(console)})
 
-	handlers["/console"] = func(writer http.ResponseWriter, request *http.Request) {
-		logger.Infof(context.TODO(), "Returning index.html")
-		WriteIndex(writer)
-	}
-
-	handlers["/console/assets/"] = func(writer http.ResponseWriter, request *http.Request) {
-		logger.Infof(context.TODO(), "Returning assets, %s", request.URL.Path)
+	// This is the base handle for "/console"
+	handlers[consoleRoot] = func(writer http.ResponseWriter, request *http.Request) {
 		consoleHandler.ServeHTTP(writer, request)
 	}
 
-	handlers["/console/"] = func(writer http.ResponseWriter, request *http.Request) {
-		newPath := strings.TrimPrefix(request.URL.Path, "/console/")
-		if newPath == "" || strings.Contains(newPath, "/") {
-			logger.Infof(context.TODO(), "Redirecting request to index.html, %s", request.URL.Path)
-			WriteIndex(writer)
-		} else {
-			consoleHandler.ServeHTTP(writer, request)
-		}
+	// this is the root handler for any pattern that matches "/console/
+	// http.mux needs a trailing "/" to allow longest pattern matching.
+	// For the previous handler "/console" the mux will only consider exact match
+	handlers[consoleRoot + "/"] = func(writer http.ResponseWriter, request *http.Request) {
+		consoleHandler.ServeHTTP(writer, request)
 	}
 	return handlers
 }
