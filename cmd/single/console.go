@@ -45,6 +45,8 @@ func (f consoleFS) Open(name string) (http.File, error) {
 	return f.fs.Open(GetConsoleFile(name))
 }
 
+// GetConsoleHandlers returns a set of handlers that can be added to the Server mux and can handle all console related
+// requests
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
 	// Serves console
