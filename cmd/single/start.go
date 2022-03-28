@@ -2,8 +2,10 @@ package single
 
 import (
 	"context"
+	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
+	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
+	datacatalog "github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
-	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyteadmin/pkg/server"
 	adminScheduler "github.com/flyteorg/flyteadmin/scheduler"
@@ -11,23 +13,21 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	_ "github.com/golang/glog"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
 
-//func startDataCatalog(ctx context.Context) error {
-//	if err := datacatalogRepo.Migrate(ctx); err != nil {
-//		return err
-//	}
-//	cfg := datacatalogConfig.GetConfig()
-//	return datacatalog.ServeInsecure(ctx, cfg)
-//}
+func startDataCatalog(ctx context.Context) error {
+	if err := datacatalogRepo.Migrate(ctx); err != nil {
+		return err
+	}
+	cfg := datacatalogConfig.GetConfig()
+	return datacatalog.ServeInsecure(ctx, cfg)
+}
 
 func startClusterResourceController(ctx context.Context) error {
 	configuration := runtime.NewConfigurationProvider()
@@ -85,16 +85,8 @@ var startCmd = &cobra.Command{
 			return nil
 		})
 
-		//g.Go(func() error {
-		//	err := startDataCatalog(childCtx)
-		//	if err != nil {
-		//		logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
-		//		return err
-		//	}
-		//	return nil
-		//})
-
 		g.Go(func() error {
+			// labeled.SetMetricKeys(storage.FailureTypeLabel)
 			err := startPropeller(childCtx)
 			if err != nil {
 				logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
@@ -102,6 +94,16 @@ var startCmd = &cobra.Command{
 			}
 			return nil
 		})
+
+		g.Go(func() error {
+			err := startDataCatalog(childCtx)
+			if err != nil {
+				logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
+				return err
+			}
+			return nil
+		})
+
 		return g.Wait()
 	},
 }
@@ -109,7 +111,8 @@ var startCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(startCmd)
 	// Set Keys
-	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
-		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey)
+	// TODO: Do we really need this? I got the error when setting metric keys. "panic: cannot set metric keys more than once"
+	//labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
+	//	contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
+	//	contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey)
 }

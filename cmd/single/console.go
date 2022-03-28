@@ -61,4 +61,3 @@ func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	}
 	return handlers
 }
-

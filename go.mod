@@ -3,7 +3,8 @@ module github.com/flyteorg/flyte
 go 1.18
 
 require (
-	github.com/flyteorg/flyteadmin v0.6.118
+	github.com/flyteorg/datacatalog v0.3.26
+	github.com/flyteorg/flyteadmin v0.6.119
 	github.com/flyteorg/flyteplugins v0.10.16
 	github.com/flyteorg/flytepropeller v0.16.37
 	github.com/flyteorg/flytestdlib v0.4.14
@@ -45,7 +46,7 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v0.24.2 // indirect
+	github.com/flyteorg/flyteidl v0.24.6 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -121,6 +122,7 @@ require (
 	github.com/prometheus/common v0.19.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sendgrid/rest v2.6.4+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -155,6 +157,7 @@ require (
 	gorm.io/driver/sqlite v1.1.1 // indirect
 	gorm.io/gorm v1.22.4 // indirect
 	k8s.io/api v0.20.4 // indirect
+	k8s.io/apiextensions-apiserver v0.20.1 // indirect
 	k8s.io/apimachinery v0.20.4 // indirect
 	k8s.io/client-go v0.20.2 // indirect
 	k8s.io/component-base v0.20.2 // indirect
@@ -167,3 +170,9 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+
+replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog v0.3.20-0.20220327154450-306e0269a783
+
+replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.120-0.20220327153632-110101f88666
+
+replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.35-0.20220316204153-74e2d2469148
