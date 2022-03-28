@@ -71,7 +71,7 @@ You can view all custom task-resource-attributes by visiting ``protocol://<host/
 
 Cluster Resources
 =================
-These are free-form key-value pairs that are used when filling in the templates that the admin feeds into its cluster manager. 
+These are free-form key-value pairs used when filling in the templates that the admin feeds into its cluster manager. 
 The keys represent templatized variables in `cluster resource template YAML <:admin/sampleresourcetemplates>`__ and the values are what you want to see filled in.
 
 

@@ -65,7 +65,7 @@ What is Flyte?
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform implemented in Golang. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, JAVA, and Scala. It is built directly on Kubernetes for all the benefits of containerization like portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome, and many others, Flyte provides first-class support for Python, JAVA, and Scala. It is built directly on Kubernetes for all the benefits of containerization like portability, scalability, and reliability.
 
 
 The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:

@@ -270,8 +270,8 @@ usually done by starting with:
 - [Github Issue](https://github.com/flyteorg/flyte/issues) - We maintain issues for all repos in the main flyte repo.
 - Writing down your proposal using a [Documented RFC process](rfc/.)
 
-For small changes, RFCs are not required, but for larger changes, they are
-  encouraged. You are welcome to drop into the Slack channel and talk to the community
+For small changes, RFCs are not required. They are encouraged for larger changes.
+You are welcome to drop into the Slack channel and talk to the community
 if you want to test the waters before proposing.
 
 <html>
