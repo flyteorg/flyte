@@ -231,5 +231,7 @@ func InitializeMockClientset() *Clientset {
 		adminServiceClient:        &mocks.AdminServiceClient{},
 		authMetadataServiceClient: &mocks.AuthMetadataServiceClient{},
 		identityServiceClient:     &mocks.IdentityServiceClient{},
+		dataProxyServiceClient:    &mocks.DataProxyClient{},
+		healthServiceClient:       grpc_health_v1.NewHealthClient(nil),
 	}
 }
