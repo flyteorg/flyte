@@ -17,4 +17,7 @@ type EventExternalResourceInfo struct {
 	Index int64 `json:"index,omitempty"`
 	RetryAttempt int64 `json:"retry_attempt,omitempty"`
 	Phase *CoreTaskExecutionPhase `json:"phase,omitempty"`
+	// Captures the status of caching for this external resource execution.
+	CacheStatus *CoreCatalogCacheStatus `json:"cache_status,omitempty"`
+	Logs []CoreTaskLog `json:"logs,omitempty"`
 }

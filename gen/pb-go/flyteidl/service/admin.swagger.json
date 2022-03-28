@@ -6537,6 +6537,17 @@
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",
           "title": "Phase associated with the external resource"
+        },
+        "cache_status": {
+          "$ref": "#/definitions/coreCatalogCacheStatus",
+          "description": "Captures the status of caching for this external resource execution."
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "title": "log information for the external resource execution"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
