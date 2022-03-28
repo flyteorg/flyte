@@ -60,7 +60,7 @@ COPY charts/flyte/ /flyteorg/share/flyte
 COPY docker/sandbox-lite/Chart.yaml /flyteorg/share/flyte
 
 # Copy scripts
-COPY docker/sandbox-lite/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/
+COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/
 
 # Copy Flyte config
 COPY flyte.yaml /flyteorg/share/flyte.yaml
