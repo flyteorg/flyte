@@ -2,6 +2,7 @@ package single
 
 import (
 	"context"
+
 	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
 	datacatalog "github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"

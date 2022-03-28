@@ -11,7 +11,7 @@ ARG BUILDKIT_CLI_FOR_KUBECTL_VERSION="v0.1.2"
 RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 https://github.com/vmware-tanzu/buildkit-cli-for-kubectl.git ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl \
     && make -C ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl ${INSTALL_DIR}/linux/kubectl-build BIN_DIR=${INSTALL_DIR} VERSION=${BUILDKIT_CLI_FOR_KUBECTL_VERSION}
 
-RUN git clone https://github.com/pingsutw/flyte.git /app/flyte && cd /app/flyte && git checkout single-binary
+RUN git clone https://github.com/flyteorg/flyte.git /app/flyte && cd /app/flyte && git checkout single-binary
 COPY --from=ghcr.io/flyteorg/flyteconsole:latest /app/dist /app/flyte/cmd/single/dist
 RUN cd /app/flyte && go mod download && go mod vendor && go build -o /flyte cmd/main.go
 
@@ -64,36 +64,6 @@ COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/
 
 # Copy Flyte config
 COPY flyte.yaml /flyteorg/share/flyte.yaml
-
-FROM base_ AS default
-
-# Install dependencies
-RUN apk add --no-cache bash git make tini curl jq
-
-# Copy entrypoints
-COPY docker/sandbox-lite/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
-COPY docker/sandbox/bashrc /root/.bashrc
-
-ARG FLYTE_VERSION="latest"
-ENV FLYTE_VERSION "${FLYTE_VERSION}"
-
-ARG FLYTE_TEST="release"
-ENV FLYTE_TEST "${FLYTE_TEST}"
-
-# Update PATH variable
-ENV PATH "/flyteorg/bin:${PATH}"
-
-# Declare volumes for k3s
-VOLUME /var/lib/kubelet
-VOLUME /var/lib/rancher/k3s
-VOLUME /var/lib/cni
-VOLUME /var/log
-
-# Expose Flyte ports
-EXPOSE 8088 8089 30082
-
-ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
-
 
 FROM docker:20.10.11-dind AS dind
 

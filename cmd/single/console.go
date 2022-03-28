@@ -24,7 +24,7 @@ const indexHTML = "/index.html"
 func GetConsoleFile(name string) string {
 	name = strings.TrimPrefix(name, consoleRoot)
 	// TODO: I have to add this to make flyteconsole work in the sandbox
-	name = strings.TrimPrefix(name, "/" + assetsDir)
+	name = strings.TrimPrefix(name, "/"+assetsDir)
 	if name == "" || name == "/" {
 		name = indexHTML
 	} else if !strings.Contains(name, assetsDir) {
@@ -60,7 +60,7 @@ func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	// this is the root handler for any pattern that matches "/console/
 	// http.mux needs a trailing "/" to allow longest pattern matching.
 	// For the previous handler "/console" the mux will only consider exact match
-	handlers[consoleRoot + "/"] = func(writer http.ResponseWriter, request *http.Request) {
+	handlers[consoleRoot+"/"] = func(writer http.ResponseWriter, request *http.Request) {
 		consoleHandler.ServeHTTP(writer, request)
 	}
 	return handlers

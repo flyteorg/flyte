@@ -22,11 +22,11 @@ var (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "flyte",
-	Short: "Flyte native scheduler to run cron and fixed rate scheduled workflows",
+	Short: "Flyte cluster",
 	Long: `
-Use the run subcommand which will start the scheduler by connecting to DB containing schedules
+Use the start subcommand which will start the Flyte cluster
 
-    flytescheduler run --config  flyteadmin_config.yaml  --admin.endpoint dns:///localhost:8089 --admin.insecure
+    flyte start --config  flyte_config.yaml
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		return initConfig(cmd.Flags())
@@ -44,7 +44,6 @@ func Execute() error {
 }
 
 func init() {
-	// allows `$ flytescheduler --logtostderr` to work
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 
 	// Add persistent flags - persistent flags persist through all sub-commands
@@ -64,7 +63,7 @@ func init() {
 
 func initConfig(flags *pflag.FlagSet) error {
 	configAccessor = viper.NewAccessor(config.Options{
-		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyteadmin"},
+		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyte"},
 		StrictMode:  false,
 	})
 
