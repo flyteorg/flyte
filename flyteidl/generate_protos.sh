@@ -30,35 +30,34 @@ core_proto_files=`ls protos/flyteidl/core/*.proto |xargs`
 # Remove any currently generated file
 ls -d protos/docs/core/* | grep -v index.rst | xargs rm
 # Use the list to generate the RST files required for sphinx conversion. Additionally generate for google.protobuf.[timestamp | struct | duration].
-protoc --doc_out=protos/docs/core --doc_opt=restructuredtext,core.rst -I=tmp/doc_gen_deps -I=protos `echo $core_proto_files` tmp/doc_gen_deps/google/protobuf/timestamp.proto  tmp/doc_gen_deps/google/protobuf/duration.proto  tmp/doc_gen_deps/google/protobuf/struct.proto
+protoc --doc_out=protos/docs/core --doc_opt=restructuredtext,core.rst -I=tmp/doc_gen_deps -I=protos `echo $core_proto_files` tmp/doc_gen_deps/google/protobuf/timestamp.proto tmp/doc_gen_deps/google/protobuf/duration.proto tmp/doc_gen_deps/google/protobuf/struct.proto
 
 # Get list of proto files in admin directory
 admin_proto_files=`ls protos/flyteidl/admin/*.proto |xargs`
 # Remove any currently generated file
 ls -d protos/docs/admin/* | grep -v index.rst | xargs rm
 # Use the list to generate the RST files required for sphinx conversion
-protoc --doc_out=protos/docs/admin --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,admin.rst -I=protos `echo $admin_proto_files`
+protoc --doc_out=protos/docs/admin --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,admin.rst -I=tmp/doc_gen_deps -I=protos `echo $admin_proto_files` tmp/doc_gen_deps/google/protobuf/duration.proto
 
 # Get list of proto files in datacatlog directory
 datacatalog_proto_files=`ls protos/flyteidl/datacatalog/*.proto |xargs`
 # Remove any currently generated file
 ls -d protos/docs/datacatalog/* | grep -v index.rst | xargs rm
 # Use the list to generate the RST files required for sphinx conversion
-protoc --doc_out=protos/docs/datacatalog --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,datacatalog.rst -I=protos `echo $datacatalog_proto_files`
+protoc --doc_out=protos/docs/datacatalog --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,datacatalog.rst -I=tmp/doc_gen_deps -I=protos `echo $datacatalog_proto_files` tmp/doc_gen_deps/google/protobuf/timestamp.proto tmp/doc_gen_deps/google/protobuf/duration.proto tmp/doc_gen_deps/google/protobuf/struct.proto
 
 # Get list of proto files in event directory
 event_proto_files=`ls protos/flyteidl/event/*.proto |xargs`
 # Remove any currently generated file
 ls -d protos/docs/event/* | grep -v index.rst | xargs rm
 # Use the list to generate the RST files required for sphinx conversion
-protoc --doc_out=protos/docs/event --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,event.rst -I=protos `echo $event_proto_files`
+protoc --doc_out=protos/docs/event --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,event.rst -I=tmp/doc_gen_deps -I=protos `echo $event_proto_files` tmp/doc_gen_deps/google/protobuf/timestamp.proto tmp/doc_gen_deps/google/protobuf/duration.proto tmp/doc_gen_deps/google/protobuf/struct.proto
 
 # Get list of proto files in plugins directory.
 plugins_proto_files=`ls protos/flyteidl/plugins/*.proto | xargs`
 # Remove any currently generated file
 ls -d protos/docs/plugins/* |grep -v index.rst| xargs rm
 # Use the list to generate the RST files required for sphinx conversion
-
 protoc --doc_out=protos/docs/plugins --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,plugins.rst -I=protos -I=tmp/doc_gen_deps `echo $plugins_proto_files`
 
 # Get list of proto files in service directory.
@@ -66,7 +65,6 @@ service_proto_files=`ls protos/flyteidl/service/*.proto | xargs`
 # Remove any currently generated file
 ls -d protos/docs/service/* |grep -v index.rst| xargs rm
 # Use the list to generate the RST files required for sphinx conversion
-
 protoc --doc_out=protos/docs/service --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,service.rst -I=protos -I=tmp/doc_gen_deps `echo $service_proto_files`
 
 # Generate binary data from OpenAPI 2 file

@@ -1676,6 +1676,18 @@ class ExternalResourceInfo final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.TaskLog logs = 6;
+  int logs_size() const;
+  void clear_logs();
+  static const int kLogsFieldNumber = 6;
+  ::flyteidl::core::TaskLog* mutable_logs(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+      mutable_logs();
+  const ::flyteidl::core::TaskLog& logs(int index) const;
+  ::flyteidl::core::TaskLog* add_logs();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+      logs() const;
+
   // string external_id = 1;
   void clear_external_id();
   static const int kExternalIdFieldNumber = 1;
@@ -1708,15 +1720,23 @@ class ExternalResourceInfo final :
   ::flyteidl::core::TaskExecution_Phase phase() const;
   void set_phase(::flyteidl::core::TaskExecution_Phase value);
 
+  // .flyteidl.core.CatalogCacheStatus cache_status = 5;
+  void clear_cache_status();
+  static const int kCacheStatusFieldNumber = 5;
+  ::flyteidl::core::CatalogCacheStatus cache_status() const;
+  void set_cache_status(::flyteidl::core::CatalogCacheStatus value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.event.ExternalResourceInfo)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > logs_;
   ::google::protobuf::internal::ArenaStringPtr external_id_;
   ::google::protobuf::uint32 index_;
   ::google::protobuf::uint32 retry_attempt_;
   int phase_;
+  int cache_status_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
 };
@@ -4290,6 +4310,47 @@ inline void ExternalResourceInfo::set_phase(::flyteidl::core::TaskExecution_Phas
   
   phase_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.event.ExternalResourceInfo.phase)
+}
+
+// .flyteidl.core.CatalogCacheStatus cache_status = 5;
+inline void ExternalResourceInfo::clear_cache_status() {
+  cache_status_ = 0;
+}
+inline ::flyteidl::core::CatalogCacheStatus ExternalResourceInfo::cache_status() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.ExternalResourceInfo.cache_status)
+  return static_cast< ::flyteidl::core::CatalogCacheStatus >(cache_status_);
+}
+inline void ExternalResourceInfo::set_cache_status(::flyteidl::core::CatalogCacheStatus value) {
+  
+  cache_status_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.ExternalResourceInfo.cache_status)
+}
+
+// repeated .flyteidl.core.TaskLog logs = 6;
+inline int ExternalResourceInfo::logs_size() const {
+  return logs_.size();
+}
+inline ::flyteidl::core::TaskLog* ExternalResourceInfo::mutable_logs(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.ExternalResourceInfo.logs)
+  return logs_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+ExternalResourceInfo::mutable_logs() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.event.ExternalResourceInfo.logs)
+  return &logs_;
+}
+inline const ::flyteidl::core::TaskLog& ExternalResourceInfo::logs(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.ExternalResourceInfo.logs)
+  return logs_.Get(index);
+}
+inline ::flyteidl::core::TaskLog* ExternalResourceInfo::add_logs() {
+  // @@protoc_insertion_point(field_add:flyteidl.event.ExternalResourceInfo.logs)
+  return logs_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+ExternalResourceInfo::logs() const {
+  // @@protoc_insertion_point(field_list:flyteidl.event.ExternalResourceInfo.logs)
+  return logs_;
 }
 
 // -------------------------------------------------------------------

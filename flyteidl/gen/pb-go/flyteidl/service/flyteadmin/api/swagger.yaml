@@ -14637,9 +14637,29 @@ definitions:
         - index: 0
           external_id: "external_id"
           retry_attempt: 6
+          cache_status: {}
+          logs:
+          - message_format: {}
+            name: "name"
+            uri: "uri"
+            ttl: "ttl"
+          - message_format: {}
+            name: "name"
+            uri: "uri"
+            ttl: "ttl"
         - index: 0
           external_id: "external_id"
           retry_attempt: 6
+          cache_status: {}
+          logs:
+          - message_format: {}
+            name: "name"
+            uri: "uri"
+            ttl: "ttl"
+          - message_format: {}
+            name: "name"
+            uri: "uri"
+            ttl: "ttl"
         instance_class: {}
         resource_pool_info:
         - allocation_token: "allocation_token"
@@ -14765,9 +14785,29 @@ definitions:
             - index: 0
               external_id: "external_id"
               retry_attempt: 6
+              cache_status: {}
+              logs:
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
             - index: 0
               external_id: "external_id"
               retry_attempt: 6
+              cache_status: {}
+              logs:
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -14833,9 +14873,29 @@ definitions:
             - index: 0
               external_id: "external_id"
               retry_attempt: 6
+              cache_status: {}
+              logs:
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
             - index: 0
               external_id: "external_id"
               retry_attempt: 6
+              cache_status: {}
+              logs:
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
+              - message_format: {}
+                name: "name"
+                uri: "uri"
+                ttl: "ttl"
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -53895,12 +53955,30 @@ definitions:
       phase:
         title: "Phase associated with the external resource"
         $ref: "#/definitions/coreTaskExecutionPhase"
+      cache_status:
+        description: "Captures the status of caching for this external resource execution."
+        $ref: "#/definitions/coreCatalogCacheStatus"
+      logs:
+        type: "array"
+        title: "log information for the external resource execution"
+        items:
+          $ref: "#/definitions/coreTaskLog"
     description: "This message contains metadata about external resources produced\
       \ or used by a specific task execution."
     example:
       index: 0
       external_id: "external_id"
       retry_attempt: 6
+      cache_status: {}
+      logs:
+      - message_format: {}
+        name: "name"
+        uri: "uri"
+        ttl: "ttl"
+      - message_format: {}
+        name: "name"
+        uri: "uri"
+        ttl: "ttl"
   eventNodeExecutionEvent:
     type: "object"
     properties:
@@ -54085,9 +54163,29 @@ definitions:
       - index: 0
         external_id: "external_id"
         retry_attempt: 6
+        cache_status: {}
+        logs:
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
       - index: 0
         external_id: "external_id"
         retry_attempt: 6
+        cache_status: {}
+        logs:
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
       instance_class: {}
       resource_pool_info:
       - allocation_token: "allocation_token"
@@ -60264,9 +60362,29 @@ definitions:
           - index: 0
             external_id: "external_id"
             retry_attempt: 6
+            cache_status: {}
+            logs:
+            - message_format: {}
+              name: "name"
+              uri: "uri"
+              ttl: "ttl"
+            - message_format: {}
+              name: "name"
+              uri: "uri"
+              ttl: "ttl"
           - index: 0
             external_id: "external_id"
             retry_attempt: 6
+            cache_status: {}
+            logs:
+            - message_format: {}
+              name: "name"
+              uri: "uri"
+              ttl: "ttl"
+            - message_format: {}
+              name: "name"
+              uri: "uri"
+              ttl: "ttl"
           instance_class: {}
           resource_pool_info:
           - allocation_token: "allocation_token"

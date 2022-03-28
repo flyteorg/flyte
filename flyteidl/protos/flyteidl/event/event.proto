@@ -204,6 +204,12 @@ message ExternalResourceInfo {
 
     // Phase associated with the external resource
     core.TaskExecution.Phase phase = 4;
+
+    // Captures the status of caching for this external resource execution.
+    core.CatalogCacheStatus cache_status = 5;
+
+    // log information for the external resource execution
+    repeated core.TaskLog logs = 6;
 }
 
 
