@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.47.2](http://github.com/lyft/flyteconsole/compare/v0.47.1...v0.47.2) (2022-03-28)
+
+
+### Bug Fixes
+
+* stop displaying empty descriptions ([#346](http://github.com/lyft/flyteconsole/issues/346)) ([6a964f6](http://github.com/lyft/flyteconsole/commit/6a964f6ab4643d137477e072b9fed10e84a02af6))
+
 ## [0.47.1](http://github.com/lyft/flyteconsole/compare/v0.47.0...v0.47.1) (2022-03-23)
 
 
