@@ -9,7 +9,6 @@
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment <deployment/index>
-   |Writing hands| Integrations <https://docs.flyte.org/projects/cookbook/en/latest/integrations.html>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
