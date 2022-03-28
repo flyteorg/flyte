@@ -11,6 +11,7 @@ import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import { Shimmer } from 'components/common/Shimmer';
 import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { debounce } from 'lodash';
+import { Typography } from '@material-ui/core';
 import { WorkflowListStructureItem } from './types';
 import ProjectStatusBar from '../Project/ProjectStatusBar';
 import { workflowNoInputsString } from '../Launch/LaunchForm/constants';
@@ -120,9 +121,11 @@ const SearchableWorkflowNameItem: React.FC<SearchableWorkflowNameItemProps> = Re
             <DeviceHub className={styles.itemIcon} />
             <div>{id.name}</div>
           </div>
-          <div className={styles.itemDescriptionRow}>
-            {description?.length ? description : 'This workflow has no description.'}
-          </div>
+          {description && (
+            <Typography variant="body2" className={styles.itemDescriptionRow}>
+              {description}
+            </Typography>
+          )}
           <div className={styles.itemRow}>
             <div className={styles.itemLabel}>Last execution time</div>
             <div className={styles.w100}>

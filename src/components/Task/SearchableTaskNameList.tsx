@@ -3,7 +3,6 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import classnames from 'classnames';
-import { noDescriptionString } from 'common/constants';
 import { SearchResult } from 'components/common/SearchableList';
 import {
   SearchableNamedEntity,
@@ -79,15 +78,17 @@ const TaskNameRow: React.FC<TaskNameRowProps> = ({ label, entityName }) => {
   const styles = useStyles();
   const listStyles = useNamedEntityListStyles();
   const [inViewRef, inView] = useInView(intersectionOptions);
-  const description = entityName.metadata.description || noDescriptionString;
+  const description = entityName?.metadata?.description;
 
   return (
     <div ref={inViewRef} className={listStyles.searchResult}>
       <div className={listStyles.itemName}>
         <div className={styles.taskName}>{label}</div>
-        <Typography variant="body2" className={styles.description}>
-          {description}
-        </Typography>
+        {description && (
+          <Typography variant="body2" className={styles.description}>
+            {description}
+          </Typography>
+        )}
         {!!inView && <TaskInterface taskName={entityName} />}
       </div>
       <ChevronRight className={listStyles.itemChevron} />
