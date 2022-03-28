@@ -29,3 +29,8 @@ details.dropdown summary {
 details.dropdown[open] summary {
     border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0 !important;
 }
+
+/* Hide "On GitHub" section from versions menu */
+.rst-versions .rst-other-versions dl:nth-child(3) {
+  display: none;
+}
