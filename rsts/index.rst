@@ -9,7 +9,7 @@
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment <deployment/index>
-   |plane| Integrations <https://docs.flyte.org/projects/cookbook/en/latest/integrations.html>
+   |Writing hands| Integrations <https://docs.flyte.org/projects/cookbook/en/latest/integrations.html>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
@@ -255,7 +255,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
 Why Flyte?
 ==========
 
-The main purpose of Flyte is to increase the development velocity for data processing and machine learning, enable large-scale compute execution without the operational overhead. Teams can therefore focus on the business goals rather than the infrastructure.
+Flyte aims to increase the development velocity for data processing and machine learning applications and enable large-scale compute execution without the operational overhead. Teams can, therefore, focus on the business goals rather than the infrastructure.
 
 Core Features
 -------------
