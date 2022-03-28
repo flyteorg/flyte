@@ -16377,6 +16377,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number|null} [index] ExternalResourceInfo index
              * @property {number|null} [retryAttempt] ExternalResourceInfo retryAttempt
              * @property {flyteidl.core.TaskExecution.Phase|null} [phase] ExternalResourceInfo phase
+             * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] ExternalResourceInfo cacheStatus
+             * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
              */
 
             /**
@@ -16388,6 +16390,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @param {flyteidl.event.IExternalResourceInfo=} [properties] Properties to set
              */
             function ExternalResourceInfo(properties) {
+                this.logs = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -16427,6 +16430,22 @@ export const flyteidl = $root.flyteidl = (() => {
             ExternalResourceInfo.prototype.phase = 0;
 
             /**
+             * ExternalResourceInfo cacheStatus.
+             * @member {flyteidl.core.CatalogCacheStatus} cacheStatus
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @instance
+             */
+            ExternalResourceInfo.prototype.cacheStatus = 0;
+
+            /**
+             * ExternalResourceInfo logs.
+             * @member {Array.<flyteidl.core.ITaskLog>} logs
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @instance
+             */
+            ExternalResourceInfo.prototype.logs = $util.emptyArray;
+
+            /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
              * @function create
              * @memberof flyteidl.event.ExternalResourceInfo
@@ -16458,6 +16477,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.retryAttempt);
                 if (message.phase != null && message.hasOwnProperty("phase"))
                     writer.uint32(/* id 4, wireType 0 =*/32).int32(message.phase);
+                if (message.cacheStatus != null && message.hasOwnProperty("cacheStatus"))
+                    writer.uint32(/* id 5, wireType 0 =*/40).int32(message.cacheStatus);
+                if (message.logs != null && message.logs.length)
+                    for (let i = 0; i < message.logs.length; ++i)
+                        $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                 return writer;
             };
 
@@ -16490,6 +16514,14 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 4:
                         message.phase = reader.int32();
+                        break;
+                    case 5:
+                        message.cacheStatus = reader.int32();
+                        break;
+                    case 6:
+                        if (!(message.logs && message.logs.length))
+                            message.logs = [];
+                        message.logs.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -16533,6 +16565,27 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 7:
                         break;
                     }
+                if (message.cacheStatus != null && message.hasOwnProperty("cacheStatus"))
+                    switch (message.cacheStatus) {
+                    default:
+                        return "cacheStatus: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                        break;
+                    }
+                if (message.logs != null && message.hasOwnProperty("logs")) {
+                    if (!Array.isArray(message.logs))
+                        return "logs: array expected";
+                    for (let i = 0; i < message.logs.length; ++i) {
+                        let error = $root.flyteidl.core.TaskLog.verify(message.logs[i]);
+                        if (error)
+                            return "logs." + error;
+                    }
+                }
                 return null;
             };
 

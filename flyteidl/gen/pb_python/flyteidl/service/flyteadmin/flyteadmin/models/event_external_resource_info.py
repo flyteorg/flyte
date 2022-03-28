@@ -16,7 +16,9 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_catalog_cache_status import CoreCatalogCacheStatus  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
+from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
 
 
 class EventExternalResourceInfo(object):
@@ -36,23 +38,29 @@ class EventExternalResourceInfo(object):
         'external_id': 'str',
         'index': 'int',
         'retry_attempt': 'int',
-        'phase': 'CoreTaskExecutionPhase'
+        'phase': 'CoreTaskExecutionPhase',
+        'cache_status': 'CoreCatalogCacheStatus',
+        'logs': 'list[CoreTaskLog]'
     }
 
     attribute_map = {
         'external_id': 'external_id',
         'index': 'index',
         'retry_attempt': 'retry_attempt',
-        'phase': 'phase'
+        'phase': 'phase',
+        'cache_status': 'cache_status',
+        'logs': 'logs'
     }
 
-    def __init__(self, external_id=None, index=None, retry_attempt=None, phase=None):  # noqa: E501
+    def __init__(self, external_id=None, index=None, retry_attempt=None, phase=None, cache_status=None, logs=None):  # noqa: E501
         """EventExternalResourceInfo - a model defined in Swagger"""  # noqa: E501
 
         self._external_id = None
         self._index = None
         self._retry_attempt = None
         self._phase = None
+        self._cache_status = None
+        self._logs = None
         self.discriminator = None
 
         if external_id is not None:
@@ -63,6 +71,10 @@ class EventExternalResourceInfo(object):
             self.retry_attempt = retry_attempt
         if phase is not None:
             self.phase = phase
+        if cache_status is not None:
+            self.cache_status = cache_status
+        if logs is not None:
+            self.logs = logs
 
     @property
     def external_id(self):
@@ -151,6 +163,50 @@ class EventExternalResourceInfo(object):
         """
 
         self._phase = phase
+
+    @property
+    def cache_status(self):
+        """Gets the cache_status of this EventExternalResourceInfo.  # noqa: E501
+
+        Captures the status of caching for this external resource execution.  # noqa: E501
+
+        :return: The cache_status of this EventExternalResourceInfo.  # noqa: E501
+        :rtype: CoreCatalogCacheStatus
+        """
+        return self._cache_status
+
+    @cache_status.setter
+    def cache_status(self, cache_status):
+        """Sets the cache_status of this EventExternalResourceInfo.
+
+        Captures the status of caching for this external resource execution.  # noqa: E501
+
+        :param cache_status: The cache_status of this EventExternalResourceInfo.  # noqa: E501
+        :type: CoreCatalogCacheStatus
+        """
+
+        self._cache_status = cache_status
+
+    @property
+    def logs(self):
+        """Gets the logs of this EventExternalResourceInfo.  # noqa: E501
+
+
+        :return: The logs of this EventExternalResourceInfo.  # noqa: E501
+        :rtype: list[CoreTaskLog]
+        """
+        return self._logs
+
+    @logs.setter
+    def logs(self, logs):
+        """Sets the logs of this EventExternalResourceInfo.
+
+
+        :param logs: The logs of this EventExternalResourceInfo.  # noqa: E501
+        :type: list[CoreTaskLog]
+        """
+
+        self._logs = logs
 
     def to_dict(self):
         """Returns the model properties as a dict"""
