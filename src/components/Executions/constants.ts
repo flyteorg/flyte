@@ -4,8 +4,8 @@ import {
   secondaryTextColor,
   statusColors,
 } from 'components/Theme/constants';
-import { Core } from 'flyteidl';
 import {
+  CatalogCacheStatus,
   NodeExecutionPhase,
   TaskExecutionPhase,
   WorkflowExecutionPhase,
@@ -196,14 +196,13 @@ export const taskTypeToNodeExecutionDisplayType: {
   [TaskType.ARRAY_K8S]: NodeExecutionDisplayType.ARRAY_K8S,
 };
 
-export const cacheStatusMessages: { [k in Core.CatalogCacheStatus]: string } = {
-  [Core.CatalogCacheStatus.CACHE_DISABLED]: 'Caching was disabled for this execution.',
-  [Core.CatalogCacheStatus.CACHE_HIT]: 'Output for this execution was read from cache.',
-  [Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE]: 'Failed to lookup cache information.',
-  [Core.CatalogCacheStatus.CACHE_MISS]: 'No cached output was found for this execution.',
-  [Core.CatalogCacheStatus.CACHE_POPULATED]: 'The result of this execution was written to cache.',
-  [Core.CatalogCacheStatus.CACHE_PUT_FAILURE]:
-    'Failed to write output for this execution to cache.',
+export const cacheStatusMessages: { [k in CatalogCacheStatus]: string } = {
+  [CatalogCacheStatus.CACHE_DISABLED]: 'Caching was disabled for this execution.',
+  [CatalogCacheStatus.CACHE_HIT]: 'Output for this execution was read from cache.',
+  [CatalogCacheStatus.CACHE_LOOKUP_FAILURE]: 'Failed to lookup cache information.',
+  [CatalogCacheStatus.CACHE_MISS]: 'No cached output was found for this execution.',
+  [CatalogCacheStatus.CACHE_POPULATED]: 'The result of this execution was written to cache.',
+  [CatalogCacheStatus.CACHE_PUT_FAILURE]: 'Failed to write output for this execution to cache.',
 };
 export const unknownCacheStatusString = 'Cache status is unknown';
 export const viewSourceExecutionString = 'View source execution';

@@ -2,9 +2,8 @@ import { Tooltip, Typography } from '@material-ui/core';
 import { formatDateLocalTimezone, formatDateUTC, millisecondsToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
-import { Core } from 'flyteidl';
 import { isEqual } from 'lodash';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
 import { TaskNodeMetadata } from 'models/Execution/types';
 import * as React from 'react';
 import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
@@ -107,10 +106,7 @@ const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => 
   return <Typography color="textSecondary">{type}</Typography>;
 };
 
-const hiddenCacheStatuses = [
-  Core.CatalogCacheStatus.CACHE_MISS,
-  Core.CatalogCacheStatus.CACHE_DISABLED,
-];
+const hiddenCacheStatuses = [CatalogCacheStatus.CACHE_MISS, CatalogCacheStatus.CACHE_DISABLED];
 function hasCacheStatus(taskNodeMetadata?: TaskNodeMetadata): taskNodeMetadata is TaskNodeMetadata {
   if (!taskNodeMetadata) {
     return false;

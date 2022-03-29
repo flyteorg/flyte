@@ -19,6 +19,7 @@ jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
 
 jest.mock('chart.js', () => ({
   Chart: { register: () => null },
+  Tooltip: { positioners: { cursor: () => null } },
   registerables: [],
 }));
 

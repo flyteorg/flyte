@@ -1,11 +1,12 @@
 import { render, waitFor } from '@testing-library/react';
 import { cacheStatusMessages, viewSourceExecutionString } from 'components/Executions/constants';
 import { NodeExecutionDetailsContextProvider } from 'components/Executions/contextProvider/NodeExecutionDetails';
-import { Core } from 'flyteidl';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { mockWorkflowId } from 'mocks/data/fixtures/types';
 import { insertFixture } from 'mocks/data/insertFixture';
 import { mockServer } from 'mocks/server';
+import { ResourceType } from 'models/Common/types';
+import { CatalogCacheStatus } from 'models/Execution/enums';
 import { NodeExecution, TaskNodeMetadata } from 'models/Execution/types';
 import { mockExecution as mockTaskExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import * as React from 'react';
@@ -53,10 +54,10 @@ describe('NodeExecutionDetails', () => {
     let taskNodeMetadata: TaskNodeMetadata;
     beforeEach(() => {
       taskNodeMetadata = {
-        cacheStatus: Core.CatalogCacheStatus.CACHE_MISS,
+        cacheStatus: CatalogCacheStatus.CACHE_MISS,
         catalogKey: {
           datasetId: makeIdentifier({
-            resourceType: Core.ResourceType.DATASET,
+            resourceType: ResourceType.DATASET,
           }),
           sourceTaskExecution: { ...mockTaskExecution.id },
         },
@@ -66,14 +67,14 @@ describe('NodeExecutionDetails', () => {
     });
 
     [
-      Core.CatalogCacheStatus.CACHE_DISABLED,
-      Core.CatalogCacheStatus.CACHE_HIT,
-      Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
-      Core.CatalogCacheStatus.CACHE_MISS,
-      Core.CatalogCacheStatus.CACHE_POPULATED,
-      Core.CatalogCacheStatus.CACHE_PUT_FAILURE,
+      CatalogCacheStatus.CACHE_DISABLED,
+      CatalogCacheStatus.CACHE_HIT,
+      CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
+      CatalogCacheStatus.CACHE_MISS,
+      CatalogCacheStatus.CACHE_POPULATED,
+      CatalogCacheStatus.CACHE_PUT_FAILURE,
     ].forEach((cacheStatusValue) =>
-      it(`renders correct status for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
+      it(`renders correct status for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
         taskNodeMetadata.cacheStatus = cacheStatusValue;
         mockServer.insertNodeExecution(execution);
         const { getByText } = renderComponent();
@@ -82,7 +83,7 @@ describe('NodeExecutionDetails', () => {
     );
 
     it('renders source execution link for cache hits', async () => {
-      taskNodeMetadata.cacheStatus = Core.CatalogCacheStatus.CACHE_HIT;
+      taskNodeMetadata.cacheStatus = CatalogCacheStatus.CACHE_HIT;
       const sourceWorkflowExecutionId =
         taskNodeMetadata.catalogKey!.sourceTaskExecution.nodeExecutionId.executionId;
       const { getByText } = renderComponent();

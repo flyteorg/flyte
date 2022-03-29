@@ -6,6 +6,7 @@ import { NodeExecutionsRequestConfigContext } from 'components/Executions/contex
 import { useAllTreeNodeExecutionGroupsQuery } from 'components/Executions/nodeExecutionQueries';
 import { DataError } from 'components/Errors/DataError';
 import { DetailsPanel } from 'components/common/DetailsPanel';
+import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { NodeExecutionDetailsPanelContent } from '../NodeExecutionDetailsPanelContent';
 import { NodeExecutionsTimelineContext } from './context';
 import { ExecutionTimelineFooter } from './ExecutionTimelineFooter';
@@ -23,6 +24,9 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     flex: '1 1 0',
     overflowY: 'auto',
+  },
+  loading: {
+    margin: 'auto',
   },
 }));
 
@@ -53,12 +57,24 @@ export const ExecutionNodesTimeline = (props: TimelineProps) => {
     return <ExecutionTimeline nodeExecutions={nodeExecutions} chartTimezone={chartTimezone} />;
   };
 
+  const TimelineLoading = () => {
+    return (
+      <div className={styles.loading}>
+        <LargeLoadingSpinner />
+      </div>
+    );
+  };
+
   return (
     <ScaleProvider>
       <div className={styles.wrapper}>
         <div className={styles.container}>
           <NodeExecutionsTimelineContext.Provider value={timelineContext}>
-            <WaitForQuery errorComponent={DataError} query={childGroupsQuery}>
+            <WaitForQuery
+              errorComponent={DataError}
+              query={childGroupsQuery}
+              loadingComponent={TimelineLoading}
+            >
               {renderExecutionsTimeline}
             </WaitForQuery>
           </NodeExecutionsTimelineContext.Provider>

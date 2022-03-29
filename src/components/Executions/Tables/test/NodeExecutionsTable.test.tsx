@@ -20,7 +20,6 @@ import { makeNodeExecutionListQuery } from 'components/Executions/nodeExecutionQ
 import { NodeExecutionDisplayType } from 'components/Executions/types';
 import { nodeExecutionIsTerminal } from 'components/Executions/utils';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
-import { Core } from 'flyteidl';
 import { cloneDeep } from 'lodash';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { dynamicExternalSubWorkflow } from 'mocks/data/fixtures/dynamicExternalSubworkflow';
@@ -35,8 +34,9 @@ import { notFoundError } from 'mocks/errors';
 import { mockServer } from 'mocks/server';
 import { FilterOperationName, RequestConfig } from 'models/AdminEntity/types';
 import { nodeExecutionQueryParams } from 'models/Execution/constants';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
 import { Execution, NodeExecution, TaskNodeMetadata } from 'models/Execution/types';
+import { ResourceType } from 'models/Common/types';
 import * as React from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
 import { makeIdentifier } from 'test/modelUtils';
@@ -225,10 +225,10 @@ describe('NodeExecutionsTable', () => {
         const { taskExecutions } = nodeExecutions.pythonNode;
         cachedNodeExecution = nodeExecutions.pythonNode.data;
         taskNodeMetadata = {
-          cacheStatus: Core.CatalogCacheStatus.CACHE_MISS,
+          cacheStatus: CatalogCacheStatus.CACHE_MISS,
           catalogKey: {
             datasetId: makeIdentifier({
-              resourceType: Core.ResourceType.DATASET,
+              resourceType: ResourceType.DATASET,
             }),
             sourceTaskExecution: {
               ...taskExecutions.firstAttempt.data.id,
@@ -239,12 +239,12 @@ describe('NodeExecutionsTable', () => {
       });
 
       [
-        Core.CatalogCacheStatus.CACHE_HIT,
-        Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
-        Core.CatalogCacheStatus.CACHE_POPULATED,
-        Core.CatalogCacheStatus.CACHE_PUT_FAILURE,
+        CatalogCacheStatus.CACHE_HIT,
+        CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
+        CatalogCacheStatus.CACHE_POPULATED,
+        CatalogCacheStatus.CACHE_PUT_FAILURE,
       ].forEach((cacheStatusValue) =>
-        it(`renders correct icon for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
+        it(`renders correct icon for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
           taskNodeMetadata.cacheStatus = cacheStatusValue;
           updateNodeExecutions([cachedNodeExecution]);
           const { getByTitle } = renderTable();
@@ -255,9 +255,9 @@ describe('NodeExecutionsTable', () => {
         }),
       );
 
-      [Core.CatalogCacheStatus.CACHE_DISABLED, Core.CatalogCacheStatus.CACHE_MISS].forEach(
+      [CatalogCacheStatus.CACHE_DISABLED, CatalogCacheStatus.CACHE_MISS].forEach(
         (cacheStatusValue) =>
-          it(`renders no icon for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
+          it(`renders no icon for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
             taskNodeMetadata.cacheStatus = cacheStatusValue;
             updateNodeExecutions([cachedNodeExecution]);
             const { getByText, queryByTitle } = renderTable();

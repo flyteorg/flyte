@@ -1,28 +1,23 @@
 import * as React from 'react';
-import * as moment from 'moment-timezone';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, registerables } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { makeStyles, Typography } from '@material-ui/core';
 
 import { useNodeExecutionContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
 import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWorkflowToDag';
 import { isEndNode, isStartNode, isExpanded } from 'components/WorkflowGraph/utils';
 import { tableHeaderColor } from 'components/Theme/constants';
+import { timestampToDate } from 'common/utils';
 import { NodeExecution } from 'models/Execution/types';
 import { dNode } from 'models/Graph/types';
-import { TaskNames } from './taskNames';
-import { convertToPlainNodes, getBarOptions, TimeZone } from './helpers';
+import { getChartDurationData } from './BarChart/chartData';
+import { convertToPlainNodes } from './helpers';
 import { ChartHeader } from './chartHeader';
-import { useChartDurationData } from './chartData';
 import { useScaleContext } from './scaleContext';
-
-// Register components to be usable by chart.js
-ChartJS.register(...registerables, ChartDataLabels);
+import { TaskNames } from './taskNames';
+import { BarChart } from './BarChart';
 
 interface StyleProps {
   chartWidth: number;
-  durationLength: number;
+  itemsShown: number;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -10,
     marginLeft: -15,
     width: `${props.chartWidth + 20}px`,
-    height: `${56 * props.durationLength + 20}px`,
+    height: `${56 * props.itemsShown + 20}px`,
   }),
   taskNames: {
     display: 'flex',
@@ -85,8 +80,10 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
 
   const [originalNodes, setOriginalNodes] = React.useState<dNode[]>([]);
   const [showNodes, setShowNodes] = React.useState<dNode[]>([]);
+  const [startedAt, setStartedAt] = React.useState<Date>(new Date());
 
   const { compiledWorkflowClosure } = useNodeExecutionContext();
+  const { chartInterval: chartTimeInterval } = useScaleContext();
 
   React.useEffect(() => {
     const nodes: dNode[] = compiledWorkflowClosure
@@ -99,39 +96,38 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
 
   React.useEffect(() => {
     const initializeNodes = convertToPlainNodes(originalNodes);
-    setShowNodes(
-      initializeNodes.map((node) => {
-        const index = nodeExecutions.findIndex((exe) => exe.scopedId === node.scopedId);
-        return {
-          ...node,
-          execution: index >= 0 ? nodeExecutions[index] : undefined,
-        };
-      }),
-    );
+    const updatedShownNodesMap = initializeNodes.map((node) => {
+      const index = nodeExecutions.findIndex((exe) => exe.scopedId === node.scopedId);
+      return {
+        ...node,
+        execution: index >= 0 ? nodeExecutions[index] : undefined,
+      };
+    });
+    setShowNodes(updatedShownNodesMap);
+
+    // set startTime for all timeline offset and duration calculations.
+    const firstStartedAt = updatedShownNodesMap[0]?.execution?.closure.startedAt;
+    if (firstStartedAt) {
+      setStartedAt(timestampToDate(firstStartedAt));
+    }
   }, [originalNodes, nodeExecutions]);
 
-  const { startedAt, totalDuration, durationLength, chartData } = useChartDurationData({
-    nodes: showNodes,
-  });
-  const { chartInterval: chartTimeInterval, setMaxValue } = useScaleContext();
-  const styles = useStyles({ chartWidth: chartWidth, durationLength: durationLength });
+  const { items: barItemsData, totalDurationSec } = getChartDurationData(showNodes, startedAt);
+  const styles = useStyles({ chartWidth: chartWidth, itemsShown: showNodes.length });
 
   React.useEffect(() => {
-    setMaxValue(totalDuration);
-  }, [totalDuration, setMaxValue]);
-
-  React.useEffect(() => {
-    const calcWidth = Math.ceil(totalDuration / chartTimeInterval) * INTERVAL_LENGTH;
+    // Sync width of elements and intervals of ChartHeader (time labels) and BarChart
+    const calcWidth = Math.ceil(totalDurationSec / chartTimeInterval) * INTERVAL_LENGTH;
     if (durationsRef.current && calcWidth < durationsRef.current.clientWidth) {
       setLabelInterval(
-        durationsRef.current.clientWidth / Math.ceil(totalDuration / chartTimeInterval),
+        durationsRef.current.clientWidth / Math.ceil(totalDurationSec / chartTimeInterval),
       );
       setChartWidth(durationsRef.current.clientWidth);
     } else {
       setChartWidth(calcWidth);
       setLabelInterval(INTERVAL_LENGTH);
     }
-  }, [totalDuration, chartTimeInterval, durationsRef]);
+  }, [totalDurationSec, chartTimeInterval, durationsRef]);
 
   const onGraphScroll = () => {
     // cover horizontal scroll only
@@ -177,17 +173,6 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     setOriginalNodes([...originalNodes]);
   };
 
-  const labels = React.useMemo(() => {
-    const len = Math.ceil(totalDuration / chartTimeInterval);
-    const lbs = len > 0 ? new Array(len).fill(0) : [];
-    return lbs.map((_, idx) => {
-      const time = moment.utc(new Date(startedAt.getTime() + idx * chartTimeInterval * 1000));
-      return chartTimezone === TimeZone.UTC
-        ? time.format('hh:mm:ss A')
-        : time.local().format('hh:mm:ss A');
-    });
-  }, [chartTimezone, startedAt, chartTimeInterval, totalDuration]);
-
   return (
     <>
       <div className={styles.taskNames}>
@@ -201,11 +186,17 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
       </div>
       <div className={styles.taskDurations}>
         <div className={styles.taskDurationsLabelsView} ref={durationsLabelsRef}>
-          <ChartHeader labels={labels} chartWidth={chartWidth} labelInterval={labelInterval} />
+          <ChartHeader
+            startedAt={startedAt}
+            chartWidth={chartWidth}
+            labelInterval={labelInterval}
+            chartTimezone={chartTimezone}
+            totalDurationSec={totalDurationSec}
+          />
         </div>
         <div className={styles.taskDurationsView} ref={durationsRef} onScroll={onGraphScroll}>
           <div className={styles.chartHeader}>
-            <Bar options={getBarOptions(chartTimeInterval)} data={chartData} />
+            <BarChart items={barItemsData} chartTimeIntervalSec={chartTimeInterval} />
           </div>
         </div>
       </div>

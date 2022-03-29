@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import { assertNever } from 'common/utils';
 import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
 import { useCommonStyles } from 'components/common/styles';
-import { Core } from 'flyteidl';
+import { CatalogCacheStatus } from 'models/Execution/enums';
 import { TaskNodeMetadata } from 'models/Execution/types';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -29,25 +29,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-/** Renders the appropriate icon for a given `Core.CatalogCacheStatus` */
+/** Renders the appropriate icon for a given CatalogCacheStatus */
 export const NodeExecutionCacheStatusIcon: React.FC<
   SvgIconProps & {
-    status: Core.CatalogCacheStatus;
+    status: CatalogCacheStatus;
   }
 > = React.forwardRef(({ status, ...props }, ref) => {
   switch (status) {
-    case Core.CatalogCacheStatus.CACHE_DISABLED:
-    case Core.CatalogCacheStatus.CACHE_MISS: {
+    case CatalogCacheStatus.CACHE_DISABLED:
+    case CatalogCacheStatus.CACHE_MISS: {
       return <InfoOutlined {...props} ref={ref} />;
     }
-    case Core.CatalogCacheStatus.CACHE_HIT: {
+    case CatalogCacheStatus.CACHE_HIT: {
       return <CachedOutlined {...props} ref={ref} />;
     }
-    case Core.CatalogCacheStatus.CACHE_POPULATED: {
+    case CatalogCacheStatus.CACHE_POPULATED: {
       return <PublishedWithChangesOutlined {...props} ref={ref} />;
     }
-    case Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE:
-    case Core.CatalogCacheStatus.CACHE_PUT_FAILURE: {
+    case CatalogCacheStatus.CACHE_LOOKUP_FAILURE:
+    case CatalogCacheStatus.CACHE_PUT_FAILURE: {
       return <ErrorOutlined {...props} ref={ref} />;
     }
     default: {

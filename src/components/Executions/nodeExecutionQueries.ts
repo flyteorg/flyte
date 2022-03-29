@@ -243,7 +243,7 @@ async function fetchGroupsForParentNodeExecution(
     /** GraphUX uses workflowClosure which uses scopedId. This builds a scopedId via parent
      *  nodeExecution to enable mapping between graph and other components     */
     let scopedId = parentScopeId;
-    if (scopedId != undefined) {
+    if (scopedId !== undefined) {
       scopedId += `-0-${child.metadata?.specNodeId}`;
       child['scopedId'] = scopedId;
     } else {

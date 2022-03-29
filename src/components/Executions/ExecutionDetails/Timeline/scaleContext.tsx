@@ -1,6 +1,7 @@
 import { Mark } from '@material-ui/core/Slider';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
+import { formatSecondsToHmsFormat } from './BarChart/utils';
 
 const MIN_SCALE_VALUE = 60; // 1 min
 const MAX_SCALE_VALUE = 3600; // 1h
@@ -36,16 +37,6 @@ export const ScaleContext = createContext<TimelineScaleState>({
 /** Could be used to access the whole TimelineScaleState */
 export const useScaleContext = (): TimelineScaleState => useContext(ScaleContext);
 
-const formatSeconds = (time: number) => {
-  if (time < 60) {
-    return `${time}s`;
-  }
-  if (time % 60 === 0) {
-    return `${Math.floor(time / 60)}m`;
-  }
-  return `${Math.floor(time / 60)}m ${time % 60}s`;
-};
-
 interface ScaleProviderProps {
   children?: React.ReactNode;
 }
@@ -69,7 +60,7 @@ export const ScaleProvider = (props: ScaleProviderProps) => {
     for (let i = 0; i < percentage.length; ++i) {
       newMarks.push({
         value: i,
-        label: formatSeconds(getIntervalValue(i)),
+        label: formatSecondsToHmsFormat(getIntervalValue(i)),
       });
     }
     setMarks(newMarks);
