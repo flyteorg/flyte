@@ -202,7 +202,7 @@ func TestFormulateExecutionCreateRequest(t *testing.T) {
 	executionRequest := testExecutor.formulateExecutionCreateRequest(launchPlan, time.Unix(1543607788, 0))
 	assert.Equal(t, "foo", executionRequest.Project)
 	assert.Equal(t, "bar", executionRequest.Domain)
-	assert.Equal(t, "o4219lgnsf", executionRequest.Name)
+	assert.Equal(t, "a2k4s9v5j246kwmdmh4t", executionRequest.Name)
 
 	assert.True(t, proto.Equal(&launchPlanIdentifier, executionRequest.Spec.LaunchPlan))
 	assert.Equal(t, admin.ExecutionMetadata_SCHEDULED, executionRequest.Spec.Metadata.Mode)
@@ -238,7 +238,7 @@ func TestRun(t *testing.T) {
 		*admin.ExecutionCreateResponse, error) {
 		assert.Equal(t, "project", request.Project)
 		assert.Equal(t, "domain", request.Domain)
-		assert.Equal(t, "u1jjtbc5tj", request.Name)
+		assert.Equal(t, "ar8fphnlc5wh9dksjncj", request.Name)
 		if messagesSeen == 0 {
 			assert.Contains(t, request.Inputs.Literals, testKickoffTime)
 			assert.Equal(t, testKickoffTimeProtoLiteral, *request.Inputs.Literals[testKickoffTime])
