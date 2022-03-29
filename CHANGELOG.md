@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.47.3](http://github.com/lyft/flyteconsole/compare/v0.47.2...v0.47.3) (2022-03-29)
+
+
+### Bug Fixes
+
+* add cached info to timeline ([#347](http://github.com/lyft/flyteconsole/issues/347)) ([d1d9bd0](http://github.com/lyft/flyteconsole/commit/d1d9bd0dfc8c7e7897e7896dbb1244402595cd7c))
+
 ## [0.47.2](http://github.com/lyft/flyteconsole/compare/v0.47.1...v0.47.2) (2022-03-28)
 
 
