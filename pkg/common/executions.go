@@ -1,29 +1,20 @@
 package common
 
 import (
-	"math/rand"
+	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"k8s.io/apimachinery/pkg/util/rand"
 )
 
-const ExecutionIDLength = 10
-
-// In kubernetes, resource names must comply with this regex: '[a-z]([-a-z0-9]*[a-z0-9])?'
-const AllowedExecutionIDStartCharStr = "abcdefghijklmnopqrstuvwxyz"
-const AllowedExecutionIDStr = "abcdefghijklmnopqrstuvwxyz1234567890"
-
-var AllowedExecutionIDStartChars = []rune(AllowedExecutionIDStartCharStr)
-var AllowedExecutionIDChars = []rune(AllowedExecutionIDStr)
+const ExecutionIDLength = 20
+const ExecutionStringFormat = "a%s"
 
 /* #nosec */
 func GetExecutionName(seed int64) string {
-	executionName := make([]rune, ExecutionIDLength)
 	rand.Seed(seed)
-	executionName[0] = AllowedExecutionIDStartChars[rand.Intn(len(AllowedExecutionIDStartChars))]
-	for i := 1; i < len(executionName); i++ {
-		executionName[i] = AllowedExecutionIDChars[rand.Intn(len(AllowedExecutionIDChars))]
-	}
-	return string(executionName)
+	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1))
 }
 
 var terminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
