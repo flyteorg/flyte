@@ -63,6 +63,18 @@ InsecureSkipVerify controls whether a client verifies the server's certificate c
   "false"
   
 
+caCertFilePath (string)
+--------------------------------------------------------------------------------
+
+Use specified certificate file to verify the admin server peer.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 maxBackoffDelay (`config.Duration`_)
 --------------------------------------------------------------------------------
 
@@ -430,6 +442,18 @@ Cache entries past this age will incur cache miss. 0 means cache never expires
   0s
   
 
+use-admin-auth (bool)
+--------------------------------------------------------------------------------
+
+Use the same gRPC credentials option as the flyteadmin client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: event
 ================================================================================
 
@@ -442,7 +466,7 @@ Sets the type of EventSink to configure [log/admin/file].
 
 .. code-block:: yaml
 
-  ""
+  admin
   
 
 file-path (string)
@@ -606,6 +630,37 @@ aws (`aws.Config`_)
   retries: 3
   
 
+bigquery (`bigquery.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  googleTokenSource:
+    type: default
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
+  
+
 catalogcache (`catalog.Config`_)
 --------------------------------------------------------------------------------
 
@@ -650,10 +705,12 @@ k8s (`config.K8sPluginConfig`_)
   default-labels: null
   default-memory: 1Gi
   default-node-selector: null
+  default-pod-dns-config: null
   default-pod-security-context: null
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  enable-host-networking-pod: null
   gpu-resource-name: nvidia.com/gpu
   inject-finalizer: false
   interruptible-node-selector: null
@@ -686,8 +743,9 @@ k8s-array (`k8s.Config`_)
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
       gcp-project: ""
-      kubernetes-enabled: false
-      kubernetes-template-uri: ""
+      kubernetes-enabled: true
+      kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+        }}/pod?namespace={{ .namespace }}
       kubernetes-url: ""
       stackdriver-enabled: false
       stackdriver-logresourcename: ""
@@ -724,8 +782,9 @@ logs (`logs.LogConfig`_)
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
   gcp-project: ""
-  kubernetes-enabled: false
-  kubernetes-template-uri: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
   kubernetes-url: ""
   stackdriver-enabled: false
   stackdriver-logresourcename: ""
@@ -1163,6 +1222,84 @@ logLevel (uint64)
 .. code-block:: yaml
 
   "0"
+  
+
+bigquery.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+googleTokenSource (`google.TokenSourceFactoryConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines Google token source
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  type: default
+  
+
+bigQueryEndpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+google.TokenSourceFactoryConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+type (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines type of TokenSourceFactory, possible values are 'default'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default
   
 
 catalog.Config
@@ -1645,6 +1782,26 @@ default-security-context (v1.SecurityContext)
   null
   
 
+enable-host-networking-pod (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  <invalid reflect.Value>
+  
+
+default-pod-dns-config (v1.PodDNSConfig)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 config.FlyteCoPilotConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1980,8 +2137,9 @@ Config for log links for k8s array jobs.
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
     gcp-project: ""
-    kubernetes-enabled: false
-    kubernetes-template-uri: ""
+    kubernetes-enabled: true
+    kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+      }}/pod?namespace={{ .namespace }}
     kubernetes-url: ""
     stackdriver-enabled: false
     stackdriver-logresourcename: ""
@@ -2096,8 +2254,9 @@ Defines the log config for k8s logs.
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
   gcp-project: ""
-  kubernetes-enabled: false
-  kubernetes-template-uri: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
   kubernetes-url: ""
   stackdriver-enabled: false
   stackdriver-logresourcename: ""
@@ -2165,7 +2324,7 @@ Enable Kubernetes Logging
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 kubernetes-url (string)
@@ -2189,7 +2348,8 @@ Template Uri to use when building kubernetes log links
 
 .. code-block:: yaml
 
-  ""
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
   
 
 stackdriver-enabled (bool)
@@ -2337,7 +2497,7 @@ Enable Kubernetes Logging
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 kubernetes-url (string)
@@ -2361,7 +2521,8 @@ Template Uri to use when building kubernetes log links
 
 .. code-block:: yaml
 
-  ""
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
   
 
 stackdriver-enabled (bool)
@@ -3055,6 +3216,18 @@ Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector
 .. code-block:: yaml
 
   []
+  
+
+cluster-id (string)
+--------------------------------------------------------------------------------
+
+Unique cluster id running this flytepropeller instance with which to annotate execution events
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  propeller
   
 
 admin-launcher (`launchplan.AdminConfig`_)

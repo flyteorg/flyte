@@ -22,26 +22,26 @@ With Flyte UI, you can:
 Launching Workflows
 -------------------
 
-Launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
+You can launch a workflow by clicking on the **Launch Workflow** button. Workflows are viewable after they are registered.
 The UI should be accessible at http://localhost:30081/console.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_001.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/launch_execution_001.png
     :alt: "Launch Workflow" button
 
     Launch a workflow using the "Launch Workflow" button.
 
 |
 
-The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_implement`.
+The end-to-end process from writing code to registering workflows is present in the :std:ref:`gettingstarted_build`.
 
-A pop-up window appears with input fields that the execution requires on clicking the **Launch Workflow** button.
+A pop-up window appears with input fields that the execution requires upon clicking the **Launch Workflow** button.
 If the default inputs are given, they will be auto-populated.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_002.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/launch_execution_002.png
     :alt: Launch form
 
     A pop-up window appears after clicking the "Launch Workflow" button.
@@ -52,7 +52,7 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_execution_003.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/launch_execution_003.png
     :alt: "Terminate" button
 
     Terminate an execution by clicking the "Terminate" button.
@@ -62,12 +62,12 @@ An execution can be terminated/aborted by clicking on the **Terminate** button.
 Launching Tasks
 ---------------
 
-Launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
+You can launch a task by clicking on the **Launch Task** button. Tasks are viewable after they are registered.
 The UI should be accessible at http://localhost:30081/console.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_001.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/launch_task_001.png
     :alt: "Launch Task" button
 
     Launch a task by clicking the "Launch Task" button.
@@ -79,7 +79,7 @@ on clicking the **Launch Task** button.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/launch_task_002.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/launch_task_002.png
     :alt: Launch form
 
     A pop-up window appears on clicking the "Launch Task" button.
@@ -93,7 +93,7 @@ Every registered Flyte entity is tagged with a version. All the registered versi
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/versioned_executions.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/versioned_executions.png
     :alt: Versioned workflows
 
     View versioned workflows.
@@ -107,7 +107,7 @@ Every registered Flyte entity is versioned and can be triggered anytime.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/trigger_versioned_executions.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/trigger_versioned_executions.png
     :alt: Trigger versioned workflows
 
     Trigger versioned workflows.
@@ -117,18 +117,18 @@ Every registered Flyte entity is versioned and can be triggered anytime.
 Inspecting Executions
 ---------------------
 
-Executions can be inspected through the UI. Inputs and Outputs can be viewed for every node and execution.
+Executions can be inspected through the UI. Inputs and Outputs for every node and execution can be viewed.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_001.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/inspect_execution_001.png
     :alt: Node's inputs and outputs
 
     View every execution node's inputs and outputs.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_002.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/inspect_execution_002.png
     :alt: Execution's inputs and outputs
 
     View every execution's inputs and outputs.
@@ -139,7 +139,7 @@ Logs are accessible as well.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_003.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/inspect_execution_003.png
     :alt: Logs
 
     View Kubernetes logs.
@@ -153,7 +153,7 @@ More about nodes can be found in :std:ref:`divedeep-nodes`.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_004.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/inspect_execution_004.png
     :alt: Nodes
 
     Inspect execution's nodes in the UI.
@@ -164,7 +164,7 @@ Graph view showcases a static DAG.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/inspect_execution_005.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/inspect_execution_005.png
     :alt: DAG
 
     Inspect execution's DAG in the UI.
@@ -180,7 +180,7 @@ Click on the ellipsis on the top right corner of the UI.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/clone_execution_001.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/clone_execution_001.png
     :alt: Clone execution
 
     Step 1: Click on the ellipsis.
@@ -191,7 +191,7 @@ Click on the **Clone Execution** button.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/clone_execution_002.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/clone_execution_002.png
     :alt: Clone execution
 
     Step 2: "Clone execution" button.
@@ -206,7 +206,7 @@ This option can be helpful to try out a new version of a Flyte entity.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/relaunch_execution.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/relaunch_execution.png
     :alt: Relaunch an execution
 
     Relaunch an execution.
@@ -219,11 +219,11 @@ Recovering Executions
 ---------------------
 
 Recovery mode allows you to recover an individual execution by copying all successful node executions and running from the failed nodes.
-The **Recover** button is able to recover a failed execution.
+The **Recover** button helps recover a failed execution.
 
 |
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flyteconsole/recover_execution.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/flyteconsole/recover_execution.png
     :alt: Recover an execution
 
     Recover an execution.

@@ -1,7 +1,9 @@
 .. _deployment-plugin-setup-aws-array:
 
-AWS Batch Setup for Map Tasks
------------------------------
+AWS Batch Setup
+---------------
+
+This setup document applies to both :std:doc:`map tasks <generated/flytekit.map_task>` and single tasks running on AWS Batch. (For single [non-map] task use, please take note of the additional code when updating Propeller config.)
 
 AWS Batch enables developers, scientists, and engineers to easily and efficiently run hundreds of thousands of batch
 computing jobs on AWS.
@@ -27,9 +29,9 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
    Then modify the policy document to allow the role to pass other roles to AWS Batch.
    Follow the guide: `Granting a user permissions to pass a role to an AWS service <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html>`_.
 
-4. Update Flyte Admin's Config
+4. Update FlyteAdmin's Config
 
-   Flyte Admin needs to be made aware of all the AWS Batch Job Queues and how the system should distribute the load onto them.
+   FlyteAdmin needs to be made aware of all the AWS Batch Job Queues and how the system should distribute the load onto them.
    The simplest setup looks something like this:
 
    .. code-block:: yaml
@@ -113,6 +115,8 @@ reading outputs, scheduling map tasks, leveraging AWS Batch Job Queues to distri
           default-for-task-types:
             # Set it as the default handler for array/map tasks.
             container_array: aws_array
+            # Make sure to add this line to enable single (non-map) AWS Batch tasks
+            aws-batch: aws_array
 
 Let's now look at how to launch an execution to leverage AWS Batch to execute jobs:
 
@@ -149,12 +153,12 @@ Let's now look at how to launch an execution to leverage AWS Batch to execute jo
 As soon as the task starts executing, a link for the AWS Array Job will appear in the log links section in Flyte Console. 
 As individual jobs start getting scheduled, links to their individual cloudWatch log streams will also appear in the UI.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/assets/img/map-task-success.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/aws_plugin_setup/map_task_success.png
     :alt: A screenshot of Flyte Console displaying log links for a successful array job.
 
 A screenshot of Flyte Console displaying log links for a successful array job.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/assets/img/map-task-failure.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/aws_plugin_setup/map_task_failure.png
     :alt: A screenshot of Flyte Console displaying log links for a failed array job.
 
 A screenshot of Flyte Console displaying log links for a failed array job.

@@ -1,42 +1,13 @@
-.. _gettingstarted_implement:
+.. _gettingstarted_build:
 
-Getting Started
----------------
 
-.. raw:: html
-  
-    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
+Implement Your Workflows in Python
+----------------------------------
 
-.. div:: getting-started-panels
-
-    .. panels::
-        :body: text-center
-        :container: container-xs
-        :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
-
-        ---
-        .. link-button:: gettingstarted_implement
-            :type: ref
-            :text: 1. Implement
-            :classes: btn-primary btn-block stretched-link
-        
-        ---
-        .. link-button:: gettingstarted_scale
-            :type: ref
-            :text: 2. Scale
-            :classes: btn-block stretched-link
-        ---
-        .. link-button:: gettingstarted_iterate
-            :type: ref
-            :text: 3. Iterate
-            :classes: btn-block stretched-link
-
-.. caution::
+.. note::
 
     We recommend using an OSX or a Linux machine, as we have not tested this on Windows. If you happen to test it, please let us know.
 
-Implement Your Workflows in Python
-==================================
 
 Prerequisites
 ^^^^^^^^^^^^^^^^
@@ -93,13 +64,3 @@ Expected output:
 .. admonition:: Recap
 
   .. rubric:: 🎉 Congratulations! You just ran your first Flyte workflow locally, let's take it to the cloud!
-
-
-.. toctree::
-   :maxdepth: -1
-   :caption: Getting Started
-   :hidden:
-
-   Build and Deploy your application<getting_started_scale>
-   Iterate "fast"er<getting_started_iterate>
-   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>

@@ -10,6 +10,7 @@ This guide gives an overview of how to set up BigQuery in your Flyte deployment.
 .. tabbed:: GCp cluster setup
 
   * Make sure you have up and running flyte cluster in `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__
+  * Create a service account for BigQuery. More detail: https://cloud.google.com/bigquery/docs/quickstarts/quickstart-client-libraries
   * Make sure you have correct kubeconfig and selected the correct kubernetes context
   * make sure you have the correct FlyteCTL config at ~/.flyte/config.yaml
 
@@ -34,7 +35,7 @@ This guide gives an overview of how to set up BigQuery in your Flyte deployment.
               container: container
               sidecar: sidecar
               container_array: k8s-array
-              bigquery: bigquery
+              bigquery_query_job_task: bigquery
 
 3. Upgrade the Flyte Helm release.
 

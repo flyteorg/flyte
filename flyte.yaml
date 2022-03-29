@@ -50,7 +50,7 @@ Logger:
   show-source: true
   level: 4
 admin:
-  endpoint: localhost:8089
+  endpoint: localhost:30081
   insecure: true
 plugins:
   # All k8s plugins default configuration

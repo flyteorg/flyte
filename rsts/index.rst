@@ -1,18 +1,24 @@
-
-
 .. toctree::
    :maxdepth: 1
    :name: mainsections
    :titlesonly:
    :hidden:
 
-   |plane| Getting Started <getting_started>
+   |plane| Getting Started <getting_started/index>
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
+
+.. toctree::
+   :caption: Getting Started
+   :maxdepth: -1
+   :name: gettingstarted
+   :hidden:
+
+   getting_started/index
 
 .. toctree::
    :caption: Concepts
@@ -46,24 +52,25 @@
    :name: apireference
    :hidden:
 
-   References <reference/index>
+   API Reference <reference/index>
 
    
-Meet Flyte
-==========
+What is Flyte?
+==============
 
 .. raw:: html
 
-   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
+   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale. </p>
 
 
-Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
+Flyte is an open-source, container-native, structured programming and distributed processing platform implemented in Golang. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, JAVA, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
-The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit SDK:
 
-.. tabbed:: python
+The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
+
+.. tabbed:: Python
 
     .. code:: python
 
@@ -87,7 +94,7 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
         welcome(name="Traveler")
         # Output: "Welcome, Traveler! How are you?"
 
-.. tabbed:: java
+.. tabbed:: Java
 
     .. code:: java
 
@@ -179,7 +186,7 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
 
     Link to the example code: `WelcomeWorkflow.java <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples/src/main/java/org/flyte/examples/WelcomeWorkflow.java>`_
 
-.. tabbed:: scala
+.. tabbed:: Scala
 
     .. code:: scala
 
@@ -247,12 +254,13 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
 Why Flyte?
 ==========
 
-Flyte's main purpose is to increase the development velocity for data processing and machine learning, enabling large-scale compute execution without the operational overhead. Teams can therefore focus on the business goals and not the infrastructure.
+The main purpose of Flyte is to increase the development velocity for data processing and machine learning, enabling large-scale compute execution without the operational overhead. Teams can therefore focus on the business goals rather than the infrastructure.
 
 Core Features
 -------------
 
 * Container Native
+* Reproducibility
 * Extensible Backend & SDK’s
 * Ergonomic SDK’s in Python, Java & Scala
 * Versioned & Auditable - all actions are recorded
@@ -262,6 +270,7 @@ Core Features
 * Deep understanding of data-lineage & provenance
 * Operation Visibility - cost, performance, etc.
 * Cross-Cloud Portable Pipelines
+* Support for cross language workflows
 
 Who's Using Flyte?
 ------------------
@@ -275,7 +284,7 @@ Next Steps
 
 Whether you want to write Flyte workflows, deploy the Flyte platform to your K8s cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
 
-* :ref:`Get Started <gettingstarted_implement>`
+* :ref:`Get Started <gettingstarted_build>`
 * :ref:`Main Concepts <divedeep>`
 * :ref:`Extend Flyte <cookbook:plugins_extend>`
 * :ref:`Join the Community <community>`

@@ -9,12 +9,12 @@ dependencies:
     version: v0.1.10 # VERSION
     repository: file://../flyte-core # REPOSITORY
   - name: contour
-    version: 4.1.2
+    version: 5.0.0
     repository: https://charts.bitnami.com/bitnami
     condition: contour.enabled
   - name: spark-operator
     alias: sparkoperator
-    version: 1.0.6
+    version: 1.1.15
     repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
     condition: sparkoperator.enabled
   - name: kubernetes-dashboard

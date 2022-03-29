@@ -4,7 +4,7 @@
 Platform Events
 #################
 
-Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the Flyte Propeller to Flyte Admin. Administrators can configure Flyte Admin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-cluster-config-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
+Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the FlytePropeller to FlyteAdmin. Administrators can configure FlyteAdmin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-cluster-config-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
 
 *********
 Use cases
@@ -21,7 +21,7 @@ Event egress can be configured to work with **AWS** using `SQS <https://aws.amaz
 Configuration
 *************
 
-To turn on, add the following to your Flyte Admin
+To turn on, add the following to your FlyteAdmin:
 
 .. code:: yaml
 

@@ -14,6 +14,7 @@ solution). The following pages will help you effectively deploy and manage an en
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: deployment-overview
        :type: ref
@@ -51,6 +52,15 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    .. link-button:: multicluster
+       :type: ref
+       :text: Multi-cluster setup
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Detailed instructions on multiple clusters' setup.
+
+    ---
+
     .. link-button:: deployment-plugin-setup
        :type: ref
        :text: Plugin Setup
@@ -66,6 +76,14 @@ solution). The following pages will help you effectively deploy and manage an en
     ^^^^^^^^^^^^
     Flyte comes with a lot of things you can configure. These pages will walk you through the various components.
 
+    ---
+    .. link-button:: ideal-flow
+       :type: ref
+       :text: How to Streamline Your Flyte Workflows
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    An example use case leveraging DevOps practices to run Flyte pipelines.
+
 
 .. toctree::
     :maxdepth: 1
@@ -75,7 +93,9 @@ solution). The following pages will help you effectively deploy and manage an en
     overview
     aws/index
     gcp/index
+    multicluster
     cluster_config/index
     sandbox
     plugin_setup/index
     security/security
+    ideal_flow

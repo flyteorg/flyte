@@ -22,7 +22,7 @@ Cluster Config
        :text: Auth Migration Guide
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Migration guide to help you move to Admin's own authorization server.
+    Migration guide to move to Admin's own authorization server.
 
     ---
 
@@ -46,7 +46,7 @@ Cluster Config
 
     .. link-button:: flyteadmin-config-specification
        :type: ref
-       :text: Flyte Admin Configuration
+       :text: FlyteAdmin Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     All about FlyteAdmin configuration specification.
@@ -55,10 +55,28 @@ Cluster Config
 
     .. link-button:: flytepropeller-config-specification
        :type: ref
-       :text: Flyte Propeller Configuration
+       :text: FlytePropeller Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Detailed list of all Flyte Propeller configuration options and their default values.
+
+    ---
+
+    .. link-button:: flytedatacatalog-config-specification
+       :type: ref
+       :text: Flyte Datacatalog Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Datacatalog configuration specification are covered here.
+
+    ---
+
+    .. link-button:: flytescheduler-config-specification
+       :type: ref
+       :text: Flyte Scheduler Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Flyte Scheduler configuration specification are covered here.
 
     ---
 
@@ -106,8 +124,10 @@ Cluster Config
     auth_appendix
     general
     customizable_resources
+    datacatalog_config
     flyteadmin_config
     flytepropeller_config
+    scheduler_config
     monitoring
     notifications
     performance

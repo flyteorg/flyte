@@ -228,9 +228,9 @@ dashboard = Dashboard(
         ),
     ],
     editable=False,
-    title="Flyte Admin Dashboard (via Prometheus)",
+    title="FlyteAdmin Dashboard (via Prometheus)",
     rows=FlyteAdmin.create_all_rows(),
-    description="Flyte Admin/Control Plane Dashboard. This is great for monitoring FlyteAdmin and the Service API.",
+    description="FlyteAdmin/Control Plane Dashboard. This is great for monitoring FlyteAdmin and the Service API.",
 ).auto_panel_ids()
 
 if __name__ == "__main__":

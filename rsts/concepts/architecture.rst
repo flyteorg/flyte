@@ -19,7 +19,7 @@ FlyteIDL uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ 
 Planes
 ======
 
-Flyte components are separated into 3 logical planes. The planes are summarized here and explained in further detail below. The goal is that any of these planes can be replaced by an alternate implementation.
+Flyte components are separated into 3 logical planes. The planes are summarized and explained in detail below. The goal is that these planes can be replaced by alternate implementations.
 
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 | **User Plane**    | The User Plane consists of all user tools that assist in interacting with the core Flyte API.                 |
@@ -97,7 +97,7 @@ Component Code Architecture
 
 .. panels::
   :container: container-lg pb-4
-  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :column: col-lg-12 p-2
   :body: text-center
 
   .. link-button:: flytepropeller-architecture
@@ -117,7 +117,7 @@ Component Code References
 
 .. panels::
   :container: container-lg pb-4
-  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :column: col-lg-12 p-2
   :body: text-center
 
   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin

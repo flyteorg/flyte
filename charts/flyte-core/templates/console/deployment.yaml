@@ -21,6 +21,9 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+      {{- if .Values.flyteconsole.priorityClassName }}
+      priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
+      {{- end }}
       containers:
       - image: "{{ .Values.flyteconsole.image.repository }}:{{ .Values.flyteconsole.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteconsole.image.pullPolicy }}"
@@ -30,6 +33,13 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        {{- if .Values.flyteconsole.ga.enabled }}
+        env:
+        - name: ENABLE_GA
+          value: "{{ .Values.flyteconsole.ga.enabled }}"
+        - name: GA_TRACKING_ID
+          value: "{{ .Values.flyteconsole.ga.tracking_id }}"
+        {{- end }}
         resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /srv/flyte

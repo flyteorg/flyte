@@ -6,6 +6,7 @@ Control Plane
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: divedeep-projects
         :type: ref
@@ -29,10 +30,10 @@ Control Plane
 
     .. link-button:: divedeep-admin
         :type: ref
-        :text: Flyte Admin
+        :text: FlyteAdmin
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Flyte Admin** is the backend that serves the main Flyte API, processing all client requests to the system.
+    **FlyteAdmin** is the backend that serves the main Flyte API, processing all client requests to the system.
 
     ---
 

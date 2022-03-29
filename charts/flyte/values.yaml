@@ -1,9 +1,9 @@
+--- # ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
 # settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
 # Flyteconsole
-# ---------------------------------------------------------------------
 flyte:
   #
   # FLYTEADMIN SETTINGS
@@ -16,9 +16,22 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v0.6.69 # FLYTEADMIN_TAG
+      tag: v0.6.112 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
+    # -- Additional flyteadmin container environment variables
+    #
+    # e.g. SendGrid's API key
+    #  - name: SENDGRID_API_KEY
+    #    value: "<your sendgrid api key>"
+    #
+    # e.g. secret environment variable (you can combine it with .additionalVolumes):
+    # - name: SENDGRID_API_KEY
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: sendgrid-secret
+    #       key: api_key
+    env: []
     # -- Default resources requests and limits for Flyteadmin deployment
     resources:
       limits:
@@ -61,8 +74,6 @@ flyte:
     secrets: {}
     additionalVolumes: []
     additionalVolumeMounts: []
-    # -- Deploys a Redoc container in Flyteadmin's pod
-    deployRedoc: true
 
   #
   # FLYTESCHEDULER SETTINGS
@@ -73,7 +84,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v0.6.69 # FLYTESCHEDULER_TAG
+      tag: v0.6.112 # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -118,7 +129,7 @@ flyte:
       # -- Docker image for Datacatalog deployment
       repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
       # -- Docker image tag
-      tag: v0.3.19 # DATACATALOG_TAG
+      tag: v0.3.23 # DATACATALOG_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Datacatalog deployment
@@ -167,7 +178,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v0.16.4 # FLYTEPROPELLER_TAG
+      tag: v0.16.32 # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -212,7 +223,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v0.34.0 # FLYTECONSOLE_TAG
+      tag: v0.43.0 # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
@@ -235,6 +246,9 @@ flyte:
     tolerations: []
     # -- affinity for Flyteconsole deployment
     affinity: {}
+    ga:
+      enabled: true
+      tracking_id: "G-0QW4DJWJ20"
 
   #
   # WEBHOOK SETTINGS
@@ -257,6 +271,9 @@ flyte:
       annotations:
         projectcontour.io/upstream-protocol.h2c: grpc
       type: ClusterIP
+
+  # It will enable the re doc route in ingress
+  deployRedoc: true
 
   # ------------------------------------------------
   #
@@ -356,7 +373,6 @@ flyte:
           name: staging
         - id: production
           name: production
-
 
     # -- FlyteAdmin server configuration
     adminServer:
@@ -717,6 +733,41 @@ minio:
   service:
     annotations: {}
     type: NodePort
+  # -- Annotations for Minio pods
+  podAnnotations: {}
+  # -- nodeSelector for Minio deployment
+  nodeSelector: {}
+  # -- tolerations for Minio deployment
+  tolerations: []
+  # -- affinity for Minio deployment
+  affinity: {}
+
+
+redoc:
+  # --- enable or disable Minio deployment installation
+  enabled: true
+  # -- Replicas count for Minio deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Minio deployment
+    repository: docker.io/redocly/redoc
+    # -- Docker image tag
+    tag: latest
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Minio deployment
+  resources:
+    # -- Requests are the minimum set of resources needed for this pod
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    # -- Limits are the maximum set of resources needed for this pod
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  # -- Service settings for Minio
+  service:
+    type: ClusterIP
   # -- Annotations for Minio pods
   podAnnotations: {}
   # -- nodeSelector for Minio deployment

@@ -1,3 +1,5 @@
+.. _contribute_Flyte:
+
 ######################
 Contributing to Flyte
 ######################
@@ -46,7 +48,7 @@ For minor edits that don’t require a local setup, you can edit the GitHub page
 
 The edit option can be found at the bottom of a page, as shown below.
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/docs_edit.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/docs_edit.png
     :alt: GitHub edit option for Documentation
     :align: center
     :figclass: align-center
@@ -137,7 +139,7 @@ Output:
 🧱 Component Reference
 ======================
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/dependency_graph.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
     :align: center
     :figclass: align-center
@@ -228,7 +230,7 @@ Output:
     * - `Repo <https://github.com/flyteorg/flyteconsole>`__
     * - **Purpose**: Admin Console
     * - **Language**: Typescript
-    * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteconsole/blob/master/README.rst>`__
+    * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteconsole/blob/master/README.md>`__
 
 ``datacatalog``
 ***************
@@ -302,5 +304,5 @@ Also, add relevant labels to your issue. For example, if you are filing a Flytek
 
 |
 
-For feedback at any point in the contribution process, feel free to reach out to us on `Slack <http://flyte-org.slack.com/>`__. 
-If you haven't joined Slack yet, you can do so by clicking `this link <https://docs.google.com/forms/d/e/1FAIpQLScWPJZncyL-bBCWbuQ9HWuMzA8-r2RJc__CSWJoAYUQADN-BQ/viewform>`__.
+For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__. 
+

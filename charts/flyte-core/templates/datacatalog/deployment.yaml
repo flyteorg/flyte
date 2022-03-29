@@ -22,17 +22,10 @@ spec:
         fsGroup: 1001
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
-      initContainers:
-      {{- if .Values.db.checks }}
-      - name: check-db-ready
-        image: postgres:10.16-alpine
-        securityContext:
-          runAsUser: 0
-        command:
-          - sh
-          - -c
-          - until pg_isready -h {{ tpl .Values.db.datacatalog.database.host $ }} -p {{ .Values.db.datacatalog.database.port }}; do echo waiting for database; sleep 2; done;
+      {{- if .Values.datacatalog.priorityClassName }}
+      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
       {{- end }}
+      initContainers:
       - command:
         - datacatalog
         - --config
@@ -50,10 +43,10 @@ spec:
         - datacatalog
         - --config
         - {{ .Values.datacatalog.configPath }}
-        {{- with .Values.datacatalog.extraArgs }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         - serve
+        {{- with .Values.datacatalog.extraArgs }}
+        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- end }}
         image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
         name: datacatalog

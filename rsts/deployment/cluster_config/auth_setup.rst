@@ -56,7 +56,7 @@ The following is required for non-sandbox deployments:
    .. note::
 
       Flyte's Ingress routes traffic to either
-      Flyte Console or Flyte Admin based on the url path
+      Flyte Console or FlyteAdmin based on the url path
 
    .. prompt:: bash
 
@@ -65,12 +65,12 @@ The following is required for non-sandbox deployments:
 
 IdP Configuration
 =================
-Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
+FlyteAdmin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
 
 Example Flyte Configurations
 ============================
 
-Below are some canonical examples of how to set up some of the common IdPs to secure your Fyte services. OpenID Connect enables users to authenticate, in the
+Below are some canonical examples of how to set up some of the common IdPs to secure your Flyte services. OpenID Connect enables users to authenticate, in the
 browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed third party app access.
 
 OpenID Connect
@@ -99,10 +99,15 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     4. *Optional*: Add logout redirect URIs (e.g. http://localhost:30081/logout for sandbox)
     5. Write down the Client ID and Client Secret
 
-.. tabbed:: KeyCloak
+.. tabbed:: Keycloak
 
-    `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others).
-    KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.
+    `Keycloak <https://www.keycloak.org/>`__ is an open source solution for authentication.It supports both OpenID Connect and OAuth2 protocols (among others).
+    Keycloak can be configured as both the OpenID Connect and OAuth2 Authorization Server provider for Flyte. Here we configure to use it for OpenID Connect.
+
+    1. If you don't have a Keycloak installation, you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides a quick way to deploy Keycloak cluster on AWS.
+    2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
+    4. Add Login redirect URIs (e.g, http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``).
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
@@ -145,6 +150,7 @@ Apply Configuration
         userAuth:
           openId:
             # 2. Put the URL of the OpenID Connect provider.
+            #    baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
             #    baseUrl: https://accounts.google.com # Uncomment for Google
             baseUrl: https://dev-14186422.okta.com/oauth2/default # Okta with a custom Authorization Server
             scopes:
@@ -154,10 +160,10 @@ Apply Configuration
             # 3. Replace with the client ID created for Flyte.
             clientId: 0oakkheteNjCMERst5d6
         authorizedUris:
-          # 4. Update with public domain name (for non-sandbox deployments)
+          # 4. Update with a public domain name (for non-sandbox deployments).
           # - https://example.foobar.com:443
           # Or uncomment this line for sandbox deployment
-          # - https://localhost:30081
+          # - http://localhost:30081
           - http://flyteadmin:80
           - http://flyteadmin.flyte.svc.cluster.local:80
 
@@ -168,6 +174,19 @@ Apply Configuration
    .. prompt:: bash
 
       kubectl rollout restart deployment/flyteadmin -n flyte
+
+#. Restart `flytepropeller` to start using authenticated requests:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytepropeller -n flyte
+
+.. note::
+
+   **Congratulations!**
+
+   It should now be possible to go to flyte UI (https://<your domain>/console) and be prompted for authentication. Flytectl should automatically pickup the change and start prompting for authentication as well.
+   If you want to use an external OAuth2 provider for App authentication, please continue reading into the next section.
 
 OAuth2 Authorization Server
 ---------------------------
@@ -183,22 +202,29 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
 
 .. tabbed:: Okta
 
-   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. https://flyte.mycompany.io/).
+   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of FlyteAdmin (e.g. https://flyte.mycompany.io/).
    2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
    3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
-   4. Create 2 apps (for flytectl and flytepropeller) to enable these clients to communicate with the service.
+   4. Create 2 apps (for Flytectl and Flytepropeller) to enable these clients to communicate with the service.
       Flytectl should be created as a `native client`.
-      FlytePropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
+      Flytepropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
 
-.. tabbed:: KeyCloak
+.. tabbed:: Keycloak
 
-   `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others).
-   KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
+    `Keycloak <https://www.keycloak.org/>`__ is an open source solution for authentication. It supports both OpenID Connect and OAuth2 protocols (among others).
+    Keycloak can be configured as both the OpenID Connect and OAuth2 Authorization Server provider for Flyte. Here we use it as OAuth2 Authorization Server.
+
+    1. If you don't have a Keycloak installation, you can use `this <https://www.amazonaws.cn/en/solutions/keycloak-on-aws/>`__ which provides quick way to deploy Keycloak cluster on AWS.
+    2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
+    3. Under `Client Scopes`, click `Add Create` inside the admin console.
+    4. Create 2 clients (for Flytectl and Flytepropeller) to enable these clients to communicate with the service.
+       * Flytectl should be created with `Access Type Public` and standard flow enabled.
+       * FlytePropeller should be created as an `Access Type Confidential`, standard flow enabled, and note the client ID and client Secrets provided.
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
-#. It is possible to direct Flyte admin to use an external authorization server. To do so, edit the same config map once
+#. It is possible to direct FlyteAdmin to use an external authorization server. To do so, edit the same config map once
    more and follow these changes:
 
    .. code-block:: yaml
@@ -206,21 +232,24 @@ Apply Configuration
         auth:
             appAuth:
                 # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
-                #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
+                #    Choose Self (or omit the value) to use FlyteAdmin's internal (albeit limited) Authorization Server.
                 authServerType: External
 
                 # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
                 externalAuthServer:
                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+                    #baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for keycloak
+                    #metadataUrl: .well-known/openid-configuration #Uncomment for keycloak
+
             thirdPartyConfig:
                 flyteClient:
-                    # 3. Replace with a new Native Client ID provisioned in the custom authorization server
+                    # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
                     clientId: flytectl
 
                     # This should not change
-                    redirectUri: https://localhost:53593/callback
+                    redirectUri: http://localhost:53593/callback
 
-                    # 4. "all" is a required scope and must be configured in the custom authorization server
+                    # 4. "all" is a required scope and must be configured in the custom authorization server.
                     scopes:
                     - offline
                     - all
@@ -315,7 +344,7 @@ Apply Configuration
 Continuous Integration - CI
 ---------------------------
 
-If your organization does any automated registration, then you'll need to authenticate with the `client credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_ flow. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
+If your organization does any automated registration, then you'll need to authenticate with the `client credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_ flow. After retrieving an access token from the IDP, you can send it along to FlyteAdmin as usual.
 
 .. tabbed:: Flytectl
 

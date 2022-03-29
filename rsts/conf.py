@@ -24,13 +24,13 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = u"Flyte"
-copyright = u"2021, Flyte Authors"
+copyright = u"2022, Flyte Authors"
 author = u"Flyte"
 
 # The short X.Y version
 version = u""
 # The full version, including alpha/beta/rc tags
-release = u"0.18.0"
+release = u"0.19.3"
 
 # -- General configuration ---------------------------------------------------
 
@@ -106,7 +106,7 @@ exclude_patterns = [u"_build", "Thumbs.db", ".DS_Store"]
 html_favicon = "images/flyte_circle_gradient_1_4x4.png"
 html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_theme = "furo"
-html_title = "Flyte Docs"
+html_title = "Flyte"
 
 templates_path = ["_templates"]
 

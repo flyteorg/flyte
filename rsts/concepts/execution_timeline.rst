@@ -4,7 +4,9 @@
 Timeline of a workflow execution
 ########################################
 
-.. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_timeline.svg?sanitize=true
+The illustration below shows the timeline view of a workflow execution. 
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/monitoring/flyte_wf_timeline.svg?sanitize=true
 
 
 The illustration above refers to a simple workflow, with 2 nodes N1 & N2. This can be represented as follows,
@@ -19,36 +21,35 @@ The illustration above refers to a simple workflow, with 2 nodes N1 & N2. This c
 
 Acceptance Latency
 ====================
-Every Workflow starts in the ``Acceptance`` phase. Acceptance refers to the time between FlyteAdmin receiving an execution request and FlytePropeller's first round of Workflow evaluation.
-Usually within this phase the K8s queuing latency is the largest contributor to latency. But overall Acceptance latency of <5s is desirable.
-
-**This is one of the latencies that the core team is working on optimizing**
+Every workflow starts in the ``Acceptance`` phase. Acceptance refers to the time between FlyteAdmin receiving an execution request and Flyte Propeller evaluating the first round of workflow.
+Usually, within this phase, the K8s queuing latency is the largest contributor to latency where the overall acceptance latency of <5s is desirable.
 
 Transition Latency
 ===================
-Transition latency refers to the time between successive node executions, i.e between N1 & N2. For the first node (N1) this latency also encapsulates executing the Start node. Similarly, the last node also encapsulates executing End node as well. ``Start Node`` and ``End Node`` are capstones inserted to mark the begining and end of the DAG.
-the latency involves, time it takes to,
-#. Gather outputs for a node after the node completes
-#. Send an observation event to FlyteAdmin. Failing to do so is regarded as an error and will be tried until successful or we exhaust system max retries. (as a default the the max system retries is configured to be 30 and can be altered per deployment)
-#. Persist data to Kubernetes
-#. Receive the persisted object back from Kubernetes (as this process is eventually consistent using informer caches)
-#. Gather inputs for a node before the node starts
-#. Send a queued event for the next node to FlyteAdmin (this is what is persisted and drives the UI/CLI and historical information)
+Transition latency refers to the time between successive node executions, i.e., between N1 & N2. For the first node ``N1`` this latency also encapsulates executing the start node. 
 
-**This is one of the latencies that the core team is working on optimizing**
+Similarly, the last node also encapsulates executing end node as well. ``Start Node`` and ``End Node`` are capstones inserted to mark the beginning and end of the DAG.
+
+The latency involves time consumed to:
+
+#. Gather outputs for a node after the node completes.
+#. Send an observation event to FlyteAdmin. Failing to do so will be regarded as an error and will be tried until it succeeds or system max retries are exhausted (the number of max system retries is configured to be 30 by default and can be altered per deployment).
+#. Persist data to Kubernetes.
+#. Receive the persisted object back from Kubernetes (as this process is eventually consistent using informer caches).
+#. Gather inputs for a node before the node starts.
+#. Send a queued event for the next node to FlyteAdmin (this is what is persisted and drives the UI/CLI and historical information).
 
 Queuing Latency
 ================
-This is the time it takes for Kubernetes to start the pod, or the other service to start the job or an HTTP throttle to be met or any rate-limiting to be overcome. This
-is usually tied to available resources and quota and is out of control for Flyte
+Queuing latency is the time taken by Kubernetes to start the pod, other services to start the job, HTTP throttle to be met, or any rate-limiting that needs to be overcome. This
+is usually tied to the available resources and quota, and is out of control for Flyte.
 
 Completion Latency
 ===================
-Time it takes to mark the workflow as complete and accumulate outputs of a workflow after the last node has completed.
+Completion latency is the time taken to mark the workflow as complete and accumulate outputs of a workflow after the last node completes its execution.
 
-**This is one of the latencies that the core team is working on optimizing**
 
-Overview of various latencies in FlytePropeller
+Overview of Various Latencies in FlytePropeller
 =================================================
 
 ===================================  ==================================================================================================================================
@@ -64,3 +65,6 @@ Repeat steps 2-4 for every task
 Transition Latency                   See #2
 Completion Latency                   Measures the time between when the WF moved to succeeding/failing state and when it finally moved to a terminal state.
 ===================================  ==================================================================================================================================
+
+.. note::
+    **The core team is working on optimizing Completion Latency, Transition Latency, and Acceptance Latency.**

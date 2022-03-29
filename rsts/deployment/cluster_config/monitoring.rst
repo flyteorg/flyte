@@ -18,7 +18,7 @@ We will be adding to this set of metrics as we implement the capabilities to pul
 
 At a high level, workflow execution goes through the following discrete steps:
 
-.. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_timeline.svg?sanitize=true
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/monitoring/flyte_wf_timeline.svg?sanitize=true
 
 ===================================  ==================================================================================================================================
                        Description of main events for workflow execution
@@ -92,6 +92,6 @@ The dashboards are divided into two types:
         - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`__
         - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
 
-The abovementioned are basic dashboards and do no include all the metrics exposed by Flyte.
+The above mentioned are basic dashboards and do no include all the metrics exposed by Flyte.
 Please help us improve the dashboards by contributing to them 🙏.
 Refer to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.

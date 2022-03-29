@@ -1,19 +1,20 @@
 .. _divedeep:
 
 #############
-Core Concepts
+Concepts
 #############
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: divedeep-tasks
        :type: ref
        :text: Tasks
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    A **Task** is any independent unit of processing. They can be pure functions or functions with side-effects.
-    Each definition of a task also has associated configuration and requirements specifications.
+    A **Task** is any independent unit of processing. Tasks can be pure functions or functions with side-effects.
+    Each definition of a task also has associated configurations and requirements specifications.
 
     ---
 
@@ -32,8 +33,8 @@ Core Concepts
        :text: Nodes
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    A **Node** is an encapsulation of an instance of a Task and represent the unit of work, where multiple Nodes that are
-    interconnected via workflows
+    A **Node** is an encapsulation of an instance of a Task. Nodes represent the unit of work, where multiple Nodes are
+    interconnected via workflows.
 
     ---
 
@@ -42,7 +43,7 @@ Core Concepts
        :text: Launch Plans
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated different schedules.
+    **Launch Plans** provide a mechanism to specialize input parameters for workflows associated with different schedules.
 
     ---
 
@@ -51,7 +52,7 @@ Core Concepts
        :text: Scheduling Launch Plans
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Scheduling** is critical to data and ML jobs; Flyte provides a native Cron-style scheduler.
+    **Scheduling** is critical to data and ML jobs. Flyte provides a native Cron-style scheduler.
 
     ---
 
@@ -60,8 +61,8 @@ Core Concepts
         :text: Registration
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    **Registration** is the process of uploading workflow and its task definitions to the FlyteAdmin service.
-    Registration creates an inventory of available tasks, workflows and launch plans - declared per project and domain.
+    **Registration** is the process of uploading a workflow and its task definitions to the FlyteAdmin service.
+    Registration creates an inventory of available tasks, workflows and launch plans, declared per project and domain.
 
     ---
 
@@ -80,7 +81,7 @@ Core Concepts
         :text: State Machine for an Execution
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    States an **Execution** passes through.
+    The various states an **Execution** passes through.
 
     ---
 
@@ -95,10 +96,10 @@ Core Concepts
 
     .. link-button:: divedeep-data-management
         :type: ref
-        :text: How Flyte Manages Data?
+        :text: How Flyte Manages Data
         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    What is **metadata**? How large amounts of **raw data** is handled? How data flows between tasks?
+    What is **metadata**? How are large amounts of **raw data** handled? How does data flow between tasks?
 
     ---
 
@@ -121,16 +122,16 @@ Core Concepts
     ---
 
     .. link-button:: divedeep-versioning
-        :type: ref
-        :text: Workflow & Task Versioning
-        :classes: btn-block stretched-link
+         :type: ref
+         :text: Workflow & Task Versioning
+         :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    A deeper dive into one of the Flyte's most important features: versioning of workflows and tasks.
+    A deeper dive into one of Flyte's most important features: versioning of workflows and tasks.
 
 
 The diagram below shows how inputs flow through tasks and workflows to produce outputs.
 
-.. image:: ./flyte_wf_tasks_high_level.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/basics/flyte_wf_tasks_high_level.png
 
 
 .. toctree::
@@ -139,8 +140,10 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     :hidden:
 
     tasks
-    workflows_nodes
-    launchplans_schedules
+    workflows
+    nodes
+    launchplans
+    schedules
     registration
     executions
     state_machine
@@ -149,4 +152,3 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     flyte_console
     catalog
     versioning
-

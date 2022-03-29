@@ -1,8 +1,8 @@
 .. _divedeep-launchplans:
   
 Launch plans
-============
-Launch plans are used to execute workflows. A workflow can have many launch plans, but an individual launch plan is always tied to a single, specific workflow. Once created, launch plans are easy to share and execute.
+=============
+Launch plans help execute workflows. A workflow can be associated with multiple launch plans and launch plan versions, but an individual launch plan is always associated with a single, specific workflow. After creating a launch plan, it is easy to share and execute them.
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
 
@@ -12,8 +12,23 @@ optional notifications. Refer to the :ref:`deployment-cluster-config-notificatio
 
 See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
 
-What do launch plans provide?
------------------------------
+The Association between Workflows and LaunchPlans
+--------------------------------------------------
+Every workflow comes with a `default` launch plan that has the same name as that of a workflow. The default launch plan is authored (in code) as part of creating a new workflow.
+A launch plan version can only ever be mapped to one WF version; meaning a launch plan version cannot be used twice. This is because part of what makes a new launch plan version is the mapping to the specific workflow version.
+
+.. note::
+   Users rarely interact with the default launch plan.
+
+Suppose we have ``Workflow A`` in ``version 1``, ``LaunchPlans`` ``A`` and ``B`` in ``version 1``, and ``LaunchPlan`` ``B`` in ``version 2``, then:
+
+1. ``Workflow A`` can be associated with ``LaunchPlan A`` (version 1);
+2. ``Workflow A`` can be associated with ``LaunchPlan B`` (different launch plan name; version 1);
+3. ``Workflow A`` can be associated with ``LaunchPlan B`` (version 2).
+
+
+What do Launch Plans Provide?
+------------------------------
 
 - One click invocation of workflows with predefined inputs and friendly launch plan names.
 - Multiple schedules with different default values for inputs per workflow.
@@ -38,25 +53,3 @@ Default inputs behave much like default workflow inputs. As their name implies, 
 Fixed Inputs
 ^^^^^^^^^^^^
 Fixed inputs cannot be overridden. If a workflow is executed with a launch plan and dynamic inputs that attempt to redefine the launch plan's fixed inputs, the execution creation request *will fail*.
-
-.. _concepts-schedules:
-
-Schedules
----------
-Workflows can be run automatically using schedules associated with launch plans. Schedules can either define a cron_expression_. or rate_unit_.
-
-At most one launch plan version for a given {Project, Domain, Name} combination can be active, which means at most one schedule can be active for a launch plan. However, many unique launch plans and corresponding schedules can be defined for the same workflow.
-
-.. _cron_expression:
-
-Cron Expression
----------------
-Cron expression strings use the `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`__. These are validated at launch plan registration time.
-
-.. _rate_unit:
-
-Rate Unit
----------
-
-Schedules can also be defined using fixed rates in units of **days**, **hours** and **minutes**.
-

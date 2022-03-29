@@ -98,47 +98,6 @@ metadata:
   namespace: flyte
 type: Opaque
 ---
-# Source: flyte-core/templates/admin/cluster_resource_configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: clusterresource-template
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-core-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-data:
-  aa_namespace.yaml: | 
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
-    
-  aab_default_service_account.yaml: | 
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: default
-      namespace: {{ namespace }}
-      annotations:
-        eks.amazonaws.com/role-arn: {{ defaultIamRole }}
-    
-  ab_project_resource_quota.yaml: | 
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }}
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }}
-        limits.memory: {{ projectQuotaMemory }}
----
 # Source: flyte-core/templates/admin/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -151,6 +110,9 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  clusters: | 
+    clusterConfigs: []
+    labelClusterMap: {}
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -264,7 +226,105 @@ data:
             value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       refresh: 5m
       refreshInterval: 5m
+      standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+---
+# Source: flyte-core/templates/clusterresourcesync/cluster_resource_configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clusterresource-template
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  aa_namespace.yaml: | 
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+    
+  aab_default_service_account.yaml: | 
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default
+      namespace: {{ namespace }}
+      annotations:
+        eks.amazonaws.com/role-arn: {{ defaultIamRole }}
+    
+  ab_project_resource_quota.yaml: | 
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }}
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }}
+        limits.memory: {{ projectQuotaMemory }}
+---
+# Source: flyte-core/templates/clusterresourcesync/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-clusterresourcesync-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  cluster_resources.yaml: | 
+    cluster_resources:
+      customData:
+      - production:
+        - projectQuotaCpu:
+            value: "5"
+        - projectQuotaMemory:
+            value: 4000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+      - staging:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+      - development:
+        - projectQuotaCpu:
+            value: "4"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+      refresh: 5m
+      refreshInterval: 5m
+      standaloneDeployment: false
+      templatePath: /etc/flyte/clusterresource/templates
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<RDS_HOST>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
+  domain.yaml: | 
+    domains:
+    - id: development
+      name: development
+    - id: staging
+      name: staging
+    - id: production
+      name: production
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -311,6 +371,8 @@ data:
       grpcServerReflection: true
       httpPort: 8080
     datacatalog:
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
       metrics-scope: datacatalog
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
@@ -489,7 +551,7 @@ data:
         kubernetes-enabled: false
 ---
 # Source: flyte-core/templates/propeller/crds/flyteworkflow.yaml
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: flyteworkflows.flyte.lyft.com
@@ -499,16 +561,24 @@ spec:
     kind: FlyteWorkflow
     plural: flyteworkflows
     shortNames:
-    - fly
+      - fly
     singular: flyteworkflow
   scope: Namespaced
-  version: v1alpha1
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+          properties:
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyteadmin
+  name: flyte-flyteadmin
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -538,7 +608,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -612,7 +682,7 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 rules:
   - apiGroups:
@@ -628,10 +698,10 @@ rules:
       - patch
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyteadmin-binding
+  name: flyte-flyteadmin-binding
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -640,17 +710,17 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyteadmin
+  name: flyte-flyteadmin
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
   namespace: flyte
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -659,7 +729,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flytepropeller
+  name: flyte-flytepropeller
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
@@ -670,12 +740,12 @@ subjects:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
 subjects:
   - kind: ServiceAccount
     name: flyte-pod-webhook
@@ -815,7 +885,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fcf0dfae32fcbeb50142b91c4bfc6d9cb8d7c5bc0c18640873c5e499f46bea5"
+        configChecksum: "8456cd6e1b8e5c6a79896b484995e9e0ce52ac075227ba7a0121738cdfd3e37"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -833,7 +903,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -850,7 +920,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -864,7 +934,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -875,7 +945,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -898,7 +968,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -980,7 +1050,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.34.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.43.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -1029,7 +1099,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "16485df0a5bd977709b6fe864dac703333ac764982922e2680fec44db3dccd8"
+        configChecksum: "46bc3bc24c47b04eded1bd0b7c039909235d974c3bae755bc3ccd531ed8c1c7"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1047,7 +1117,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.19"
+        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.23"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -1061,7 +1131,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.19"
+        image: "cr.flyte.org/flyteorg/datacatalog:v0.3.23"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -1120,7 +1190,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fcf0dfae32fcbeb50142b91c4bfc6d9cb8d7c5bc0c18640873c5e499f46bea5"
+        configChecksum: "8456cd6e1b8e5c6a79896b484995e9e0ce52ac075227ba7a0121738cdfd3e37"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1137,7 +1207,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.69"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -1153,7 +1223,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.69"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -1219,6 +1289,7 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+      priorityClassName: system-cluster-critical
       containers:
       - command:
         - flytepropeller
@@ -1229,7 +1300,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.4"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -1282,7 +1353,7 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.16.4
+        app.kubernetes.io/version: v0.16.32
       annotations:
         configChecksum: "0d6064977e729ccf7ff28a5198b11fe0679dafc50d2636d8783578243394d0a"
     spec:
@@ -1293,7 +1364,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.4"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1316,7 +1387,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.4"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1348,7 +1419,7 @@ spec:
           secret:
             secretName: flyte-pod-webhook
 ---
-# Source: flyte-core/templates/admin/cronjob.yaml
+# Source: flyte-core/templates/clusterresourcesync/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -1372,7 +1443,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.69"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
@@ -1392,11 +1463,11 @@ spec:
               name: clusterresource-template
             name: resource-templates
           - configMap:
-              name: flyte-admin-config
+              name: flyte-clusterresourcesync-config
             name: config-volume
 ---
 # Source: flyte-core/templates/common/ingress.yaml
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flyte-core
@@ -1418,123 +1489,151 @@ spec:
           - path: /*
             pathType: ImplementationSpecific
             backend:
-              serviceName: ssl-redirect
-              servicePort: use-annotation
+              service:
+                name: ssl-redirect
+                port:
+                  name: use-annotation
           # This is useful only for frontend development
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteconsole
-              servicePort: 80
+              service:
+                name: flyteconsole
+                port:
+                  number: 80
           - path: /console/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteconsole
-              servicePort: 80
+              service:
+                name: flyteconsole
+                port:
+                  number: 80
           - path: /api
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /api/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /healthcheck
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /v1/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 87
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /login
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /login/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /logout
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /logout/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /callback
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /callback/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /me
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /config
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /config/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /oauth2
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
           - path: /oauth2/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 80
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
       host: null
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
 # Source: flyte-core/templates/common/ingress.yaml
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flyte-core-grpc
@@ -1567,40 +1666,56 @@ spec:
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.AdminService/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.AuthMetadataService
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.AuthMetadataService/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.IdentityService
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.IdentityService/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /grpc.health.v1.Health
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /grpc.health.v1.Health/*
             pathType: ImplementationSpecific
             backend:
-              serviceName: flyteadmin
-              servicePort: 81
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
