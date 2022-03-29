@@ -23,7 +23,6 @@ import (
 
 type Service struct {
 	service.DataProxyServer
-	*service.UnimplementedDataProxyServer
 
 	cfg           config.DataProxyConfig
 	dataStore     *storage.DataStore
@@ -77,6 +76,8 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	}, nil
 }
 
+// createShardedStorageLocation creates a location in storage destination to maximize read/write performance in most
+// block stores. The final location should look something like: s3://<my bucket>/<shard length>/<file name>
 func createShardedStorageLocation(ctx context.Context, req *service.CreateUploadLocationRequest,
 	shardSelector ioutils.ShardSelector, store *storage.DataStore, cfg config.DataProxyUploadConfig) (storage.DataReference, error) {
 	keySuffixArr := make([]string, 0, 4)
@@ -90,10 +91,8 @@ func createShardedStorageLocation(ctx context.Context, req *service.CreateUpload
 		return "", err
 	}
 
-	keySuffixArr = append([]string{prefix}, keySuffixArr...)
-
 	storagePath, err := store.ConstructReference(ctx, store.GetBaseContainerFQN(ctx),
-		keySuffixArr...)
+		append([]string{prefix}, keySuffixArr...)...)
 	if err != nil {
 		return "", fmt.Errorf("failed to construct datastore reference. Error: %w", err)
 	}

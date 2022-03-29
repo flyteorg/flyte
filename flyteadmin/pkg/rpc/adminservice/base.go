@@ -7,7 +7,7 @@ import (
 
 	"github.com/flyteorg/flyteadmin/plugins"
 
-	interfaces2 "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtimeIfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 
@@ -59,7 +59,7 @@ func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message
 
 const defaultRetries = 3
 
-func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, configuration interfaces2.Configuration,
+func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, configuration runtimeIfaces.Configuration,
 	kubeConfig, master string, dataStorageClient *storage.DataStore, adminScope promutils.Scope) *AdminService {
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
