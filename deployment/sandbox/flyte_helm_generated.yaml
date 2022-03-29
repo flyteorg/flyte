@@ -4070,7 +4070,7 @@ spec:
   type: NodePort
   ports:
   - name: postgres
-    nodePort: 30088
+    nodePort: 30089
     port: 5432
     protocol: TCP
     targetPort: postgres
