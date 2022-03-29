@@ -27,3 +27,4 @@ dist/
 dist
 *.db
 flyte
+vendor/

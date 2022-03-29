@@ -39,6 +39,8 @@ helm dep update $charts
 helm install -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml
 k3s kubectl create namespace flytesnacks-development
 k3s kubectl wait --for=condition=available deployment/minio deployment/postgres -n flyte --timeout=5m || ( echo >&2 "Timed out while waiting for the Flyte deployment to start"; exit 1 )
+# Wait few seconds for Postgres service work because it doesn't work immediately
+sleep 3
 flyte start --config /flyteorg/share/flyte.yaml &
 FLYTE_PID=$!
 
