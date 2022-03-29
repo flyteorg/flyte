@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/workflowengine"
+	"github.com/flyteorg/flyteadmin/plugins"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
@@ -96,6 +96,7 @@ type ExecutionManager struct {
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
 	eventPublisher            notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
+	pluginRegistry            *plugins.Registry
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -681,7 +682,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
-	execInfo, err := workflowengine.GetRegistry().GetExecutor().Execute(ctx, workflowengineInterfaces.ExecutionData{
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:               namespace,
 		ExecutionID:             &workflowExecutionID,
 		ReferenceWorkflowName:   workflow.Id.Name,
@@ -920,7 +922,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
-	execInfo, err := workflowengine.GetRegistry().GetExecutor().Execute(ctx, workflowengineInterfaces.ExecutionData{
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:               namespace,
 		ExecutionID:             &workflowExecutionID,
 		ReferenceWorkflowName:   workflow.Id.Name,
@@ -1617,7 +1620,8 @@ func (m *ExecutionManager) TerminateExecution(
 		return nil, err
 	}
 
-	err = workflowengine.GetRegistry().GetExecutor().Abort(ctx, workflowengineInterfaces.AbortData{
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	err = workflowExecutor.Abort(ctx, workflowengineInterfaces.AbortData{
 		Namespace: common.GetNamespaceName(
 			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.Id.Project, request.Id.Domain),
 
@@ -1661,7 +1665,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 	}
 }
 
-func NewExecutionManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration,
+func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
@@ -1696,6 +1700,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, config runtimeInter
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
 		eventPublisher:            eventPublisher,
 		dbEventWriter:             eventWriter,
+		pluginRegistry:            pluginRegistry,
 	}
 }
 

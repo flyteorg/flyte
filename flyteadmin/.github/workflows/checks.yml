@@ -26,7 +26,7 @@ jobs:
 
   endtoend:
     name: End2End Test
-    needs: [docker-build]
+    needs: [ docker-build ]
     uses: flyteorg/flytetools/.github/workflows/end2end.yml@master
     with:
       priorities: "P0"
@@ -34,13 +34,13 @@ jobs:
 
   integration:
     name: Integration Test
-    needs: [docker-build]
+    needs: [ docker-build ]
     uses: flyteorg/flytetools/.github/workflows/integration.yml@master
     with:
       cache_key: ${{ needs.docker-build.outputs.cache_key }}
 
   generate:
-    name: Check Go Gennerate
+    name: Check Go Generate
     uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
 
   bump_version:

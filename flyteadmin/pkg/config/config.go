@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"time"
+
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	authConfig "github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flytestdlib/config"
@@ -21,6 +24,19 @@ type ServerConfig struct {
 	GrpcConfig           GrpcConfig            `json:"grpc"`
 	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
 	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
+
+	DataProxy DataProxyConfig `json:"dataProxy" pflag:",Defines data proxy configuration."`
+}
+
+type DataProxyConfig struct {
+	Upload DataProxyUploadConfig `json:"upload" pflag:",Defines data proxy upload configuration."`
+}
+
+type DataProxyUploadConfig struct {
+	MaxSize               resource.Quantity `json:"maxSize" pflag:",Maximum allowed upload size."`
+	MaxExpiresIn          config.Duration   `json:"maxExpiresIn" pflag:",Maximum allowed expiration duration."`
+	DefaultFileNameLength int               `json:"defaultFileNameLength" pflag:",Default length for the generated file name if not provided in the request."`
+	StoragePrefix         string            `json:"storagePrefix" pflag:",Storage prefix to use for all upload requests."`
 }
 
 type GrpcConfig struct {
@@ -63,6 +79,13 @@ var defaultServerConfig = &ServerConfig{
 	GrpcConfig: GrpcConfig{
 		Port:             8089,
 		ServerReflection: true,
+	},
+	DataProxy: DataProxyConfig{
+		Upload: DataProxyUploadConfig{
+			MaxSize:               resource.MustParse("6Mi"),
+			MaxExpiresIn:          config.Duration{Duration: time.Hour},
+			DefaultFileNameLength: 20,
+		},
 	},
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
