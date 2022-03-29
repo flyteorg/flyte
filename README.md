@@ -257,7 +257,7 @@ The table below has different release versions as the columns and the result of 
 
 <html>
 <h2 id="rfc">
-   🛣️  RFC's (Request for Commments) & Proposals
+   🛣️  RFC's (Request for Comments) & Proposals
 </h2>
 </html>
 
