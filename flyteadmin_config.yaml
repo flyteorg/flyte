@@ -117,11 +117,11 @@ Logger:
 storage:
   type: minio
   connection:
-    access-key: minio
+    access-key: minioadmin
     auth-type: accesskey
-    secret-key: miniostorage
+    secret-key: minioadmin
     disable-ssl: true
-    endpoint: "http://localhost:30084"
+    endpoint: "http://localhost:9000"
     region: my-region
   cache:
     max_size_mbs: 10
@@ -205,4 +205,4 @@ qualityOfService:
     staging: MEDIUM
     # by default production has an UNDEFINED tier when it is omitted from the configuration
 namespace_mapping:
-   template: "{{ project }}-{{ domain }}" # Default namespace mapping template.
+  template: "{{ project }}-{{ domain }}" # Default namespace mapping template.

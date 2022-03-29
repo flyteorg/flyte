@@ -3,6 +3,8 @@ package entrypoints
 import (
 	"context"
 
+	"github.com/flyteorg/flyteadmin/plugins"
+
 	"github.com/flyteorg/flytestdlib/profutils"
 
 	_ "net/http/pprof" // Required to serve application.
@@ -16,6 +18,8 @@ import (
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
+
+var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -33,7 +37,7 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 
-		return server.Serve(ctx, nil)
+		return server.Serve(ctx, pluginRegistryStore.Load(), nil)
 	},
 }
 

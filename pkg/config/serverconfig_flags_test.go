@@ -256,7 +256,7 @@ func TestServerConfig_SetFlags(t *testing.T) {
 	t.Run("Test_security.allowedOrigins", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_ServerConfig("1,1", ",")
+			testValue := join_ServerConfig(defaultServerConfig.Security.AllowedOrigins, ",")
 
 			cmdFlags.Set("security.allowedOrigins", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedOrigins"); err == nil {
@@ -270,7 +270,7 @@ func TestServerConfig_SetFlags(t *testing.T) {
 	t.Run("Test_security.allowedHeaders", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_ServerConfig("1,1", ",")
+			testValue := join_ServerConfig(defaultServerConfig.Security.AllowedHeaders, ",")
 
 			cmdFlags.Set("security.allowedHeaders", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedHeaders"); err == nil {
@@ -354,11 +354,67 @@ func TestServerConfig_SetFlags(t *testing.T) {
 	t.Run("Test_thirdPartyConfig.flyteClient.scopes", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_ServerConfig("1,1", ",")
+			testValue := join_ServerConfig(defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.Scopes, ",")
 
 			cmdFlags.Set("thirdPartyConfig.flyteClient.scopes", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("thirdPartyConfig.flyteClient.scopes"); err == nil {
 				testDecodeRaw_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.DeprecatedThirdPartyConfig.FlyteClientConfig.Scopes)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_dataProxy.upload.maxSize", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultServerConfig.DataProxy.Upload.MaxSize.String()
+
+			cmdFlags.Set("dataProxy.upload.maxSize", testValue)
+			if vString, err := cmdFlags.GetString("dataProxy.upload.maxSize"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.DataProxy.Upload.MaxSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_dataProxy.upload.maxExpiresIn", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultServerConfig.DataProxy.Upload.MaxExpiresIn.String()
+
+			cmdFlags.Set("dataProxy.upload.maxExpiresIn", testValue)
+			if vString, err := cmdFlags.GetString("dataProxy.upload.maxExpiresIn"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.DataProxy.Upload.MaxExpiresIn)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_dataProxy.upload.defaultFileNameLength", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("dataProxy.upload.defaultFileNameLength", testValue)
+			if vInt, err := cmdFlags.GetInt("dataProxy.upload.defaultFileNameLength"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vInt), &actual.DataProxy.Upload.DefaultFileNameLength)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_dataProxy.upload.storagePrefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("dataProxy.upload.storagePrefix", testValue)
+			if vString, err := cmdFlags.GetString("dataProxy.upload.storagePrefix"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.DataProxy.Upload.StoragePrefix)
 
 			} else {
 				assert.FailNow(t, err.Error())

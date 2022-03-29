@@ -15,23 +15,30 @@ import (
 type SecretName = string
 
 const (
+	// SecretNameOIdCClientSecret defines the default OIdC client secret name to use.
 	// #nosec
-	// Default OIdC client secret name to use.
 	SecretNameOIdCClientSecret SecretName = "oidc_client_secret"
+
+	// SecretNameCookieHashKey defines the default cookie hash key secret name to use.
 	// #nosec
 	SecretNameCookieHashKey SecretName = "cookie_hash_key"
+
+	// SecretNameCookieBlockKey defines the default cookie block key secret name to use.
 	// #nosec
 	SecretNameCookieBlockKey SecretName = "cookie_block_key"
+
+	// SecretNameClaimSymmetricKey must be a base64 encoded secret of exactly 32 bytes
 	// #nosec
-	// Base64 encoded secret of exactly 32 bytes
 	SecretNameClaimSymmetricKey SecretName = "claim_symmetric_key"
+
+	// SecretNameTokenSigningRSAKey is the privateKey used to sign JWT tokens. The default strategy uses RS256 (RSA Signature with SHA-256)
 	// #nosec
-	// PrivateKey is used to sign JWT tokens. The default strategy uses RS256 (RSA Signature with SHA-256)
 	SecretNameTokenSigningRSAKey SecretName = "token_rsa_key.pem"
-	// #nosec
-	// PrivateKey that was used to sign old JWT tokens. The default strategy uses RS256 (RSA Signature with SHA-256)
+
+	// SecretNameOldTokenSigningRSAKey is the privateKey used to sign old JWT tokens. The default strategy uses RS256 (RSA Signature with SHA-256)
 	// This is used to support key rotation. When present, it'll only be used to validate incoming tokens. New tokens
 	// will not be issued using this key.
+	// #nosec
 	SecretNameOldTokenSigningRSAKey SecretName = "token_rsa_key_old.pem"
 )
 
@@ -139,7 +146,7 @@ type Config struct {
 	// when generating metadata endpoints and when validating audience and issuer claims. If no matching authorizedUri
 	// is found, it'll default to the first one. If not provided, the urls will be deduced based on the request url and
 	// the `secure` setting.
-	AuthorizedURIs []config.URL `json:"authorizedUris" pflag:",Optional: Defines the set of URIs that clients are allowed to visit the service on. If set, the system will attempt to match the incoming host to the first authorized URIs and use that (including the scheme) when generating metadata endpoints and when validating audience and issuer claims. If not provided, the urls will be deduced based on the request url and the 'secure' setting."`
+	AuthorizedURIs []config.URL `json:"authorizedUris" pflag:"-,Optional: Defines the set of URIs that clients are allowed to visit the service on. If set, the system will attempt to match the incoming host to the first authorized URIs and use that (including the scheme) when generating metadata endpoints and when validating audience and issuer claims. If not provided, the urls will be deduced based on the request url and the 'secure' setting."`
 
 	// UserAuth settings used to authenticate end users in web-browsers.
 	UserAuth UserAuthConfig `json:"userAuth" pflag:",Defines Auth options for users."`

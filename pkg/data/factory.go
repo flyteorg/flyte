@@ -6,8 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/graymeta/stow"
-	"github.com/graymeta/stow/s3"
+	"github.com/flyteorg/stow"
+	"github.com/flyteorg/stow/s3"
 
 	"github.com/flyteorg/flytestdlib/storage"
 

@@ -43,6 +43,10 @@ func (t *TestDataStore) GetBaseContainerFQN(ctx context.Context) storage.DataRef
 	return "s3://bucket"
 }
 
+func (t *TestDataStore) CreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) (storage.SignedURLResponse, error) {
+	return storage.SignedURLResponse{}, fmt.Errorf("unsupported")
+}
+
 // Retrieves a byte array from the Blob store or an error
 func (t *TestDataStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
 	return NopCloser{}, nil
