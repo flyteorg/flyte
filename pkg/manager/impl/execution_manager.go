@@ -490,15 +490,19 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 		return workflowExecConfig, nil
 	}
 
+	var workflowName string
 	if launchPlan != nil && launchPlan.Spec != nil {
 		// merge the launch plan spec into workflowExecConfig
 		if isChanged := mergeIntoExecConfig(workflowExecConfig, launchPlan.Spec); isChanged {
 			return workflowExecConfig, nil
 		}
+		if launchPlan.Spec.WorkflowId != nil {
+			workflowName = launchPlan.Spec.WorkflowId.Name
+		}
 	}
 
 	matchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain)
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain, workflowName)
 	if err != nil {
 		return nil, err
 	}
