@@ -3961,6 +3961,50 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
 	})
+	t.Run("matchable resource workflow resource", func(t *testing.T) {
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				Workflow:     workflowIdentifier.Name,
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			})
+			return &managerInterfaces.ResourceResponse{
+				Attributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+						WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+							MaxParallelism: 300,
+							SecurityContext: &core.SecurityContext{
+								RunAs: &core.Identity{
+									K8SServiceAccount: "workflowDefault",
+								},
+							},
+						},
+					},
+				},
+			}, nil
+		}
+		request := &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		}
+		launchPlan := &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				WorkflowId: &core.Identifier{
+					Name: workflowIdentifier.Name,
+				},
+			},
+		}
+		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
+		assert.NoError(t, err)
+		assert.Equal(t, int32(300), execConfig.MaxParallelism)
+		assert.Equal(t, "workflowDefault", execConfig.SecurityContext.RunAs.K8SServiceAccount)
+		assert.Nil(t, execConfig.GetRawOutputDataConfig())
+		assert.Nil(t, execConfig.GetLabels())
+		assert.Nil(t, execConfig.GetAnnotations())
+	})
 	t.Run("matchable resource failure", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
