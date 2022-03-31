@@ -4608,10 +4608,10 @@ spec:
         resources: 
           limits:
             cpu: 500m
-            memory: 250Mi
+            memory: 275Mi
           requests:
             cpu: 10m
-            memory: 50Mi
+            memory: 250Mi
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
