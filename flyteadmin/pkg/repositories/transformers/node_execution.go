@@ -15,11 +15,11 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
 
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	genModel "github.com/flyteorg/flyteadmin/pkg/repositories/gen/models"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
-
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 type ToNodeExecutionModelInput struct {
@@ -119,8 +119,10 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 	}
 
 	nodeExecutionMetadata := admin.NodeExecutionMetaData{
-		RetryGroup: input.Request.Event.RetryGroup,
-		SpecNodeId: input.Request.Event.SpecNodeId,
+		RetryGroup:   input.Request.Event.RetryGroup,
+		SpecNodeId:   input.Request.Event.SpecNodeId,
+		IsParentNode: input.Request.Event.IsParent,
+		IsDynamic:    input.Request.Event.IsDynamic,
 	}
 
 	if input.Request.Event.Phase == core.NodeExecution_RUNNING {
@@ -158,6 +160,15 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 	}
 	nodeExecution.ParentID = input.ParentID
 	nodeExecution.DynamicWorkflowRemoteClosureReference = input.DynamicWorkflowRemoteClosure
+
+	internalData := &genModel.NodeExecutionInternalData{
+		EventVersion: input.Request.Event.EventVersion,
+	}
+	internalDataBytes, err := proto.Marshal(internalData)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to marshal node execution data with err: %v", err)
+	}
+	nodeExecution.InternalData = internalDataBytes
 	return nodeExecution, nil
 }
 
@@ -223,6 +234,33 @@ func UpdateNodeExecutionModel(
 	}
 	nodeExecutionModel.NodeExecutionUpdatedAt = &updatedAt
 	nodeExecutionModel.DynamicWorkflowRemoteClosureReference = dynamicWorkflowRemoteClosure
+
+	// In the case of dynamic nodes reporting DYNAMIC_RUNNING, the IsParent and IsDynamic bits will be set for this event.
+	// Update the node execution metadata accordingly.
+	if request.Event.IsParent || request.Event.IsDynamic {
+		var nodeExecutionMetadata admin.NodeExecutionMetaData
+		if len(nodeExecutionModel.NodeExecutionMetadata) > 0 {
+			if err := proto.Unmarshal(nodeExecutionModel.NodeExecutionMetadata, &nodeExecutionMetadata); err != nil {
+				return errors.NewFlyteAdminErrorf(codes.Internal,
+					"failed to unmarshal node execution metadata with error: %+v", err)
+			}
+		}
+		// Not every event sends IsParent and IsDynamic as an artifact of how propeller handles dynamic nodes.
+		// Only explicitly set the fields, when they're set in the event itself.
+		if request.Event.IsParent {
+			nodeExecutionMetadata.IsParentNode = true
+		}
+		if request.Event.IsDynamic {
+			nodeExecutionMetadata.IsDynamic = true
+		}
+		nodeExecMetadataBytes, err := proto.Marshal(&nodeExecutionMetadata)
+		if err != nil {
+			return errors.NewFlyteAdminErrorf(codes.Internal,
+				"failed to marshal node execution metadata with error: %+v", err)
+		}
+		nodeExecutionModel.NodeExecutionMetadata = nodeExecMetadataBytes
+	}
+
 	return nil
 }
 
@@ -238,12 +276,17 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.Nod
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal nodeExecutionMetadata")
 	}
-	if len(nodeExecutionModel.ChildNodeExecutions) > 0 {
-		nodeExecutionMetadata.IsParentNode = true
-		if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
-			nodeExecutionMetadata.IsDynamic = true
+	// TODO: delete this block and references to preloading child node executions no earlier than Q3 2022
+	// This is required for historical reasons because propeller did not always send IsParent or IsDynamic in events.
+	if !(nodeExecutionMetadata.IsParentNode || nodeExecutionMetadata.IsDynamic) {
+		if len(nodeExecutionModel.ChildNodeExecutions) > 0 {
+			nodeExecutionMetadata.IsParentNode = true
+			if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
+				nodeExecutionMetadata.IsDynamic = true
+			}
 		}
 	}
+
 	return &admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: nodeExecutionModel.NodeID,
@@ -259,15 +302,13 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.Nod
 	}, nil
 }
 
-func FromNodeExecutionModels(
-	nodeExecutionModels []models.NodeExecution) ([]*admin.NodeExecution, error) {
-	nodeExecutions := make([]*admin.NodeExecution, len(nodeExecutionModels))
-	for idx, nodeExecutionModel := range nodeExecutionModels {
-		nodeExecution, err := FromNodeExecutionModel(nodeExecutionModel)
+func GetNodeExecutionInternalData(internalData []byte) (*genModel.NodeExecutionInternalData, error) {
+	var nodeExecutionInternalData genModel.NodeExecutionInternalData
+	if len(internalData) > 0 {
+		err := proto.Unmarshal(internalData, &nodeExecutionInternalData)
 		if err != nil {
-			return nil, err
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal node execution data: %v", err)
 		}
-		nodeExecutions[idx] = nodeExecution
 	}
-	return nodeExecutions, nil
+	return &nodeExecutionInternalData, nil
 }

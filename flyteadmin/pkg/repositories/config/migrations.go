@@ -370,6 +370,16 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Table("execution").Migrator().DropColumn(&models.Execution{}, "state")
 		},
 	},
+	// Add internal data to node execution model.
+	{
+		ID: "2022-03-29-node-execution-internal-data",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&NodeExecution{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("node_execution").Migrator().DropColumn(&NodeExecution{}, "internal_data")
+		},
+	},
 }
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {

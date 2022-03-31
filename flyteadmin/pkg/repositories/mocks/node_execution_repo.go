@@ -16,12 +16,13 @@ type ListNodeExecutionEventFunc func(ctx context.Context, input interfaces.ListR
 	interfaces.NodeExecutionEventCollectionOutput, error)
 
 type MockNodeExecutionRepo struct {
-	createFunction    CreateNodeExecutionFunc
-	updateFunction    UpdateNodeExecutionFunc
-	getFunction       GetNodeExecutionFunc
-	listFunction      ListNodeExecutionFunc
-	listEventFunction ListNodeExecutionEventFunc
-	ExistsFunction    func(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error)
+	createFunction          CreateNodeExecutionFunc
+	updateFunction          UpdateNodeExecutionFunc
+	getFunction             GetNodeExecutionFunc
+	GetWithChildrenFunction GetNodeExecutionFunc
+	listFunction            ListNodeExecutionFunc
+	listEventFunction       ListNodeExecutionEventFunc
+	ExistsFunction          func(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error)
 }
 
 func (r *MockNodeExecutionRepo) Create(ctx context.Context, input *models.NodeExecution) error {
@@ -55,6 +56,13 @@ func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeEx
 
 func (r *MockNodeExecutionRepo) SetGetCallback(getFunction GetNodeExecutionFunc) {
 	r.getFunction = getFunction
+}
+
+func (r *MockNodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+	if r.GetWithChildrenFunction != nil {
+		return r.GetWithChildrenFunction(ctx, input)
+	}
+	return models.NodeExecution{}, nil
 }
 
 func (r *MockNodeExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (

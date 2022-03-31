@@ -5,12 +5,16 @@ import (
 	"testing"
 	"time"
 
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/ptypes"
 
+	genModel "github.com/flyteorg/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -206,6 +210,9 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 						RetryAttempt: 1,
 					},
 				},
+				IsParent:     true,
+				IsDynamic:    true,
+				EventVersion: 2,
 			},
 		},
 		ParentTaskExecutionID: &parentTaskExecID,
@@ -219,6 +226,14 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		UpdatedAt: occurredAtProto,
 	}
 	var closureBytes, _ = proto.Marshal(closure)
+	var nodeExecutionMetadata, _ = proto.Marshal(&admin.NodeExecutionMetaData{
+		IsParentNode: true,
+		IsDynamic:    true,
+	})
+	internalData := &genModel.NodeExecutionInternalData{
+		EventVersion: 2,
+	}
+	internalDataBytes, _ := proto.Marshal(internalData)
 	assert.Equal(t, &models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: "node id",
@@ -234,8 +249,9 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		StartedAt:              &occurredAt,
 		NodeExecutionCreatedAt: &occurredAt,
 		NodeExecutionUpdatedAt: &occurredAt,
-		NodeExecutionMetadata:  []byte{},
+		NodeExecutionMetadata:  nodeExecutionMetadata,
 		ParentTaskExecutionID:  &parentTaskExecID,
+		InternalData:           internalDataBytes,
 	}, nodeExecutionModel)
 }
 
@@ -343,6 +359,42 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 		var closureBytes, _ = proto.Marshal(closure)
 		assert.Equal(t, nodeExecutionModel.Closure, closureBytes)
 	})
+	t.Run("is parent & is dynamic", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Phase:      core.NodeExecution_RUNNING,
+				OccurredAt: occurredAtProto,
+				TargetMetadata: &event.NodeExecutionEvent_WorkflowNodeMetadata{
+					WorkflowNodeMetadata: &event.WorkflowNodeMetadata{
+						ExecutionId: childExecutionID,
+					},
+				},
+				IsParent:  true,
+				IsDynamic: true,
+			},
+		}
+		nodeExecMetadata := admin.NodeExecutionMetaData{
+			SpecNodeId: "foo",
+		}
+		nodeExecMetadataSerialized, _ := proto.Marshal(&nodeExecMetadata)
+		nodeExecutionModel := models.NodeExecution{
+			Phase:                 core.NodeExecution_UNDEFINED.String(),
+			NodeExecutionMetadata: nodeExecMetadataSerialized,
+		}
+		err := UpdateNodeExecutionModel(context.TODO(), &request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Nil(t, err)
+		assert.Equal(t, core.NodeExecution_RUNNING.String(), nodeExecutionModel.Phase)
+		assert.Equal(t, occurredAt, *nodeExecutionModel.StartedAt)
+		assert.EqualValues(t, occurredAt, *nodeExecutionModel.NodeExecutionUpdatedAt)
+		assert.Nil(t, nodeExecutionModel.CacheStatus)
+		assert.Equal(t, nodeExecutionModel.DynamicWorkflowRemoteClosureReference, dynamicWorkflowClosureRef)
+
+		nodeExecMetadata.IsParentNode = true
+		nodeExecMetadata.IsDynamic = true
+		nodeExecMetadataExpected, _ := proto.Marshal(&nodeExecMetadata)
+		assert.Equal(t, nodeExecutionModel.NodeExecutionMetadata, nodeExecMetadataExpected)
+	})
 }
 
 func TestFromNodeExecutionModel(t *testing.T) {
@@ -444,40 +496,25 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 			},
 		}, nodeExecution))
 	})
-
 }
 
-func TestFromNodeExecutionModels(t *testing.T) {
-	nodeExecutions, err := FromNodeExecutionModels([]models.NodeExecution{
-		{
-			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: "node id",
-				ExecutionKey: models.ExecutionKey{
-					Project: "project",
-					Domain:  "domain",
-					Name:    "name",
-				},
-			},
-			Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
-			Closure:               closureBytes,
-			NodeExecutionMetadata: nodeExecutionMetadataBytes,
-			InputURI:              "input uri",
-			Duration:              duration,
-		},
+func TestGetNodeExecutionInternalData(t *testing.T) {
+	t.Run("unset", func(t *testing.T) {
+		data, err := GetNodeExecutionInternalData(nil)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(data, &genModel.NodeExecutionInternalData{}))
 	})
-	assert.Nil(t, err)
-	assert.Len(t, nodeExecutions, 1)
-	assert.True(t, proto.Equal(&admin.NodeExecution{
-		Id: &core.NodeExecutionIdentifier{
-			NodeId: "node id",
-			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "name",
-			},
-		},
-		InputUri: "input uri",
-		Closure:  closure,
-		Metadata: &nodeExecutionMetadata,
-	}, nodeExecutions[0]))
+	t.Run("set", func(t *testing.T) {
+		internalData := &genModel.NodeExecutionInternalData{
+			EventVersion: 2,
+		}
+		serializedData, _ := proto.Marshal(internalData)
+		actualData, err := GetNodeExecutionInternalData(serializedData)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(internalData, actualData))
+	})
+	t.Run("invalid internal", func(t *testing.T) {
+		_, err := GetNodeExecutionInternalData([]byte("i'm invalid"))
+		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.Internal)
+	})
 }

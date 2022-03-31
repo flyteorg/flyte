@@ -538,13 +538,6 @@ func TestGetTaskExecution(t *testing.T) {
 				InputURI:  "input-uri.pb",
 				StartedAt: &taskStartedAt,
 				Closure:   closureBytes,
-				ChildNodeExecution: []models.NodeExecution{
-					{
-						BaseModel: models.BaseModel{
-							ID: uint(2),
-						},
-					},
-				},
 			}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil)
@@ -565,7 +558,6 @@ func TestGetTaskExecution(t *testing.T) {
 		},
 		InputUri: "input-uri.pb",
 		Closure:  expectedClosure,
-		IsParent: true,
 	}, taskExecution))
 }
 
