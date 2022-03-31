@@ -27,6 +27,7 @@ require (
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
 	golang.org/x/tools v0.1.0
 	google.golang.org/protobuf v1.25.0
+	gorm.io/gorm v1.22.4
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847
