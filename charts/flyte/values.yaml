@@ -230,10 +230,10 @@ flyte:
     resources:
       limits:
         cpu: 500m
-        memory: 250Mi
+        memory: 275Mi
       requests:
         cpu: 10m
-        memory: 50Mi
+        memory: 250Mi
     # -- Service settings for Flyteconsole
     service:
       annotations: {}
@@ -741,7 +741,6 @@ minio:
   tolerations: []
   # -- affinity for Minio deployment
   affinity: {}
-
 
 redoc:
   # --- enable or disable Minio deployment installation
