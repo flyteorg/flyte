@@ -17,7 +17,7 @@
   "paths": {
     "/api/v1/dataproxy/artifact_urn": {
       "post": {
-        "summary": "Retrieves user information about the currently logged in user.",
+        "summary": "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.",
         "description": "Creates a write-only http location that is accessible for tasks at runtime.",
         "operationId": "CreateUploadLocation",
         "responses": {
@@ -39,7 +39,7 @@
           }
         ],
         "tags": [
-          "DataProxy"
+          "DataProxyService"
         ]
       }
     }

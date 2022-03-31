@@ -29,7 +29,7 @@ type Clientset struct {
 	authMetadataServiceClient service.AuthMetadataServiceClient
 	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
-	dataProxyServiceClient    service.DataProxyClient
+	dataProxyServiceClient    service.DataProxyServiceClient
 	authOpt                   grpc.DialOption
 }
 
@@ -56,7 +56,7 @@ func (c Clientset) IdentityClient() service.IdentityServiceClient {
 	return c.identityServiceClient
 }
 
-func (c Clientset) DataProxyClient() service.DataProxyClient {
+func (c Clientset) DataProxyClient() service.DataProxyServiceClient {
 	return c.dataProxyServiceClient
 }
 
@@ -202,7 +202,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 	cs.authMetadataServiceClient = service.NewAuthMetadataServiceClient(adminConnection)
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
-	cs.dataProxyServiceClient = service.NewDataProxyClient(adminConnection)
+	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	if authOpt != nil {
 		cs.authOpt = authOpt
 	}
@@ -231,7 +231,7 @@ func InitializeMockClientset() *Clientset {
 		adminServiceClient:        &mocks.AdminServiceClient{},
 		authMetadataServiceClient: &mocks.AuthMetadataServiceClient{},
 		identityServiceClient:     &mocks.IdentityServiceClient{},
-		dataProxyServiceClient:    &mocks.DataProxyClient{},
+		dataProxyServiceClient:    &mocks.DataProxyServiceClient{},
 		healthServiceClient:       grpc_health_v1.NewHealthClient(nil),
 	}
 }

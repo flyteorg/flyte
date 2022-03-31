@@ -39,9 +39,9 @@ message CreateUploadLocationRequest {
   google.protobuf.Duration expires_in = 4;
 }
 
-// DataProxy defines an RPC Service that allows access to user-data in a controlled manner.
-service DataProxy {
-  // Retrieves user information about the currently logged in user.
+// DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.
+service DataProxyService {
+  // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
   rpc CreateUploadLocation (CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {
     option (google.api.http) = {
       post: "/api/v1/dataproxy/artifact_urn"
