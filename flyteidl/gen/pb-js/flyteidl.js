@@ -39820,41 +39820,41 @@ export const flyteidl = $root.flyteidl = (() => {
             return CreateUploadLocationRequest;
         })();
 
-        service.DataProxy = (function() {
+        service.DataProxyService = (function() {
 
             /**
-             * Constructs a new DataProxy service.
+             * Constructs a new DataProxyService service.
              * @memberof flyteidl.service
-             * @classdesc Represents a DataProxy
+             * @classdesc Represents a DataProxyService
              * @extends $protobuf.rpc.Service
              * @constructor
              * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
              * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
              * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
              */
-            function DataProxy(rpcImpl, requestDelimited, responseDelimited) {
+            function DataProxyService(rpcImpl, requestDelimited, responseDelimited) {
                 $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
             }
 
-            (DataProxy.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = DataProxy;
+            (DataProxyService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = DataProxyService;
 
             /**
-             * Creates new DataProxy service using the specified rpc implementation.
+             * Creates new DataProxyService service using the specified rpc implementation.
              * @function create
-             * @memberof flyteidl.service.DataProxy
+             * @memberof flyteidl.service.DataProxyService
              * @static
              * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
              * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
              * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-             * @returns {DataProxy} RPC service. Useful where requests and/or responses are streamed.
+             * @returns {DataProxyService} RPC service. Useful where requests and/or responses are streamed.
              */
-            DataProxy.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+            DataProxyService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
                 return new this(rpcImpl, requestDelimited, responseDelimited);
             };
 
             /**
-             * Callback as used by {@link flyteidl.service.DataProxy#createUploadLocation}.
-             * @memberof flyteidl.service.DataProxy
+             * Callback as used by {@link flyteidl.service.DataProxyService#createUploadLocation}.
+             * @memberof flyteidl.service.DataProxyService
              * @typedef CreateUploadLocationCallback
              * @type {function}
              * @param {Error|null} error Error, if any
@@ -39864,28 +39864,28 @@ export const flyteidl = $root.flyteidl = (() => {
             /**
              * Calls CreateUploadLocation.
              * @function createUploadLocation
-             * @memberof flyteidl.service.DataProxy
+             * @memberof flyteidl.service.DataProxyService
              * @instance
              * @param {flyteidl.service.ICreateUploadLocationRequest} request CreateUploadLocationRequest message or plain object
-             * @param {flyteidl.service.DataProxy.CreateUploadLocationCallback} callback Node-style callback called with the error, if any, and CreateUploadLocationResponse
+             * @param {flyteidl.service.DataProxyService.CreateUploadLocationCallback} callback Node-style callback called with the error, if any, and CreateUploadLocationResponse
              * @returns {undefined}
              * @variation 1
              */
-            Object.defineProperty(DataProxy.prototype.createUploadLocation = function createUploadLocation(request, callback) {
+            Object.defineProperty(DataProxyService.prototype.createUploadLocation = function createUploadLocation(request, callback) {
                 return this.rpcCall(createUploadLocation, $root.flyteidl.service.CreateUploadLocationRequest, $root.flyteidl.service.CreateUploadLocationResponse, request, callback);
             }, "name", { value: "CreateUploadLocation" });
 
             /**
              * Calls CreateUploadLocation.
              * @function createUploadLocation
-             * @memberof flyteidl.service.DataProxy
+             * @memberof flyteidl.service.DataProxyService
              * @instance
              * @param {flyteidl.service.ICreateUploadLocationRequest} request CreateUploadLocationRequest message or plain object
              * @returns {Promise<flyteidl.service.CreateUploadLocationResponse>} Promise
              * @variation 2
              */
 
-            return DataProxy;
+            return DataProxyService;
         })();
 
         service.UserInfoRequest = (function() {

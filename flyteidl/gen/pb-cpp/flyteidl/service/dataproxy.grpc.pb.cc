@@ -19,60 +19,60 @@
 namespace flyteidl {
 namespace service {
 
-static const char* DataProxy_method_names[] = {
-  "/flyteidl.service.DataProxy/CreateUploadLocation",
+static const char* DataProxyService_method_names[] = {
+  "/flyteidl.service.DataProxyService/CreateUploadLocation",
 };
 
-std::unique_ptr< DataProxy::Stub> DataProxy::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
+std::unique_ptr< DataProxyService::Stub> DataProxyService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
-  std::unique_ptr< DataProxy::Stub> stub(new DataProxy::Stub(channel));
+  std::unique_ptr< DataProxyService::Stub> stub(new DataProxyService::Stub(channel));
   return stub;
 }
 
-DataProxy::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_CreateUploadLocation_(DataProxy_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+DataProxyService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
+  : channel_(channel), rpcmethod_CreateUploadLocation_(DataProxyService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status DataProxy::Stub::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::flyteidl::service::CreateUploadLocationResponse* response) {
+::grpc::Status DataProxyService::Stub::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::flyteidl::service::CreateUploadLocationResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_CreateUploadLocation_, context, request, response);
 }
 
-void DataProxy::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)> f) {
+void DataProxyService::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_CreateUploadLocation_, context, request, response, std::move(f));
 }
 
-void DataProxy::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)> f) {
+void DataProxyService::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_CreateUploadLocation_, context, request, response, std::move(f));
 }
 
-void DataProxy::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void DataProxyService::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_CreateUploadLocation_, context, request, response, reactor);
 }
 
-void DataProxy::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void DataProxyService::Stub::experimental_async::CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_CreateUploadLocation_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* DataProxy::Stub::AsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* DataProxyService::Stub::AsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateUploadLocationResponse>::Create(channel_.get(), cq, rpcmethod_CreateUploadLocation_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* DataProxy::Stub::PrepareAsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* DataProxyService::Stub::PrepareAsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateUploadLocationResponse>::Create(channel_.get(), cq, rpcmethod_CreateUploadLocation_, context, request, false);
 }
 
-DataProxy::Service::Service() {
+DataProxyService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      DataProxy_method_names[0],
+      DataProxyService_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< DataProxy::Service, ::flyteidl::service::CreateUploadLocationRequest, ::flyteidl::service::CreateUploadLocationResponse>(
-          std::mem_fn(&DataProxy::Service::CreateUploadLocation), this)));
+      new ::grpc::internal::RpcMethodHandler< DataProxyService::Service, ::flyteidl::service::CreateUploadLocationRequest, ::flyteidl::service::CreateUploadLocationResponse>(
+          std::mem_fn(&DataProxyService::Service::CreateUploadLocation), this)));
 }
 
-DataProxy::Service::~Service() {
+DataProxyService::Service::~Service() {
 }
 
-::grpc::Status DataProxy::Service::CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response) {
+::grpc::Status DataProxyService::Service::CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response) {
   (void) context;
   (void) request;
   (void) response;

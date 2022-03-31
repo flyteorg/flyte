@@ -24,7 +24,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.service',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service'),
-  serialized_pb=_b('\n flyteidl/service/dataproxy.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a,protoc-gen-swagger/options/annotations.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"v\n\x1c\x43reateUploadLocationResponse\x12\x12\n\nsigned_url\x18\x01 \x01(\t\x12\x12\n\nnative_url\x18\x02 \x01(\t\x12.\n\nexpires_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"}\n\x1b\x43reateUploadLocationRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0e\n\x06suffix\x18\x03 \x01(\t\x12-\n\nexpires_in\x18\x04 \x01(\x0b\x32\x19.google.protobuf.Duration2\xfe\x01\n\tDataProxy\x12\xf0\x01\n\x14\x43reateUploadLocation\x12-.flyteidl.service.CreateUploadLocationRequest\x1a..flyteidl.service.CreateUploadLocationResponse\"y\x82\xd3\xe4\x93\x02#\"\x1e/api/v1/dataproxy/artifact_urn:\x01*\x92\x41M\x1aKCreates a write-only http location that is accessible for tasks at runtime.B9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
+  serialized_pb=_b('\n flyteidl/service/dataproxy.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a,protoc-gen-swagger/options/annotations.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"v\n\x1c\x43reateUploadLocationResponse\x12\x12\n\nsigned_url\x18\x01 \x01(\t\x12\x12\n\nnative_url\x18\x02 \x01(\t\x12.\n\nexpires_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"}\n\x1b\x43reateUploadLocationRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0e\n\x06suffix\x18\x03 \x01(\t\x12-\n\nexpires_in\x18\x04 \x01(\x0b\x32\x19.google.protobuf.Duration2\x85\x02\n\x10\x44\x61taProxyService\x12\xf0\x01\n\x14\x43reateUploadLocation\x12-.flyteidl.service.CreateUploadLocationRequest\x1a..flyteidl.service.CreateUploadLocationResponse\"y\x82\xd3\xe4\x93\x02#\"\x1e/api/v1/dataproxy/artifact_urn:\x01*\x92\x41M\x1aKCreates a write-only http location that is accessible for tasks at runtime.B9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
   ,
   dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,protoc__gen__swagger_dot_options_dot_annotations__pb2.DESCRIPTOR,google_dot_protobuf_dot_duration__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -150,18 +150,18 @@ _sym_db.RegisterMessage(CreateUploadLocationRequest)
 
 DESCRIPTOR._options = None
 
-_DATAPROXY = _descriptor.ServiceDescriptor(
-  name='DataProxy',
-  full_name='flyteidl.service.DataProxy',
+_DATAPROXYSERVICE = _descriptor.ServiceDescriptor(
+  name='DataProxyService',
+  full_name='flyteidl.service.DataProxyService',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   serialized_start=443,
-  serialized_end=697,
+  serialized_end=704,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateUploadLocation',
-    full_name='flyteidl.service.DataProxy.CreateUploadLocation',
+    full_name='flyteidl.service.DataProxyService.CreateUploadLocation',
     index=0,
     containing_service=None,
     input_type=_CREATEUPLOADLOCATIONREQUEST,
@@ -169,8 +169,8 @@ _DATAPROXY = _descriptor.ServiceDescriptor(
     serialized_options=_b('\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact_urn:\001*\222AM\032KCreates a write-only http location that is accessible for tasks at runtime.'),
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_DATAPROXY)
+_sym_db.RegisterServiceDescriptor(_DATAPROXYSERVICE)
 
-DESCRIPTOR.services_by_name['DataProxy'] = _DATAPROXY
+DESCRIPTOR.services_by_name['DataProxyService'] = _DATAPROXYSERVICE
 
 # @@protoc_insertion_point(module_scope)

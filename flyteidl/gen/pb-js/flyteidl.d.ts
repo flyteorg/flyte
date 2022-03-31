@@ -17092,11 +17092,11 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Represents a DataProxy */
-        class DataProxy extends $protobuf.rpc.Service {
+        /** Represents a DataProxyService */
+        class DataProxyService extends $protobuf.rpc.Service {
 
             /**
-             * Constructs a new DataProxy service.
+             * Constructs a new DataProxyService service.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
@@ -17104,20 +17104,20 @@ export namespace flyteidl {
             constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
 
             /**
-             * Creates new DataProxy service using the specified rpc implementation.
+             * Creates new DataProxyService service using the specified rpc implementation.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
              * @returns RPC service. Useful where requests and/or responses are streamed.
              */
-            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): DataProxy;
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): DataProxyService;
 
             /**
              * Calls CreateUploadLocation.
              * @param request CreateUploadLocationRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and CreateUploadLocationResponse
              */
-            public createUploadLocation(request: flyteidl.service.ICreateUploadLocationRequest, callback: flyteidl.service.DataProxy.CreateUploadLocationCallback): void;
+            public createUploadLocation(request: flyteidl.service.ICreateUploadLocationRequest, callback: flyteidl.service.DataProxyService.CreateUploadLocationCallback): void;
 
             /**
              * Calls CreateUploadLocation.
@@ -17127,10 +17127,10 @@ export namespace flyteidl {
             public createUploadLocation(request: flyteidl.service.ICreateUploadLocationRequest): Promise<flyteidl.service.CreateUploadLocationResponse>;
         }
 
-        namespace DataProxy {
+        namespace DataProxyService {
 
             /**
-             * Callback as used by {@link flyteidl.service.DataProxy#createUploadLocation}.
+             * Callback as used by {@link flyteidl.service.DataProxyService#createUploadLocation}.
              * @param error Error, if any
              * @param [response] CreateUploadLocationResponse
              */

@@ -40,16 +40,16 @@ class ServerContext;
 namespace flyteidl {
 namespace service {
 
-// DataProxy defines an RPC Service that allows access to user-data in a controlled manner.
-class DataProxy final {
+// DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.
+class DataProxyService final {
  public:
   static constexpr char const* service_full_name() {
-    return "flyteidl.service.DataProxy";
+    return "flyteidl.service.DataProxyService";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    // Retrieves user information about the currently logged in user.
+    // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
     virtual ::grpc::Status CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::flyteidl::service::CreateUploadLocationResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>> AsyncCreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>>(AsyncCreateUploadLocationRaw(context, request, cq));
@@ -60,7 +60,7 @@ class DataProxy final {
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
-      // Retrieves user information about the currently logged in user.
+      // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -109,7 +109,7 @@ class DataProxy final {
    public:
     Service();
     virtual ~Service();
-    // Retrieves user information about the currently logged in user.
+    // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
     virtual ::grpc::Status CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response);
   };
   template <class BaseClass>
