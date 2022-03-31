@@ -2306,15 +2306,15 @@ public final class Dataproxy {
       "ateUploadLocationRequest\022\017\n\007project\030\001 \001(" +
       "\t\022\016\n\006domain\030\002 \001(\t\022\016\n\006suffix\030\003 \001(\t\022-\n\nexp" +
       "ires_in\030\004 \001(\0132\031.google.protobuf.Duration" +
-      "2\376\001\n\tDataProxy\022\360\001\n\024CreateUploadLocation\022" +
-      "-.flyteidl.service.CreateUploadLocationR" +
-      "equest\032..flyteidl.service.CreateUploadLo" +
-      "cationResponse\"y\202\323\344\223\002#\"\036/api/v1/dataprox" +
-      "y/artifact_urn:\001*\222AM\032KCreates a write-on" +
-      "ly http location that is accessible for " +
-      "tasks at runtime.B9Z7github.com/flyteorg" +
-      "/flyteidl/gen/pb-go/flyteidl/serviceb\006pr" +
-      "oto3"
+      "2\205\002\n\020DataProxyService\022\360\001\n\024CreateUploadLo" +
+      "cation\022-.flyteidl.service.CreateUploadLo" +
+      "cationRequest\032..flyteidl.service.CreateU" +
+      "ploadLocationResponse\"y\202\323\344\223\002#\"\036/api/v1/d" +
+      "ataproxy/artifact_urn:\001*\222AM\032KCreates a w" +
+      "rite-only http location that is accessib" +
+      "le for tasks at runtime.B9Z7github.com/f" +
+      "lyteorg/flyteidl/gen/pb-go/flyteidl/serv" +
+      "iceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -28,7 +28,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_DataProxy_CreateUploadLocation_0(ctx context.Context, marshaler runtime.Marshaler, client DataProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_DataProxyService_CreateUploadLocation_0(ctx context.Context, marshaler runtime.Marshaler, client DataProxyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateUploadLocationRequest
 	var metadata runtime.ServerMetadata
 
@@ -45,9 +45,9 @@ func request_DataProxy_CreateUploadLocation_0(ctx context.Context, marshaler run
 
 }
 
-// RegisterDataProxyHandlerFromEndpoint is same as RegisterDataProxyHandler but
+// RegisterDataProxyServiceHandlerFromEndpoint is same as RegisterDataProxyServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterDataProxyHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterDataProxyServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -67,23 +67,23 @@ func RegisterDataProxyHandlerFromEndpoint(ctx context.Context, mux *runtime.Serv
 		}()
 	}()
 
-	return RegisterDataProxyHandler(ctx, mux, conn)
+	return RegisterDataProxyServiceHandler(ctx, mux, conn)
 }
 
-// RegisterDataProxyHandler registers the http handlers for service DataProxy to "mux".
+// RegisterDataProxyServiceHandler registers the http handlers for service DataProxyService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterDataProxyHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterDataProxyHandlerClient(ctx, mux, NewDataProxyClient(conn))
+func RegisterDataProxyServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterDataProxyServiceHandlerClient(ctx, mux, NewDataProxyServiceClient(conn))
 }
 
-// RegisterDataProxyHandlerClient registers the http handlers for service DataProxy
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "DataProxyClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "DataProxyClient"
+// RegisterDataProxyServiceHandlerClient registers the http handlers for service DataProxyService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "DataProxyServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "DataProxyServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "DataProxyClient" to call the correct interceptors.
-func RegisterDataProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, client DataProxyClient) error {
+// "DataProxyServiceClient" to call the correct interceptors.
+func RegisterDataProxyServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client DataProxyServiceClient) error {
 
-	mux.Handle("POST", pattern_DataProxy_CreateUploadLocation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_DataProxyService_CreateUploadLocation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -92,14 +92,14 @@ func RegisterDataProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DataProxy_CreateUploadLocation_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_DataProxyService_CreateUploadLocation_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DataProxy_CreateUploadLocation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DataProxyService_CreateUploadLocation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -107,9 +107,9 @@ func RegisterDataProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_DataProxy_CreateUploadLocation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "dataproxy", "artifact_urn"}, ""))
+	pattern_DataProxyService_CreateUploadLocation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "dataproxy", "artifact_urn"}, ""))
 )
 
 var (
-	forward_DataProxy_CreateUploadLocation_0 = runtime.ForwardResponseMessage
+	forward_DataProxyService_CreateUploadLocation_0 = runtime.ForwardResponseMessage
 )
