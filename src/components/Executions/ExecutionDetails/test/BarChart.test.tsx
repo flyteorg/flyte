@@ -1,4 +1,3 @@
-import { getChartDurationData } from '../Timeline/BarChart/chartData';
 import {
   CASHED_GREEN,
   formatSecondsToHmsFormat,
@@ -6,7 +5,7 @@ import {
   getOffsetColor,
   TRANSPARENT,
 } from '../Timeline/BarChart/utils';
-import { getMockExecutionsForBarChart, mockbarItems } from './__mocks__/NodeExecution.mock';
+import { mockbarItems } from './__mocks__/NodeExecution.mock';
 
 describe('ExecutionDetails > Timeline > BarChart', () => {
   it('formatSecondsToHmsFormat works as expected', () => {
@@ -38,22 +37,6 @@ describe('ExecutionDetails > Timeline > BarChart', () => {
     // If cached - colored backfground
     expect(offsetColors[1]).toEqual(CASHED_GREEN);
   });
-
-  // Mock bars used below
-  // const mockbarItems = [
-  //   { phase: NodeExecutionPhase.FAILED, startOffsetSec: 0, durationSec: 15, isFromCache: false },
-  //   { phase: NodeExecutionPhase.SUCCEEDED, startOffsetSec: 5, durationSec: 11, isFromCache: true },
-  //   { phase: NodeExecutionPhase.RUNNING, startOffsetSec: 17, durationSec: 23, isFromCache: false },
-  //   { phase: NodeExecutionPhase.QUEUED, startOffsetSec: 39, durationSec: 0, isFromCache: false },
-  // ];
-  // it('getChartDurationData is properly generated from Node[] items', () => {
-  //   /** */
-  //   const startTime = 1642627611;
-  //   const mockData = getMockExecutionsForBarChart(startTime);
-  //   const chartItems = getChartDurationData(mockData, new Date(1642627611 * 1000));
-
-  //   expect(chartItems[0]).toEqual(mockbarItems[0]);
-  // });
 
   it('generateChartData properly generates map of data for ChartBars', () => {
     const chartData = generateChartData(mockbarItems);

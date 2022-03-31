@@ -77,7 +77,6 @@ export const BarChartItem: React.FC<BarChartItemProps> = ({
   onClick,
 }) => {
   const styles = useStyles();
-  const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
   const content = (
     <div

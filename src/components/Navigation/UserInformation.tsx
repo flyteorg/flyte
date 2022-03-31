@@ -31,9 +31,9 @@ export const UserInformation: React.FC<{}> = () => {
   return (
     <WaitForData spinnerVariant="none" {...profile}>
       <div className={useStyles().container}>
-        {profile.value == null ? (
+        {!profile.value ? (
           <LoginLink />
-        ) : profile.value.preferredUsername == null || profile.value.preferredUsername == '' ? (
+        ) : !profile.value.preferredUsername || profile.value.preferredUsername === '' ? (
           profile.value.name
         ) : (
           profile.value.preferredUsername

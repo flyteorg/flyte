@@ -106,7 +106,7 @@ export const useExpandableMonospaceTextStyles = makeStyles((theme: Theme) => ({
 export interface ExpandableMonospaceTextProps {
   initialExpansionState?: boolean;
   text: string;
-  onExpandCollapse?(expanded: boolean): void;
+  onExpandCollapse?: (expanded: boolean) => void;
 }
 
 /** An expandable/collapsible container which renders the provided text in a
@@ -121,7 +121,9 @@ export const ExpandableMonospaceText: React.FC<ExpandableMonospaceTextProps> = (
   const styles = useExpandableMonospaceTextStyles();
   const onClickExpand = () => {
     setExpanded(!expanded);
-    typeof onExpandCollapse === 'function' && onExpandCollapse(!expanded);
+    if (onExpandCollapse) {
+      onExpandCollapse(!expanded);
+    }
   };
   const onClickCopy = () => copyToClipboard(text);
 

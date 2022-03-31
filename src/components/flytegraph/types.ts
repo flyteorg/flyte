@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { DierarchyPointNode } from 'd3-dag';
 
 /** Graph-related types */

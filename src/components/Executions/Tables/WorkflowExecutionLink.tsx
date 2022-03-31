@@ -18,7 +18,7 @@ export const WorkflowExecutionLink: React.FC<{
   } = history;
   const fromExecutionNav = pathname.split('/').pop() === 'executions';
 
-  const linkColor = color == 'disabled' ? commonStyles.secondaryLink : commonStyles.primaryLink;
+  const linkColor = color === 'disabled' ? commonStyles.secondaryLink : commonStyles.primaryLink;
   return (
     <RouterLink
       className={classnames(linkColor, className)}

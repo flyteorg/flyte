@@ -3,7 +3,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { formatDateUTC, millisecondsToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
-import { fetchStates } from 'components/hooks/types';
 import { BarChart } from 'components/common/BarChart';
 import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';

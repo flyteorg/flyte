@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { log } from 'common/log';
 import { Identifier } from 'models/Common/types';
 import { NodeExecution } from 'models/Execution/types';
 import { CompiledWorkflowClosure } from 'models/Workflow/types';
@@ -21,7 +22,7 @@ const NOT_AVAILABLE = 'NotAvailable';
 export const NodeExecutionDetailsContext = createContext<NodeExecutionDetailsState>({
   /** Default values used if ContextProvider wasn't initialized. */
   getNodeExecutionDetails: async () => {
-    console.error('ERROR: No NodeExecutionDetailsContextProvider was found in parent components.');
+    log.error('ERROR: No NodeExecutionDetailsContextProvider was found in parent components.');
     return UNKNOWN_DETAILS;
   },
   workflowId: {

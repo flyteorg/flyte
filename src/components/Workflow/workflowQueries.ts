@@ -1,10 +1,9 @@
 import { QueryInput, QueryType } from 'components/data/types';
-import { DataError } from 'components/Errors/DataError';
 import { extractTaskTemplates } from 'components/hooks/utils';
 import { getNodeExecutionData } from 'models/Execution/api';
 import { getWorkflow } from 'models/Workflow/api';
 import { Workflow, WorkflowId } from 'models/Workflow/types';
-import { QueryClient, QueryObserverResult } from 'react-query';
+import { QueryClient } from 'react-query';
 
 export function makeWorkflowQuery(queryClient: QueryClient, id: WorkflowId): QueryInput<Workflow> {
   return {

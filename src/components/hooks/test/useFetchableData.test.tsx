@@ -102,7 +102,7 @@ describe('useFetchableData', () => {
 
   it('should clear lastError when retrying failed initial fetch', async () => {
     const { container } = renderTester();
-    const { errorEl, fetchButton, valueEl } = await getElements(container);
+    const { errorEl, fetchButton } = await getElements(container);
 
     const error = 'something went wrong';
     rejectValue(new Error(error));

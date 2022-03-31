@@ -64,9 +64,9 @@ export const getDisplayName = (context: any, truncate = true): string => {
     displayName = context.id;
   }
 
-  if (displayName == startNodeId) {
+  if (displayName === startNodeId) {
     return DISPLAY_NAME_START;
-  } else if (displayName == endNodeId) {
+  } else if (displayName === endNodeId) {
     return DISPLAY_NAME_END;
   } else if (displayName.indexOf('.') > 0 && truncate) {
     /* Note: for displaying truncated task name */
@@ -85,7 +85,7 @@ export const getWorkflowId = (workflow: CompiledWorkflow): string => {
   return workflow.template.id.name;
 };
 
-export const createWorkflowNodeFromDynamic = (dw) => {
+export const createWorkflowNodeFromDynamic = () => {
   return {
     subWorkflowRef: {
       domain: 'development',

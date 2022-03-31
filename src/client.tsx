@@ -14,7 +14,7 @@ const initializeApp = () => {
 
   const { ENABLE_GA, GA_TRACKING_ID } = env;
 
-  if (ENABLE_GA != 'false') {
+  if (ENABLE_GA !== 'false') {
     ReactGA.initialize(GA_TRACKING_ID as string);
   }
 

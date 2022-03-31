@@ -8,7 +8,7 @@ export const LegendItem = ({ color, text }) => {
    * @TODO temporary check for nested graph until
    * nested functionality is deployed
    */
-  const isNested = text == 'Nested';
+  const isNested = text === 'Nested';
 
   const containerStyle: CSSProperties = {
     display: 'flex',

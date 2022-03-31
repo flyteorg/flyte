@@ -105,7 +105,7 @@ export const ReactFlowCustomMaxNested = ({ data }: any) => {
     );
   };
 
-  const onClick = (e) => {
+  const onClick = () => {
     data.onAddNestedView();
   };
 
@@ -208,7 +208,7 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
   const [selectedNode, setSelectedNode] = useState(false);
 
   useEffect(() => {
-    if (selectedNode == true) {
+    if (selectedNode === true) {
       onNodeSelectionChanged(selectedNode);
       setSelectedNode(false);
     }
@@ -293,10 +293,10 @@ export const ReactFlowSubWorkflowContainer = ({ data }: any) => {
     return (
       <li
         onClick={onClick}
-        style={index == currentNestedDepth - 1 ? liStyleInactive : liStyles}
+        style={index === currentNestedDepth - 1 ? liStyleInactive : liStyles}
         id={`${data.scopedId}_${index}`}
       >
-        {index == 0 ? <span style={beforeStyle}>{'>'}</span> : null}
+        {index === 0 ? <span style={beforeStyle}>{'>'}</span> : null}
         {nestedView}
         {index < currentNestedDepth - 1 ? <span style={beforeStyle}>{'>'}</span> : null}
       </li>

@@ -58,14 +58,13 @@ describe('ExecutionDetailsAppBarContent', () => {
     describe('in overflow menu', () => {
       let renderResult: RenderResult;
       let buttonEl: HTMLElement;
-      let menuEl: HTMLElement;
 
       beforeEach(async () => {
         renderResult = renderContent();
         const { getByLabelText } = renderResult;
         buttonEl = await waitFor(() => getByLabelText(commonLabels.moreOptionsButton));
         fireEvent.click(buttonEl);
-        menuEl = await waitFor(() => getByLabelText(commonLabels.moreOptionsMenu));
+        await waitFor(() => getByLabelText(commonLabels.moreOptionsMenu));
       });
 
       it('renders a clone option', () => {

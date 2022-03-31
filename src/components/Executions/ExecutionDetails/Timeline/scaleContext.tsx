@@ -1,4 +1,5 @@
 import { Mark } from '@material-ui/core/Slider';
+import { log } from 'common/log';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
 import { formatSecondsToHmsFormat } from './BarChart/utils';
@@ -27,10 +28,10 @@ export const ScaleContext = createContext<TimelineScaleState>({
   chartInterval: 20,
   marks: [],
   setMaxValue: () => {
-    console.error('ERROR: No ScaleContextProvider was found in parent components.');
+    log.error('ERROR: No ScaleContextProvider was found in parent components.');
   },
   setScaleFactor: () => {
-    console.error('ERROR: No ScaleContextProvider was found in parent components.');
+    log.error('ERROR: No ScaleContextProvider was found in parent components.');
   },
 });
 

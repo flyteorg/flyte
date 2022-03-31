@@ -1,6 +1,6 @@
 import { ensureSlashPrefixed } from 'common/utils';
-import { TaskExecutionIdentifier, WorkflowExecutionIdentifier } from 'models/Execution/types';
-import { projectBasePath, projectDomainBasePath, taskExecutionPath } from './constants';
+import { WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { projectBasePath, projectDomainBasePath } from './constants';
 import { makeRoute } from './utils';
 
 /** Creates a path relative to a particular project */

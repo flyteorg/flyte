@@ -1,19 +1,16 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformDAGToReactFlowV2';
-import { createDebugLogger } from 'common/log';
 import { RFWrapperProps, RFGraphTypes, ConvertDagProps } from './types';
 import { getRFBackground } from './utils';
 import { ReactFlowWrapper } from './ReactFlowWrapper';
 import { Legend } from './NodeStatusLegend';
 
-const debug = createDebugLogger('@ReactFlowGraphComponent');
-
 const nodeExecutionStatusChanged = (previous, nodeExecutionsById) => {
   for (const exe in nodeExecutionsById) {
     const oldStatus = previous[exe]?.closure.phase;
     const newStatus = nodeExecutionsById[exe]?.closure.phase;
-    if (oldStatus != newStatus) {
+    if (oldStatus !== newStatus) {
       return true;
     }
   }

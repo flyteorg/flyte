@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Admin } from 'flyteidl';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -11,7 +12,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Form from '@rjsf/material-ui';
-import { flyteidl } from '@flyteorg/flyteidl/gen/pb-js/flyteidl';
 import { State } from 'xstate';
 import { LaunchAdvancedOptionsRef } from './types';
 import {
@@ -20,8 +20,6 @@ import {
   WorkflowLaunchTypestate,
 } from './launchMachine';
 import { useStyles } from './styles';
-
-import IExecutionSpec = flyteidl.admin.IExecutionSpec;
 
 const muiTheme = createMuiTheme({
   props: {
@@ -86,7 +84,7 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
       }
       if (
         other?.rawOutputDataConfig?.outputLocationPrefix !== undefined &&
-          other.rawOutputDataConfig.outputLocationPrefix !== null
+        other.rawOutputDataConfig.outputLocationPrefix !== null
       ) {
         setRawOutputDataConfig(other.rawOutputDataConfig.outputLocationPrefix);
       }
@@ -100,7 +98,14 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
       };
       setLabelsParamData(newLabels);
       setAnnotationsParamData(newAnnotations);
-    }, [other.disableAll, other.maxParallelism, other.rawOutputDataConfig, other.labels, other.annotations, launchPlan?.spec]);
+    }, [
+      other.disableAll,
+      other.maxParallelism,
+      other.rawOutputDataConfig,
+      other.labels,
+      other.annotations,
+      launchPlan?.spec,
+    ]);
 
     React.useImperativeHandle(
       ref,
@@ -109,7 +114,7 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
           return {
             disableAll,
             rawOutputDataConfig: {
-              outputLocationPrefix: rawOutputDataConfig
+              outputLocationPrefix: rawOutputDataConfig,
             },
             maxParallelism: parseInt(maxParallelism || '', 10),
             labels: {
@@ -118,7 +123,7 @@ export const LaunchFormAdvancedInputs = React.forwardRef<
             annotations: {
               values: annotationsParamData,
             },
-          } as IExecutionSpec;
+          } as Admin.IExecutionSpec;
         },
         validate: () => {
           return true;

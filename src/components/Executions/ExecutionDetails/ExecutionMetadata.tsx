@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme: Theme) => {
 
 interface DetailItem {
   className?: string;
-  label: React.ReactNode;
+  label: ExecutionMetadataLabels;
   value: React.ReactNode;
 }
 
@@ -109,8 +109,8 @@ export const ExecutionMetadata: React.FC<{
   return (
     <div className={styles.container}>
       <div className={styles.detailsContainer}>
-        {details.map(({ className, label, value }, idx) => (
-          <div className={classnames(styles.detailItem, className)} key={idx}>
+        {details.map(({ className, label, value }) => (
+          <div className={classnames(styles.detailItem, className)} key={label}>
             <Typography className={commonStyles.truncateText} variant="subtitle1">
               {label}
             </Typography>

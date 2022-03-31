@@ -1,7 +1,6 @@
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { getCacheKey } from 'components/Cache/utils';
-import { fetchStates } from 'components/hooks/types';
 import { ErrorBoundary } from 'components/common/ErrorBoundary';
 import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { DataError } from 'components/Errors/DataError';

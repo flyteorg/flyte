@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import ReactFlow, { Background } from 'react-flow-renderer';
-import { createDebugLogger } from 'common/log';
 import { RFWrapperProps } from './types';
 import {
   ReactFlowCustomEndNode,
@@ -14,8 +13,6 @@ import {
   ReactFlowStaticNode,
 } from './customNodeComponents';
 import { getPositionedNodes, ReactFlowIdHash } from './utils';
-
-const debug = createDebugLogger('@ReactFlowWrapper');
 
 /**
  * Mapping for using custom nodes inside ReactFlow
@@ -48,7 +45,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
   const [reactFlowInstance, setReactFlowInstance] = useState<null | any>(null);
 
   useEffect(() => {
-    if (reactFlowInstance && state.shouldUpdate == false) {
+    if (reactFlowInstance && state.shouldUpdate === false) {
       reactFlowInstance?.fitView();
     }
   }, [state.shouldUpdate, reactFlowInstance]);
@@ -68,7 +65,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
 
   const onNodesChange = useCallback(
     (changes) => {
-      if (changes.length == state.nodes.length && state.shouldUpdate) {
+      if (changes.length === state.nodes.length && state.shouldUpdate) {
         const nodesWithDimensions: any[] = [];
         for (let i = 0; i < changes.length; i++) {
           nodesWithDimensions.push({

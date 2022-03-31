@@ -1,4 +1,4 @@
-import { render, waitFor, fireEvent, within, getByText } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
 import { insertFixture } from 'mocks/data/insertFixture';

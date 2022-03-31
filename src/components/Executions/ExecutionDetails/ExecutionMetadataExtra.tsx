@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => {
 
 interface DetailItem {
   className?: string;
-  label: React.ReactNode;
+  label: ExecutionMetadataLabels;
   value: React.ReactNode;
 }
 
@@ -34,7 +34,12 @@ export const ExecutionMetadataExtra: React.FC<{
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
-  const { launchPlan: launchPlanId, maxParallelism, rawOutputDataConfig, authRole } = execution.spec;
+  const {
+    launchPlan: launchPlanId,
+    maxParallelism,
+    rawOutputDataConfig,
+    authRole,
+  } = execution.spec;
 
   const [launchPlanSpec, setLaunchPlanSpec] = React.useState<Partial<LaunchPlanSpec>>({});
 
@@ -53,7 +58,9 @@ export const ExecutionMetadataExtra: React.FC<{
     },
     {
       label: ExecutionMetadataLabels.rawOutputPrefix,
-      value: rawOutputDataConfig?.outputLocationPrefix || launchPlanSpec?.rawOutputDataConfig?.outputLocationPrefix,
+      value:
+        rawOutputDataConfig?.outputLocationPrefix ||
+        launchPlanSpec?.rawOutputDataConfig?.outputLocationPrefix,
     },
     {
       label: ExecutionMetadataLabels.parallelism,
@@ -63,8 +70,8 @@ export const ExecutionMetadataExtra: React.FC<{
 
   return (
     <>
-      {details.map(({ className, label, value }, idx) => (
-        <div className={classnames(styles.detailItem, className)} key={idx}>
+      {details.map(({ className, label, value }) => (
+        <div className={classnames(styles.detailItem, className)} key={label}>
           <Typography className={commonStyles.truncateText} variant="subtitle1">
             {label}
           </Typography>

@@ -38,7 +38,7 @@ export const nodeHasChildren = (node: dNode) => {
 };
 
 export const isStartOrEndEdge = (edge) => {
-  return edge.sourceId == 'start-node' || edge.targetId == 'end-node';
+  return edge.sourceId === 'start-node' || edge.targetId === 'end-node';
 };
 
 interface BuildDataProps {
@@ -99,7 +99,7 @@ export const buildReactFlowDataProps = (props: BuildDataProps) => {
   };
 
   for (const rootParentId in currentNestedView) {
-    if (node.scopedId == rootParentId) {
+    if (node.scopedId === rootParentId) {
       dataProps['currentNestedView'] = currentNestedView[rootParentId];
     }
   }
@@ -136,7 +136,7 @@ export const buildReactFlowNode = ({
     output['parentNode'] = parentNode.scopedId;
   }
 
-  if (output.parentNode == node.scopedId) {
+  if (output.parentNode === node.scopedId) {
     delete output.parentNode;
   }
 
@@ -245,14 +245,14 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
           dataProps: nodeDataProps,
           rootParentNode: rootParentNode,
           parentNode: contextParent,
-          typeOverride: isStaticGraph == true ? dTypes.staticNode : undefined,
+          typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
         });
         context.nodes[reactFlowNode.id] = reactFlowNode;
       } else {
         const reactFlowNode = buildReactFlowNode({
           node: node,
           dataProps: nodeDataProps,
-          typeOverride: isStaticGraph == true ? dTypes.staticNode : undefined,
+          typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
         });
         root.nodes[reactFlowNode.id] = reactFlowNode;
       }

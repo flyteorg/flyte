@@ -3,6 +3,7 @@
  * This file is NOT compiled and is run directly by Node.js. Make sure you are not using JavaScript features that
  * does not exist in Node.js runtime.
  */
+/* eslint-disable no-console */
 const morgan = require('morgan');
 const express = require('express');
 const env = require('./env');
@@ -80,7 +81,7 @@ if (process.env.NODE_ENV === 'production') {
 /* Set ADMIN_API_USE_SSL to https for CORS support */
 let server;
 const port = process.env.PORT || 3000;
-if (env.ADMIN_API_USE_SSL == 'https') {
+if (env.ADMIN_API_USE_SSL === 'https') {
   const fs = require('fs');
   const https = require('https');
   var privateKey = fs.readFileSync('script/server.key');

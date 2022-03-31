@@ -1,9 +1,12 @@
+import { createDebugLogger } from 'common/log';
 import { ValueError } from 'errors/parameterErrors';
 import { Core } from 'flyteidl';
 import { InputProps, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 import { InputValidatorParams, ValidationParams } from './types';
+
+const debug = createDebugLogger('@InputHelper');
 
 type ToLiteralParams = Pick<InputProps, 'initialValue' | 'typeDefinition' | 'value'>;
 /** Converts a type/InputValue combination to a `Core.ILiteral` which can be
@@ -47,7 +50,7 @@ export function literalToInputValue(
   } catch (e) {
     // If something goes wrong (most likely malformed default value input),
     // we'll return the system default value.
-    console.debug((e as Error).message);
+    debug((e as Error).message);
     return defaultValue;
   }
 }

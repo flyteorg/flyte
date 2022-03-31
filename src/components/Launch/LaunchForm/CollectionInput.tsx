@@ -1,5 +1,6 @@
 import { TextField } from '@material-ui/core';
 import * as React from 'react';
+import { log } from 'common/log';
 import { makeStringChangeHandler } from './handlers';
 import { InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
@@ -16,7 +17,7 @@ export const CollectionInput: React.FC<InputProps> = (props) => {
     value = '',
   } = props;
   if (!subtype) {
-    console.error('Unexpected missing subtype for collection input', props.typeDefinition);
+    log.warn('Unexpected missing subtype for collection input', props.typeDefinition);
     return <UnsupportedInput {...props} />;
   }
   const hasError = !!error;
