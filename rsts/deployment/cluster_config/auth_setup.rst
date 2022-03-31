@@ -181,6 +181,12 @@ Apply Configuration
 
       kubectl rollout restart deployment/flytepropeller -n flyte
 
+#. Restart `flytescheduler` to start using authenticated requests:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytescheduler -n flyte
+
 .. note::
 
    **Congratulations!**
