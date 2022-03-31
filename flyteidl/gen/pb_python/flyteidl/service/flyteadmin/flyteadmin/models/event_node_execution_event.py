@@ -54,7 +54,10 @@ class EventNodeExecutionEvent(object):
         'parent_node_metadata': 'EventParentNodeExecutionMetadata',
         'retry_group': 'str',
         'spec_node_id': 'str',
-        'node_name': 'str'
+        'node_name': 'str',
+        'event_version': 'int',
+        'is_parent': 'bool',
+        'is_dynamic': 'bool'
     }
 
     attribute_map = {
@@ -72,10 +75,13 @@ class EventNodeExecutionEvent(object):
         'parent_node_metadata': 'parent_node_metadata',
         'retry_group': 'retry_group',
         'spec_node_id': 'spec_node_id',
-        'node_name': 'node_name'
+        'node_name': 'node_name',
+        'event_version': 'event_version',
+        'is_parent': 'is_parent',
+        'is_dynamic': 'is_dynamic'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -93,6 +99,9 @@ class EventNodeExecutionEvent(object):
         self._retry_group = None
         self._spec_node_id = None
         self._node_name = None
+        self._event_version = None
+        self._is_parent = None
+        self._is_dynamic = None
         self.discriminator = None
 
         if id is not None:
@@ -125,6 +134,12 @@ class EventNodeExecutionEvent(object):
             self.spec_node_id = spec_node_id
         if node_name is not None:
             self.node_name = node_name
+        if event_version is not None:
+            self.event_version = event_version
+        if is_parent is not None:
+            self.is_parent = is_parent
+        if is_dynamic is not None:
+            self.is_dynamic = is_dynamic
 
     @property
     def id(self):
@@ -450,6 +465,73 @@ class EventNodeExecutionEvent(object):
         """
 
         self._node_name = node_name
+
+    @property
+    def event_version(self):
+        """Gets the event_version of this EventNodeExecutionEvent.  # noqa: E501
+
+
+        :return: The event_version of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: int
+        """
+        return self._event_version
+
+    @event_version.setter
+    def event_version(self, event_version):
+        """Sets the event_version of this EventNodeExecutionEvent.
+
+
+        :param event_version: The event_version of this EventNodeExecutionEvent.  # noqa: E501
+        :type: int
+        """
+
+        self._event_version = event_version
+
+    @property
+    def is_parent(self):
+        """Gets the is_parent of this EventNodeExecutionEvent.  # noqa: E501
+
+        Whether this node launched a subworkflow.  # noqa: E501
+
+        :return: The is_parent of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_parent
+
+    @is_parent.setter
+    def is_parent(self, is_parent):
+        """Sets the is_parent of this EventNodeExecutionEvent.
+
+        Whether this node launched a subworkflow.  # noqa: E501
+
+        :param is_parent: The is_parent of this EventNodeExecutionEvent.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_parent = is_parent
+
+    @property
+    def is_dynamic(self):
+        """Gets the is_dynamic of this EventNodeExecutionEvent.  # noqa: E501
+
+        Whether this node yielded a dynamic workflow.  # noqa: E501
+
+        :return: The is_dynamic of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_dynamic
+
+    @is_dynamic.setter
+    def is_dynamic(self, is_dynamic):
+        """Sets the is_dynamic of this EventNodeExecutionEvent.
+
+        Whether this node yielded a dynamic workflow.  # noqa: E501
+
+        :param is_dynamic: The is_dynamic of this EventNodeExecutionEvent.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_dynamic = is_dynamic
 
     def to_dict(self):
         """Returns the model properties as a dict"""

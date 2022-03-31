@@ -54029,6 +54029,17 @@ definitions:
       node_name:
         type: "string"
         title: "Friendly readable name for the node"
+      event_version:
+        type: "integer"
+        format: "int32"
+      is_parent:
+        type: "boolean"
+        format: "boolean"
+        description: "Whether this node launched a subworkflow."
+      is_dynamic:
+        type: "boolean"
+        format: "boolean"
+        description: "Whether this node yielded a dynamic workflow."
   eventParentNodeExecutionMetadata:
     type: "object"
     properties:

@@ -6245,6 +6245,15 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent nodeName */
             nodeName?: (string|null);
+
+            /** NodeExecutionEvent eventVersion */
+            eventVersion?: (number|null);
+
+            /** NodeExecutionEvent isParent */
+            isParent?: (boolean|null);
+
+            /** NodeExecutionEvent isDynamic */
+            isDynamic?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -6300,6 +6309,15 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent nodeName. */
             public nodeName: string;
+
+            /** NodeExecutionEvent eventVersion. */
+            public eventVersion: number;
+
+            /** NodeExecutionEvent isParent. */
+            public isParent: boolean;
+
+            /** NodeExecutionEvent isDynamic. */
+            public isDynamic: boolean;
 
             /** NodeExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");

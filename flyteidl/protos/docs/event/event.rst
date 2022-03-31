@@ -90,6 +90,9 @@ NodeExecutionEvent
    "retry_group", ":ref:`ref_string`", "", "Retry group to indicate grouping of nodes by retries"
    "spec_node_id", ":ref:`ref_string`", "", "Identifier of the node in the original workflow/graph This maps to value of WorkflowTemplate.nodes[X].id"
    "node_name", ":ref:`ref_string`", "", "Friendly readable name for the node"
+   "event_version", ":ref:`ref_int32`", "", ""
+   "is_parent", ":ref:`ref_bool`", "", "Whether this node launched a subworkflow."
+   "is_dynamic", ":ref:`ref_bool`", "", "Whether this node yielded a dynamic workflow."
 
 
 

@@ -87,6 +87,14 @@ message NodeExecutionEvent {
 
     // Friendly readable name for the node
     string node_name = 13;
+
+    int32 event_version = 16;
+
+    // Whether this node launched a subworkflow.
+    bool is_parent = 17;
+
+    // Whether this node yielded a dynamic workflow.
+    bool is_dynamic = 18;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched

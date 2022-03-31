@@ -14890,6 +14890,9 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [retryGroup] NodeExecutionEvent retryGroup
              * @property {string|null} [specNodeId] NodeExecutionEvent specNodeId
              * @property {string|null} [nodeName] NodeExecutionEvent nodeName
+             * @property {number|null} [eventVersion] NodeExecutionEvent eventVersion
+             * @property {boolean|null} [isParent] NodeExecutionEvent isParent
+             * @property {boolean|null} [isDynamic] NodeExecutionEvent isDynamic
              */
 
             /**
@@ -15027,6 +15030,30 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             NodeExecutionEvent.prototype.nodeName = "";
 
+            /**
+             * NodeExecutionEvent eventVersion.
+             * @member {number} eventVersion
+             * @memberof flyteidl.event.NodeExecutionEvent
+             * @instance
+             */
+            NodeExecutionEvent.prototype.eventVersion = 0;
+
+            /**
+             * NodeExecutionEvent isParent.
+             * @member {boolean} isParent
+             * @memberof flyteidl.event.NodeExecutionEvent
+             * @instance
+             */
+            NodeExecutionEvent.prototype.isParent = false;
+
+            /**
+             * NodeExecutionEvent isDynamic.
+             * @member {boolean} isDynamic
+             * @memberof flyteidl.event.NodeExecutionEvent
+             * @instance
+             */
+            NodeExecutionEvent.prototype.isDynamic = false;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -15106,6 +15133,12 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.event.TaskNodeMetadata.encode(message.taskNodeMetadata, writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
                 if (message.outputData != null && message.hasOwnProperty("outputData"))
                     $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    writer.uint32(/* id 16, wireType 0 =*/128).int32(message.eventVersion);
+                if (message.isParent != null && message.hasOwnProperty("isParent"))
+                    writer.uint32(/* id 17, wireType 0 =*/136).bool(message.isParent);
+                if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
+                    writer.uint32(/* id 18, wireType 0 =*/144).bool(message.isDynamic);
                 return writer;
             };
 
@@ -15171,6 +15204,15 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 13:
                         message.nodeName = reader.string();
+                        break;
+                    case 16:
+                        message.eventVersion = reader.int32();
+                        break;
+                    case 17:
+                        message.isParent = reader.bool();
+                        break;
+                    case 18:
+                        message.isDynamic = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -15287,6 +15329,15 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.nodeName != null && message.hasOwnProperty("nodeName"))
                     if (!$util.isString(message.nodeName))
                         return "nodeName: string expected";
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    if (!$util.isInteger(message.eventVersion))
+                        return "eventVersion: integer expected";
+                if (message.isParent != null && message.hasOwnProperty("isParent"))
+                    if (typeof message.isParent !== "boolean")
+                        return "isParent: boolean expected";
+                if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
+                    if (typeof message.isDynamic !== "boolean")
+                        return "isDynamic: boolean expected";
                 return null;
             };
 
