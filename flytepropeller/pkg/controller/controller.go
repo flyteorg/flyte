@@ -9,55 +9,58 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+
+	"github.com/flyteorg/flytepropeller/events"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
+	lister "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	errors3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
+	leader "github.com/flyteorg/flytepropeller/pkg/leaderelection"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+
+	"github.com/flyteorg/flytestdlib/contextutils"
+	stdErrs "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/pkg/errors"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-
-	stdErrs "github.com/flyteorg/flytestdlib/errors"
-
-	errors3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-
-	"github.com/flyteorg/flytepropeller/events"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
-
-	"github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/clock"
+
 	k8sInformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/record"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
-	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
-	lister "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
-	leader "github.com/flyteorg/flytepropeller/pkg/leaderelection"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 const (
@@ -504,6 +507,24 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
 	if err != nil {
 		return errors.Wrapf(err, "error building FlyteWorkflow clientset")
+	}
+
+	// Create FlyteWorkflow CRD if it does not exist
+	if cfg.CreateFlyteWorkflowCRD {
+		logger.Infof(ctx, "creating FlyteWorkflow CRD")
+		apiextensionsClient, err := apiextensionsclientset.NewForConfig(kubecfg)
+		if err != nil {
+			return errors.Wrapf(err, "error building apiextensions clientset")
+		}
+
+		_, err = apiextensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, &flyteworkflow.CRD, v1.CreateOptions{})
+		if err != nil {
+			if apierrors.IsAlreadyExists(err) {
+				logger.Warnf(ctx, "FlyteWorkflow CRD already exists")
+			} else {
+				return errors.Wrapf(err, "failed to create FlyteWorkflow CRD")
+			}
+		}
 	}
 
 	opts := SharedInformerOptions(cfg, defaultNamespace)

@@ -108,7 +108,8 @@ var (
 		EventConfig: EventConfig{
 			RawOutputPolicy: RawOutputPolicyReference,
 		},
-		ClusterID: "propeller",
+		ClusterID:              "propeller",
+		CreateFlyteWorkflowCRD: false,
 	}
 )
 
@@ -145,6 +146,7 @@ type Config struct {
 	IncludeDomainLabel     []string             `json:"include-domain-label" pflag:",Include the specified domain label in the k8s FlyteWorkflow CRD label selector"`
 	ExcludeDomainLabel     []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
 	ClusterID              string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
+	CreateFlyteWorkflowCRD bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.

@@ -827,4 +827,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_create-flyteworkflow-crd", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("create-flyteworkflow-crd", testValue)
+			if vBool, err := cmdFlags.GetBool("create-flyteworkflow-crd"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.CreateFlyteWorkflowCRD)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
