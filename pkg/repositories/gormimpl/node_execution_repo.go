@@ -44,6 +44,38 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
 			},
 		},
+	}).Take(&nodeExecution)
+	timer.Stop()
+
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return models.NodeExecution{},
+			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
+				NodeId: input.NodeExecutionIdentifier.NodeId,
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
+					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
+					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				},
+			})
+	} else if tx.Error != nil {
+		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+
+	return nodeExecution, nil
+}
+
+func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+	var nodeExecution models.NodeExecution
+	timer := r.metrics.GetDuration.Start()
+	tx := r.db.Where(&models.NodeExecution{
+		NodeExecutionKey: models.NodeExecutionKey{
+			NodeID: input.NodeExecutionIdentifier.NodeId,
+			ExecutionKey: models.ExecutionKey{
+				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
+				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
+				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+			},
+		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
 	timer.Stop()
 

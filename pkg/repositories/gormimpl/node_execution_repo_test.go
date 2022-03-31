@@ -5,6 +5,10 @@ import (
 	"testing"
 	"time"
 
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
+
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -30,8 +34,7 @@ func TestCreateNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	nodeExecutionQuery := GlobalMock.NewMock()
-	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at","node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id","parent_task_execution_id","error_kind","error_code","cache_status","dynamic_workflow_remote_closure_reference") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`)
-
+	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at","node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id","parent_task_execution_id","error_kind","error_code","cache_status","dynamic_workflow_remote_closure_reference","internal_data") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)`)
 	parentID := uint(10)
 	nodeExecution := models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
@@ -150,6 +153,43 @@ func TestGetNodeExecution(t *testing.T) {
 	assert.EqualValues(t, expectedNodeExecution, output)
 }
 
+func TestGetNodeExecutionErr(t *testing.T) {
+	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	t.Run("not found", func(t *testing.T) {
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.NewMock().WithError(gorm.ErrRecordNotFound)
+
+		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
+			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+				NodeId: "1",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "execution_project",
+					Domain:  "execution_domain",
+					Name:    "execution_name",
+				},
+			},
+		})
+		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.NotFound)
+	})
+	t.Run("other error", func(t *testing.T) {
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.NewMock().WithError(gorm.ErrInvalidData)
+
+		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
+			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+				NodeId: "1",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "execution_project",
+					Domain:  "execution_domain",
+					Name:    "execution_name",
+				},
+			},
+		})
+		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.Unknown)
+	})
+}
+
 func TestListNodeExecutions(t *testing.T) {
 	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
@@ -176,7 +216,7 @@ func TestListNodeExecutions(t *testing.T) {
 	}
 
 	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(`SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 LIMIT 20`).
+	GlobalMock.NewMock().WithQuery(`SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference","node_executions"."internal_data" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 LIMIT 20%`).
 		WithReply(nodeExecutions)
 
 	collection, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
@@ -263,7 +303,7 @@ func TestListNodeExecutionsForExecution(t *testing.T) {
 	nodeExecutions = append(nodeExecutions, nodeExecution)
 
 	GlobalMock := mocket.Catcher.Reset()
-	query := `SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND executions.execution_name = $2 LIMIT 20`
+	query := `SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference","node_executions"."internal_data" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND executions.execution_name = $2 LIMIT 20%`
 	GlobalMock.NewMock().WithQuery(query).WithReply(nodeExecutions)
 
 	collection, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{

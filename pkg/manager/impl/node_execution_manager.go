@@ -294,6 +294,51 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	return &admin.NodeExecutionEventResponse{}, nil
 }
 
+// Handles making additional database calls, if necessary, to populate IsParent & IsDynamic data using the historical pattern of
+// preloading child node executions. Otherwise, simply calls transform on the input model.
+func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, nodeExecutionModel models.NodeExecution,
+	nodeExecutionID *core.NodeExecutionIdentifier) (*admin.NodeExecution, error) {
+	internalData, err := transformers.GetNodeExecutionInternalData(nodeExecutionModel.InternalData)
+	if err != nil {
+		return nil, err
+	}
+	if internalData.EventVersion == 0 {
+		// Issue more expensive query to determine whether this node is a parent and/or dynamic node.
+		nodeExecutionModel, err = m.db.NodeExecutionRepo().GetWithChildren(ctx, repoInterfaces.NodeExecutionResource{
+			NodeExecutionIdentifier: *nodeExecutionID,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	nodeExecution, err := transformers.FromNodeExecutionModel(nodeExecutionModel)
+	if err != nil {
+		logger.Debugf(ctx, "failed to transform node execution model [%+v] to proto with err: %v", nodeExecutionID, err)
+		return nil, err
+	}
+	return nodeExecution, nil
+}
+
+func (m *NodeExecutionManager) transformNodeExecutionModelList(ctx context.Context, nodeExecutionModels []models.NodeExecution) ([]*admin.NodeExecution, error) {
+	nodeExecutions := make([]*admin.NodeExecution, len(nodeExecutionModels))
+	for idx, nodeExecutionModel := range nodeExecutionModels {
+		nodeExecution, err := m.transformNodeExecutionModel(ctx, nodeExecutionModel, &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: nodeExecutionModel.Project,
+				Domain:  nodeExecutionModel.Domain,
+				Name:    nodeExecutionModel.Name,
+			},
+			NodeId: nodeExecutionModel.NodeID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		nodeExecutions[idx] = nodeExecution
+	}
+	return nodeExecutions, nil
+}
+
 func (m *NodeExecutionManager) GetNodeExecution(
 	ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
@@ -306,9 +351,8 @@ func (m *NodeExecutionManager) GetNodeExecution(
 			request.Id, err)
 		return nil, err
 	}
-	nodeExecution, err := transformers.FromNodeExecutionModel(*nodeExecutionModel)
+	nodeExecution, err := m.transformNodeExecutionModel(ctx, *nodeExecutionModel, request.Id)
 	if err != nil {
-		logger.Debugf(ctx, "failed to transform node execution model [%+v] to proto with err: %v", request.Id, err)
 		return nil, err
 	}
 	return nodeExecution, nil
@@ -353,7 +397,7 @@ func (m *NodeExecutionManager) listNodeExecutions(
 	if len(output.NodeExecutions) == int(limit) {
 		token = strconv.Itoa(offset + len(output.NodeExecutions))
 	}
-	nodeExecutionList, err := transformers.FromNodeExecutionModels(output.NodeExecutions)
+	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, output.NodeExecutions)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform node execution models for request with err: %v", err)
 		return nil, err

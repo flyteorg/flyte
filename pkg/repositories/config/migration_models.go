@@ -51,6 +51,8 @@ type NodeExecution struct {
 	LaunchedExecution models.Execution `gorm:"foreignKey:ParentNodeExecutionID;references:ID"`
 	// In the case of dynamic workflow nodes, the remote closure is uploaded to the path specified here.
 	DynamicWorkflowRemoteClosureReference string
+	// Metadata that is only relevant to the flyteadmin service that is used to parse the model and track additional attributes.
+	InternalData []byte
 }
 
 type TaskExecutionKey struct {
