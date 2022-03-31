@@ -204,7 +204,17 @@ Flyte comes with a built-in authorization server that can be statically configur
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/pull/168/files#diff-1267ff8bd9146e1c0ff22a9e9d53cfc56d71c1d47fed9905f95ed4bddf930f8eR74-R100>`__
 and the corresponding section can be modified through configs.
 
+It's therefore not required to proceed with setting up an external Authorization Server. However, it's strongly recommended to do so to maintain the security of configured apps in a secure location and to 
+be able to manage (add, modify, delete) apps using the external authorization server.
+
 To set up an external OAuth2 Authorization Server, please follow the instructions below:
+
+.. note::
+
+   **Google IdP**
+
+   Google IdP does not offer an OAuth2 Authorization Server that can be used to protect external services (e.g. Flyte). Google offers a separate Cloud Product called Google Cloud Identity that can be used
+   in this scenario. Configuration for Cloud Identity is not included in this guide. If unavailable, setup can stop here and FlyteAdmin BuiltIn OAuth2 Authorization Server can be used instead.
 
 .. tabbed:: Okta
 
