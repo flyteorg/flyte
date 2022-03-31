@@ -71,9 +71,10 @@ You can view all custom task-resource-attributes by visiting ``protocol://<host/
 
 Cluster Resources
 =================
-These are free-form key-value pairs that are used when filling in the templates that the admin feeds into the process that syncs kubernetes resources, also known as the cluster manager.
-The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__
-and the values are what you want to see filled in.
+These are free-form key-value pairs used when filling the templates that the admin feeds into the cluster manager, the process that syncs kubernetes resources.
+
+The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__ and the values are what you want to see filled in.
+
 
 In the absence of custom override values, ``templateData`` from the `FlyteAdmin config <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__
 is used as a default. Note, these defaults are specified by domain but will be applied to every project-domain namespace combination.
