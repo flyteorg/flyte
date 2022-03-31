@@ -1,4 +1,4 @@
-git+https://github.com/flyteorg/furo@142cf2049ca9f3e84639efafe1d0a3d8de708666#egg=furo
+git+https://github.com/flyteorg/furo@b8c1c9f384296e2ca2797ff9d41df75567a15fe1#egg=furo
 sphinx
 sphinx-prompt
 sphinx-code-include
