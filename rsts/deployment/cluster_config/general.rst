@@ -71,7 +71,7 @@ You can view all custom task-resource-attributes by visiting ``protocol://<host/
 
 Cluster Resources
 =================
-These are free-form key-value pairs used when filling the templates that the admin feeds into the process to sync kubernetes resources, known as cluster manager.
+These are free-form key-value pairs used when filling the templates that the admin feeds into the cluster manager, the process that syncs kubernetes resources.
 
 The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__ and the values are what you want to see filled in.
 
