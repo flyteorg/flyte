@@ -13,12 +13,16 @@ jobs:
   lint:
     name: Lint
     uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+    with:
+      go-version: 1.17
 
   tests:
     name: Unit Tests
     uses: flyteorg/flytetools/.github/workflows/tests.yml@master
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+    with:
+      go-version: 1.17
 
   docker-build:
     name: Docker Build Images
@@ -26,7 +30,7 @@ jobs:
 
   endtoend:
     name: End2End Test
-    needs: [docker-build]
+    needs: [ docker-build ]
     uses: flyteorg/flytetools/.github/workflows/end2end.yml@master
     with:
       cache_key: ${{ needs.docker-build.outputs.cache_key }}
@@ -34,14 +38,17 @@ jobs:
 
   integration:
     name: Integration Test
-    needs: [docker-build]
+    needs: [ docker-build ]
     uses: flyteorg/flytetools/.github/workflows/integration.yml@master
     with:
       cache_key: ${{ needs.docker-build.outputs.cache_key }}
+      go-version: 1.17
 
   generate:
-    name: Check Go Gennerate
+    name: Check Go Generate
     uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
+    with:
+      go-version: 1.17
 
   bump_version:
     name: Bump Version
@@ -55,6 +62,8 @@ jobs:
     name: Goreleaser
     needs: [ bump_version ] # Only to ensure it can successfully build
     uses: flyteorg/flytetools/.github/workflows/goreleaser.yml@master
+    with:
+      go-version: 1.17
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
