@@ -428,7 +428,6 @@ configmap:
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
-    DISABLE_AUTH: "1"
 
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
