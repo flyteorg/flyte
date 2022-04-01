@@ -1,15 +1,16 @@
 .. flyteidl documentation master file, created by
 
-FlyteIDL: Flyte's Core Language Specification
-===================================================
+Flyteidl: Flyte's Core Language Specification
+==============================================
 
-``FlyteIDL`` contains the core language specification of Flyte, using `Google's Protocol Buffers <https://developers.google.com/protocol-buffers>`_. The Specification contains
+``Flyteidl`` contains the core language specification of Flyte, using `Google's Protocol Buffers <https://developers.google.com/protocol-buffers>`_. 
+The Specification contains:
 
-#. The core specification for Flyte Workflows, tasks and the type system
+#. The core specification for Flyte workflows, tasks, and the type system
 #. The specification for FlyteAdmin's `gRPC <https://grpc.io/>`_ and ``REST`` endpoints
-#. Some of the core plugin API's like - Spark, Sagemaker, etc
+#. Some of the core plugin APIs like - Spark, Sagemaker, etc.
 
-This specification is used to generate client stubs for `FlyteKit <https://flyte.readthedocs.io/projects/flytekit>`_, `FlyteKit Java <https://github.com/spotify/flytekit-java>`_, `Flytectl <https://github.com/flyteorg/flytectl>`_ and the `FlyteAdmin Service <https://pkg.go.dev/github.com/lyft/flyteadmin>`_.
+This specification is used to generate client stubs for `Flytekit <https://flyte.readthedocs.io/projects/flytekit>`_, `Flytekit Java <https://github.com/spotify/flytekit-java>`_, `Flytectl <https://github.com/flyteorg/flytectl>`_ and the `FlyteAdmin Service <https://pkg.go.dev/github.com/lyft/flyteadmin>`_.
 
 
 .. toctree::
@@ -31,6 +32,6 @@ This specification is used to generate client stubs for `FlyteKit <https://flyte
    :caption: FlyteIDL
    :hidden:
 
-   Flyte IDL <self>
+   Flyteidl <self>
    protos/index
    Contributing Guide <README>
