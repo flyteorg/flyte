@@ -118,7 +118,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	pluginRegistry.RegisterDefault(plugins.PluginIDDataProxy, dataProxySvc)
-	service.RegisterDataProxyServer(grpcServer, plugins.Get[service.DataProxyServer](pluginRegistry, plugins.PluginIDDataProxy))
+	service.RegisterDataProxyServiceServer(grpcServer, plugins.Get[service.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("flyteadmin", grpc_health_v1.HealthCheckResponse_SERVING)

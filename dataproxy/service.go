@@ -22,7 +22,7 @@ import (
 )
 
 type Service struct {
-	service.DataProxyServer
+	service.DataProxyServiceServer
 
 	cfg           config.DataProxyConfig
 	dataStore     *storage.DataStore
