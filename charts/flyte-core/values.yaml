@@ -16,8 +16,21 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.104 # FLYTEADMIN_TAG
+    tag: v0.6.112 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
+  # -- Additional flyteadmin container environment variables
+  #
+  # e.g. SendGrid's API key
+  #  - name: SENDGRID_API_KEY
+  #    value: "<your sendgrid api key>"
+  #
+  # e.g. secret environment variable (you can combine it with .additionalVolumes):
+  # - name: SENDGRID_API_KEY
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: sendgrid-secret
+  #       key: api_key
+  env: []
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
@@ -62,8 +75,6 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
-  # -- Deploys a Redoc container in Flyteadmin's pod
-  deployRedoc: true
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
@@ -78,7 +89,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.104 # FLYTESCHEDULER_TAG
+    tag: v0.6.112 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -174,12 +185,14 @@ datacatalog:
 flytepropeller:
   enabled: true
   manager: false
+  # -- Whether to install the flyteworkflows CRD with helm
+  createCRDs: true
   # -- Replicas count for Flytepropeller deployment
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v0.16.29 # FLYTEPROPELLER_TAG
+    tag: v0.16.32 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -257,6 +270,10 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+
+
+# It will enable the redoc route in ingress
+deployRedoc: false
 
 #
 # Common secret auth for propeller & scheduler
@@ -353,7 +370,6 @@ storage:
 
 # Database configuration
 db:
-  checks: true
   datacatalog:
     database:
       port: 5432
@@ -374,6 +390,40 @@ db:
 #
 
 configmap:
+  clusters:
+    labelClusterMap: {}
+#  labelClusterMap:
+#    team1:
+#      - id: testcluster
+#        weight: 1
+#    team2:
+#      - id: testcluster2
+#        weight: 0.5
+#      - id: testcluster3
+#        weight: 0.5
+    clusterConfigs: []
+#  clusterConfigs:
+#    - name: "testcluster"
+#      endpoint: "testcluster_endpoint"
+#      auth:
+#        type: "file_path"
+#        tokenPath: "/path/to/testcluster/token"
+#        certPath: "/path/to/testcluster/cert"
+#    - name: "testcluster2"
+#      endpoint: "testcluster2_endpoint"
+#      enabled: true
+#      auth:
+#        type: "file_path"
+#        tokenPath: "/path/to/testcluster2/token"
+#        certPath: "/path/to/testcluster2/cert"
+#    - name: "testcluster3"
+#      endpoint: "testcluster3_endpoint"
+#      enabled: true
+#      auth:
+#        type: "file_path"
+#        tokenPath: "/path/to/testcluster3/token"
+#        certPath: "/path/to/testcluster3/cert"
+
   # -- Configuration for Flyte console UI
   console:
     BASE_URL: /console

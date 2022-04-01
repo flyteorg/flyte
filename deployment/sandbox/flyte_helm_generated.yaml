@@ -224,6 +224,9 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  clusters: | 
+    clusterConfigs: []
+    labelClusterMap: {}
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -3295,7 +3298,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyteadmin
+  name: flyte-flyteadmin
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -3325,7 +3328,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -3399,7 +3402,7 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 rules:
   - apiGroups:
@@ -3618,7 +3621,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyteadmin-binding
+  name: flyte-flyteadmin-binding
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -3627,7 +3630,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyteadmin
+  name: flyte-flyteadmin
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
@@ -3637,7 +3640,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -3646,7 +3649,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flytepropeller
+  name: flyte-flytepropeller
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
@@ -3657,12 +3660,12 @@ subjects:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
   namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
 subjects:
   - kind: ServiceAccount
     name: flyte-pod-webhook
@@ -4074,6 +4077,28 @@ spec:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/templates/redoc/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redoc
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+  selector: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
@@ -4415,7 +4440,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4c2b21ffd7fbd7bb8eae5d29e9d06856f014cffde66a848e52dfe35668eb268"
+        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4427,21 +4452,13 @@ spec:
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
       initContainers:
-        - name: check-db-ready
-          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
-          securityContext:
-             runAsUser: 0
-          command:
-          - sh
-          - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -4457,7 +4474,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -4470,7 +4487,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -4480,7 +4497,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -4503,7 +4520,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -4527,26 +4544,6 @@ spec:
           name: config-volume
         - name: auth
           mountPath: /etc/secrets/
-      - command:
-        - sh
-        - -c
-        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-        - name: PAGE_TITLE
-          value: Flyte Admin OpenAPI
-        - name: SPEC_URL
-          value: /api/v1/openapi
-        - name: PORT
-          value: "8087"
-        image: docker.io/redocly/redoc
-        imagePullPolicy: IfNotPresent
-        name: redoc
-        ports:
-        - containerPort: 8087
-        resources:
-          limits:
-            cpu: "0.1"
-            memory: 200Mi
       serviceAccountName: flyteadmin
       volumes:
         
@@ -4611,10 +4608,10 @@ spec:
         resources: 
           limits:
             cpu: 500m
-            memory: 250Mi
+            memory: 275Mi
           requests:
             cpu: 10m
-            memory: 50Mi
+            memory: 250Mi
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
@@ -4654,14 +4651,6 @@ spec:
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
-      - name: check-db-ready
-        image: postgres:10.16-alpine
-        securityContext:
-          runAsUser: 0
-        command:
-          - sh
-          - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
       - command:
         - datacatalog
         - --config
@@ -4730,7 +4719,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4c2b21ffd7fbd7bb8eae5d29e9d06856f014cffde66a848e52dfe35668eb268"
+        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4747,7 +4736,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.104"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -4762,7 +4751,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.104"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.112"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -4836,7 +4825,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -4882,7 +4871,7 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.16.29
+        app.kubernetes.io/version: v0.16.32
       annotations:
         configChecksum: "5a2bb5ada5db747f67b3bdfcdc742117d8ff5e163cad25b57963e24d9345198"
     spec:
@@ -4893,7 +4882,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -4916,7 +4905,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.29"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v0.16.32"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -5151,6 +5140,56 @@ spec:
         - name: postgres-storage
           emptyDir: {}
 ---
+# Source: flyte/templates/redoc/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redoc
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: redoc
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: redoc
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: redoc
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+      - image: "docker.io/redocly/redoc:latest"
+        imagePullPolicy: "IfNotPresent"
+        name: redoc
+        command:
+          - sh
+          - -c
+          - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+          - name: PAGE_TITLE
+            value: Flyte Admin OpenAPI
+          - name: SPEC_URL
+            value: /api/v1/openapi
+          - name: PORT
+            value: "8087"
+        ports:
+          - containerPort: 8087
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
+---
 # Source: flyte/charts/flyte/templates/clusterresourcesync/cronjob.yaml
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -5175,7 +5214,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.104"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.112"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
@@ -5215,14 +5254,6 @@ spec:
                 name: flyteconsole
                 port:
                   number: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
@@ -5267,11 +5298,19 @@ spec:
                 port:
                   number: 80
           # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: redoc
+                port:
+                  number: 87
+          # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: redoc
                 port:
                   number: 87
           - path: /.well-known

@@ -1,0 +1,17 @@
+flyteadmin:
+  enabled: false
+
+cluster_resource_manager:
+  enabled: false
+
+workflow_scheduler:
+  enabled: false
+
+flytescheduler:
+  enabled: false
+
+datacatalog:
+  enabled: false
+
+flyteconsole:
+  enabled: false

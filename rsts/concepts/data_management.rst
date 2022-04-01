@@ -59,7 +59,7 @@ data from the configured object-store paths. These paths are completely customiz
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
 - To override the ``RawOutput`` path (prefix in an object store like S3/GCS), we can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
-  .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/launch_raw_output.png
+  .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/launch_raw_output.png
 
 - In the sandbox, the default Rawoutput-prefix is configured to be the root of the local bucket. Hence Flyte will write all the raw data (reference types like blob, file, df/schema/parquet, etc.) under a path defined by the execution.
 
@@ -154,13 +154,13 @@ We could use faster metadata stores to speed up data movement or exploit localit
 Between Flytepropeller and Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_data_movement.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/flyte_data_movement.png
 
 
 Between Tasks
 ~~~~~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_data_transfer.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/flyte_data_transfer.png
 
 
 Bringing in Your Own Datastores for Raw Data

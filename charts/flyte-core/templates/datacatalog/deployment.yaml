@@ -26,16 +26,6 @@ spec:
       priorityClassName: {{ .Values.datacatalog.priorityClassName }}
       {{- end }}
       initContainers:
-      {{- if .Values.db.checks }}
-      - name: check-db-ready
-        image: postgres:10.16-alpine
-        securityContext:
-          runAsUser: 0
-        command:
-          - sh
-          - -c
-          - until pg_isready -h {{ tpl .Values.db.datacatalog.database.host $ }} -p {{ .Values.db.datacatalog.database.port }}; do echo waiting for database; sleep 2; done;
-      {{- end }}
       - command:
         - datacatalog
         - --config

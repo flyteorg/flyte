@@ -11,14 +11,6 @@ modules:
   - name: s3
     type: aws-s3
     bucket_name: "{parent_name}-{layer_name}"
-  - name: notifcationsQueue
-    type: aws-sqs
-  - name: schedulesQueue
-    type: aws-sqs
-  - name: topic
-    type: aws-sns
-    sqs_subscribers:
-      - "${{module.notifcationsQueue.queue_arn}}"
   - name: adminflyterole
     type: aws-iam-role
     extra_iam_policies:
@@ -29,9 +21,6 @@ modules:
         service_name: "*"
     links:
       - s3: ["write"]
-      - notifcationsQueue
-      - schedulesQueue
-      - topic
   - name: userflyterole
     type: aws-iam-role
     extra_iam_policies:

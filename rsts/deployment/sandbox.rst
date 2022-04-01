@@ -33,9 +33,9 @@ When users call ``flytectl sandbox start --source <dir>``, the source ``<dir>`` 
 This is not possible with the sandbox's Docker environment however, because it does not ship with a Docker registry. Users are free to use an external registry of course, as long as the inner k3s cluster has permissions to pull from it. To reduce the friction of procuring such a registry, configuring permissions to access it, and having to explicitly push to it,
 we recommend using the ``flytectl sandbox exec -- ...`` mode to trigger a Docker build for your code (which is mounted in the sandbox environment) using the docker-in-docker daemon. Since K3s uses the same Docker daemon, it is possible to re-use the images built internally. This greatly simplifies the user's interaction and ability to try out Flyte, at the cost of hiding one part of the real-world iteration cycle, calling ``docker push`` on your task images.
 
-The illustration below shows the archtecture of flyte-sandbox in a single container. It is identical to a Flyte sandbox cluster, except that we have built one docker container, with Kubernetes and Flyte already installed.
+The illustration below shows the architecture of flyte-sandbox in a single container. It is identical to a Flyte sandbox cluster, except that we have built one docker container, with Kubernetes and Flyte already installed.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_sandbox_single_container.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_container.png
    :alt: Architecture of single container Flyte Sandbox
 
 
@@ -58,7 +58,7 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
     #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the :ref:`deployment` guides.
 
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_sandbox_single_k8s_cluster.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_k8s_cluster.png
    :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
 
 
@@ -117,7 +117,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
     .. note::
 
         #. Sometimes Flyteconsole will not open up. This is probably because your docker networking is impacted. One solution is to restart docker and repeat the previous steps.
-        #. To debug you can try a simple excercise - run nginx as follows::
+        #. To debug you can try a simple exercise - run nginx as follows::
 
             docker run -it --rm -p 8083:80 nginx
 
@@ -159,7 +159,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
         - Flyte runs within Kubernetes (minikube), so to access FlyteConsole, you cannot just use https://localhost:30081/console. You need to use the IP address of the minikube VM instead of the localhost
         - Refer to https://kubernetes.io/docs/tutorials/hello-minikube/ to understand how to run a sample app on kubernetes using minikube and Katacoda. To  register workflows, tasks, etc. or use the CLI to query Flyte services, you have to use the IP address.
         - If you are building an image locally and want to execute on Minikube hosted Flyte environment, please push the image to docker registry running on the Minikube VM.
-        - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more detailed information about this process. Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to a regisry that is available to Kuberentes. In the minikube case, this registry is the one that is running on the VM.
+        - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more detailed information about this process. Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to a registry that is available to Kubernetes. In the minikube case, this registry is the one that is running on the VM.
 
 
 .. _deployment-sandbox-dedicated-k8s-cluster:
@@ -191,7 +191,7 @@ Flyte configuration on your remote cluster.
     helm repo add flyte https://flyteorg.github.io/flyte
     helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte
 
-#. For customisations instructions, see ``/charts/flyte/README.md`` in the flyte repo.
+#. For customizations instructions, see ``/charts/flyte/README.md`` in the flyte repo.
 
 #. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows ::
 
@@ -203,17 +203,17 @@ Flyte configuration on your remote cluster.
 
     flytectl config init --host='localhost:30081' --insecure
 
-#. Open the minio console http://localhost:30088, Your minio username is `minio` and password is `miniostorage`
+#. Open the minio console http://localhost:30088. Your minio username is `minio` and password is `miniostorage`.
 
-#. Open the Kubernetes dashboard http://localhost:30082
+#. Open the Kubernetes dashboard http://localhost:30082.
 
-#. You can port-forward to connect postgres, as follows ::
+#. You can port-forward to connect postgres using ::
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
 
 #. Now use these credentials for postgres
 
-  .. code-block::
+   .. code-block::
 
       dbname: flyteadmin
       host: 127.0.0.1

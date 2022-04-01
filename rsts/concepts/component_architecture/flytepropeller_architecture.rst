@@ -15,7 +15,7 @@ FlytePropeller is responsible for scheduling and tracking execution of Flyte wor
 
 This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
 
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/e953a78abb3e31d1cad4daf6a4680642ed4cc7d0/img/architecture/flytepropeller_architecture.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_architecture.png
 
 Components
 ==========
@@ -61,7 +61,7 @@ FlytePropeller includes a robust collection of NodeHandlers to support diverse e
 
 * **TaskHandler (Plugins)**: These are responsible for executing plugin specific tasks. This may include contacting FlyteAdmin to schedule k8s pod to perform work, calling a web API to begin / track evaluation, and much more. The plugin paradigm exposes a very extensible interface for adding functionality to Flyte workflows.
 * **DynamicHandler**: Flyte workflow CRDs are initialized using a DAG compiled during the registration process. The numerous benefits of this approach are beyond the scope of this document. However, there are situations where the complete DAG is unknown at compile time. For example, when executing a task on each value of an input list. Using Dynamic nodes a new DAG subgraph may be dynamically compiled during runtime and linked to the existing FlyteWorkflow CRD.
-* **WorkflowHandler**: This handler allows embedding workflows within another workflow definition. The API exposes this functionality using either (1) an inline execution, where the workflow function is invoked directly resulting in a single FlyteWorkflow CRD with an appended sub-workflow or (2) a launch plan, which uses a TODO to create a separate sub-workflow FlyteWorkflow CRD whos execution state is linked to the parent FlyteWorkflow CRD.
+* **WorkflowHandler**: This handler allows embedding workflows within another workflow definition. The API exposes this functionality using either (1) an inline execution, where the workflow function is invoked directly resulting in a single FlyteWorkflow CRD with an appended sub-workflow, or (2) a launch plan, which uses a TODO to create a separate sub-workflow FlyteWorkflow CRD whose execution state is linked to the parent FlyteWorkflow CRD.
 * **BranchHandler**: The branch handler allows the DAG to follow a specific control path based on input (or computed) values.
 * **Start / End Handlers**: These are dummy handlers which process input and output data and in turn transition start and end nodes to success.
 
