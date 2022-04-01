@@ -32,18 +32,20 @@ Usage
 `
 )
 
-func updateWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	project := config.GetConfig().Project
-	domain := config.GetConfig().Domain
-	if len(args) != 1 {
-		return fmt.Errorf(clierrors.ErrWorkflowNotPassed)
+func getUpdateWorkflowFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+	return func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+		project := config.GetConfig().Project
+		domain := config.GetConfig().Domain
+		if len(args) != 1 {
+			return fmt.Errorf(clierrors.ErrWorkflowNotPassed)
+		}
+		name := args[0]
+		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_WORKFLOW, cmdCtx)
+		if err != nil {
+			fmt.Printf(clierrors.ErrFailedWorkflowUpdate, name, err)
+			return err
+		}
+		fmt.Printf("updated metadata successfully on %v", name)
+		return nil
 	}
-	name := args[0]
-	err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_WORKFLOW, cmdCtx)
-	if err != nil {
-		fmt.Printf(clierrors.ErrFailedWorkflowUpdate, name, err)
-		return err
-	}
-	fmt.Printf("updated metadata successfully on %v", name)
-	return nil
 }

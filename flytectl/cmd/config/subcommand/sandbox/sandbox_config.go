@@ -53,4 +53,11 @@ type Config struct {
 	// Optionally it is possible to use local sandbox image
 	// Flytectl will not pull the image from the registry if the local flag passes. It is usually useful while testing your local images without pushing them to a registry.
 	ImagePullPolicy ImagePullPolicy `json:"imagePullPolicy" pflag:",Optional. Defines the image pull behavior [Always/IfNotPresent/Never]"`
+
+	ImagePullOptions ImagePullOptions `json:"imagePullOptions" pflag:",Optional. Defines image pull options (e.g. auth)"`
+}
+
+type ImagePullOptions struct {
+	RegistryAuth string `json:"registryAuth" pflag:",The base64 encoded credentials for the registry."`
+	Platform     string `json:"platform" pflag:",Forces a specific platform's image to be pulled.'"`
 }

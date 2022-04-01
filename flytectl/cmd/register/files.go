@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
+
+	"github.com/flyteorg/flytectl/cmd/config"
+
+	"github.com/flyteorg/flytestdlib/storage"
 
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -106,10 +109,10 @@ Usage
 )
 
 func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	return Register(ctx, args, cmdCtx)
+	return Register(ctx, args, config.GetConfig(), cmdCtx)
 }
 
-func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+func Register(ctx context.Context, args []string, cfg *config.Config, cmdCtx cmdCore.CommandContext) error {
 	var regErr error
 	var dataRefs []string
 
@@ -125,7 +128,7 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	logger.Infof(ctx, "Parsing file... Total(%v)", len(dataRefs))
 
 	// It will segregate serialize output files in valid proto,Invalid files if have any and source code(In case of fast serialize input files)
-	sourceCode, validProto, InvalidFiles := segregateSourceAndProtos(dataRefs)
+	sourceCodePath, validProto, InvalidFiles := segregateSourceAndProtos(dataRefs)
 
 	// If any invalid files provide in input then through an error
 	if len(InvalidFiles) > 0 {
@@ -133,20 +136,22 @@ func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext)
 	}
 
 	// In case of fast serialize input upload source code to destination bucket
-	var sourceCodeName string
-	if len(sourceCode) > 0 {
+	var uploadLocation storage.DataReference
+	if len(sourceCodePath) > 0 {
 		logger.Infof(ctx, "Fast Registration detected")
-		_, sourceCodeName = filepath.Split(sourceCode)
-		if err = uploadFastRegisterArtifact(ctx, sourceCode, sourceCodeName, rconfig.DefaultFilesConfig.Version, &rconfig.DefaultFilesConfig.SourceUploadPath); err != nil {
-			return fmt.Errorf("please check your Storage Config. It failed while uploading the source code. %v", err)
+		uploadLocation, err = uploadFastRegisterArtifact(ctx, cfg.Project, cfg.Domain, sourceCodePath, rconfig.DefaultFilesConfig.Version,
+			cmdCtx.ClientSet().DataProxyClient(), rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
+		if err != nil {
+			return fmt.Errorf("failed to upload source code from [%v]. Error: %w", sourceCodePath, err)
 		}
-		logger.Infof(ctx, "Source code successfully uploaded %v/%v ", rconfig.DefaultFilesConfig.SourceUploadPath, sourceCodeName)
+
+		logger.Infof(ctx, "Source code successfully uploaded to [%v]", uploadLocation)
 	}
 
 	var registerResults []Result
 	fastFail := !rconfig.DefaultFilesConfig.ContinueOnError
 	for i := 0; i < len(validProto) && !(fastFail && regErr != nil); i++ {
-		registerResults, regErr = registerFile(ctx, validProto[i], sourceCodeName, registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		registerResults, regErr = registerFile(ctx, validProto[i], registerResults, cmdCtx, uploadLocation, *rconfig.DefaultFilesConfig)
 	}
 
 	payload, _ := json.Marshal(registerResults)

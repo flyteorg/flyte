@@ -9,7 +9,6 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/stretchr/testify/assert"
@@ -23,9 +22,6 @@ var (
 )
 
 func createProjectSetup() {
-	ctx = testutils.Ctx
-	cmdCtx = testutils.CmdCtx
-	mockClient = testutils.MockClient
 	projectRegisterRequest = &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          projectValue,
@@ -42,39 +38,39 @@ func createProjectSetup() {
 	project.DefaultProjectConfig.Description = ""
 }
 func TestCreateProjectFunc(t *testing.T) {
-	setup()
+	s := setup()
 	createProjectSetup()
-	defer tearDownAndVerify(t, "project created successfully.")
+	defer tearDownAndVerify(t, s.Writer, "project created successfully.")
 	project.DefaultProjectConfig.ID = projectValue
 	project.DefaultProjectConfig.Name = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""
-	mockClient.OnRegisterProjectMatch(ctx, projectRegisterRequest).Return(nil, nil)
-	err := createProjectsCommand(ctx, args, cmdCtx)
+	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "RegisterProject", ctx, projectRegisterRequest)
+	s.MockAdminClient.AssertCalled(t, "RegisterProject", s.Ctx, projectRegisterRequest)
 }
 
 func TestEmptyProjectID(t *testing.T) {
-	setup()
+	s := setup()
 	createProjectSetup()
-	defer tearDownAndVerify(t, "")
+	defer tearDownAndVerify(t, s.Writer, "")
 	project.DefaultProjectConfig = &project.ConfigProject{}
-	mockClient.OnRegisterProjectMatch(ctx, projectRegisterRequest).Return(nil, nil)
-	err := createProjectsCommand(ctx, args, cmdCtx)
+	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Equal(t, errors.New(clierrors.ErrProjectNotPassed), err)
-	mockClient.AssertNotCalled(t, "RegisterProject", ctx, mock.Anything)
+	s.MockAdminClient.AssertNotCalled(t, "RegisterProject", s.Ctx, mock.Anything)
 }
 
 func TestEmptyProjectName(t *testing.T) {
-	setup()
+	s := setup()
 	createProjectSetup()
-	defer tearDownAndVerify(t, "")
+	defer tearDownAndVerify(t, s.Writer, "")
 	project.DefaultProjectConfig.ID = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""
-	mockClient.OnRegisterProjectMatch(ctx, projectRegisterRequest).Return(nil, nil)
-	err := createProjectsCommand(ctx, args, cmdCtx)
+	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Equal(t, fmt.Errorf("project name is a required flag"), err)
-	mockClient.AssertNotCalled(t, "RegisterProject", ctx, mock.Anything)
+	s.MockAdminClient.AssertNotCalled(t, "RegisterProject", s.Ctx, mock.Anything)
 }

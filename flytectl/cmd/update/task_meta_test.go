@@ -11,34 +11,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func UpdateTaskSetup() {
-	ctx = testutils.Ctx
-	cmdCtx = testutils.CmdCtx
-	mockClient = testutils.MockClient
-}
-
 func TestTaskUpdate(t *testing.T) {
-	testutils.Setup()
-	UpdateTaskSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{"task1"}
-	mockClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(&admin.NamedEntityUpdateResponse{}, nil)
-	assert.Nil(t, updateTaskFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	args := []string{"task1"}
+	s.MockAdminClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(&admin.NamedEntityUpdateResponse{}, nil)
+	assert.Nil(t, getUpdateTaskFunc(&NamedEntityConfig{})(s.Ctx, args, s.CmdCtx))
 }
 
 func TestTaskUpdateFail(t *testing.T) {
-	testutils.Setup()
-	UpdateWorkflowSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{"workflow1"}
-	mockClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to update"))
-	assert.NotNil(t, updateTaskFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	args := []string{"workflow1"}
+	s.MockAdminClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to update"))
+	assert.NotNil(t, getUpdateTaskFunc(&NamedEntityConfig{})(s.Ctx, args, s.CmdCtx))
 }
 
 func TestTaskUpdateInvalidArgs(t *testing.T) {
-	testutils.Setup()
-	UpdateWorkflowSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{}
-	assert.NotNil(t, updateTaskFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	assert.NotNil(t, getUpdateTaskFunc(&NamedEntityConfig{})(s.Ctx, []string{}, s.CmdCtx))
 }

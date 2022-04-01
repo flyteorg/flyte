@@ -181,4 +181,32 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_imagePullOptions.registryAuth", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("imagePullOptions.registryAuth", testValue)
+			if vString, err := cmdFlags.GetString("imagePullOptions.registryAuth"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ImagePullOptions.RegistryAuth)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_imagePullOptions.platform", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("imagePullOptions.platform", testValue)
+			if vString, err := cmdFlags.GetString("imagePullOptions.platform"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ImagePullOptions.Platform)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

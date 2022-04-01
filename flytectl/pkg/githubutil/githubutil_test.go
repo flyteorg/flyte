@@ -6,6 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
 	"github.com/flyteorg/flytectl/pkg/platformutil"
@@ -99,7 +102,7 @@ func TestGetAssetsFromRelease(t *testing.T) {
 
 func TestGetAssetsName(t *testing.T) {
 	t.Run("Get Assets name", func(t *testing.T) {
-		expected := fmt.Sprintf("flytectl_%s_386.tar.gz", strings.Title(runtime.GOOS))
+		expected := fmt.Sprintf("flytectl_%s_386.tar.gz", cases.Title(language.English).String(runtime.GOOS))
 		arch = platformutil.Arch386
 		assert.Equal(t, expected, getFlytectlAssetName())
 	})

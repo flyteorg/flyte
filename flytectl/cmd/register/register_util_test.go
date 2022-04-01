@@ -1,6 +1,7 @@
 package register
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -10,6 +11,9 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flytestdlib/utils"
 
@@ -23,8 +27,6 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/stretchr/testify/assert"
@@ -54,9 +56,6 @@ func registerFilesSetup() {
 	GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return response, nil
 	}
-	ctx = u.Ctx
-	mockAdminClient = u.MockClient
-	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
 
 	rconfig.DefaultFilesConfig.AssumableIamRole = ""
 	rconfig.DefaultFilesConfig.K8sServiceAccount = ""
@@ -64,11 +63,11 @@ func registerFilesSetup() {
 }
 
 func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/valid-parent-folder-register.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/valid-parent-folder-register.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "parentfolder", "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "parentfolder", "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -81,11 +80,11 @@ func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/valid-register.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -98,11 +97,11 @@ func TestGetSortedArchivedFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/valid-unordered-register.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/valid-unordered-register.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -115,11 +114,11 @@ func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
 }
 
 func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/invalid.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/invalid.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 0)
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -128,11 +127,11 @@ func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedTgzList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/valid-register.tgz"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/valid-register.tgz"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -145,10 +144,10 @@ func TestGetSortedArchivedTgzList(t *testing.T) {
 }
 
 func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
-	setup()
+	s := setup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/invalid.tgz"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/invalid.tgz"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -157,11 +156,11 @@ func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"testdata/invalid-extension-register.zip"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"testdata/invalid-extension-register.zip"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -171,10 +170,10 @@ func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
-	setup()
+	s := setup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"http://invalidhost:invalidport/testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"http://invalidhost:invalidport/testdata/valid-register.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -183,11 +182,11 @@ func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
-	setup()
+	s := setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
+	args := []string{"http://dummyhost:80/testdata/valid-register.tar"}
+	fileList, tmpDir, err := getSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -203,10 +202,10 @@ func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) 
 	setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
-	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
-	ctx = nil
+	args := []string{"http://dummyhost:80/testdata/valid-register.tar"}
+	var ctx context.Context = nil
 	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args, rconfig.DefaultFilesConfig.Archive)
-	assert.Equal(t, len(fileList), 0)
+	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
 	assert.Equal(t, errors.New("net/http: nil Context"), err)
@@ -214,21 +213,28 @@ func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) 
 	assert.Nil(t, os.RemoveAll(tmpDir), "unable to delete temp dir %v", tmpDir)
 }
 
+func Test_getTotalSize(t *testing.T) {
+	b := bytes.NewBufferString("hello world")
+	size, err := getTotalSize(b)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(11), size)
+}
+
 func TestRegisterFile(t *testing.T) {
 	t.Run("Successful run", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Nil(t, err)
 	})
 	t.Run("Failed Scheduled launch plan registration", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		mockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
 		variableMap := map[string]*core.Variable{
 			"var1": {
 				Type: &core.LiteralType{
@@ -270,58 +276,60 @@ func TestRegisterFile(t *testing.T) {
 				},
 			},
 		}
-		mockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
-		args = []string{"testdata/152_my_cron_scheduled_lp_3.pb"}
+		s.MockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
+		s.FetcherExt.OnFetchWorkflowVersion(s.Ctx, "core.scheduled_workflows.lp_schedules.date_formatter_wf", "v0.3.59", "dummyProject", "dummyDomain").Return(wf, nil)
+		s.FetcherExt.OnFetchWorkflowVersion(s.Ctx, "core.scheduled_workflows.lp_schedules.date_formatter_wf", "", "dummyProject", "dummyDomain").Return(wf, nil)
+		args := []string{"testdata/152_my_cron_scheduled_lp_3.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Contains(t, results[0].Info, "param values are missing on scheduled workflow for the following params")
 		assert.NotNil(t, err)
 	})
 	t.Run("Non existent file", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		args = []string{"testdata/non-existent.pb"}
+		args := []string{"testdata/non-existent.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Equal(t, "Error reading file due to open testdata/non-existent.pb: no such file or directory", results[0].Info)
 		assert.NotNil(t, err)
 	})
 	t.Run("unmarhal failure", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		args = []string{"testdata/valid-register.tar"}
+		args := []string{"testdata/valid-register.tar"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
-		assert.Equal(t, "Error unmarshalling file due to failed unmarshalling file testdata/valid-register.tar", results[0].Info)
+		assert.True(t, strings.HasPrefix(results[0].Info, "Error unmarshalling file due to failed unmarshalling file testdata/valid-register.tar"))
 		assert.NotNil(t, err)
 	})
 	t.Run("AlreadyExists", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.AlreadyExists, "AlreadyExists"))
-		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Success", results[0].Status)
 		assert.Equal(t, "AlreadyExists", results[0].Info)
 		assert.Nil(t, err)
 	})
 	t.Run("Registration Error", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
-		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.InvalidArgument, "Invalid"))
-		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx, *rconfig.DefaultFilesConfig)
+		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Equal(t, "Error registering file due to rpc error: code = InvalidArgument desc = Invalid", results[0].Info)
@@ -340,7 +348,6 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.AuthRole)
 	})
 	t.Run("k8sService account override", func(t *testing.T) {
-		setup()
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
 		lpSpec := &admin.LaunchPlanSpec{}
@@ -349,7 +356,6 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
 	})
 	t.Run("Both k8sService and IamRole", func(t *testing.T) {
-		setup()
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.AssumableIamRole = "iamRole"
 		rconfig.DefaultFilesConfig.K8sServiceAccount = "k8Account"
@@ -360,7 +366,6 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 			KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
 	})
 	t.Run("Output prefix", func(t *testing.T) {
-		setup()
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.OutputLocationPrefix = "prefix"
 		lpSpec := &admin.LaunchPlanSpec{}
@@ -372,14 +377,37 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 
 func TestUploadFastRegisterArtifact(t *testing.T) {
 	t.Run("Successful upload", func(t *testing.T) {
+		s := setup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
-		s, err := storage.NewDataStore(&storage.Config{
+		store, err := storage.NewDataStore(&storage.Config{
 			Type: storage.TypeMemory,
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
-		Client = s
-		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacks-core.tgz", "flytesnacks-core.tgz", "", &rconfig.DefaultFilesConfig.SourceUploadPath)
+		Client = store
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+			Project: "flytesnacks",
+			Domain:  "development",
+			Suffix:  "/flytesnacks-core.tgz",
+		}).Return(&service.CreateUploadLocationResponse{}, nil)
+		_, err = uploadFastRegisterArtifact(s.Ctx, "flytesnacks", "development", "testdata/flytesnacks-core.tgz", "", s.MockClient.DataProxyClient(), rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
+		assert.Nil(t, err)
+	})
+	t.Run("Failed upload", func(t *testing.T) {
+		s := setup()
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		store, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		assert.Nil(t, err)
+		Client = store
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+			Project: "flytesnacks",
+			Domain:  "development",
+			Suffix:  "/flytesnacks-core.tgz",
+		}).Return(&service.CreateUploadLocationResponse{}, nil)
+		_, err = uploadFastRegisterArtifact(context.Background(), "flytesnacks", "development", "testdata/flytesnacks-core.tgz", "", s.MockClient.DataProxyClient(), rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
 		assert.Nil(t, err)
 	})
 	t.Run("Failed upload", func(t *testing.T) {
@@ -390,18 +418,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
 		Client = s
-		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacks-core.tgz", "", "", &rconfig.DefaultFilesConfig.SourceUploadPath)
-		assert.Nil(t, err)
-	})
-	t.Run("Failed upload", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
-		s, err := storage.NewDataStore(&storage.Config{
-			Type: storage.TypeMemory,
-		}, testScope.NewSubScope("flytectl"))
-		assert.Nil(t, err)
-		Client = s
-		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacksre.tgz", "", "", &rconfig.DefaultFilesConfig.SourceUploadPath)
+		_, err = uploadFastRegisterArtifact(context.Background(), "flytesnacks", "development", "testdata/flytesnacksre.tgz", "", nil, rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
 		assert.NotNil(t, err)
 	})
 }
@@ -409,7 +426,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 func TestGetStorageClient(t *testing.T) {
 	t.Run("Failed to create storage client", func(t *testing.T) {
 		Client = nil
-		s, err := getStorageClient(ctx)
+		s, err := getStorageClient(context.Background())
 		assert.NotNil(t, err)
 		assert.Nil(t, s)
 	})
@@ -434,17 +451,16 @@ func TestGetAllFlytesnacksExample(t *testing.T) {
 
 func TestRegister(t *testing.T) {
 	t.Run("Failed to register", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
 		node := &admin.NodeExecution{}
-		err := register(ctx, node, cmdCtx, rconfig.DefaultFilesConfig.DryRun)
+		err := register(s.Ctx, node, s.CmdCtx, rconfig.DefaultFilesConfig.DryRun)
 		assert.NotNil(t, err)
 	})
 }
 
 func TestHydrateNode(t *testing.T) {
 	t.Run("Failed hydrate node", func(t *testing.T) {
-		setup()
 		registerFilesSetup()
 		node := &core.Node{}
 		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
@@ -452,7 +468,6 @@ func TestHydrateNode(t *testing.T) {
 	})
 
 	t.Run("hydrateSpec with wrong type", func(t *testing.T) {
-		setup()
 		registerFilesSetup()
 		task := &admin.Task{}
 		err := hydrateSpec(task, "", *rconfig.DefaultFilesConfig)
@@ -503,13 +518,13 @@ func TestHydrateTaskSpec(t *testing.T) {
 			},
 		},
 	}
-	err = hydrateTaskSpec(task, "sourcey", rconfig.DefaultFilesConfig.SourceUploadPath, rconfig.DefaultFilesConfig.Version, "")
+	err = hydrateTaskSpec(task, storage.DataReference("file://somewhere"), "sourcey")
 	assert.NoError(t, err)
 	var hydratedPodSpec = v1.PodSpec{}
 	err = utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &hydratedPodSpec)
 	assert.NoError(t, err)
 	assert.Len(t, hydratedPodSpec.Containers[1].Args, 2)
-	assert.True(t, strings.HasSuffix(hydratedPodSpec.Containers[1].Args[1], "sourcey"))
+	assert.Contains(t, hydratedPodSpec.Containers[1].Args[1], "somewhere")
 }
 
 func TestLeftDiff(t *testing.T) {
@@ -564,17 +579,20 @@ func TestLeftDiff(t *testing.T) {
 func TestValidateLaunchSpec(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil launchplan spec", func(t *testing.T) {
+		s := setup()
 		registerFilesSetup()
-		err := validateLaunchSpec(ctx, nil, cmdCtx)
+		err := validateLaunchSpec(ctx, nil, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with nil workflow id", func(t *testing.T) {
+		s := setup()
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with empty metadata", func(t *testing.T) {
+		s := setup()
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
@@ -584,10 +602,11 @@ func TestValidateLaunchSpec(t *testing.T) {
 				Version: "workflowVersionValue",
 			},
 		}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with metadata and empty schedule", func(t *testing.T) {
+		s := setup()
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
@@ -598,14 +617,14 @@ func TestValidateLaunchSpec(t *testing.T) {
 			},
 			EntityMetadata: &admin.LaunchPlanMetadata{},
 		}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("validate spec failed to fetch workflow", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
 
-		mockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		s.MockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -622,15 +641,15 @@ func TestValidateLaunchSpec(t *testing.T) {
 		lp := &admin.LaunchPlan{
 			Spec: lpSpec,
 		}
-		err := validateSpec(ctx, lp, cmdCtx)
+		err := validateSpec(ctx, lp, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, "failed", err.Error())
 	})
 	t.Run("failed to fetch workflow", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
 
-		mockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		s.MockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -644,12 +663,12 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, "failed", err.Error())
 	})
 	t.Run("launchplan spec missing required param schedule", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
 		variableMap := map[string]*core.Variable{
 			"var1": {
@@ -692,7 +711,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		mockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
+		s.MockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -706,12 +725,12 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "param values are missing on scheduled workflow for the following params")
 	})
 	t.Run("launchplan spec non empty schedule required param success", func(t *testing.T) {
-		setup()
+		s := setup()
 		registerFilesSetup()
 		variableMap := map[string]*core.Variable{
 			"var1": {
@@ -754,7 +773,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		mockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
+		s.MockAdminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(wf, nil)
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -796,7 +815,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		err := validateLaunchSpec(ctx, lpSpec, cmdCtx)
+		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 }

@@ -1,26 +1,15 @@
 package create
 
 import (
-	"context"
 	"sort"
 	"testing"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-
 	"github.com/stretchr/testify/assert"
 )
 
 const testDataFolder = "../testdata/"
 
-var (
-	err        error
-	ctx        context.Context
-	mockClient *mocks.AdminServiceClient
-	args       []string
-	cmdCtx     cmdCore.CommandContext
-)
 var setup = testutils.Setup
 var tearDownAndVerify = testutils.TearDownAndVerify
 

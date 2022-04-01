@@ -32,18 +32,20 @@ Usage
 `
 )
 
-func updateLPMetaFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	project := config.GetConfig().Project
-	domain := config.GetConfig().Domain
-	if len(args) != 1 {
-		return fmt.Errorf(clierrors.ErrLPNotPassed)
+func getUpdateLPMetaFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+	return func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+		project := config.GetConfig().Project
+		domain := config.GetConfig().Domain
+		if len(args) != 1 {
+			return fmt.Errorf(clierrors.ErrLPNotPassed)
+		}
+		name := args[0]
+		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_LAUNCH_PLAN, cmdCtx)
+		if err != nil {
+			fmt.Printf(clierrors.ErrFailedLPUpdate, name, err)
+			return err
+		}
+		fmt.Printf("updated metadata successfully on %v", name)
+		return nil
 	}
-	name := args[0]
-	err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_LAUNCH_PLAN, cmdCtx)
-	if err != nil {
-		fmt.Printf(clierrors.ErrFailedLPUpdate, name, err)
-		return err
-	}
-	fmt.Printf("updated metadata successfully on %v", name)
-	return nil
 }

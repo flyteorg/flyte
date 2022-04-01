@@ -5,7 +5,8 @@ import (
 	"testing"
 	"time"
 
-	u "github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flytectl/cmd/testutils"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -159,10 +160,10 @@ func createDummyTaskExecutionForNode(nodeID string, taskID string) *admin.TaskEx
 
 func TestGetExecutionDetails(t *testing.T) {
 	t.Run("successful get details default view", func(t *testing.T) {
-		setup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockFetcherExt := u.FetcherExt
+		s := testutils.SetupWithExt()
+		ctx := s.Ctx
+		mockCmdCtx := s.CmdCtx
+		mockFetcherExt := s.FetcherExt
 
 		nodeExecStart := createDummyNodeWithID("start-node", false)
 		nodeExecN2 := createDummyNodeWithID("n2", true)
@@ -225,10 +226,10 @@ func TestGetExecutionDetails(t *testing.T) {
 	})
 
 	t.Run("successful get details default view for node-id", func(t *testing.T) {
-		setup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockFetcherExt := u.FetcherExt
+		s := testutils.SetupWithExt()
+		ctx := s.Ctx
+		mockCmdCtx := s.CmdCtx
+		mockFetcherExt := s.FetcherExt
 
 		nodeExec1 := createDummyNodeWithID("n0", false)
 		taskExec1 := createDummyTaskExecutionForNode("n0", "task21")
@@ -288,10 +289,10 @@ func TestGetExecutionDetails(t *testing.T) {
 	})
 
 	t.Run("failure task exec fetch", func(t *testing.T) {
-		setup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockFetcherExt := u.FetcherExt
+		s := testutils.SetupWithExt()
+		ctx := s.Ctx
+		mockCmdCtx := s.CmdCtx
+		mockFetcherExt := s.FetcherExt
 		nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
 
 		nodeExec1 := createDummyNodeWithID("n0", false)
@@ -307,7 +308,7 @@ func TestGetExecutionDetails(t *testing.T) {
 
 		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
 		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch task exec details"))
-		_, err = getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
+		_, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to fetch task exec details"), err)
 	})

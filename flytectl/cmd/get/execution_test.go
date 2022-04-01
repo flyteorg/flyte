@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"testing"
+
+	"github.com/flyteorg/flytectl/cmd/testutils"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -32,12 +30,9 @@ func getExecutionSetup() {
 }
 
 func TestListExecutionFunc(t *testing.T) {
-	ctx := context.Background()
 	getExecutionSetup()
-	var args []string
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
+	s := setup()
+	ctx := s.Ctx
 	execListRequest := &admin.ResourceListRequest{
 		Limit: 100,
 		SortBy: &admin.Sort{
@@ -77,21 +72,15 @@ func TestListExecutionFunc(t *testing.T) {
 	executionList := &admin.ExecutionList{
 		Executions: executions,
 	}
-	mockClient.OnListExecutionsMatch(mock.Anything, mock.MatchedBy(func(o *admin.ResourceListRequest) bool {
-		return execListRequest.SortBy.Key == o.SortBy.Key && execListRequest.SortBy.Direction == o.SortBy.Direction && execListRequest.Filters == o.Filters && execListRequest.Limit == o.Limit
-	})).Return(executionList, nil)
-	err := getExecutionFunc(ctx, args, cmdCtx)
+	s.MockAdminClient.OnListExecutionsMatch(mock.Anything, execListRequest).Return(executionList, nil)
+	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
+	s.MockAdminClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
 }
 
 func TestListExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
 	getExecutionSetup()
-	var args []string
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	execListRequest := &admin.ResourceListRequest{
 		Limit: 100,
 		SortBy: &admin.Sort{
@@ -102,6 +91,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Domain:  domainValue,
 		},
 	}
+
 	_ = &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -126,21 +116,18 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	mockClient.OnListExecutionsMatch(mock.Anything, mock.MatchedBy(func(o *admin.ResourceListRequest) bool {
-		return execListRequest.SortBy.Key == o.SortBy.Key && execListRequest.SortBy.Direction == o.SortBy.Direction && execListRequest.Filters == o.Filters && execListRequest.Limit == o.Limit
-	})).Return(nil, errors.New("executions NotFound"))
-	err := getExecutionFunc(ctx, args, cmdCtx)
+	s := setup()
+	s.FetcherExt.OnListExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
+	s.MockAdminClient.OnListExecutionsMatch(mock.Anything, execListRequest).Return(nil, errors.New("executions NotFound"))
+	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("executions NotFound"))
-	mockClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
+	s.MockAdminClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
 }
 
 func TestGetExecutionFunc(t *testing.T) {
 	ctx := context.Background()
 	getExecutionSetup()
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	execGetRequest := &admin.WorkflowExecutionGetRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -173,37 +160,39 @@ func TestGetExecutionFunc(t *testing.T) {
 		},
 	}
 	args := []string{executionNameValue}
-	mockClient.OnGetExecutionMatch(ctx, execGetRequest).Return(executionResponse, nil)
-	err := getExecutionFunc(ctx, args, cmdCtx)
-	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
+	s := setup()
+	//executionList := &admin.ExecutionList{
+	//	Executions: []*admin.Execution{executionResponse},
+	//}
+	s.MockAdminClient.OnGetExecutionMatch(ctx, execGetRequest).Return(executionResponse, nil)
 
+	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
+	assert.Nil(t, err)
+	s.MockAdminClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
 }
 
 func TestGetExecutionFuncForDetails(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getExecutionSetup()
-	ctx := u.Ctx
-	mockCmdCtx := u.CmdCtx
-	mockClient = u.MockClient
-	mockFetcherExt := u.FetcherExt
+	ctx := s.Ctx
+	mockCmdCtx := s.CmdCtx
+	mockFetcherExt := s.FetcherExt
 	execution.DefaultConfig.Details = true
 	args := []string{dummyExec}
 	mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
 	mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nil, fmt.Errorf("unable to fetch details"))
-	err = getExecutionFunc(ctx, args, mockCmdCtx)
+	err := getExecutionFunc(ctx, args, mockCmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf("unable to fetch details"), err)
 }
 
 func TestGetExecutionFuncWithIOData(t *testing.T) {
 	t.Run("successful inputs outputs", func(t *testing.T) {
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionSetup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockClient = u.MockClient
-		mockFetcherExt := u.FetcherExt
+		ctx := s.Ctx
+		mockCmdCtx := s.CmdCtx
+		mockFetcherExt := s.FetcherExt
 		execution.DefaultConfig.NodeID = nodeID
 		args := []string{dummyExec}
 
@@ -259,16 +248,15 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		}, nil)
 		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
 
-		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		err := getExecutionFunc(ctx, args, mockCmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("fetch data error from admin", func(t *testing.T) {
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionSetup()
-		ctx := u.Ctx
-		mockCmdCtx := u.CmdCtx
-		mockClient = u.MockClient
-		mockFetcherExt := u.FetcherExt
+		ctx := s.Ctx
+		mockCmdCtx := s.CmdCtx
+		mockFetcherExt := s.FetcherExt
 		execution.DefaultConfig.NodeID = nodeID
 		args := []string{dummyExec}
 
@@ -285,7 +273,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		}, nil)
 		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("error in fetching data"))
 
-		err = getExecutionFunc(ctx, args, mockCmdCtx)
+		err := getExecutionFunc(ctx, args, mockCmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("error in fetching data"), err)
 	})
@@ -304,13 +292,13 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 
 		args := []string{dummyExec}
 		for _, tt := range tests {
-			setup()
+			s := testutils.SetupWithExt()
 			config.GetConfig().Output = tt.outputFormat
 			execution.DefaultConfig.NodeID = tt.nodeID
 
-			ctx := u.Ctx
-			mockCmdCtx := u.CmdCtx
-			mockFetcherExt := u.FetcherExt
+			ctx := s.Ctx
+			mockCmdCtx := s.CmdCtx
+			mockFetcherExt := s.FetcherExt
 			nodeExecToTaskExec := map[string]*admin.TaskExecutionList{}
 
 			nodeExec1 := createDummyNodeWithID("n0", false)
@@ -377,16 +365,6 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 func TestGetExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
 	getExecutionSetup()
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-	execGetRequest := &admin.WorkflowExecutionGetRequest{
-		Id: &core.WorkflowExecutionIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-			Name:    executionNameValue,
-		},
-	}
 	_ = &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -413,9 +391,10 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 	}
 
 	args := []string{executionNameValue}
-	mockClient.OnGetExecutionMatch(ctx, execGetRequest).Return(nil, errors.New("execution NotFound"))
-	err := getExecutionFunc(ctx, args, cmdCtx)
+	s := testutils.SetupWithExt()
+	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("execution NotFound"))
+	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("execution NotFound"))
-	mockClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
+	s.FetcherExt.AssertCalled(t, "FetchExecution", ctx, "e124", "dummyProject", "dummyDomain")
 }

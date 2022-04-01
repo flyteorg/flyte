@@ -3,12 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-
 	"os"
-
-	"github.com/flyteorg/flytectl/cmd/sandbox"
-
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	configuration "github.com/flyteorg/flytectl/cmd/configuration"
@@ -17,9 +12,11 @@ import (
 	"github.com/flyteorg/flytectl/cmd/delete"
 	"github.com/flyteorg/flytectl/cmd/get"
 	"github.com/flyteorg/flytectl/cmd/register"
+	"github.com/flyteorg/flytectl/cmd/sandbox"
 	"github.com/flyteorg/flytectl/cmd/update"
 	"github.com/flyteorg/flytectl/cmd/upgrade"
 	"github.com/flyteorg/flytectl/cmd/version"
+	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/config/viper"
