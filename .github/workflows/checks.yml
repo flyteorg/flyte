@@ -13,10 +13,14 @@ jobs:
   lint:
     name: Lint
     uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+    with:
+      go-version: "1.17"
 
   tests:
     name: Unit Tests
     uses: flyteorg/flytetools/.github/workflows/tests.yml@master
+    with:
+      go-version: "1.17"
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
@@ -27,6 +31,8 @@ jobs:
   generate:
     name: Check Go Gennerate
     uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
+    with:
+      go-version: "1.17"
 
   bump_version:
     name: Bump Version
@@ -42,6 +48,8 @@ jobs:
     uses: flyteorg/flytetools/.github/workflows/goreleaser.yml@master
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+    with:
+      go-version: "1.17"
 
   push_docker_image:
     name: Build & Push Datacatalog Image
