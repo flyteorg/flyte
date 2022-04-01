@@ -53,15 +53,15 @@ The following is required for non-sandbox deployments:
 * A public domain name (e.g. example.foobar.com)
 * Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
 
-   .. note::
+.. note::
 
-      Flyte's Ingress routes traffic to either
-      Flyte Console or FlyteAdmin based on the url path
+   Flyte's Ingress routes traffic to either
+   Flyte Console or FlyteAdmin based on the url path
 
-   .. prompt:: bash
+.. prompt:: bash
 
-      # determine Flyte Ingress IP
-      kubectl get ingress -n flyte flyte
+   # determine Flyte Ingress IP
+   kubectl get ingress -n flyte flyte
 
 IdP Configuration
 =================
