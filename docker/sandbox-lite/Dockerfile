@@ -1,4 +1,4 @@
-FROM golang:1.16.5-alpine3.13 AS go_builder_
+FROM golang:1.18.0-alpine3.15 AS go_builder_
 
 # Install dependencies
 RUN apk add --no-cache build-base git make

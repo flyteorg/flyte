@@ -1302,6 +1302,8 @@ github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi
 github.com/pierrec/lz4 v2.4.1+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pingsutw/datacatalog v0.3.20-0.20220401083413-eacc5af2899e h1:4uKyBCgjrttoLqktbBKnTG1OP6CPXtd4Tv6fxf3rTsY=
 github.com/pingsutw/datacatalog v0.3.20-0.20220401083413-eacc5af2899e/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
+github.com/pingsutw/datacatalog v0.3.20-0.20220401094030-812a492c775e h1:jaDy3U37f/njoEHFPcdlyiVZAddr2EI//mkQjJZHLVQ=
+github.com/pingsutw/datacatalog v0.3.20-0.20220401094030-812a492c775e/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 h1:Qj1ukM4GlMWXNdMBuXcXfz/Kw9s1qm0CLY32QxuSImI=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4/go.mod h1:N6UoU20jOqggOuDwUaBQpluzLNDqif3kq9z2wpdYEfQ=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

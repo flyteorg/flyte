@@ -178,4 +178,4 @@ replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.12
 
 replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.38-0.20220331200644-46566e649f11
 
-replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog 812a492c775ea7f8ef4f376678b5e5931cb07572
+replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog v0.3.20-0.20220401094030-812a492c775e
