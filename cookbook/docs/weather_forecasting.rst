@@ -1,8 +1,12 @@
 ###################
-Weather forecasting
+Weather Forecasting
 ###################
 
-Learn how to build an online weather forecasting system that updates a model daily and displays hourly forecasts on a web UI, using Pandera and Streamlit.
+Learn how to build an online weather forecasting system that updates a model daily and displays hourly forecasts on a web UI, using Pandera and Streamlit. 
+
+The video below briefly shows how the Weather Forecasting app is made, a few launch plans, and a Streamlit demo. Find the complete video, `Case Study: Building a Weather Forecasting App Using Flyte and Streamlit <https://youtu.be/c-X1u42uK-g>`_ on YouTube.
+
+..  youtube:: aovn_01bzwU
 
 .. panels::
     :header: text-center
