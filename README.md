@@ -317,6 +317,8 @@ Ask us anything Flyte, weekly on Wednesdays:
 
 ### Conferences
 
+Videos and recordings can be found on Flyte's YouTube channel under the [Conference Talks and Podcasts](https://www.youtube.com/playlist?list=PLmQd1BBY9MWouwgSeivMoA4ldSyRcRj_-) playlist.   
+
 2019  
 
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
