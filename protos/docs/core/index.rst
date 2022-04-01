@@ -1,9 +1,9 @@
 Core Flyte language specification
 =================================
 
-These set of protocol buffers provides details of some of the core data
-structures like Workflows, Tasks, Nodes, Literals. These are the specification
-of the various entities in Flyte as well as the type system.
+Protocol buffers provide details about core data
+structures like :ref:`workflows <divedeep-workflows>`, :ref:`tasks <divedeep-tasks>`, :ref:`nodes <divedeep-nodes>`, and Literals. They are the specifications
+of the various entities in Flyte and the type system.
 
 `Core raw protos <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core>`__
 
