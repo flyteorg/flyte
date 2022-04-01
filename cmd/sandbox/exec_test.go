@@ -8,6 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/testutils"
+
+	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/stretchr/testify/assert"
 
@@ -21,7 +25,8 @@ func TestSandboxClusterExec(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	mockOutStream := new(io.Writer)
 	ctx := context.Background()
-	cmdCtx := cmdCore.NewCommandContext(nil, *mockOutStream)
+	mockClient := admin2.InitializeMockClientset()
+	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	reader := bufio.NewReader(strings.NewReader("test"))
 
 	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
@@ -46,10 +51,9 @@ func TestSandboxClusterExec(t *testing.T) {
 
 func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	mockDocker := &mocks.Docker{}
-	mockOutStream := new(io.Writer)
-	ctx := context.Background()
-	cmdCtx := cmdCore.NewCommandContext(nil, *mockOutStream)
 	reader := bufio.NewReader(strings.NewReader("test"))
+	s := testutils.Setup()
+	ctx := s.Ctx
 
 	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
 		{
@@ -66,7 +70,7 @@ func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 		Reader: reader,
 	}, fmt.Errorf("Test"))
 	docker.Client = mockDocker
-	err := sandboxClusterExec(ctx, []string{}, cmdCtx)
+	err := sandboxClusterExec(ctx, []string{}, s.CmdCtx)
 
 	assert.NotNil(t, err)
 }

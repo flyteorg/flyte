@@ -17,21 +17,15 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/docker/docker/api/types"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
-
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	cmdCtx     cmdCore.CommandContext
 	containers []types.Container
 	imageName  = "cr.flyte.org/flyteorg/flyte-sandbox"
 )
 
 func setupSandbox() {
-	mockAdminClient := u.MockClient
-	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
 	err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), os.ModePerm)
 	if err != nil {
 		fmt.Println(err)
@@ -110,7 +104,7 @@ func TestPullDockerImage(t *testing.T) {
 		context := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways)
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways, sandboxConfig.ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 
@@ -120,7 +114,7 @@ func TestPullDockerImage(t *testing.T) {
 		context := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("error"))
-		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways)
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways, sandboxConfig.ImagePullOptions{})
 		assert.NotNil(t, err)
 	})
 
@@ -131,7 +125,7 @@ func TestPullDockerImage(t *testing.T) {
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(context, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
 		mockDocker.OnImageListMatch(context, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
-		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyIfNotPresent)
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyIfNotPresent, sandboxConfig.ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 
@@ -139,7 +133,7 @@ func TestPullDockerImage(t *testing.T) {
 		setupSandbox()
 		mockDocker := &mocks.Docker{}
 		context := context.Background()
-		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyNever)
+		err := PullDockerImage(context, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyNever, sandboxConfig.ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 }

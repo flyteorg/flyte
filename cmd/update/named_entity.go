@@ -24,9 +24,9 @@ type NamedEntityConfig struct {
 	DryRun      bool   `json:"dryRun" pflag:",execute command without making any modifications."`
 }
 
-func (n NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdCore.CommandContext) error {
-	archiveProject := n.Archive
-	activateProject := n.Activate
+func (cfg NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdCore.CommandContext) error {
+	archiveProject := cfg.Archive
+	activateProject := cfg.Activate
 	if activateProject == archiveProject && activateProject {
 		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
 	}
@@ -36,7 +36,7 @@ func (n NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, p
 	} else if archiveProject {
 		nameEntityState = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 	}
-	if namedEntityConfig.DryRun {
+	if cfg.DryRun {
 		logger.Infof(ctx, "skipping UpdateNamedEntity request (dryRun)")
 	} else {
 		_, err := cmdCtx.AdminClient().UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
@@ -47,7 +47,7 @@ func (n NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, p
 				Name:    name,
 			},
 			Metadata: &admin.NamedEntityMetadata{
-				Description: n.Description,
+				Description: cfg.Description,
 				State:       nameEntityState,
 			},
 		})

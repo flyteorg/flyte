@@ -8,6 +8,9 @@ import (
 	"runtime"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/flyteorg/flytectl/pkg/util"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -131,7 +134,7 @@ func getFlytectlAssetName() string {
 	} else if arch == platformutil.ArchX86 {
 		arch = platformutil.Archi386
 	}
-	return fmt.Sprintf("flytectl_%s_%s.tar.gz", strings.Title(runtime.GOOS), arch.String())
+	return fmt.Sprintf("flytectl_%s_%s.tar.gz", cases.Title(language.English).String(runtime.GOOS), arch.String())
 }
 
 // CheckVersionExist returns the provided version release if version exist in repository

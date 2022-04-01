@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/testutils"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flytectl/pkg/printer"
@@ -17,7 +19,6 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
 )
 
 var (
@@ -29,9 +30,6 @@ var (
 )
 
 func getWorkflowSetup() {
-	ctx = u.Ctx
-	mockClient = u.MockClient
-	cmdCtx = u.CmdCtx
 	resourceListRequestWorkflow = &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
@@ -110,59 +108,59 @@ func getWorkflowSetup() {
 
 func TestGetWorkflowFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		setup()
+		s := setup()
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Latest = true
 		mockFetcher.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
-		_, _, err = FetchWorkflowForName(ctx, mockFetcher, "workflowName", projectValue, domainValue)
+		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		setup()
+		s := setup()
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Version = "v1"
 		mockFetcher.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching version"))
-		_, _, err = FetchWorkflowForName(ctx, mockFetcher, "workflowName", projectValue, domainValue)
+		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		setup()
+		s := setup()
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		mockFetcher.OnFetchAllVerOfWorkflowMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
-		_, _, err = FetchWorkflowForName(ctx, mockFetcher, "workflowName", projectValue, domainValue)
+		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		setup()
+		s := testutils.SetupWithExt()
 		getWorkflowSetup()
 		workflow.DefaultConfig.Latest = true
 		args := []string{"workflowName"}
-		u.FetcherExt.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
-		err = getWorkflowFunc(ctx, args, cmdCtx)
+		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
 
 }
 
 func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
 	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	u.FetcherExt.OnFetchWorkflowLatestVersionMatch(ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflow1, nil)
-	err = getWorkflowFunc(ctx, argsWf, cmdCtx)
+	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflow1, nil)
+	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `
+	tearDownAndVerify(t, s.Writer, `
  --------- ----------- --------------------------- --------- ---------------------- 
 | VERSION | NAME      | INPUTS                    | OUTPUTS | CREATED AT           |
  --------- ----------- --------------------------- --------- ---------------------- 
@@ -173,14 +171,14 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 }
 
 func TestListWorkflowFuncWithTable(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getWorkflowSetup()
 	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	u.FetcherExt.OnFetchAllVerOfWorkflowMatch(ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflows, nil)
-	err = getWorkflowFunc(ctx, argsWf, cmdCtx)
+	s.FetcherExt.OnFetchAllVerOfWorkflowMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflows, nil)
+	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `
+	tearDownAndVerify(t, s.Writer, `
  --------- ----------- ---------------------- 
 | VERSION | NAME      | CREATED AT           |
  --------- ----------- ---------------------- 

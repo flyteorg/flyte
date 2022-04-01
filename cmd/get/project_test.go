@@ -2,15 +2,13 @@ package get
 
 import (
 	"fmt"
-	"io"
 	"testing"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytectl/cmd/testutils"
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
 	"github.com/flyteorg/flytectl/pkg/filters"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,16 +16,11 @@ import (
 var (
 	resourceListRequestProject *admin.ProjectListRequest
 	projectListResponse        *admin.Projects
-	argsProject                []string
+	argsProject                = []string{"flyteexample"}
 	project1                   *admin.Project
 )
 
 func getProjectSetup() {
-
-	mockOutStream := new(io.Writer)
-	cmdCtx = cmdCore.NewCommandContext(mockClient, *mockOutStream)
-
-	argsProject = []string{"flyteexample"}
 	resourceListRequestProject = &admin.ProjectListRequest{}
 
 	project1 = &admin.Project{
@@ -60,40 +53,40 @@ func getProjectSetup() {
 }
 
 func TestListProjectFunc(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getProjectSetup()
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-
 	project.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListProjectsMatch(ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	err = getProjectsFunc(ctx, argsProject, cmdCtx)
+	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
+	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListProjects", ctx, resourceListRequestProject)
+	s.FetcherExt.AssertCalled(t, "ListProjects", s.Ctx, filters.Filters{})
 }
 
 func TestGetProjectFunc(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getProjectSetup()
-
 	argsProject = []string{}
 
 	project.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListProjectsMatch(ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	err = getProjectsFunc(ctx, argsProject, cmdCtx)
+	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
+	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListProjects", ctx, resourceListRequestProject)
+	s.FetcherExt.AssertCalled(t, "ListProjects", s.Ctx, filters.Filters{})
 }
 
 func TestGetProjectFuncError(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "hello=",
 	}
-	mockClient.OnListProjectsMatch(ctx, resourceListRequestProject).Return(nil, fmt.Errorf("Please add a valid field selector"))
-	err = getProjectsFunc(ctx, argsProject, cmdCtx)
+	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(nil, fmt.Errorf("Please add a valid field selector"))
+	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{
+		FieldSelector: "hello=",
+	}).Return(nil, fmt.Errorf("Please add a valid field selector"))
+	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 	assert.NotNil(t, err)
 }

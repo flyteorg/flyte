@@ -1,15 +1,11 @@
 package get
 
 import (
-	"context"
 	"fmt"
 	"sort"
 	"testing"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,12 +19,6 @@ const workflowNameValue = "wf_name"
 const workflowVersionValue = "wf_version"
 const testDataFolder = "../testdata/"
 
-var (
-	err        error
-	ctx        context.Context
-	mockClient *mocks.AdminServiceClient
-	cmdCtx     cmdCore.CommandContext
-)
 var setup = testutils.Setup
 var tearDownAndVerify = testutils.TearDownAndVerify
 

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+
 	"github.com/flyteorg/flytectl/pkg/configutil"
 
 	initConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/config"
@@ -51,7 +53,8 @@ func TestSetupConfigFunc(t *testing.T) {
 
 	_ = util.SetupFlyteDir()
 
-	cmdCtx := cmdCore.NewCommandContext(nil, *mockOutStream)
+	mockClient := admin2.InitializeMockClientset()
+	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	err := configInitFunc(ctx, []string{}, cmdCtx)
 	initConfig.DefaultConfig.Host = ""
 	assert.Nil(t, err)

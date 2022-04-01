@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/testutils"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 
 	taskConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 
 	"github.com/flyteorg/flytectl/pkg/filters"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -37,10 +37,6 @@ var (
 )
 
 func getTaskSetup() {
-	ctx = u.Ctx
-	mockClient = u.MockClient
-	// TODO: migrate to new command context from testutils
-	cmdCtx = cmdCore.NewCommandContext(mockClient, u.MockOutStream)
 	argsTask = []string{"task1"}
 	sortedListLiteralType := core.Variable{
 		Type: &core.LiteralType{
@@ -179,73 +175,79 @@ func getTaskSetup() {
 
 func TestGetTaskFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		setup()
+		s := setup()
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Latest = true
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		mockFetcher.OnFetchTaskLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
-		_, err = FetchTaskForName(ctx, mockFetcher, "lpName", projectValue, domainValue)
+		_, err := FetchTaskForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		setup()
+		s := setup()
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Version = "v1"
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		mockFetcher.OnFetchTaskVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching version"))
-		_, err = FetchTaskForName(ctx, mockFetcher, "lpName", projectValue, domainValue)
+		_, err := FetchTaskForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		setup()
+		s := setup()
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		mockFetcher.OnFetchAllVerOfTaskMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
-		_, err = FetchTaskForName(ctx, mockFetcher, "lpName", projectValue, domainValue)
+		_, err := FetchTaskForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		setup()
+		s := setup()
 		getLaunchPlanSetup()
-		mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
-		mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
-		mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
-		err = getTaskFunc(ctx, argsTask, cmdCtx)
+		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
+		s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
+		s.FetcherExt.OnFetchAllVerOfTaskMatch(mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
+		err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
 
 	t.Run("failure fetching list task", func(t *testing.T) {
-		setup()
+		s := setup()
 		getLaunchPlanSetup()
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		argsTask = []string{}
-		mockClient.OnListTasksMatch(ctx, resourceListTaskRequest).Return(nil, fmt.Errorf("error fetching all version"))
-		mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
-		mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
-		err = getTaskFunc(ctx, argsTask, cmdCtx)
+		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListTaskRequest).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
+		s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
+		s.FetcherExt.OnFetchAllVerOfTaskMatch(mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
+		err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
 }
 
 func TestGetTaskFunc(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.FetcherExt.OnFetchAllVerOfTaskMatch(mock.Anything, mock.Anything, mock.Anything,
+		mock.Anything, mock.Anything).Return(taskListResponse.Tasks, nil)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListTasks", ctx, resourceListRequestTask)
-	tearDownAndVerify(t, `[
+	s.FetcherExt.AssertCalled(t, "FetchAllVerOfTask", s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{})
+	tearDownAndVerify(t, s.Writer, `[
 	{
 		"id": {
 			"name": "task1",
@@ -320,16 +322,17 @@ func TestGetTaskFunc(t *testing.T) {
 }
 
 func TestGetTaskFuncWithTable(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.Tasks, nil)
 	config.GetConfig().Output = "table"
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListTasks", ctx, resourceListRequestTask)
-	tearDownAndVerify(t, `
+	s.FetcherExt.AssertCalled(t, "FetchAllVerOfTask", s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{})
+	tearDownAndVerify(t, s.Writer, `
 --------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
 | VERSION | NAME  | TYPE | INPUTS                    | OUTPUTS | DISCOVERABLE | DISCOVERY VERSION | CREATED AT           | 
 --------- ------- ------ --------------------------- --------- -------------- ------------------- ---------------------- 
@@ -343,17 +346,18 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 }
 
 func TestGetTaskFuncLatest(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
-	mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.FetcherExt.OnFetchTaskLatestVersion(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(task2, nil)
 	taskConfig.DefaultConfig.Latest = true
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListTasks", ctx, resourceListRequestTask)
-	tearDownAndVerify(t, `{
+	s.FetcherExt.AssertCalled(t, "FetchTaskLatestVersion", s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{})
+	tearDownAndVerify(t, s.Writer, `{
 	"id": {
 		"name": "task1",
 		"version": "v2"
@@ -391,18 +395,19 @@ func TestGetTaskFuncLatest(t *testing.T) {
 }
 
 func TestGetTaskWithVersion(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
-	mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.FetcherExt.OnFetchTaskVersion(s.Ctx, "task1", "v2", "dummyProject", "dummyDomain").Return(task2, nil)
 	taskConfig.DefaultConfig.Version = "v2"
 	objectGetRequestTask.Id.ResourceType = core.ResourceType_TASK
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "GetTask", ctx, objectGetRequestTask)
-	tearDownAndVerify(t, `{
+	s.FetcherExt.AssertCalled(t, "FetchTaskVersion", s.Ctx, "task1", "v2", "dummyProject", "dummyDomain")
+	tearDownAndVerify(t, s.Writer, `{
 	"id": {
 		"name": "task1",
 		"version": "v2"
@@ -440,41 +445,47 @@ func TestGetTaskWithVersion(t *testing.T) {
 }
 
 func TestGetTasks(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.Tasks, nil)
+
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `[{"id": {"name": "task1","version": "v2"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
+	tearDownAndVerify(t, s.Writer, `[{"id": {"name": "task1","version": "v2"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 }
 
 func TestGetTasksFilters(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "task.name=task1,task.version=v1",
 	}
-	mockClient.OnListTasksMatch(ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
+	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{
+		FieldSelector: "task.name=task1,task.version=v1",
+	}).Return(taskListResponse.Tasks, nil)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, `{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}`)
+	tearDownAndVerify(t, s.Writer, `{"id": {"name": "task1","version": "v1"},"closure": {"compiledTask": {"template": {"interface": {"inputs": {"variables": {"sorted_list1": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"},"sorted_list2": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "var description"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}`)
 }
 
 func TestGetTaskWithExecFile(t *testing.T) {
-	setup()
+	s := testutils.SetupWithExt()
 	getTaskSetup()
-	mockClient.OnListTasksMatch(ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	mockClient.OnGetTaskMatch(ctx, objectGetRequestTask).Return(task2, nil)
-	mockClient.OnListTaskIdsMatch(ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.FetcherExt.OnFetchTaskVersion(s.Ctx, "task1", "v2", "dummyProject", "dummyDomain").Return(task2, nil)
 	taskConfig.DefaultConfig.Version = "v2"
 	taskConfig.DefaultConfig.ExecFile = testDataFolder + "task_exec_file"
-	err = getTaskFunc(ctx, argsTask, cmdCtx)
+	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	os.Remove(taskConfig.DefaultConfig.ExecFile)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "GetTask", ctx, objectGetRequestTask)
-	tearDownAndVerify(t, `{
+	s.FetcherExt.AssertCalled(t, "FetchTaskVersion", s.Ctx, "task1", "v2", "dummyProject", "dummyDomain")
+	tearDownAndVerify(t, s.Writer, `{
 	"id": {
 		"name": "task1",
 		"version": "v2"

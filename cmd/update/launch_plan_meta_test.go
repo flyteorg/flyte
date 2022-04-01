@@ -11,34 +11,25 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func UpdateLPMetaSetup() {
-	ctx = testutils.Ctx
-	cmdCtx = testutils.CmdCtx
-	mockClient = testutils.MockClient
-}
-
 func TestLPMetaUpdate(t *testing.T) {
-	testutils.Setup()
-	UpdateLPMetaSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{"task1"}
-	mockClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(&admin.NamedEntityUpdateResponse{}, nil)
-	assert.Nil(t, updateLPMetaFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	namedEntityConfig := &NamedEntityConfig{}
+	args := []string{"task1"}
+	s.MockAdminClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(&admin.NamedEntityUpdateResponse{}, nil)
+	assert.Nil(t, getUpdateLPMetaFunc(namedEntityConfig)(s.Ctx, args, s.CmdCtx))
 }
 
 func TestLPMetaUpdateFail(t *testing.T) {
-	testutils.Setup()
-	UpdateLPMetaSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{"task1"}
-	mockClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to update"))
-	assert.NotNil(t, updateTaskFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	namedEntityConfig := &NamedEntityConfig{}
+	args := []string{"task1"}
+	s.MockAdminClient.OnUpdateNamedEntityMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to update"))
+	assert.NotNil(t, getUpdateTaskFunc(namedEntityConfig)(s.Ctx, args, s.CmdCtx))
 }
 
 func TestLPMetaUpdateInvalidArgs(t *testing.T) {
-	testutils.Setup()
-	UpdateLPMetaSetup()
-	namedEntityConfig = &NamedEntityConfig{}
-	args = []string{}
-	assert.NotNil(t, updateTaskFunc(ctx, args, cmdCtx))
+	s := testutils.Setup()
+	namedEntityConfig := &NamedEntityConfig{}
+	args := []string{}
+	assert.NotNil(t, getUpdateTaskFunc(namedEntityConfig)(s.Ctx, args, s.CmdCtx))
 }

@@ -218,7 +218,7 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("sourceUploadPath", testValue)
 			if vString, err := cmdFlags.GetString("sourceUploadPath"); err == nil {
-				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.SourceUploadPath)
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.DeprecatedSourceUploadPath)
 
 			} else {
 				assert.FailNow(t, err.Error())

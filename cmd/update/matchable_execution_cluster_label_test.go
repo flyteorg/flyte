@@ -5,90 +5,85 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func updateExecutionClusterLabelSetup() {
-	ctx = u.Ctx
-	cmdCtx = u.CmdCtx
-	mockClient = u.MockClient
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 }
 
 func TestExecutionClusterLabel(t *testing.T) {
 	t.Run("no input file for update", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
-		err = updateExecutionClusterLabelFunc(ctx, args, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("attrFile is mandatory while calling update for execution cluster label"), err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("successful update project domain attribute", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = "testdata/valid_project_domain_execution_cluster_label.yaml"
 		// No args implying project domain attribute deletion
-		u.UpdaterExt.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.UpdaterExt.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
-		err = updateExecutionClusterLabelFunc(ctx, args, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, `Updated attributes from flytectldemo project and domain development`)
+		tearDownAndVerify(t, s.Writer, `Updated attributes from flytectldemo project and domain development`)
 	})
 	t.Run("failed update project domain attribute", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = "testdata/valid_project_domain_execution_cluster_label.yaml"
 		// No args implying project domain attribute deletion
-		u.UpdaterExt.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.UpdaterExt.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(fmt.Errorf("failed to update attributes"))
-		err = updateExecutionClusterLabelFunc(ctx, args, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to update attributes"), err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("successful update workflow attribute", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = "testdata/valid_workflow_execution_cluster_label.yaml"
 		// No args implying project domain attribute deletion
-		u.UpdaterExt.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.UpdaterExt.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
-		err = updateExecutionClusterLabelFunc(ctx, nil, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, nil, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, `Updated attributes from flytectldemo project and domain development and workflow core.control_flow.run_merge_sort.merge_sort`)
+		tearDownAndVerify(t, s.Writer, `Updated attributes from flytectldemo project and domain development and workflow core.control_flow.run_merge_sort.merge_sort`)
 	})
 	t.Run("failed update workflow attribute", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = "testdata/valid_workflow_execution_cluster_label.yaml"
 		// No args implying project domain attribute deletion
-		u.UpdaterExt.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.UpdaterExt.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(fmt.Errorf("failed to update attributes"))
-		err = updateExecutionClusterLabelFunc(ctx, nil, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to update attributes"), err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("non existent file", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = testDataNonExistentFile
-		err = updateExecutionClusterLabelFunc(ctx, nil, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to read from testdata/non-existent-file yaml file"), err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("invalid update file", func(t *testing.T) {
-		setup()
+		s := setup()
 		updateExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultUpdateConfig.AttrFile = testDataInvalidAttrFile
-		err = updateExecutionClusterLabelFunc(ctx, nil, cmdCtx)
+		err := updateExecutionClusterLabelFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""), err)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 }

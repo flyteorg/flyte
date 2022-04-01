@@ -5,9 +5,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/flyteorg/flytectl/cmd/testutils"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/stretchr/testify/assert"
@@ -15,9 +16,6 @@ import (
 )
 
 func getExecutionClusterLabelSetup() {
-	ctx = u.Ctx
-	cmdCtx = u.CmdCtx
-	mockClient = u.MockClient
 	executionclusterlabel.DefaultFetchConfig = &executionclusterlabel.AttrFetchConfig{}
 	// Clean up the temp directory.
 	_ = os.Remove(testDataTempFile)
@@ -51,88 +49,82 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
-		u.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
-		u.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","value":"foo"}`)
+		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
+		tearDownAndVerify(t, s.Writer, `{"project":"dummyProject","domain":"dummyDomain","value":"foo"}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
-		u.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
-		u.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, `wrote the config to file temp-output-file`)
+		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
+		tearDownAndVerify(t, s.Writer, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
-		u.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("error dumping in file due to open non-existent-dir/temp-output-file: no such file or directory"), err)
-		u.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, ``)
+		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("failed to get project domain attribute", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
-		u.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to fetch response"), err)
-		u.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, ``)
+		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
-		args = []string{"workflow"}
-		u.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		args := []string{"workflow"}
+		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(workflowResp, nil)
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
-		u.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
+		s.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","value":"foo"}`)
+		tearDownAndVerify(t, s.Writer, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","value":"foo"}`)
 	})
 	t.Run("failed to get workflow attribute", func(t *testing.T) {
-		var args []string
-		setup()
+		s := testutils.SetupWithExt()
 		getExecutionClusterLabelSetup()
-		args = []string{"workflow"}
-		u.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		args := []string{"workflow"}
+		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
-		err = getExecutionClusterLabel(ctx, args, cmdCtx)
+		err := getExecutionClusterLabel(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to fetch response"), err)
-		u.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
-			ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
+		s.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
+			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-		tearDownAndVerify(t, ``)
+		tearDownAndVerify(t, s.Writer, ``)
 	})
 }

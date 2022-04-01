@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytectl/cmd/config"
+
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/google/go-github/v42/github"
@@ -54,8 +56,8 @@ func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Com
 		args := []string{
 			*v.BrowserDownloadURL,
 		}
-		if err := Register(ctx, args, cmdCtx); err != nil {
-			return fmt.Errorf("Example %v failed to register %v", v.Name, err)
+		if err := Register(ctx, args, config.GetConfig(), cmdCtx); err != nil {
+			return fmt.Errorf("example %v failed to register %v", v.Name, err)
 		}
 	}
 	return nil

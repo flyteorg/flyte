@@ -104,7 +104,9 @@ func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, e
 }
 
 // PullDockerImage will Pull docker image
-func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy sandboxConfig.ImagePullPolicy) error {
+func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy sandboxConfig.ImagePullPolicy,
+	imagePullOptions sandboxConfig.ImagePullOptions) error {
+
 	if pullPolicy == sandboxConfig.ImagePullPolicyAlways || pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
 		if pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
 			imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
@@ -119,7 +121,11 @@ func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy s
 				}
 			}
 		}
-		r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+
+		r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{
+			RegistryAuth: imagePullOptions.RegistryAuth,
+			Platform:     imagePullOptions.Platform,
+		})
 		if err != nil {
 			return err
 		}

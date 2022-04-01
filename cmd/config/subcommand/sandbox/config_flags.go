@@ -56,5 +56,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.BoolVar(&DefaultConfig.Prerelease, fmt.Sprintf("%v%v", prefix, "pre"), DefaultConfig.Prerelease, "Optional. Pre release Version of flyte will be used for sandbox.")
 	cmdFlags.StringSliceVar(&DefaultConfig.Env, fmt.Sprintf("%v%v", prefix, "env"), DefaultConfig.Env, "Optional. Provide Env variable in key=value format which can be passed to sandbox container.")
 	cmdFlags.Var(&DefaultConfig.ImagePullPolicy, fmt.Sprintf("%v%v", prefix, "imagePullPolicy"), "Optional. Defines the image pull behavior [Always/IfNotPresent/Never]")
+	cmdFlags.StringVar(&DefaultConfig.ImagePullOptions.RegistryAuth, fmt.Sprintf("%v%v", prefix, "imagePullOptions.registryAuth"), DefaultConfig.ImagePullOptions.RegistryAuth, "The base64 encoded credentials for the registry.")
+	cmdFlags.StringVar(&DefaultConfig.ImagePullOptions.Platform, fmt.Sprintf("%v%v", prefix, "imagePullOptions.platform"), DefaultConfig.ImagePullOptions.Platform, "Forces a specific platform's image to be pulled.'")
 	return cmdFlags
 }

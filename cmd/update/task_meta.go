@@ -32,18 +32,22 @@ Usage
 `
 )
 
-func updateTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	project := config.GetConfig().Project
-	domain := config.GetConfig().Domain
-	if len(args) != 1 {
-		return fmt.Errorf(clierrors.ErrTaskNotPassed)
+func getUpdateTaskFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+	return func(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+		project := config.GetConfig().Project
+		domain := config.GetConfig().Domain
+		if len(args) != 1 {
+			return fmt.Errorf(clierrors.ErrTaskNotPassed)
+		}
+
+		name := args[0]
+		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_TASK, cmdCtx)
+		if err != nil {
+			fmt.Printf(clierrors.ErrFailedTaskUpdate, name, err)
+			return err
+		}
+
+		fmt.Printf("updated metadata successfully on %v", name)
+		return nil
 	}
-	name := args[0]
-	err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_TASK, cmdCtx)
-	if err != nil {
-		fmt.Printf(clierrors.ErrFailedTaskUpdate, name, err)
-		return err
-	}
-	fmt.Printf("updated metadata successfully on %v", name)
-	return nil
 }
