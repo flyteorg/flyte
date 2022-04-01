@@ -111,6 +111,8 @@ flytepropeller:
       ephemeral-storage: 1Gi
       memory: 2Gi
   cacheSizeMbs: 1024
+  # -- Sets priorityClassName for propeller pod(s).
+  priorityClassName: "system-cluster-critical"
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

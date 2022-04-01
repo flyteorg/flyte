@@ -229,7 +229,7 @@ flytepropeller:
   # -- Defines the cluster name used in events sent to Admin
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
-  priorityClassName: "system-cluster-critical"
+  priorityClassName: ""
 
 #
 # FLYTECONSOLE SETTINGS
