@@ -23,11 +23,6 @@ server:
 flyteadmin:
   runScheduler: false
 database:
-  port: 30089
-  username: postgres
-  host: localhost
-  dbname: flyteadmin
-  options: "sslmode=disable"
 #  sqlite:
 #    file: admin.db
   postgres:

@@ -76,12 +76,6 @@ COPY --from=base_ /flyteorg/ /flyteorg/
 # Copy entrypoints
 COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
-ARG FLYTE_VERSION="latest"
-ENV FLYTE_VERSION "${FLYTE_VERSION}"
-
-ARG FLYTE_TEST="release"
-ENV FLYTE_TEST "${FLYTE_TEST}"
-
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
 
@@ -92,6 +86,6 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 8088 8089 30082
+EXPOSE 8088 30081 30082
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]

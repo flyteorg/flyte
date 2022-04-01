@@ -7,7 +7,7 @@ require (
 	github.com/flyteorg/flyteadmin v0.6.119
 	github.com/flyteorg/flyteplugins v0.10.16
 	github.com/flyteorg/flytepropeller v0.16.37
-	github.com/flyteorg/flytestdlib v0.4.14
+	github.com/flyteorg/flytestdlib v0.4.17
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
@@ -21,16 +21,16 @@ require (
 	cloud.google.com/go/iam v0.1.0 // indirect
 	cloud.google.com/go/pubsub v1.10.1 // indirect
 	cloud.google.com/go/storage v1.14.0 // indirect
-	github.com/Azure/azure-sdk-for-go v52.4.0+incompatible // indirect
+	github.com/Azure/azure-sdk-for-go v62.3.0+incompatible // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest v0.11.18 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.13 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/Masterminds/goutils v1.1.0 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/Masterminds/sprig v2.20.0+incompatible // indirect
 	github.com/NYTimes/gizmo v1.3.6 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/aws/aws-sdk-go v1.37.31 // indirect
@@ -49,7 +49,8 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v0.24.6 // indirect
+	github.com/flyteorg/flyteidl v0.24.10 // indirect
+	github.com/flyteorg/stow v0.3.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -58,7 +59,7 @@ require (
 	github.com/go-redis/redis v6.15.7+incompatible // indirect
 	github.com/go-test/deep v1.0.7 // indirect
 	github.com/goccy/go-json v0.4.8 // indirect
-	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -71,14 +72,12 @@ require (
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/graymeta/stow v0.2.7 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/huandu/xstrings v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -110,7 +109,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/ncw/swift v1.0.53 // indirect
-	github.com/norwoodj/helm-docs v1.7.0 // indirect
 	github.com/ory/fosite v0.39.0 // indirect
 	github.com/ory/go-acc v0.2.5 // indirect
 	github.com/ory/go-convenience v0.1.0 // indirect
@@ -146,7 +144,7 @@ require (
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
-	golang.org/x/tools v0.1.9-0.20211228192929-ee1ca4ffc4da // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.1.0 // indirect
 	google.golang.org/api v0.67.0 // indirect
@@ -166,7 +164,6 @@ require (
 	k8s.io/apimachinery v0.20.4 // indirect
 	k8s.io/client-go v0.20.2 // indirect
 	k8s.io/component-base v0.20.2 // indirect
-	k8s.io/helm v2.14.3+incompatible // indirect
 	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305164622-f622666832c1 // indirect
 	k8s.io/utils v0.0.0-20210305010621-2afb4311ab10 // indirect
@@ -177,8 +174,8 @@ require (
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
 
-replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.120-0.20220327153632-110101f88666
+replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v0.6.126-0.20220401040810-85c443ba86b1
 
-replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.35-0.20220316204153-74e2d2469148
+replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.38-0.20220331200644-46566e649f11
 
-replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog v0.3.20-0.20220328101114-57ef1bb69027
+replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog 812a492c775ea7f8ef4f376678b5e5931cb07572
