@@ -2,6 +2,7 @@ package single
 
 import (
 	"context"
+	"github.com/flyteorg/flyteadmin/plugins"
 
 	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
@@ -62,7 +63,8 @@ func startAdmin(ctx context.Context) error {
 	})
 	g.Go(func() error {
 		logger.Infof(ctx, "Starting Admin server...")
-		return adminServer.Serve(ctx, GetConsoleHandlers())
+		registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+		return adminServer.Serve(ctx, registry.Load(), GetConsoleHandlers())
 	})
 	return g.Wait()
 }
