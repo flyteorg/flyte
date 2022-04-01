@@ -359,8 +359,6 @@ github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8S
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/flyteorg/flyteidl v0.23.0/go.mod h1:576W2ViEyjTpT+kEVHAGbrTP3HARNUZ/eCwrNPmdx9U=
 github.com/flyteorg/flyteidl v0.24.0/go.mod h1:576W2ViEyjTpT+kEVHAGbrTP3HARNUZ/eCwrNPmdx9U=
-github.com/flyteorg/flyteidl v0.24.10-0.20220331230832-978d1aea7412 h1:njI9nBHdLOa9Ndueg8GGDAiYtft4ri8HmesgdXoZpO4=
-github.com/flyteorg/flyteidl v0.24.10-0.20220331230832-978d1aea7412/go.mod h1:vHSugApgS3hRITIafzQDU8DZD/W8wFRfFcgaFU35Dww=
 github.com/flyteorg/flyteidl v0.24.10 h1:fCYpfp5fxKbhRMSkP0Hdw5lOPBTItLU1A3WA1Lc7sEU=
 github.com/flyteorg/flyteidl v0.24.10/go.mod h1:vHSugApgS3hRITIafzQDU8DZD/W8wFRfFcgaFU35Dww=
 github.com/flyteorg/flyteplugins v0.10.16 h1:rwNI2MACPbcST2O6CEUsNW6bccz7ZLni0GiY3orevfw=
