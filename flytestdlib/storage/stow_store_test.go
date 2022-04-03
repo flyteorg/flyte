@@ -16,8 +16,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 
+	"github.com/flyteorg/stow/azure"
 	"github.com/flyteorg/stow/google"
 	"github.com/flyteorg/stow/local"
+	"github.com/flyteorg/stow/oracle"
+	"github.com/flyteorg/stow/s3"
+	"github.com/flyteorg/stow/swift"
 	"github.com/pkg/errors"
 
 	"github.com/flyteorg/stow"
@@ -647,4 +651,13 @@ func TestStowStore_WriteRaw(t *testing.T) {
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.EqualError(t, err, "Failed to write data [0b] to path [path].: foo")
 	})
+}
+
+func TestStowStore_fQNFn(t *testing.T) {
+	assert.Equal(t, DataReference("s3://bucket"), fQNFn[s3.Kind]("bucket"))
+	assert.Equal(t, DataReference("gs://bucket"), fQNFn[google.Kind]("bucket"))
+	assert.Equal(t, DataReference("os://bucket"), fQNFn[oracle.Kind]("bucket"))
+	assert.Equal(t, DataReference("sw://bucket"), fQNFn[swift.Kind]("bucket"))
+	assert.Equal(t, DataReference("abfs://bucket"), fQNFn[azure.Kind]("bucket"))
+	assert.Equal(t, DataReference("file://bucket"), fQNFn[local.Kind]("bucket"))
 }
