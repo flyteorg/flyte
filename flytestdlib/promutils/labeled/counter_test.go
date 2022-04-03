@@ -16,7 +16,9 @@ func TestLabeledCounter(t *testing.T) {
 	})
 
 	scope := promutils.NewTestScope()
-	c := NewCounter("lbl_counter", "help", scope)
+	// Make sure we will not register the same metrics key again.
+	option := AdditionalLabelsOption{Labels: []string{contextutils.ProjectKey.String(), contextutils.DomainKey.String()}}
+	c := NewCounter("lbl_counter", "help", scope, option)
 	assert.NotNil(t, c)
 	ctx := context.TODO()
 	c.Inc(ctx)

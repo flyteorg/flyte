@@ -43,8 +43,9 @@ func NewSummary(name, description string, scope promutils.Scope, opts ...MetricO
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			s.Summary = scope.MustNewSummary(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			s.SummaryVec = scope.MustNewSummaryVec(name, description, append(metricStringKeys, additionalLabels.Labels...)...)
-			s.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
+			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
+			s.SummaryVec = scope.MustNewSummaryVec(name, description, append(metricStringKeys, labels...)...)
+			s.additionalLabels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 

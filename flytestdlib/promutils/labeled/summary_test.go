@@ -21,7 +21,9 @@ func TestLabeledSummary(t *testing.T) {
 		scope := promutils.NewScope("testscope_summary")
 		ctx := context.Background()
 		ctx = contextutils.WithProjectDomain(ctx, "flyte", "dev")
-		s := NewSummary("unittest", "some desc", scope)
+		// Make sure we will not register the same metrics key again.
+		option := AdditionalLabelsOption{Labels: []string{contextutils.ProjectKey.String(), contextutils.DomainKey.String()}}
+		s := NewSummary("unittest", "some desc", scope, option)
 		assert.NotNil(t, s)
 
 		s.Observe(ctx, 10)
