@@ -47,7 +47,7 @@ var fQNFn = map[string]func(string) DataReference{
 		return DataReference(fmt.Sprintf("sw://%s", bucket))
 	},
 	azure.Kind: func(bucket string) DataReference {
-		return DataReference(fmt.Sprintf("afs://%s", bucket))
+		return DataReference(fmt.Sprintf("abfs://%s", bucket))
 	},
 	local.Kind: func(bucket string) DataReference {
 		return DataReference(fmt.Sprintf("file://%s", bucket))
