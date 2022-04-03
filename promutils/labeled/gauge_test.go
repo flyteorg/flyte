@@ -20,7 +20,9 @@ func TestLabeledGauge(t *testing.T) {
 	scope := promutils.NewScope("testscope")
 	ctx := context.Background()
 	ctx = contextutils.WithProjectDomain(ctx, "flyte", "dev")
-	g := NewGauge("unittest", "some desc", scope)
+	// Make sure we will not register the same metrics key again.
+	option := AdditionalLabelsOption{Labels: []string{contextutils.ProjectKey.String(), contextutils.DomainKey.String()}}
+	g := NewGauge("unittest", "some desc", scope, option)
 	assert.NotNil(t, g)
 
 	g.Inc(ctx)

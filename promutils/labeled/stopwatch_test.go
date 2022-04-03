@@ -18,7 +18,9 @@ func TestLabeledStopWatch(t *testing.T) {
 
 	t.Run("always labeled", func(t *testing.T) {
 		scope := promutils.NewTestScope()
-		c := NewStopWatch("lbl_counter", "help", time.Second, scope)
+		// Make sure we will not register the same metrics key again.
+		option := AdditionalLabelsOption{Labels: []string{contextutils.ProjectKey.String(), contextutils.DomainKey.String()}}
+		c := NewStopWatch("lbl_counter", "help", time.Second, scope, option)
 		assert.NotNil(t, c)
 		ctx := context.TODO()
 		w := c.Start(ctx)

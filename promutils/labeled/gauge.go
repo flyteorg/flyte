@@ -113,8 +113,9 @@ func NewGauge(name, description string, scope promutils.Scope, opts ...MetricOpt
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			g.Gauge = scope.MustNewGauge(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			g.GaugeVec = scope.MustNewGaugeVec(name, description, append(metricStringKeys, additionalLabels.Labels...)...)
-			g.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
+			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
+			g.GaugeVec = scope.MustNewGaugeVec(name, description, append(metricStringKeys, labels...)...)
+			g.additionalLabels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 

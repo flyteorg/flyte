@@ -3,6 +3,8 @@ package labeled
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
@@ -45,6 +47,18 @@ func (c Counter) Add(ctx context.Context, v float64) {
 	}
 }
 
+// GetUniqueLabels Remove labels from additionalLabels that already exist in metricStringKeys
+func GetUniqueLabels(metricStringKeys []string, additionalLabels []string) []string {
+	labels := make([]string, 0, len(additionalLabels))
+	metricKeysSet := sets.NewString(metricStringKeys...)
+	for _, label := range additionalLabels {
+		if !metricKeysSet.Has(label) {
+			labels = append(labels, label)
+		}
+	}
+	return labels
+}
+
 // NewCounter  creates a new labeled counter. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys for
 // information about to configure that.
 func NewCounter(name, description string, scope promutils.Scope, opts ...MetricOption) Counter {
@@ -59,8 +73,10 @@ func NewCounter(name, description string, scope promutils.Scope, opts ...MetricO
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			c.Counter = scope.MustNewCounter(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			c.CounterVec = scope.MustNewCounterVec(name, description, append(metricStringKeys, additionalLabels.Labels...)...)
-			c.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
+			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
+			// Here we only append the labels that don't exist in metricStringKeys
+			c.CounterVec = scope.MustNewCounterVec(name, description, append(metricStringKeys, labels...)...)
+			c.additionalLabels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 

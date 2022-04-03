@@ -82,9 +82,10 @@ func NewStopWatch(name, description string, scale time.Duration, scope promutils
 		if _, emitUnableMetric := opt.(EmitUnlabeledMetricOption); emitUnableMetric {
 			sw.StopWatch = scope.MustNewStopWatch(GetUnlabeledMetricName(name), description, scale)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
+			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
 			sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale,
-				append(metricStringKeys, additionalLabels.Labels...)...)
-			sw.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
+				append(metricStringKeys, labels...)...)
+			sw.additionalLabels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 
