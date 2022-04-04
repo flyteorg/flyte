@@ -32,7 +32,7 @@ then
     rm $(which helm-docs)
 fi
 
-GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 

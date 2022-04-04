@@ -203,17 +203,17 @@ Flyte configuration on your remote cluster.
 
     flytectl config init --host='localhost:30081' --insecure
 
-#. Open the minio console http://localhost:30088, Your minio username is `minio` and password is `miniostorage`
+#. Open the minio console http://localhost:30088. Your minio username is `minio` and password is `miniostorage`.
 
-#. Open the Kubernetes dashboard http://localhost:30082
+#. Open the Kubernetes dashboard http://localhost:30082.
 
-#. You can port-forward to connect postgres, as follows ::
+#. You can port-forward to connect postgres using ::
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
 
 #. Now use these credentials for postgres
 
-  .. code-block::
+   .. code-block::
 
       dbname: flyteadmin
       host: 127.0.0.1

@@ -50,7 +50,7 @@
   <span> · </span>
   <a href="#roadmap">Live Roadmap</a>
   <span> · </span>
-  <a href="#rfc">RFC's & Proposals</a>
+  <a href="#rfc">RFCs & Proposals</a>
   <span> · </span>
   <a href="#features">Features</a>
   <span> · </span>
@@ -78,8 +78,8 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 ## ⏳ Five Reasons to Use Flyte
 
 - Kubernetes-Native Workflow Automation Platform
-- Ergonomic SDK's in Python, Java & Scala
-- Versioned, Auditable & Reproducible Pipelines
+- Ergonomic SDKs in Python, Java, and Scala
+- Versioned, Auditable, and Reproducible Pipelines
 - Data Aware and Strongly Typed
 - Resource Aware and deployed to scale with your organization
 
@@ -160,7 +160,7 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
   - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
   - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
   - Workflow of workflows - **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embedded within one node of the top-level workflow)
-  - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
+  - Distributed **remote external workflows** (a remote workflow can be triggered and statically verified at compile time)
   - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
   - **[Dynamic workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
   - [Flytekit plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
@@ -256,8 +256,8 @@ The table below has different release versions as the columns and the result of 
 </details>
 
 <html>
-<h2 id="rfc">
-   🛣️  RFC's (Request for Commments) & Proposals
+<h2 id="rfc"> 
+   🛣️  RFCs (Request for Comments) & Proposals
 </h2>
 </html>
 
@@ -270,9 +270,9 @@ usually done by starting with:
 - [Github Issue](https://github.com/flyteorg/flyte/issues) - We maintain issues for all repos in the main flyte repo.
 - Writing down your proposal using a [Documented RFC process](rfc/.)
 
-For small changes, RFCs are not required, but for larger changes, RFC's are
-  encouraged. You are welcome to drop into the Slack channel and talk to the community,
-if you want to test the waters, before proposing.
+For small changes, RFCs are not required. They are encouraged for larger changes.
+You are welcome to drop into the Slack channel and talk to the community
+if you want to test the waters before proposing.
 
 <html>
 <h2 id="community--resources">
