@@ -29,7 +29,7 @@ type Execution struct {
 	StartedAt    *time.Time
 	// Corresponds to the CreatedAt field in the Execution closure.
 	// Prefixed with Execution to avoid clashes with gorm.Model CreatedAt
-	ExecutionCreatedAt *time.Time
+	ExecutionCreatedAt *time.Time `gorm:"index:idx_executions_created_at"`
 	// Corresponds to the UpdatedAt field in the Execution closure
 	// Prefixed with Execution to avoid clashes with gorm.Model UpdatedAt
 	ExecutionUpdatedAt *time.Time
