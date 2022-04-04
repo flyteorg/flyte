@@ -235,49 +235,56 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                    limits.cpu: {{ projectQuotaCpu }}
                    limits.memory: {{ projectQuotaMemory }}
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
-             kind: Role
-             metadata:
-                 name: spark-role
-                 namespace: {{ namespace }}
-             rules:
-               - apiGroups:
-                 - ""
-                 resources:
-                 - pods
-                 verbs:
-                 - '*'
-               - apiGroups:
-                 - ""
-                 resources:
-                 - services
-                 verbs:
-                 - '*'
-               - apiGroups:
-                 - ""
-                 resources:
-                 - configmaps
-                 verbs:
-                 - '*'
-           - apiVersion: v1
-             kind: ServiceAccount
-             metadata:
-               name: spark
-               namespace: {{ namespace }}
+           - key: aa_spark_role
+             value: |
+                Version: rbac.authorization.k8s.io/v1beta1
+                kind: Role
+                metadata:
+                  name: spark-role
+                  namespace: {{ namespace }}
+                rules:
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - pods
+                  verbs:
+                  - '*'
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - services
+                  verbs:
+                  - '*'
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - configmaps
+                  verbs:
+                  - '*'
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
-             kind: RoleBinding
-             metadata:
-                 name: spark-role-binding
-                 namespace: {{ namespace }}
-             roleRef:
-                 apiGroup: rbac.authorization.k8s.io
-                 kind: Role
-                 name: spark-role
-             subjects:
-               - kind: ServiceAccount
-                 name: spark
-                 namespace: {{ namespace }}
+           - key: aa_spark_service_account
+             value: |
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: spark
+                  namespace: {{ namespace }}
+
+           - key: aa_spark_role_binding
+             value: |
+                apiVersion: rbac.authorization.k8s.io/v1beta1
+                kind: RoleBinding
+                metadata:
+                  name: spark-role-binding
+                  namespace: {{ namespace }}
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: Role
+                  name: spark-role
+                subjects:
+                - kind: ServiceAccount
+                  name: spark
+                  namespace: {{ namespace }}
 
        sparkoperator:
          enabled: true

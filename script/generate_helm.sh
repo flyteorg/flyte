@@ -27,7 +27,14 @@ done
 helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
 
 echo "Generating helm docs"
-helm-docs -c ${DIR}/../charts/
+if  command -v helm-docs &> /dev/null
+then
+    rm $(which helm-docs)
+fi
+
+GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+
+${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
