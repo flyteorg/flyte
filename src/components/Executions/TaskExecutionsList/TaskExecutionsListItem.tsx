@@ -2,6 +2,7 @@ import * as React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import classnames from 'classnames';
+import { PanelSection } from 'components/common/PanelSection';
 import { useCommonStyles } from 'components/common/styles';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { TaskExecution } from 'models/Execution/types';
@@ -45,32 +46,30 @@ export const TaskExecutionsListItem: React.FC<TaskExecutionsListItemProps> = ({
   const taskHasStarted = closure.phase >= TaskExecutionPhase.QUEUED;
 
   return (
-    <div className={commonStyles.detailsPanelCard}>
-      <div className={commonStyles.detailsPanelCardContent}>
+    <PanelSection>
+      <section className={styles.section}>
+        <header className={styles.header}>
+          <Typography variant="h6" className={classnames(styles.title, commonStyles.textWrapped)}>
+            {headerText}
+          </Typography>
+        </header>
+        <ExecutionStatusBadge phase={closure.phase} type="task" variant="text" />
+      </section>
+      {!!error && (
         <section className={styles.section}>
-          <header className={styles.header}>
-            <Typography variant="h6" className={classnames(styles.title, commonStyles.textWrapped)}>
-              {headerText}
-            </Typography>
-          </header>
-          <ExecutionStatusBadge phase={closure.phase} type="task" variant="text" />
+          <TaskExecutionError error={error} />
         </section>
-        {!!error && (
+      )}
+      {taskHasStarted && (
+        <>
           <section className={styles.section}>
-            <TaskExecutionError error={error} />
+            <TaskExecutionLogs taskLogs={taskExecution.closure.logs || []} />
           </section>
-        )}
-        {taskHasStarted && (
-          <>
-            <section className={styles.section}>
-              <TaskExecutionLogs taskLogs={taskExecution.closure.logs || []} />
-            </section>
-            <section className={styles.section}>
-              <TaskExecutionDetails taskExecution={taskExecution} />
-            </section>
-          </>
-        )}
-      </div>
-    </div>
+          <section className={styles.section}>
+            <TaskExecutionDetails taskExecution={taskExecution} />
+          </section>
+        </>
+      )}
+    </PanelSection>
   );
 };

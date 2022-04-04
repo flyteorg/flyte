@@ -48,12 +48,6 @@ export const useCommonStyles = makeStyles((theme: Theme) => ({
       color: dangerousButtonHoverColor,
     },
   },
-  detailsPanelCard: {
-    borderBottom: `1px solid ${theme.palette.divider}`,
-  },
-  detailsPanelCardContent: {
-    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px`,
-  },
   errorText: {
     color: theme.palette.error.main,
   },

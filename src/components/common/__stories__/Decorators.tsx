@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const PANEL_VIEW = '320px';
+const PANEL_VIEW = '420px';
 
 export function PanelViewDecorator(Story: any) {
   return (

@@ -24,9 +24,10 @@ module.exports = {
       '<rootDir>/assetsTransformer.js',
   },
   coverageDirectory: '.coverage',
-  collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*/*.stories.tsx'],
+  collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*/*.stories.{ts,tsx}', '!**/*/*.mocks.{ts,tsx}'],
   coveragePathIgnorePatterns: [
     '__stories__',
+    '__mocks__',
     '<rootDir>/.storybook',
     '<rootDir>/node_modules',
     '<rootDir>/dist',

@@ -18,7 +18,7 @@ interface TaskExecutionsListProps {
   nodeExecution: NodeExecution;
 }
 
-const TaskExecutionsListContent: React.FC<{
+export const TaskExecutionsListContent: React.FC<{
   taskExecutions: TaskExecution[];
 }> = ({ taskExecutions }) => {
   const styles = useStyles();

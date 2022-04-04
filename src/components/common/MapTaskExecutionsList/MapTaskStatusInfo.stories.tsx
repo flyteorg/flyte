@@ -5,7 +5,7 @@ import { MapTaskStatusInfo } from './MapTaskStatusInfo';
 import { PanelViewDecorator } from '../__stories__/Decorators';
 
 export default {
-  title: 'Common/MapTaskExecutionList/MapTaskStatusInfo',
+  title: 'Task/MapTaskExecutionList/MapTaskStatusInfo',
   component: MapTaskStatusInfo,
   parameters: { actions: { argTypesRegex: 'toggleExpanded' } },
 } as ComponentMeta<typeof MapTaskStatusInfo>;

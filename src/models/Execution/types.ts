@@ -107,13 +107,13 @@ export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
 export interface TaskExecutionIdentifier extends Core.ITaskExecutionIdentifier {
   taskId: Identifier;
   nodeExecutionId: NodeExecutionIdentifier;
-  retryAttempt: number;
+  retryAttempt?: number;
 }
 
 export interface TaskExecution extends Admin.ITaskExecution {
   id: TaskExecutionIdentifier;
   inputUri: string;
-  isParent: boolean;
+  isParent?: boolean;
   closure: TaskExecutionClosure;
 }
 export interface TaskExecutionClosure extends Admin.ITaskExecutionClosure {

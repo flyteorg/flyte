@@ -9,7 +9,7 @@ import { TaskExecution } from 'models/Execution/types';
 export function getUniqueTaskExecutionName({ id }: TaskExecution) {
   const { name } = id.taskId;
   const { retryAttempt } = id;
-  const suffix = retryAttempt > 0 ? ` (${retryAttempt + 1})` : '';
+  const suffix = retryAttempt && retryAttempt > 0 ? ` (${retryAttempt + 1})` : '';
   return `${name}${suffix}`;
 }
 

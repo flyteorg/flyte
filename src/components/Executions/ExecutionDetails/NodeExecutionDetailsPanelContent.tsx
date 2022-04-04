@@ -1,8 +1,7 @@
+import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { IconButton, Typography } from '@material-ui/core';
+import { IconButton, Typography, Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
 import Close from '@material-ui/icons/Close';
 import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
@@ -15,27 +14,25 @@ import { LocationDescriptor } from 'history';
 import { PaginatedEntityResponse } from 'models/AdminEntity/types';
 import { Workflow } from 'models/Workflow/types';
 import { NodeExecution, NodeExecutionIdentifier, TaskExecution } from 'models/Execution/types';
-import { TaskTemplate } from 'models/Task/types';
-import * as React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useQuery, useQueryClient } from 'react-query';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes/routes';
 import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
 import { fetchWorkflow } from 'components/Workflow/workflowQueries';
+import { PanelSection } from 'components/common/PanelSection';
+import { DumpJSON } from 'components/common/DumpJSON';
 import { dNode } from 'models/Graph/types';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import { transformWorkflowToKeyedDag, getNodeNameFromDag } from 'components/WorkflowGraph/utils';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { makeListTaskExecutionsQuery, makeNodeExecutionQuery } from '../nodeExecutionQueries';
-import { TaskExecutionsList } from '../TaskExecutionsList/TaskExecutionsList';
 import { NodeExecutionDetails } from '../types';
 import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
-import { NodeExecutionInputs } from './NodeExecutionInputs';
-import { NodeExecutionOutputs } from './NodeExecutionOutputs';
-import { NodeExecutionTaskDetails } from './NodeExecutionTaskDetails';
 import { getTaskExecutionDetailReasons } from './utils';
 import { ExpandableMonospaceText } from '../../common/ExpandableMonospaceText';
 import { fetchWorkflowExecution } from '../useWorkflowExecution';
+import { NodeExecutionTabs } from './NodeExecutionTabs';
 
 const useStyles = makeStyles((theme: Theme) => {
   const paddingVertical = `${theme.spacing(2)}px`;
@@ -127,8 +124,6 @@ const tabIds = {
   task: 'task',
 };
 
-const defaultTab = tabIds.executions;
-
 interface NodeExecutionDetailsProps {
   nodeExecutionId: NodeExecutionIdentifier;
   onClose?: () => void;
@@ -176,60 +171,13 @@ const ExecutionTypeDetails: React.FC<{
   );
 };
 
-const NodeExecutionTabs: React.FC<{
-  nodeExecution: NodeExecution;
-  taskTemplate?: TaskTemplate | null;
-}> = ({ nodeExecution, taskTemplate }) => {
-  const styles = useStyles();
-  const tabState = useTabState(tabIds, defaultTab);
-
-  if (tabState.value === tabIds.task && !taskTemplate) {
-    // Reset tab value, if task tab is selected, while no taskTemplate is avaible
-    // can happen when user switches between nodeExecutions without closing the drawer
-    tabState.onChange(() => {
-      /* */
-    }, defaultTab);
-  }
-
-  let tabContent: JSX.Element | null = null;
-  switch (tabState.value) {
-    case tabIds.executions: {
-      tabContent = <TaskExecutionsList nodeExecution={nodeExecution} />;
-      break;
-    }
-    case tabIds.inputs: {
-      tabContent = <NodeExecutionInputs execution={nodeExecution} />;
-      break;
-    }
-    case tabIds.outputs: {
-      tabContent = <NodeExecutionOutputs execution={nodeExecution} />;
-      break;
-    }
-    case tabIds.task: {
-      tabContent = taskTemplate ? <NodeExecutionTaskDetails taskTemplate={taskTemplate} /> : null;
-      break;
-    }
-  }
-  return (
-    <>
-      <Tabs {...tabState} className={styles.tabs}>
-        <Tab value={tabIds.executions} label="Executions" />
-        <Tab value={tabIds.inputs} label="Inputs" />
-        <Tab value={tabIds.outputs} label="Outputs" />
-        {!!taskTemplate && <Tab value={tabIds.task} label="Task" />}
-      </Tabs>
-      <div className={styles.content}>{tabContent}</div>
-    </>
-  );
-};
-
 const WorkflowTabs: React.FC<{
   dagData: dNode;
   nodeId: string;
 }> = ({ dagData, nodeId }) => {
   const styles = useStyles();
   const tabState = useTabState(tabIds, tabIds.inputs);
-  const commonStyles = useCommonStyles();
+
   let tabContent: JSX.Element | null = null;
   const id = nodeId.slice(nodeId.lastIndexOf('-') + 1);
   const taskTemplate = dagData[id].value.template;
@@ -237,16 +185,18 @@ const WorkflowTabs: React.FC<{
   switch (tabState.value) {
     case tabIds.inputs: {
       tabContent = taskTemplate ? (
-        <div className={commonStyles.detailsPanelCard}>
-          <div className={commonStyles.detailsPanelCardContent}>
-            <RemoteLiteralMapViewer blob={taskTemplate.interface.inputs} map={null} />
-          </div>
-        </div>
+        <PanelSection>
+          <RemoteLiteralMapViewer blob={taskTemplate.interface.inputs} map={null} />
+        </PanelSection>
       ) : null;
       break;
     }
     case tabIds.task: {
-      tabContent = taskTemplate ? <NodeExecutionTaskDetails taskTemplate={taskTemplate} /> : null;
+      tabContent = taskTemplate ? (
+        <PanelSection>
+          <DumpJSON value={taskTemplate} />
+        </PanelSection>
+      ) : null;
       break;
     }
   }
@@ -340,7 +290,10 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
   const displayName = details?.displayName ?? <Skeleton />;
 
   const isRunningPhase = React.useMemo(() => {
-    return nodeExecution?.closure.phase === 1 || nodeExecution?.closure.phase === 2;
+    return (
+      nodeExecution?.closure.phase === NodeExecutionPhase.QUEUED ||
+      nodeExecution?.closure.phase === NodeExecutionPhase.RUNNING
+    );
   }, [nodeExecution]);
 
   const handleReasonsVisibility = React.useCallback(() => {

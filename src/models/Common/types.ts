@@ -19,6 +19,8 @@ export type BlobDimensionality = Core.BlobType.BlobDimensionality;
 export const BlobDimensionality = Core.BlobType.BlobDimensionality;
 export type SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
 export const SchemaColumnType = Core.SchemaType.SchemaColumn.SchemaColumnType;
+export type MessageFormat = Core.TaskLog.MessageFormat;
+export const MessageFormat = Core.TaskLog.MessageFormat;
 /* eslint-enable @typescript-eslint/no-redeclare */
 
 export type Alias = Core.IAlias;
@@ -49,7 +51,7 @@ export type Notification = Admin.INotification;
 export type RetryStrategy = Core.IRetryStrategy;
 export type RuntimeMetadata = Core.IRuntimeMetadata;
 export type Schedule = Admin.ISchedule;
-export type MessageFormat = Core.TaskLog.MessageFormat;
+
 export interface TaskLog extends Core.ITaskLog {
   name: string;
   uri: string;
