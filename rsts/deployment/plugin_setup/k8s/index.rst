@@ -235,7 +235,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                    limits.cpu: {{ projectQuotaCpu }}
                    limits.memory: {{ projectQuotaMemory }}
 
-           - key: aa_spark_role
+           - key: ac_spark_role
              value: |
                 Version: rbac.authorization.k8s.io/v1beta1
                 kind: Role
@@ -262,7 +262,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                   verbs:
                   - '*'
 
-           - key: aa_spark_service_account
+           - key: ad_spark_service_account
              value: |
                 apiVersion: v1
                 kind: ServiceAccount
@@ -270,7 +270,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                   name: spark
                   namespace: {{ namespace }}
 
-           - key: aa_spark_role_binding
+           - key: ae_spark_role_binding
              value: |
                 apiVersion: rbac.authorization.k8s.io/v1beta1
                 kind: RoleBinding
