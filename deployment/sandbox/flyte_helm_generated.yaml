@@ -303,7 +303,7 @@ data:
         auth-type: accesskey
         secret-key: miniostorage
         disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
+        endpoint: http://localhost:30084
         region: us-east-1
       limits:
         maxDownloadMBs: 10
@@ -480,7 +480,7 @@ data:
         auth-type: accesskey
         secret-key: miniostorage
         disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
+        endpoint: http://localhost:30084
         region: us-east-1
       limits:
         maxDownloadMBs: 10
@@ -634,7 +634,7 @@ data:
         auth-type: accesskey
         secret-key: miniostorage
         disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
+        endpoint: http://localhost:30084
         region: us-east-1
       limits:
         maxDownloadMBs: 10
@@ -4440,7 +4440,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
+        configChecksum: "6b6d37d42c95e143665a2e0a7dd8abfa51d15cc7313f3811786db6b77bb301e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4639,7 +4639,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "707654d78d9df94986f4943808c0b84027b01d91da9e41d312d68dfac950062"
+        configChecksum: "97975c32b33b9f1e678361d1e4e61df5d69d524b120e28db97d8fee79acbbaf"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -4719,7 +4719,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d01b84685cf6c9590b5a3668f94055ea8d39505c7d3baba728db9ebf2b66ce3"
+        configChecksum: "6b6d37d42c95e143665a2e0a7dd8abfa51d15cc7313f3811786db6b77bb301e"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4803,7 +4803,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5a2bb5ada5db747f67b3bdfcdc742117d8ff5e163cad25b57963e24d9345198"
+        configChecksum: "6830ab80c2d0a89459ce5c70f0402c7e0deb057a8c6829cc413c015af59200c"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -4872,7 +4872,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "5a2bb5ada5db747f67b3bdfcdc742117d8ff5e163cad25b57963e24d9345198"
+        configChecksum: "6830ab80c2d0a89459ce5c70f0402c7e0deb057a8c6829cc413c015af59200c"
     spec:
       securityContext:
         fsGroup: 65534

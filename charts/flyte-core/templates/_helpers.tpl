@@ -152,7 +152,7 @@ storage:
     auth-type: accesskey
     secret-key: miniostorage
     disable-ssl: true
-    endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
+    endpoint: http://localhost:30084
     region: us-east-1
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
