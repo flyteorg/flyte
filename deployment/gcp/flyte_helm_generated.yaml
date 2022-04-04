@@ -523,11 +523,9 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
-          spark: spark
         enabled-plugins:
         - container
         - sidecar
-        - spark
         - k8s-array
   k8s.yaml: | 
     plugins:
@@ -1294,7 +1292,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
+        configChecksum: "be468a4502922654ea8a6c82559d15ada1d2821494861a96c8a9825f1dd9de9"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1370,7 +1368,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
+        configChecksum: "be468a4502922654ea8a6c82559d15ada1d2821494861a96c8a9825f1dd9de9"
     spec:
       securityContext:
         fsGroup: 65534
