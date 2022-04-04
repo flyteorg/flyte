@@ -54,6 +54,15 @@
       "exit_success": true,
         "exit_message": ""
     }
+  },
+  {
+    "name": "integrations-modin_examples",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/modin_examples",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
   },{
     "name": "integrations-papermilltasks",
     "priority": "P1",
