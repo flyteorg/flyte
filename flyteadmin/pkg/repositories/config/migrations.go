@@ -380,6 +380,16 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Table("node_execution").Migrator().DropColumn(&NodeExecution{}, "internal_data")
 		},
 	},
+	// Add created_at index to the execution model.
+	{
+		ID: "2022-04-04-execution-created-at-index",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&models.Execution{}).Migrator().DropIndex(&models.Execution{}, "idx_executions_created_at")
+		},
+	},
 }
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
