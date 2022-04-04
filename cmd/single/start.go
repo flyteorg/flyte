@@ -2,7 +2,11 @@ package single
 
 import (
 	"context"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
@@ -89,7 +93,6 @@ var startCmd = &cobra.Command{
 		})
 
 		g.Go(func() error {
-			// labeled.SetMetricKeys(storage.FailureTypeLabel)
 			err := startPropeller(childCtx)
 			if err != nil {
 				logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
@@ -114,8 +117,7 @@ var startCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(startCmd)
 	// Set Keys
-	// TODO: Do we really need this? I got the error when setting metric keys. "panic: cannot set metric keys more than once"
-	//labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-	//	contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
-	//	contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey)
+	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
+		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
+		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey, storage.FailureTypeLabel)
 }

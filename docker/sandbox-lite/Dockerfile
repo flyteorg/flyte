@@ -11,10 +11,9 @@ ARG BUILDKIT_CLI_FOR_KUBECTL_VERSION="v0.1.2"
 RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 https://github.com/vmware-tanzu/buildkit-cli-for-kubectl.git ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl \
     && make -C ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl ${INSTALL_DIR}/linux/kubectl-build BIN_DIR=${INSTALL_DIR} VERSION=${BUILDKIT_CLI_FOR_KUBECTL_VERSION}
 
-RUN git clone https://github.com/flyteorg/flyte.git /app/flyte && cd /app/flyte && git checkout single-binary
+COPY . /app/flyte
 COPY --from=ghcr.io/flyteorg/flyteconsole:latest /app/dist /app/flyte/cmd/single/dist
 RUN cd /app/flyte && go mod download && go mod vendor && go build -o /flyte cmd/main.go
-
 
 FROM alpine:3.13.5 AS base_
 
