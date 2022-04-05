@@ -13,7 +13,6 @@ import (
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/k8s"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -58,6 +57,6 @@ func tearDownSandbox(ctx context.Context, cli docker.Docker) error {
 }
 
 func removeSandboxKubeContext() error {
-	localConfigAccess := clientcmd.NewDefaultPathOptions()
-	return k8s.RemoveKubeContext(localConfigAccess, sandboxContextName)
+	k8sCtxMgr := k8s.NewK8sContextManager()
+	return k8sCtxMgr.RemoveContext(sandboxContextName)
 }

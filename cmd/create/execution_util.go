@@ -16,7 +16,7 @@ import (
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
-	cmdCtx cmdCore.CommandContext) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the launch plan
 	lp, err := cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -35,23 +35,27 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 	}
 
 	// Set both deprecated field and new field for security identity passing
-	authRole := &admin.AuthRole{
-		KubernetesServiceAccount: executionConfig.KubeServiceAcct,
-		AssumableIamRole:         executionConfig.IamRoleARN,
-	}
+	var securityContext *core.SecurityContext
+	var authRole *admin.AuthRole
 
-	securityContext := &core.SecurityContext{
-		RunAs: &core.Identity{
-			K8SServiceAccount: executionConfig.KubeServiceAcct,
-			IamRole:           executionConfig.IamRoleARN,
-		},
+	if len(executionConfig.KubeServiceAcct) > 0 || len(executionConfig.IamRoleARN) > 0 {
+		authRole = &admin.AuthRole{
+			KubernetesServiceAccount: executionConfig.KubeServiceAcct,
+			AssumableIamRole:         executionConfig.IamRoleARN,
+		}
+		securityContext = &core.SecurityContext{
+			RunAs: &core.Identity{
+				K8SServiceAccount: executionConfig.KubeServiceAcct,
+				IamRole:           executionConfig.IamRoleARN,
+			},
+		}
 	}
 
 	return createExecutionRequest(lp.Id, inputs, securityContext, authRole), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the task
 	task, err := cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -69,16 +73,20 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 	}
 
 	// Set both deprecated field and new field for security identity passing
-	authRole := &admin.AuthRole{
-		KubernetesServiceAccount: executionConfig.KubeServiceAcct,
-		AssumableIamRole:         executionConfig.IamRoleARN,
-	}
+	var securityContext *core.SecurityContext
+	var authRole *admin.AuthRole
 
-	securityContext := &core.SecurityContext{
-		RunAs: &core.Identity{
-			K8SServiceAccount: executionConfig.KubeServiceAcct,
-			IamRole:           executionConfig.IamRoleARN,
-		},
+	if len(executionConfig.KubeServiceAcct) > 0 || len(executionConfig.IamRoleARN) > 0 {
+		authRole = &admin.AuthRole{
+			KubernetesServiceAccount: executionConfig.KubeServiceAcct,
+			AssumableIamRole:         executionConfig.IamRoleARN,
+		}
+		securityContext = &core.SecurityContext{
+			RunAs: &core.Identity{
+				K8SServiceAccount: executionConfig.KubeServiceAcct,
+				IamRole:           executionConfig.IamRoleARN,
+			},
+		}
 	}
 
 	id := &core.Identifier{
@@ -93,7 +101,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RelaunchExecution request (DryRun)")
 		return nil
@@ -113,7 +121,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 }
 
 func recoverExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RecoverExecution request (DryRun)")
 		return nil

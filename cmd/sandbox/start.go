@@ -150,14 +150,12 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 }
 
 func updateLocalKubeContext() error {
-	localConfigAccess := clientcmd.NewDefaultPathOptions()
-
-	dockerConfigAccess := &clientcmd.PathOptions{
+	srcConfigAccess := &clientcmd.PathOptions{
 		GlobalFile:   docker.Kubeconfig,
 		LoadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 	}
-
-	return k8s.CopyKubeContext(dockerConfigAccess, localConfigAccess, sandboxDockerContext, sandboxContextName)
+	k8sCtxMgr := k8s.NewK8sContextManager()
+	return k8sCtxMgr.CopyContext(srcConfigAccess, sandboxDockerContext, sandboxContextName)
 }
 
 func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {

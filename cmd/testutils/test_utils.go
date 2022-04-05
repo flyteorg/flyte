@@ -10,8 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flytectl/pkg/ext"
-
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin"
@@ -61,11 +59,8 @@ func Setup() (s TestStruct) {
 	s.UpdaterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
 	s.DeleterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
 	s.MockAdminClient = s.MockClient.AdminClient().(*mocks.AdminServiceClient)
-	fetcher := &ext.AdminFetcherExtClient{
-		AdminClient: s.MockAdminClient,
-	}
 	s.MockOutStream = s.Writer
-	s.CmdCtx = cmdCore.NewCommandContextWithExt(s.MockClient, fetcher, s.UpdaterExt, s.DeleterExt, s.MockOutStream)
+	s.CmdCtx = cmdCore.NewCommandContextWithExt(s.MockClient, s.FetcherExt, s.UpdaterExt, s.DeleterExt, s.MockOutStream)
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
 	config.GetConfig().Output = output
