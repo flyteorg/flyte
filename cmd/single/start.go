@@ -19,6 +19,8 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
+	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	_ "github.com/golang/glog"
@@ -27,12 +29,12 @@ import (
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
 
-func startDataCatalog(ctx context.Context) error {
+func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
 		return err
 	}
-	cfg := datacatalogConfig.GetConfig()
-	return datacatalog.ServeInsecure(ctx, cfg)
+	catalogCfg := datacatalogConfig.GetConfig()
+	return datacatalog.ServeInsecure(ctx, catalogCfg)
 }
 
 func startClusterResourceController(ctx context.Context) error {
@@ -47,34 +49,59 @@ func startClusterResourceController(ctx context.Context) error {
 	return nil
 }
 
-func startAdmin(ctx context.Context) error {
+func startAdmin(ctx context.Context, cfg Admin) error {
 	logger.Infof(ctx, "Running Database Migrations...")
 	if err := adminServer.Migrate(ctx); err != nil {
 		return err
 	}
+
 	logger.Infof(ctx, "Seeding default projects...")
 	if err := adminServer.SeedProjects(ctx, []string{"flytesnacks"}); err != nil {
 		return err
 	}
-	g := new(errgroup.Group)
-	g.Go(func() error {
+
+	g, childCtx := errgroup.WithContext(ctx)
+
+	if !cfg.DisableScheduler {
 		logger.Infof(ctx, "Starting Scheduler...")
-		return adminScheduler.StartScheduler(ctx)
-	})
-	logger.Infof(ctx, "Starting cluster resource controller...")
-	g.Go(func() error {
-		return startClusterResourceController(ctx)
-	})
-	g.Go(func() error {
-		logger.Infof(ctx, "Starting Admin server...")
-		registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
-		return adminServer.Serve(ctx, registry.Load(), GetConsoleHandlers())
-	})
+		g.Go(func() error {
+			return adminScheduler.StartScheduler(childCtx)
+		})
+	}
+
+	if !cfg.DisableClusterResourceManager {
+		logger.Infof(ctx, "Starting cluster resource controller...")
+		g.Go(func() error {
+			return startClusterResourceController(childCtx)
+		})
+	}
+
+	if !cfg.Disabled {
+		g.Go(func() error {
+			logger.Infof(ctx, "Starting Admin server...")
+			registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+			return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers())
+		})
+	}
 	return g.Wait()
 }
 
-func startPropeller(ctx context.Context) error {
-	return propellerEntrypoint.StartController(ctx, propellerConfig.GetConfig(), "all")
+func startPropeller(ctx context.Context, cfg Propeller) error {
+	g, childCtx := errgroup.WithContext(ctx)
+
+	if !cfg.DisableWebhook {
+		g.Go(func() error {
+			return webhookEntrypoint.Run(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig(), "all")
+		})
+	}
+
+	if !cfg.Disabled {
+		g.Go(func() error {
+			return propellerEntrypoint.StartController(ctx, propellerConfig.GetConfig(), "all")
+		})
+	}
+
+	return g.Wait()
 }
 
 var startCmd = &cobra.Command{
@@ -83,32 +110,40 @@ var startCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
-		g.Go(func() error {
-			err := startAdmin(childCtx)
-			if err != nil {
-				logger.Errorf(childCtx, "Failed to start Admin, err: %v", err)
-				return err
-			}
-			return nil
-		})
+		cfg := GetConfig()
 
-		g.Go(func() error {
-			err := startPropeller(childCtx)
-			if err != nil {
-				logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
-				return err
-			}
-			return nil
-		})
+		if !cfg.Admin.Disabled {
+			g.Go(func() error {
+				err := startAdmin(childCtx, cfg.Admin)
+				if err != nil {
+					logger.Errorf(childCtx, "Failed to start Admin, err: %v", err)
+					return err
+				}
+				return nil
+			})
+		}
 
-		g.Go(func() error {
-			err := startDataCatalog(childCtx)
-			if err != nil {
-				logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
-				return err
-			}
-			return nil
-		})
+		if !cfg.Propeller.Disabled {
+			g.Go(func() error {
+				err := startPropeller(childCtx, cfg.Propeller)
+				if err != nil {
+					logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
+					return err
+				}
+				return nil
+			})
+		}
+
+		if !cfg.DataCatalog.Disabled {
+			g.Go(func() error {
+				err := startDataCatalog(childCtx, cfg.DataCatalog)
+				if err != nil {
+					logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
+					return err
+				}
+				return nil
+			})
+		}
 
 		return g.Wait()
 	},
