@@ -1346,3 +1346,67 @@ func TestLaunchPlanManager_ListActiveLaunchPlans_BadRequest(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, lpList)
 }
+
+func TestIsScheduleEmpty(t *testing.T) {
+	t.Run("deprecated cron expression used", func(t *testing.T) {
+		sp := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{},
+				},
+			},
+		}
+		assert.True(t, isScheduleEmpty(sp))
+	})
+	t.Run("deprecated cron expression used", func(t *testing.T) {
+		sp := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "* * * * *",
+					},
+				},
+			},
+		}
+		assert.False(t, isScheduleEmpty(sp))
+	})
+	t.Run("fixed rate used", func(t *testing.T) {
+		sp := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_Rate{
+						Rate: &admin.FixedRate{
+							Value: 10,
+							Unit:  admin.FixedRateUnit_HOUR,
+						},
+					},
+				},
+			},
+		}
+		assert.False(t, isScheduleEmpty(sp))
+	})
+	t.Run("cron schedule used", func(t *testing.T) {
+		sp := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronSchedule{
+						CronSchedule: &admin.CronSchedule{
+							Schedule: "* * * * *",
+						},
+					},
+				},
+			},
+		}
+		assert.False(t, isScheduleEmpty(sp))
+	})
+	t.Run("kick off time used", func(t *testing.T) {
+		sp := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					KickoffTimeInputArg: "name",
+				},
+			},
+		}
+		assert.False(t, isScheduleEmpty(sp))
+	})
+}
