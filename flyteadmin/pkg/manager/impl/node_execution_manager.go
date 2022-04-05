@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
 
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
@@ -41,7 +43,7 @@ type nodeExecutionMetrics struct {
 	Scope                      promutils.Scope
 	ActiveNodeExecutions       prometheus.Gauge
 	NodeExecutionsCreated      prometheus.Counter
-	NodeExecutionsTerminated   prometheus.Counter
+	NodeExecutionsTerminated   labeled.Counter
 	NodeExecutionEventsCreated prometheus.Counter
 	MissingWorkflowExecution   prometheus.Counter
 	ClosureSizeBytes           prometheus.Summary
@@ -279,7 +281,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 		m.metrics.ActiveNodeExecutions.Inc()
 	} else if common.IsNodeExecutionTerminal(request.Event.Phase) {
 		m.metrics.ActiveNodeExecutions.Dec()
-		m.metrics.NodeExecutionsTerminated.Inc()
+		m.metrics.NodeExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
 		if request.Event.GetOutputData() != nil {
 			m.metrics.NodeExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
 		}
@@ -551,8 +553,8 @@ func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 			"overall count of active node executions"),
 		NodeExecutionsCreated: scope.MustNewCounter("node_executions_created",
 			"overall count of node executions created"),
-		NodeExecutionsTerminated: scope.MustNewCounter("node_executions_terminated",
-			"overall count of terminated node executions"),
+		NodeExecutionsTerminated: labeled.NewCounter("node_executions_terminated",
+			"overall count of terminated node executions", scope),
 		NodeExecutionEventsCreated: scope.MustNewCounter("node_execution_events_created",
 			"overall count of successfully completed NodeExecutionEventRequest"),
 		MissingWorkflowExecution: scope.MustNewCounter("missing_workflow_execution",
