@@ -28,6 +28,10 @@ func FromNamedEntityMetadataFields(metadata models.NamedEntityMetadataFields) ad
 }
 
 func FromNamedEntityModel(model models.NamedEntity) admin.NamedEntity {
+	var entityState int32
+	if model.State != nil {
+		entityState = *model.State
+	}
 	return admin.NamedEntity{
 		ResourceType: model.ResourceType,
 		Id: &admin.NamedEntityIdentifier{
@@ -37,6 +41,7 @@ func FromNamedEntityModel(model models.NamedEntity) admin.NamedEntity {
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: model.Description,
+			State:       admin.NamedEntityState(entityState),
 		},
 	}
 }

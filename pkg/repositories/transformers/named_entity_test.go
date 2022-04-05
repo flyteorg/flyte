@@ -40,6 +40,7 @@ func TestCreateNamedEntityModel(t *testing.T) {
 }
 
 func TestFromNamedEntityModel(t *testing.T) {
+	entityState := int32(1)
 	model := models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
 			ResourceType: core.ResourceType_WORKFLOW,
@@ -49,6 +50,7 @@ func TestFromNamedEntityModel(t *testing.T) {
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: "description",
+			State:       &entityState,
 		},
 	}
 
@@ -62,6 +64,7 @@ func TestFromNamedEntityModel(t *testing.T) {
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: "description",
+			State:       admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
 		},
 	}, &namedEntity))
 }
