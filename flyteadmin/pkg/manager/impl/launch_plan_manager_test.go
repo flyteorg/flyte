@@ -1407,6 +1407,6 @@ func TestIsScheduleEmpty(t *testing.T) {
 				},
 			},
 		}
-		assert.False(t, isScheduleEmpty(sp))
+		assert.True(t, isScheduleEmpty(sp))
 	})
 }

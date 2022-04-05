@@ -145,9 +145,6 @@ func isScheduleEmpty(launchPlanSpec admin.LaunchPlanSpec) bool {
 	if schedule.GetCronSchedule() != nil && len(schedule.GetCronSchedule().Schedule) != 0 {
 		return false
 	}
-	if len(schedule.GetKickoffTimeInputArg()) != 0 {
-		return false
-	}
 	if len(schedule.GetCronExpression()) != 0 {
 		return false
 	}
