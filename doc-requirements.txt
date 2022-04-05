@@ -23,7 +23,7 @@ docutils==0.17.1
     #   sphinx
     #   sphinx-panels
     #   sphinx-tabs
-furo @ git+https://github.com/flyteorg/furo@5e14cd814e462dde37ded2fef28e058c6e5a604c
+furo @ git+https://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==3.3
     # via requests
