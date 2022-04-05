@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	k8sMocks "github.com/flyteorg/flytectl/pkg/k8s/mocks"
 	"github.com/flyteorg/flytectl/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -554,9 +555,12 @@ func TestStartSandboxFunc(t *testing.T) {
 			Follow:     true,
 		}).Return(reader, nil)
 		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		docker.Client = mockDocker
 		sandboxConfig.DefaultConfig.Source = ""
 		sandboxConfig.DefaultConfig.Version = ""
+		k8s.ContextMgr = mockK8sContextMgr
+		mockK8sContextMgr.OnCopyContextMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		err = startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})

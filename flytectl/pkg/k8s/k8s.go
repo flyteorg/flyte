@@ -15,7 +15,29 @@ type K8s interface {
 	CoreV1() corev1.CoreV1Interface
 }
 
+//go:generate mockery -name=ContextOps -case=underscore
+type ContextOps interface {
+	CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error
+	RemoveContext(ctxName string) error
+}
+
+// ContextManager context manager implementing ContextOps
+type ContextManager struct {
+	configAccess clientcmd.ConfigAccess
+}
+
+func NewK8sContextManager() ContextOps {
+	if ContextMgr != nil {
+		return ContextMgr
+	}
+	ContextMgr = &ContextManager{
+		configAccess: clientcmd.NewDefaultPathOptions(),
+	}
+	return ContextMgr
+}
+
 var Client K8s
+var ContextMgr ContextOps
 
 // GetK8sClient return the k8s client from sandbox kubeconfig
 func GetK8sClient(cfg, master string) (K8s, error) {
@@ -34,70 +56,69 @@ func GetK8sClient(cfg, master string) (K8s, error) {
 	return Client, nil
 }
 
-// CopyKubeContext copies context fromContext part of fromConfigAccess to toContext part of toConfigAccess.
-func CopyKubeContext(fromConfigAccess, toConfigAccess clientcmd.ConfigAccess, fromContext, toContext string) error {
-	_, err := toConfigAccess.GetStartingConfig()
+// CopyKubeContext copies context srcCtxName part of srcConfigAccess to targetCtxName part of targetConfigAccess.
+func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error {
+	_, err := k.configAccess.GetStartingConfig()
 	if err != nil {
 		return err
 	}
 
-	fromStartingConfig, err := fromConfigAccess.GetStartingConfig()
+	fromStartingConfig, err := srcConfigAccess.GetStartingConfig()
 	if err != nil {
 		return err
 	}
-	_, exists := fromStartingConfig.Contexts[fromContext]
+	_, exists := fromStartingConfig.Contexts[srcCtxName]
 	if !exists {
-		return fmt.Errorf("context %v doesn't exist", fromContext)
+		return fmt.Errorf("context %v doesn't exist", srcCtxName)
 	}
 
-	toStartingConfig, err := toConfigAccess.GetStartingConfig()
+	toStartingConfig, err := k.configAccess.GetStartingConfig()
 	if err != nil {
 		return err
 	}
 
-	_, exists = toStartingConfig.Contexts[toContext]
+	_, exists = toStartingConfig.Contexts[targetCtxName]
 	if exists {
-		fmt.Printf("context %v already exist. Overwriting it\n", toContext)
+		fmt.Printf("context %v already exist. Overwriting it\n", targetCtxName)
 	} else {
-		toStartingConfig.Contexts[toContext] = clientcmdapi.NewContext()
+		toStartingConfig.Contexts[targetCtxName] = clientcmdapi.NewContext()
 	}
 
-	toStartingConfig.Clusters[toContext] = fromStartingConfig.Clusters[fromContext]
-	toStartingConfig.Clusters[toContext].LocationOfOrigin = toConfigAccess.GetDefaultFilename()
-	toStartingConfig.AuthInfos[toContext] = fromStartingConfig.AuthInfos[fromContext]
-	toStartingConfig.AuthInfos[toContext].LocationOfOrigin = toConfigAccess.GetDefaultFilename()
-	toStartingConfig.Contexts[toContext].Cluster = toContext
-	toStartingConfig.Contexts[toContext].AuthInfo = toContext
-	toStartingConfig.CurrentContext = toContext
-
-	if err := clientcmd.ModifyConfig(toConfigAccess, *toStartingConfig, true); err != nil {
+	toStartingConfig.Clusters[targetCtxName] = fromStartingConfig.Clusters[srcCtxName]
+	toStartingConfig.Clusters[targetCtxName].LocationOfOrigin = k.configAccess.GetDefaultFilename()
+	toStartingConfig.AuthInfos[targetCtxName] = fromStartingConfig.AuthInfos[srcCtxName]
+	toStartingConfig.AuthInfos[targetCtxName].LocationOfOrigin = k.configAccess.GetDefaultFilename()
+	toStartingConfig.Contexts[targetCtxName].Cluster = targetCtxName
+	toStartingConfig.Contexts[targetCtxName].AuthInfo = targetCtxName
+	toStartingConfig.CurrentContext = targetCtxName
+	if err := clientcmd.ModifyConfig(k.configAccess, *toStartingConfig, true); err != nil {
 		return err
 	}
 
-	fmt.Printf("context modified for %q and switched over to it.\n", toContext)
+	fmt.Printf("context modified for %q and switched over to it.\n", targetCtxName)
 	return nil
 }
 
 // RemoveKubeContext removes the contextToRemove from the kubeContext pointed to be fromConfigAccess
-func RemoveKubeContext(fromConfigAccess clientcmd.ConfigAccess, contextToRemove string) error {
-	fromStartingConfig, err := fromConfigAccess.GetStartingConfig()
+func (k *ContextManager) RemoveContext(ctxName string) error {
+	fromStartingConfig, err := k.configAccess.GetStartingConfig()
 	if err != nil {
 		return err
 	}
-	_, exists := fromStartingConfig.Contexts[contextToRemove]
+	_, exists := fromStartingConfig.Contexts[ctxName]
 	if !exists {
-		return fmt.Errorf("context %v doesn't exist", contextToRemove)
+		return fmt.Errorf("context %v doesn't exist", ctxName)
 	}
 
-	delete(fromStartingConfig.Clusters, contextToRemove)
-	delete(fromStartingConfig.AuthInfos, contextToRemove)
-	delete(fromStartingConfig.Contexts, contextToRemove)
+	delete(fromStartingConfig.Clusters, ctxName)
+	delete(fromStartingConfig.AuthInfos, ctxName)
+	delete(fromStartingConfig.Contexts, ctxName)
 	fromStartingConfig.CurrentContext = ""
 
-	if err := clientcmd.ModifyConfig(fromConfigAccess, *fromStartingConfig, true); err != nil {
+	if err := clientcmd.ModifyConfig(k.configAccess, *fromStartingConfig, true); err != nil {
 		return err
 	}
 
-	fmt.Printf("context removed for %q.\n", contextToRemove)
+	fmt.Printf("context removed for %q.\n", ctxName)
 	return nil
 }

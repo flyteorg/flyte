@@ -32,18 +32,6 @@ func getExecutionSetup() {
 func TestListExecutionFunc(t *testing.T) {
 	getExecutionSetup()
 	s := setup()
-	ctx := s.Ctx
-	execListRequest := &admin.ResourceListRequest{
-		Limit: 100,
-		SortBy: &admin.Sort{
-			Key:       "created_at",
-			Direction: admin.Sort_DESCENDING,
-		},
-		Id: &admin.NamedEntityIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-		},
-	}
 	executionResponse := &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -72,26 +60,14 @@ func TestListExecutionFunc(t *testing.T) {
 	executionList := &admin.ExecutionList{
 		Executions: executions,
 	}
-	s.MockAdminClient.OnListExecutionsMatch(mock.Anything, execListRequest).Return(executionList, nil)
+	s.FetcherExt.OnListExecutionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executionList, nil)
 	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
+	s.FetcherExt.AssertCalled(t, "ListExecution", s.Ctx, projectValue, domainValue, execution.DefaultConfig.Filter)
 }
 
 func TestListExecutionFuncWithError(t *testing.T) {
-	ctx := context.Background()
 	getExecutionSetup()
-	execListRequest := &admin.ResourceListRequest{
-		Limit: 100,
-		SortBy: &admin.Sort{
-			Key: "created_at",
-		},
-		Id: &admin.NamedEntityIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-		},
-	}
-
 	_ = &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -118,23 +94,14 @@ func TestListExecutionFuncWithError(t *testing.T) {
 	}
 	s := setup()
 	s.FetcherExt.OnListExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
-	s.MockAdminClient.OnListExecutionsMatch(mock.Anything, execListRequest).Return(nil, errors.New("executions NotFound"))
 	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("executions NotFound"))
-	s.MockAdminClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
+	s.FetcherExt.AssertCalled(t, "ListExecution", s.Ctx, projectValue, domainValue, execution.DefaultConfig.Filter)
 }
 
 func TestGetExecutionFunc(t *testing.T) {
-	ctx := context.Background()
 	getExecutionSetup()
-	execGetRequest := &admin.WorkflowExecutionGetRequest{
-		Id: &core.WorkflowExecutionIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-			Name:    executionNameValue,
-		},
-	}
 	executionResponse := &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
@@ -161,14 +128,11 @@ func TestGetExecutionFunc(t *testing.T) {
 	}
 	args := []string{executionNameValue}
 	s := setup()
-	//executionList := &admin.ExecutionList{
-	//	Executions: []*admin.Execution{executionResponse},
-	//}
-	s.MockAdminClient.OnGetExecutionMatch(ctx, execGetRequest).Return(executionResponse, nil)
 
+	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(executionResponse, nil)
 	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
+	s.FetcherExt.AssertCalled(t, "FetchExecution", s.Ctx, executionNameValue, projectValue, domainValue)
 }
 
 func TestGetExecutionFuncForDetails(t *testing.T) {

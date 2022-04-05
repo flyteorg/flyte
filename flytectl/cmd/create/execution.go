@@ -177,15 +177,15 @@ func createExecutionCommand(ctx context.Context, args []string, cmdCtx cmdCore.C
 	var executionRequest *admin.ExecutionCreateRequest
 	switch execParams.execType {
 	case Relaunch:
-		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx)
+		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 	case Recover:
-		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx)
+		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 	case Task:
-		if executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx); err != nil {
+		if executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig); err != nil {
 			return err
 		}
 	case Workflow:
-		if executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx); err != nil {
+		if executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig); err != nil {
 			return err
 		}
 	default:
