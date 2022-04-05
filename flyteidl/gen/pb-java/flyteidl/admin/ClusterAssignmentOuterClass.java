@@ -30,6 +30,19 @@ public final class ClusterAssignmentOuterClass {
      * <code>.flyteidl.admin.Affinity affinity = 1;</code>
      */
     flyteidl.admin.ClusterAssignmentOuterClass.AffinityOrBuilder getAffinityOrBuilder();
+
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    boolean hasToleration();
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.Toleration getToleration();
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder getTolerationOrBuilder();
   }
   /**
    * <pre>
@@ -87,6 +100,19 @@ public final class ClusterAssignmentOuterClass {
 
               break;
             }
+            case 18: {
+              flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder subBuilder = null;
+              if (toleration_ != null) {
+                subBuilder = toleration_.toBuilder();
+              }
+              toleration_ = input.readMessage(flyteidl.admin.ClusterAssignmentOuterClass.Toleration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(toleration_);
+                toleration_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -140,6 +166,27 @@ public final class ClusterAssignmentOuterClass {
       return getAffinity();
     }
 
+    public static final int TOLERATION_FIELD_NUMBER = 2;
+    private flyteidl.admin.ClusterAssignmentOuterClass.Toleration toleration_;
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    public boolean hasToleration() {
+      return toleration_ != null;
+    }
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.Toleration getToleration() {
+      return toleration_ == null ? flyteidl.admin.ClusterAssignmentOuterClass.Toleration.getDefaultInstance() : toleration_;
+    }
+    /**
+     * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder getTolerationOrBuilder() {
+      return getToleration();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -157,6 +204,9 @@ public final class ClusterAssignmentOuterClass {
       if (affinity_ != null) {
         output.writeMessage(1, getAffinity());
       }
+      if (toleration_ != null) {
+        output.writeMessage(2, getToleration());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -169,6 +219,10 @@ public final class ClusterAssignmentOuterClass {
       if (affinity_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getAffinity());
+      }
+      if (toleration_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getToleration());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -190,6 +244,11 @@ public final class ClusterAssignmentOuterClass {
         if (!getAffinity()
             .equals(other.getAffinity())) return false;
       }
+      if (hasToleration() != other.hasToleration()) return false;
+      if (hasToleration()) {
+        if (!getToleration()
+            .equals(other.getToleration())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -204,6 +263,10 @@ public final class ClusterAssignmentOuterClass {
       if (hasAffinity()) {
         hash = (37 * hash) + AFFINITY_FIELD_NUMBER;
         hash = (53 * hash) + getAffinity().hashCode();
+      }
+      if (hasToleration()) {
+        hash = (37 * hash) + TOLERATION_FIELD_NUMBER;
+        hash = (53 * hash) + getToleration().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -348,6 +411,12 @@ public final class ClusterAssignmentOuterClass {
           affinity_ = null;
           affinityBuilder_ = null;
         }
+        if (tolerationBuilder_ == null) {
+          toleration_ = null;
+        } else {
+          toleration_ = null;
+          tolerationBuilder_ = null;
+        }
         return this;
       }
 
@@ -378,6 +447,11 @@ public final class ClusterAssignmentOuterClass {
           result.affinity_ = affinity_;
         } else {
           result.affinity_ = affinityBuilder_.build();
+        }
+        if (tolerationBuilder_ == null) {
+          result.toleration_ = toleration_;
+        } else {
+          result.toleration_ = tolerationBuilder_.build();
         }
         onBuilt();
         return result;
@@ -429,6 +503,9 @@ public final class ClusterAssignmentOuterClass {
         if (other == flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignment.getDefaultInstance()) return this;
         if (other.hasAffinity()) {
           mergeAffinity(other.getAffinity());
+        }
+        if (other.hasToleration()) {
+          mergeToleration(other.getToleration());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -574,6 +651,123 @@ public final class ClusterAssignmentOuterClass {
           affinity_ = null;
         }
         return affinityBuilder_;
+      }
+
+      private flyteidl.admin.ClusterAssignmentOuterClass.Toleration toleration_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.Toleration, flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder, flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder> tolerationBuilder_;
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public boolean hasToleration() {
+        return tolerationBuilder_ != null || toleration_ != null;
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Toleration getToleration() {
+        if (tolerationBuilder_ == null) {
+          return toleration_ == null ? flyteidl.admin.ClusterAssignmentOuterClass.Toleration.getDefaultInstance() : toleration_;
+        } else {
+          return tolerationBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public Builder setToleration(flyteidl.admin.ClusterAssignmentOuterClass.Toleration value) {
+        if (tolerationBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          toleration_ = value;
+          onChanged();
+        } else {
+          tolerationBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public Builder setToleration(
+          flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder builderForValue) {
+        if (tolerationBuilder_ == null) {
+          toleration_ = builderForValue.build();
+          onChanged();
+        } else {
+          tolerationBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public Builder mergeToleration(flyteidl.admin.ClusterAssignmentOuterClass.Toleration value) {
+        if (tolerationBuilder_ == null) {
+          if (toleration_ != null) {
+            toleration_ =
+              flyteidl.admin.ClusterAssignmentOuterClass.Toleration.newBuilder(toleration_).mergeFrom(value).buildPartial();
+          } else {
+            toleration_ = value;
+          }
+          onChanged();
+        } else {
+          tolerationBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public Builder clearToleration() {
+        if (tolerationBuilder_ == null) {
+          toleration_ = null;
+          onChanged();
+        } else {
+          toleration_ = null;
+          tolerationBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder getTolerationBuilder() {
+        
+        onChanged();
+        return getTolerationFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder getTolerationOrBuilder() {
+        if (tolerationBuilder_ != null) {
+          return tolerationBuilder_.getMessageOrBuilder();
+        } else {
+          return toleration_ == null ?
+              flyteidl.admin.ClusterAssignmentOuterClass.Toleration.getDefaultInstance() : toleration_;
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.Toleration toleration = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.Toleration, flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder, flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder> 
+          getTolerationFieldBuilder() {
+        if (tolerationBuilder_ == null) {
+          tolerationBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.ClusterAssignmentOuterClass.Toleration, flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder, flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder>(
+                  getToleration(),
+                  getParentForChildren(),
+                  isClean());
+          toleration_ = null;
+        }
+        return tolerationBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1524,6 +1718,907 @@ public final class ClusterAssignmentOuterClass {
 
     @java.lang.Override
     public flyteidl.admin.ClusterAssignmentOuterClass.Affinity getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface TolerationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.Toleration)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector> 
+        getSelectorsList();
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.Selector getSelectors(int index);
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    int getSelectorsCount();
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    java.util.List<? extends flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder> 
+        getSelectorsOrBuilderList();
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder getSelectorsOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * Defines a set of specific label selectors that the execution can tolerate on a cluster.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.Toleration}
+   */
+  public  static final class Toleration extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.Toleration)
+      TolerationOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Toleration.newBuilder() to construct.
+    private Toleration(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Toleration() {
+      selectors_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Toleration(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                selectors_ = new java.util.ArrayList<flyteidl.admin.ClusterAssignmentOuterClass.Selector>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              selectors_.add(
+                  input.readMessage(flyteidl.admin.ClusterAssignmentOuterClass.Selector.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          selectors_ = java.util.Collections.unmodifiableList(selectors_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.ClusterAssignmentOuterClass.internal_static_flyteidl_admin_Toleration_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.ClusterAssignmentOuterClass.internal_static_flyteidl_admin_Toleration_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.ClusterAssignmentOuterClass.Toleration.class, flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder.class);
+    }
+
+    public static final int SELECTORS_FIELD_NUMBER = 1;
+    private java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector> selectors_;
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    public java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector> getSelectorsList() {
+      return selectors_;
+    }
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    public java.util.List<? extends flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder> 
+        getSelectorsOrBuilderList() {
+      return selectors_;
+    }
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    public int getSelectorsCount() {
+      return selectors_.size();
+    }
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.Selector getSelectors(int index) {
+      return selectors_.get(index);
+    }
+    /**
+     * <pre>
+     * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+     */
+    public flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder getSelectorsOrBuilder(
+        int index) {
+      return selectors_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < selectors_.size(); i++) {
+        output.writeMessage(1, selectors_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < selectors_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, selectors_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.ClusterAssignmentOuterClass.Toleration)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.ClusterAssignmentOuterClass.Toleration other = (flyteidl.admin.ClusterAssignmentOuterClass.Toleration) obj;
+
+      if (!getSelectorsList()
+          .equals(other.getSelectorsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getSelectorsCount() > 0) {
+        hash = (37 * hash) + SELECTORS_FIELD_NUMBER;
+        hash = (53 * hash) + getSelectorsList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.ClusterAssignmentOuterClass.Toleration prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Defines a set of specific label selectors that the execution can tolerate on a cluster.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.Toleration}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.Toleration)
+        flyteidl.admin.ClusterAssignmentOuterClass.TolerationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.ClusterAssignmentOuterClass.internal_static_flyteidl_admin_Toleration_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.ClusterAssignmentOuterClass.internal_static_flyteidl_admin_Toleration_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.ClusterAssignmentOuterClass.Toleration.class, flyteidl.admin.ClusterAssignmentOuterClass.Toleration.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.ClusterAssignmentOuterClass.Toleration.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getSelectorsFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (selectorsBuilder_ == null) {
+          selectors_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          selectorsBuilder_.clear();
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.ClusterAssignmentOuterClass.internal_static_flyteidl_admin_Toleration_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ClusterAssignmentOuterClass.Toleration getDefaultInstanceForType() {
+        return flyteidl.admin.ClusterAssignmentOuterClass.Toleration.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ClusterAssignmentOuterClass.Toleration build() {
+        flyteidl.admin.ClusterAssignmentOuterClass.Toleration result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ClusterAssignmentOuterClass.Toleration buildPartial() {
+        flyteidl.admin.ClusterAssignmentOuterClass.Toleration result = new flyteidl.admin.ClusterAssignmentOuterClass.Toleration(this);
+        int from_bitField0_ = bitField0_;
+        if (selectorsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            selectors_ = java.util.Collections.unmodifiableList(selectors_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.selectors_ = selectors_;
+        } else {
+          result.selectors_ = selectorsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.ClusterAssignmentOuterClass.Toleration) {
+          return mergeFrom((flyteidl.admin.ClusterAssignmentOuterClass.Toleration)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.ClusterAssignmentOuterClass.Toleration other) {
+        if (other == flyteidl.admin.ClusterAssignmentOuterClass.Toleration.getDefaultInstance()) return this;
+        if (selectorsBuilder_ == null) {
+          if (!other.selectors_.isEmpty()) {
+            if (selectors_.isEmpty()) {
+              selectors_ = other.selectors_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureSelectorsIsMutable();
+              selectors_.addAll(other.selectors_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.selectors_.isEmpty()) {
+            if (selectorsBuilder_.isEmpty()) {
+              selectorsBuilder_.dispose();
+              selectorsBuilder_ = null;
+              selectors_ = other.selectors_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              selectorsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getSelectorsFieldBuilder() : null;
+            } else {
+              selectorsBuilder_.addAllMessages(other.selectors_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.ClusterAssignmentOuterClass.Toleration parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.ClusterAssignmentOuterClass.Toleration) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector> selectors_ =
+        java.util.Collections.emptyList();
+      private void ensureSelectorsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          selectors_ = new java.util.ArrayList<flyteidl.admin.ClusterAssignmentOuterClass.Selector>(selectors_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.Selector, flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder, flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder> selectorsBuilder_;
+
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector> getSelectorsList() {
+        if (selectorsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(selectors_);
+        } else {
+          return selectorsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public int getSelectorsCount() {
+        if (selectorsBuilder_ == null) {
+          return selectors_.size();
+        } else {
+          return selectorsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Selector getSelectors(int index) {
+        if (selectorsBuilder_ == null) {
+          return selectors_.get(index);
+        } else {
+          return selectorsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder setSelectors(
+          int index, flyteidl.admin.ClusterAssignmentOuterClass.Selector value) {
+        if (selectorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSelectorsIsMutable();
+          selectors_.set(index, value);
+          onChanged();
+        } else {
+          selectorsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder setSelectors(
+          int index, flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder builderForValue) {
+        if (selectorsBuilder_ == null) {
+          ensureSelectorsIsMutable();
+          selectors_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          selectorsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder addSelectors(flyteidl.admin.ClusterAssignmentOuterClass.Selector value) {
+        if (selectorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSelectorsIsMutable();
+          selectors_.add(value);
+          onChanged();
+        } else {
+          selectorsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder addSelectors(
+          int index, flyteidl.admin.ClusterAssignmentOuterClass.Selector value) {
+        if (selectorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSelectorsIsMutable();
+          selectors_.add(index, value);
+          onChanged();
+        } else {
+          selectorsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder addSelectors(
+          flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder builderForValue) {
+        if (selectorsBuilder_ == null) {
+          ensureSelectorsIsMutable();
+          selectors_.add(builderForValue.build());
+          onChanged();
+        } else {
+          selectorsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder addSelectors(
+          int index, flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder builderForValue) {
+        if (selectorsBuilder_ == null) {
+          ensureSelectorsIsMutable();
+          selectors_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          selectorsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder addAllSelectors(
+          java.lang.Iterable<? extends flyteidl.admin.ClusterAssignmentOuterClass.Selector> values) {
+        if (selectorsBuilder_ == null) {
+          ensureSelectorsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, selectors_);
+          onChanged();
+        } else {
+          selectorsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder clearSelectors() {
+        if (selectorsBuilder_ == null) {
+          selectors_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          selectorsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public Builder removeSelectors(int index) {
+        if (selectorsBuilder_ == null) {
+          ensureSelectorsIsMutable();
+          selectors_.remove(index);
+          onChanged();
+        } else {
+          selectorsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder getSelectorsBuilder(
+          int index) {
+        return getSelectorsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder getSelectorsOrBuilder(
+          int index) {
+        if (selectorsBuilder_ == null) {
+          return selectors_.get(index);  } else {
+          return selectorsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public java.util.List<? extends flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder> 
+           getSelectorsOrBuilderList() {
+        if (selectorsBuilder_ != null) {
+          return selectorsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(selectors_);
+        }
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder addSelectorsBuilder() {
+        return getSelectorsFieldBuilder().addBuilder(
+            flyteidl.admin.ClusterAssignmentOuterClass.Selector.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder addSelectorsBuilder(
+          int index) {
+        return getSelectorsFieldBuilder().addBuilder(
+            index, flyteidl.admin.ClusterAssignmentOuterClass.Selector.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Selector selectors = 1;</code>
+       */
+      public java.util.List<flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder> 
+           getSelectorsBuilderList() {
+        return getSelectorsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.ClusterAssignmentOuterClass.Selector, flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder, flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder> 
+          getSelectorsFieldBuilder() {
+        if (selectorsBuilder_ == null) {
+          selectorsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.admin.ClusterAssignmentOuterClass.Selector, flyteidl.admin.ClusterAssignmentOuterClass.Selector.Builder, flyteidl.admin.ClusterAssignmentOuterClass.SelectorOrBuilder>(
+                  selectors_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          selectors_ = null;
+        }
+        return selectorsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.Toleration)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.Toleration)
+    private static final flyteidl.admin.ClusterAssignmentOuterClass.Toleration DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.ClusterAssignmentOuterClass.Toleration();
+    }
+
+    public static flyteidl.admin.ClusterAssignmentOuterClass.Toleration getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Toleration>
+        PARSER = new com.google.protobuf.AbstractParser<Toleration>() {
+      @java.lang.Override
+      public Toleration parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Toleration(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Toleration> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Toleration> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.ClusterAssignmentOuterClass.Toleration getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2660,6 +3755,11 @@ public final class ClusterAssignmentOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_Affinity_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_Toleration_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_Toleration_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_Selector_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -2674,16 +3774,18 @@ public final class ClusterAssignmentOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/cluster_assignment.prot" +
-      "o\022\016flyteidl.admin\"?\n\021ClusterAssignment\022*" +
+      "o\022\016flyteidl.admin\"o\n\021ClusterAssignment\022*" +
       "\n\010affinity\030\001 \001(\0132\030.flyteidl.admin.Affini" +
-      "ty\"7\n\010Affinity\022+\n\tselectors\030\001 \003(\0132\030.flyt" +
-      "eidl.admin.Selector\"\243\001\n\010Selector\022\013\n\003key\030" +
-      "\001 \001(\t\022\r\n\005value\030\002 \003(\t\0223\n\010operator\030\003 \001(\0162!" +
-      ".flyteidl.admin.Selector.Operator\"F\n\010Ope" +
-      "rator\022\n\n\006EQUALS\020\000\022\016\n\nNOT_EQUALS\020\001\022\006\n\002IN\020" +
-      "\002\022\n\n\006NOT_IN\020\003\022\n\n\006EXISTS\020\004B7Z5github.com/" +
-      "flyteorg/flyteidl/gen/pb-go/flyteidl/adm" +
-      "inb\006proto3"
+      "ty\022.\n\ntoleration\030\002 \001(\0132\032.flyteidl.admin." +
+      "Toleration\"7\n\010Affinity\022+\n\tselectors\030\001 \003(" +
+      "\0132\030.flyteidl.admin.Selector\"9\n\nToleratio" +
+      "n\022+\n\tselectors\030\001 \003(\0132\030.flyteidl.admin.Se" +
+      "lector\"\243\001\n\010Selector\022\013\n\003key\030\001 \001(\t\022\r\n\005valu" +
+      "e\030\002 \003(\t\0223\n\010operator\030\003 \001(\0162!.flyteidl.adm" +
+      "in.Selector.Operator\"F\n\010Operator\022\n\n\006EQUA" +
+      "LS\020\000\022\016\n\nNOT_EQUALS\020\001\022\006\n\002IN\020\002\022\n\n\006NOT_IN\020\003" +
+      "\022\n\n\006EXISTS\020\004B7Z5github.com/flyteorg/flyt" +
+      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2702,15 +3804,21 @@ public final class ClusterAssignmentOuterClass {
     internal_static_flyteidl_admin_ClusterAssignment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ClusterAssignment_descriptor,
-        new java.lang.String[] { "Affinity", });
+        new java.lang.String[] { "Affinity", "Toleration", });
     internal_static_flyteidl_admin_Affinity_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_Affinity_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Affinity_descriptor,
         new java.lang.String[] { "Selectors", });
-    internal_static_flyteidl_admin_Selector_descriptor =
+    internal_static_flyteidl_admin_Toleration_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_admin_Toleration_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_Toleration_descriptor,
+        new java.lang.String[] { "Selectors", });
+    internal_static_flyteidl_admin_Selector_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_admin_Selector_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Selector_descriptor,

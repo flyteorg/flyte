@@ -7,11 +7,20 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 // Encapsulates specifications for routing an execution onto a specific cluster.
 message ClusterAssignment {
   Affinity affinity = 1;
+
+  Toleration toleration = 2;
 }
 
 // Defines a set of constraints used to select eligible objects based on labels they possess.
 message Affinity {
   // Multiples selectors are 'and'-ed together to produce the list of matching, eligible objects.
+  repeated Selector selectors = 1;
+}
+
+// Defines a set of specific label selectors that the execution can tolerate on a cluster.
+message Toleration {
+
+  // A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
   repeated Selector selectors = 1;
 }
 

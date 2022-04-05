@@ -17006,6 +17006,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.admin
              * @interface IClusterAssignment
              * @property {flyteidl.admin.IAffinity|null} [affinity] ClusterAssignment affinity
+             * @property {flyteidl.admin.IToleration|null} [toleration] ClusterAssignment toleration
              */
 
             /**
@@ -17030,6 +17031,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             ClusterAssignment.prototype.affinity = null;
+
+            /**
+             * ClusterAssignment toleration.
+             * @member {flyteidl.admin.IToleration|null|undefined} toleration
+             * @memberof flyteidl.admin.ClusterAssignment
+             * @instance
+             */
+            ClusterAssignment.prototype.toleration = null;
 
             /**
              * Creates a new ClusterAssignment instance using the specified properties.
@@ -17057,6 +17066,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.affinity != null && message.hasOwnProperty("affinity"))
                     $root.flyteidl.admin.Affinity.encode(message.affinity, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.toleration != null && message.hasOwnProperty("toleration"))
+                    $root.flyteidl.admin.Toleration.encode(message.toleration, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 return writer;
             };
 
@@ -17081,6 +17092,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 1:
                         message.affinity = $root.flyteidl.admin.Affinity.decode(reader, reader.uint32());
                         break;
+                    case 2:
+                        message.toleration = $root.flyteidl.admin.Toleration.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -17104,6 +17118,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.Affinity.verify(message.affinity);
                     if (error)
                         return "affinity." + error;
+                }
+                if (message.toleration != null && message.hasOwnProperty("toleration")) {
+                    let error = $root.flyteidl.admin.Toleration.verify(message.toleration);
+                    if (error)
+                        return "toleration." + error;
                 }
                 return null;
             };
@@ -17229,6 +17248,126 @@ export const flyteidl = $root.flyteidl = (() => {
             };
 
             return Affinity;
+        })();
+
+        admin.Toleration = (function() {
+
+            /**
+             * Properties of a Toleration.
+             * @memberof flyteidl.admin
+             * @interface IToleration
+             * @property {Array.<flyteidl.admin.ISelector>|null} [selectors] Toleration selectors
+             */
+
+            /**
+             * Constructs a new Toleration.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a Toleration.
+             * @implements IToleration
+             * @constructor
+             * @param {flyteidl.admin.IToleration=} [properties] Properties to set
+             */
+            function Toleration(properties) {
+                this.selectors = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Toleration selectors.
+             * @member {Array.<flyteidl.admin.ISelector>} selectors
+             * @memberof flyteidl.admin.Toleration
+             * @instance
+             */
+            Toleration.prototype.selectors = $util.emptyArray;
+
+            /**
+             * Creates a new Toleration instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.Toleration
+             * @static
+             * @param {flyteidl.admin.IToleration=} [properties] Properties to set
+             * @returns {flyteidl.admin.Toleration} Toleration instance
+             */
+            Toleration.create = function create(properties) {
+                return new Toleration(properties);
+            };
+
+            /**
+             * Encodes the specified Toleration message. Does not implicitly {@link flyteidl.admin.Toleration.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.Toleration
+             * @static
+             * @param {flyteidl.admin.IToleration} message Toleration message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Toleration.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.selectors != null && message.selectors.length)
+                    for (let i = 0; i < message.selectors.length; ++i)
+                        $root.flyteidl.admin.Selector.encode(message.selectors[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a Toleration message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.Toleration
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.Toleration} Toleration
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Toleration.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Toleration();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        if (!(message.selectors && message.selectors.length))
+                            message.selectors = [];
+                        message.selectors.push($root.flyteidl.admin.Selector.decode(reader, reader.uint32()));
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a Toleration message.
+             * @function verify
+             * @memberof flyteidl.admin.Toleration
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Toleration.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.selectors != null && message.hasOwnProperty("selectors")) {
+                    if (!Array.isArray(message.selectors))
+                        return "selectors: array expected";
+                    for (let i = 0; i < message.selectors.length; ++i) {
+                        let error = $root.flyteidl.admin.Selector.verify(message.selectors[i]);
+                        if (error)
+                            return "selectors." + error;
+                    }
+                }
+                return null;
+            };
+
+            return Toleration;
         })();
 
         admin.Selector = (function() {

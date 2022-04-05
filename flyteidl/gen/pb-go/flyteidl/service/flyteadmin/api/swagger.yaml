@@ -2954,9 +2954,23 @@ definitions:
     properties:
       affinity:
         $ref: "#/definitions/adminAffinity"
+      toleration:
+        $ref: "#/definitions/adminToleration"
     description: "Encapsulates specifications for routing an execution onto a specific\
       \ cluster."
     example:
+      toleration:
+        selectors:
+        - value:
+          - "value"
+          - "value"
+          key: "key"
+          operator: {}
+        - value:
+          - "value"
+          - "value"
+          key: "key"
+          operator: {}
       affinity:
         selectors:
         - value:
@@ -3152,6 +3166,18 @@ definitions:
         raw_output_data_config:
           output_location_prefix: "output_location_prefix"
         cluster_assignment:
+          toleration:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
           affinity:
             selectors:
             - value:
@@ -3535,6 +3561,18 @@ definitions:
           raw_output_data_config:
             output_location_prefix: "output_location_prefix"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:
@@ -3734,6 +3772,18 @@ definitions:
           raw_output_data_config:
             output_location_prefix: "output_location_prefix"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:
@@ -4016,6 +4066,18 @@ definitions:
       raw_output_data_config:
         output_location_prefix: "output_location_prefix"
       cluster_assignment:
+        toleration:
+          selectors:
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
         affinity:
           selectors:
           - value:
@@ -6537,6 +6599,18 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:
@@ -6646,6 +6720,18 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:
@@ -6788,6 +6874,18 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
+          toleration:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
           affinity:
             selectors:
             - value:
@@ -6937,6 +7035,18 @@ definitions:
           values:
             key: "values"
       cluster_assignment:
+        toleration:
+          selectors:
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
+          - value:
+            - "value"
+            - "value"
+            key: "key"
+            operator: {}
         affinity:
           selectors:
           - value:
@@ -13672,6 +13782,18 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
+          toleration:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
           affinity:
             selectors:
             - value:
@@ -13805,6 +13927,18 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:
@@ -15526,6 +15660,29 @@ definitions:
         $ref: "#/definitions/coreTaskTemplate"
     description: "Represents a structure that encapsulates the user-configured specification\
       \ of the task."
+  adminToleration:
+    type: "object"
+    properties:
+      selectors:
+        type: "array"
+        description: "A toleration selector is similar to that of an affinity but\
+          \ the only valid operators are EQUALS AND EXISTS."
+        items:
+          $ref: "#/definitions/adminSelector"
+    description: "Defines a set of specific label selectors that the execution can\
+      \ tolerate on a cluster."
+    example:
+      selectors:
+      - value:
+        - "value"
+        - "value"
+        key: "key"
+        operator: {}
+      - value:
+        - "value"
+        - "value"
+        key: "key"
+        operator: {}
   adminUrlBlob:
     type: "object"
     properties:
@@ -21660,6 +21817,18 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
+          toleration:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
           affinity:
             selectors:
             - value:
@@ -21796,6 +21965,18 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
             affinity:
               selectors:
               - value:

@@ -220,6 +220,7 @@ Class | Method | HTTP request | Description
  - [AdminTaskResourceAttributes](docs/AdminTaskResourceAttributes.md)
  - [AdminTaskResourceSpec](docs/AdminTaskResourceSpec.md)
  - [AdminTaskSpec](docs/AdminTaskSpec.md)
+ - [AdminToleration](docs/AdminToleration.md)
  - [AdminUrlBlob](docs/AdminUrlBlob.md)
  - [AdminVersion](docs/AdminVersion.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
