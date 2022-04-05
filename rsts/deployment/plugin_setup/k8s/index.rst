@@ -90,13 +90,13 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       helm repo add incubator https://charts.helm.sh/incubator --force-update
+       helm repo add spark-operator https://googlecloudplatform.github.io/spark-on-k8s-operator
 
   * Install Spark Operator
 
     .. code-block:: bash
 
-       helm install incubator/sparkoperator --namespace spark-operator --kubeconfig=~/.flyte/k3s/k3s.yaml
+       helm install spark-operator spark-operator/spark-operator --namespace spark-operator --create-namespace
 
 
 4. Create a file named ``values-override.yaml`` and add the following config to it:
@@ -335,13 +335,13 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+       helm upgrade flyte flyteorg/flyte -f values-override.yaml -n flyte
 
 .. tabbed:: AWS/GCP
 
     .. code-block:: bash
 
-        helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
+        helm upgrade flyte flyteorg/flyte-core -f values-override.yaml -n flyte
 
 
 
