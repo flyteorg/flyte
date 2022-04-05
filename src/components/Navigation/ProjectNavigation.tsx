@@ -3,7 +3,7 @@ import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import DeviceHub from '@material-ui/icons/DeviceHub';
 import LinearScale from '@material-ui/icons/LinearScale';
-import TrendingFlat from '@material-ui/icons/TrendingFlat';
+import Dashboard from '@material-ui/icons/Dashboard';
 import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import { withRouteParams } from 'components/common/withRouteParams';
@@ -72,6 +72,20 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
 
   const routes: ProjectRoute[] = [
     {
+      icon: Dashboard,
+      isActive: (match, location) => {
+        const finalMatch = match
+          ? match
+          : matchPath(location.pathname, {
+              path: Routes.ProjectDashboard.path,
+              exact: false,
+            });
+        return !!finalMatch;
+      },
+      path: Routes.ProjectDetails.sections.dashboard.makeUrl(project.value.id, domainId),
+      text: 'Project Dashboard',
+    },
+    {
       icon: DeviceHub,
       isActive: (match, location) => {
         const finalMatch = match
@@ -98,20 +112,6 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
       },
       path: Routes.ProjectDetails.sections.tasks.makeUrl(project.value.id, domainId),
       text: 'Tasks',
-    },
-    {
-      icon: TrendingFlat,
-      isActive: (match, location) => {
-        const finalMatch = match
-          ? match
-          : matchPath(location.pathname, {
-              path: Routes.ProjectExecutions.path,
-              exact: false,
-            });
-        return !!finalMatch;
-      },
-      path: Routes.ProjectDetails.sections.executions.makeUrl(project.value.id, domainId),
-      text: 'Executions',
     },
   ];
 

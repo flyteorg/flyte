@@ -19,7 +19,7 @@ export class Routes {
       makeProjectBoundPath(project, section ? `/${section}` : ''),
     path: projectBasePath,
     sections: {
-      executions: {
+      dashboard: {
         makeUrl: (project: string, domain?: string) =>
           makeProjectBoundPath(project, `/executions${domain ? `?domain=${domain}` : ''}`),
         path: `${projectBasePath}/executions`,
@@ -37,7 +37,7 @@ export class Routes {
     },
   };
 
-  static ProjectExecutions = {
+  static ProjectDashboard = {
     makeUrl: (project: string, domain: string) =>
       makeProjectDomainBoundPath(project, domain, '/executions'),
     path: `${projectDomainBasePath}/executions`,

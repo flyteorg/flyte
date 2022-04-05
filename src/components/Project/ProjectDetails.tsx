@@ -8,7 +8,7 @@ import { Project } from 'models/Project/types';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import { Routes } from 'routes/routes';
-import { ProjectExecutions } from './ProjectExecutions';
+import { ProjectDashboard } from './ProjectDashboard';
 import { ProjectTasks } from './ProjectTasks';
 import { ProjectWorkflows } from './ProjectWorkflows';
 
@@ -27,7 +27,7 @@ export interface ProjectDetailsRouteParams {
 export type ProjectDetailsProps = ProjectDetailsRouteParams;
 
 const entityTypeToComponent = {
-  executions: ProjectExecutions,
+  executions: ProjectDashboard,
   tasks: ProjectTasks,
   workflows: ProjectWorkflows,
 };
@@ -59,7 +59,7 @@ const ProjectEntitiesByDomain: React.FC<{
   );
 };
 
-const ProjectExecutionsByDomain: React.FC<{ project: Project }> = ({ project }) => (
+const ProjectDashboardByDomain: React.FC<{ project: Project }> = ({ project }) => (
   <ProjectEntitiesByDomain project={project} entityType="executions" />
 );
 
@@ -79,14 +79,14 @@ export const ProjectDetailsContainer: React.FC<ProjectDetailsRouteParams> = ({ p
       {() => {
         return (
           <Switch>
+            <Route path={Routes.ProjectDetails.sections.dashboard.path}>
+              <ProjectDashboardByDomain project={project.value} />
+            </Route>
             <Route path={Routes.ProjectDetails.sections.workflows.path}>
               <ProjectWorkflowsByDomain project={project.value} />
             </Route>
             <Route path={Routes.ProjectDetails.sections.tasks.path}>
               <ProjectTasksByDomain project={project.value} />
-            </Route>
-            <Route path={Routes.ProjectDetails.sections.executions.path}>
-              <ProjectExecutionsByDomain project={project.value} />
             </Route>
             <Redirect to={Routes.ProjectDetails.sections.workflows.makeUrl(projectId)} />
           </Switch>

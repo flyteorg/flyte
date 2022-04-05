@@ -1,3 +1,4 @@
+import { Identifier } from 'models/Common/types';
 import { Project } from './types';
 
 export function getProjectDomain(project: Project, domainId: string) {
@@ -6,4 +7,11 @@ export function getProjectDomain(project: Project, domainId: string) {
     throw new Error(`Project ${project.name} has no domain with id ${domainId}`);
   }
   return domain;
+}
+
+export function makeProjectDomainAttributesPath(
+  prefix: string,
+  { project, domain }: Partial<Identifier>,
+) {
+  return [prefix, project, domain].join('/');
 }

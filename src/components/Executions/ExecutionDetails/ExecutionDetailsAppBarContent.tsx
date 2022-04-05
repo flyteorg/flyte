@@ -92,11 +92,11 @@ export const ExecutionDetailsAppBarContent: React.FC<{
   const onCloseRelaunch = () => setShowRelaunchForm(false);
   const fromExecutionNav = new URLSearchParams(history.location.search).get('fromExecutionNav');
   const backLink = fromExecutionNav
-    ? Routes.ProjectDetails.sections.executions.makeUrl(project, domain)
+    ? Routes.ProjectDetails.sections.dashboard.makeUrl(project, domain)
     : originalBackLink;
   const {
     recoverExecution,
-    recoverState: { isLoading: recovering, error, data: recoveredId },
+    recoverState: { isLoading: recovering, data: recoveredId },
   } = useRecoverExecutionState();
 
   React.useEffect(() => {

@@ -17,16 +17,35 @@ import { createTestQueryClient, disableQueryLogger, enableQueryLogger } from 'te
 import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { getUserProfile } from 'models/Common/api';
-import { ProjectExecutions } from '../ProjectExecutions';
+import { getProjectDomainAttributes } from 'models/Project/api';
+import { Admin } from 'flyteidl';
+import { ProjectDashboard } from '../ProjectDashboard';
 import { failedToLoadExecutionsString } from '../constants';
 
 jest.mock('components/Executions/Tables/WorkflowExecutionsTable');
-// jest.mock('components/common/LoadingSpinner');
 jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
 
-describe('ProjectExecutions', () => {
+const projectDomainAttributesMock: Admin.ProjectDomainAttributesDeleteResponse = {
+  attributes: {
+    matchingAttributes: {
+      workflowExecutionConfig: {
+        maxParallelism: 5,
+        securityContext: { runAs: { k8sServiceAccount: 'default' } },
+        rawOutputDataConfig: { outputLocationPrefix: 'cliOutputLocationPrefix' },
+        annotations: { values: { cliAnnotationKey: 'cliAnnotationValue' } },
+        labels: { values: { cliLabelKey: 'cliLabelValue' } },
+      },
+    },
+  },
+};
+
+jest.mock('models/Project/api', () => ({
+  getProjectDomainAttributes: jest.fn().mockResolvedValue(projectDomainAttributesMock),
+}));
+
+describe('ProjectDashboard', () => {
   let basicPythonFixture: ReturnType<typeof basicPythonWorkflow.generate>;
   let failedTaskFixture: ReturnType<typeof oneFailedTaskWorkflow.generate>;
   let executions1: Execution[];
@@ -76,11 +95,19 @@ describe('ProjectExecutions', () => {
             getUserProfile: mockGetUserProfile,
           })}
         >
-          <ProjectExecutions projectId={scope.project} domainId={scope.domain} />
+          <ProjectDashboard projectId={scope.project} domainId={scope.domain} />
         </APIContext.Provider>
       </QueryClientProvider>,
       { wrapper: MemoryRouter },
     );
+
+  it('should display domain attributes section when config was provided', async () => {
+    const { getByText } = renderView();
+    expect(getProjectDomainAttributes).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getByText('Domain Settings')).toBeInTheDocument();
+    });
+  });
 
   it('should show loading spinner', async () => {
     mockGetUserProfile.mockResolvedValue(sampleUserProfile);
