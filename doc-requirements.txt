@@ -23,7 +23,7 @@ docutils==0.17.1
     #   sphinx
     #   sphinx-panels
     #   sphinx-tabs
-furo @ git+https://github.com/flyteorg/furo@main
+furo @ git+https://github.com/flyteorg/furo@5e14cd814e462dde37ded2fef28e058c6e5a604c
     # via -r doc-requirements.in
 idna==3.3
     # via requests
@@ -118,7 +118,7 @@ urllib3==1.26.9
     # via requests
 wrapt==1.14.0
     # via astroid
-zipp==3.7.0
+zipp==3.8.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
