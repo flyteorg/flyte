@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
 	"github.com/flyteorg/flyteadmin/plugins"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
@@ -59,7 +61,7 @@ type executionSystemMetrics struct {
 	Scope                      promutils.Scope
 	ActiveExecutions           prometheus.Gauge
 	ExecutionsCreated          prometheus.Counter
-	ExecutionsTerminated       prometheus.Counter
+	ExecutionsTerminated       labeled.Counter
 	ExecutionEventsCreated     prometheus.Counter
 	PropellerFailures          prometheus.Counter
 	PublishNotificationError   prometheus.Counter
@@ -1331,7 +1333,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		}
 	} else if common.IsExecutionTerminal(request.Event.Phase) {
 		m.systemMetrics.ActiveExecutions.Dec()
-		m.systemMetrics.ExecutionsTerminated.Inc()
+		m.systemMetrics.ExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
 		go m.emitOverallWorkflowExecutionTime(executionModel, request.Event.OccurredAt)
 		if request.Event.GetOutputData() != nil {
 			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
@@ -1646,8 +1648,8 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 			"overall count of active workflow executions"),
 		ExecutionsCreated: scope.MustNewCounter("executions_created",
 			"overall count of successfully completed CreateExecutionRequests"),
-		ExecutionsTerminated: scope.MustNewCounter("executions_terminated",
-			"overall count of terminated workflow executions"),
+		ExecutionsTerminated: labeled.NewCounter("executions_terminated",
+			"overall count of terminated workflow executions", scope),
 		ExecutionEventsCreated: scope.MustNewCounter("execution_events_created",
 			"overall count of successfully completed WorkflowExecutionEventRequest"),
 		PropellerFailures: scope.MustNewCounter("propeller_failures",

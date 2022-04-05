@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/golang/protobuf/proto"
 
@@ -35,7 +37,7 @@ type taskExecutionMetrics struct {
 	Scope                      promutils.Scope
 	ActiveTaskExecutions       prometheus.Gauge
 	TaskExecutionsCreated      prometheus.Counter
-	TaskExecutionsTerminated   prometheus.Counter
+	TaskExecutionsTerminated   labeled.Counter
 	TaskExecutionEventsCreated prometheus.Counter
 	MissingTaskExecution       prometheus.Counter
 	MissingTaskDefinition      prometheus.Counter
@@ -192,7 +194,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		m.metrics.ActiveTaskExecutions.Inc()
 	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()
-		m.metrics.TaskExecutionsTerminated.Inc()
+		m.metrics.TaskExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
 		if request.Event.GetOutputData() != nil {
 			m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
 		}
@@ -338,8 +340,8 @@ func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 			"overall count of task execution events received that are missing a parent node execution"),
 		TaskExecutionsCreated: scope.MustNewCounter("task_executions_created",
 			"overall count of successfully completed CreateExecutionRequests"),
-		TaskExecutionsTerminated: scope.MustNewCounter("task_executions_terminated",
-			"overall count of terminated workflow executions"),
+		TaskExecutionsTerminated: labeled.NewCounter("task_executions_terminated",
+			"overall count of terminated workflow executions", scope),
 		TaskExecutionEventsCreated: scope.MustNewCounter("task_execution_events_created",
 			"overall count of successfully completed WorkflowExecutionEventRequest"),
 		MissingTaskDefinition: scope.MustNewCounter("missing_task_definition",
