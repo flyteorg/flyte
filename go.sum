@@ -1300,8 +1300,8 @@ github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG
 github.com/pierrec/lz4 v1.0.2-0.20190131084431-473cd7ce01a1/go.mod h1:3/3N9NVKO0jef7pBehbT1qWhCMrIgbYNnFAZCqQ5LRc=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pierrec/lz4 v2.4.1+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pingsutw/datacatalog v0.3.20-0.20220401094030-812a492c775e h1:jaDy3U37f/njoEHFPcdlyiVZAddr2EI//mkQjJZHLVQ=
-github.com/pingsutw/datacatalog v0.3.20-0.20220401094030-812a492c775e/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
+github.com/pingsutw/datacatalog v0.3.20-0.20220405132753-33c8f8e87aec h1:yC7rpYyljiwl9PuntzHBeAczQNJaHfn7UMQIJ513UPI=
+github.com/pingsutw/datacatalog v0.3.20-0.20220405132753-33c8f8e87aec/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 h1:Qj1ukM4GlMWXNdMBuXcXfz/Kw9s1qm0CLY32QxuSImI=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4/go.mod h1:N6UoU20jOqggOuDwUaBQpluzLNDqif3kq9z2wpdYEfQ=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

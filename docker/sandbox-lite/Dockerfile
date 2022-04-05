@@ -1,4 +1,4 @@
-FROM golang:1.18.0-alpine3.15 AS go_builder_
+FROM golang:1.18.0-alpine3.15 AS go_builder
 
 # Install dependencies
 RUN apk add --no-cache build-base git make
@@ -15,7 +15,7 @@ COPY . /app/flyte
 COPY --from=ghcr.io/flyteorg/flyteconsole:latest /app/dist /app/flyte/cmd/single/dist
 RUN cd /app/flyte && go mod download && go mod vendor && go build -o /flyte cmd/main.go
 
-FROM alpine:3.13.5 AS base_
+FROM alpine:3.13.5 AS base
 
 # Install dependencies
 RUN apk add --no-cache openssl
@@ -50,7 +50,7 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
 # Install buildkit-cli-for-kubectl
-COPY --from=go_builder_ /install/linux/ /flyte /flyteorg/bin/
+COPY --from=go_builder /install/linux/ /flyte /flyteorg/bin/
 
 # Copy flyte chart
 COPY charts/flyte/ /flyteorg/share/flyte
@@ -70,7 +70,7 @@ FROM docker:20.10.11-dind AS dind
 RUN apk add --no-cache bash git make tini curl jq
 
 # Copy artifacts from base
-COPY --from=base_ /flyteorg/ /flyteorg/
+COPY --from=base /flyteorg/ /flyteorg/
 
 # Copy entrypoints
 COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
