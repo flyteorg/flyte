@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.48.0](http://github.com/lyft/flyteconsole/compare/v0.47.3...v0.48.0) (2022-04-05)
+
+
+### Features
+
+* project domain default page ([#352](http://github.com/lyft/flyteconsole/issues/352)) ([aaded00](http://github.com/lyft/flyteconsole/commit/aaded00accd742ef6cdfb0398e985a0fd8d114f4))
+
 ## [0.47.3](http://github.com/lyft/flyteconsole/compare/v0.47.2...v0.47.3) (2022-03-29)
 
 
