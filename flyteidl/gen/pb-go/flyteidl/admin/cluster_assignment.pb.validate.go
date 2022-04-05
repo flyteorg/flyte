@@ -54,6 +54,16 @@ func (m *ClusterAssignment) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetToleration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterAssignmentValidationError{
+				field:  "Toleration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -191,6 +201,85 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AffinityValidationError{}
+
+// Validate checks the field values on Toleration with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Toleration) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TolerationValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// TolerationValidationError is the validation error returned by
+// Toleration.Validate if the designated constraints aren't met.
+type TolerationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TolerationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TolerationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TolerationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TolerationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TolerationValidationError) ErrorName() string { return "TolerationValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TolerationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sToleration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TolerationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TolerationValidationError{}
 
 // Validate checks the field values on Selector with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.

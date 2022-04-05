@@ -49,6 +49,7 @@ Encapsulates specifications for routing an execution onto a specific cluster.
    :widths: auto
 
    "affinity", ":ref:`ref_flyteidl.admin.Affinity`", "", ""
+   "toleration", ":ref:`ref_flyteidl.admin.Toleration`", "", ""
 
 
 
@@ -72,6 +73,27 @@ A Selector is a specification for identifying a set of objects with correspondin
    "key", ":ref:`ref_string`", "", "The label key."
    "value", ":ref:`ref_string`", "repeated", "One or more values used to match labels. For equality (or inequality) requirements, values must contain a single element. For set-based requirements, values may contain one or more elements."
    "operator", ":ref:`ref_flyteidl.admin.Selector.Operator`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.Toleration:
+
+Toleration
+------------------------------------------------------------------
+
+Defines a set of specific label selectors that the execution can tolerate on a cluster.
+
+
+
+.. csv-table:: Toleration type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "selectors", ":ref:`ref_flyteidl.admin.Selector`", "repeated", "A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS."
 
 
 

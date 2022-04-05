@@ -9,8 +9,8 @@
 
 package flyteadmin
 
-// Encapsulates specifications for routing an execution onto a specific cluster.
-type AdminClusterAssignment struct {
-	Affinity *AdminAffinity `json:"affinity,omitempty"`
-	Toleration *AdminToleration `json:"toleration,omitempty"`
+// Defines a set of specific label selectors that the execution can tolerate on a cluster.
+type AdminToleration struct {
+	// A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
+	Selectors []AdminSelector `json:"selectors,omitempty"`
 }

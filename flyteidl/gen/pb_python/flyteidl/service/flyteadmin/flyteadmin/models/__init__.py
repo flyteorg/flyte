@@ -111,6 +111,7 @@ from flyteadmin.models.admin_task_list import AdminTaskList
 from flyteadmin.models.admin_task_resource_attributes import AdminTaskResourceAttributes
 from flyteadmin.models.admin_task_resource_spec import AdminTaskResourceSpec
 from flyteadmin.models.admin_task_spec import AdminTaskSpec
+from flyteadmin.models.admin_toleration import AdminToleration
 from flyteadmin.models.admin_url_blob import AdminUrlBlob
 from flyteadmin.models.admin_version import AdminVersion
 from flyteadmin.models.admin_workflow import AdminWorkflow

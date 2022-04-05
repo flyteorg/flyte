@@ -7021,6 +7021,9 @@ export namespace flyteidl {
 
             /** ClusterAssignment affinity */
             affinity?: (flyteidl.admin.IAffinity|null);
+
+            /** ClusterAssignment toleration */
+            toleration?: (flyteidl.admin.IToleration|null);
         }
 
         /** Represents a ClusterAssignment. */
@@ -7034,6 +7037,9 @@ export namespace flyteidl {
 
             /** ClusterAssignment affinity. */
             public affinity?: (flyteidl.admin.IAffinity|null);
+
+            /** ClusterAssignment toleration. */
+            public toleration?: (flyteidl.admin.IToleration|null);
 
             /**
              * Creates a new ClusterAssignment instance using the specified properties.
@@ -7114,6 +7120,58 @@ export namespace flyteidl {
 
             /**
              * Verifies an Affinity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Toleration. */
+        interface IToleration {
+
+            /** Toleration selectors */
+            selectors?: (flyteidl.admin.ISelector[]|null);
+        }
+
+        /** Represents a Toleration. */
+        class Toleration implements IToleration {
+
+            /**
+             * Constructs a new Toleration.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IToleration);
+
+            /** Toleration selectors. */
+            public selectors: flyteidl.admin.ISelector[];
+
+            /**
+             * Creates a new Toleration instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Toleration instance
+             */
+            public static create(properties?: flyteidl.admin.IToleration): flyteidl.admin.Toleration;
+
+            /**
+             * Encodes the specified Toleration message. Does not implicitly {@link flyteidl.admin.Toleration.verify|verify} messages.
+             * @param message Toleration message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IToleration, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Toleration message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Toleration
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Toleration;
+
+            /**
+             * Verifies a Toleration message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

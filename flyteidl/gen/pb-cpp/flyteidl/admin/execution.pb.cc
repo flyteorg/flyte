@@ -16,7 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_AuthRole_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RawOutputDataConfig_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_UrlBlob_flyteidl_2fadmin_2fcommon_2eproto;

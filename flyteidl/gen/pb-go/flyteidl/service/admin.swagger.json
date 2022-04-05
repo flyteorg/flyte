@@ -3236,6 +3236,9 @@
       "properties": {
         "affinity": {
           "$ref": "#/definitions/adminAffinity"
+        },
+        "toleration": {
+          "$ref": "#/definitions/adminToleration"
         }
       },
       "description": "Encapsulates specifications for routing an execution onto a specific cluster."
@@ -4730,6 +4733,19 @@
         }
       },
       "description": "Represents a structure that encapsulates the user-configured specification of the task."
+    },
+    "adminToleration": {
+      "type": "object",
+      "properties": {
+        "selectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminSelector"
+          },
+          "description": "A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS."
+        }
+      },
+      "description": "Defines a set of specific label selectors that the execution can tolerate on a cluster."
     },
     "adminUrlBlob": {
       "type": "object",
