@@ -42,7 +42,7 @@ struct TableStruct_flyteidl_2fadmin_2fcluster_5fassignment_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[3]
+  static const ::google::protobuf::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -60,6 +60,9 @@ extern ClusterAssignmentDefaultTypeInternal _ClusterAssignment_default_instance_
 class Selector;
 class SelectorDefaultTypeInternal;
 extern SelectorDefaultTypeInternal _Selector_default_instance_;
+class Toleration;
+class TolerationDefaultTypeInternal;
+extern TolerationDefaultTypeInternal _Toleration_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
@@ -67,6 +70,7 @@ namespace protobuf {
 template<> ::flyteidl::admin::Affinity* Arena::CreateMaybeMessage<::flyteidl::admin::Affinity>(Arena*);
 template<> ::flyteidl::admin::ClusterAssignment* Arena::CreateMaybeMessage<::flyteidl::admin::ClusterAssignment>(Arena*);
 template<> ::flyteidl::admin::Selector* Arena::CreateMaybeMessage<::flyteidl::admin::Selector>(Arena*);
+template<> ::flyteidl::admin::Toleration* Arena::CreateMaybeMessage<::flyteidl::admin::Toleration>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -202,12 +206,22 @@ class ClusterAssignment final :
   ::flyteidl::admin::Affinity* mutable_affinity();
   void set_allocated_affinity(::flyteidl::admin::Affinity* affinity);
 
+  // .flyteidl.admin.Toleration toleration = 2;
+  bool has_toleration() const;
+  void clear_toleration();
+  static const int kTolerationFieldNumber = 2;
+  const ::flyteidl::admin::Toleration& toleration() const;
+  ::flyteidl::admin::Toleration* release_toleration();
+  ::flyteidl::admin::Toleration* mutable_toleration();
+  void set_allocated_toleration(::flyteidl::admin::Toleration* toleration);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ClusterAssignment)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::admin::Affinity* affinity_;
+  ::flyteidl::admin::Toleration* toleration_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
 };
@@ -331,6 +345,124 @@ class Affinity final :
 };
 // -------------------------------------------------------------------
 
+class Toleration final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Toleration) */ {
+ public:
+  Toleration();
+  virtual ~Toleration();
+
+  Toleration(const Toleration& from);
+
+  inline Toleration& operator=(const Toleration& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Toleration(Toleration&& from) noexcept
+    : Toleration() {
+    *this = ::std::move(from);
+  }
+
+  inline Toleration& operator=(Toleration&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Toleration& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Toleration* internal_default_instance() {
+    return reinterpret_cast<const Toleration*>(
+               &_Toleration_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(Toleration* other);
+  friend void swap(Toleration& a, Toleration& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Toleration* New() const final {
+    return CreateMaybeMessage<Toleration>(nullptr);
+  }
+
+  Toleration* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Toleration>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Toleration& from);
+  void MergeFrom(const Toleration& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Toleration* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.admin.Selector selectors = 1;
+  int selectors_size() const;
+  void clear_selectors();
+  static const int kSelectorsFieldNumber = 1;
+  ::flyteidl::admin::Selector* mutable_selectors(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector >*
+      mutable_selectors();
+  const ::flyteidl::admin::Selector& selectors(int index) const;
+  ::flyteidl::admin::Selector* add_selectors();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector >&
+      selectors() const;
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.Toleration)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector > selectors_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Selector final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Selector) */ {
  public:
@@ -369,7 +501,7 @@ class Selector final :
                &_Selector_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(Selector* other);
   friend void swap(Selector& a, Selector& b) {
@@ -573,6 +705,57 @@ inline void ClusterAssignment::set_allocated_affinity(::flyteidl::admin::Affinit
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ClusterAssignment.affinity)
 }
 
+// .flyteidl.admin.Toleration toleration = 2;
+inline bool ClusterAssignment::has_toleration() const {
+  return this != internal_default_instance() && toleration_ != nullptr;
+}
+inline void ClusterAssignment::clear_toleration() {
+  if (GetArenaNoVirtual() == nullptr && toleration_ != nullptr) {
+    delete toleration_;
+  }
+  toleration_ = nullptr;
+}
+inline const ::flyteidl::admin::Toleration& ClusterAssignment::toleration() const {
+  const ::flyteidl::admin::Toleration* p = toleration_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ClusterAssignment.toleration)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Toleration*>(
+      &::flyteidl::admin::_Toleration_default_instance_);
+}
+inline ::flyteidl::admin::Toleration* ClusterAssignment::release_toleration() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ClusterAssignment.toleration)
+  
+  ::flyteidl::admin::Toleration* temp = toleration_;
+  toleration_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Toleration* ClusterAssignment::mutable_toleration() {
+  
+  if (toleration_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Toleration>(GetArenaNoVirtual());
+    toleration_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ClusterAssignment.toleration)
+  return toleration_;
+}
+inline void ClusterAssignment::set_allocated_toleration(::flyteidl::admin::Toleration* toleration) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete toleration_;
+  }
+  if (toleration) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      toleration = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, toleration, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  toleration_ = toleration;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ClusterAssignment.toleration)
+}
+
 // -------------------------------------------------------------------
 
 // Affinity
@@ -604,6 +787,40 @@ inline ::flyteidl::admin::Selector* Affinity::add_selectors() {
 inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector >&
 Affinity::selectors() const {
   // @@protoc_insertion_point(field_list:flyteidl.admin.Affinity.selectors)
+  return selectors_;
+}
+
+// -------------------------------------------------------------------
+
+// Toleration
+
+// repeated .flyteidl.admin.Selector selectors = 1;
+inline int Toleration::selectors_size() const {
+  return selectors_.size();
+}
+inline void Toleration::clear_selectors() {
+  selectors_.Clear();
+}
+inline ::flyteidl::admin::Selector* Toleration::mutable_selectors(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Toleration.selectors)
+  return selectors_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector >*
+Toleration::mutable_selectors() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Toleration.selectors)
+  return &selectors_;
+}
+inline const ::flyteidl::admin::Selector& Toleration::selectors(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Toleration.selectors)
+  return selectors_.Get(index);
+}
+inline ::flyteidl::admin::Selector* Toleration::add_selectors() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.Toleration.selectors)
+  return selectors_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Selector >&
+Toleration::selectors() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.Toleration.selectors)
   return selectors_;
 }
 
@@ -750,6 +967,8 @@ inline void Selector::set_operator_(::flyteidl::admin::Selector_Operator value) 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

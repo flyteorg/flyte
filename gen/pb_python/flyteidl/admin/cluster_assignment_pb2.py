@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\'flyteidl/admin/cluster_assignment.proto\x12\x0e\x66lyteidl.admin\"?\n\x11\x43lusterAssignment\x12*\n\x08\x61\x66\x66inity\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.Affinity\"7\n\x08\x41\x66\x66inity\x12+\n\tselectors\x18\x01 \x03(\x0b\x32\x18.flyteidl.admin.Selector\"\xa3\x01\n\x08Selector\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x03(\t\x12\x33\n\x08operator\x18\x03 \x01(\x0e\x32!.flyteidl.admin.Selector.Operator\"F\n\x08Operator\x12\n\n\x06\x45QUALS\x10\x00\x12\x0e\n\nNOT_EQUALS\x10\x01\x12\x06\n\x02IN\x10\x02\x12\n\n\x06NOT_IN\x10\x03\x12\n\n\x06\x45XISTS\x10\x04\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\'flyteidl/admin/cluster_assignment.proto\x12\x0e\x66lyteidl.admin\"o\n\x11\x43lusterAssignment\x12*\n\x08\x61\x66\x66inity\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.Affinity\x12.\n\ntoleration\x18\x02 \x01(\x0b\x32\x1a.flyteidl.admin.Toleration\"7\n\x08\x41\x66\x66inity\x12+\n\tselectors\x18\x01 \x03(\x0b\x32\x18.flyteidl.admin.Selector\"9\n\nToleration\x12+\n\tselectors\x18\x01 \x03(\x0b\x32\x18.flyteidl.admin.Selector\"\xa3\x01\n\x08Selector\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x03(\t\x12\x33\n\x08operator\x18\x03 \x01(\x0e\x32!.flyteidl.admin.Selector.Operator\"F\n\x08Operator\x12\n\n\x06\x45QUALS\x10\x00\x12\x0e\n\nNOT_EQUALS\x10\x01\x12\x06\n\x02IN\x10\x02\x12\n\n\x06NOT_IN\x10\x03\x12\n\n\x06\x45XISTS\x10\x04\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 
@@ -54,8 +54,8 @@ _SELECTOR_OPERATOR = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=275,
-  serialized_end=345,
+  serialized_start=382,
+  serialized_end=452,
 )
 _sym_db.RegisterEnumDescriptor(_SELECTOR_OPERATOR)
 
@@ -74,6 +74,13 @@ _CLUSTERASSIGNMENT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='toleration', full_name='flyteidl.admin.ClusterAssignment.toleration', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -87,7 +94,7 @@ _CLUSTERASSIGNMENT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=59,
-  serialized_end=122,
+  serialized_end=170,
 )
 
 
@@ -117,8 +124,39 @@ _AFFINITY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=124,
-  serialized_end=179,
+  serialized_start=172,
+  serialized_end=227,
+)
+
+
+_TOLERATION = _descriptor.Descriptor(
+  name='Toleration',
+  full_name='flyteidl.admin.Toleration',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='selectors', full_name='flyteidl.admin.Toleration.selectors', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=229,
+  serialized_end=286,
 )
 
 
@@ -163,16 +201,19 @@ _SELECTOR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=182,
-  serialized_end=345,
+  serialized_start=289,
+  serialized_end=452,
 )
 
 _CLUSTERASSIGNMENT.fields_by_name['affinity'].message_type = _AFFINITY
+_CLUSTERASSIGNMENT.fields_by_name['toleration'].message_type = _TOLERATION
 _AFFINITY.fields_by_name['selectors'].message_type = _SELECTOR
+_TOLERATION.fields_by_name['selectors'].message_type = _SELECTOR
 _SELECTOR.fields_by_name['operator'].enum_type = _SELECTOR_OPERATOR
 _SELECTOR_OPERATOR.containing_type = _SELECTOR
 DESCRIPTOR.message_types_by_name['ClusterAssignment'] = _CLUSTERASSIGNMENT
 DESCRIPTOR.message_types_by_name['Affinity'] = _AFFINITY
+DESCRIPTOR.message_types_by_name['Toleration'] = _TOLERATION
 DESCRIPTOR.message_types_by_name['Selector'] = _SELECTOR
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -189,6 +230,13 @@ Affinity = _reflection.GeneratedProtocolMessageType('Affinity', (_message.Messag
   # @@protoc_insertion_point(class_scope:flyteidl.admin.Affinity)
   ))
 _sym_db.RegisterMessage(Affinity)
+
+Toleration = _reflection.GeneratedProtocolMessageType('Toleration', (_message.Message,), dict(
+  DESCRIPTOR = _TOLERATION,
+  __module__ = 'flyteidl.admin.cluster_assignment_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.Toleration)
+  ))
+_sym_db.RegisterMessage(Toleration)
 
 Selector = _reflection.GeneratedProtocolMessageType('Selector', (_message.Message,), dict(
   DESCRIPTOR = _SELECTOR,
