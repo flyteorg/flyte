@@ -28,6 +28,15 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (Config) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (Config) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -41,9 +50,9 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpcPort"), *new(int), "On which grpc port to serve Catalog")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpcServerReflection"), *new(bool), "Enable GRPC Server Reflection")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "httpPort"), *new(int), "On which http port to serve Catalog")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "secure"), *new(bool), "Whether to run Catalog in secure mode or not")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpcPort"), defaultConfig.GrpcPort, "On which grpc port to serve Catalog")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpcServerReflection"), defaultConfig.GrpcServerReflection, "Enable GRPC Server Reflection")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "httpPort"), defaultConfig.HTTPPort, "On which http port to serve Catalog")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "secure"), defaultConfig.Secure, "Whether to run Catalog in secure mode or not")
 	return cmdFlags
 }

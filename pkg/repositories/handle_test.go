@@ -1,9 +1,12 @@
 package repositories
 
 import (
+	"path"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/datacatalog/pkg/repositories/config"
+	"github.com/flyteorg/flytestdlib/database"
 	"github.com/stretchr/testify/assert"
 
 	"database/sql/driver"
@@ -75,4 +78,19 @@ func TestDBAlreadyExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, checkExists)
 	assert.False(t, createdDB)
+}
+
+func TestNewDBHandle(t *testing.T) {
+	t.Run("missing DB Config", func(t *testing.T) {
+		_, err := NewDBHandle(database.DbConfig{}, migrateScope)
+		assert.Error(t, err)
+	})
+
+	t.Run("sqlite config", func(t *testing.T) {
+		dbFile := path.Join(t.TempDir(), "admin.db")
+		dbHandle, err := NewDBHandle(database.DbConfig{SQLite: database.SQLiteConfig{File: dbFile}}, migrateScope)
+		assert.Nil(t, err)
+		assert.NotNil(t, dbHandle)
+		assert.Equal(t, config.Sqlite, dbHandle.db.Name())
+	})
 }
