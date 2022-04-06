@@ -63,6 +63,15 @@ func MapStrings(mapper func(string) string, strings ...string) []string {
 	return strings
 }
 
+// MergeMaps merges all src maps into dst in order.
+func MergeMaps(dst map[string]string, src ...map[string]string) {
+	for _, m := range src {
+		for k, v := range m {
+			dst[k] = v
+		}
+	}
+}
+
 func incFailureCounterForError(ctx context.Context, counter labeled.Counter, err error) {
 	errCode, found := stdErrs.GetErrorCode(err)
 	if found {

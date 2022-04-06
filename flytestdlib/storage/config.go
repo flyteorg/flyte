@@ -45,7 +45,8 @@ var (
 
 // Config is a common storage config.
 type Config struct {
-	Type       Type             `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
+	Type Type `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
+	// Deprecated: Please use StowConfig instead
 	Connection ConnectionConfig `json:"connection"`
 	Stow       StowConfig       `json:"stow,omitempty" pflag:",Storage config for stow backend."`
 	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
@@ -60,6 +61,12 @@ type Config struct {
 	Cache             CachingConfig    `json:"cache"`
 	Limits            LimitsConfig     `json:"limits" pflag:",Sets limits for stores."`
 	DefaultHTTPClient HTTPClientConfig `json:"defaultHttpClient" pflag:",Sets the default http client config."`
+	SignedURL         SignedURLConfig  `json:"signedUrl" pflag:",Sets config for SignedURL."`
+}
+
+// SignedURLConfig encapsulates configs specifically used for SignedURL behavior.
+type SignedURLConfig struct {
+	StowConfigOverride map[string]string `json:"stowConfigOverride,omitempty" pflag:"-,Configuration for stow backend. Refer to github/flyteorg/stow"`
 }
 
 // HTTPClientConfig encapsulates common settings that can be applied to an HTTP Client.
@@ -78,9 +85,10 @@ type ConnectionConfig struct {
 	DisableSSL bool       `json:"disable-ssl" pflag:",Disables SSL connection. Should only be used for development."`
 }
 
+// StowConfig defines configs for stow as defined in github.com/flyteorg/stow
 type StowConfig struct {
-	Kind   string            `json:"kind,omitempty" pflag:",Kind of Stow backend to use. Refer to github/graymeta/stow"`
-	Config map[string]string `json:"config,omitempty" pflag:",Configuration for stow backend. Refer to github/graymeta/stow"`
+	Kind   string            `json:"kind,omitempty" pflag:",Kind of Stow backend to use. Refer to github/flyteorg/stow"`
+	Config map[string]string `json:"config,omitempty" pflag:",Configuration for stow backend. Refer to github/flyteorg/stow"`
 }
 
 type CachingConfig struct {
@@ -98,12 +106,12 @@ type CachingConfig struct {
 	TargetGCPercent int `json:"target_gc_percent" pflag:",Sets the garbage collection target percentage."`
 }
 
-// Specifies limits for storage package.
+// LimitsConfig specifies limits for storage package.
 type LimitsConfig struct {
 	GetLimitMegabytes int64 `json:"maxDownloadMBs" pflag:",Maximum allowed download size (in MBs) per call."`
 }
 
-// Retrieve current global config for storage.
+// GetConfig retrieve current global config for storage.
 func GetConfig() *Config {
 	if c, ok := ConfigSection.GetConfig().(*Config); ok {
 		return c

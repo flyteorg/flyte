@@ -173,7 +173,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 
 		actual, err := s.CreateSignedURL(context.TODO(), DataReference("https://container/path"), SignedURLProperties{})
@@ -197,7 +197,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 
 		_, err = s.CreateSignedURL(context.TODO(), DataReference("://container/path"), SignedURLProperties{})
@@ -220,7 +220,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 
 		_, err = s.CreateSignedURL(context.TODO(), DataReference("s3://container2/path"), SignedURLProperties{})
@@ -248,7 +248,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -280,7 +280,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -311,7 +311,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, false, testScope)
+		}, nil, false, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -340,7 +340,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, true, testScope)
+		}, nil, true, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), "s3://bad-container/path", 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -372,7 +372,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, true, testScope)
+		}, nil, true, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), "s3://bad-container/path", 0, Options{}, bytes.NewReader([]byte{}))
 		assert.Error(t, err)
@@ -618,7 +618,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, true, testScope)
+		}, nil, true, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -646,7 +646,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, true, testScope)
+		}, nil, true, testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.EqualError(t, err, "Failed to write data [0b] to path [path].: foo")
