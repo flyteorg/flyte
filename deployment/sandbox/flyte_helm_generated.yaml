@@ -298,13 +298,16 @@ data:
     storage:
       type: minio
       container: "my-s3-bucket"
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://localhost:30084
+      stow:
+        access_key_id: minio
+        auth_type: accesskey
+        secret_key: miniostorage
+        disable_ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
         region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:30084
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -475,13 +478,16 @@ data:
     storage:
       type: minio
       container: "my-s3-bucket"
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://localhost:30084
+      stow:
+        access_key_id: minio
+        auth_type: accesskey
+        secret_key: miniostorage
+        disable_ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
         region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:30084
       limits:
         maxDownloadMBs: 10
 ---
@@ -629,13 +635,16 @@ data:
     storage:
       type: minio
       container: "my-s3-bucket"
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://localhost:30084
+      stow:
+        access_key_id: minio
+        auth_type: accesskey
+        secret_key: miniostorage
+        disable_ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
         region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:30084
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -4440,7 +4449,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6b6d37d42c95e143665a2e0a7dd8abfa51d15cc7313f3811786db6b77bb301e"
+        configChecksum: "d3ad9884a7b9db1e92351cfd738cb099bca1764064090b286620c9c902fe29f"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4639,7 +4648,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "97975c32b33b9f1e678361d1e4e61df5d69d524b120e28db97d8fee79acbbaf"
+        configChecksum: "9937db0fbcdb08c62495b85b851d591776c4e3006f7049b7dbe321ee66b73d8"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -4719,7 +4728,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6b6d37d42c95e143665a2e0a7dd8abfa51d15cc7313f3811786db6b77bb301e"
+        configChecksum: "d3ad9884a7b9db1e92351cfd738cb099bca1764064090b286620c9c902fe29f"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4803,7 +4812,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6830ab80c2d0a89459ce5c70f0402c7e0deb057a8c6829cc413c015af59200c"
+        configChecksum: "8cf44ab8bde432ed661cc90b9f2e33c4f4c55af68003f253b4438ca27fc369e"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -4872,7 +4881,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "6830ab80c2d0a89459ce5c70f0402c7e0deb057a8c6829cc413c015af59200c"
+        configChecksum: "8cf44ab8bde432ed661cc90b9f2e33c4f4c55af68003f253b4438ca27fc369e"
     spec:
       securityContext:
         fsGroup: 65534
@@ -5412,6 +5421,20 @@ spec:
                 port:
                   number: 81
           - path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService/*
             pathType: ImplementationSpecific
             backend:
               service:
