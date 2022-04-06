@@ -219,15 +219,6 @@ Table of Contents
 
    ---
 
-   .. link-button:: integrations
-      :type: ref
-      :text: 🔌  Integrations
-      :classes: btn-block stretched-link
-   ^^^^^^^^^^^^
-   Leverage a rich ecosystem of plugins from compute infrastructure to jupyter notebooks.
-
-   ---
-
    .. link-button:: auto/core/extend_flyte/index
       :type: ref
       :text: 🏗 Extending Flyte
@@ -252,7 +243,7 @@ Table of Contents
    :caption: User Guide
    :hidden:
 
-   Introduction <self>
+   User Guide <self>
    Basics <auto/core/flyte_basics/index>
    Control Flow <auto/core/control_flow/index>
    Type System <auto/core/type_system/index>
@@ -261,7 +252,6 @@ Table of Contents
    Remote Access <auto/remote_access/index>
    Production Config <auto/deployment/index>
    Scheduling Workflows <auto/core/scheduled_workflows/index>
-   integrations
    Extending flyte <auto/core/extend_flyte/index>
    contribute
 
@@ -270,8 +260,31 @@ Table of Contents
    :caption: Tutorials
    :hidden:
 
-   Introduction <tutorials>
+   Tutorials <tutorials>
    ml_training
    feature_engineering
    bioinformatics
    flytelab
+
+.. toctree::
+   :maxdepth: -1
+   :caption: Integrations
+   :hidden:
+
+   Integrations <integrations>
+   auto/integrations/flytekit_plugins/sql/index
+   auto/integrations/flytekit_plugins/greatexpectations/index
+   auto/integrations/flytekit_plugins/papermilltasks/index
+   auto/integrations/flytekit_plugins/pandera_examples/index
+   auto/integrations/flytekit_plugins/modin_examples/index
+   auto/integrations/flytekit_plugins/dolt/index
+   auto/integrations/kubernetes/pod/index
+   auto/integrations/kubernetes/k8s_spark/index
+   auto/integrations/kubernetes/kfpytorch/index
+   auto/integrations/kubernetes/kftensorflow/index
+   auto/integrations/kubernetes/kfmpi/index
+   auto/integrations/aws/sagemaker_training/index
+   auto/integrations/aws/sagemaker_pytorch/index
+   auto/integrations/aws/athena/index
+   auto/integrations/external_services/hive/index
+   auto/integrations/external_services/snowflake/index

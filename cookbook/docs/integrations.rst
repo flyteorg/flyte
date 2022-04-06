@@ -269,27 +269,4 @@ The :ref:`community <community>` would love to help you with your own ideas of b
     The Java/Scala SDK for Flyte.
 
 
-.. TODO: write doct on Helm https://github.com/flyteorg/flyte/issues/299
-
-
-.. toctree::
-    :maxdepth: -1
-    :caption: Integrations
-    :hidden:
-
-    auto/integrations/flytekit_plugins/sql/index
-    auto/integrations/flytekit_plugins/greatexpectations/index
-    auto/integrations/flytekit_plugins/papermilltasks/index
-    auto/integrations/flytekit_plugins/pandera_examples/index
-    auto/integrations/flytekit_plugins/modin_examples/index
-    auto/integrations/flytekit_plugins/dolt/index
-    auto/integrations/kubernetes/pod/index
-    auto/integrations/kubernetes/k8s_spark/index
-    auto/integrations/kubernetes/kfpytorch/index
-    auto/integrations/kubernetes/kftensorflow/index
-    auto/integrations/kubernetes/kfmpi/index
-    auto/integrations/aws/sagemaker_training/index
-    auto/integrations/aws/sagemaker_pytorch/index
-    auto/integrations/aws/athena/index
-    auto/integrations/external_services/hive/index
-    auto/integrations/external_services/snowflake/index
+.. TODO: write docs on Helm https://github.com/flyteorg/flyte/issues/299
