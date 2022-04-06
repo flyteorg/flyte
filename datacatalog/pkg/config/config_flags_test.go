@@ -84,7 +84,7 @@ func testDecodeJson_Config(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_Config(val, result))
 }
 
-func testDecodeSlice_Config(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_Config(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_grpcPort", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("grpcPort"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_grpcServerReflection", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("grpcServerReflection"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_httpPort", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("httpPort"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_secure", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("secure"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"

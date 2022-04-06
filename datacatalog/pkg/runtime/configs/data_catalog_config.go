@@ -1,12 +1,20 @@
 package configs
 
 import (
+	"time"
+
 	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags DataCatalogConfig --default-var=defaultConfig
 
-var defaultConfig = &DataCatalogConfig{}
+var defaultConfig = &DataCatalogConfig{
+	StoragePrefix:                  "metadata",
+	MetricsScope:                   "datacatalog",
+	ProfilerPort:                   10254,
+	HeartbeatGracePeriodMultiplier: 3,
+	MaxReservationHeartbeat:        config.Duration{Duration: time.Second * 10},
+}
 
 // DataCatalogConfig is the base configuration to start datacatalog
 type DataCatalogConfig struct {

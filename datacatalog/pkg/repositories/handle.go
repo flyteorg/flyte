@@ -3,7 +3,11 @@ package repositories
 import (
 	"context"
 
+	"gorm.io/driver/sqlite"
+
 	"fmt"
+
+	"github.com/flyteorg/flytestdlib/database"
 
 	"github.com/flyteorg/datacatalog/pkg/repositories/config"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
@@ -16,27 +20,25 @@ type DBHandle struct {
 	db *gorm.DB
 }
 
-func NewDBHandle(dbConfigValues config.DbConfig, catalogScope promutils.Scope) (*DBHandle, error) {
-	dbConfig := config.DbConfig{
-		Host:         dbConfigValues.Host,
-		Port:         dbConfigValues.Port,
-		DbName:       dbConfigValues.DbName,
-		User:         dbConfigValues.User,
-		Password:     dbConfigValues.Password,
-		ExtraOptions: dbConfigValues.ExtraOptions,
-		BaseConfig: config.BaseConfig{
-			DisableForeignKeyConstraintWhenMigrating: true,
-		},
+func NewDBHandle(dbConfigValues database.DbConfig, catalogScope promutils.Scope) (*DBHandle, error) {
+	var gormDb *gorm.DB
+	var err error
+
+	switch {
+	case !dbConfigValues.SQLite.IsEmpty():
+		gormDb, err = gorm.Open(sqlite.Open(dbConfigValues.SQLite.File))
+	case !dbConfigValues.Postgres.IsEmpty():
+		gormDb, err = config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfigValues, catalogScope.NewSubScope(config.Postgres)))
+	default:
+		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfigValues)
 	}
 
-	//TODO: abstract away the type of db we are connecting to
-	db, err := config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfig, catalogScope.NewSubScope("postgres")))
 	if err != nil {
 		return nil, err
 	}
 
 	out := &DBHandle{
-		db: db,
+		db: gormDb,
 	}
 
 	return out, nil

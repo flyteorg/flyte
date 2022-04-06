@@ -17,7 +17,8 @@ type Config struct {
 	Secure               bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
 }
 
-var applicationConfig = config.MustRegisterSection(SectionKey, &Config{})
+var defaultConfig = &Config{GrpcPort: 8081, HTTPPort: 8080, GrpcServerReflection: true}
+var applicationConfig = config.MustRegisterSection(SectionKey, defaultConfig)
 
 func GetConfig() *Config {
 	return applicationConfig.GetConfig().(*Config)
