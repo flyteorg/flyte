@@ -70,7 +70,7 @@ async function loadLaunchPlans(
           value: version,
         },
       ],
-      limit: 10,
+      limit: 50,
     },
   );
 
