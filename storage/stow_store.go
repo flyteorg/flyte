@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"strconv"
 	"sync"
 	"time"
 
@@ -108,7 +109,8 @@ func (s StowMetadata) Exists() bool {
 // Implements DataStore to talk to stow location store.
 type StowStore struct {
 	copyImpl
-	loc stow.Location
+	loc          stow.Location
+	signedURLLoc stow.Location
 	// This is a default configured container.
 	baseContainer stow.Container
 	// If dynamic container loading is enabled, then for any new container that is not the base container
@@ -121,8 +123,12 @@ type StowStore struct {
 }
 
 func (s *StowStore) CreateContainer(ctx context.Context, container string) (stow.Container, error) {
+	return s.createContainer(ctx, locationIDMain, container)
+}
+
+func (s *StowStore) createContainer(ctx context.Context, locID locationID, container string) (stow.Container, error) {
 	logger.Infof(ctx, "Attempting to create container [%s]", container)
-	c, err := s.loc.CreateContainer(container)
+	c, err := s.getLocation(locID).CreateContainer(container)
 	if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
 		return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
 	}
@@ -130,12 +136,16 @@ func (s *StowStore) CreateContainer(ctx context.Context, container string) (stow
 }
 
 func (s *StowStore) LoadContainer(ctx context.Context, container string, createIfNotFound bool) (stow.Container, error) {
-	c, err := s.loc.Container(container)
+	return s.loadContainer(ctx, locationIDMain, container, createIfNotFound)
+}
+
+func (s *StowStore) loadContainer(ctx context.Context, locID locationID, container string, createIfNotFound bool) (stow.Container, error) {
+	c, err := s.getLocation(locID).Container(container)
 	if err != nil {
 		// IsNotFound is not always guaranteed to be returned if the underlying container doesn't exist!
 		// As of stow v0.2.6, the call to get container elides the lookup when a bucket region is set for S3 containers.
 		if IsNotFound(err) && createIfNotFound {
-			c, err = s.CreateContainer(ctx, container)
+			c, err = s.createContainer(ctx, locID, container)
 			if err != nil {
 				logger.Errorf(ctx, "Call to create container [%s] failed. Error %s", container, err)
 				return nil, err
@@ -145,29 +155,33 @@ func (s *StowStore) LoadContainer(ctx context.Context, container string, createI
 			return nil, err
 		}
 	}
+
 	return c, nil
 }
 
-func (s *StowStore) getContainer(ctx context.Context, container string) (c stow.Container, err error) {
-	if s.baseContainer != nil && s.baseContainer.Name() == container {
+func (s *StowStore) getContainer(ctx context.Context, locID locationID, container string) (c stow.Container, err error) {
+	if s.baseContainer != nil && s.baseContainer.Name() == container && locID == locationIDMain {
 		return s.baseContainer, nil
 	}
 
-	if !s.enableDynamicContainerLoading {
+	if !s.enableDynamicContainerLoading && locID == locationIDMain {
 		s.metrics.BadContainer.Inc(ctx)
 		return nil, errs.Wrapf(stow.ErrNotFound, "Conf container:%v != Passed Container:%v. Dynamic loading is disabled", s.baseContainer.Name(), container)
 	}
 
-	iface, ok := s.dynamicContainerMap.Load(container)
+	containerID := locID.String() + container
+	iface, ok := s.dynamicContainerMap.Load(containerID)
 	if !ok {
-		c, err := s.LoadContainer(ctx, container, false)
+		c, err := s.loadContainer(ctx, locID, container, false)
 		if err != nil {
 			logger.Errorf(ctx, "failed to load container [%s] dynamically, error %s", container, err)
 			return nil, err
 		}
-		s.dynamicContainerMap.Store(container, c)
+
+		s.dynamicContainerMap.Store(containerID, c)
 		return c, nil
 	}
+
 	return iface.(stow.Container), nil
 }
 
@@ -178,7 +192,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 		return nil, err
 	}
 
-	container, err := s.getContainer(ctx, c)
+	container, err := s.getContainer(ctx, locationIDMain, c)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +227,7 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		return nil, err
 	}
 
-	container, err := s.getContainer(ctx, c)
+	container, err := s.getContainer(ctx, locationIDMain, c)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +261,7 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
-	container, err := s.getContainer(ctx, c)
+	container, err := s.getContainer(ctx, locationIDMain, c)
 	if err != nil {
 		return err
 	}
@@ -283,7 +297,7 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	c, err := s.getContainer(ctx, container)
+	c, err := s.getContainer(ctx, locationIDSignedURL, container)
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
@@ -306,10 +320,35 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 	}, nil
 }
 
-func NewStowRawStore(baseContainerFQN DataReference, loc stow.Location, enableDynamicContainerLoading bool, metricsScope promutils.Scope) (*StowStore, error) {
+type locationID uint
+
+const (
+	locationIDMain locationID = iota
+	locationIDSignedURL
+)
+
+func (l locationID) String() string {
+	return strconv.Itoa(int(l))
+}
+
+func (s *StowStore) getLocation(id locationID) stow.Location {
+	switch id {
+	case locationIDSignedURL:
+		if s.signedURLLoc != nil {
+			return s.signedURLLoc
+		}
+
+		fallthrough
+	default:
+		return s.loc
+	}
+}
+
+func NewStowRawStore(baseContainerFQN DataReference, loc, signedURLLoc stow.Location, enableDynamicContainerLoading bool, metricsScope promutils.Scope) (*StowStore, error) {
 	failureTypeOption := labeled.AdditionalLabelsOption{Labels: []string{FailureTypeLabel.String()}}
 	self := &StowStore{
 		loc:                           loc,
+		signedURLLoc:                  signedURLLoc,
 		baseContainerFQN:              baseContainerFQN,
 		enableDynamicContainerLoading: enableDynamicContainerLoading,
 		dynamicContainerMap:           sync.Map{},
@@ -369,7 +408,17 @@ func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error
 		return emptyStore, fmt.Errorf("unable to configure the storage for %s. Error: %v", kind, err)
 	}
 
-	return NewStowRawStore(fn(cfg.InitContainer), loc, cfg.MultiContainerEnabled, metricsScope)
+	var signedURLLoc stow.Location
+	if len(cfg.SignedURL.StowConfigOverride) > 0 {
+		var newCfg stow.ConfigMap = make(map[string]string, len(cfgMap))
+		MergeMaps(newCfg, cfgMap, cfg.SignedURL.StowConfigOverride)
+		signedURLLoc, err = stow.Dial(kind, newCfg)
+		if err != nil {
+			return emptyStore, fmt.Errorf("unable to configure the storage for %s. Error: %v", kind, err)
+		}
+	}
+
+	return NewStowRawStore(fn(cfg.InitContainer), loc, signedURLLoc, cfg.MultiContainerEnabled, metricsScope)
 }
 
 func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
