@@ -299,12 +299,14 @@ data:
       type: minio
       container: "my-s3-bucket"
       stow:
-        access_key_id: minio
-        auth_type: accesskey
-        secret_key: miniostorage
-        disable_ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
+        kind: s3
+        config:
+          access_key_id: minio
+          auth_type: accesskey
+          secret_key: miniostorage
+          disable_ssl: true
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+          region: us-east-1
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
@@ -479,12 +481,14 @@ data:
       type: minio
       container: "my-s3-bucket"
       stow:
-        access_key_id: minio
-        auth_type: accesskey
-        secret_key: miniostorage
-        disable_ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
+        kind: s3
+        config:
+          access_key_id: minio
+          auth_type: accesskey
+          secret_key: miniostorage
+          disable_ssl: true
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+          region: us-east-1
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
@@ -636,12 +640,14 @@ data:
       type: minio
       container: "my-s3-bucket"
       stow:
-        access_key_id: minio
-        auth_type: accesskey
-        secret_key: miniostorage
-        disable_ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
+        kind: s3
+        config:
+          access_key_id: minio
+          auth_type: accesskey
+          secret_key: miniostorage
+          disable_ssl: true
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+          region: us-east-1
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
@@ -4449,7 +4455,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d3ad9884a7b9db1e92351cfd738cb099bca1764064090b286620c9c902fe29f"
+        configChecksum: "cdb229570c3c16d58df40c947e095bc344993b8a691fe196e9645fb7e615059"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4648,7 +4654,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9937db0fbcdb08c62495b85b851d591776c4e3006f7049b7dbe321ee66b73d8"
+        configChecksum: "6edd66d302b3a62f43a373626c06c3861c1ace8bc499a6c59139b6eb4166aa6"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -4728,7 +4734,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d3ad9884a7b9db1e92351cfd738cb099bca1764064090b286620c9c902fe29f"
+        configChecksum: "cdb229570c3c16d58df40c947e095bc344993b8a691fe196e9645fb7e615059"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4812,7 +4818,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8cf44ab8bde432ed661cc90b9f2e33c4f4c55af68003f253b4438ca27fc369e"
+        configChecksum: "78628e38afc03117d2173a07f6f890ec765a20c6522dfb97c81fc75242f5b97"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -4881,7 +4887,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "8cf44ab8bde432ed661cc90b9f2e33c4f4c55af68003f253b4438ca27fc369e"
+        configChecksum: "78628e38afc03117d2173a07f6f890ec765a20c6522dfb97c81fc75242f5b97"
     spec:
       securityContext:
         fsGroup: 65534

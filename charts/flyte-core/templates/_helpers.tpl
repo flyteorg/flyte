@@ -148,12 +148,14 @@ storage:
   type: minio
   container: {{ .Values.storage.bucketName | quote }}
   stow:
-    access_key_id: minio
-    auth_type: accesskey
-    secret_key: miniostorage
-    disable_ssl: true
-    endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
-    region: us-east-1
+    kind: s3
+    config:
+      access_key_id: minio
+      auth_type: accesskey
+      secret_key: miniostorage
+      disable_ssl: true
+      endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
+      region: us-east-1
   signedUrl:
     stowConfigOverride:
       endpoint: http://localhost:30084
