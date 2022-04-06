@@ -19,6 +19,8 @@ __pycache__/
 /charts/flyte/charts
 /charts/flyte/Chart.lock
 /charts/flyte-core/Chart.lock
+/docker/sandbox-lite/storage/charts
+/docker/sandbox-lite/storage/Chart.lock
 **/*.bak-
 bin/-
 bin/

@@ -29,6 +29,8 @@ import (
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
 
+const defaultNamespace = "all"
+
 func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
 		return err
@@ -91,13 +93,13 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 
 	if !cfg.DisableWebhook {
 		g.Go(func() error {
-			return webhookEntrypoint.Run(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig(), "all")
+			return webhookEntrypoint.Run(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig(), defaultNamespace)
 		})
 	}
 
 	if !cfg.Disabled {
 		g.Go(func() error {
-			return propellerEntrypoint.StartController(ctx, propellerConfig.GetConfig(), "all")
+			return propellerEntrypoint.StartController(ctx, propellerConfig.GetConfig(), defaultNamespace)
 		})
 	}
 
