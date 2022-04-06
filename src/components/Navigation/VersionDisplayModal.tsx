@@ -3,7 +3,7 @@ import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
 import { ClosableDialogTitle } from 'components/common/ClosableDialogTitle';
-import { useVersion } from 'components/hooks/useVersion';
+import { useAdminVersion } from 'components/hooks/useVersion';
 import { env } from 'common/env';
 
 const { version: platformVersion } = require('../../../package.json');
@@ -61,15 +61,7 @@ interface VersionDisplayModalProps {
 
 export const VersionDisplayModal: React.FC<VersionDisplayModalProps> = ({ onClose }) => {
   const styles = useStyles();
-  const version = useVersion();
-
-  const adminVersion =
-    version && version.value && version.value.controlPlaneVersion
-      ? version.value.controlPlaneVersion.Version?.slice(
-          1,
-          version.value.controlPlaneVersion.Version?.indexOf('-'),
-        )
-      : null;
+  const { adminVersion } = useAdminVersion();
 
   const { DISABLE_GA } = env;
 

@@ -21,7 +21,4 @@ export const defaultLocalCacheConfig: LocalCacheConfig = {
 
   // Production
   'flyte.show-workflow-versions': 'true',
-
-  // Feature flags - for prod testing
-  'ff.timeline-view': 'false',
 };
