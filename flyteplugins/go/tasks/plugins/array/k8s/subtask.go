@@ -309,13 +309,6 @@ func getSubtaskPhaseInfo(ctx context.Context, stCtx SubTaskExecutionContext, cfg
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if phaseInfo.Info() != nil {
-		// Append sub-job status in Log Name for viz.
-		for _, log := range phaseInfo.Info().Logs {
-			log.Name += fmt.Sprintf(" (%s)", phaseInfo.Phase().String())
-		}
-	}
-
 	return phaseInfo, err
 }
 

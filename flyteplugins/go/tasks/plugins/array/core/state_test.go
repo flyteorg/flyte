@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -50,34 +49,15 @@ func assertBitSetsEqual(t testing.TB, b1, b2 *bitarray.BitSet, len int) {
 	}
 }
 
-func assertTaskExternalResources(t *testing.T, subTaskIDs []*string, retryAttemptsArray *bitarray.CompactArray, detailedArray *bitarray.CompactArray, externalResources []*core.ExternalResource) {
-	assert.NotNil(t, externalResources)
-	for i, subTaskID := range subTaskIDs {
-		externalResource := externalResources[i]
-		assert.Equal(t, *subTaskID, externalResource.ExternalID)
-		assert.Equal(t, retryAttemptsArray.GetItem(i), bitarray.Item(externalResource.RetryAttempt))
-		assert.Equal(t, core.Phases[detailedArray.GetItem(i)], externalResource.Phase)
-	}
-}
-
 func TestMapArrayStateToPluginPhase(t *testing.T) {
 	ctx := context.Background()
 
 	subTaskCount := 3
 
-	var subTaskIDs = make([]*string, subTaskCount)
 	detailedArray := NewPhasesCompactArray(uint(subTaskCount))
 	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount))
 	retryAttemptsArray, err := bitarray.NewCompactArray(uint(subTaskCount), bitarray.Item(1))
 	assert.NoError(t, err)
-
-	for i := 0; i < subTaskCount; i++ {
-		subTaskID := fmt.Sprintf("sub_task_%d", i)
-		subTaskIDs[i] = &subTaskID
-
-		detailedArray.SetItem(i, bitarray.Item(core.PhaseRunning))
-		retryAttemptsArray.SetItem(i, bitarray.Item(1))
-	}
 
 	t.Run("start", func(t *testing.T) {
 		s := State{
@@ -88,7 +68,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			IndexesToCache: indexesToCache,
 			RetryAttempts:  retryAttemptsArray,
 		}
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseInitializing, phaseInfo.Phase())
 	})
@@ -104,7 +84,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 	})
@@ -122,11 +102,10 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 		assert.Equal(t, uint32(368), phaseInfo.Version())
-		assertTaskExternalResources(t, subTaskIDs, &retryAttemptsArray, &detailedArray, phaseInfo.Info().ExternalResources)
 	})
 
 	t.Run("write to discovery", func(t *testing.T) {
@@ -142,11 +121,10 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 		assert.Equal(t, uint32(548), phaseInfo.Version())
-		assertTaskExternalResources(t, subTaskIDs, &retryAttemptsArray, &detailedArray, phaseInfo.Info().ExternalResources)
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -160,10 +138,9 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseSuccess, phaseInfo.Phase())
-		assertTaskExternalResources(t, subTaskIDs, &retryAttemptsArray, &detailedArray, phaseInfo.Info().ExternalResources)
 	})
 
 	t.Run("retryable failure", func(t *testing.T) {
@@ -177,10 +154,9 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRetryableFailure, phaseInfo.Phase())
-		assertTaskExternalResources(t, subTaskIDs, &retryAttemptsArray, &detailedArray, phaseInfo.Info().ExternalResources)
 	})
 
 	t.Run("permanent failure", func(t *testing.T) {
@@ -194,10 +170,9 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			RetryAttempts:  retryAttemptsArray,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhasePermanentFailure, phaseInfo.Phase())
-		assertTaskExternalResources(t, subTaskIDs, &retryAttemptsArray, &detailedArray, phaseInfo.Info().ExternalResources)
 	})
 
 	t.Run("All phases", func(t *testing.T) {
@@ -211,7 +186,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 				RetryAttempts:  retryAttemptsArray,
 			}
 
-			phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
+			phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 			assert.NoError(t, err)
 			assert.NotEqual(t, core.PhaseUndefined, phaseInfo.Phase())
 		}

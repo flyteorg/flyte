@@ -21,10 +21,10 @@ func TestSubTaskExecutionContext(t *testing.T) {
 	originalIndex := 5
 	retryAttempt := uint64(1)
 
-	stCtx, err := newSubTaskExecutionContext(tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt)
+	stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt)
 	assert.Nil(t, err)
 
-	assert.Equal(t, stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), fmt.Sprintf("notfound-%d-%d", executionIndex, retryAttempt))
+	assert.Equal(t, fmt.Sprintf("notfound-%d-%d", executionIndex, retryAttempt), stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
 	subtaskTemplate, err := stCtx.TaskReader().Read(ctx)
 	assert.Nil(t, err)
