@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin/workflow-execution-event-request",
+  "properties": {
+    "RequestId": {
+      "type": "string"
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "execution_id": {
+          "$ref": "#/$defs/WorkflowExecutionIdentifier"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "integer"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "output_result": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "output_uri": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/ExecutionError"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "WorkflowExecutionIdentifier": {
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Timestamp": {
+      "properties": {
+        "seconds": {
+          "type": "integer"
+        },
+        "nanos": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ExecutionError": {
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "error_uri": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
