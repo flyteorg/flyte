@@ -81,12 +81,12 @@ backups. You can read more about it `here <https://docs.opta.dev/modules-referen
 Production-grade Object Store
 *****************************
 The aws-s3 module in ``flyte.yaml`` creates a new S3 bucket for Flyte, including disk encryption. You can read more about it
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-s3>`__.
+`here <https://docs.opta.dev/reference/aws/modules/aws-s3/>`__.
 
 Secure IAM Roles for Data and Control Planes
 ********************************************
 The aws-iam-role module in ``flyte.yaml`` creates IAM roles for the data and control planes of the Flyte service. You can read more about it
-`here <https://docs.opta.dev/reference/aws/service_modules/aws-iam-role/>`__.
+`here <https://docs.opta.dev/reference/aws/modules/aws-iam-role/>`__.
 
 Once complete please run ``opta apply -c env.yaml`` and follow the prompts.
 
