@@ -3,8 +3,6 @@ package k8s
 import (
 	"context"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -84,12 +82,21 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	var nextState *arrayCore.State
 	var err error
-	var logLinks []*idlCore.TaskLog
-	var subTaskIDs []*string
+	var externalResources []*core.ExternalResource
 
-	switch p, _ := pluginState.GetPhase(); p {
+	switch p, version := pluginState.GetPhase(); p {
 	case arrayCore.PhaseStart:
 		nextState, err = array.DetermineDiscoverability(ctx, tCtx, pluginState)
+		if err != nil {
+			return core.UnknownTransition, err
+		}
+
+		externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, pluginState,
+			func(tCtx core.TaskExecutionContext, childIndex int) string {
+				subTaskExecutionID := NewSubTaskExecutionID(tCtx.TaskExecutionMetadata().GetTaskExecutionID(), childIndex, 0)
+				return subTaskExecutionID.GetGeneratedName()
+			},
+		)
 
 	case arrayCore.PhasePreLaunch:
 		nextState = pluginState.SetPhase(arrayCore.PhaseLaunch, core.DefaultPhaseVersion).SetReason("Nothing to do in PreLaunch phase.")
@@ -102,12 +109,11 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		// In order to maintain backwards compatibility with the state transitions
 		// in the aws batch plugin. Forward to PhaseCheckingSubTasksExecutions where the launching
 		// is actually occurring.
-		nextState = pluginState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, core.DefaultPhaseVersion).SetReason("Nothing to do in Launch phase.")
+		nextState = pluginState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, version).SetReason("Nothing to do in Launch phase.")
 		err = nil
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
-
-		nextState, logLinks, subTaskIDs, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
+		nextState, externalResources, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
 			tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:
@@ -135,7 +141,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	}
 
 	// Determine transition information from the state
-	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, nextState, logLinks, subTaskIDs)
+	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, nextState, nil, externalResources)
 	if err != nil {
 		return core.UnknownTransition, err
 	}

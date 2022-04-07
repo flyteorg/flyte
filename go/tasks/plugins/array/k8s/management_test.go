@@ -175,7 +175,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -212,7 +212,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			}
 
 			// execute
-			newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+			newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 			// validate results
 			assert.Nil(t, err)
@@ -254,7 +254,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -272,7 +272,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		ntCtx := getMockTaskExecutionContext(ctx, 0)
 		ntCtx.OnResourceManager().Return(&nresourceManager)
 
-		lastState, _, _, err := LaunchAndCheckSubTasksState(ctx, ntCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", newState)
+		lastState, _, err := LaunchAndCheckSubTasksState(ctx, ntCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", newState)
 		assert.Nil(t, err)
 		np, _ := lastState.GetPhase()
 		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), np.String())
@@ -315,7 +315,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -380,7 +380,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, logLinks, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, externalResources, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -390,18 +390,17 @@ func TestCheckSubTasksState(t *testing.T) {
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", 0)
 		resourceManager.AssertNumberOfCalls(t, "ReleaseResource", 0)
 
-		assert.NotEmpty(t, logLinks)
-		assert.Equal(t, subtaskCount*2, len(logLinks))
-		for i := 0; i < subtaskCount*2; i = i + 2 {
-			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #0-%d (PhaseRunning)", i/2), logLinks[i].Name)
-			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i/2), logLinks[i].Uri)
-
-			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #0-%d (PhaseRunning)", i/2), logLinks[i+1].Name)
-			assert.Equal(t, fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.notfound-%d;streamFilter=typeLogStreamPrefix", i/2), logLinks[i+1].Uri)
-		}
-
+		assert.Equal(t, subtaskCount, len(externalResources))
 		for i := 0; i < subtaskCount; i++ {
-			assert.Equal(t, fmt.Sprintf("notfound-%d", i), *subTaskIDs[i])
+			externalResource := externalResources[i]
+			assert.Equal(t, fmt.Sprintf("notfound-%d", i), externalResource.ExternalID)
+
+			logLinks := externalResource.Logs
+			assert.Equal(t, 2, len(logLinks))
+			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #0-%d", i), logLinks[0].Name)
+			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i), logLinks[0].Uri)
+			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #0-%d", i), logLinks[1].Name)
+			assert.Equal(t, fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.notfound-%d;streamFilter=typeLogStreamPrefix", i), logLinks[1].Uri)
 		}
 	})
 
@@ -438,7 +437,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -487,7 +486,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
