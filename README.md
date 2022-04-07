@@ -72,6 +72,8 @@ Code. Iterate. Deploy.
 
 </html>
 
+---
+
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable, and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type-safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI, and REST/gRPC API to interact with the computation.
 
@@ -90,10 +92,9 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 - Data-aware and strongly-typed
 - Resource-aware and deployments at scale
 
-<figure>
-  <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif" alt="Flyte UI"/>
-  <figcaption>✨ Flyte UI ✨</figcaption>
-</figure>
+| ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif) |
+|:--:|
+| *✨ Flyte UI ✨* |
 
 ## ⭐️ Current Deployments & Contributors
 
@@ -304,9 +305,7 @@ Ask us anything Flyte, weekly on Wednesdays:
 
 ### Knowledge Base
 
-Find answers to the FAQs: our minified StackOverflow and magnified Slack.
-
-- [Knowledge Base](https://discuss.flyte.io)
+Find answers to the FAQs at [Knowledge Base](https://discuss.flyte.io): our minified StackOverflow and magnified Slack.
 
 ### Conference Talks & Podcasts
 
