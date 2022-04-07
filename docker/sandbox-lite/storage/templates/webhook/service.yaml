@@ -1,0 +1,17 @@
+# Webhook Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with .Values.webhook.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  type: ExternalName
+  externalName: host.docker.internal
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9443

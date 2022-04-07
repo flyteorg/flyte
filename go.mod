@@ -3,7 +3,7 @@ module github.com/flyteorg/flyte
 go 1.18
 
 require (
-	github.com/flyteorg/datacatalog v0.3.26
+	github.com/flyteorg/datacatalog v0.3.30
 	github.com/flyteorg/flyteadmin v0.6.127
 	github.com/flyteorg/flyteplugins v0.10.16
 	github.com/flyteorg/flytepropeller v0.16.37
@@ -174,6 +174,4 @@ require (
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
 
-replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.39-0.20220406090050-0f1471579e74
-
-replace github.com/flyteorg/datacatalog => github.com/pingsutw/datacatalog v0.3.20-0.20220405132753-33c8f8e87aec
+replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.39-0.20220407084621-09a8aa129117

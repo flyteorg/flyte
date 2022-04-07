@@ -355,6 +355,8 @@ github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga
 github.com/fatih/structtag v1.2.0/go.mod h1:mBJUNpUnHmRKrKlQQlmCrh5PuhftFbNv8Ys4/aAZl94=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
+github.com/flyteorg/datacatalog v0.3.30 h1:pJV0OxXwR2zXGl2AwD4a0/HNjhXzNo9vtSG7MeW0BQE=
+github.com/flyteorg/datacatalog v0.3.30/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
 github.com/flyteorg/flyteadmin v0.6.127 h1:J6urIamqRPBrbEEo91vXgryL0ZCYFQqa4nrmuvANs+8=
 github.com/flyteorg/flyteadmin v0.6.127/go.mod h1:6r+k5PbVffIC99Pqw+PF1giBFMvBRolqE9nQGqyt/BY=
 github.com/flyteorg/flyteidl v0.23.0/go.mod h1:576W2ViEyjTpT+kEVHAGbrTP3HARNUZ/eCwrNPmdx9U=
@@ -363,8 +365,8 @@ github.com/flyteorg/flyteidl v0.24.10 h1:fCYpfp5fxKbhRMSkP0Hdw5lOPBTItLU1A3WA1Lc
 github.com/flyteorg/flyteidl v0.24.10/go.mod h1:vHSugApgS3hRITIafzQDU8DZD/W8wFRfFcgaFU35Dww=
 github.com/flyteorg/flyteplugins v0.10.16 h1:rwNI2MACPbcST2O6CEUsNW6bccz7ZLni0GiY3orevfw=
 github.com/flyteorg/flyteplugins v0.10.16/go.mod h1:YBWV8QnFakDJfLyua8pYddiWqszAqseBKIJPNMERlos=
-github.com/flyteorg/flytepropeller v0.16.39-0.20220406090050-0f1471579e74 h1:JVpPrkt/QX/iVoHUetbQaQLwl4Z00yi7+WFfK57EvTs=
-github.com/flyteorg/flytepropeller v0.16.39-0.20220406090050-0f1471579e74/go.mod h1:4q7GMNboImpsm06ug69oduRB0jn2rPrAop+gWqW3KPw=
+github.com/flyteorg/flytepropeller v0.16.39-0.20220407084621-09a8aa129117 h1:3nGcj4YpBB10MLZGWOR3j5SobfVadcfqiRacgtkU0/A=
+github.com/flyteorg/flytepropeller v0.16.39-0.20220407084621-09a8aa129117/go.mod h1:4q7GMNboImpsm06ug69oduRB0jn2rPrAop+gWqW3KPw=
 github.com/flyteorg/flytestdlib v0.3.13/go.mod h1:Tz8JCECAbX6VWGwFT6cmEQ+RJpZ/6L9pswu3fzWs220=
 github.com/flyteorg/flytestdlib v0.4.13/go.mod h1:fv1ar34LJLMTaf0tbfetisLykUlARi7rP+NQTUn6QQs=
 github.com/flyteorg/flytestdlib v0.4.19 h1:gBq5tVSenS4+nt5O8s+RwWsrgqxr+G9DZTD/3teP1Qc=
@@ -1300,8 +1302,6 @@ github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG
 github.com/pierrec/lz4 v1.0.2-0.20190131084431-473cd7ce01a1/go.mod h1:3/3N9NVKO0jef7pBehbT1qWhCMrIgbYNnFAZCqQ5LRc=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pierrec/lz4 v2.4.1+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pingsutw/datacatalog v0.3.20-0.20220405132753-33c8f8e87aec h1:yC7rpYyljiwl9PuntzHBeAczQNJaHfn7UMQIJ513UPI=
-github.com/pingsutw/datacatalog v0.3.20-0.20220405132753-33c8f8e87aec/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 h1:Qj1ukM4GlMWXNdMBuXcXfz/Kw9s1qm0CLY32QxuSImI=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4/go.mod h1:N6UoU20jOqggOuDwUaBQpluzLNDqif3kq9z2wpdYEfQ=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

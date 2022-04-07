@@ -93,6 +93,10 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 
 	if !cfg.DisableWebhook {
 		g.Go(func() error {
+			err := webhookEntrypoint.InitCerts(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig())
+			if err != nil {
+				return err
+			}
 			return webhookEntrypoint.Run(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig(), defaultNamespace)
 		})
 	}

@@ -1,7 +1,6 @@
 #
 # POSTGRES SETTINGS
 #
-
 postgres:
   # --- enable or disable Postgres deployment installation
   enabled: true
@@ -97,3 +96,13 @@ kubernetes-dashboard:
 sparkoperator:
   # --- enable or disable Spark operator deployment installation
   enabled: false
+
+#
+# Webhook SETTINGS
+#
+webhook:
+  # -- Service settings for the webhook
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: ClusterIP
