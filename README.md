@@ -26,8 +26,7 @@
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytectl/latest.svg?style=plastic)
 [![Slack](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://slack.flyte.org)
 
-FlyteCTL was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang
-and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
+Flytectl was designed as a portable and lightweight command-line interface to work with Flyte. It is written in Golang and accesses [FlyteAdmin](https://github.com/flyteorg/flyteadmin/), the control plane for Flyte.
 
 ## 🚀 Quick Start
 
@@ -68,5 +67,5 @@ You can find the detailed contribution guide [here](docs/source/contribute.rst).
     </h2>
 </html>
 
-Refer to the [issues](https://docs.flyte.org/en/latest/community/contribute.html#issues) section in the contribution
+Refer to the [issues](https://docs.flyte.org/en/latest/community/contribute.html#file-an-issue) section in the contribution
 guide if you'd like to file an issue.
