@@ -8,12 +8,12 @@
 </h1>
 
 <p align="center">
-  💻 ♻️ 🚀
+  💻 🛳 🚀
 </p>
 
 <p align="center">
 <strong>
-Code. Iterate. Deploy.
+Code. Ship. Scale.
 </strong>
 </p>
 
