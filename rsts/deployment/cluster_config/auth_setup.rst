@@ -53,15 +53,14 @@ The following is required for non-sandbox deployments:
 * A public domain name (e.g. example.foobar.com)
 * Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
 
-   .. note::
+.. note::
 
-      Flyte's Ingress routes traffic to either
-      Flyte Console or FlyteAdmin based on the url path
+   Flyte's Ingress routes traffic to either Flyte Console or FlyteAdmin based on the url path.
 
-   .. prompt:: bash
+.. prompt:: bash
 
-      # determine Flyte Ingress IP
-      kubectl get ingress -n flyte flyte
+   # determine Flyte Ingress IP
+   kubectl get ingress -n flyte flyte
 
 IdP Configuration
 =================
@@ -181,6 +180,12 @@ Apply Configuration
 
       kubectl rollout restart deployment/flytepropeller -n flyte
 
+#. Restart `flytescheduler` to start using authenticated requests:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytescheduler -n flyte
+
 .. note::
 
    **Congratulations!**
@@ -198,7 +203,17 @@ Flyte comes with a built-in authorization server that can be statically configur
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/pull/168/files#diff-1267ff8bd9146e1c0ff22a9e9d53cfc56d71c1d47fed9905f95ed4bddf930f8eR74-R100>`__
 and the corresponding section can be modified through configs.
 
-To set up an external OAuth2 Authorization Server, please follow the instructions below:
+Hence, it is not necessary to set up an external Authorization Server. However, it is recommended to do so to maintain the security of the configured apps in a secure location and to
+be manage (add, modify, delete) apps using the external authorization server.
+
+To set up an external OAuth2 Authorization Server, follow the instructions below:
+
+.. note::
+
+   **Google IdP**
+
+   Google IdP does not offer an OAuth2 Authorization Server that could be used to protect external services (For example Flyte). In this case, Google offers a separate Cloud Product called Google Cloud Identity.
+   Configuration for Cloud Identity is not included in this guide. If unavailable, setup can stop here and FlyteAdmin BuiltIn OAuth2 Authorization Server can be used instead.
 
 .. tabbed:: Okta
 
