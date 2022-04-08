@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 
+	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
@@ -97,6 +98,7 @@ type ExecutionManager struct {
 	resourceManager           interfaces.ResourceInterface
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
 	eventPublisher            notificationInterfaces.Publisher
+	cloudEventPublisher       notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 	pluginRegistry            *plugins.Registry
 }
@@ -1352,8 +1354,13 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		m.systemMetrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
+	go func() {
+		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+			m.systemMetrics.PublishEventError.Inc()
+			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+		}
+	}()
 
-	m.systemMetrics.ExecutionEventsCreated.Inc()
 	return &admin.WorkflowExecutionEventResponse{}, nil
 }
 
@@ -1675,7 +1682,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
-	eventPublisher notificationInterfaces.Publisher, eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
+	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
+	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1705,6 +1713,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
 		eventPublisher:            eventPublisher,
+		cloudEventPublisher:       cloudEventPublisher,
 		dbEventWriter:             eventWriter,
 		pluginRegistry:            pluginRegistry,
 	}

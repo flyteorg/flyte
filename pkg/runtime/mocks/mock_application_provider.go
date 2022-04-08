@@ -12,6 +12,7 @@ type MockApplicationProvider struct {
 	notificationsConfig  interfaces.NotificationsConfig
 	domainsConfig        interfaces.DomainsConfig
 	externalEventsConfig interfaces.ExternalEventsConfig
+	cloudEventConfig     interfaces.CloudEventsConfig
 }
 
 func (p *MockApplicationProvider) GetDbConfig() *interfaces.DbConfig {
@@ -68,4 +69,12 @@ func (p *MockApplicationProvider) SetExternalEventsConfig(externalEventsConfig i
 
 func (p *MockApplicationProvider) GetExternalEventsConfig() *interfaces.ExternalEventsConfig {
 	return &p.externalEventsConfig
+}
+
+func (p *MockApplicationProvider) SetCloudEventsConfig(cloudEventConfig interfaces.CloudEventsConfig) {
+	p.cloudEventConfig = cloudEventConfig
+}
+
+func (p *MockApplicationProvider) GetCloudEventsConfig() *interfaces.CloudEventsConfig {
+	return &p.cloudEventConfig
 }
