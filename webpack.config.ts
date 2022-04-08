@@ -26,7 +26,7 @@ export const serviceName = process.env.SERVICE_NAME || 'not set';
 export const dist = path.join(__dirname, 'dist');
 
 /** Webpack public path. All emitted assets will have relative path to this path */
-export const publicPath = `${env.BASE_URL}/`;
+export const publicPath = `${env.BASE_URL}/assets/`;
 
 /** True if we are in development mode */
 export const isDev = env.NODE_ENV === 'development';
@@ -53,7 +53,7 @@ export const resolve: webpack.ResolveOptions = {
   /** Extension that are allowed to be omitted from import statements */
   extensions: ['.ts', '.tsx', '.js', '.jsx'],
   /** "main" fields in package.json files to resolve a CommonJS module for */
-  mainFields: ['browser', 'module', 'main'],
+  mainFields: ['browser', 'module', 'main']
 };
 
 /** Get clean version of a version string of package.json entry for a package by
@@ -68,10 +68,10 @@ export function absoluteVersion(version: string) {
 
 /** CDN path in case we would use minified react and react-DOM */
 const cdnReact = `https://unpkg.com/react@${absoluteVersion(
-  packageJson.devDependencies.react,
+  packageJson.devDependencies.react
 )}/umd/react.production.min.js`;
 const cdnReactDOM = `https://unpkg.com/react-dom@${absoluteVersion(
-  packageJson.devDependencies['react-dom'],
+  packageJson.devDependencies['react-dom']
 )}/umd/react-dom.production.min.js`;
 
 /** Minification options for HTMLWebpackPlugin */
@@ -80,20 +80,20 @@ export const htmlMinifyConfig: HTMLWebpackPlugin.MinifyOptions = {
   minifyJS: false,
   removeComments: true,
   collapseInlineTagWhitespace: true,
-  collapseWhitespace: true,
+  collapseWhitespace: true
 };
 
 /** Adds sourcemap support */
 export const sourceMapRule: webpack.RuleSetRule = {
   test: /\.js$/,
   enforce: 'pre',
-  use: ['source-map-loader'],
+  use: ['source-map-loader']
 };
 
 /** Rule for images, icons and fonts */
 export const imageAndFontsRule: webpack.RuleSetRule = {
   test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-  type: 'asset/resource',
+  type: 'asset/resource'
 };
 
 /** Generates HTML file that includes webpack assets */
@@ -102,18 +102,18 @@ export const htmlPlugin = new HTMLWebpackPlugin({
   inject: 'body',
   minify: isProd ? htmlMinifyConfig : false,
   hash: false,
-  showErrors: isDev,
+  showErrors: isDev
 });
 
 export const favIconPlugin = new FavIconWebpackPlugin({
-  logo: path.resolve(__dirname, 'src/assets/favicon.png'),
-  prefix: 'assets/', // we can add '[fullhash:8]/' to the end of the file in future
+  logo: path.resolve(__dirname, 'src/assets/favicon.png'), //'./src/assets/favicon.png', - narusina
+  prefix: '[fullhash:8]/'
 });
 
 /** Write client stats to a JSON file for production */
 export const statsWriterPlugin = new StatsWriterPlugin({
   filename: 'client-stats.json',
-  fields: ['chunks', 'publicPath', 'assets', 'assetsByChunkName', 'assetsByChunkId'],
+  fields: ['chunks', 'publicPath', 'assets', 'assetsByChunkName', 'assetsByChunkId']
 });
 
 /** Gzip assets */
@@ -121,7 +121,7 @@ export const compressionPlugin = new CompressionWebpackPlugin({
   algorithm: 'gzip',
   test: /\.(js|css|html)$/,
   threshold: 10240,
-  minRatio: 0.8,
+  minRatio: 0.8
 });
 
 /** Define "process.env" in client app. Only provide things that can be public */
@@ -132,11 +132,11 @@ export const getDefinePlugin = (isServer: boolean) =>
       : Object.keys(env).reduce(
           (result, key: string) => ({
             ...result,
-            [key]: JSON.stringify((env as any)[key]),
+            [key]: JSON.stringify((env as any)[key])
           }),
-          {},
+          {}
         ),
-    __isServer: isServer,
+    __isServer: isServer
   });
 
 /** Enables Webpack HMR */
@@ -144,13 +144,13 @@ export const hmrPlugin = new webpack.HotModuleReplacementPlugin();
 
 /** Limit server chunks to be only one. No need to split code in server */
 export const limitChunksPlugin = new webpack.optimize.LimitChunkCountPlugin({
-  maxChunks: 1,
+  maxChunks: 1
 });
 
 const typescriptRule = {
   test: /\.tsx?$/,
   exclude: /node_modules/,
-  use: ['babel-loader', { loader: 'ts-loader', options: { transpileOnly: true } }],
+  use: ['babel-loader', { loader: 'ts-loader', options: { transpileOnly: true } }]
 };
 
 /**
@@ -174,7 +174,7 @@ export const clientConfig: webpack.Configuration = {
   },
   mode: isDev ? 'development' : 'production',
   module: {
-    rules: [sourceMapRule, typescriptRule, imageAndFontsRule],
+    rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
   },
   optimization: {
     emitOnErrors: isProd,
@@ -185,17 +185,17 @@ export const clientConfig: webpack.Configuration = {
           enforce: true,
           name: 'vendor',
           priority: 10,
-          test: /[\\/]node_modules/,
-        },
-      },
-    },
+          test: /[\\/]node_modules/
+        }
+      }
+    }
   },
   output: {
     publicPath,
     path: dist,
     filename: '[name]-[fullhash:8].js',
     chunkFilename: '[name]-[chunkhash].chunk.js',
-    crossOriginLoading: 'anonymous',
+    crossOriginLoading: 'anonymous'
   },
   get plugins() {
     const plugins: webpack.WebpackPluginInstance[] = [
@@ -210,8 +210,8 @@ export const clientConfig: webpack.Configuration = {
             ctx.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
             await next();
           }),
-        port: 7777,
-      }),
+        port: 7777
+      })
     ];
 
     // Apply production specific configs
@@ -220,7 +220,7 @@ export const clientConfig: webpack.Configuration = {
     }
 
     return plugins;
-  },
+  }
 };
 
 /**
@@ -236,16 +236,16 @@ export const serverConfig: webpack.Configuration = {
   devtool: isProd ? devtool : undefined,
   entry: ['babel-polyfill', './src/server'],
   module: {
-    rules: [sourceMapRule, typescriptRule, imageAndFontsRule],
+    rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
   },
   externals: [nodeExternals({ allowlist: /lyft/ })],
   output: {
     path: dist,
     filename: 'server.js',
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'commonjs2'
     // assetModuleFilename: `${publicPath}/[fullhash:8].[ext]`
   },
-  plugins: [limitChunksPlugin, new ForkTsCheckerWebpackPlugin(), getDefinePlugin(true)],
+  plugins: [limitChunksPlugin, new ForkTsCheckerWebpackPlugin(), getDefinePlugin(true)]
 };
 
 export default [clientConfig, serverConfig];
