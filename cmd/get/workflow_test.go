@@ -22,20 +22,12 @@ import (
 )
 
 var (
-	resourceListRequestWorkflow *admin.ResourceListRequest
-	workflowListResponse        *admin.WorkflowList
-	argsWf                      []string
-	workflow1                   *admin.Workflow
-	workflows                   []*admin.Workflow
+	argsWf    []string
+	workflow1 *admin.Workflow
+	workflows []*admin.Workflow
 )
 
 func getWorkflowSetup() {
-	resourceListRequestWorkflow = &admin.ResourceListRequest{
-		Id: &admin.NamedEntityIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-		},
-	}
 
 	variableMap := map[string]*core.Variable{
 		"var1": {
@@ -97,9 +89,6 @@ func getWorkflowSetup() {
 		},
 	}
 	workflows = []*admin.Workflow{workflow1, workflow2}
-	workflowListResponse = &admin.WorkflowList{
-		Workflows: workflows,
-	}
 	argsWf = []string{"workflow1"}
 	workflow.DefaultConfig.Latest = false
 	workflow.DefaultConfig.Version = ""
@@ -145,6 +134,26 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 		args := []string{"workflowName"}
 		s.FetcherExt.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
+		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("fetching all workflow success", func(t *testing.T) {
+		s := setup()
+		getWorkflowSetup()
+		var args []string
+		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return([]*admin.NamedEntity{}, nil)
+		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
+		assert.Nil(t, err)
+	})
+
+	t.Run("fetching all workflow error", func(t *testing.T) {
+		s := setup()
+		getWorkflowSetup()
+		var args []string
+		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all workflows"))
 		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
 	})

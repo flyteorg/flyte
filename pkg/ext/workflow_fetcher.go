@@ -26,6 +26,22 @@ func (a *AdminFetcherExtClient) FetchAllVerOfWorkflow(ctx context.Context, workf
 	return wList.Workflows, nil
 }
 
+// FetchAllWorkflows fetches all workflows in project domain
+func (a *AdminFetcherExtClient) FetchAllWorkflows(ctx context.Context, project, domain string, filter filters.Filters) ([]*admin.NamedEntity, error) {
+	tranformFilters, err := filters.BuildNamedEntityListRequest(filter, project, domain, core.ResourceType_WORKFLOW)
+	if err != nil {
+		return nil, err
+	}
+	wList, err := a.AdminServiceClient().ListNamedEntities(ctx, tranformFilters)
+	if err != nil {
+		return nil, err
+	}
+	if len(wList.Entities) == 0 {
+		return nil, fmt.Errorf("no workflow retrieved for %v project %v domain", project, domain)
+	}
+	return wList.Entities, nil
+}
+
 // FetchWorkflowLatestVersion fetches latest version for given workflow name
 func (a *AdminFetcherExtClient) FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error) {
 	// Fetch the latest version of the workflow.

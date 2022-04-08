@@ -17,9 +17,10 @@ import (
 )
 
 var (
-	workflowListResponse *admin.WorkflowList
-	workflowFilter       = filters.Filters{}
-	workflowResponse     *admin.Workflow
+	workflowListResponse    *admin.WorkflowList
+	namedEntityListResponse *admin.NamedEntityList
+	workflowFilter          = filters.Filters{}
+	workflowResponse        *admin.Workflow
 )
 
 func getWorkflowFetcherSetup() {
@@ -79,12 +80,47 @@ func getWorkflowFetcherSetup() {
 		},
 	}
 
+	namedEntity := &admin.NamedEntity{
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "workflow",
+		},
+		ResourceType: core.ResourceType_WORKFLOW,
+	}
+
 	workflows := []*admin.Workflow{workflow2, workflow1}
 
+	namedEntityListResponse = &admin.NamedEntityList{
+		Entities: []*admin.NamedEntity{namedEntity},
+	}
 	workflowListResponse = &admin.WorkflowList{
 		Workflows: workflows,
 	}
 	workflowResponse = workflows[0]
+}
+
+func TestFetchAllWorkflows(t *testing.T) {
+	t.Run("non empty response", func(t *testing.T) {
+		getWorkflowFetcherSetup()
+		adminClient.OnListNamedEntitiesMatch(mock.Anything, mock.Anything).Return(namedEntityListResponse, nil)
+		_, err := adminFetcherExt.FetchAllWorkflows(ctx, "project", "domain", workflowFilter)
+		assert.Nil(t, err)
+	})
+	t.Run("empty response", func(t *testing.T) {
+		getWorkflowFetcherSetup()
+		namedEntityListResponse := &admin.NamedEntityList{}
+		adminClient.OnListNamedEntitiesMatch(mock.Anything, mock.Anything).Return(namedEntityListResponse, nil)
+		_, err := adminFetcherExt.FetchAllWorkflows(ctx, "project", "domain", workflowFilter)
+		assert.Equal(t, fmt.Errorf("no workflow retrieved for project project domain domain"), err)
+	})
+}
+
+func TestFetchAllWorkflowsError(t *testing.T) {
+	getWorkflowFetcherSetup()
+	adminClient.OnListNamedEntitiesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	_, err := adminFetcherExt.FetchAllWorkflows(ctx, "project", "domain", workflowFilter)
+	assert.Equal(t, fmt.Errorf("failed"), err)
 }
 
 func TestFetchAllVerOfWorkflow(t *testing.T) {
