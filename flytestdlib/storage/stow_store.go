@@ -303,7 +303,8 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 	}
 
 	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
-		ExpiresIn: properties.ExpiresIn,
+		ExpiresIn:  properties.ExpiresIn,
+		ContentMD5: properties.ContentMD5,
 	})
 
 	if err != nil {

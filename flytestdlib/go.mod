@@ -9,7 +9,7 @@ require (
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.10.0
 	github.com/fatih/structtag v1.2.0
-	github.com/flyteorg/stow v0.3.1
+	github.com/flyteorg/stow v0.3.3
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.0.7
