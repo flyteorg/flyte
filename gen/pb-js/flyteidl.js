@@ -16013,6 +16013,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [reason] TaskExecutionEvent reason
              * @property {string|null} [taskType] TaskExecutionEvent taskType
              * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
+             * @property {number|null} [eventVersion] TaskExecutionEvent eventVersion
              */
 
             /**
@@ -16159,6 +16160,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskExecutionEvent.prototype.metadata = null;
 
+            /**
+             * TaskExecutionEvent eventVersion.
+             * @member {number} eventVersion
+             * @memberof flyteidl.event.TaskExecutionEvent
+             * @instance
+             */
+            TaskExecutionEvent.prototype.eventVersion = 0;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -16230,6 +16239,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.outputData != null && message.hasOwnProperty("outputData"))
                     $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    writer.uint32(/* id 18, wireType 0 =*/144).int32(message.eventVersion);
                 return writer;
             };
 
@@ -16300,6 +16311,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 16:
                         message.metadata = $root.flyteidl.event.TaskExecutionMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 18:
+                        message.eventVersion = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -16412,6 +16426,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "metadata." + error;
                 }
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    if (!$util.isInteger(message.eventVersion))
+                        return "eventVersion: integer expected";
                 return null;
             };
 
@@ -34642,6 +34659,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [reason] TaskExecutionClosure reason
              * @property {string|null} [taskType] TaskExecutionClosure taskType
              * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionClosure metadata
+             * @property {number|null} [eventVersion] TaskExecutionClosure eventVersion
              */
 
             /**
@@ -34764,6 +34782,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskExecutionClosure.prototype.metadata = null;
 
+            /**
+             * TaskExecutionClosure eventVersion.
+             * @member {number} eventVersion
+             * @memberof flyteidl.admin.TaskExecutionClosure
+             * @instance
+             */
+            TaskExecutionClosure.prototype.eventVersion = 0;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -34829,6 +34855,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 12, wireType 2 =*/98).fork()).ldelim();
                 if (message.metadata != null && message.hasOwnProperty("metadata"))
                     $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    writer.uint32(/* id 17, wireType 0 =*/136).int32(message.eventVersion);
                 return writer;
             };
 
@@ -34890,6 +34918,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 16:
                         message.metadata = $root.flyteidl.event.TaskExecutionMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 17:
+                        message.eventVersion = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -34995,6 +35026,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "metadata." + error;
                 }
+                if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                    if (!$util.isInteger(message.eventVersion))
+                        return "eventVersion: integer expected";
                 return null;
             };
 

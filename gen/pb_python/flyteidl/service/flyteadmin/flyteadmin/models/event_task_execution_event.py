@@ -55,7 +55,8 @@ class EventTaskExecutionEvent(object):
         'phase_version': 'int',
         'reason': 'str',
         'task_type': 'str',
-        'metadata': 'EventTaskExecutionMetadata'
+        'metadata': 'EventTaskExecutionMetadata',
+        'event_version': 'int'
     }
 
     attribute_map = {
@@ -74,10 +75,11 @@ class EventTaskExecutionEvent(object):
         'phase_version': 'phase_version',
         'reason': 'reason',
         'task_type': 'task_type',
-        'metadata': 'metadata'
+        'metadata': 'metadata',
+        'event_version': 'event_version'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -96,6 +98,7 @@ class EventTaskExecutionEvent(object):
         self._reason = None
         self._task_type = None
         self._metadata = None
+        self._event_version = None
         self.discriminator = None
 
         if task_id is not None:
@@ -130,6 +133,8 @@ class EventTaskExecutionEvent(object):
             self.task_type = task_type
         if metadata is not None:
             self.metadata = metadata
+        if event_version is not None:
+            self.event_version = event_version
 
     @property
     def task_id(self):
@@ -486,6 +491,29 @@ class EventTaskExecutionEvent(object):
         """
 
         self._metadata = metadata
+
+    @property
+    def event_version(self):
+        """Gets the event_version of this EventTaskExecutionEvent.  # noqa: E501
+
+        The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.  # noqa: E501
+
+        :return: The event_version of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: int
+        """
+        return self._event_version
+
+    @event_version.setter
+    def event_version(self, event_version):
+        """Sets the event_version of this EventTaskExecutionEvent.
+
+        The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.  # noqa: E501
+
+        :param event_version: The event_version of this EventTaskExecutionEvent.  # noqa: E501
+        :type: int
+        """
+
+        self._event_version = event_version
 
     def to_dict(self):
         """Returns the model properties as a dict"""

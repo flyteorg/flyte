@@ -6692,6 +6692,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent metadata */
             metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionEvent eventVersion */
+            eventVersion?: (number|null);
         }
 
         /** Represents a TaskExecutionEvent. */
@@ -6750,6 +6753,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent metadata. */
             public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionEvent eventVersion. */
+            public eventVersion: number;
 
             /** TaskExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");
@@ -14561,6 +14567,9 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure metadata */
             metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionClosure eventVersion */
+            eventVersion?: (number|null);
         }
 
         /** Represents a TaskExecutionClosure. */
@@ -14610,6 +14619,9 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure metadata. */
             public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionClosure eventVersion. */
+            public eventVersion: number;
 
             /** TaskExecutionClosure outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");

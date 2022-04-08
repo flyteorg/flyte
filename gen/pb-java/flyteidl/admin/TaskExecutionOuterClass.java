@@ -4622,6 +4622,18 @@ public final class TaskExecutionOuterClass {
      */
     flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder();
 
+    /**
+     * <pre>
+     * The event version is used to indicate versioned changes in how data is maintained using this
+     * proto message. For example, event_verison &gt; 0 means that maps tasks logs use the
+     * TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+     * in this message.
+     * </pre>
+     *
+     * <code>int32 event_version = 17;</code>
+     */
+    int getEventVersion();
+
     public flyteidl.admin.TaskExecutionOuterClass.TaskExecutionClosure.OutputResultCase getOutputResultCase();
   }
   /**
@@ -4808,6 +4820,11 @@ public final class TaskExecutionOuterClass {
                 metadata_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 136: {
+
+              eventVersion_ = input.readInt32();
               break;
             }
             default: {
@@ -5380,6 +5397,22 @@ public final class TaskExecutionOuterClass {
       return getMetadata();
     }
 
+    public static final int EVENT_VERSION_FIELD_NUMBER = 17;
+    private int eventVersion_;
+    /**
+     * <pre>
+     * The event version is used to indicate versioned changes in how data is maintained using this
+     * proto message. For example, event_verison &gt; 0 means that maps tasks logs use the
+     * TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+     * in this message.
+     * </pre>
+     *
+     * <code>int32 event_version = 17;</code>
+     */
+    public int getEventVersion() {
+      return eventVersion_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5432,6 +5465,9 @@ public final class TaskExecutionOuterClass {
       }
       if (metadata_ != null) {
         output.writeMessage(16, getMetadata());
+      }
+      if (eventVersion_ != 0) {
+        output.writeInt32(17, eventVersion_);
       }
       unknownFields.writeTo(output);
     }
@@ -5491,6 +5527,10 @@ public final class TaskExecutionOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(16, getMetadata());
       }
+      if (eventVersion_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(17, eventVersion_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5543,6 +5583,8 @@ public final class TaskExecutionOuterClass {
         if (!getMetadata()
             .equals(other.getMetadata())) return false;
       }
+      if (getEventVersion()
+          != other.getEventVersion()) return false;
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 1:
@@ -5605,6 +5647,8 @@ public final class TaskExecutionOuterClass {
         hash = (37 * hash) + METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getMetadata().hashCode();
       }
+      hash = (37 * hash) + EVENT_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getEventVersion();
       switch (outputResultCase_) {
         case 1:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -5807,6 +5851,8 @@ public final class TaskExecutionOuterClass {
           metadata_ = null;
           metadataBuilder_ = null;
         }
+        eventVersion_ = 0;
+
         outputResultCase_ = 0;
         outputResult_ = null;
         return this;
@@ -5896,6 +5942,7 @@ public final class TaskExecutionOuterClass {
         } else {
           result.metadata_ = metadataBuilder_.build();
         }
+        result.eventVersion_ = eventVersion_;
         result.bitField0_ = to_bitField0_;
         result.outputResultCase_ = outputResultCase_;
         onBuilt();
@@ -6000,6 +6047,9 @@ public final class TaskExecutionOuterClass {
         }
         if (other.hasMetadata()) {
           mergeMetadata(other.getMetadata());
+        }
+        if (other.getEventVersion() != 0) {
+          setEventVersion(other.getEventVersion());
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -7994,6 +8044,53 @@ public final class TaskExecutionOuterClass {
           metadata_ = null;
         }
         return metadataBuilder_;
+      }
+
+      private int eventVersion_ ;
+      /**
+       * <pre>
+       * The event version is used to indicate versioned changes in how data is maintained using this
+       * proto message. For example, event_verison &gt; 0 means that maps tasks logs use the
+       * TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+       * in this message.
+       * </pre>
+       *
+       * <code>int32 event_version = 17;</code>
+       */
+      public int getEventVersion() {
+        return eventVersion_;
+      }
+      /**
+       * <pre>
+       * The event version is used to indicate versioned changes in how data is maintained using this
+       * proto message. For example, event_verison &gt; 0 means that maps tasks logs use the
+       * TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+       * in this message.
+       * </pre>
+       *
+       * <code>int32 event_version = 17;</code>
+       */
+      public Builder setEventVersion(int value) {
+        
+        eventVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The event version is used to indicate versioned changes in how data is maintained using this
+       * proto message. For example, event_verison &gt; 0 means that maps tasks logs use the
+       * TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+       * in this message.
+       * </pre>
+       *
+       * <code>int32 event_version = 17;</code>
+       */
+      public Builder clearEventVersion() {
+        
+        eventVersion_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -10269,7 +10366,7 @@ public final class TaskExecutionOuterClass {
       "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001" +
       "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio" +
       "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022" +
-      "\r\n\005token\030\002 \001(\t\"\307\004\n\024TaskExecutionClosure\022" +
+      "\r\n\005token\030\002 \001(\t\"\336\004\n\024TaskExecutionClosure\022" +
       "\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\013" +
       "2\035.flyteidl.core.ExecutionErrorH\000\0224\n\013out" +
       "put_data\030\014 \001(\0132\031.flyteidl.core.LiteralMa" +
@@ -10283,17 +10380,17 @@ public final class TaskExecutionOuterClass {
       "stamp\022,\n\013custom_info\030\t \001(\0132\027.google.prot" +
       "obuf.Struct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type" +
       "\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even" +
-      "t.TaskExecutionMetadataB\017\n\routput_result" +
-      "\"Q\n\033TaskExecutionGetDataRequest\0222\n\002id\030\001 " +
-      "\001(\0132&.flyteidl.core.TaskExecutionIdentif" +
-      "ier\"\332\001\n\034TaskExecutionGetDataResponse\022+\n\006" +
-      "inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030" +
-      "\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.UrlB" +
-      "lobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl." +
-      "core.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031." +
-      "flyteidl.core.LiteralMapB7Z5github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/admi" +
-      "nb\006proto3"
+      "t.TaskExecutionMetadata\022\025\n\revent_version" +
+      "\030\021 \001(\005B\017\n\routput_result\"Q\n\033TaskExecution" +
+      "GetDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.co" +
+      "re.TaskExecutionIdentifier\"\332\001\n\034TaskExecu" +
+      "tionGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.fl" +
+      "yteidl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(" +
+      "\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_i" +
+      "nputs\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/" +
+      "\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Lit" +
+      "eralMapB7Z5github.com/flyteorg/flyteidl/" +
+      "gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10344,7 +10441,7 @@ public final class TaskExecutionOuterClass {
     internal_static_flyteidl_admin_TaskExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "OutputResult", });
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "EventVersion", "OutputResult", });
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_fieldAccessorTable = new

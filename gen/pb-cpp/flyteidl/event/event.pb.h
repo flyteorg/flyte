@@ -1528,6 +1528,12 @@ class TaskExecutionEvent final :
   ::google::protobuf::uint32 phase_version() const;
   void set_phase_version(::google::protobuf::uint32 value);
 
+  // int32 event_version = 18;
+  void clear_event_version();
+  static const int kEventVersionFieldNumber = 18;
+  ::google::protobuf::int32 event_version() const;
+  void set_event_version(::google::protobuf::int32 value);
+
   // string output_uri = 9;
   private:
   bool has_output_uri() const;
@@ -1589,6 +1595,7 @@ class TaskExecutionEvent final :
   ::google::protobuf::uint32 retry_attempt_;
   int phase_;
   ::google::protobuf::uint32 phase_version_;
+  ::google::protobuf::int32 event_version_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
@@ -4265,6 +4272,20 @@ inline void TaskExecutionEvent::set_allocated_metadata(::flyteidl::event::TaskEx
   }
   metadata_ = metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskExecutionEvent.metadata)
+}
+
+// int32 event_version = 18;
+inline void TaskExecutionEvent::clear_event_version() {
+  event_version_ = 0;
+}
+inline ::google::protobuf::int32 TaskExecutionEvent::event_version() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.event_version)
+  return event_version_;
+}
+inline void TaskExecutionEvent::set_event_version(::google::protobuf::int32 value) {
+  
+  event_version_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.event_version)
 }
 
 inline bool TaskExecutionEvent::has_output_result() const {
