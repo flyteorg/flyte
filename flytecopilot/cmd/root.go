@@ -9,8 +9,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
-	"github.com/aws/aws-sdk-go/aws/ec2metadata"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
@@ -78,30 +77,30 @@ func PollUntilTimeout(ctx context.Context, pollInterval, timeout time.Duration, 
 	return wait.PollUntil(pollInterval, condition, childCtx.Done())
 }
 
-func checkAWSCreds() error {
-	cfg, err := session.NewSession(&aws.Config{})
+func checkAWSCreds() (*credentials.Value, error) {
+	sess, err := session.NewSession(&aws.Config{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	role := &ec2rolecreds.EC2RoleProvider{
-		Client: ec2metadata.New(cfg),
-	}
-	creds, err := role.Retrieve()
+	// Determine the AWS credentials from the default credential chain
+	creds, err := sess.Config.Credentials.Get()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if creds.AccessKeyID == "" || creds.SecretAccessKey == "" || creds.SessionToken == "" {
-		return fmt.Errorf("invalid data in credential fetch")
+		return nil, fmt.Errorf("invalid data in credential fetch")
 	}
-	return nil
+	return &creds, nil
 }
 
 func waitForAWSCreds(ctx context.Context, timeout time.Duration) error {
 	return PollUntilTimeout(ctx, time.Second*5, timeout, func() (bool, error) {
-		if err := checkAWSCreds(); err != nil {
-			logger.Errorf(ctx, "Failed to Get credentials.")
+		if creds, err := checkAWSCreds(); err != nil {
+			logger.Errorf(ctx, "failed to get AWS credentials: %s", err)
 			return false, nil
+		} else if creds != nil {
+			logger.Infof(ctx, "found AWS credentials from provider: %s", creds.ProviderName)
 		}
 		return true, nil
 	})
