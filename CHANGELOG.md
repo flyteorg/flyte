@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.50.0](http://github.com/lyft/flyteconsole/compare/v0.49.0...v0.50.0) (2022-04-08)
+
+
+### Features
+
+* expand/collapse domain settings section ([#358](http://github.com/lyft/flyteconsole/issues/358)) ([fc048a6](http://github.com/lyft/flyteconsole/commit/fc048a668a89d44a3e4abd332e07274c83caa320))
+
 # [0.49.0](http://github.com/lyft/flyteconsole/compare/v0.48.0...v0.49.0) (2022-04-08)
 
 
