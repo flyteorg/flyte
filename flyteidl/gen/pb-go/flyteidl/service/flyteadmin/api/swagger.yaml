@@ -14762,6 +14762,13 @@ definitions:
       metadata:
         description: "Metadata around how a task was executed."
         $ref: "#/definitions/eventTaskExecutionMetadata"
+      event_version:
+        type: "integer"
+        format: "int32"
+        description: "The event version is used to indicate versioned changes in how\
+          \ data is maintained using this\nproto message. For example, event_verison\
+          \ > 0 means that maps tasks logs use the\nTaskExecutionMetadata ExternalResourceInfo\
+          \ fields for each subtask rather than the TaskLog\nin this message."
     description: "Container for task execution details and results."
     example:
       phase: {}
@@ -14809,6 +14816,7 @@ definitions:
         message: "message"
         error_uri: "error_uri"
       duration: "duration"
+      event_version: 1
       updated_at: "2000-01-23T04:56:07.000+00:00"
       custom_info:
         fields:
@@ -14957,6 +14965,7 @@ definitions:
             message: "message"
             error_uri: "error_uri"
           duration: "duration"
+          event_version: 1
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -15045,6 +15054,7 @@ definitions:
             message: "message"
             error_uri: "error_uri"
           duration: "duration"
+          event_version: 1
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -54319,6 +54329,14 @@ definitions:
       metadata:
         description: "Metadata around how a task was executed."
         $ref: "#/definitions/eventTaskExecutionMetadata"
+      event_version:
+        type: "integer"
+        format: "int32"
+        description: "The event version is used to indicate versioned changes in how\
+          \ data is reported using this\nproto message. For example, event_verison\
+          \ > 0 means that maps tasks report logs using the\nTaskExecutionMetadata\
+          \ ExternalResourceInfo fields for each subtask rather than the TaskLog\n\
+          in this message."
     description: "Plugin specific execution event information. For tasks like Python,\
       \ Hive, Spark, DynamicJob."
   eventTaskExecutionMetadata:
@@ -60592,6 +60610,7 @@ definitions:
           message: "message"
           error_uri: "error_uri"
         duration: "duration"
+        event_version: 1
         updated_at: "2000-01-23T04:56:07.000+00:00"
         custom_info:
           fields:

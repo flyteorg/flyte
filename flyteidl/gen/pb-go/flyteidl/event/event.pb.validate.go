@@ -847,6 +847,8 @@ func (m *TaskExecutionEvent) Validate() error {
 		}
 	}
 
+	// no validation rules for EventVersion
+
 	switch m.OutputResult.(type) {
 
 	case *TaskExecutionEvent_OutputUri:

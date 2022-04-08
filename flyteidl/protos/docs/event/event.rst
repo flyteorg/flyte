@@ -194,6 +194,7 @@ Plugin specific execution event information. For tasks like Python, Hive, Spark,
    "reason", ":ref:`ref_string`", "", "An optional explanation for the phase transition."
    "task_type", ":ref:`ref_string`", "", "A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin this type will be identical, but not all task executions necessarily use pre-registered definitions and this type is useful to render the task in the UI, filter task executions, etc."
    "metadata", ":ref:`ref_flyteidl.event.TaskExecutionMetadata`", "", "Metadata around how a task was executed."
+   "event_version", ":ref:`ref_int32`", "", "The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message."
 
 
 

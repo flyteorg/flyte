@@ -389,6 +389,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fevent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskExecutionEvent, reason_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskExecutionEvent, task_type_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskExecutionEvent, metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskExecutionEvent, event_version_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskExecutionEvent, output_result_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::ExternalResourceInfo, _internal_metadata_),
@@ -428,9 +429,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 60, -1, sizeof(::flyteidl::event::ParentTaskExecutionMetadata)},
   { 66, -1, sizeof(::flyteidl::event::ParentNodeExecutionMetadata)},
   { 72, -1, sizeof(::flyteidl::event::TaskExecutionEvent)},
-  { 94, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
-  { 105, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
-  { 112, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
+  { 95, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
+  { 106, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
+  { 113, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -504,7 +505,7 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "WorkflowClosure\"Q\n\033ParentTaskExecutionMe"
   "tadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core.TaskE"
   "xecutionIdentifier\".\n\033ParentNodeExecutio"
-  "nMetadata\022\017\n\007node_id\030\001 \001(\t\"\375\004\n\022TaskExecu"
+  "nMetadata\022\017\n\007node_id\030\001 \001(\t\"\224\005\n\022TaskExecu"
   "tionEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl.co"
   "re.Identifier\022H\n\030parent_node_execution_i"
   "d\030\002 \001(\0132&.flyteidl.core.NodeExecutionIde"
@@ -520,29 +521,30 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "rotobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\016\n"
   "\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010meta"
   "data\030\020 \001(\0132%.flyteidl.event.TaskExecutio"
-  "nMetadataB\017\n\routput_result\"\343\001\n\024ExternalR"
-  "esourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n\005inde"
-  "x\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030"
-  "\004 \001(\0162\".flyteidl.core.TaskExecution.Phas"
-  "e\0227\n\014cache_status\030\005 \001(\0162!.flyteidl.core."
-  "CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyte"
-  "idl.core.TaskLog\"\?\n\020ResourcePoolInfo\022\030\n\020"
-  "allocation_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001("
-  "\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016generated"
-  "_name\030\001 \001(\t\022@\n\022external_resources\030\002 \003(\0132"
-  "$.flyteidl.event.ExternalResourceInfo\022<\n"
-  "\022resource_pool_info\030\003 \003(\0132 .flyteidl.eve"
-  "nt.ResourcePoolInfo\022\031\n\021plugin_identifier"
-  "\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.flyteid"
-  "l.event.TaskExecutionMetadata.InstanceCl"
-  "ass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINT"
-  "ERRUPTIBLE\020\001B7Z5github.com/flyteorg/flyt"
-  "eidl/gen/pb-go/flyteidl/eventb\006proto3"
+  "nMetadata\022\025\n\revent_version\030\022 \001(\005B\017\n\routp"
+  "ut_result\"\343\001\n\024ExternalResourceInfo\022\023\n\013ex"
+  "ternal_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretry_"
+  "attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl."
+  "core.TaskExecution.Phase\0227\n\014cache_status"
+  "\030\005 \001(\0162!.flyteidl.core.CatalogCacheStatu"
+  "s\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\""
+  "\?\n\020ResourcePoolInfo\022\030\n\020allocation_token\030"
+  "\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecuti"
+  "onMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022ex"
+  "ternal_resources\030\002 \003(\0132$.flyteidl.event."
+  "ExternalResourceInfo\022<\n\022resource_pool_in"
+  "fo\030\003 \003(\0132 .flyteidl.event.ResourcePoolIn"
+  "fo\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016instanc"
+  "e_class\030\020 \001(\01623.flyteidl.event.TaskExecu"
+  "tionMetadata.InstanceClass\"/\n\rInstanceCl"
+  "ass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5g"
+  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
+  "yteidl/eventb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto,
-  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3357,
+  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3380,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fevent_2eproto() {
@@ -4708,6 +4710,7 @@ const int TaskExecutionEvent::kPhaseVersionFieldNumber;
 const int TaskExecutionEvent::kReasonFieldNumber;
 const int TaskExecutionEvent::kTaskTypeFieldNumber;
 const int TaskExecutionEvent::kMetadataFieldNumber;
+const int TaskExecutionEvent::kEventVersionFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskExecutionEvent::TaskExecutionEvent()
@@ -4762,8 +4765,8 @@ TaskExecutionEvent::TaskExecutionEvent(const TaskExecutionEvent& from)
     metadata_ = nullptr;
   }
   ::memcpy(&retry_attempt_, &from.retry_attempt_,
-    static_cast<size_t>(reinterpret_cast<char*>(&phase_version_) -
-    reinterpret_cast<char*>(&retry_attempt_)) + sizeof(phase_version_));
+    static_cast<size_t>(reinterpret_cast<char*>(&event_version_) -
+    reinterpret_cast<char*>(&retry_attempt_)) + sizeof(event_version_));
   clear_has_output_result();
   switch (from.output_result_case()) {
     case kOutputUri: {
@@ -4793,8 +4796,8 @@ void TaskExecutionEvent::SharedCtor() {
   reason_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&task_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&phase_version_) -
-      reinterpret_cast<char*>(&task_id_)) + sizeof(phase_version_));
+      reinterpret_cast<char*>(&event_version_) -
+      reinterpret_cast<char*>(&task_id_)) + sizeof(event_version_));
   clear_has_output_result();
 }
 
@@ -4882,8 +4885,8 @@ void TaskExecutionEvent::Clear() {
   }
   metadata_ = nullptr;
   ::memset(&retry_attempt_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&phase_version_) -
-      reinterpret_cast<char*>(&retry_attempt_)) + sizeof(phase_version_));
+      reinterpret_cast<char*>(&event_version_) -
+      reinterpret_cast<char*>(&retry_attempt_)) + sizeof(event_version_));
   clear_output_result();
   _internal_metadata_.Clear();
 }
@@ -5108,6 +5111,13 @@ const char* TaskExecutionEvent::_InternalParse(const char* begin, const char* en
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // int32 event_version = 18;
+      case 18: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 144) goto handle_unusual;
+        msg->set_event_version(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -5347,6 +5357,19 @@ bool TaskExecutionEvent::MergePartialFromCodedStream(
         break;
       }
 
+      // int32 event_version = 18;
+      case 18: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (144 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &event_version_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -5491,6 +5514,11 @@ void TaskExecutionEvent::SerializeWithCachedSizes(
       17, HasBitSetters::output_data(this), output);
   }
 
+  // int32 event_version = 18;
+  if (this->event_version() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(18, this->event_version(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -5632,6 +5660,11 @@ void TaskExecutionEvent::SerializeWithCachedSizes(
         17, HasBitSetters::output_data(this), target);
   }
 
+  // int32 event_version = 18;
+  if (this->event_version() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(18, this->event_version(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -5747,6 +5780,13 @@ size_t TaskExecutionEvent::ByteSizeLong() const {
         this->phase_version());
   }
 
+  // int32 event_version = 18;
+  if (this->event_version() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->event_version());
+  }
+
   switch (output_result_case()) {
     // string output_uri = 9;
     case kOutputUri: {
@@ -5841,6 +5881,9 @@ void TaskExecutionEvent::MergeFrom(const TaskExecutionEvent& from) {
   if (from.phase_version() != 0) {
     set_phase_version(from.phase_version());
   }
+  if (from.event_version() != 0) {
+    set_event_version(from.event_version());
+  }
   switch (from.output_result_case()) {
     case kOutputUri: {
       set_output_uri(from.output_uri());
@@ -5902,6 +5945,7 @@ void TaskExecutionEvent::InternalSwap(TaskExecutionEvent* other) {
   swap(retry_attempt_, other->retry_attempt_);
   swap(phase_, other->phase_);
   swap(phase_version_, other->phase_version_);
+  swap(event_version_, other->event_version_);
   swap(output_result_, other->output_result_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }

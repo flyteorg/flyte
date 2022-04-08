@@ -243,6 +243,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2ftask_5fexecution
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionClosure, reason_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionClosure, task_type_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionClosure, metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionClosure, event_version_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionClosure, output_result_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionGetDataRequest, _internal_metadata_),
@@ -266,8 +267,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 16, -1, sizeof(::flyteidl::admin::TaskExecution)},
   { 25, -1, sizeof(::flyteidl::admin::TaskExecutionList)},
   { 32, -1, sizeof(::flyteidl::admin::TaskExecutionClosure)},
-  { 51, -1, sizeof(::flyteidl::admin::TaskExecutionGetDataRequest)},
-  { 57, -1, sizeof(::flyteidl::admin::TaskExecutionGetDataResponse)},
+  { 52, -1, sizeof(::flyteidl::admin::TaskExecutionGetDataRequest)},
+  { 58, -1, sizeof(::flyteidl::admin::TaskExecutionGetDataResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -307,7 +308,7 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001"
   "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio"
   "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022"
-  "\r\n\005token\030\002 \001(\t\"\307\004\n\024TaskExecutionClosure\022"
+  "\r\n\005token\030\002 \001(\t\"\336\004\n\024TaskExecutionClosure\022"
   "\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\013"
   "2\035.flyteidl.core.ExecutionErrorH\000\0224\n\013out"
   "put_data\030\014 \001(\0132\031.flyteidl.core.LiteralMa"
@@ -321,22 +322,22 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "stamp\022,\n\013custom_info\030\t \001(\0132\027.google.prot"
   "obuf.Struct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type"
   "\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even"
-  "t.TaskExecutionMetadataB\017\n\routput_result"
-  "\"Q\n\033TaskExecutionGetDataRequest\0222\n\002id\030\001 "
-  "\001(\0132&.flyteidl.core.TaskExecutionIdentif"
-  "ier\"\332\001\n\034TaskExecutionGetDataResponse\022+\n\006"
-  "inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030"
-  "\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.UrlB"
-  "lobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl."
-  "core.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031."
-  "flyteidl.core.LiteralMapB7Z5github.com/f"
-  "lyteorg/flyteidl/gen/pb-go/flyteidl/admi"
-  "nb\006proto3"
+  "t.TaskExecutionMetadata\022\025\n\revent_version"
+  "\030\021 \001(\005B\017\n\routput_result\"Q\n\033TaskExecution"
+  "GetDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.co"
+  "re.TaskExecutionIdentifier\"\332\001\n\034TaskExecu"
+  "tionGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.fl"
+  "yteidl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001("
+  "\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_i"
+  "nputs\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/"
+  "\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Lit"
+  "eralMapB7Z5github.com/flyteorg/flyteidl/"
+  "gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
-  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1769,
+  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1792,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto() {
@@ -2209,6 +2210,7 @@ const int TaskExecutionClosure::kCustomInfoFieldNumber;
 const int TaskExecutionClosure::kReasonFieldNumber;
 const int TaskExecutionClosure::kTaskTypeFieldNumber;
 const int TaskExecutionClosure::kMetadataFieldNumber;
+const int TaskExecutionClosure::kEventVersionFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskExecutionClosure::TaskExecutionClosure()
@@ -2259,7 +2261,9 @@ TaskExecutionClosure::TaskExecutionClosure(const TaskExecutionClosure& from)
   } else {
     metadata_ = nullptr;
   }
-  phase_ = from.phase_;
+  ::memcpy(&phase_, &from.phase_,
+    static_cast<size_t>(reinterpret_cast<char*>(&event_version_) -
+    reinterpret_cast<char*>(&phase_)) + sizeof(event_version_));
   clear_has_output_result();
   switch (from.output_result_case()) {
     case kOutputUri: {
@@ -2287,8 +2291,8 @@ void TaskExecutionClosure::SharedCtor() {
   reason_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&started_at_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&phase_) -
-      reinterpret_cast<char*>(&started_at_)) + sizeof(phase_));
+      reinterpret_cast<char*>(&event_version_) -
+      reinterpret_cast<char*>(&started_at_)) + sizeof(event_version_));
   clear_has_output_result();
 }
 
@@ -2376,7 +2380,9 @@ void TaskExecutionClosure::Clear() {
     delete metadata_;
   }
   metadata_ = nullptr;
-  phase_ = 0;
+  ::memset(&phase_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&event_version_) -
+      reinterpret_cast<char*>(&phase_)) + sizeof(event_version_));
   clear_output_result();
   _internal_metadata_.Clear();
 }
@@ -2568,6 +2574,13 @@ const char* TaskExecutionClosure::_InternalParse(const char* begin, const char* 
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // int32 event_version = 17;
+      case 17: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 136) goto handle_unusual;
+        msg->set_event_version(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -2762,6 +2775,19 @@ bool TaskExecutionClosure::MergePartialFromCodedStream(
         break;
       }
 
+      // int32 event_version = 17;
+      case 17: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (136 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &event_version_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2882,6 +2908,11 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
       16, HasBitSetters::metadata(this), output);
   }
 
+  // int32 event_version = 17;
+  if (this->event_version() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(17, this->event_version(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2998,6 +3029,11 @@ void TaskExecutionClosure::SerializeWithCachedSizes(
         16, HasBitSetters::metadata(this), target);
   }
 
+  // int32 event_version = 17;
+  if (this->event_version() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(17, this->event_version(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -3092,6 +3128,13 @@ size_t TaskExecutionClosure::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->phase());
   }
 
+  // int32 event_version = 17;
+  if (this->event_version() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->event_version());
+  }
+
   switch (output_result_case()) {
     // string output_uri = 1 [deprecated = true];
     case kOutputUri: {
@@ -3175,6 +3218,9 @@ void TaskExecutionClosure::MergeFrom(const TaskExecutionClosure& from) {
   if (from.phase() != 0) {
     set_phase(from.phase());
   }
+  if (from.event_version() != 0) {
+    set_event_version(from.event_version());
+  }
   switch (from.output_result_case()) {
     case kOutputUri: {
       set_output_uri(from.output_uri());
@@ -3231,6 +3277,7 @@ void TaskExecutionClosure::InternalSwap(TaskExecutionClosure* other) {
   swap(custom_info_, other->custom_info_);
   swap(metadata_, other->metadata_);
   swap(phase_, other->phase_);
+  swap(event_version_, other->event_version_);
   swap(output_result_, other->output_result_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
