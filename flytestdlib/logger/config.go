@@ -27,7 +27,7 @@ var (
 		Formatter: FormatterConfig{
 			Type: FormatterJSON,
 		},
-		Level: InfoLevel,
+		Level: WarnLevel,
 	}
 
 	configSection = config.MustRegisterSectionWithUpdates(configSectionKey, defaultConfig, func(ctx context.Context, newValue config.Config) {

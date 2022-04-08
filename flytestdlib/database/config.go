@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/flyteorg/flytestdlib/config"
-	"gorm.io/gorm/logger"
 )
 
 const (
@@ -52,7 +51,6 @@ type DbConfig struct {
 	MaxIdleConnections                      int             `json:"maxIdleConnections" pflag:",maxIdleConnections sets the maximum number of connections in the idle connection pool."`
 	MaxOpenConnections                      int             `json:"maxOpenConnections" pflag:",maxOpenConnections sets the maximum number of open connections to the database."`
 	ConnMaxLifeTime                         config.Duration `json:"connMaxLifeTime" pflag:",sets the maximum amount of time a connection may be reused"`
-	LogLevel                                logger.LogLevel `json:"log_level" pflag:"-,"`
 	Postgres                                PostgresConfig  `json:"postgres,omitempty"`
 	SQLite                                  SQLiteConfig    `json:"sqlite,omitempty"`
 }
