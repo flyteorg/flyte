@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.49.0](http://github.com/lyft/flyteconsole/compare/v0.48.0...v0.49.0) (2022-04-08)
+
+
+### Bug Fixes
+
+* **359:** fix assets folder location to simplify oneclick experience ([#360](http://github.com/lyft/flyteconsole/issues/360)) ([9d1a5f8](http://github.com/lyft/flyteconsole/commit/9d1a5f83c256e3265c0d02d41038335ddd5eb948))
+
+
+### Features
+
+* **310:** map task v1 visuals, supporting both old and new api ([#357](http://github.com/lyft/flyteconsole/issues/357)) ([4bbc71f](http://github.com/lyft/flyteconsole/commit/4bbc71f200dbf5bd36f6ace59a6d54a1cab0df6c))
+
 # [0.48.0](http://github.com/lyft/flyteconsole/compare/v0.47.3...v0.48.0) (2022-04-05)
 
 
