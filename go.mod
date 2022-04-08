@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/aws/aws-sdk-go v1.37.1
-	github.com/flyteorg/flyteidl v0.21.10
+	github.com/flyteorg/flyteidl v0.22.1
 	github.com/flyteorg/flytestdlib v0.4.7
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/ghodss/yaml v1.0.0
