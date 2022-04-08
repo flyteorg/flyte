@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	"github.com/Shopify/sarama"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
@@ -145,6 +146,12 @@ type AWSConfig struct {
 // This section holds common config for GCP
 type GCPConfig struct {
 	ProjectID string `json:"projectId"`
+}
+
+type KafkaConfig struct {
+	Version sarama.KafkaVersion
+	// kafka broker addresses
+	Brokers []string `json:"brokers"`
 }
 
 // This section holds configuration for the event scheduler used to schedule workflow executions.
@@ -433,6 +440,22 @@ type ExternalEventsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
+type CloudEventsConfig struct {
+	Enable bool `json:"enable"`
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type        string      `json:"type"`
+	AWSConfig   AWSConfig   `json:"aws"`
+	GCPConfig   GCPConfig   `json:"gcp"`
+	KafkaConfig KafkaConfig `json:"kafka"`
+	// Publish events to a pubsub tops
+	EventsPublisherConfig EventsPublisherConfig `json:"eventsPublisher"`
+	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+}
+
 // Configuration specific to notifications handling
 type NotificationsConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -470,4 +493,5 @@ type ApplicationConfiguration interface {
 	GetNotificationsConfig() *NotificationsConfig
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
+	GetCloudEventsConfig() *CloudEventsConfig
 }

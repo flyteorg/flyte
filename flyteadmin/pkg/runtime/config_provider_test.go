@@ -50,6 +50,17 @@ func TestClusterConfig(t *testing.T) {
 	assert.Equal(t, "file_path", clusters[1].Auth.Type)
 }
 
+func TestGetCloudEventsConfig(t *testing.T) {
+	err := initConfig("testdata/event.yaml")
+	assert.NoError(t, err)
+	configProvider := NewConfigurationProvider()
+	cloudEventsConfig := configProvider.ApplicationConfiguration().GetCloudEventsConfig()
+	assert.Equal(t, true, cloudEventsConfig.Enable)
+	assert.Equal(t, "aws", cloudEventsConfig.Type)
+	assert.Equal(t, "us-east-1", cloudEventsConfig.AWSConfig.Region)
+	assert.Equal(t, "topic", cloudEventsConfig.EventsPublisherConfig.TopicName)
+}
+
 func TestPostgresConfig(t *testing.T) {
 	err := initConfig("testdata/postgres_config.yaml")
 	assert.NoError(t, err)
