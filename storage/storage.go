@@ -43,9 +43,14 @@ type DataStore struct {
 	ReferenceConstructor
 }
 
+// SignedURLProperties encapsulates properties about the signedURL operation.
 type SignedURLProperties struct {
-	Scope     stow.ClientMethod
+	// Scope defines the permission level allowed for the generated URL.
+	Scope stow.ClientMethod
+	// ExpiresIn defines the expiration duration for the URL. It's strongly recommended setting it.
 	ExpiresIn time.Duration
+	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
+	ContentMD5 string
 }
 
 type SignedURLResponse struct {
