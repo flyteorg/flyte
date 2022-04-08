@@ -43,9 +43,9 @@ func (s SubTaskExecutionContext) TaskReader() pluginsCore.TaskReader {
 
 // NewSubtaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
 func NewSubTaskExecutionContext(tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
-	executionIndex, originalIndex int, retryAttempt uint64) (SubTaskExecutionContext, error) {
+	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
 
-	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, retryAttempt)
+	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, retryAttempt, systemFailures)
 	if err != nil {
 		return SubTaskExecutionContext{}, err
 	}
@@ -135,6 +135,7 @@ type SubTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	annotations        map[string]string
 	labels             map[string]string
+	interruptible      bool
 	subtaskExecutionID SubTaskExecutionID
 }
 
@@ -153,8 +154,14 @@ func (s SubTaskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecution
 	return s.subtaskExecutionID
 }
 
+// IsInterruptbile overrides the base NodeExecutionMetadata to return a subtask specific identifier
+func (s SubTaskExecutionMetadata) IsInterruptible() bool {
+	return s.interruptible
+}
+
 // NewSubtaskExecutionMetadata constructs a SubTaskExecutionMetadata using the provided parameters
-func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskTemplate *core.TaskTemplate, executionIndex int, retryAttempt uint64) (SubTaskExecutionMetadata, error) {
+func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskTemplate *core.TaskTemplate,
+	executionIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionMetadata, error) {
 
 	var err error
 	secretsMap := make(map[string]string)
@@ -171,10 +178,12 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 	}
 
 	subTaskExecutionID := NewSubTaskExecutionID(taskExecutionMetadata.GetTaskExecutionID(), executionIndex, retryAttempt)
+	interruptible := taskExecutionMetadata.IsInterruptible() && uint32(systemFailures) < taskExecutionMetadata.GetInterruptibleFailureThreshold()
 	return SubTaskExecutionMetadata{
 		taskExecutionMetadata,
 		utils.UnionMaps(taskExecutionMetadata.GetAnnotations(), secretsMap),
 		utils.UnionMaps(taskExecutionMetadata.GetLabels(), injectSecretsLabel),
+		interruptible,
 		subTaskExecutionID,
 	}, nil
 }

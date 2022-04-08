@@ -93,7 +93,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		retryAttemptsArray, err := bitarray.NewCompactArray(count, maxValue)
 		if err != nil {
-			logger.Errorf(context.Background(), "Failed to create attempts compact array with [count: %v, maxValue: %v]", count, maxValue)
+			logger.Errorf(ctx, "Failed to create attempts compact array with [count: %v, maxValue: %v]", count, maxValue)
 			return currentState, externalResources, nil
 		}
 
@@ -104,6 +104,26 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		}
 
 		currentState.RetryAttempts = retryAttemptsArray
+	}
+
+	// If the current State is newly minted then we must initialize SystemFailures to track how many
+	// times the subtask failed due to system issues, this is necessary to correctly evaluate
+	// interruptible subtasks.
+	if len(currentState.SystemFailures.GetItems()) == 0 {
+		count := uint(currentState.GetExecutionArraySize())
+		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetInterruptibleFailureThreshold())
+
+		systemFailuresArray, err := bitarray.NewCompactArray(count, maxValue)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create system failures array with [count: %v, maxValue: %v]", count, maxValue)
+			return currentState, externalResources, err
+		}
+
+		for i := 0; i < currentState.GetExecutionArraySize(); i++ {
+			systemFailuresArray.SetItem(i, 0)
+		}
+
+		currentState.SystemFailures = systemFailuresArray
 	}
 
 	// initialize log plugin
@@ -146,7 +166,8 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		}
 
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, newState.GetIndexesToCache())
-		stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, childIdx, originalIdx, retryAttempt)
+		systemFailures := currentState.SystemFailures.GetItem(childIdx)
+		stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, systemFailures)
 		if err != nil {
 			return currentState, externalResources, err
 		}
@@ -186,6 +207,16 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		if perr != nil {
 			return currentState, externalResources, perr
+		}
+
+		if phaseInfo.Err() != nil {
+			messageCollector.Collect(childIdx, phaseInfo.Err().String())
+		}
+
+		if phaseInfo.Err() != nil && phaseInfo.Err().GetKind() == idlCore.ExecutionError_SYSTEM {
+			newState.SystemFailures.SetItem(childIdx, systemFailures+1)
+		} else {
+			newState.SystemFailures.SetItem(childIdx, systemFailures)
 		}
 
 		// process subtask phase
@@ -294,7 +325,11 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
-		retryAttempt := currentState.RetryAttempts.GetItem(childIdx)
+		retryAttempt := uint64(0)
+		if childIdx < len(currentState.RetryAttempts.GetItems()) {
+			// we can use RetryAttempts if it has been initialized, otherwise stay with default 0
+			retryAttempt = currentState.RetryAttempts.GetItem(childIdx)
+		}
 
 		// return immediately if subtask has completed or not yet started
 		if existingPhase.IsTerminal() || existingPhase == core.PhaseUndefined {
@@ -302,7 +337,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		}
 
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
-		stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, childIdx, originalIdx, retryAttempt)
+		stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0)
 		if err != nil {
 			return err
 		}
