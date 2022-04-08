@@ -146,10 +146,6 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -365,7 +361,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -442,7 +438,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
     spec:
       securityContext:
         fsGroup: 65534

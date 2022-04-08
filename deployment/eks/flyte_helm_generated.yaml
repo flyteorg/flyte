@@ -128,10 +128,6 @@ data:
       name: staging
     - id: production
       name: production
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
   server.yaml: | 
     auth:
       appAuth:
@@ -360,10 +356,6 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
   server.yaml: | 
     application:
       grpcPort: 8089
@@ -418,10 +410,6 @@ data:
     scheduler:
       metricsScope: 'flyte:'
       profilerPort: 10254
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
 ---
 # Source: flyte-core/templates/propeller/configmap.yaml
 apiVersion: v1
@@ -520,10 +508,6 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
-  logger.yaml: | 
-    logger:
-      level: 4
-      show-source: true
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -884,7 +868,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "859084b803eecd3a53eaae0559fc311a947393a1d8f30a5bc8a36d9a9f11d28"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1098,7 +1082,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "50a468638e00376fe2bcfbb4d2be652756c7a7d5ea070a3cb3643f60801e73e"
+        configChecksum: "940a08491eb44bb4202fb0209dc0ac27f0141db9db7dd7e6883641369f9a593"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1189,7 +1173,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "859084b803eecd3a53eaae0559fc311a947393a1d8f30a5bc8a36d9a9f11d28"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1277,7 +1261,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1354,7 +1338,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
     spec:
       securityContext:
         fsGroup: 65534
