@@ -49,6 +49,9 @@ type AdminFetcherExtInterface interface {
 	// FetchTaskVersion fetches particular version of task in a  project, domain
 	FetchTaskVersion(ctx context.Context, name, version, project, domain string) (*admin.Task, error)
 
+	// FetchAllWorkflows fetches all workflows in project domain
+	FetchAllWorkflows(ctx context.Context, project, domain string, filter filters.Filters) ([]*admin.NamedEntity, error)
+
 	// FetchAllVerOfWorkflow fetches all versions of task in a  project, domain
 	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Workflow, error)
 

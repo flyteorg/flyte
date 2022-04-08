@@ -23,7 +23,7 @@ Retrieve all the workflows within project and domain (workflow/workflows can be 
 
  flytectl get workflow -p flytesnacks -d development
 
-Retrieve workflow by name within project and domain:
+Retrieve all versions of a workflow by name within project and domain:
 
 ::
 
@@ -103,7 +103,23 @@ var listWorkflowColumns = []printer.Column{
 	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 
+var namedEntityColumns = []printer.Column{
+	{Header: "Project", JSONPath: "$.id.project"},
+	{Header: "Domain", JSONPath: "$.id.domain"},
+	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Description", JSONPath: "$.metadata.description"},
+	{Header: "State", JSONPath: "$.metadata.state"},
+}
+
 func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
+}
+
+func NamedEntityToProtoMessages(l []*admin.NamedEntity) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		messages = append(messages, m)
@@ -155,16 +171,13 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), columns, WorkflowToProtoMessages(workflows)...)
 	}
 
-	workflows, err = cmdCtx.AdminFetcherExt().FetchAllVerOfWorkflow(ctx, "", config.GetConfig().Project, config.GetConfig().Domain, workflowconfig.DefaultConfig.Filter)
+	nameEntities, err := cmdCtx.AdminFetcherExt().FetchAllWorkflows(ctx, config.GetConfig().Project, config.GetConfig().Domain, workflowconfig.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}
 
-	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
-	if config.GetConfig().MustOutputFormat() == printer.OutputFormatTABLE {
-		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), listWorkflowColumns, WorkflowToTableProtoMessages(workflows)...)
-	}
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), listWorkflowColumns, WorkflowToProtoMessages(workflows)...)
+	logger.Debugf(ctx, "Retrieved %v workflows", len(nameEntities))
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), namedEntityColumns, NamedEntityToProtoMessages(nameEntities)...)
 }
 
 // FetchWorkflowForName fetches the workflow give it name.

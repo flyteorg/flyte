@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func BuildResourceListRequestWithName(c Filters, project, domain, name string) (*admin.ResourceListRequest, error) {
@@ -22,6 +23,25 @@ func BuildResourceListRequestWithName(c Filters, project, domain, name string) (
 	}
 	if len(name) > 0 {
 		request.Id.Name = name
+	}
+	if sort := buildSortingRequest(c); sort != nil {
+		request.SortBy = sort
+	}
+	return request, nil
+}
+
+func BuildNamedEntityListRequest(c Filters, project, domain string, resourceType core.ResourceType) (*admin.NamedEntityListRequest, error) {
+	fieldSelector, err := Transform(SplitTerms(c.FieldSelector))
+	if err != nil {
+		return nil, err
+	}
+	request := &admin.NamedEntityListRequest{
+		Limit:        uint32(c.Limit),
+		Token:        getToken(c),
+		Filters:      fieldSelector,
+		Project:      project,
+		Domain:       domain,
+		ResourceType: resourceType,
 	}
 	if sort := buildSortingRequest(c); sort != nil {
 		request.SortBy = sort
