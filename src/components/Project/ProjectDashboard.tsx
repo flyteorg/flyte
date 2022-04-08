@@ -23,7 +23,6 @@ import {
   getExecutionTimeData,
   getStartExecutionTime,
 } from 'components/Entities/EntityExecutionsBarChart';
-import classNames from 'classnames';
 import { useExecutionShowArchivedState } from 'components/Executions/filters/useExecutionArchiveState';
 import { useOnlyMyExecutionsFilterState } from 'components/Executions/filters/useOnlyMyExecutionsFilterState';
 import { WaitForData } from 'components/common/WaitForData';
@@ -37,7 +36,7 @@ import { failedToLoadExecutionsString } from './constants';
 const useStyles = makeStyles((theme: Theme) => ({
   projectStats: {
     paddingTop: theme.spacing(7),
-    paddingBottom: theme.spacing(7),
+    paddingBottom: theme.spacing(5),
     display: 'flex',
     justifyContent: 'space-evenly',
     alignItems: 'center',
@@ -52,13 +51,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: theme.spacing(1),
     borderBottom: `1px solid ${theme.palette.divider}`,
   },
-  marginTop: {
-    marginTop: theme.spacing(2),
-  },
-  chartContainer: {
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(3),
-    paddingTop: theme.spacing(1),
+  withPaddingX: {
+    padding: theme.spacing(0, 2, 0, 2),
   },
 }));
 
@@ -190,12 +184,10 @@ export const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
         {renderDomainSettingsSection}
       </WaitForQuery>
       <div className={styles.container}>
-        <Typography className={classNames(styles.header, styles.marginTop)} variant="h6">
-          {t('last100ExecutionsTitle')}
-        </Typography>
-        <div className={styles.chartContainer}>
+        <div className={styles.withPaddingX}>
           <WaitForData {...last100Executions}>
             <BarChart
+              title={t('last100ExecutionsTitle')}
               chartIds={[]}
               data={getExecutionTimeData(last100Executions.value)}
               startDate={getStartExecutionTime(last100Executions.value)}

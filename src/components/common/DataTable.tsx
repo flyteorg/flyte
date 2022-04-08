@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { COLOR_SPECTRUM } from 'components/Theme/colorSpectrum';
+import classNames from 'classnames';
 
 const useStyles = makeStyles((theme: Theme) => ({
   headerCell: {
@@ -20,9 +21,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(1, 0, 1, 0),
     minWidth: '100px',
   },
-  cellLeft: {
-    padding: theme.spacing(1, 1, 1, 0),
-    minWidth: '100px',
+  withRightPadding: {
+    paddingRight: theme.spacing(1),
   },
 }));
 
@@ -45,7 +45,9 @@ export const DataTable: React.FC<DataTableProps> = ({ data }) => {
         <TableBody>
           {Object.keys(data).map((key) => (
             <TableRow key={key}>
-              <TableCell className={styles.cellLeft}>{key}</TableCell>
+              <TableCell className={classNames(styles.cell, styles.withRightPadding)}>
+                {key}
+              </TableCell>
               <TableCell className={styles.cell}>{data[key]}</TableCell>
             </TableRow>
           ))}

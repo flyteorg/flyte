@@ -2,7 +2,7 @@ import { Mark } from '@material-ui/core/Slider';
 import { log } from 'common/log';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
-import { formatSecondsToHmsFormat } from './BarChart/utils';
+import { formatSecondsToHmsFormat } from './TimelineChart/utils';
 
 const MIN_SCALE_VALUE = 60; // 1 min
 const MAX_SCALE_VALUE = 3600; // 1h

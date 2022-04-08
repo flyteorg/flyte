@@ -6,6 +6,7 @@ export enum LocalCacheItem {
 
   // Production flags
   ShowWorkflowVersions = 'flyte.show-workflow-versions',
+  ShowDomainSettings = 'flyte.show-domain-settings',
 }
 
 type LocalCacheConfig = { [k: string]: string };
@@ -21,4 +22,5 @@ export const defaultLocalCacheConfig: LocalCacheConfig = {
 
   // Production
   'flyte.show-workflow-versions': 'true',
+  'flyte.show-domain-settings': 'true',
 };

@@ -2,7 +2,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react';
 import * as React from 'react';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import { BarItemData } from './utils';
-import { BarChart } from '.';
+import { TimelineChart } from '.';
 
 const phaseEnumTyping = {
   options: Object.values(NodeExecutionPhase),
@@ -22,7 +22,7 @@ interface SingleItemProps extends BarItemData {
  */
 const SingleBarItem = (props: SingleItemProps) => {
   const items = [props];
-  return <BarChart items={items} chartTimeIntervalSec={props.chartTimeIntervalSec} />;
+  return <TimelineChart items={items} chartTimeIntervalSec={props.chartTimeIntervalSec} />;
 };
 
 export default {

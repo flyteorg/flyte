@@ -2,10 +2,22 @@ import * as React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { smallFontSize } from 'components/Theme/constants';
 import { COLOR_SPECTRUM } from 'components/Theme/colorSpectrum';
-import { Tooltip, Zoom } from '@material-ui/core';
+import { Tooltip, Typography, Zoom } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  container: {
+  chartContainer: {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(3),
+    paddingTop: theme.spacing(1),
+    minHeight: '135px',
+  },
+  title: {
+    marginTop: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
+    paddingLeft: theme.spacing(1),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  wrapper: {
     display: 'flex',
     flexDirection: 'column',
     marginBottom: theme.spacing(2.5),
@@ -57,6 +69,7 @@ interface BarChartItemProps extends BarChartData {
 }
 
 interface BarChartProps {
+  title: string;
   data: BarChartData[];
   startDate?: string;
   onClickItem?: (item: any) => void;
@@ -109,7 +122,13 @@ export const BarChartItem: React.FC<BarChartItemProps> = ({
  * @param startDate
  * @constructor
  */
-export const BarChart: React.FC<BarChartProps> = ({ chartIds, data, startDate, onClickItem }) => {
+export const BarChart: React.FC<BarChartProps> = ({
+  title,
+  chartIds,
+  data,
+  startDate,
+  onClickItem,
+}) => {
   const styles = useStyles();
 
   const maxHeight = React.useMemo(() => {
@@ -126,24 +145,33 @@ export const BarChart: React.FC<BarChartProps> = ({ chartIds, data, startDate, o
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <span>{startDate}</span>
-        <span>Most Recent</span>
-      </div>
-      <div className={styles.body}>
-        {data.map((item, index) => (
-          <BarChartItem
-            value={(Math.log2(item.value) / maxHeight) * 100}
-            color={item.color}
-            tooltip={item.tooltip}
-            onClick={handleClickItem(item)}
-            key={`bar-chart-item-${index}`}
-            isSelected={
-              chartIds.length === 0 ? true : item.metadata && chartIds.includes(item.metadata.name)
-            }
-          />
-        ))}
+    <div>
+      <Typography className={styles.title} variant="h6">
+        {title}
+      </Typography>
+      <div className={styles.chartContainer}>
+        <div className={styles.wrapper}>
+          <div className={styles.header}>
+            <span>{startDate}</span>
+            <span>Most Recent</span>
+          </div>
+          <div className={styles.body}>
+            {data.map((item, index) => (
+              <BarChartItem
+                value={(Math.log2(item.value) / maxHeight) * 100}
+                color={item.color}
+                tooltip={item.tooltip}
+                onClick={handleClickItem(item)}
+                key={`bar-chart-item-${index}`}
+                isSelected={
+                  chartIds.length === 0
+                    ? true
+                    : item.metadata && chartIds.includes(item.metadata.name)
+                }
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

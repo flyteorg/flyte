@@ -2,6 +2,7 @@ import { createLocalizedString } from 'basics/Locale';
 import { startCase } from 'lodash';
 
 const str = {
+  allExecutionsChartTitle: 'All Executions in the Workflow',
   workflowVersionsTitle: 'Recent Workflow Versions',
   viewAll: 'View All',
   schedulesHeader: 'Schedules',

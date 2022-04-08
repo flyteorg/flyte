@@ -1,7 +1,7 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import * as React from 'react';
 import { NodeExecutionPhase } from 'models/Execution/enums';
-import { BarChart } from '.';
+import { TimelineChart } from '.';
 
 const barItems = [
   { phase: NodeExecutionPhase.FAILED, startOffsetSec: 0, durationSec: 5, isFromCache: false },
@@ -14,10 +14,10 @@ const barItems = [
 
 export default {
   title: 'Workflow/Timeline',
-  component: BarChart,
-} as ComponentMeta<typeof BarChart>;
+  component: TimelineChart,
+} as ComponentMeta<typeof TimelineChart>;
 
-const Template: ComponentStory<typeof BarChart> = (args) => <BarChart {...args} />;
+const Template: ComponentStory<typeof TimelineChart> = (args) => <TimelineChart {...args} />;
 export const BarSection = Template.bind({});
 BarSection.args = {
   items: barItems,

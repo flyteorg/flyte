@@ -4,7 +4,7 @@ import {
   generateChartData,
   getOffsetColor,
   TRANSPARENT,
-} from '../Timeline/BarChart/utils';
+} from '../Timeline/TimelineChart/utils';
 import { mockbarItems } from './__mocks__/NodeExecution.mock';
 
 describe('ExecutionDetails > Timeline > BarChart', () => {

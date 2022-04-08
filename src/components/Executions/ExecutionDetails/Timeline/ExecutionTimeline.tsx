@@ -8,12 +8,12 @@ import { tableHeaderColor } from 'components/Theme/constants';
 import { timestampToDate } from 'common/utils';
 import { NodeExecution } from 'models/Execution/types';
 import { dNode } from 'models/Graph/types';
-import { getChartDurationData } from './BarChart/chartData';
 import { convertToPlainNodes } from './helpers';
 import { ChartHeader } from './chartHeader';
 import { useScaleContext } from './scaleContext';
 import { TaskNames } from './taskNames';
-import { BarChart } from './BarChart';
+import { getChartDurationData } from './TimelineChart/chartData';
+import { TimelineChart } from './TimelineChart';
 
 interface StyleProps {
   chartWidth: number;
@@ -116,7 +116,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
   const styles = useStyles({ chartWidth: chartWidth, itemsShown: showNodes.length });
 
   React.useEffect(() => {
-    // Sync width of elements and intervals of ChartHeader (time labels) and BarChart
+    // Sync width of elements and intervals of ChartHeader (time labels) and TimelineChart
     const calcWidth = Math.ceil(totalDurationSec / chartTimeInterval) * INTERVAL_LENGTH;
     if (durationsRef.current && calcWidth < durationsRef.current.clientWidth) {
       setLabelInterval(
@@ -196,7 +196,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
         </div>
         <div className={styles.taskDurationsView} ref={durationsRef} onScroll={onGraphScroll}>
           <div className={styles.chartHeader}>
-            <BarChart items={barItemsData} chartTimeIntervalSec={chartTimeInterval} />
+            <TimelineChart items={barItemsData} chartTimeIntervalSec={chartTimeInterval} />
           </div>
         </div>
       </div>

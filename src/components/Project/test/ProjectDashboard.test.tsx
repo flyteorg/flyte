@@ -19,6 +19,7 @@ import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { getUserProfile } from 'models/Common/api';
 import { getProjectDomainAttributes } from 'models/Project/api';
 import { Admin } from 'flyteidl';
+import * as LocalCache from 'basics/LocalCache';
 import { ProjectDashboard } from '../ProjectDashboard';
 import { failedToLoadExecutionsString } from '../constants';
 
@@ -68,6 +69,8 @@ describe('ProjectDashboard', () => {
     [sortQueryKeys.direction]: SortDirection[SortDirection.DESCENDING],
     [sortQueryKeys.key]: executionSortFields.createdAt,
   };
+
+  jest.spyOn(LocalCache, 'useLocalCache');
 
   beforeEach(() => {
     mockGetUserProfile = jest.fn().mockResolvedValue(null);
