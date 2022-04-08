@@ -50,7 +50,8 @@ class AdminTaskExecutionClosure(object):
         'custom_info': 'ProtobufStruct',
         'reason': 'str',
         'task_type': 'str',
-        'metadata': 'EventTaskExecutionMetadata'
+        'metadata': 'EventTaskExecutionMetadata',
+        'event_version': 'int'
     }
 
     attribute_map = {
@@ -66,10 +67,11 @@ class AdminTaskExecutionClosure(object):
         'custom_info': 'custom_info',
         'reason': 'reason',
         'task_type': 'task_type',
-        'metadata': 'metadata'
+        'metadata': 'metadata',
+        'event_version': 'event_version'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
         """AdminTaskExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
@@ -85,6 +87,7 @@ class AdminTaskExecutionClosure(object):
         self._reason = None
         self._task_type = None
         self._metadata = None
+        self._event_version = None
         self.discriminator = None
 
         if output_uri is not None:
@@ -113,6 +116,8 @@ class AdminTaskExecutionClosure(object):
             self.task_type = task_type
         if metadata is not None:
             self.metadata = metadata
+        if event_version is not None:
+            self.event_version = event_version
 
     @property
     def output_uri(self):
@@ -412,6 +417,29 @@ class AdminTaskExecutionClosure(object):
         """
 
         self._metadata = metadata
+
+    @property
+    def event_version(self):
+        """Gets the event_version of this AdminTaskExecutionClosure.  # noqa: E501
+
+        The event version is used to indicate versioned changes in how data is maintained using this proto message. For example, event_verison > 0 means that maps tasks logs use the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.  # noqa: E501
+
+        :return: The event_version of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: int
+        """
+        return self._event_version
+
+    @event_version.setter
+    def event_version(self, event_version):
+        """Sets the event_version of this AdminTaskExecutionClosure.
+
+        The event version is used to indicate versioned changes in how data is maintained using this proto message. For example, event_verison > 0 means that maps tasks logs use the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.  # noqa: E501
+
+        :param event_version: The event_version of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: int
+        """
+
+        self._event_version = event_version
 
     def to_dict(self):
         """Returns the model properties as a dict"""

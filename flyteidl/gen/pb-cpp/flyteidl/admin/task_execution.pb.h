@@ -856,6 +856,12 @@ class TaskExecutionClosure final :
   ::flyteidl::core::TaskExecution_Phase phase() const;
   void set_phase(::flyteidl::core::TaskExecution_Phase value);
 
+  // int32 event_version = 17;
+  void clear_event_version();
+  static const int kEventVersionFieldNumber = 17;
+  ::google::protobuf::int32 event_version() const;
+  void set_event_version(::google::protobuf::int32 value);
+
   // string output_uri = 1 [deprecated = true];
   private:
   bool has_output_uri() const;
@@ -914,6 +920,7 @@ class TaskExecutionClosure final :
   ::google::protobuf::Struct* custom_info_;
   ::flyteidl::event::TaskExecutionMetadata* metadata_;
   int phase_;
+  ::google::protobuf::int32 event_version_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
@@ -2295,6 +2302,20 @@ inline void TaskExecutionClosure::set_allocated_metadata(::flyteidl::event::Task
   }
   metadata_ = metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionClosure.metadata)
+}
+
+// int32 event_version = 17;
+inline void TaskExecutionClosure::clear_event_version() {
+  event_version_ = 0;
+}
+inline ::google::protobuf::int32 TaskExecutionClosure::event_version() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionClosure.event_version)
+  return event_version_;
+}
+inline void TaskExecutionClosure::set_event_version(::google::protobuf::int32 value) {
+  
+  event_version_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.TaskExecutionClosure.event_version)
 }
 
 inline bool TaskExecutionClosure::has_output_result() const {
