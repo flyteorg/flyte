@@ -1072,23 +1072,23 @@ public final class Dataproxy {
 
     /**
      * <pre>
-     * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-     * +optional. By default, the service will generate a random file name.
+     * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+     * +optional. By default, the service will generate a consistent name based on the provided parameters.
      * </pre>
      *
-     * <code>string suffix = 3;</code>
+     * <code>string filename = 3;</code>
      */
-    java.lang.String getSuffix();
+    java.lang.String getFilename();
     /**
      * <pre>
-     * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-     * +optional. By default, the service will generate a random file name.
+     * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+     * +optional. By default, the service will generate a consistent name based on the provided parameters.
      * </pre>
      *
-     * <code>string suffix = 3;</code>
+     * <code>string filename = 3;</code>
      */
     com.google.protobuf.ByteString
-        getSuffixBytes();
+        getFilenameBytes();
 
     /**
      * <pre>
@@ -1120,6 +1120,17 @@ public final class Dataproxy {
      * <code>.google.protobuf.Duration expires_in = 4;</code>
      */
     com.google.protobuf.DurationOrBuilder getExpiresInOrBuilder();
+
+    /**
+     * <pre>
+     * ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the
+     * generated path.
+     * +required
+     * </pre>
+     *
+     * <code>bytes content_md5 = 5;</code>
+     */
+    com.google.protobuf.ByteString getContentMd5();
   }
   /**
    * <pre>
@@ -1140,7 +1151,8 @@ public final class Dataproxy {
     private CreateUploadLocationRequest() {
       project_ = "";
       domain_ = "";
-      suffix_ = "";
+      filename_ = "";
+      contentMd5_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -1182,7 +1194,7 @@ public final class Dataproxy {
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              suffix_ = s;
+              filename_ = s;
               break;
             }
             case 34: {
@@ -1196,6 +1208,11 @@ public final class Dataproxy {
                 expiresIn_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 42: {
+
+              contentMd5_ = input.readBytes();
               break;
             }
             default: {
@@ -1318,44 +1335,44 @@ public final class Dataproxy {
       }
     }
 
-    public static final int SUFFIX_FIELD_NUMBER = 3;
-    private volatile java.lang.Object suffix_;
+    public static final int FILENAME_FIELD_NUMBER = 3;
+    private volatile java.lang.Object filename_;
     /**
      * <pre>
-     * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-     * +optional. By default, the service will generate a random file name.
+     * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+     * +optional. By default, the service will generate a consistent name based on the provided parameters.
      * </pre>
      *
-     * <code>string suffix = 3;</code>
+     * <code>string filename = 3;</code>
      */
-    public java.lang.String getSuffix() {
-      java.lang.Object ref = suffix_;
+    public java.lang.String getFilename() {
+      java.lang.Object ref = filename_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        suffix_ = s;
+        filename_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-     * +optional. By default, the service will generate a random file name.
+     * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+     * +optional. By default, the service will generate a consistent name based on the provided parameters.
      * </pre>
      *
-     * <code>string suffix = 3;</code>
+     * <code>string filename = 3;</code>
      */
     public com.google.protobuf.ByteString
-        getSuffixBytes() {
-      java.lang.Object ref = suffix_;
+        getFilenameBytes() {
+      java.lang.Object ref = filename_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        suffix_ = b;
+        filename_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1401,6 +1418,21 @@ public final class Dataproxy {
       return getExpiresIn();
     }
 
+    public static final int CONTENT_MD5_FIELD_NUMBER = 5;
+    private com.google.protobuf.ByteString contentMd5_;
+    /**
+     * <pre>
+     * ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the
+     * generated path.
+     * +required
+     * </pre>
+     *
+     * <code>bytes content_md5 = 5;</code>
+     */
+    public com.google.protobuf.ByteString getContentMd5() {
+      return contentMd5_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1421,11 +1453,14 @@ public final class Dataproxy {
       if (!getDomainBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, domain_);
       }
-      if (!getSuffixBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, suffix_);
+      if (!getFilenameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, filename_);
       }
       if (expiresIn_ != null) {
         output.writeMessage(4, getExpiresIn());
+      }
+      if (!contentMd5_.isEmpty()) {
+        output.writeBytes(5, contentMd5_);
       }
       unknownFields.writeTo(output);
     }
@@ -1442,12 +1477,16 @@ public final class Dataproxy {
       if (!getDomainBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, domain_);
       }
-      if (!getSuffixBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, suffix_);
+      if (!getFilenameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, filename_);
       }
       if (expiresIn_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getExpiresIn());
+      }
+      if (!contentMd5_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, contentMd5_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1468,13 +1507,15 @@ public final class Dataproxy {
           .equals(other.getProject())) return false;
       if (!getDomain()
           .equals(other.getDomain())) return false;
-      if (!getSuffix()
-          .equals(other.getSuffix())) return false;
+      if (!getFilename()
+          .equals(other.getFilename())) return false;
       if (hasExpiresIn() != other.hasExpiresIn()) return false;
       if (hasExpiresIn()) {
         if (!getExpiresIn()
             .equals(other.getExpiresIn())) return false;
       }
+      if (!getContentMd5()
+          .equals(other.getContentMd5())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1490,12 +1531,14 @@ public final class Dataproxy {
       hash = (53 * hash) + getProject().hashCode();
       hash = (37 * hash) + DOMAIN_FIELD_NUMBER;
       hash = (53 * hash) + getDomain().hashCode();
-      hash = (37 * hash) + SUFFIX_FIELD_NUMBER;
-      hash = (53 * hash) + getSuffix().hashCode();
+      hash = (37 * hash) + FILENAME_FIELD_NUMBER;
+      hash = (53 * hash) + getFilename().hashCode();
       if (hasExpiresIn()) {
         hash = (37 * hash) + EXPIRES_IN_FIELD_NUMBER;
         hash = (53 * hash) + getExpiresIn().hashCode();
       }
+      hash = (37 * hash) + CONTENT_MD5_FIELD_NUMBER;
+      hash = (53 * hash) + getContentMd5().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1637,7 +1680,7 @@ public final class Dataproxy {
 
         domain_ = "";
 
-        suffix_ = "";
+        filename_ = "";
 
         if (expiresInBuilder_ == null) {
           expiresIn_ = null;
@@ -1645,6 +1688,8 @@ public final class Dataproxy {
           expiresIn_ = null;
           expiresInBuilder_ = null;
         }
+        contentMd5_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -1673,12 +1718,13 @@ public final class Dataproxy {
         flyteidl.service.Dataproxy.CreateUploadLocationRequest result = new flyteidl.service.Dataproxy.CreateUploadLocationRequest(this);
         result.project_ = project_;
         result.domain_ = domain_;
-        result.suffix_ = suffix_;
+        result.filename_ = filename_;
         if (expiresInBuilder_ == null) {
           result.expiresIn_ = expiresIn_;
         } else {
           result.expiresIn_ = expiresInBuilder_.build();
         }
+        result.contentMd5_ = contentMd5_;
         onBuilt();
         return result;
       }
@@ -1735,12 +1781,15 @@ public final class Dataproxy {
           domain_ = other.domain_;
           onChanged();
         }
-        if (!other.getSuffix().isEmpty()) {
-          suffix_ = other.suffix_;
+        if (!other.getFilename().isEmpty()) {
+          filename_ = other.filename_;
           onChanged();
         }
         if (other.hasExpiresIn()) {
           mergeExpiresIn(other.getExpiresIn());
+        }
+        if (other.getContentMd5() != com.google.protobuf.ByteString.EMPTY) {
+          setContentMd5(other.getContentMd5());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1959,22 +2008,22 @@ public final class Dataproxy {
         return this;
       }
 
-      private java.lang.Object suffix_ = "";
+      private java.lang.Object filename_ = "";
       /**
        * <pre>
-       * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-       * +optional. By default, the service will generate a random file name.
+       * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+       * +optional. By default, the service will generate a consistent name based on the provided parameters.
        * </pre>
        *
-       * <code>string suffix = 3;</code>
+       * <code>string filename = 3;</code>
        */
-      public java.lang.String getSuffix() {
-        java.lang.Object ref = suffix_;
+      public java.lang.String getFilename() {
+        java.lang.Object ref = filename_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          suffix_ = s;
+          filename_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1982,20 +2031,20 @@ public final class Dataproxy {
       }
       /**
        * <pre>
-       * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-       * +optional. By default, the service will generate a random file name.
+       * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+       * +optional. By default, the service will generate a consistent name based on the provided parameters.
        * </pre>
        *
-       * <code>string suffix = 3;</code>
+       * <code>string filename = 3;</code>
        */
       public com.google.protobuf.ByteString
-          getSuffixBytes() {
-        java.lang.Object ref = suffix_;
+          getFilenameBytes() {
+        java.lang.Object ref = filename_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          suffix_ = b;
+          filename_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -2003,52 +2052,52 @@ public final class Dataproxy {
       }
       /**
        * <pre>
-       * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-       * +optional. By default, the service will generate a random file name.
+       * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+       * +optional. By default, the service will generate a consistent name based on the provided parameters.
        * </pre>
        *
-       * <code>string suffix = 3;</code>
+       * <code>string filename = 3;</code>
        */
-      public Builder setSuffix(
+      public Builder setFilename(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        suffix_ = value;
+        filename_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-       * +optional. By default, the service will generate a random file name.
+       * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+       * +optional. By default, the service will generate a consistent name based on the provided parameters.
        * </pre>
        *
-       * <code>string suffix = 3;</code>
+       * <code>string filename = 3;</code>
        */
-      public Builder clearSuffix() {
+      public Builder clearFilename() {
         
-        suffix_ = getDefaultInstance().getSuffix();
+        filename_ = getDefaultInstance().getFilename();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Suffix specifies a desired suffix for the generated location. E.g. `/file.py` or `pre/fix/file.zip`.
-       * +optional. By default, the service will generate a random file name.
+       * Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
+       * +optional. By default, the service will generate a consistent name based on the provided parameters.
        * </pre>
        *
-       * <code>string suffix = 3;</code>
+       * <code>string filename = 3;</code>
        */
-      public Builder setSuffixBytes(
+      public Builder setFilenameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        suffix_ = value;
+        filename_ = value;
         onChanged();
         return this;
       }
@@ -2223,6 +2272,53 @@ public final class Dataproxy {
         }
         return expiresInBuilder_;
       }
+
+      private com.google.protobuf.ByteString contentMd5_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <pre>
+       * ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the
+       * generated path.
+       * +required
+       * </pre>
+       *
+       * <code>bytes content_md5 = 5;</code>
+       */
+      public com.google.protobuf.ByteString getContentMd5() {
+        return contentMd5_;
+      }
+      /**
+       * <pre>
+       * ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the
+       * generated path.
+       * +required
+       * </pre>
+       *
+       * <code>bytes content_md5 = 5;</code>
+       */
+      public Builder setContentMd5(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        contentMd5_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the
+       * generated path.
+       * +required
+       * </pre>
+       *
+       * <code>bytes content_md5 = 5;</code>
+       */
+      public Builder clearContentMd5() {
+        
+        contentMd5_ = getDefaultInstance().getContentMd5();
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2302,19 +2398,19 @@ public final class Dataproxy {
       "\032\037google/protobuf/timestamp.proto\"v\n\034Cre" +
       "ateUploadLocationResponse\022\022\n\nsigned_url\030" +
       "\001 \001(\t\022\022\n\nnative_url\030\002 \001(\t\022.\n\nexpires_at\030" +
-      "\003 \001(\0132\032.google.protobuf.Timestamp\"}\n\033Cre" +
-      "ateUploadLocationRequest\022\017\n\007project\030\001 \001(" +
-      "\t\022\016\n\006domain\030\002 \001(\t\022\016\n\006suffix\030\003 \001(\t\022-\n\nexp" +
-      "ires_in\030\004 \001(\0132\031.google.protobuf.Duration" +
-      "2\205\002\n\020DataProxyService\022\360\001\n\024CreateUploadLo" +
-      "cation\022-.flyteidl.service.CreateUploadLo" +
-      "cationRequest\032..flyteidl.service.CreateU" +
-      "ploadLocationResponse\"y\202\323\344\223\002#\"\036/api/v1/d" +
-      "ataproxy/artifact_urn:\001*\222AM\032KCreates a w" +
-      "rite-only http location that is accessib" +
-      "le for tasks at runtime.B9Z7github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/serv" +
-      "iceb\006proto3"
+      "\003 \001(\0132\032.google.protobuf.Timestamp\"\224\001\n\033Cr" +
+      "eateUploadLocationRequest\022\017\n\007project\030\001 \001" +
+      "(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010filename\030\003 \001(\t\022-\n\n" +
+      "expires_in\030\004 \001(\0132\031.google.protobuf.Durat" +
+      "ion\022\023\n\013content_md5\030\005 \001(\0142\205\002\n\020DataProxySe" +
+      "rvice\022\360\001\n\024CreateUploadLocation\022-.flyteid" +
+      "l.service.CreateUploadLocationRequest\032.." +
+      "flyteidl.service.CreateUploadLocationRes" +
+      "ponse\"y\202\323\344\223\002#\"\036/api/v1/dataproxy/artifac" +
+      "t_urn:\001*\222AM\032KCreates a write-only http l" +
+      "ocation that is accessible for tasks at " +
+      "runtime.B9Z7github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2343,7 +2439,7 @@ public final class Dataproxy {
     internal_static_flyteidl_service_CreateUploadLocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Suffix", "ExpiresIn", });
+        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
