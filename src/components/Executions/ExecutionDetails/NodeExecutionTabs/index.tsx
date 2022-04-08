@@ -6,6 +6,7 @@ import { TaskTemplate } from 'models/Task/types';
 import { useTabState } from 'components/hooks/useTabState';
 import { PanelSection } from 'components/common/PanelSection';
 import { DumpJSON } from 'components/common/DumpJSON';
+import { isMapTaskType } from 'models/Task/utils';
 import { TaskExecutionsList } from '../../TaskExecutionsList/TaskExecutionsList';
 import { NodeExecutionInputs } from './NodeExecutionInputs';
 import { NodeExecutionOutputs } from './NodeExecutionOutputs';
@@ -17,6 +18,12 @@ const useStyles = makeStyles((theme) => {
     },
     tabs: {
       borderBottom: `1px solid ${theme.palette.divider}`,
+      '& .MuiTabs-flexContainer': {
+        justifyContent: 'space-around',
+      },
+    },
+    tabItem: {
+      margin: theme.spacing(0, 1),
     },
   };
 });
@@ -68,13 +75,15 @@ export const NodeExecutionTabs: React.FC<{
       break;
     }
   }
+
+  const executionLabel = isMapTaskType(taskTemplate?.type) ? 'Map Execution' : 'Executions';
   return (
     <>
       <Tabs {...tabState} className={styles.tabs}>
-        <Tab value={tabIds.executions} label="Executions" />
-        <Tab value={tabIds.inputs} label="Inputs" />
-        <Tab value={tabIds.outputs} label="Outputs" />
-        {!!taskTemplate && <Tab value={tabIds.task} label="Task" />}
+        <Tab className={styles.tabItem} value={tabIds.executions} label={executionLabel} />
+        <Tab className={styles.tabItem} value={tabIds.inputs} label="Inputs" />
+        <Tab className={styles.tabItem} value={tabIds.outputs} label="Outputs" />
+        {!!taskTemplate && <Tab className={styles.tabItem} value={tabIds.task} label="Task" />}
       </Tabs>
       <div className={styles.content}>{tabContent}</div>
     </>

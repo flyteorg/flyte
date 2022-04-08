@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { RowExpander } from 'components/Executions/Tables/RowExpander';
-import { NodeExecutionPhase } from 'models/Execution/enums';
-import { getNodeExecutionPhaseConstants } from 'components/Executions/utils';
-import { Typography } from '@material-ui/core';
-import { TaskExecutionLogs } from 'components/Executions/TaskExecutionsList/TaskExecutionLogs';
-import { TaskLog } from 'models/Common/types';
+import { TaskExecutionPhase } from 'models/Execution/enums';
+import { getTaskExecutionPhaseConstants } from 'components/Executions/utils';
+import { TaskLogList } from 'components/Executions/TaskExecutionsList/TaskExecutionLogs';
+import { Core } from 'flyteidl';
 
 const useStyles = makeStyles((_theme: Theme) => ({
   mainWrapper: {
@@ -36,8 +36,8 @@ const useStyles = makeStyles((_theme: Theme) => ({
 }));
 
 interface MapTaskStatusInfoProps {
-  taskLogs: TaskLog[];
-  status: NodeExecutionPhase;
+  taskLogs: Core.ITaskLog[];
+  status: TaskExecutionPhase;
   expanded: boolean;
 }
 
@@ -49,7 +49,7 @@ export const MapTaskStatusInfo = (props: MapTaskStatusInfoProps) => {
     setExpanded(!expanded);
   };
 
-  const phaseData = getNodeExecutionPhaseConstants(props.status);
+  const phaseData = getTaskExecutionPhaseConstants(props.status);
   return (
     <div className={styles.mainWrapper}>
       <div className={styles.headerWrapper}>
@@ -62,7 +62,7 @@ export const MapTaskStatusInfo = (props: MapTaskStatusInfoProps) => {
       </div>
       {expanded && (
         <div className={styles.logs}>
-          <TaskExecutionLogs taskLogs={props.taskLogs} />
+          <TaskLogList logs={props.taskLogs} />
         </div>
       )}
     </div>

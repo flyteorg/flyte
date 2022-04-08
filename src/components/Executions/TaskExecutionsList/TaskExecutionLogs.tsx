@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { Core } from 'flyteidl';
 import { NewTargetLink } from 'components/common/NewTargetLink';
 import { useCommonStyles } from 'components/common/styles';
-import { TaskLog } from 'models/Common/types';
 import { noLogsFoundString } from '../constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -13,9 +13,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   sectionHeader: {
     marginTop: theme.spacing(1),
   },
+  logName: {
+    fontWeight: 'lighter',
+  },
 }));
 
-const TaskLogList: React.FC<{ logs: TaskLog[] }> = ({ logs }) => {
+export const TaskLogList: React.FC<{ logs: Core.ITaskLog[] }> = ({ logs }) => {
   const styles = useStyles();
   const commonStyles = useCommonStyles();
   if (!(logs && logs.length > 0)) {
@@ -23,11 +26,16 @@ const TaskLogList: React.FC<{ logs: TaskLog[] }> = ({ logs }) => {
   }
   return (
     <>
-      {logs.map(({ name, uri }) => (
-        <NewTargetLink className={styles.logLink} key={name} external={true} href={uri}>
-          {name}
-        </NewTargetLink>
-      ))}
+      {logs.map(({ name, uri }) =>
+        uri ? (
+          <NewTargetLink className={styles.logLink} key={name} external={true} href={uri}>
+            {name}
+          </NewTargetLink>
+        ) : (
+          // If there is no url, show item a a name string only, as it's not really clickable
+          <div className={styles.logName}>{name}</div>
+        ),
+      )}
     </>
   );
 };
@@ -35,12 +43,15 @@ const TaskLogList: React.FC<{ logs: TaskLog[] }> = ({ logs }) => {
 /** Renders log links from a `taskLogs`(aka taskExecution.closure.logs), if they exist.
  *  Otherwise renders a message indicating that no logs are available.
  */
-export const TaskExecutionLogs: React.FC<{ taskLogs: TaskLog[] }> = ({ taskLogs }) => {
+export const TaskExecutionLogs: React.FC<{ taskLogs: Core.ITaskLog[]; title?: string }> = ({
+  taskLogs,
+  title,
+}) => {
   const styles = useStyles();
   return (
     <section>
       <header className={styles.sectionHeader}>
-        <Typography variant="h6">Logs</Typography>
+        <Typography variant="h6">{title ?? 'Logs'}</Typography>
       </header>
       <TaskLogList logs={taskLogs} />
     </section>

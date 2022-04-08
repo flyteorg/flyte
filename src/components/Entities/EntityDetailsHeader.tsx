@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
   },
   headerText: {
-    margin: `0 ${theme.spacing(1)}px`,
+    margin: theme.spacing(0, 1),
   },
   headerTextContainer: {
     display: 'flex',

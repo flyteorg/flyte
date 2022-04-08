@@ -1,9 +1,10 @@
-import { Protobuf } from 'flyteidl';
-import { MessageFormat, ResourceType } from 'models/Common/types';
+import { Protobuf, Event } from 'flyteidl';
+import { MessageFormat, ResourceType, TaskLog } from 'models/Common/types';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { TaskExecution } from 'models/Execution/types';
 
 import * as Long from 'long';
+import { TaskType } from 'models/Task/constants';
 
 // we probably will create a new helper function in future, to make testing/storybooks closer to what we see in API Json responses
 const getProtobufTimestampFromIsoTime = (isoDateTime: string): Protobuf.ITimestamp => {
@@ -12,6 +13,19 @@ const getProtobufTimestampFromIsoTime = (isoDateTime: string): Protobuf.ITimesta
   timestamp.seconds = Long.fromInt(Math.floor(timeMs / 1000));
   timestamp.nanos = (timeMs % 1000) * 1e6;
   return timestamp;
+};
+
+const getProtobufDurationFromString = (durationSec: string): Protobuf.Duration => {
+  const secondsInt = parseInt(durationSec, 10);
+  const duration = new Protobuf.Duration();
+  duration.seconds = Long.fromInt(secondsInt);
+  return duration;
+};
+
+export const MockTaskExceutionLog: TaskLog = {
+  uri: '#',
+  name: 'Cloudwatch Logs (User)',
+  messageFormat: MessageFormat.JSON,
 };
 
 export const MockPythonTaskExecution: TaskExecution = {
@@ -38,16 +52,79 @@ export const MockPythonTaskExecution: TaskExecution = {
     outputUri:
       's3://flyte-demo/metadata/propeller/flytesnacks-development-ogaayir2e3/athenaworkflowsexamplesayhello/data/0/outputs.pb',
     phase: TaskExecutionPhase.SUCCEEDED,
-    logs: [
-      {
-        uri: 'https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logEventViewer:group=/aws/containerinsights/flyte-demo-2/application;stream=var.log.containers.ogaayir2e3-ff65vi3y-0_flytesnacks-development_ogaayir2e3-ff65vi3y-0-380d210ccaac45a6e2314a155822b36a67e044914069d01323bc18832487ac4a.log',
-        name: 'Cloudwatch Logs (User)',
-        messageFormat: MessageFormat.JSON,
-      },
-    ],
+    logs: [MockTaskExceutionLog],
     createdAt: getProtobufTimestampFromIsoTime('2022-03-17T21:30:53.469624134Z'),
     updatedAt: getProtobufTimestampFromIsoTime('2022-03-17T21:31:04.011303736Z'),
     reason: 'task submitted to K8s',
-    taskType: 'python-task',
+    taskType: TaskType.PYTHON,
+  },
+};
+
+export const getMockMapTaskLogItem = (
+  phase: TaskExecutionPhase,
+  hasLogs: boolean,
+  index?: number,
+  retryAttempt?: number,
+): Event.IExternalResourceInfo => {
+  const retryString = retryAttempt && retryAttempt > 0 ? `-${retryAttempt}` : '';
+  return {
+    externalId: `y286hpfvwh-n0-0-${index ?? 0}`,
+    index: index,
+    phase: phase,
+    retryAttempt: retryAttempt,
+    logs: hasLogs
+      ? [
+          {
+            uri: '#',
+            name: `Kubernetes Logs #0-${index ?? 0}${retryString} (State)`,
+            messageFormat: MessageFormat.JSON,
+          },
+        ]
+      : [],
+  };
+};
+
+export const MockMapTaskExecution: TaskExecution = {
+  id: {
+    taskId: {
+      resourceType: ResourceType.TASK,
+      project: 'flytesnacks',
+      domain: 'development',
+      name: 'flyte.workflows.example.mapper_a_mappable_task_0',
+      version: 'v2',
+    },
+    nodeExecutionId: {
+      nodeId: 'n0',
+      executionId: {
+        project: 'flytesnacks',
+        domain: 'development',
+        name: 'y286hpfvwh',
+      },
+    },
+  },
+  inputUri:
+    's3://my-s3-bucket/metadata/propeller/sandbox/flytesnacks-development-y286hpfvwh/n0/data/inputs.pb',
+  closure: {
+    outputUri:
+      's3://my-s3-bucket/metadata/propeller/sandbox/flytesnacks-development-y286hpfvwh/n0/data/0/outputs.pb',
+    phase: TaskExecutionPhase.SUCCEEDED,
+    startedAt: getProtobufTimestampFromIsoTime('2022-03-30T19:31:09.487343Z'),
+    duration: getProtobufDurationFromString('190.302384340s'),
+    createdAt: getProtobufTimestampFromIsoTime('2022-03-30T19:31:09.487343693Z'),
+    updatedAt: getProtobufTimestampFromIsoTime('2022-03-30T19:34:19.789727340Z'),
+    taskType: 'container_array',
+    metadata: {
+      generatedName: 'y286hpfvwh-n0-0',
+      externalResources: [
+        getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true),
+        getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true, 1),
+        getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true, 2),
+        getMockMapTaskLogItem(TaskExecutionPhase.FAILED, true, 3),
+        getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true, 3, 1),
+        getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true, 4),
+        getMockMapTaskLogItem(TaskExecutionPhase.FAILED, false, 5),
+      ],
+      pluginIdentifier: 'k8s-array',
+    },
   },
 };

@@ -45,7 +45,6 @@ export const formatSecondsToHmsFormat = (seconds: number) => {
   return `${seconds}s`;
 };
 
-// narusina - check if exports are still needed
 export const getOffsetColor = (isCachedValue: boolean[]) => {
   const colors = isCachedValue.map((val) => (val === true ? CASHED_GREEN : TRANSPARENT));
   return colors;

@@ -4,8 +4,9 @@ import { flyteidl, google } from '@flyteorg/flyteidl/gen/pb-js/flyteidl';
 import admin = flyteidl.admin;
 import core = flyteidl.core;
 import service = flyteidl.service;
+import event = flyteidl.event;
 
 /** Message classes for built-in Protobuf types */
 import protobuf = google.protobuf;
 
-export { admin as Admin, core as Core, service as Service, protobuf as Protobuf };
+export { admin as Admin, core as Core, service as Service, protobuf as Protobuf, event as Event };

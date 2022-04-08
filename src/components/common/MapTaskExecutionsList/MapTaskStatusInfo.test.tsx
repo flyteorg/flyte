@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { noLogsFoundString } from 'components/Executions/constants';
-import { getNodeExecutionPhaseConstants } from 'components/Executions/utils';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { getTaskExecutionPhaseConstants } from 'components/Executions/utils';
+import { TaskExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
 
 import { MapTaskStatusInfo } from './MapTaskStatusInfo';
@@ -14,8 +14,8 @@ const taskLogs = [
 
 describe('MapTaskStatusInfo', () => {
   it('Phase and amount of links rendered correctly', async () => {
-    const status = NodeExecutionPhase.RUNNING;
-    const phaseData = getNodeExecutionPhaseConstants(status);
+    const status = TaskExecutionPhase.RUNNING;
+    const phaseData = getTaskExecutionPhaseConstants(status);
 
     const { queryByText, getByTitle } = render(
       <MapTaskStatusInfo taskLogs={taskLogs} status={status} expanded={false} />,
@@ -29,13 +29,13 @@ describe('MapTaskStatusInfo', () => {
     const buttonEl = getByTitle('Expand row');
     fireEvent.click(buttonEl);
     await waitFor(() => {
-      expect(queryByText('Logs')).toBeInTheDocument();
+      expect(queryByText(taskLogs[0].name)).toBeInTheDocument();
     });
   });
 
   it('Phase with no links show proper texts when opened', () => {
-    const status = NodeExecutionPhase.ABORTED;
-    const phaseData = getNodeExecutionPhaseConstants(status);
+    const status = TaskExecutionPhase.ABORTED;
+    const phaseData = getTaskExecutionPhaseConstants(status);
 
     const { queryByText } = render(
       <MapTaskStatusInfo taskLogs={[]} status={status} expanded={true} />,

@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { TaskExecutionPhase } from 'models/Execution/enums';
 import { MapTaskStatusInfo } from './MapTaskStatusInfo';
 import { PanelViewDecorator } from '../__stories__/Decorators';
 
 export default {
-  title: 'Task/MapTaskExecutionList/MapTaskStatusInfo',
+  title: 'Task/NodeExecutionTabs/MapTaskStatusInfo',
   component: MapTaskStatusInfo,
   parameters: { actions: { argTypesRegex: 'toggleExpanded' } },
 } as ComponentMeta<typeof MapTaskStatusInfo>;
@@ -24,12 +24,12 @@ Default.args = {
     { uri: '#', name: 'Kubernetes Logs #0-3' },
     { uri: '#', name: 'Kubernetes Logs #0-4' },
   ],
-  status: NodeExecutionPhase.QUEUED,
+  status: TaskExecutionPhase.QUEUED,
   expanded: true,
 };
 
 export const AllSpace = Template.bind({});
 AllSpace.args = {
   taskLogs: [],
-  status: NodeExecutionPhase.SUCCEEDED,
+  status: TaskExecutionPhase.SUCCEEDED,
 };
