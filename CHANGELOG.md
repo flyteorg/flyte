@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.50.1](http://github.com/lyft/flyteconsole/compare/v0.50.0...v0.50.1) (2022-04-08)
+
+
+### Bug Fixes
+
+* fix the crash in graph/timeline view for corner case ([#362](http://github.com/lyft/flyteconsole/issues/362)) ([ab7340e](http://github.com/lyft/flyteconsole/commit/ab7340ebe9f5fc6e277305234cf9f6eb139035a2))
+
 # [0.50.0](http://github.com/lyft/flyteconsole/compare/v0.49.0...v0.50.0) (2022-04-08)
 
 
