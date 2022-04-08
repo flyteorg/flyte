@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.50.2](http://github.com/lyft/flyteconsole/compare/v0.50.1...v0.50.2) (2022-04-08)
+
+
+### Reverts
+
+* Revert "fix(359): fix assets folder location to simplify oneclick experience (#360)" (#363) ([7d2d252](http://github.com/lyft/flyteconsole/commit/7d2d25259b0a14f8f26e57ffb64367150efc7761)), closes [#360](http://github.com/lyft/flyteconsole/issues/360) [#363](http://github.com/lyft/flyteconsole/issues/363)
+
 ## [0.50.1](http://github.com/lyft/flyteconsole/compare/v0.50.0...v0.50.1) (2022-04-08)
 
 
