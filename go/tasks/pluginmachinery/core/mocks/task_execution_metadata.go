@@ -54,6 +54,38 @@ func (_m *TaskExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetInterruptibleFailureThreshold struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint32) *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
+	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetInterruptibleFailureThreshold() *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
+	c := _m.On("GetInterruptibleFailureThreshold")
+	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+}
+
+func (_m *TaskExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matchers ...interface{}) *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
+	c := _m.On("GetInterruptibleFailureThreshold", matchers...)
+	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+}
+
+// GetInterruptibleFailureThreshold provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetInterruptibleFailureThreshold() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetK8sServiceAccount struct {
 	*mock.Call
 }

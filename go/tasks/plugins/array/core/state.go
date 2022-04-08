@@ -53,6 +53,9 @@ type State struct {
 
 	// Tracks the number of subtask retries using the execution index
 	RetryAttempts bitarray.CompactArray `json:"retryAttempts"`
+
+	// Tracks the number of system failures for each subtask using the execution index
+	SystemFailures bitarray.CompactArray `json:"systemFailures"`
 }
 
 func (s State) GetReason() string {

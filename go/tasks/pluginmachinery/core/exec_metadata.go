@@ -44,4 +44,5 @@ type TaskExecutionMetadata interface {
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
+	GetInterruptibleFailureThreshold() uint32
 }
