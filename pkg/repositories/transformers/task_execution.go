@@ -137,14 +137,15 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 	}
 
 	closure := &admin.TaskExecutionClosure{
-		Phase:      input.Request.Event.Phase,
-		UpdatedAt:  input.Request.Event.OccurredAt,
-		CreatedAt:  input.Request.Event.OccurredAt,
-		Logs:       input.Request.Event.Logs,
-		CustomInfo: input.Request.Event.CustomInfo,
-		Reason:     input.Request.Event.Reason,
-		TaskType:   input.Request.Event.TaskType,
-		Metadata:   metadata,
+		Phase:        input.Request.Event.Phase,
+		UpdatedAt:    input.Request.Event.OccurredAt,
+		CreatedAt:    input.Request.Event.OccurredAt,
+		Logs:         input.Request.Event.Logs,
+		CustomInfo:   input.Request.Event.CustomInfo,
+		Reason:       input.Request.Event.Reason,
+		TaskType:     input.Request.Event.TaskType,
+		Metadata:     metadata,
+		EventVersion: input.Request.Event.EventVersion,
 	}
 
 	eventPhase := input.Request.Event.Phase
@@ -374,6 +375,9 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
 	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
+	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
+		taskExecutionClosure.EventVersion = request.Event.EventVersion
+	}
 	marshaledClosure, err := proto.Marshal(&taskExecutionClosure)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(
