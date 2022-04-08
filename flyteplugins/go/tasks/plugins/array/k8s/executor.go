@@ -117,16 +117,16 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 			tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:
-		nextState, err = array.AssembleFinalOutputs(ctx, e.outputsAssembler, tCtx, arrayCore.PhaseSuccess, pluginState)
+		nextState, err = array.AssembleFinalOutputs(ctx, e.outputsAssembler, tCtx, arrayCore.PhaseSuccess, version, pluginState)
 
 	case arrayCore.PhaseWriteToDiscoveryThenFail:
-		nextState, err = array.WriteToDiscovery(ctx, tCtx, pluginState, arrayCore.PhaseAssembleFinalError)
+		nextState, err = array.WriteToDiscovery(ctx, tCtx, pluginState, arrayCore.PhaseAssembleFinalError, version)
 
 	case arrayCore.PhaseWriteToDiscovery:
-		nextState, err = array.WriteToDiscovery(ctx, tCtx, pluginState, arrayCore.PhaseAssembleFinalOutput)
+		nextState, err = array.WriteToDiscovery(ctx, tCtx, pluginState, arrayCore.PhaseAssembleFinalOutput, version)
 
 	case arrayCore.PhaseAssembleFinalError:
-		nextState, err = array.AssembleFinalOutputs(ctx, e.errorAssembler, tCtx, arrayCore.PhasePermanentFailure, pluginState)
+		nextState, err = array.AssembleFinalOutputs(ctx, e.errorAssembler, tCtx, arrayCore.PhasePermanentFailure, version, pluginState)
 
 	default:
 		nextState = pluginState

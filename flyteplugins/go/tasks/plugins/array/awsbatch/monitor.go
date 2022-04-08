@@ -63,6 +63,11 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
 	}
 
+	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
+	if err != nil {
+		return currentState, err
+	}
+
 	queued := 0
 	for childIdx, subJob := range job.SubJobs {
 		actualPhase := subJob.Status.Phase
@@ -132,16 +137,20 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 		errorMsg := msg.Summary(cfg.MaxErrorStringLength)
 		parentState = parentState.SetReason(errorMsg)
 	}
+	_, version := currentState.GetPhase()
 	if phase == arrayCore.PhaseCheckingSubTaskExecutions {
-		newPhaseVersion := uint32(0)
-		// For now, the only changes to PhaseVersion and PreviousSummary occur for running array jobs.
-		for phase, count := range parentState.GetArrayStatus().Summary {
-			newPhaseVersion += uint32(phase) * uint32(count)
+		newSubTaskPhaseHash, err := parentState.GetArrayStatus().HashCode()
+		if err != nil {
+			return currentState, err
 		}
 
-		parentState = parentState.SetPhase(phase, newPhaseVersion).SetReason("Task is still running.")
+		if newSubTaskPhaseHash != currentSubTaskPhaseHash {
+			version++
+		}
+
+		parentState = parentState.SetPhase(phase, version).SetReason("Task is still running")
 	} else {
-		parentState = parentState.SetPhase(phase, core.DefaultPhaseVersion)
+		parentState = parentState.SetPhase(phase, version)
 	}
 
 	p, v := parentState.GetPhase()

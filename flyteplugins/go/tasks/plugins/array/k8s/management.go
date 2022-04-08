@@ -128,6 +128,11 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	currentParallelism := 0
 	maxParallelism := int(arrayJob.Parallelism)
 
+	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
+	if err != nil {
+		return currentState, externalResources, err
+	}
+
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
 		retryAttempt := currentState.RetryAttempts.GetItem(childIdx)
@@ -255,17 +260,20 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		newState = newState.SetReason(errorMsg)
 	}
 
+	_, version := currentState.GetPhase()
 	if phase == arrayCore.PhaseCheckingSubTaskExecutions {
-		newPhaseVersion := uint32(0)
-
-		// For now, the only changes to PhaseVersion and PreviousSummary occur for running array jobs.
-		for phase, count := range newState.GetArrayStatus().Summary {
-			newPhaseVersion += uint32(phase) * uint32(count)
+		newSubTaskPhaseHash, err := newState.GetArrayStatus().HashCode()
+		if err != nil {
+			return currentState, externalResources, err
 		}
 
-		newState = newState.SetPhase(phase, newPhaseVersion).SetReason("Task is still running.")
+		if newSubTaskPhaseHash != currentSubTaskPhaseHash {
+			version++
+		}
+
+		newState = newState.SetPhase(phase, version).SetReason("Task is still running")
 	} else {
-		newState = newState.SetPhase(phase, core.DefaultPhaseVersion)
+		newState = newState.SetPhase(phase, version)
 	}
 
 	return newState, externalResources, nil

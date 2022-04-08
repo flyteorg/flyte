@@ -164,11 +164,6 @@ func ToArrayJob(structObj *structpb.Struct, taskTypeVersion int32) (*idlPlugins.
 	return arrayJob, err
 }
 
-func GetPhaseVersionOffset(currentPhase Phase, length int64) uint32 {
-	// NB: Make sure this is the last/highest value of the Phase!
-	return uint32(length * (int64(core.PhasePermanentFailure) + 1) * int64(currentPhase))
-}
-
 // Any state of the plugin needs to map to a core.PhaseInfo (which in turn will map to Admin events) so that the rest
 // of the Flyte platform can understand what's happening. That is, each possible state that our plugin state
 // machine returns should map to a unique (core.Phase, core.PhaseInfo.version).
@@ -189,20 +184,16 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 	case PhaseStart:
 		phaseInfo = core.PhaseInfoInitializing(t, core.DefaultPhaseVersion, state.GetReason(), nowTaskInfo)
 
-	case PhasePreLaunch:
-		version := GetPhaseVersionOffset(p, 1) + version
-		phaseInfo = core.PhaseInfoRunning(version, nowTaskInfo)
-
-	case PhaseLaunch:
-		// The first time we return a Running core.Phase, we can just use the version inside the state object itself.
-		phaseInfo = core.PhaseInfoRunning(version, nowTaskInfo)
-
 	case PhaseWaitingForResources:
 		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(t, version, state.GetReason(), nowTaskInfo)
 
+	case PhasePreLaunch:
+		fallthrough
+
+	case PhaseLaunch:
+		fallthrough
+
 	case PhaseCheckingSubTaskExecutions:
-		// For future Running core.Phases, we have to make sure we don't use an earlier Admin version number,
-		// which means we need to offset things.
 		fallthrough
 
 	case PhaseAssembleFinalOutput:
@@ -215,15 +206,11 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 		fallthrough
 
 	case PhaseWriteToDiscovery:
-		// If the array task has 0 inputs we need to ensure the phaseVersion changes so that the
-		// task can progess. Therefore we default to task length 1 to ensure phase updates.
-		length := int64(1)
-		if state.GetOriginalArraySize() != 0 {
-			length = state.GetOriginalArraySize()
-		}
-
-		version := GetPhaseVersionOffset(p, length) + version
-		phaseInfo = core.PhaseInfoRunning(version, nowTaskInfo)
+		// The state version is only incremented in PhaseCheckingSubTaskExecutions when subtask
+		// phases are updated. Therefore by adding the phase to the state version we ensure that
+		// (1) all phase changes will have a new phase version and (2) all subtask phase updates
+		// result in monotonically increasing phase version.
+		phaseInfo = core.PhaseInfoRunning(version+uint32(p), nowTaskInfo)
 
 	case PhaseSuccess:
 		phaseInfo = core.PhaseInfoSuccess(nowTaskInfo)
