@@ -2,6 +2,7 @@ package dataproxy
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -37,6 +38,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		return nil, fmt.Errorf("prjoect and domain are required parameters")
 	}
 
+	if len(req.ContentMd5) == 0 {
+		return nil, fmt.Errorf("content_md5 is a required parameter")
+	}
+
 	if expiresIn := req.ExpiresIn; expiresIn != nil {
 		if !expiresIn.IsValid() {
 			return nil, fmt.Errorf("expiresIn [%v] is invalid", expiresIn)
@@ -50,19 +55,21 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		req.ExpiresIn = durationpb.New(s.cfg.Upload.MaxExpiresIn.Duration)
 	}
 
-	if len(req.Suffix) == 0 {
-		req.Suffix = rand.String(20)
+	if len(req.Filename) == 0 {
+		req.Filename = rand.String(s.cfg.Upload.DefaultFileNameLength)
 	}
 
-	storagePath, err := createShardedStorageLocation(ctx, req, s.shardSelector, s.dataStore, s.cfg.Upload)
+	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
+	storagePath, err := createShardedStorageLocation(ctx, s.shardSelector, s.dataStore, s.cfg.Upload,
+		req.Project, req.Domain, md5, req.Filename)
 	if err != nil {
 		return nil, err
 	}
 
 	resp, err := s.dataStore.CreateSignedURL(ctx, storagePath, storage.SignedURLProperties{
-		Scope:     stow.ClientMethodPut,
-		ExpiresIn: req.ExpiresIn.AsDuration(),
-		// TODO: pass max allowed upload size
+		Scope:      stow.ClientMethodPut,
+		ExpiresIn:  req.ExpiresIn.AsDuration(),
+		ContentMD5: md5,
 	})
 
 	if err != nil {
@@ -78,14 +85,14 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 
 // createShardedStorageLocation creates a location in storage destination to maximize read/write performance in most
 // block stores. The final location should look something like: s3://<my bucket>/<shard length>/<file name>
-func createShardedStorageLocation(ctx context.Context, req *service.CreateUploadLocationRequest,
-	shardSelector ioutils.ShardSelector, store *storage.DataStore, cfg config.DataProxyUploadConfig) (storage.DataReference, error) {
+func createShardedStorageLocation(ctx context.Context, shardSelector ioutils.ShardSelector, store *storage.DataStore,
+	cfg config.DataProxyUploadConfig, keyParts ...string) (storage.DataReference, error) {
 	keySuffixArr := make([]string, 0, 4)
 	if len(cfg.StoragePrefix) > 0 {
 		keySuffixArr = append(keySuffixArr, cfg.StoragePrefix)
 	}
 
-	keySuffixArr = append(keySuffixArr, req.Project, req.Domain, req.Suffix)
+	keySuffixArr = append(keySuffixArr, keyParts...)
 	prefix, err := shardSelector.GetShardPrefix(ctx, []byte(strings.Join(keySuffixArr, "/")))
 	if err != nil {
 		return "", err

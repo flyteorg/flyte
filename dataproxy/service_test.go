@@ -38,12 +38,11 @@ func Test_createShardedStorageLocation(t *testing.T) {
 	assert.NoError(t, err)
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	loc, err := createShardedStorageLocation(context.Background(), &service.CreateUploadLocationRequest{},
-		selector, dataStore, config.DataProxyUploadConfig{
-			StoragePrefix: "blah",
-		})
+	loc, err := createShardedStorageLocation(context.Background(), selector, dataStore, config.DataProxyUploadConfig{
+		StoragePrefix: "blah",
+	})
 	assert.NoError(t, err)
-	assert.Equal(t, "/4n/blah///", loc.String())
+	assert.Equal(t, "/u8/blah", loc.String())
 }
 
 func TestCreateUploadLocation(t *testing.T) {
