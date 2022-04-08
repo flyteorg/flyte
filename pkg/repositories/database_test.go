@@ -16,33 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 )
-
-func TestGetGormLogLevel(t *testing.T) {
-	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.PanicLevel,
-	}))
-	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.FatalLevel,
-	}))
-	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.ErrorLevel,
-	}))
-
-	assert.Equal(t, gormLogger.Warn, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.WarnLevel,
-	}))
-
-	assert.Equal(t, gormLogger.Info, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.InfoLevel,
-	}))
-	assert.Equal(t, gormLogger.Info, getGormLogLevel(context.TODO(), &logger.Config{
-		Level: logger.DebugLevel,
-	}))
-
-	assert.Equal(t, gormLogger.Error, getGormLogLevel(context.TODO(), nil))
-}
 
 func TestResolvePassword(t *testing.T) {
 	password := "123abc"

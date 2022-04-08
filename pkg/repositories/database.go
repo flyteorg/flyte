@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	repoErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"gorm.io/driver/sqlite"
@@ -23,27 +25,40 @@ const pqInvalidDBCode = "3D000"
 const defaultDB = "postgres"
 
 // getGormLogLevel converts between the flytestdlib configured log level to the equivalent gorm log level.
-func getGormLogLevel(ctx context.Context, logConfig *logger.Config) gormLogger.LogLevel {
-	if logConfig == nil {
+func getGormLogger(ctx context.Context, logConfig *logger.Config) gormLogger.Interface {
+	logConfigLevel := logger.ErrorLevel
+	if logConfig != nil {
+		logConfigLevel = logConfig.Level
+	} else {
 		logger.Debugf(ctx, "No log config block found, setting gorm db log level to: error")
-		return gormLogger.Error
 	}
-	switch logConfig.Level {
+	var logLevel gormLogger.LogLevel
+	ignoreRecordNotFoundError := true
+	switch logConfigLevel {
 	case logger.PanicLevel:
 		fallthrough
 	case logger.FatalLevel:
 		fallthrough
 	case logger.ErrorLevel:
-		return gormLogger.Error
+		logLevel = gormLogger.Error
 	case logger.WarnLevel:
-		return gormLogger.Warn
+		logLevel = gormLogger.Warn
 	case logger.InfoLevel:
 		fallthrough
 	case logger.DebugLevel:
-		return gormLogger.Info
+		logLevel = gormLogger.Info
+		ignoreRecordNotFoundError = false
 	default:
-		return gormLogger.Silent
+		logLevel = gormLogger.Silent
 	}
+	// Copied from gormLogger.Default initialization. The gormLogger interface only allows modifying the LogLevel
+	// and not IgnoreRecordNotFoundError.
+	return gormLogger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), gormLogger.Config{
+		SlowThreshold:             200 * time.Millisecond,
+		LogLevel:                  logLevel,
+		IgnoreRecordNotFoundError: ignoreRecordNotFoundError,
+		Colorful:                  true,
+	})
 }
 
 // Resolves a password value from either a user-provided inline value or a filepath whose contents contain a password.
@@ -86,7 +101,7 @@ func GetDB(ctx context.Context, dbConfig *runtimeInterfaces.DbConfig, logConfig 
 		panic("Cannot initialize database repository from empty db config")
 	}
 	gormConfig := &gorm.Config{
-		Logger:                                   gormLogger.Default.LogMode(getGormLogLevel(ctx, logConfig)),
+		Logger:                                   getGormLogger(ctx, logConfig),
 		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
 	}
 
