@@ -73,7 +73,7 @@ func TestConfigHandler(t *testing.T) {
 		"logger": map[string]interface{}{
 			"show-source": false,
 			"mute":        false,
-			"level":       float64(4),
+			"level":       float64(3),
 			"formatter": map[string]interface{}{
 				"type": "json",
 			},
