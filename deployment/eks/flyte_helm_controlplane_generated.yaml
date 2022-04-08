@@ -99,7 +99,7 @@ data:
       name: production
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
   server.yaml: | 
     auth:
@@ -331,7 +331,7 @@ data:
       username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
   server.yaml: | 
     application:
@@ -389,7 +389,7 @@ data:
       profilerPort: 10254
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
@@ -557,7 +557,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e411c1a885875ea3564a310f245a0a1dd66036b36b782aae6bf7dc28cd20e87"
+        configChecksum: "859084b803eecd3a53eaae0559fc311a947393a1d8f30a5bc8a36d9a9f11d28"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -771,7 +771,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0f75299a2e2d6378ef628fbf1fee8ea162934c177c650615210b887d6e6a2bd"
+        configChecksum: "50a468638e00376fe2bcfbb4d2be652756c7a7d5ea070a3cb3643f60801e73e"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -862,7 +862,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e411c1a885875ea3564a310f245a0a1dd66036b36b782aae6bf7dc28cd20e87"
+        configChecksum: "859084b803eecd3a53eaae0559fc311a947393a1d8f30a5bc8a36d9a9f11d28"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

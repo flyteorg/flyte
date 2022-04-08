@@ -118,7 +118,7 @@ data:
       name: production
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
   server.yaml: | 
     auth:
@@ -365,7 +365,7 @@ data:
       username: flyteadmin
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
   server.yaml: | 
     application:
@@ -487,7 +487,7 @@ data:
         default-memory: 100Mi
   logger.yaml: | 
     logger:
-      level: 3
+      level: 4
       show-source: true
   resource_manager.yaml: | 
     propeller:
@@ -849,7 +849,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a6c7c57df6f2adc5b4c3a4e5b0eaf1573ea5d08ed89e0682d07265d7f9d0676"
+        configChecksum: "518341c4bce84873fc5d9751455e74a3b48a08912f84ce14db9a2de141f5eba"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1063,7 +1063,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0f75299a2e2d6378ef628fbf1fee8ea162934c177c650615210b887d6e6a2bd"
+        configChecksum: "50a468638e00376fe2bcfbb4d2be652756c7a7d5ea070a3cb3643f60801e73e"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1154,7 +1154,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a9e2709c109f5b4c0deb700f71cbe3a72c10007fdb9cee3307aec9fde080708"
+        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1231,7 +1231,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "a9e2709c109f5b4c0deb700f71cbe3a72c10007fdb9cee3307aec9fde080708"
+        configChecksum: "8291af94098b4b34e2b14fbf7d77651e8ccf3564330b56a8d5d4bb5e7ebbd43"
     spec:
       securityContext:
         fsGroup: 65534
