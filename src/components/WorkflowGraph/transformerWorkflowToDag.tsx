@@ -288,6 +288,10 @@ export const transformerWorkflowToDag = (
    * @param context       The current workflow being parsed
    */
   const parseWorkflow = (root, context: CompiledWorkflow) => {
+    if (!context?.template?.nodes) {
+      return root;
+    }
+
     /* Build Nodes from template */
     for (let i = 0; i < context.template.nodes.length; i++) {
       const compiledNode: CompiledNode = context.template.nodes[i];
