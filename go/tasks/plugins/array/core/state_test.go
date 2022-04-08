@@ -14,14 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetPhaseVersionOffset(t *testing.T) {
-	length := int64(100)
-	checkSubTasksOffset := GetPhaseVersionOffset(PhaseAssembleFinalOutput, length)
-	discoverWriteOffset := GetPhaseVersionOffset(PhaseWriteToDiscovery, length)
-	// There are 9 possible core.Phases, from PhaseUndefined to PhasePermanentFailure
-	assert.Equal(t, uint32(length*9), discoverWriteOffset-checkSubTasksOffset)
-}
-
 func TestInvertBitSet(t *testing.T) {
 	input := bitarray.NewBitSet(4)
 	input.Set(0)
@@ -105,7 +97,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
-		assert.Equal(t, uint32(368), phaseInfo.Version())
+		assert.Equal(t, uint32(12), phaseInfo.Version())
 	})
 
 	t.Run("write to discovery", func(t *testing.T) {
@@ -124,7 +116,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
-		assert.Equal(t, uint32(548), phaseInfo.Version())
+		assert.Equal(t, uint32(14), phaseInfo.Version())
 	})
 
 	t.Run("success", func(t *testing.T) {

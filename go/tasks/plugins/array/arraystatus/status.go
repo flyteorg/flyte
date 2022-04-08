@@ -5,6 +5,9 @@
 package arraystatus
 
 import (
+	"encoding/binary"
+	"hash/fnv"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flytestdlib/bitarray"
 )
@@ -18,6 +21,22 @@ type ArrayStatus struct {
 
 	// Status of every job in the array.
 	Detailed bitarray.CompactArray `json:"details"`
+}
+
+// HashCode computes a hash of the phase indicies stored in the Detailed array to uniquely represent
+// a collection of subtask phases.
+func (a ArrayStatus) HashCode() (uint64, error) {
+	hash := fnv.New64()
+	bytes := make([]byte, 8)
+	for _, phaseIndex := range a.Detailed.GetItems() {
+		binary.LittleEndian.PutUint64(bytes, phaseIndex)
+		_, err := hash.Write(bytes)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return hash.Sum64(), nil
 }
 
 // This is a status object that is returned after we make Catalog calls to see if subtasks are Cached

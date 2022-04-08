@@ -193,7 +193,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	return state, nil
 }
 
-func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State, phaseOnSuccess arrayCore.Phase) (*arrayCore.State, error) {
+func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State, phaseOnSuccess arrayCore.Phase, versionOnSuccess uint32) (*arrayCore.State, error) {
 
 	// Check that the taskTemplate is valid
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -205,7 +205,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 
 	if tMeta := taskTemplate.Metadata; tMeta == nil || !tMeta.Discoverable {
 		logger.Debugf(ctx, "Task is not marked as discoverable. Moving to [%v] phase.", phaseOnSuccess)
-		return state.SetPhase(phaseOnSuccess, core.DefaultPhaseVersion).SetReason("Task is not discoverable."), nil
+		return state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Task is not discoverable."), nil
 	}
 
 	var inputReaders []io.InputReader
@@ -263,7 +263,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	}
 
 	if len(catalogWriterItems) == 0 {
-		state.SetPhase(phaseOnSuccess, core.DefaultPhaseVersion).SetReason("No outputs need to be cached.")
+		state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("No outputs need to be cached.")
 		return state, nil
 	}
 
@@ -273,7 +273,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	}
 
 	if allWritten {
-		state.SetPhase(phaseOnSuccess, core.DefaultPhaseVersion).SetReason("Finished writing catalog cache.")
+		state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Finished writing catalog cache.")
 	}
 
 	return state, nil

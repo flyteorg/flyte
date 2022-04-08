@@ -170,7 +170,7 @@ func buildFinalPhases(executedTasks bitarray.CompactArray, indexes *bitarray.Bit
 // Assembles a single outputs.pb that contain all the outputs of the subtasks and write them to the final OutputWriter.
 // This step can potentially be expensive (hence the metrics) and why it's offloaded to a background process.
 func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tCtx pluginCore.TaskExecutionContext,
-	terminalPhase arrayCore.Phase, state *arrayCore.State) (*arrayCore.State, error) {
+	terminalPhase arrayCore.Phase, terminalVersion uint32, state *arrayCore.State) (*arrayCore.State, error) {
 
 	// Otherwise, run the data catalog steps - create and submit work items to the catalog processor,
 	// build input readers
@@ -191,7 +191,7 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 		outputVariables := taskTemplate.GetInterface().GetOutputs()
 		if outputVariables == nil || outputVariables.GetVariables() == nil {
 			// If the task has no outputs, bail early.
-			state = state.SetPhase(terminalPhase, 0).SetReason("Task has no outputs")
+			state = state.SetPhase(terminalPhase, terminalVersion).SetReason("Task has no outputs")
 			return state, nil
 		}
 
@@ -241,7 +241,7 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 		}
 
 		if outputExists {
-			state = state.SetPhase(terminalPhase, 0).SetReason("Assembled outputs")
+			state = state.SetPhase(terminalPhase, terminalVersion).SetReason("Assembled outputs")
 			return state, nil
 		}
 
@@ -256,11 +256,11 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 				return nil, err
 			}
 
-			state = state.SetPhase(terminalPhase, 0).
+			state = state.SetPhase(terminalPhase, terminalVersion).
 				SetReason("Assembled error").
 				SetExecutionErr(ee.ExecutionError)
 		} else {
-			state = state.SetPhase(terminalPhase, 0).SetReason("No output or error assembled.")
+			state = state.SetPhase(terminalPhase, terminalVersion).SetReason("No output or error assembled.")
 		}
 	case workqueue.WorkStatusFailed:
 		state = state.SetExecutionErr(&core.ExecutionError{

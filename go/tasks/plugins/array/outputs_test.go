@@ -256,9 +256,10 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		tCtx.OnMaxDatasetSizeBytes().Return(10000)
 		tCtx.OnDataStore().Return(d)
 
-		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
+		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseSuccess, s.CurrentPhase)
+		assert.Equal(t, uint32(1), s.PhaseVersion)
 		assert.False(t, called)
 	})
 
@@ -294,9 +295,10 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		tCtx := &mocks3.TaskExecutionContext{}
 		tCtx.OnTaskExecutionMetadata().Return(tMeta)
 
-		_, err := AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
+		_, err := AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseRetryableFailure, s.CurrentPhase)
+		assert.Equal(t, uint32(0), s.PhaseVersion)
 		assert.False(t, called)
 	})
 
@@ -377,9 +379,10 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		tCtx.OnDataStore().Return(ds)
 		tCtx.OnMaxDatasetSizeBytes().Return(10000)
 
-		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
+		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseSuccess, s.CurrentPhase)
+		assert.Equal(t, uint32(1), s.PhaseVersion)
 		assert.True(t, called)
 	})
 }
