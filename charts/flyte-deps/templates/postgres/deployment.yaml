@@ -1,0 +1,47 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "postgres.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "postgres.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.postgres.replicaCount }}
+  selector:
+    matchLabels: {{ include "postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.postgres.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      labels: {{ include "postgres.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
+        imagePullPolicy: "{{ .Values.postgres.image.pullPolicy }}"
+        name: postgres
+        env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        - name: POSTGRES_DB
+          value: {{ .Values.flyte.db.admin.database.dbname }}
+        ports:
+        - containerPort: 5432
+          name: postgres
+        resources: {{ toYaml .Values.postgres.resources | nindent 10 }}
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          emptyDir: {}
+      {{- with .Values.postgres.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgres.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgres.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

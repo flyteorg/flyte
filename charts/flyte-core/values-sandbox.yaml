@@ -1,0 +1,96 @@
+
+flyteadmin:
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: ClusterIP
+    loadBalancerSourceRanges: []
+
+datacatalog:
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: NodePort
+
+flyteconsole:
+  ga:
+    enabled: true
+    tracking_id: "G-0QW4DJWJ20"
+
+deployRedoc: true
+
+common:
+  databaseSecret:
+    # -- Specify name of K8s Secret which contains Database password. Leave it empty if you don't need this Secret
+    name: ""
+
+    # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
+    secretManifest: {}
+  ingress:
+    host: ""
+    webpackHMR: true
+
+db:
+  datacatalog:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "datacatalog"
+  admin:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: "flyteadmin"
+
+configmap:
+  console:
+    CONFIG_DIR: /etc/flyte/config
+    DISABLE_AUTH: "1"
+
+
+  # -- Kubernetes specific Flyte configuration
+  k8s:
+    plugins:
+      # -- Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config)
+      k8s:
+        #  DEFAULT_ENV_VAR: VALUE
+        default-cpus: 100m
+        default-env-vars:
+          - FLYTE_AWS_ENDPOINT: "http://minio:9000"
+          - FLYTE_AWS_ACCESS_KEY_ID: minio
+          - FLYTE_AWS_SECRET_ACCESS_KEY: flyte
+        default-memory: 200Mi
+
+  remoteData:
+    remoteData:
+      region: "us-east-1"
+      scheme: "local"
+      signedUrls:
+        durationMinutes: 3
+
+  # -- Resource manager configuration
+  resource_manager:
+    # -- resource manager configuration
+    propeller:
+      resourcemanager:
+        type: noop
+        redis: null
+
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: true
+        kubernetes-template-uri: 'http://localhost:30082/#/log/{{ "{{" }} .namespace {{ "}}" }}/{{ "{{" }} .podName {{ "}}" }}/pod?namespace={{ "{{" }} .namespace {{ "}}" }}'
+        # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
+        cloudwatch-enabled: false
+
+workflow_notifications:
+  enabled: false
+  config: {}
+
+redis:
+  # --- enable or disable Redis Statefulset installation
+  enabled: false
+

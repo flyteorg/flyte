@@ -1,0 +1,183 @@
+redis:
+  # --- enable or disable Redis Statefulset installation
+  enabled: false
+
+#
+# POSTGRES SETTINGS
+#
+
+postgres:
+  # --- enable or disable Postgres deployment installation
+  enabled: true
+  # -- Replicas count for Postgres deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Postgres deployment
+    repository: ecr.flyte.org/ubuntu/postgres
+    # -- Docker image tag
+    tag: 13-21.04_beta
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Postgres deployment
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  # -- Service settings for Postgres
+  service:
+    annotations: {}
+    type: ClusterIP
+  # -- Annotations for Postgres pods
+  podAnnotations: {}
+  # -- nodeSelector for Postgres deployment
+  nodeSelector: {}
+  # -- tolerations for Postgres deployment
+  tolerations: []
+  # -- affinity for Postgres deployment
+  affinity: {}
+
+#
+# MINIO SETTINGS
+#
+
+minio:
+  # --- enable or disable Minio deployment installation
+  enabled: true
+  # -- Replicas count for Minio deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Minio deployment
+    repository: ecr.flyte.org/bitnami/minio
+    # -- Docker image tag
+    tag: 2021.10.13-debian-10-r0
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Minio deployment
+  resources:
+    # -- Requests are the minimum set of resources needed for this pod
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    # -- Limits are the maximum set of resources needed for this pod
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  # -- Service settings for Minio
+  service:
+    annotations: {}
+    type: NodePort
+  # -- Annotations for Minio pods
+  podAnnotations: {}
+  # -- nodeSelector for Minio deployment
+  nodeSelector: {}
+  # -- tolerations for Minio deployment
+  tolerations: []
+  # -- affinity for Minio deployment
+  affinity: {}
+
+redoc:
+  # --- enable or disable Minio deployment installation
+  enabled: true
+  # -- Replicas count for Minio deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Minio deployment
+    repository: docker.io/redocly/redoc
+    # -- Docker image tag
+    tag: latest
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Minio deployment
+  resources:
+    # -- Requests are the minimum set of resources needed for this pod
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    # -- Limits are the maximum set of resources needed for this pod
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  # -- Service settings for Minio
+  service:
+    type: ClusterIP
+  # -- Annotations for Minio pods
+  podAnnotations: {}
+  # -- nodeSelector for Minio deployment
+  nodeSelector: {}
+  # -- tolerations for Minio deployment
+  tolerations: []
+  # -- affinity for Minio deployment
+  affinity: {}
+
+#
+# CONTOUR SETTINGS
+#
+
+contour:
+  # --- enable or disable Contour deployment installation
+  enabled: true
+  # -- Replicas count for Contour deployment
+  replicaCount: 1
+  contour:
+    # -- Default resources requests and limits for Contour
+    resources:
+      # -- Requests are the minimum set of resources needed for this pod
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      # -- Limits are the maximum set of resources needed for this pod
+      limits:
+        cpu: 100m
+        memory: 100Mi
+  envoy:
+    service:
+      type: NodePort
+      ports:
+        http: 80
+      nodePorts:
+        http: 30081
+    # -- Default resources requests and limits for Envoy
+    resources:
+      # -- Requests are the minimum set of resources needed for this pod
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      # -- Limits are the maximum set of resources needed for this pod
+      limits:
+        cpu: 100m
+        memory: 100Mi
+  # -- Annotations for ServiceAccount attached to Contour pods
+  serviceAccountAnnotations: {}
+  # -- Annotations for Contour pods
+  podAnnotations: {}
+  # -- nodeSelector for Contour deployment
+  nodeSelector: {}
+  # -- tolerations for Contour deployment
+  tolerations: []
+  # -- affinity for Contour deployment
+  affinity: {}
+
+#
+# KUBERNETES DASHBOARD
+#
+kubernetes-dashboard:
+  enabled: true
+  extraArgs:
+    - --enable-skip-login
+    - --enable-insecure-login
+    - --disable-settings-authorizer
+  protocolHttp: true
+  rbac:
+    clusterReadOnlyRole: true
+  service:
+    type: NodePort
+    externalPort: 30082
+    nodePort: 30082
+
+# -- Optional: Spark Plugin using the Spark Operator
+sparkoperator:
+  # --- enable or disable Sparkoperator deployment installation
+  enabled: false

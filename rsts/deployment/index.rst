@@ -52,6 +52,15 @@ solution). The following pages will help you effectively deploy and manage an en
 
     ---
 
+    .. link-button:: deployment-sandbox
+       :type: ref
+       :text: Sandbox
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Deployment guides with detailed instructions for sandbox deployment.
+
+    ---
+
     .. link-button:: multicluster
        :type: ref
        :text: Multi-cluster setup
@@ -93,6 +102,7 @@ solution). The following pages will help you effectively deploy and manage an en
     overview
     aws/index
     gcp/index
+    sandbox/index
     multicluster
     cluster_config/index
     sandbox

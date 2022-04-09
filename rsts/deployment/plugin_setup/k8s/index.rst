@@ -15,23 +15,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
 2. Setup the cluster
 
-.. tabbed:: Sandbox
-
-  * Start the sandbox cluster
-
-    .. code-block:: bash
-
-       flytectl sandbox start
-
-  * Generate Flytectl sandbox config
-
-    .. code-block:: bash
-
-       flytectl config init
-
-.. tabbed:: AWS/GCP
-
-  * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__ / `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__
+  * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__ / `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__ /  `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__
   * Make sure you have correct kubeconfig and selected the correct kubernetes context
   * make sure you have the correct flytectl config at ~/.flyte/config.yaml
 

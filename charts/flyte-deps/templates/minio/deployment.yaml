@@ -1,0 +1,51 @@
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "minio.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "minio.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.minio.replicaCount }}
+  selector:
+    matchLabels: {{ include "minio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.minio.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      labels: {{ include "minio.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"
+        imagePullPolicy: "{{ .Values.minio.image.pullPolicy }}"
+        name: minio
+        env:
+          - name: MINIO_ACCESS_KEY
+            value: minio
+          - name: MINIO_SECRET_KEY
+            value: miniostorage
+          - name: MINIO_DEFAULT_BUCKETS
+            value: my-s3-bucket
+        ports:
+        - containerPort: 9000
+          name: minio
+        - containerPort: 9001
+          name: minio-console
+        resources: {{ toYaml .Values.minio.resources | nindent 10 }}
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /data
+      volumes:
+      - name: minio-storage
+        emptyDir: {}
+      {{- with .Values.minio.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}
