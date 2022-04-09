@@ -101,7 +101,9 @@ export const WorkflowExecutionRow: React.FC<WorkflowExecutionRowProps> = ({
     onCancel: () => setShowConfirmation(false),
     onConfirmClick: onArchiveConfirmClick,
   });
-  const columnsWithApproval = [...columns.slice(0, -2), confirmation];
+  // To hide the onHover action buttons,
+  // we take off the last column which is onHover actions buttons
+  const columnsWithApproval = [...columns.slice(0, -1), confirmation];
 
   // we show error info only on active items
   const { abortMetadata, error } = execution.closure;

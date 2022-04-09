@@ -34,7 +34,8 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   confirmationButton: {
     borderRadius: 0,
-    minWidth: '100px',
+    // make the button responsive, so the button won't overflow
+    width: '50%',
     minHeight: '53px',
     // cancel margins that are coming from table row style
     marginTop: theme.spacing(-1),
