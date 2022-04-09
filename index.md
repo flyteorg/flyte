@@ -50,7 +50,7 @@ Install Flyte cluster by running this command:
 $ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml -f values-override.yaml
 ```
 
-For more details please read the AWS [manual documentation (https://docs.flyte.org/en/latest/deployment/aws/manual.html)
+For more details please read the AWS [manual documentation](https://docs.flyte.org/en/latest/deployment/aws/manual.html)
 
 ### Production Clusters for GCP
 
@@ -85,4 +85,4 @@ Install Flyte cluster by running this command:
 $ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-gcp.yaml -f values-override.yaml
 ```
 
-For more details please read the GCP [manual documentation (https://docs.flyte.org/en/latest/deployment/gcp/manual.html)
+For more details please read the GCP [manual documentation](https://docs.flyte.org/en/latest/deployment/gcp/manual.html)
