@@ -1,4 +1,4 @@
-ARG FLYTECONSOLE_VERSION="v0.50.2"
+ARG FLYTECONSOLE_VERSION="v0.50.3"
 FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
 
 FROM golang:1.18.0-alpine3.15 AS go_builder
@@ -66,7 +66,7 @@ COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/
 # Copy Flyte config
 COPY flyte.yaml /flyteorg/share/flyte.yaml
 
-FROM docker:20.10.11-dind AS dind
+FROM docker:20.10.14-dind-alpine3.15 AS dind
 
 # Install dependencies
 RUN apk add --no-cache bash git make tini curl jq

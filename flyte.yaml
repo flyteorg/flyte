@@ -6,9 +6,7 @@ propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
   kube-config: "/etc/rancher/k3s/k3s.yaml"
   create-flyteworkflow-crd: true
-  metricsBindAddress: 0 # disable the prometheus metrics listener
 webhook:
-  metricsBindAddress: 0 # disable the prometheus metrics listener
   certDir: /etc/webhook/certs
   serviceName: flyte-pod-webhook
   localCert: true

@@ -2,11 +2,18 @@ package single
 
 import (
 	"context"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/plugins"
+	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
+	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/flyteorg/flytepropeller/pkg/signals"
+	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
+	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 
 	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
@@ -17,11 +24,6 @@ import (
 	adminScheduler "github.com/flyteorg/flyteadmin/scheduler"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/k8s"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
-	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
-	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/signals"
-	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
-	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	_ "github.com/golang/glog"
@@ -90,24 +92,31 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 }
 
 func startPropeller(ctx context.Context, cfg Propeller) error {
+	propellerCfg := propellerConfig.GetConfig()
+	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
+	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, defaultNamespace, &propellerScope)
+	if err != nil {
+		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
+		return err
+	}
 	g, childCtx := errgroup.WithContext(ctx)
 
 	if !cfg.DisableWebhook {
 		g.Go(func() error {
 			logger.Infof(childCtx, "Starting to initialize certificate...")
-			err := webhookEntrypoint.InitCerts(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig())
+			err := webhookEntrypoint.InitCerts(childCtx, propellerCfg, webhookConfig.GetConfig())
 			if err != nil {
 				return err
 			}
 			logger.Infof(childCtx, "Starting Webhook server...")
-			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerConfig.GetConfig(), webhookConfig.GetConfig(), "flyte")
+			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), "flyte", &propellerScope, mgr)
 		})
 	}
 
 	if !cfg.Disabled {
 		g.Go(func() error {
 			logger.Infof(childCtx, "Starting Flyte Propeller...")
-			return propellerEntrypoint.StartController(childCtx, propellerConfig.GetConfig(), defaultNamespace)
+			return propellerEntrypoint.StartController(childCtx, propellerCfg, defaultNamespace, mgr, &propellerScope)
 		})
 	}
 
