@@ -11,21 +11,19 @@ $ helm repo update
 
 The Flyte Helm Chart helps you to run flyte cluster
 
-### Install Flyte
+### Prerequisite
 
-To install Flyte, the following configuration values must be set:
-
-- `union.cloudUrl`
-- `union.appId`
-- `union.appSecret`
-- `union.clusterName` (Optional: By default helm generates a random string)
-- `union.metadataBucketPrefix`
-
-You can create a `values.yaml` file to set the required values, a sample `values.yaml` file is provided below:
+- You need production grade Postgres Aurora or equivalent database
+- You need s3/GCS storage
+- You need a production grade kubernetes cluster
+- Please make sure you have connectivity with database from k8s cluster
+- Please make sure you have correct role & service account in place
 
 #### Production Clusters for eks
 
-You need pre request in place before installing flyte cluster in eks
+NOTE: Before installing please read our [manual guide](https://docs.flyte.org/en/latest/deployment/aws/manual.html#aws-permissioning) for aws and create roles & service account. They are required for communication with s3.
+
+You need Prerequisite in place before installing flyte cluster in eks
 
 | Placeholder | Description | Sample Value |
 | -------- | -------- | -------- |
@@ -35,9 +33,6 @@ You need pre request in place before installing flyte cluster in eks
 | <BUCKET_NAME>    | Bucket used by Flyte | my-sample-s3-bucket |
 | <DB_PASSWORD>    | The password in plaintext for your RDS instance | awesomesauce |
 | <RDS_HOST_DNS>    | The AWS Account ID | 173113148371 |
-| <LOG_GROUP_NAME>    | CloudWatch Log Group | flyteplatform |
-| <CERTIFICATE_ARN>    | ARN of the self-signed (or official) certificate
-| arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4 |
 
 Create `values-override.yaml` file and add your connection details:
 ```yaml
@@ -47,8 +42,6 @@ userSettings:
   certificateArn: <CERTIFICATE_ARN>
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
-  bucketName: <BUCKET_NAME>
-  logGroup: <LOG_GROUP_NAME>
 ```
 
 Install Flyte cluster by running this command:
@@ -57,27 +50,33 @@ Install Flyte cluster by running this command:
 $ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml -f values-override.yaml
 ```
 
+For more details please read the AWS [manual documentation (https://docs.flyte.org/en/latest/deployment/aws/manual.html)
+
 ### Production Clusters for GCP
+
+NOTE: Before installing please read our [manual guide](https://docs.flyte.org/en/latest/deployment/gcp/manual.html#permissions) for GCP and create roles & service account. They are required for communication with GCS.
+
 
 You need pre request in place before installing flyte cluster in eks
 
 | Placeholder | Description | Sample Value |
 | -------- | -------- | -------- |
 | <PROJECT-ID>    | The Google Project ID | flyte-gcp |
-| <CLOUD-SQL-IP>    | DNS entry for your Google SQL instance | 127.0.0.1 |
-| <DBPASSWORD>    | The password in plaintext for your RDS instance | awesomesauce |
-| <BUCKET_NAME>    | Bucket used by Flyte | my-sample-gcs-bucket |
-| <HOSTNAME>    | DNS entry for your Google SQL instance | gcp.flyte.org |
+| <CLOUD-SQL-IP>  | DNS entry for your Google SQL instance | 127.0.0.1 |
+| <DB_PASSWORD>   | The password in plaintext for your RDS instance | awesomesauce |
+| <BUCKET_NAME> | Bucket used by Flyte | my-sample-gcs-bucket |
+| <HOST_NAME>    | DNS entry for flyte cluster | gcp.flyte.org |
 
 
 Create `values-override.yaml` file and add your connection details:
+
 ```yaml
 userSettings:
-	googleProjectId: <PROJECT-ID>
-	dbHost: <CLOUD-SQL-IP>
-	dbPassword: <DBPASSWORD>
-	bucketName: <BUCKETNAME>
-	hostName: <HOSTNAME>
+  googleProjectId: <PROJECT-ID>
+  dbHost: <CLOUD-SQL-IP>
+  dbPassword: <DB_PASSWORD>
+  bucketName: <BUCKETNAME>
+  hostName: <HOSTNAME>
 ```
 
 Install Flyte cluster by running this command:
@@ -85,3 +84,5 @@ Install Flyte cluster by running this command:
 ```bash
 $ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-gcp.yaml -f values-override.yaml
 ```
+
+For more details please read the GCP [manual documentation (https://docs.flyte.org/en/latest/deployment/gcp/manual.html)
