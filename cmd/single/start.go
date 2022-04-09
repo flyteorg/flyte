@@ -19,6 +19,7 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -93,17 +94,20 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 
 	if !cfg.DisableWebhook {
 		g.Go(func() error {
+			logger.Infof(childCtx, "Starting to initialize certificate...")
 			err := webhookEntrypoint.InitCerts(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig())
 			if err != nil {
 				return err
 			}
-			return webhookEntrypoint.Run(childCtx, propellerConfig.GetConfig(), webhookConfig.GetConfig(), defaultNamespace)
+			logger.Infof(childCtx, "Starting Webhook server...")
+			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerConfig.GetConfig(), webhookConfig.GetConfig(), "flyte")
 		})
 	}
 
 	if !cfg.Disabled {
 		g.Go(func() error {
-			return propellerEntrypoint.StartController(ctx, propellerConfig.GetConfig(), defaultNamespace)
+			logger.Infof(childCtx, "Starting Flyte Propeller...")
+			return propellerEntrypoint.StartController(childCtx, propellerConfig.GetConfig(), defaultNamespace)
 		})
 	}
 

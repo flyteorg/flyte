@@ -2,9 +2,6 @@
 # Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
 # Look in the artifacts directory in the flyte repo for what's actually run
 # https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
-flyte:
-  propeller:
-    DisableWebhook: false
 propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
   kube-config: "/etc/rancher/k3s/k3s.yaml"
@@ -14,6 +11,8 @@ webhook:
   metricsBindAddress: 0 # disable the prometheus metrics listener
   certDir: /etc/webhook/certs
   serviceName: flyte-pod-webhook
+  localCert: true
+  servicePort: 9443
 tasks:
   task-plugins:
     enabled-plugins:

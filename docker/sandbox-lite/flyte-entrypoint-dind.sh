@@ -36,7 +36,6 @@ echo "Done."
 # Deploy flyte
 echo "Deploying Flyte..."
 charts="/flyteorg/share/storage"
-helm dep update $charts
 helm install -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml
 k3s kubectl create namespace flytesnacks-development
 
@@ -45,6 +44,8 @@ timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment mini
 timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment postgres -n flyte  &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the postgres rollout to be created"; exit 1 )
 
 k3s kubectl wait --for=condition=available deployment/minio deployment/postgres -n flyte --timeout=5m || ( echo >&2 "Timed out while waiting for the Flyte deployment to start"; exit 1 )
+# Create directory to store certificate
+mkdir -p /etc/webhook/certs
 flyte start --config /flyteorg/share/flyte.yaml &
 FLYTE_PID=$!
 

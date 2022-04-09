@@ -10,8 +10,3 @@ metadata:
 spec:
   type: ExternalName
   externalName: host.docker.internal
-  ports:
-    - name: https
-      protocol: TCP
-      port: 443
-      targetPort: 9443

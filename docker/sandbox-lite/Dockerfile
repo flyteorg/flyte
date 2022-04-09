@@ -1,4 +1,4 @@
-ARG FLYTECONSOLE_VERSION="v0.47.3"
+ARG FLYTECONSOLE_VERSION="v0.50.2"
 FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
 
 FROM golang:1.18.0-alpine3.15 AS go_builder
@@ -14,10 +14,11 @@ ARG BUILDKIT_CLI_FOR_KUBECTL_VERSION="v0.1.2"
 RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 https://github.com/vmware-tanzu/buildkit-cli-for-kubectl.git ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl \
     && make -C ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl ${INSTALL_DIR}/linux/kubectl-build BIN_DIR=${INSTALL_DIR} VERSION=${BUILDKIT_CLI_FOR_KUBECTL_VERSION}
 
+COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 COPY go.mod go.sum /app/flyte/
 COPY cmd/ /app/flyte/cmd/
 RUN cd /app/flyte && go mod download && go mod vendor && go build -o /flyte cmd/main.go
-COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
+
 
 FROM alpine:3.13.5 AS base
 
@@ -84,6 +85,7 @@ VOLUME /var/lib/kubelet
 VOLUME /var/lib/rancher/k3s
 VOLUME /var/lib/cni
 VOLUME /var/log
+COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 
 # Expose Flyte ports
 # 30080 for console, 30081 for gRPC, 30082 for k8s dashboard, 30084 for minio api, 30088 for minio console
