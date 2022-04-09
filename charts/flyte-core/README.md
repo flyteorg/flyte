@@ -76,7 +76,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.catalog | object | `{"catalog-cache":{"endpoint":"datacatalog:89","insecure":true,"type":"datacatalog"}}` | Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config) Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config) |
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |
-| configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config","DISABLE_AUTH":"1"}` | Configuration for Flyte console UI |
+| configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config"}` | Configuration for Flyte console UI |
 | configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v0.0.24","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
 | configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v0.0.24","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
 | configmap.core | object | `{"manager":{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"},"propeller":{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://my-s3-bucket/","workers":4,"workflow-reeval-duration":"30s"},"webhook":{"certDir":"/etc/webhook/certs","serviceName":"flyte-pod-webhook"}}` | Core propeller configuration |
@@ -89,7 +89,6 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
-| configmap.logger | object | `{"logger":{"level":4,"show-source":true}}` | Logger configuration |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
 | configmap.remoteData.remoteData.signedUrls.durationMinutes | int | `3` |  |
@@ -123,17 +122,16 @@ helm install gateway bitnami/contour -n flyte
 | db.admin.database.host | string | `"postgres"` |  |
 | db.admin.database.port | int | `5432` |  |
 | db.admin.database.username | string | `"postgres"` |  |
-| db.checks | bool | `true` |  |
 | db.datacatalog.database.dbname | string | `"datacatalog"` |  |
 | db.datacatalog.database.host | string | `"postgres"` |  |
 | db.datacatalog.database.port | int | `5432` |  |
 | db.datacatalog.database.username | string | `"postgres"` |  |
+| deployRedoc | bool | `false` |  |
 | external_events | object | `{"aws":{"region":"us-east-2"},"enable":false,"eventsPublisher":{"eventTypes":["all"],"topicName":"arn:aws:sns:us-east-2:123456:123-my-topic"},"type":"aws"}` | **Optional Component** External events are used to send events (unprocessed, as Admin see them) to an SNS topic (or gcp equivalent) The config is here as an example only - if not enabled, it won't be used. |
 | flyteadmin.additionalVolumeMounts | list | `[]` |  |
 | flyteadmin.additionalVolumes | list | `[]` |  |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteadmin.deployRedoc | bool | `true` | Deploys a Redoc container in Flyteadmin's pod |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>" e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
@@ -181,7 +179,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
-| flytepropeller.priorityClassName | string | `"system-cluster-critical"` | Sets priorityClassName for propeller pod(s). |
+| flytepropeller.priorityClassName | string | `""` | Sets priorityClassName for propeller pod(s). |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
 | flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for FlytePropeller |

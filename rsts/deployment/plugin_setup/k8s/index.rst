@@ -90,13 +90,13 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       helm repo add incubator https://charts.helm.sh/incubator --force-update
+       helm repo add spark-operator https://googlecloudplatform.github.io/spark-on-k8s-operator
 
   * Install Spark Operator
 
     .. code-block:: bash
 
-       helm install incubator/sparkoperator --namespace spark-operator --kubeconfig=~/.flyte/k3s/k3s.yaml
+       helm install spark-operator spark-operator/spark-operator --namespace spark-operator --create-namespace
 
 
 4. Create a file named ``values-override.yaml`` and add the following config to it:
@@ -235,49 +235,56 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                    limits.cpu: {{ projectQuotaCpu }}
                    limits.memory: {{ projectQuotaMemory }}
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
-             kind: Role
-             metadata:
-                 name: spark-role
-                 namespace: {{ namespace }}
-             rules:
-               - apiGroups:
-                 - ""
-                 resources:
-                 - pods
-                 verbs:
-                 - '*'
-               - apiGroups:
-                 - ""
-                 resources:
-                 - services
-                 verbs:
-                 - '*'
-               - apiGroups:
-                 - ""
-                 resources:
-                 - configmaps
-                 verbs:
-                 - '*'
-           - apiVersion: v1
-             kind: ServiceAccount
-             metadata:
-               name: spark
-               namespace: {{ namespace }}
+           - key: ac_spark_role
+             value: |
+                apiVersion: rbac.authorization.k8s.io/v1beta1
+                kind: Role
+                metadata:
+                  name: spark-role
+                  namespace: {{ namespace }}
+                rules:
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - pods
+                  verbs:
+                  - '*'
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - services
+                  verbs:
+                  - '*'
+                  - apiGroups:
+                  - ""
+                  resources:
+                  - configmaps
+                  verbs:
+                  - '*'
 
-           - apiVersion: rbac.authorization.k8s.io/v1beta1
-             kind: RoleBinding
-             metadata:
-                 name: spark-role-binding
-                 namespace: {{ namespace }}
-             roleRef:
-                 apiGroup: rbac.authorization.k8s.io
-                 kind: Role
-                 name: spark-role
-             subjects:
-               - kind: ServiceAccount
-                 name: spark
-                 namespace: {{ namespace }}
+           - key: ad_spark_service_account
+             value: |
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: spark
+                  namespace: {{ namespace }}
+
+           - key: ae_spark_role_binding
+             value: |
+                apiVersion: rbac.authorization.k8s.io/v1beta1
+                kind: RoleBinding
+                metadata:
+                  name: spark-role-binding
+                  namespace: {{ namespace }}
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: Role
+                  name: spark-role
+                subjects:
+                - kind: ServiceAccount
+                  name: spark
+                  namespace: {{ namespace }}
 
        sparkoperator:
          enabled: true
@@ -328,13 +335,13 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
+       helm upgrade flyte flyteorg/flyte -f values-override.yaml -n flyte
 
 .. tabbed:: AWS/GCP
 
     .. code-block:: bash
 
-        helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
+        helm upgrade flyte flyteorg/flyte-core -f values-override.yaml -n flyte
 
 
 

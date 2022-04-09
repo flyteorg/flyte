@@ -75,8 +75,6 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
-  # -- Deploys a Redoc container in Flyteadmin's pod
-  deployRedoc: true
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
@@ -231,7 +229,7 @@ flytepropeller:
   # -- Defines the cluster name used in events sent to Admin
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
-  priorityClassName: "system-cluster-critical"
+  priorityClassName: ""
 
 #
 # FLYTECONSOLE SETTINGS
@@ -272,6 +270,10 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+
+
+# It will enable the redoc route in ingress
+deployRedoc: false
 
 #
 # Common secret auth for propeller & scheduler
@@ -368,7 +370,6 @@ storage:
 
 # Database configuration
 db:
-  checks: true
   datacatalog:
     database:
       port: 5432
@@ -427,7 +428,6 @@ configmap:
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
-    DISABLE_AUTH: "1"
 
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
@@ -631,12 +631,6 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-
-  # -- Logger configuration
-  logger:
-    logger:
-      show-source: true
-      level: 4
 
   remoteData:
     remoteData:

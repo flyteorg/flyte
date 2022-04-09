@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "redoc.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "redoc.labels" . | nindent 4 }}
+  {{- with .Values.redoc.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.redoc.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+  selector: {{ include "redoc.selectorLabels" . | nindent 4 }}

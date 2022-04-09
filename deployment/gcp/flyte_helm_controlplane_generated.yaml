@@ -97,10 +97,6 @@ data:
       name: staging
     - id: production
       name: production
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     auth:
       appAuth:
@@ -319,7 +315,6 @@ metadata:
 data: 
   BASE_URL: /console
   CONFIG_DIR: /etc/flyte/config
-  DISABLE_AUTH: "1"
 ---
 # Source: flyte-core/templates/datacatalog/configmap.yaml
 apiVersion: v1
@@ -340,10 +335,6 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     application:
       grpcPort: 8089
@@ -401,10 +392,6 @@ data:
     scheduler:
       metricsScope: 'flyte:'
       profilerPort: 10254
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -565,7 +552,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59f04b289445b7a883e5de2a26b58c442769f954ca1fbeee7430290405a8b14"
+        configChecksum: "8ce155adcafa4029b8d11e94f999f3b51fd2eca00a4647347e700c1ba74bcd0"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -577,14 +564,6 @@ spec:
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
       initContainers:
-        - name: check-db-ready
-          image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
-          securityContext:
-             runAsUser: 0
-          command:
-          - sh
-          - -c
-          - until pg_isready -h <CLOUD-SQL-IP> -p 5432; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config
@@ -727,7 +706,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "7f868bf47b27523ca99ad1070cbde82bd09a51d99ab35ed486c642f33d58e2a"
+        configChecksum: "2f930e1732c47d0849f79f9a8d06262ec97597a217bbf2337ae4f2938402ee0"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
@@ -787,7 +766,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "43487b221efc7b181835ab2a929d3d464bf182da8e4e204f8f0e4ac43798b3e"
+        configChecksum: "a869b0be61ad92348342d7ca6a6b4a2b91dd59c1e9494bcc9272bd6cad79835"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -799,14 +778,6 @@ spec:
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
-      - name: check-db-ready
-        image: postgres:10.16-alpine
-        securityContext:
-          runAsUser: 0
-        command:
-          - sh
-          - -c
-          - until pg_isready -h <CLOUD-SQL-IP> -p 5432; do echo waiting for database; sleep 2; done;
       - command:
         - datacatalog
         - --config
@@ -886,7 +857,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59f04b289445b7a883e5de2a26b58c442769f954ca1fbeee7430290405a8b14"
+        configChecksum: "8ce155adcafa4029b8d11e94f999f3b51fd2eca00a4647347e700c1ba74bcd0"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1017,14 +988,6 @@ spec:
     - http:
         paths:
           # This is useful only for frontend development
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
@@ -1068,14 +1031,6 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
@@ -1203,6 +1158,20 @@ spec:
                 port:
                   number: 81
           - path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService/*
             pathType: ImplementationSpecific
             backend:
               service:

@@ -24,6 +24,30 @@
     serviceName: flyteadmin
     servicePort: 81
 {{- end }}
+- path: /flyteidl.service.DataProxyService
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
+- path: /flyteidl.service.DataProxyService/*
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
 - path: /flyteidl.service.AuthMetadataService
   pathType: ImplementationSpecific
   backend:
@@ -143,19 +167,6 @@ spec:
               servicePort: 80
 {{- end }}
           {{- end }}
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 87
-{{- end }}
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
@@ -229,18 +240,33 @@ spec:
               serviceName: flyteadmin
               servicePort: 80
 {{- end }}
+{{- if .Values.deployRedoc }}
+          # Port 87 in FlyteAdmin maps to the redoc container.
+          - path: /openapi
+            pathType: ImplementationSpecific
+            backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              service:
+                name: redoc
+                port:
+                  number: 87
+{{- else }}
+              serviceName: redoc
+              servicePort: 87
+{{- end }}
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
             pathType: ImplementationSpecific
             backend:
 {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
-                name: flyteadmin
+                name: redoc
                 port:
                   number: 87
 {{- else }}
-              serviceName: flyteadmin
+              serviceName: redoc
               servicePort: 87
+{{- end }}
 {{- end }}
           - path: /.well-known
             pathType: ImplementationSpecific

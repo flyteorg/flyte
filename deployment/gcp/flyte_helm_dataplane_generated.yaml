@@ -136,11 +136,9 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
-          spark: spark
         enabled-plugins:
         - container
         - sidecar
-        - spark
         - k8s-array
   k8s.yaml: | 
     plugins:
@@ -148,10 +146,6 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -375,7 +369,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
+        configChecksum: "c764b73cca66a0760dcd8afa89a6b3e978e7ab5b48ca116b35c827599da4e9d"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -386,7 +380,6 @@ spec:
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
-      priorityClassName: system-cluster-critical
       containers:
       - command:
         - flytepropeller
@@ -456,7 +449,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "4500b57fd135741a7b095f2927b857f9db6d3b14e0b1266116f22df070144ef"
+        configChecksum: "c764b73cca66a0760dcd8afa89a6b3e978e7ab5b48ca116b35c827599da4e9d"
     spec:
       securityContext:
         fsGroup: 65534
@@ -536,14 +529,6 @@ spec:
     - http:
         paths:
           # This is useful only for frontend development
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
@@ -587,14 +572,6 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
-          # Port 87 in FlyteAdmin maps to the redoc container.
-          - path: /openapi/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 87
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
@@ -722,6 +699,20 @@ spec:
                 port:
                   number: 81
           - path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService/*
             pathType: ImplementationSpecific
             backend:
               service:
