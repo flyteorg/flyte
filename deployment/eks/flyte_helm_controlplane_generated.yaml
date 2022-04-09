@@ -97,10 +97,6 @@ data:
       name: staging
     - id: production
       name: production
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     auth:
       appAuth:
@@ -329,10 +325,6 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     application:
       grpcPort: 8089
@@ -387,10 +379,6 @@ data:
     scheduler:
       metricsScope: 'flyte:'
       profilerPort: 10254
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -557,7 +545,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8456cd6e1b8e5c6a79896b484995e9e0ce52ac075227ba7a0121738cdfd3e37"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -771,7 +759,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "46bc3bc24c47b04eded1bd0b7c039909235d974c3bae755bc3ccd531ed8c1c7"
+        configChecksum: "940a08491eb44bb4202fb0209dc0ac27f0141db9db7dd7e6883641369f9a593"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -862,7 +850,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8456cd6e1b8e5c6a79896b484995e9e0ce52ac075227ba7a0121738cdfd3e37"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

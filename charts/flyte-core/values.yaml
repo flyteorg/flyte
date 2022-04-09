@@ -632,12 +632,6 @@ configmap:
         default-cpus: 100m
         default-memory: 100Mi
 
-  # -- Logger configuration
-  logger:
-    logger:
-      show-source: true
-      level: 4
-
   remoteData:
     remoteData:
       region: "us-east-1"

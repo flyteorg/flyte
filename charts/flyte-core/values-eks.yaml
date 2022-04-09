@@ -300,9 +300,6 @@ configmap:
   #          sagemaker_custom_training_task: sagemaker_custom_training
   #          sagemaker_custom_training_job_task: sagemaker_custom_training
 
-  logger:
-    logger:
-      level: 5
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various

@@ -116,10 +116,6 @@ data:
       name: staging
     - id: production
       name: production
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     auth:
       appAuth:
@@ -363,10 +359,6 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   server.yaml: | 
     application:
       grpcPort: 8089
@@ -485,10 +477,6 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
-  logger.yaml: | 
-    logger:
-      level: 5
-      show-source: true
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -849,7 +837,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0b244ed2fea51b87915043bf4e19408bb76ee985b93922125c29c7bf40b4ae5"
+        configChecksum: "2bf32e9a4f406a940aeb8e4d72e4eb44dcd6cd41589fc0cef28400972fde4e6"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1063,7 +1051,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "46bc3bc24c47b04eded1bd0b7c039909235d974c3bae755bc3ccd531ed8c1c7"
+        configChecksum: "940a08491eb44bb4202fb0209dc0ac27f0141db9db7dd7e6883641369f9a593"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1154,7 +1142,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0d6064977e729ccf7ff28a5198b11fe0679dafc50d2636d8783578243394d0a"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1231,7 +1219,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.16.32
       annotations:
-        configChecksum: "0d6064977e729ccf7ff28a5198b11fe0679dafc50d2636d8783578243394d0a"
+        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
     spec:
       securityContext:
         fsGroup: 65534
