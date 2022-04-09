@@ -290,6 +290,7 @@ rules:
       - mutatingwebhookconfigurations
       - secrets
       - pods
+      - replicasets/finalizers
     verbs:
       - get
       - create
