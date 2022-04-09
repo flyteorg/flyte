@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.50.3](http://github.com/lyft/flyteconsole/compare/v0.50.2...v0.50.3) (2022-04-09)
+
+
+### Bug Fixes
+
+* fixed the css to avoid overflow and add the duration back to the table ([#368](http://github.com/lyft/flyteconsole/issues/368)) ([55c63d2](http://github.com/lyft/flyteconsole/commit/55c63d2145b9faafade9132aec6db06cd632eb95))
+* return back static assets folder ([#366](http://github.com/lyft/flyteconsole/issues/366)) ([067e61d](http://github.com/lyft/flyteconsole/commit/067e61d83c7b6e50378c13fb0616abf4614f1348))
+
 ## [0.50.2](http://github.com/lyft/flyteconsole/compare/v0.50.1...v0.50.2) (2022-04-08)
 
 
