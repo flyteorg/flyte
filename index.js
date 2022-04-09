@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'production') {
   const clientStats = require('./dist/client-stats.json');
   const distPath = path.join(__dirname, 'dist');
   app.use(
-    `${env.BASE_URL}/assets`,
+    `${env.BASE_URL}/`,
     expressStaticGzip(distPath, {
       maxAge: '1d',
     }),
