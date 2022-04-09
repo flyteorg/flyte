@@ -384,9 +384,10 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		assert.Nil(t, err)
 		Client = store
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
-			Project: "flytesnacks",
-			Domain:  "development",
-			Suffix:  "/flytesnacks-core.tgz",
+			Project:    "flytesnacks",
+			Domain:     "development",
+			Filename:   "flytesnacks-core.tgz",
+			ContentMd5: []uint8{0x19, 0x72, 0x39, 0xcd, 0x85, 0x2d, 0xf1, 0x79, 0x8f, 0x6b, 0x3, 0xb3, 0xa9, 0x6c, 0xec, 0xa0},
 		}).Return(&service.CreateUploadLocationResponse{}, nil)
 		_, err = uploadFastRegisterArtifact(s.Ctx, "flytesnacks", "development", "testdata/flytesnacks-core.tgz", "", s.MockClient.DataProxyClient(), rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
 		assert.Nil(t, err)
@@ -401,9 +402,10 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		assert.Nil(t, err)
 		Client = store
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
-			Project: "flytesnacks",
-			Domain:  "development",
-			Suffix:  "/flytesnacks-core.tgz",
+			Project:    "flytesnacks",
+			Domain:     "development",
+			Filename:   "flytesnacks-core.tgz",
+			ContentMd5: []uint8{0x19, 0x72, 0x39, 0xcd, 0x85, 0x2d, 0xf1, 0x79, 0x8f, 0x6b, 0x3, 0xb3, 0xa9, 0x6c, 0xec, 0xa0},
 		}).Return(&service.CreateUploadLocationResponse{}, nil)
 		_, err = uploadFastRegisterArtifact(context.Background(), "flytesnacks", "development", "testdata/flytesnacks-core.tgz", "", s.MockClient.DataProxyClient(), rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath)
 		assert.Nil(t, err)
