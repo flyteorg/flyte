@@ -61,8 +61,8 @@ You need pre request in place before installing flyte cluster in eks
 
 | Placeholder | Description | Sample Value |
 | -------- | -------- | -------- |
-| <PROJECT-ID>    | The Google Project ID | flyte-gcp |
-| <CLOUD-SQL-IP>  | DNS entry for your Google SQL instance | 127.0.0.1 |
+| <PROJECT_ID>   | The Google Project ID | flyte-gcp |
+| <CLOUD_SQL_IP>  | DNS entry for your Google SQL instance | 127.0.0.1 |
 | <DB_PASSWORD>   | The password in plaintext for your RDS instance | awesomesauce |
 | <BUCKET_NAME> | Bucket used by Flyte | my-sample-gcs-bucket |
 | <HOST_NAME>    | DNS entry for flyte cluster | gcp.flyte.org |
@@ -72,8 +72,8 @@ Create `values-override.yaml` file and add your connection details:
 
 ```yaml
 userSettings:
-  googleProjectId: <PROJECT-ID>
-  dbHost: <CLOUD-SQL-IP>
+  googleProjectId: <PROJECT_ID>
+  dbHost: <CCLOUD_SQL_IP>
   dbPassword: <DB_PASSWORD>
   bucketName: <BUCKETNAME>
   hostName: <HOSTNAME>
