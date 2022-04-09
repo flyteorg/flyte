@@ -16906,6 +16906,9 @@ export namespace flyteidl {
 
             /** PublicClientAuthConfigResponse authorizationMetadataKey */
             authorizationMetadataKey?: (string|null);
+
+            /** PublicClientAuthConfigResponse serviceHttpEndpoint */
+            serviceHttpEndpoint?: (string|null);
         }
 
         /** Represents a PublicClientAuthConfigResponse. */
@@ -16928,6 +16931,9 @@ export namespace flyteidl {
 
             /** PublicClientAuthConfigResponse authorizationMetadataKey. */
             public authorizationMetadataKey: string;
+
+            /** PublicClientAuthConfigResponse serviceHttpEndpoint. */
+            public serviceHttpEndpoint: string;
 
             /**
              * Creates a new PublicClientAuthConfigResponse instance using the specified properties.

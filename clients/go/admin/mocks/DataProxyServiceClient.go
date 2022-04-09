@@ -26,13 +26,13 @@ func (_m DataProxyServiceClient_CreateUploadLocation) Return(_a0 *service.Create
 }
 
 func (_m *DataProxyServiceClient) OnCreateUploadLocation(ctx context.Context, in *service.CreateUploadLocationRequest, opts ...grpc.CallOption) *DataProxyServiceClient_CreateUploadLocation {
-	c := _m.On("CreateUploadLocation", ctx, in, opts)
-	return &DataProxyServiceClient_CreateUploadLocation{Call: c}
+	c_call := _m.On("CreateUploadLocation", ctx, in, opts)
+	return &DataProxyServiceClient_CreateUploadLocation{Call: c_call}
 }
 
 func (_m *DataProxyServiceClient) OnCreateUploadLocationMatch(matchers ...interface{}) *DataProxyServiceClient_CreateUploadLocation {
-	c := _m.On("CreateUploadLocation", matchers...)
-	return &DataProxyServiceClient_CreateUploadLocation{Call: c}
+	c_call := _m.On("CreateUploadLocation", matchers...)
+	return &DataProxyServiceClient_CreateUploadLocation{Call: c_call}
 }
 
 // CreateUploadLocation provides a mock function with given fields: ctx, in, opts

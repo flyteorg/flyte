@@ -728,6 +728,20 @@ class PublicClientAuthConfigResponse final :
   ::std::string* release_authorization_metadata_key();
   void set_allocated_authorization_metadata_key(::std::string* authorization_metadata_key);
 
+  // string service_http_endpoint = 5;
+  void clear_service_http_endpoint();
+  static const int kServiceHttpEndpointFieldNumber = 5;
+  const ::std::string& service_http_endpoint() const;
+  void set_service_http_endpoint(const ::std::string& value);
+  #if LANG_CXX11
+  void set_service_http_endpoint(::std::string&& value);
+  #endif
+  void set_service_http_endpoint(const char* value);
+  void set_service_http_endpoint(const char* value, size_t size);
+  ::std::string* mutable_service_http_endpoint();
+  ::std::string* release_service_http_endpoint();
+  void set_allocated_service_http_endpoint(::std::string* service_http_endpoint);
+
   // @@protoc_insertion_point(class_scope:flyteidl.service.PublicClientAuthConfigResponse)
  private:
   class HasBitSetters;
@@ -737,6 +751,7 @@ class PublicClientAuthConfigResponse final :
   ::google::protobuf::internal::ArenaStringPtr client_id_;
   ::google::protobuf::internal::ArenaStringPtr redirect_uri_;
   ::google::protobuf::internal::ArenaStringPtr authorization_metadata_key_;
+  ::google::protobuf::internal::ArenaStringPtr service_http_endpoint_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fauth_2eproto;
 };
@@ -1546,6 +1561,59 @@ inline void PublicClientAuthConfigResponse::set_allocated_authorization_metadata
   }
   authorization_metadata_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), authorization_metadata_key);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.service.PublicClientAuthConfigResponse.authorization_metadata_key)
+}
+
+// string service_http_endpoint = 5;
+inline void PublicClientAuthConfigResponse::clear_service_http_endpoint() {
+  service_http_endpoint_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PublicClientAuthConfigResponse::service_http_endpoint() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+  return service_http_endpoint_.GetNoArena();
+}
+inline void PublicClientAuthConfigResponse::set_service_http_endpoint(const ::std::string& value) {
+  
+  service_http_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+}
+#if LANG_CXX11
+inline void PublicClientAuthConfigResponse::set_service_http_endpoint(::std::string&& value) {
+  
+  service_http_endpoint_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+}
+#endif
+inline void PublicClientAuthConfigResponse::set_service_http_endpoint(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  service_http_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+}
+inline void PublicClientAuthConfigResponse::set_service_http_endpoint(const char* value, size_t size) {
+  
+  service_http_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+}
+inline ::std::string* PublicClientAuthConfigResponse::mutable_service_http_endpoint() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+  return service_http_endpoint_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PublicClientAuthConfigResponse::release_service_http_endpoint() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
+  
+  return service_http_endpoint_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PublicClientAuthConfigResponse::set_allocated_service_http_endpoint(::std::string* service_http_endpoint) {
+  if (service_http_endpoint != nullptr) {
+    
+  } else {
+    
+  }
+  service_http_endpoint_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service_http_endpoint);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint)
 }
 
 #ifdef __GNUC__

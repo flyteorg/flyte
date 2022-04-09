@@ -23,13 +23,13 @@ func (_m IdentityServiceServer_UserInfo) Return(_a0 *service.UserInfoResponse, _
 }
 
 func (_m *IdentityServiceServer) OnUserInfo(_a0 context.Context, _a1 *service.UserInfoRequest) *IdentityServiceServer_UserInfo {
-	c := _m.On("UserInfo", _a0, _a1)
-	return &IdentityServiceServer_UserInfo{Call: c}
+	c_call := _m.On("UserInfo", _a0, _a1)
+	return &IdentityServiceServer_UserInfo{Call: c_call}
 }
 
 func (_m *IdentityServiceServer) OnUserInfoMatch(matchers ...interface{}) *IdentityServiceServer_UserInfo {
-	c := _m.On("UserInfo", matchers...)
-	return &IdentityServiceServer_UserInfo{Call: c}
+	c_call := _m.On("UserInfo", matchers...)
+	return &IdentityServiceServer_UserInfo{Call: c_call}
 }
 
 // UserInfo provides a mock function with given fields: _a0, _a1
