@@ -4,6 +4,8 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
+	"crypto/md5" //#nosec
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -705,7 +707,10 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 		return "", err
 	}
 
-	size, err := getTotalSize(dataRefReaderCloser)
+	/* #nosec */
+	hash := md5.New()
+	/* #nosec */
+	size, err := io.Copy(hash, dataRefReaderCloser)
 	if err != nil {
 		return "", err
 	}
@@ -720,12 +725,14 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 		return "", err
 	}
 
+	h := hash.Sum(nil)
 	remotePath := storage.DataReference(deprecatedSourceUploadPath)
 	_, fileName := filepath.Split(sourceCodeFilePath)
 	resp, err := dataProxyClient.CreateUploadLocation(ctx, &service.CreateUploadLocationRequest{
-		Project: project,
-		Domain:  domain,
-		Suffix:  strings.Join([]string{version, fileName}, "/"),
+		Project:    project,
+		Domain:     domain,
+		Filename:   fileName,
+		ContentMd5: h,
 	})
 
 	if err != nil {
@@ -737,7 +744,7 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 	}
 
 	if resp != nil && len(resp.SignedUrl) > 0 {
-		return storage.DataReference(resp.NativeUrl), DirectUpload(resp.SignedUrl, size, dataRefReaderCloser)
+		return storage.DataReference(resp.NativeUrl), DirectUpload(resp.SignedUrl, h, size, dataRefReaderCloser)
 	}
 
 	dataStore, err := getStorageClient(ctx)
@@ -764,7 +771,7 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 	return remotePath, nil
 }
 
-func DirectUpload(url string, size int64, data io.Reader) error {
+func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader) error {
 	req, err := http.NewRequest(http.MethodPut, url, data)
 	if err != nil {
 		return err
@@ -772,6 +779,7 @@ func DirectUpload(url string, size int64, data io.Reader) error {
 
 	req.ContentLength = size
 	req.Header.Set("Content-Length", strconv.FormatInt(size, 10))
+	req.Header.Set("Content-MD5", base64.StdEncoding.EncodeToString(contentMD5))
 
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -785,7 +793,7 @@ func DirectUpload(url string, size int64, data io.Reader) error {
 			return fmt.Errorf("received response code [%v]. Failed to read response body. Error: %w", res.StatusCode, err)
 		}
 
-		return fmt.Errorf("bad status: %s : %s", res.Status, string(raw))
+		return fmt.Errorf("failed uploading to [%v]. bad status: %s: %s", url, res.Status, string(raw))
 	}
 
 	return nil
