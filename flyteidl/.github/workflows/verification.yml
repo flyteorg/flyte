@@ -109,7 +109,7 @@ jobs:
   generate-admin-swagger-code:
     runs-on: ubuntu-latest
     name: Generate Admin Swagger Code
-    needs: [generate-protos]
+    needs: [ generate-protos ]
     container:
       image: lyft/protocgenerator:8167e11d3b3439373c2f033080a4b550078884a2
       options: --cpus 1
@@ -143,7 +143,7 @@ jobs:
   generate-js-code:
     runs-on: ubuntu-latest
     name: Generate JS Code
-    needs: [generate-admin-swagger-code]
+    needs: [ generate-admin-swagger-code ]
     container:
       image: schottra/docker-protobufjs:v0.0.2
       options: --cpus 1
@@ -176,7 +176,7 @@ jobs:
   generate-swagger-code:
     runs-on: ubuntu-latest
     name: Generate Swagger Code
-    needs: [generate-js-code]
+    needs: [ generate-js-code ]
     container:
       image: docker.io/lyft/swagger-codegen-cli:dc5ce6ec6d7d4d980fa882d6bd13a83cba3be3c3
       options: --cpus 1
@@ -206,7 +206,7 @@ jobs:
   test-proto-changes:
     runs-on: ubuntu-latest
     name: Test Proto Changes
-    needs: [generate-swagger-code]
+    needs: [ generate-swagger-code ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -220,3 +220,9 @@ jobs:
           path: ./gen
       - name: Test
         run: ./scripts/test_diff.sh
+
+  generate:
+    name: Check Generate
+    uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
+    with:
+      go-version: 1.17

@@ -137,6 +137,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fservice_2fauth_2eproto::
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::PublicClientAuthConfigResponse, redirect_uri_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::PublicClientAuthConfigResponse, scopes_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::PublicClientAuthConfigResponse, authorization_metadata_key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::service::PublicClientAuthConfigResponse, service_http_endpoint_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::service::OAuth2MetadataRequest)},
@@ -170,30 +171,31 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto[] =
   "point_auth_methods_supported\030\006 \003(\t\022\020\n\010jw"
   "ks_uri\030\007 \001(\t\022(\n code_challenge_methods_s"
   "upported\030\010 \003(\t\022\035\n\025grant_types_supported\030"
-  "\t \003(\t\"\037\n\035PublicClientAuthConfigRequest\"}"
-  "\n\036PublicClientAuthConfigResponse\022\021\n\tclie"
-  "nt_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sco"
-  "pes\030\003 \003(\t\022\"\n\032authorization_metadata_key\030"
-  "\004 \001(\t2\374\003\n\023AuthMetadataService\022\365\001\n\021GetOAu"
-  "th2Metadata\022\'.flyteidl.service.OAuth2Met"
-  "adataRequest\032(.flyteidl.service.OAuth2Me"
-  "tadataResponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oa"
-  "uth-authorization-server\222AZ\032XRetrieves O"
-  "Auth2 authorization server metadata. Thi"
-  "s endpoint is anonymously accessible.\022\354\001"
-  "\n\025GetPublicClientConfig\022/.flyteidl.servi"
-  "ce.PublicClientAuthConfigRequest\0320.flyte"
-  "idl.service.PublicClientAuthConfigRespon"
-  "se\"p\202\323\344\223\002\031\022\027/config/v1/flyte_client\222AN\032L"
-  "Retrieves public flyte client info. This"
-  " endpoint is anonymously accessible.B9Z7"
-  "github.com/flyteorg/flyteidl/gen/pb-go/f"
-  "lyteidl/serviceb\006proto3"
+  "\t \003(\t\"\037\n\035PublicClientAuthConfigRequest\"\234"
+  "\001\n\036PublicClientAuthConfigResponse\022\021\n\tcli"
+  "ent_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sc"
+  "opes\030\003 \003(\t\022\"\n\032authorization_metadata_key"
+  "\030\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t2\374\003"
+  "\n\023AuthMetadataService\022\365\001\n\021GetOAuth2Metad"
+  "ata\022\'.flyteidl.service.OAuth2MetadataReq"
+  "uest\032(.flyteidl.service.OAuth2MetadataRe"
+  "sponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oauth-auth"
+  "orization-server\222AZ\032XRetrieves OAuth2 au"
+  "thorization server metadata. This endpoi"
+  "nt is anonymously accessible.\022\354\001\n\025GetPub"
+  "licClientConfig\022/.flyteidl.service.Publi"
+  "cClientAuthConfigRequest\0320.flyteidl.serv"
+  "ice.PublicClientAuthConfigResponse\"p\202\323\344\223"
+  "\002\031\022\027/config/v1/flyte_client\222AN\032LRetrieve"
+  "s public flyte client info. This endpoin"
+  "t is anonymously accessible.B9Z7github.c"
+  "om/flyteorg/flyteidl/gen/pb-go/flyteidl/"
+  "serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fauth_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fauth_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto,
-  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1183,
+  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1215,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fauth_2eproto() {
@@ -1497,6 +1499,7 @@ const int PublicClientAuthConfigResponse::kClientIdFieldNumber;
 const int PublicClientAuthConfigResponse::kRedirectUriFieldNumber;
 const int PublicClientAuthConfigResponse::kScopesFieldNumber;
 const int PublicClientAuthConfigResponse::kAuthorizationMetadataKeyFieldNumber;
+const int PublicClientAuthConfigResponse::kServiceHttpEndpointFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 PublicClientAuthConfigResponse::PublicClientAuthConfigResponse()
@@ -1521,6 +1524,10 @@ PublicClientAuthConfigResponse::PublicClientAuthConfigResponse(const PublicClien
   if (from.authorization_metadata_key().size() > 0) {
     authorization_metadata_key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.authorization_metadata_key_);
   }
+  service_http_endpoint_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.service_http_endpoint().size() > 0) {
+    service_http_endpoint_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_http_endpoint_);
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.service.PublicClientAuthConfigResponse)
 }
 
@@ -1530,6 +1537,7 @@ void PublicClientAuthConfigResponse::SharedCtor() {
   client_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   redirect_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   authorization_metadata_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_http_endpoint_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 PublicClientAuthConfigResponse::~PublicClientAuthConfigResponse() {
@@ -1541,6 +1549,7 @@ void PublicClientAuthConfigResponse::SharedDtor() {
   client_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   redirect_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   authorization_metadata_key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_http_endpoint_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void PublicClientAuthConfigResponse::SetCachedSize(int size) const {
@@ -1562,6 +1571,7 @@ void PublicClientAuthConfigResponse::Clear() {
   client_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   redirect_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   authorization_metadata_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_http_endpoint_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -1636,6 +1646,22 @@ const char* PublicClientAuthConfigResponse::_InternalParse(const char* begin, co
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("flyteidl.service.PublicClientAuthConfigResponse.authorization_metadata_key");
         object = msg->mutable_authorization_metadata_key();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string service_http_endpoint = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint");
+        object = msg->mutable_service_http_endpoint();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -1740,6 +1766,21 @@ bool PublicClientAuthConfigResponse::MergePartialFromCodedStream(
         break;
       }
 
+      // string service_http_endpoint = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_service_http_endpoint()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->service_http_endpoint().data(), static_cast<int>(this->service_http_endpoint().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1807,6 +1848,16 @@ void PublicClientAuthConfigResponse::SerializeWithCachedSizes(
       4, this->authorization_metadata_key(), output);
   }
 
+  // string service_http_endpoint = 5;
+  if (this->service_http_endpoint().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->service_http_endpoint().data(), static_cast<int>(this->service_http_endpoint().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      5, this->service_http_endpoint(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1863,6 +1914,17 @@ void PublicClientAuthConfigResponse::SerializeWithCachedSizes(
         4, this->authorization_metadata_key(), target);
   }
 
+  // string service_http_endpoint = 5;
+  if (this->service_http_endpoint().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->service_http_endpoint().data(), static_cast<int>(this->service_http_endpoint().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.service.PublicClientAuthConfigResponse.service_http_endpoint");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        5, this->service_http_endpoint(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1913,6 +1975,13 @@ size_t PublicClientAuthConfigResponse::ByteSizeLong() const {
         this->authorization_metadata_key());
   }
 
+  // string service_http_endpoint = 5;
+  if (this->service_http_endpoint().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->service_http_endpoint());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1953,6 +2022,10 @@ void PublicClientAuthConfigResponse::MergeFrom(const PublicClientAuthConfigRespo
 
     authorization_metadata_key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.authorization_metadata_key_);
   }
+  if (from.service_http_endpoint().size() > 0) {
+
+    service_http_endpoint_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_http_endpoint_);
+  }
 }
 
 void PublicClientAuthConfigResponse::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1986,6 +2059,8 @@ void PublicClientAuthConfigResponse::InternalSwap(PublicClientAuthConfigResponse
   redirect_uri_.Swap(&other->redirect_uri_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   authorization_metadata_key_.Swap(&other->authorization_metadata_key_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  service_http_endpoint_.Swap(&other->service_http_endpoint_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 

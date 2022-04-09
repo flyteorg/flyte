@@ -25,13 +25,13 @@ func (_m DataCatalogClient_AddTag) Return(_a0 *datacatalog.AddTagResponse, _a1 e
 }
 
 func (_m *DataCatalogClient) OnAddTag(ctx context.Context, in *datacatalog.AddTagRequest, opts ...grpc.CallOption) *DataCatalogClient_AddTag {
-	c := _m.On("AddTag", ctx, in, opts)
-	return &DataCatalogClient_AddTag{Call: c}
+	c_call := _m.On("AddTag", ctx, in, opts)
+	return &DataCatalogClient_AddTag{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnAddTagMatch(matchers ...interface{}) *DataCatalogClient_AddTag {
-	c := _m.On("AddTag", matchers...)
-	return &DataCatalogClient_AddTag{Call: c}
+	c_call := _m.On("AddTag", matchers...)
+	return &DataCatalogClient_AddTag{Call: c_call}
 }
 
 // AddTag provides a mock function with given fields: ctx, in, opts
@@ -73,13 +73,13 @@ func (_m DataCatalogClient_CreateArtifact) Return(_a0 *datacatalog.CreateArtifac
 }
 
 func (_m *DataCatalogClient) OnCreateArtifact(ctx context.Context, in *datacatalog.CreateArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_CreateArtifact {
-	c := _m.On("CreateArtifact", ctx, in, opts)
-	return &DataCatalogClient_CreateArtifact{Call: c}
+	c_call := _m.On("CreateArtifact", ctx, in, opts)
+	return &DataCatalogClient_CreateArtifact{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnCreateArtifactMatch(matchers ...interface{}) *DataCatalogClient_CreateArtifact {
-	c := _m.On("CreateArtifact", matchers...)
-	return &DataCatalogClient_CreateArtifact{Call: c}
+	c_call := _m.On("CreateArtifact", matchers...)
+	return &DataCatalogClient_CreateArtifact{Call: c_call}
 }
 
 // CreateArtifact provides a mock function with given fields: ctx, in, opts
@@ -121,13 +121,13 @@ func (_m DataCatalogClient_CreateDataset) Return(_a0 *datacatalog.CreateDatasetR
 }
 
 func (_m *DataCatalogClient) OnCreateDataset(ctx context.Context, in *datacatalog.CreateDatasetRequest, opts ...grpc.CallOption) *DataCatalogClient_CreateDataset {
-	c := _m.On("CreateDataset", ctx, in, opts)
-	return &DataCatalogClient_CreateDataset{Call: c}
+	c_call := _m.On("CreateDataset", ctx, in, opts)
+	return &DataCatalogClient_CreateDataset{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnCreateDatasetMatch(matchers ...interface{}) *DataCatalogClient_CreateDataset {
-	c := _m.On("CreateDataset", matchers...)
-	return &DataCatalogClient_CreateDataset{Call: c}
+	c_call := _m.On("CreateDataset", matchers...)
+	return &DataCatalogClient_CreateDataset{Call: c_call}
 }
 
 // CreateDataset provides a mock function with given fields: ctx, in, opts
@@ -169,13 +169,13 @@ func (_m DataCatalogClient_GetArtifact) Return(_a0 *datacatalog.GetArtifactRespo
 }
 
 func (_m *DataCatalogClient) OnGetArtifact(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_GetArtifact {
-	c := _m.On("GetArtifact", ctx, in, opts)
-	return &DataCatalogClient_GetArtifact{Call: c}
+	c_call := _m.On("GetArtifact", ctx, in, opts)
+	return &DataCatalogClient_GetArtifact{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnGetArtifactMatch(matchers ...interface{}) *DataCatalogClient_GetArtifact {
-	c := _m.On("GetArtifact", matchers...)
-	return &DataCatalogClient_GetArtifact{Call: c}
+	c_call := _m.On("GetArtifact", matchers...)
+	return &DataCatalogClient_GetArtifact{Call: c_call}
 }
 
 // GetArtifact provides a mock function with given fields: ctx, in, opts
@@ -217,13 +217,13 @@ func (_m DataCatalogClient_GetDataset) Return(_a0 *datacatalog.GetDatasetRespons
 }
 
 func (_m *DataCatalogClient) OnGetDataset(ctx context.Context, in *datacatalog.GetDatasetRequest, opts ...grpc.CallOption) *DataCatalogClient_GetDataset {
-	c := _m.On("GetDataset", ctx, in, opts)
-	return &DataCatalogClient_GetDataset{Call: c}
+	c_call := _m.On("GetDataset", ctx, in, opts)
+	return &DataCatalogClient_GetDataset{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnGetDatasetMatch(matchers ...interface{}) *DataCatalogClient_GetDataset {
-	c := _m.On("GetDataset", matchers...)
-	return &DataCatalogClient_GetDataset{Call: c}
+	c_call := _m.On("GetDataset", matchers...)
+	return &DataCatalogClient_GetDataset{Call: c_call}
 }
 
 // GetDataset provides a mock function with given fields: ctx, in, opts
@@ -265,13 +265,13 @@ func (_m DataCatalogClient_GetOrExtendReservation) Return(_a0 *datacatalog.GetOr
 }
 
 func (_m *DataCatalogClient) OnGetOrExtendReservation(ctx context.Context, in *datacatalog.GetOrExtendReservationRequest, opts ...grpc.CallOption) *DataCatalogClient_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", ctx, in, opts)
-	return &DataCatalogClient_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", ctx, in, opts)
+	return &DataCatalogClient_GetOrExtendReservation{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnGetOrExtendReservationMatch(matchers ...interface{}) *DataCatalogClient_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", matchers...)
-	return &DataCatalogClient_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", matchers...)
+	return &DataCatalogClient_GetOrExtendReservation{Call: c_call}
 }
 
 // GetOrExtendReservation provides a mock function with given fields: ctx, in, opts
@@ -313,13 +313,13 @@ func (_m DataCatalogClient_ListArtifacts) Return(_a0 *datacatalog.ListArtifactsR
 }
 
 func (_m *DataCatalogClient) OnListArtifacts(ctx context.Context, in *datacatalog.ListArtifactsRequest, opts ...grpc.CallOption) *DataCatalogClient_ListArtifacts {
-	c := _m.On("ListArtifacts", ctx, in, opts)
-	return &DataCatalogClient_ListArtifacts{Call: c}
+	c_call := _m.On("ListArtifacts", ctx, in, opts)
+	return &DataCatalogClient_ListArtifacts{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnListArtifactsMatch(matchers ...interface{}) *DataCatalogClient_ListArtifacts {
-	c := _m.On("ListArtifacts", matchers...)
-	return &DataCatalogClient_ListArtifacts{Call: c}
+	c_call := _m.On("ListArtifacts", matchers...)
+	return &DataCatalogClient_ListArtifacts{Call: c_call}
 }
 
 // ListArtifacts provides a mock function with given fields: ctx, in, opts
@@ -361,13 +361,13 @@ func (_m DataCatalogClient_ListDatasets) Return(_a0 *datacatalog.ListDatasetsRes
 }
 
 func (_m *DataCatalogClient) OnListDatasets(ctx context.Context, in *datacatalog.ListDatasetsRequest, opts ...grpc.CallOption) *DataCatalogClient_ListDatasets {
-	c := _m.On("ListDatasets", ctx, in, opts)
-	return &DataCatalogClient_ListDatasets{Call: c}
+	c_call := _m.On("ListDatasets", ctx, in, opts)
+	return &DataCatalogClient_ListDatasets{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnListDatasetsMatch(matchers ...interface{}) *DataCatalogClient_ListDatasets {
-	c := _m.On("ListDatasets", matchers...)
-	return &DataCatalogClient_ListDatasets{Call: c}
+	c_call := _m.On("ListDatasets", matchers...)
+	return &DataCatalogClient_ListDatasets{Call: c_call}
 }
 
 // ListDatasets provides a mock function with given fields: ctx, in, opts
@@ -409,13 +409,13 @@ func (_m DataCatalogClient_ReleaseReservation) Return(_a0 *datacatalog.ReleaseRe
 }
 
 func (_m *DataCatalogClient) OnReleaseReservation(ctx context.Context, in *datacatalog.ReleaseReservationRequest, opts ...grpc.CallOption) *DataCatalogClient_ReleaseReservation {
-	c := _m.On("ReleaseReservation", ctx, in, opts)
-	return &DataCatalogClient_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", ctx, in, opts)
+	return &DataCatalogClient_ReleaseReservation{Call: c_call}
 }
 
 func (_m *DataCatalogClient) OnReleaseReservationMatch(matchers ...interface{}) *DataCatalogClient_ReleaseReservation {
-	c := _m.On("ReleaseReservation", matchers...)
-	return &DataCatalogClient_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", matchers...)
+	return &DataCatalogClient_ReleaseReservation{Call: c_call}
 }
 
 // ReleaseReservation provides a mock function with given fields: ctx, in, opts

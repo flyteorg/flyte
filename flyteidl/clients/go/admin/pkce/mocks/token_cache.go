@@ -21,13 +21,13 @@ func (_m TokenCache_GetToken) Return(_a0 *oauth2.Token, _a1 error) *TokenCache_G
 }
 
 func (_m *TokenCache) OnGetToken() *TokenCache_GetToken {
-	c := _m.On("GetToken")
-	return &TokenCache_GetToken{Call: c}
+	c_call := _m.On("GetToken")
+	return &TokenCache_GetToken{Call: c_call}
 }
 
 func (_m *TokenCache) OnGetTokenMatch(matchers ...interface{}) *TokenCache_GetToken {
-	c := _m.On("GetToken", matchers...)
-	return &TokenCache_GetToken{Call: c}
+	c_call := _m.On("GetToken", matchers...)
+	return &TokenCache_GetToken{Call: c_call}
 }
 
 // GetToken provides a mock function with given fields:
@@ -62,13 +62,13 @@ func (_m TokenCache_SaveToken) Return(_a0 error) *TokenCache_SaveToken {
 }
 
 func (_m *TokenCache) OnSaveToken(token *oauth2.Token) *TokenCache_SaveToken {
-	c := _m.On("SaveToken", token)
-	return &TokenCache_SaveToken{Call: c}
+	c_call := _m.On("SaveToken", token)
+	return &TokenCache_SaveToken{Call: c_call}
 }
 
 func (_m *TokenCache) OnSaveTokenMatch(matchers ...interface{}) *TokenCache_SaveToken {
-	c := _m.On("SaveToken", matchers...)
-	return &TokenCache_SaveToken{Call: c}
+	c_call := _m.On("SaveToken", matchers...)
+	return &TokenCache_SaveToken{Call: c_call}
 }
 
 // SaveToken provides a mock function with given fields: token

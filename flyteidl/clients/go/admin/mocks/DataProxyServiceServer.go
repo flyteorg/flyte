@@ -23,13 +23,13 @@ func (_m DataProxyServiceServer_CreateUploadLocation) Return(_a0 *service.Create
 }
 
 func (_m *DataProxyServiceServer) OnCreateUploadLocation(_a0 context.Context, _a1 *service.CreateUploadLocationRequest) *DataProxyServiceServer_CreateUploadLocation {
-	c := _m.On("CreateUploadLocation", _a0, _a1)
-	return &DataProxyServiceServer_CreateUploadLocation{Call: c}
+	c_call := _m.On("CreateUploadLocation", _a0, _a1)
+	return &DataProxyServiceServer_CreateUploadLocation{Call: c_call}
 }
 
 func (_m *DataProxyServiceServer) OnCreateUploadLocationMatch(matchers ...interface{}) *DataProxyServiceServer_CreateUploadLocation {
-	c := _m.On("CreateUploadLocation", matchers...)
-	return &DataProxyServiceServer_CreateUploadLocation{Call: c}
+	c_call := _m.On("CreateUploadLocation", matchers...)
+	return &DataProxyServiceServer_CreateUploadLocation{Call: c_call}
 }
 
 // CreateUploadLocation provides a mock function with given fields: _a0, _a1

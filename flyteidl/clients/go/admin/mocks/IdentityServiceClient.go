@@ -26,13 +26,13 @@ func (_m IdentityServiceClient_UserInfo) Return(_a0 *service.UserInfoResponse, _
 }
 
 func (_m *IdentityServiceClient) OnUserInfo(ctx context.Context, in *service.UserInfoRequest, opts ...grpc.CallOption) *IdentityServiceClient_UserInfo {
-	c := _m.On("UserInfo", ctx, in, opts)
-	return &IdentityServiceClient_UserInfo{Call: c}
+	c_call := _m.On("UserInfo", ctx, in, opts)
+	return &IdentityServiceClient_UserInfo{Call: c_call}
 }
 
 func (_m *IdentityServiceClient) OnUserInfoMatch(matchers ...interface{}) *IdentityServiceClient_UserInfo {
-	c := _m.On("UserInfo", matchers...)
-	return &IdentityServiceClient_UserInfo{Call: c}
+	c_call := _m.On("UserInfo", matchers...)
+	return &IdentityServiceClient_UserInfo{Call: c_call}
 }
 
 // UserInfo provides a mock function with given fields: ctx, in, opts

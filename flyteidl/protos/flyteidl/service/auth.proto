@@ -56,6 +56,10 @@ message PublicClientAuthConfigResponse {
     // Authorization Header to use when passing Access Tokens to the server. If not provided, the client should use the
     // default http `Authorization` header.
     string authorization_metadata_key = 4;
+    // ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used
+    // to configure the gRPC connection can be used for the http one respecting the insecure flag to choose between
+    // SSL or no SSL connections.
+    string service_http_endpoint = 5;
 }
 
 // The following defines an RPC service that is also served over HTTP via grpc-gateway.

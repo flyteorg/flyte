@@ -131,6 +131,10 @@
         "authorization_metadata_key": {
           "type": "string",
           "description": "Authorization Header to use when passing Access Tokens to the server. If not provided, the client should use the\ndefault http `Authorization` header."
+        },
+        "service_http_endpoint": {
+          "type": "string",
+          "description": "ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used\nto configure the gRPC connection can be used for the http one respecting the insecure flag to choose between\nSSL or no SSL connections."
         }
       },
       "description": "FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users."
