@@ -88,7 +88,7 @@ modules:
           annotations:
             "eks.amazonaws.com/role-arn": "${{module.adminflyterole.role_arn}}"
       workflow_scheduler:
-        enabled: false
+        enabled: true
       workflow_notifications:
         enabled: false
       configmap:
