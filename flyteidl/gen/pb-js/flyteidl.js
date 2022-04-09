@@ -39424,6 +39424,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [redirectUri] PublicClientAuthConfigResponse redirectUri
              * @property {Array.<string>|null} [scopes] PublicClientAuthConfigResponse scopes
              * @property {string|null} [authorizationMetadataKey] PublicClientAuthConfigResponse authorizationMetadataKey
+             * @property {string|null} [serviceHttpEndpoint] PublicClientAuthConfigResponse serviceHttpEndpoint
              */
 
             /**
@@ -39475,6 +39476,14 @@ export const flyteidl = $root.flyteidl = (() => {
             PublicClientAuthConfigResponse.prototype.authorizationMetadataKey = "";
 
             /**
+             * PublicClientAuthConfigResponse serviceHttpEndpoint.
+             * @member {string} serviceHttpEndpoint
+             * @memberof flyteidl.service.PublicClientAuthConfigResponse
+             * @instance
+             */
+            PublicClientAuthConfigResponse.prototype.serviceHttpEndpoint = "";
+
+            /**
              * Creates a new PublicClientAuthConfigResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.service.PublicClientAuthConfigResponse
@@ -39507,6 +39516,8 @@ export const flyteidl = $root.flyteidl = (() => {
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.scopes[i]);
                 if (message.authorizationMetadataKey != null && message.hasOwnProperty("authorizationMetadataKey"))
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.authorizationMetadataKey);
+                if (message.serviceHttpEndpoint != null && message.hasOwnProperty("serviceHttpEndpoint"))
+                    writer.uint32(/* id 5, wireType 2 =*/42).string(message.serviceHttpEndpoint);
                 return writer;
             };
 
@@ -39541,6 +39552,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 4:
                         message.authorizationMetadataKey = reader.string();
+                        break;
+                    case 5:
+                        message.serviceHttpEndpoint = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -39577,6 +39591,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.authorizationMetadataKey != null && message.hasOwnProperty("authorizationMetadataKey"))
                     if (!$util.isString(message.authorizationMetadataKey))
                         return "authorizationMetadataKey: string expected";
+                if (message.serviceHttpEndpoint != null && message.hasOwnProperty("serviceHttpEndpoint"))
+                    if (!$util.isString(message.serviceHttpEndpoint))
+                        return "serviceHttpEndpoint: string expected";
                 return null;
             };
 

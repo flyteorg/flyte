@@ -26,13 +26,13 @@ func (_m AuthMetadataServiceClient_GetOAuth2Metadata) Return(_a0 *service.OAuth2
 }
 
 func (_m *AuthMetadataServiceClient) OnGetOAuth2Metadata(ctx context.Context, in *service.OAuth2MetadataRequest, opts ...grpc.CallOption) *AuthMetadataServiceClient_GetOAuth2Metadata {
-	c := _m.On("GetOAuth2Metadata", ctx, in, opts)
-	return &AuthMetadataServiceClient_GetOAuth2Metadata{Call: c}
+	c_call := _m.On("GetOAuth2Metadata", ctx, in, opts)
+	return &AuthMetadataServiceClient_GetOAuth2Metadata{Call: c_call}
 }
 
 func (_m *AuthMetadataServiceClient) OnGetOAuth2MetadataMatch(matchers ...interface{}) *AuthMetadataServiceClient_GetOAuth2Metadata {
-	c := _m.On("GetOAuth2Metadata", matchers...)
-	return &AuthMetadataServiceClient_GetOAuth2Metadata{Call: c}
+	c_call := _m.On("GetOAuth2Metadata", matchers...)
+	return &AuthMetadataServiceClient_GetOAuth2Metadata{Call: c_call}
 }
 
 // GetOAuth2Metadata provides a mock function with given fields: ctx, in, opts
@@ -74,13 +74,13 @@ func (_m AuthMetadataServiceClient_GetPublicClientConfig) Return(_a0 *service.Pu
 }
 
 func (_m *AuthMetadataServiceClient) OnGetPublicClientConfig(ctx context.Context, in *service.PublicClientAuthConfigRequest, opts ...grpc.CallOption) *AuthMetadataServiceClient_GetPublicClientConfig {
-	c := _m.On("GetPublicClientConfig", ctx, in, opts)
-	return &AuthMetadataServiceClient_GetPublicClientConfig{Call: c}
+	c_call := _m.On("GetPublicClientConfig", ctx, in, opts)
+	return &AuthMetadataServiceClient_GetPublicClientConfig{Call: c_call}
 }
 
 func (_m *AuthMetadataServiceClient) OnGetPublicClientConfigMatch(matchers ...interface{}) *AuthMetadataServiceClient_GetPublicClientConfig {
-	c := _m.On("GetPublicClientConfig", matchers...)
-	return &AuthMetadataServiceClient_GetPublicClientConfig{Call: c}
+	c_call := _m.On("GetPublicClientConfig", matchers...)
+	return &AuthMetadataServiceClient_GetPublicClientConfig{Call: c_call}
 }
 
 // GetPublicClientConfig provides a mock function with given fields: ctx, in, opts

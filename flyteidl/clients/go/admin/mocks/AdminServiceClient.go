@@ -26,13 +26,13 @@ func (_m AdminServiceClient_CreateExecution) Return(_a0 *admin.ExecutionCreateRe
 }
 
 func (_m *AdminServiceClient) OnCreateExecution(ctx context.Context, in *admin.ExecutionCreateRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateExecution {
-	c := _m.On("CreateExecution", ctx, in, opts)
-	return &AdminServiceClient_CreateExecution{Call: c}
+	c_call := _m.On("CreateExecution", ctx, in, opts)
+	return &AdminServiceClient_CreateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateExecutionMatch(matchers ...interface{}) *AdminServiceClient_CreateExecution {
-	c := _m.On("CreateExecution", matchers...)
-	return &AdminServiceClient_CreateExecution{Call: c}
+	c_call := _m.On("CreateExecution", matchers...)
+	return &AdminServiceClient_CreateExecution{Call: c_call}
 }
 
 // CreateExecution provides a mock function with given fields: ctx, in, opts
@@ -74,13 +74,13 @@ func (_m AdminServiceClient_CreateLaunchPlan) Return(_a0 *admin.LaunchPlanCreate
 }
 
 func (_m *AdminServiceClient) OnCreateLaunchPlan(ctx context.Context, in *admin.LaunchPlanCreateRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateLaunchPlan {
-	c := _m.On("CreateLaunchPlan", ctx, in, opts)
-	return &AdminServiceClient_CreateLaunchPlan{Call: c}
+	c_call := _m.On("CreateLaunchPlan", ctx, in, opts)
+	return &AdminServiceClient_CreateLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateLaunchPlanMatch(matchers ...interface{}) *AdminServiceClient_CreateLaunchPlan {
-	c := _m.On("CreateLaunchPlan", matchers...)
-	return &AdminServiceClient_CreateLaunchPlan{Call: c}
+	c_call := _m.On("CreateLaunchPlan", matchers...)
+	return &AdminServiceClient_CreateLaunchPlan{Call: c_call}
 }
 
 // CreateLaunchPlan provides a mock function with given fields: ctx, in, opts
@@ -122,13 +122,13 @@ func (_m AdminServiceClient_CreateNodeEvent) Return(_a0 *admin.NodeExecutionEven
 }
 
 func (_m *AdminServiceClient) OnCreateNodeEvent(ctx context.Context, in *admin.NodeExecutionEventRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateNodeEvent {
-	c := _m.On("CreateNodeEvent", ctx, in, opts)
-	return &AdminServiceClient_CreateNodeEvent{Call: c}
+	c_call := _m.On("CreateNodeEvent", ctx, in, opts)
+	return &AdminServiceClient_CreateNodeEvent{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateNodeEventMatch(matchers ...interface{}) *AdminServiceClient_CreateNodeEvent {
-	c := _m.On("CreateNodeEvent", matchers...)
-	return &AdminServiceClient_CreateNodeEvent{Call: c}
+	c_call := _m.On("CreateNodeEvent", matchers...)
+	return &AdminServiceClient_CreateNodeEvent{Call: c_call}
 }
 
 // CreateNodeEvent provides a mock function with given fields: ctx, in, opts
@@ -170,13 +170,13 @@ func (_m AdminServiceClient_CreateTask) Return(_a0 *admin.TaskCreateResponse, _a
 }
 
 func (_m *AdminServiceClient) OnCreateTask(ctx context.Context, in *admin.TaskCreateRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateTask {
-	c := _m.On("CreateTask", ctx, in, opts)
-	return &AdminServiceClient_CreateTask{Call: c}
+	c_call := _m.On("CreateTask", ctx, in, opts)
+	return &AdminServiceClient_CreateTask{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateTaskMatch(matchers ...interface{}) *AdminServiceClient_CreateTask {
-	c := _m.On("CreateTask", matchers...)
-	return &AdminServiceClient_CreateTask{Call: c}
+	c_call := _m.On("CreateTask", matchers...)
+	return &AdminServiceClient_CreateTask{Call: c_call}
 }
 
 // CreateTask provides a mock function with given fields: ctx, in, opts
@@ -218,13 +218,13 @@ func (_m AdminServiceClient_CreateTaskEvent) Return(_a0 *admin.TaskExecutionEven
 }
 
 func (_m *AdminServiceClient) OnCreateTaskEvent(ctx context.Context, in *admin.TaskExecutionEventRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateTaskEvent {
-	c := _m.On("CreateTaskEvent", ctx, in, opts)
-	return &AdminServiceClient_CreateTaskEvent{Call: c}
+	c_call := _m.On("CreateTaskEvent", ctx, in, opts)
+	return &AdminServiceClient_CreateTaskEvent{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateTaskEventMatch(matchers ...interface{}) *AdminServiceClient_CreateTaskEvent {
-	c := _m.On("CreateTaskEvent", matchers...)
-	return &AdminServiceClient_CreateTaskEvent{Call: c}
+	c_call := _m.On("CreateTaskEvent", matchers...)
+	return &AdminServiceClient_CreateTaskEvent{Call: c_call}
 }
 
 // CreateTaskEvent provides a mock function with given fields: ctx, in, opts
@@ -266,13 +266,13 @@ func (_m AdminServiceClient_CreateWorkflow) Return(_a0 *admin.WorkflowCreateResp
 }
 
 func (_m *AdminServiceClient) OnCreateWorkflow(ctx context.Context, in *admin.WorkflowCreateRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateWorkflow {
-	c := _m.On("CreateWorkflow", ctx, in, opts)
-	return &AdminServiceClient_CreateWorkflow{Call: c}
+	c_call := _m.On("CreateWorkflow", ctx, in, opts)
+	return &AdminServiceClient_CreateWorkflow{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateWorkflowMatch(matchers ...interface{}) *AdminServiceClient_CreateWorkflow {
-	c := _m.On("CreateWorkflow", matchers...)
-	return &AdminServiceClient_CreateWorkflow{Call: c}
+	c_call := _m.On("CreateWorkflow", matchers...)
+	return &AdminServiceClient_CreateWorkflow{Call: c_call}
 }
 
 // CreateWorkflow provides a mock function with given fields: ctx, in, opts
@@ -314,13 +314,13 @@ func (_m AdminServiceClient_CreateWorkflowEvent) Return(_a0 *admin.WorkflowExecu
 }
 
 func (_m *AdminServiceClient) OnCreateWorkflowEvent(ctx context.Context, in *admin.WorkflowExecutionEventRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateWorkflowEvent {
-	c := _m.On("CreateWorkflowEvent", ctx, in, opts)
-	return &AdminServiceClient_CreateWorkflowEvent{Call: c}
+	c_call := _m.On("CreateWorkflowEvent", ctx, in, opts)
+	return &AdminServiceClient_CreateWorkflowEvent{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnCreateWorkflowEventMatch(matchers ...interface{}) *AdminServiceClient_CreateWorkflowEvent {
-	c := _m.On("CreateWorkflowEvent", matchers...)
-	return &AdminServiceClient_CreateWorkflowEvent{Call: c}
+	c_call := _m.On("CreateWorkflowEvent", matchers...)
+	return &AdminServiceClient_CreateWorkflowEvent{Call: c_call}
 }
 
 // CreateWorkflowEvent provides a mock function with given fields: ctx, in, opts
@@ -362,13 +362,13 @@ func (_m AdminServiceClient_DeleteProjectDomainAttributes) Return(_a0 *admin.Pro
 }
 
 func (_m *AdminServiceClient) OnDeleteProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", ctx, in, opts)
-	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", ctx, in, opts)
+	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnDeleteProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceClient_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", matchers...)
-	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", matchers...)
+	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 // DeleteProjectDomainAttributes provides a mock function with given fields: ctx, in, opts
@@ -410,13 +410,13 @@ func (_m AdminServiceClient_DeleteWorkflowAttributes) Return(_a0 *admin.Workflow
 }
 
 func (_m *AdminServiceClient) OnDeleteWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", ctx, in, opts)
-	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", ctx, in, opts)
+	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnDeleteWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceClient_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", matchers...)
-	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", matchers...)
+	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c_call}
 }
 
 // DeleteWorkflowAttributes provides a mock function with given fields: ctx, in, opts
@@ -458,13 +458,13 @@ func (_m AdminServiceClient_GetActiveLaunchPlan) Return(_a0 *admin.LaunchPlan, _
 }
 
 func (_m *AdminServiceClient) OnGetActiveLaunchPlan(ctx context.Context, in *admin.ActiveLaunchPlanRequest, opts ...grpc.CallOption) *AdminServiceClient_GetActiveLaunchPlan {
-	c := _m.On("GetActiveLaunchPlan", ctx, in, opts)
-	return &AdminServiceClient_GetActiveLaunchPlan{Call: c}
+	c_call := _m.On("GetActiveLaunchPlan", ctx, in, opts)
+	return &AdminServiceClient_GetActiveLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetActiveLaunchPlanMatch(matchers ...interface{}) *AdminServiceClient_GetActiveLaunchPlan {
-	c := _m.On("GetActiveLaunchPlan", matchers...)
-	return &AdminServiceClient_GetActiveLaunchPlan{Call: c}
+	c_call := _m.On("GetActiveLaunchPlan", matchers...)
+	return &AdminServiceClient_GetActiveLaunchPlan{Call: c_call}
 }
 
 // GetActiveLaunchPlan provides a mock function with given fields: ctx, in, opts
@@ -506,13 +506,13 @@ func (_m AdminServiceClient_GetExecution) Return(_a0 *admin.Execution, _a1 error
 }
 
 func (_m *AdminServiceClient) OnGetExecution(ctx context.Context, in *admin.WorkflowExecutionGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetExecution {
-	c := _m.On("GetExecution", ctx, in, opts)
-	return &AdminServiceClient_GetExecution{Call: c}
+	c_call := _m.On("GetExecution", ctx, in, opts)
+	return &AdminServiceClient_GetExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetExecutionMatch(matchers ...interface{}) *AdminServiceClient_GetExecution {
-	c := _m.On("GetExecution", matchers...)
-	return &AdminServiceClient_GetExecution{Call: c}
+	c_call := _m.On("GetExecution", matchers...)
+	return &AdminServiceClient_GetExecution{Call: c_call}
 }
 
 // GetExecution provides a mock function with given fields: ctx, in, opts
@@ -554,13 +554,13 @@ func (_m AdminServiceClient_GetExecutionData) Return(_a0 *admin.WorkflowExecutio
 }
 
 func (_m *AdminServiceClient) OnGetExecutionData(ctx context.Context, in *admin.WorkflowExecutionGetDataRequest, opts ...grpc.CallOption) *AdminServiceClient_GetExecutionData {
-	c := _m.On("GetExecutionData", ctx, in, opts)
-	return &AdminServiceClient_GetExecutionData{Call: c}
+	c_call := _m.On("GetExecutionData", ctx, in, opts)
+	return &AdminServiceClient_GetExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetExecutionDataMatch(matchers ...interface{}) *AdminServiceClient_GetExecutionData {
-	c := _m.On("GetExecutionData", matchers...)
-	return &AdminServiceClient_GetExecutionData{Call: c}
+	c_call := _m.On("GetExecutionData", matchers...)
+	return &AdminServiceClient_GetExecutionData{Call: c_call}
 }
 
 // GetExecutionData provides a mock function with given fields: ctx, in, opts
@@ -602,13 +602,13 @@ func (_m AdminServiceClient_GetLaunchPlan) Return(_a0 *admin.LaunchPlan, _a1 err
 }
 
 func (_m *AdminServiceClient) OnGetLaunchPlan(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", ctx, in, opts)
-	return &AdminServiceClient_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", ctx, in, opts)
+	return &AdminServiceClient_GetLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetLaunchPlanMatch(matchers ...interface{}) *AdminServiceClient_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", matchers...)
-	return &AdminServiceClient_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", matchers...)
+	return &AdminServiceClient_GetLaunchPlan{Call: c_call}
 }
 
 // GetLaunchPlan provides a mock function with given fields: ctx, in, opts
@@ -650,13 +650,13 @@ func (_m AdminServiceClient_GetNamedEntity) Return(_a0 *admin.NamedEntity, _a1 e
 }
 
 func (_m *AdminServiceClient) OnGetNamedEntity(ctx context.Context, in *admin.NamedEntityGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetNamedEntity {
-	c := _m.On("GetNamedEntity", ctx, in, opts)
-	return &AdminServiceClient_GetNamedEntity{Call: c}
+	c_call := _m.On("GetNamedEntity", ctx, in, opts)
+	return &AdminServiceClient_GetNamedEntity{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetNamedEntityMatch(matchers ...interface{}) *AdminServiceClient_GetNamedEntity {
-	c := _m.On("GetNamedEntity", matchers...)
-	return &AdminServiceClient_GetNamedEntity{Call: c}
+	c_call := _m.On("GetNamedEntity", matchers...)
+	return &AdminServiceClient_GetNamedEntity{Call: c_call}
 }
 
 // GetNamedEntity provides a mock function with given fields: ctx, in, opts
@@ -698,13 +698,13 @@ func (_m AdminServiceClient_GetNodeExecution) Return(_a0 *admin.NodeExecution, _
 }
 
 func (_m *AdminServiceClient) OnGetNodeExecution(ctx context.Context, in *admin.NodeExecutionGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetNodeExecution {
-	c := _m.On("GetNodeExecution", ctx, in, opts)
-	return &AdminServiceClient_GetNodeExecution{Call: c}
+	c_call := _m.On("GetNodeExecution", ctx, in, opts)
+	return &AdminServiceClient_GetNodeExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetNodeExecutionMatch(matchers ...interface{}) *AdminServiceClient_GetNodeExecution {
-	c := _m.On("GetNodeExecution", matchers...)
-	return &AdminServiceClient_GetNodeExecution{Call: c}
+	c_call := _m.On("GetNodeExecution", matchers...)
+	return &AdminServiceClient_GetNodeExecution{Call: c_call}
 }
 
 // GetNodeExecution provides a mock function with given fields: ctx, in, opts
@@ -746,13 +746,13 @@ func (_m AdminServiceClient_GetNodeExecutionData) Return(_a0 *admin.NodeExecutio
 }
 
 func (_m *AdminServiceClient) OnGetNodeExecutionData(ctx context.Context, in *admin.NodeExecutionGetDataRequest, opts ...grpc.CallOption) *AdminServiceClient_GetNodeExecutionData {
-	c := _m.On("GetNodeExecutionData", ctx, in, opts)
-	return &AdminServiceClient_GetNodeExecutionData{Call: c}
+	c_call := _m.On("GetNodeExecutionData", ctx, in, opts)
+	return &AdminServiceClient_GetNodeExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetNodeExecutionDataMatch(matchers ...interface{}) *AdminServiceClient_GetNodeExecutionData {
-	c := _m.On("GetNodeExecutionData", matchers...)
-	return &AdminServiceClient_GetNodeExecutionData{Call: c}
+	c_call := _m.On("GetNodeExecutionData", matchers...)
+	return &AdminServiceClient_GetNodeExecutionData{Call: c_call}
 }
 
 // GetNodeExecutionData provides a mock function with given fields: ctx, in, opts
@@ -794,13 +794,13 @@ func (_m AdminServiceClient_GetProjectDomainAttributes) Return(_a0 *admin.Projec
 }
 
 func (_m *AdminServiceClient) OnGetProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetProjectDomainAttributes {
-	c := _m.On("GetProjectDomainAttributes", ctx, in, opts)
-	return &AdminServiceClient_GetProjectDomainAttributes{Call: c}
+	c_call := _m.On("GetProjectDomainAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetProjectDomainAttributes {
-	c := _m.On("GetProjectDomainAttributes", matchers...)
-	return &AdminServiceClient_GetProjectDomainAttributes{Call: c}
+	c_call := _m.On("GetProjectDomainAttributes", matchers...)
+	return &AdminServiceClient_GetProjectDomainAttributes{Call: c_call}
 }
 
 // GetProjectDomainAttributes provides a mock function with given fields: ctx, in, opts
@@ -842,13 +842,13 @@ func (_m AdminServiceClient_GetTask) Return(_a0 *admin.Task, _a1 error) *AdminSe
 }
 
 func (_m *AdminServiceClient) OnGetTask(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetTask {
-	c := _m.On("GetTask", ctx, in, opts)
-	return &AdminServiceClient_GetTask{Call: c}
+	c_call := _m.On("GetTask", ctx, in, opts)
+	return &AdminServiceClient_GetTask{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetTaskMatch(matchers ...interface{}) *AdminServiceClient_GetTask {
-	c := _m.On("GetTask", matchers...)
-	return &AdminServiceClient_GetTask{Call: c}
+	c_call := _m.On("GetTask", matchers...)
+	return &AdminServiceClient_GetTask{Call: c_call}
 }
 
 // GetTask provides a mock function with given fields: ctx, in, opts
@@ -890,13 +890,13 @@ func (_m AdminServiceClient_GetTaskExecution) Return(_a0 *admin.TaskExecution, _
 }
 
 func (_m *AdminServiceClient) OnGetTaskExecution(ctx context.Context, in *admin.TaskExecutionGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetTaskExecution {
-	c := _m.On("GetTaskExecution", ctx, in, opts)
-	return &AdminServiceClient_GetTaskExecution{Call: c}
+	c_call := _m.On("GetTaskExecution", ctx, in, opts)
+	return &AdminServiceClient_GetTaskExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetTaskExecutionMatch(matchers ...interface{}) *AdminServiceClient_GetTaskExecution {
-	c := _m.On("GetTaskExecution", matchers...)
-	return &AdminServiceClient_GetTaskExecution{Call: c}
+	c_call := _m.On("GetTaskExecution", matchers...)
+	return &AdminServiceClient_GetTaskExecution{Call: c_call}
 }
 
 // GetTaskExecution provides a mock function with given fields: ctx, in, opts
@@ -938,13 +938,13 @@ func (_m AdminServiceClient_GetTaskExecutionData) Return(_a0 *admin.TaskExecutio
 }
 
 func (_m *AdminServiceClient) OnGetTaskExecutionData(ctx context.Context, in *admin.TaskExecutionGetDataRequest, opts ...grpc.CallOption) *AdminServiceClient_GetTaskExecutionData {
-	c := _m.On("GetTaskExecutionData", ctx, in, opts)
-	return &AdminServiceClient_GetTaskExecutionData{Call: c}
+	c_call := _m.On("GetTaskExecutionData", ctx, in, opts)
+	return &AdminServiceClient_GetTaskExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetTaskExecutionDataMatch(matchers ...interface{}) *AdminServiceClient_GetTaskExecutionData {
-	c := _m.On("GetTaskExecutionData", matchers...)
-	return &AdminServiceClient_GetTaskExecutionData{Call: c}
+	c_call := _m.On("GetTaskExecutionData", matchers...)
+	return &AdminServiceClient_GetTaskExecutionData{Call: c_call}
 }
 
 // GetTaskExecutionData provides a mock function with given fields: ctx, in, opts
@@ -986,13 +986,13 @@ func (_m AdminServiceClient_GetVersion) Return(_a0 *admin.GetVersionResponse, _a
 }
 
 func (_m *AdminServiceClient) OnGetVersion(ctx context.Context, in *admin.GetVersionRequest, opts ...grpc.CallOption) *AdminServiceClient_GetVersion {
-	c := _m.On("GetVersion", ctx, in, opts)
-	return &AdminServiceClient_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", ctx, in, opts)
+	return &AdminServiceClient_GetVersion{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetVersionMatch(matchers ...interface{}) *AdminServiceClient_GetVersion {
-	c := _m.On("GetVersion", matchers...)
-	return &AdminServiceClient_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", matchers...)
+	return &AdminServiceClient_GetVersion{Call: c_call}
 }
 
 // GetVersion provides a mock function with given fields: ctx, in, opts
@@ -1034,13 +1034,13 @@ func (_m AdminServiceClient_GetWorkflow) Return(_a0 *admin.Workflow, _a1 error) 
 }
 
 func (_m *AdminServiceClient) OnGetWorkflow(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetWorkflow {
-	c := _m.On("GetWorkflow", ctx, in, opts)
-	return &AdminServiceClient_GetWorkflow{Call: c}
+	c_call := _m.On("GetWorkflow", ctx, in, opts)
+	return &AdminServiceClient_GetWorkflow{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetWorkflowMatch(matchers ...interface{}) *AdminServiceClient_GetWorkflow {
-	c := _m.On("GetWorkflow", matchers...)
-	return &AdminServiceClient_GetWorkflow{Call: c}
+	c_call := _m.On("GetWorkflow", matchers...)
+	return &AdminServiceClient_GetWorkflow{Call: c_call}
 }
 
 // GetWorkflow provides a mock function with given fields: ctx, in, opts
@@ -1082,13 +1082,13 @@ func (_m AdminServiceClient_GetWorkflowAttributes) Return(_a0 *admin.WorkflowAtt
 }
 
 func (_m *AdminServiceClient) OnGetWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetWorkflowAttributes {
-	c := _m.On("GetWorkflowAttributes", ctx, in, opts)
-	return &AdminServiceClient_GetWorkflowAttributes{Call: c}
+	c_call := _m.On("GetWorkflowAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnGetWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetWorkflowAttributes {
-	c := _m.On("GetWorkflowAttributes", matchers...)
-	return &AdminServiceClient_GetWorkflowAttributes{Call: c}
+	c_call := _m.On("GetWorkflowAttributes", matchers...)
+	return &AdminServiceClient_GetWorkflowAttributes{Call: c_call}
 }
 
 // GetWorkflowAttributes provides a mock function with given fields: ctx, in, opts
@@ -1130,13 +1130,13 @@ func (_m AdminServiceClient_ListActiveLaunchPlans) Return(_a0 *admin.LaunchPlanL
 }
 
 func (_m *AdminServiceClient) OnListActiveLaunchPlans(ctx context.Context, in *admin.ActiveLaunchPlanListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListActiveLaunchPlans {
-	c := _m.On("ListActiveLaunchPlans", ctx, in, opts)
-	return &AdminServiceClient_ListActiveLaunchPlans{Call: c}
+	c_call := _m.On("ListActiveLaunchPlans", ctx, in, opts)
+	return &AdminServiceClient_ListActiveLaunchPlans{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListActiveLaunchPlansMatch(matchers ...interface{}) *AdminServiceClient_ListActiveLaunchPlans {
-	c := _m.On("ListActiveLaunchPlans", matchers...)
-	return &AdminServiceClient_ListActiveLaunchPlans{Call: c}
+	c_call := _m.On("ListActiveLaunchPlans", matchers...)
+	return &AdminServiceClient_ListActiveLaunchPlans{Call: c_call}
 }
 
 // ListActiveLaunchPlans provides a mock function with given fields: ctx, in, opts
@@ -1178,13 +1178,13 @@ func (_m AdminServiceClient_ListExecutions) Return(_a0 *admin.ExecutionList, _a1
 }
 
 func (_m *AdminServiceClient) OnListExecutions(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListExecutions {
-	c := _m.On("ListExecutions", ctx, in, opts)
-	return &AdminServiceClient_ListExecutions{Call: c}
+	c_call := _m.On("ListExecutions", ctx, in, opts)
+	return &AdminServiceClient_ListExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListExecutionsMatch(matchers ...interface{}) *AdminServiceClient_ListExecutions {
-	c := _m.On("ListExecutions", matchers...)
-	return &AdminServiceClient_ListExecutions{Call: c}
+	c_call := _m.On("ListExecutions", matchers...)
+	return &AdminServiceClient_ListExecutions{Call: c_call}
 }
 
 // ListExecutions provides a mock function with given fields: ctx, in, opts
@@ -1226,13 +1226,13 @@ func (_m AdminServiceClient_ListLaunchPlanIds) Return(_a0 *admin.NamedEntityIden
 }
 
 func (_m *AdminServiceClient) OnListLaunchPlanIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListLaunchPlanIds {
-	c := _m.On("ListLaunchPlanIds", ctx, in, opts)
-	return &AdminServiceClient_ListLaunchPlanIds{Call: c}
+	c_call := _m.On("ListLaunchPlanIds", ctx, in, opts)
+	return &AdminServiceClient_ListLaunchPlanIds{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListLaunchPlanIdsMatch(matchers ...interface{}) *AdminServiceClient_ListLaunchPlanIds {
-	c := _m.On("ListLaunchPlanIds", matchers...)
-	return &AdminServiceClient_ListLaunchPlanIds{Call: c}
+	c_call := _m.On("ListLaunchPlanIds", matchers...)
+	return &AdminServiceClient_ListLaunchPlanIds{Call: c_call}
 }
 
 // ListLaunchPlanIds provides a mock function with given fields: ctx, in, opts
@@ -1274,13 +1274,13 @@ func (_m AdminServiceClient_ListLaunchPlans) Return(_a0 *admin.LaunchPlanList, _
 }
 
 func (_m *AdminServiceClient) OnListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListLaunchPlans {
-	c := _m.On("ListLaunchPlans", ctx, in, opts)
-	return &AdminServiceClient_ListLaunchPlans{Call: c}
+	c_call := _m.On("ListLaunchPlans", ctx, in, opts)
+	return &AdminServiceClient_ListLaunchPlans{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListLaunchPlansMatch(matchers ...interface{}) *AdminServiceClient_ListLaunchPlans {
-	c := _m.On("ListLaunchPlans", matchers...)
-	return &AdminServiceClient_ListLaunchPlans{Call: c}
+	c_call := _m.On("ListLaunchPlans", matchers...)
+	return &AdminServiceClient_ListLaunchPlans{Call: c_call}
 }
 
 // ListLaunchPlans provides a mock function with given fields: ctx, in, opts
@@ -1322,13 +1322,13 @@ func (_m AdminServiceClient_ListMatchableAttributes) Return(_a0 *admin.ListMatch
 }
 
 func (_m *AdminServiceClient) OnListMatchableAttributes(ctx context.Context, in *admin.ListMatchableAttributesRequest, opts ...grpc.CallOption) *AdminServiceClient_ListMatchableAttributes {
-	c := _m.On("ListMatchableAttributes", ctx, in, opts)
-	return &AdminServiceClient_ListMatchableAttributes{Call: c}
+	c_call := _m.On("ListMatchableAttributes", ctx, in, opts)
+	return &AdminServiceClient_ListMatchableAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListMatchableAttributesMatch(matchers ...interface{}) *AdminServiceClient_ListMatchableAttributes {
-	c := _m.On("ListMatchableAttributes", matchers...)
-	return &AdminServiceClient_ListMatchableAttributes{Call: c}
+	c_call := _m.On("ListMatchableAttributes", matchers...)
+	return &AdminServiceClient_ListMatchableAttributes{Call: c_call}
 }
 
 // ListMatchableAttributes provides a mock function with given fields: ctx, in, opts
@@ -1370,13 +1370,13 @@ func (_m AdminServiceClient_ListNamedEntities) Return(_a0 *admin.NamedEntityList
 }
 
 func (_m *AdminServiceClient) OnListNamedEntities(ctx context.Context, in *admin.NamedEntityListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListNamedEntities {
-	c := _m.On("ListNamedEntities", ctx, in, opts)
-	return &AdminServiceClient_ListNamedEntities{Call: c}
+	c_call := _m.On("ListNamedEntities", ctx, in, opts)
+	return &AdminServiceClient_ListNamedEntities{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListNamedEntitiesMatch(matchers ...interface{}) *AdminServiceClient_ListNamedEntities {
-	c := _m.On("ListNamedEntities", matchers...)
-	return &AdminServiceClient_ListNamedEntities{Call: c}
+	c_call := _m.On("ListNamedEntities", matchers...)
+	return &AdminServiceClient_ListNamedEntities{Call: c_call}
 }
 
 // ListNamedEntities provides a mock function with given fields: ctx, in, opts
@@ -1418,13 +1418,13 @@ func (_m AdminServiceClient_ListNodeExecutions) Return(_a0 *admin.NodeExecutionL
 }
 
 func (_m *AdminServiceClient) OnListNodeExecutions(ctx context.Context, in *admin.NodeExecutionListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListNodeExecutions {
-	c := _m.On("ListNodeExecutions", ctx, in, opts)
-	return &AdminServiceClient_ListNodeExecutions{Call: c}
+	c_call := _m.On("ListNodeExecutions", ctx, in, opts)
+	return &AdminServiceClient_ListNodeExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListNodeExecutionsMatch(matchers ...interface{}) *AdminServiceClient_ListNodeExecutions {
-	c := _m.On("ListNodeExecutions", matchers...)
-	return &AdminServiceClient_ListNodeExecutions{Call: c}
+	c_call := _m.On("ListNodeExecutions", matchers...)
+	return &AdminServiceClient_ListNodeExecutions{Call: c_call}
 }
 
 // ListNodeExecutions provides a mock function with given fields: ctx, in, opts
@@ -1466,13 +1466,13 @@ func (_m AdminServiceClient_ListNodeExecutionsForTask) Return(_a0 *admin.NodeExe
 }
 
 func (_m *AdminServiceClient) OnListNodeExecutionsForTask(ctx context.Context, in *admin.NodeExecutionForTaskListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListNodeExecutionsForTask {
-	c := _m.On("ListNodeExecutionsForTask", ctx, in, opts)
-	return &AdminServiceClient_ListNodeExecutionsForTask{Call: c}
+	c_call := _m.On("ListNodeExecutionsForTask", ctx, in, opts)
+	return &AdminServiceClient_ListNodeExecutionsForTask{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListNodeExecutionsForTaskMatch(matchers ...interface{}) *AdminServiceClient_ListNodeExecutionsForTask {
-	c := _m.On("ListNodeExecutionsForTask", matchers...)
-	return &AdminServiceClient_ListNodeExecutionsForTask{Call: c}
+	c_call := _m.On("ListNodeExecutionsForTask", matchers...)
+	return &AdminServiceClient_ListNodeExecutionsForTask{Call: c_call}
 }
 
 // ListNodeExecutionsForTask provides a mock function with given fields: ctx, in, opts
@@ -1514,13 +1514,13 @@ func (_m AdminServiceClient_ListProjects) Return(_a0 *admin.Projects, _a1 error)
 }
 
 func (_m *AdminServiceClient) OnListProjects(ctx context.Context, in *admin.ProjectListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListProjects {
-	c := _m.On("ListProjects", ctx, in, opts)
-	return &AdminServiceClient_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", ctx, in, opts)
+	return &AdminServiceClient_ListProjects{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListProjectsMatch(matchers ...interface{}) *AdminServiceClient_ListProjects {
-	c := _m.On("ListProjects", matchers...)
-	return &AdminServiceClient_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", matchers...)
+	return &AdminServiceClient_ListProjects{Call: c_call}
 }
 
 // ListProjects provides a mock function with given fields: ctx, in, opts
@@ -1562,13 +1562,13 @@ func (_m AdminServiceClient_ListTaskExecutions) Return(_a0 *admin.TaskExecutionL
 }
 
 func (_m *AdminServiceClient) OnListTaskExecutions(ctx context.Context, in *admin.TaskExecutionListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListTaskExecutions {
-	c := _m.On("ListTaskExecutions", ctx, in, opts)
-	return &AdminServiceClient_ListTaskExecutions{Call: c}
+	c_call := _m.On("ListTaskExecutions", ctx, in, opts)
+	return &AdminServiceClient_ListTaskExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListTaskExecutionsMatch(matchers ...interface{}) *AdminServiceClient_ListTaskExecutions {
-	c := _m.On("ListTaskExecutions", matchers...)
-	return &AdminServiceClient_ListTaskExecutions{Call: c}
+	c_call := _m.On("ListTaskExecutions", matchers...)
+	return &AdminServiceClient_ListTaskExecutions{Call: c_call}
 }
 
 // ListTaskExecutions provides a mock function with given fields: ctx, in, opts
@@ -1610,13 +1610,13 @@ func (_m AdminServiceClient_ListTaskIds) Return(_a0 *admin.NamedEntityIdentifier
 }
 
 func (_m *AdminServiceClient) OnListTaskIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListTaskIds {
-	c := _m.On("ListTaskIds", ctx, in, opts)
-	return &AdminServiceClient_ListTaskIds{Call: c}
+	c_call := _m.On("ListTaskIds", ctx, in, opts)
+	return &AdminServiceClient_ListTaskIds{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListTaskIdsMatch(matchers ...interface{}) *AdminServiceClient_ListTaskIds {
-	c := _m.On("ListTaskIds", matchers...)
-	return &AdminServiceClient_ListTaskIds{Call: c}
+	c_call := _m.On("ListTaskIds", matchers...)
+	return &AdminServiceClient_ListTaskIds{Call: c_call}
 }
 
 // ListTaskIds provides a mock function with given fields: ctx, in, opts
@@ -1658,13 +1658,13 @@ func (_m AdminServiceClient_ListTasks) Return(_a0 *admin.TaskList, _a1 error) *A
 }
 
 func (_m *AdminServiceClient) OnListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListTasks {
-	c := _m.On("ListTasks", ctx, in, opts)
-	return &AdminServiceClient_ListTasks{Call: c}
+	c_call := _m.On("ListTasks", ctx, in, opts)
+	return &AdminServiceClient_ListTasks{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListTasksMatch(matchers ...interface{}) *AdminServiceClient_ListTasks {
-	c := _m.On("ListTasks", matchers...)
-	return &AdminServiceClient_ListTasks{Call: c}
+	c_call := _m.On("ListTasks", matchers...)
+	return &AdminServiceClient_ListTasks{Call: c_call}
 }
 
 // ListTasks provides a mock function with given fields: ctx, in, opts
@@ -1706,13 +1706,13 @@ func (_m AdminServiceClient_ListWorkflowIds) Return(_a0 *admin.NamedEntityIdenti
 }
 
 func (_m *AdminServiceClient) OnListWorkflowIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListWorkflowIds {
-	c := _m.On("ListWorkflowIds", ctx, in, opts)
-	return &AdminServiceClient_ListWorkflowIds{Call: c}
+	c_call := _m.On("ListWorkflowIds", ctx, in, opts)
+	return &AdminServiceClient_ListWorkflowIds{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListWorkflowIdsMatch(matchers ...interface{}) *AdminServiceClient_ListWorkflowIds {
-	c := _m.On("ListWorkflowIds", matchers...)
-	return &AdminServiceClient_ListWorkflowIds{Call: c}
+	c_call := _m.On("ListWorkflowIds", matchers...)
+	return &AdminServiceClient_ListWorkflowIds{Call: c_call}
 }
 
 // ListWorkflowIds provides a mock function with given fields: ctx, in, opts
@@ -1754,13 +1754,13 @@ func (_m AdminServiceClient_ListWorkflows) Return(_a0 *admin.WorkflowList, _a1 e
 }
 
 func (_m *AdminServiceClient) OnListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListWorkflows {
-	c := _m.On("ListWorkflows", ctx, in, opts)
-	return &AdminServiceClient_ListWorkflows{Call: c}
+	c_call := _m.On("ListWorkflows", ctx, in, opts)
+	return &AdminServiceClient_ListWorkflows{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnListWorkflowsMatch(matchers ...interface{}) *AdminServiceClient_ListWorkflows {
-	c := _m.On("ListWorkflows", matchers...)
-	return &AdminServiceClient_ListWorkflows{Call: c}
+	c_call := _m.On("ListWorkflows", matchers...)
+	return &AdminServiceClient_ListWorkflows{Call: c_call}
 }
 
 // ListWorkflows provides a mock function with given fields: ctx, in, opts
@@ -1802,13 +1802,13 @@ func (_m AdminServiceClient_RecoverExecution) Return(_a0 *admin.ExecutionCreateR
 }
 
 func (_m *AdminServiceClient) OnRecoverExecution(ctx context.Context, in *admin.ExecutionRecoverRequest, opts ...grpc.CallOption) *AdminServiceClient_RecoverExecution {
-	c := _m.On("RecoverExecution", ctx, in, opts)
-	return &AdminServiceClient_RecoverExecution{Call: c}
+	c_call := _m.On("RecoverExecution", ctx, in, opts)
+	return &AdminServiceClient_RecoverExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnRecoverExecutionMatch(matchers ...interface{}) *AdminServiceClient_RecoverExecution {
-	c := _m.On("RecoverExecution", matchers...)
-	return &AdminServiceClient_RecoverExecution{Call: c}
+	c_call := _m.On("RecoverExecution", matchers...)
+	return &AdminServiceClient_RecoverExecution{Call: c_call}
 }
 
 // RecoverExecution provides a mock function with given fields: ctx, in, opts
@@ -1850,13 +1850,13 @@ func (_m AdminServiceClient_RegisterProject) Return(_a0 *admin.ProjectRegisterRe
 }
 
 func (_m *AdminServiceClient) OnRegisterProject(ctx context.Context, in *admin.ProjectRegisterRequest, opts ...grpc.CallOption) *AdminServiceClient_RegisterProject {
-	c := _m.On("RegisterProject", ctx, in, opts)
-	return &AdminServiceClient_RegisterProject{Call: c}
+	c_call := _m.On("RegisterProject", ctx, in, opts)
+	return &AdminServiceClient_RegisterProject{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnRegisterProjectMatch(matchers ...interface{}) *AdminServiceClient_RegisterProject {
-	c := _m.On("RegisterProject", matchers...)
-	return &AdminServiceClient_RegisterProject{Call: c}
+	c_call := _m.On("RegisterProject", matchers...)
+	return &AdminServiceClient_RegisterProject{Call: c_call}
 }
 
 // RegisterProject provides a mock function with given fields: ctx, in, opts
@@ -1898,13 +1898,13 @@ func (_m AdminServiceClient_RelaunchExecution) Return(_a0 *admin.ExecutionCreate
 }
 
 func (_m *AdminServiceClient) OnRelaunchExecution(ctx context.Context, in *admin.ExecutionRelaunchRequest, opts ...grpc.CallOption) *AdminServiceClient_RelaunchExecution {
-	c := _m.On("RelaunchExecution", ctx, in, opts)
-	return &AdminServiceClient_RelaunchExecution{Call: c}
+	c_call := _m.On("RelaunchExecution", ctx, in, opts)
+	return &AdminServiceClient_RelaunchExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnRelaunchExecutionMatch(matchers ...interface{}) *AdminServiceClient_RelaunchExecution {
-	c := _m.On("RelaunchExecution", matchers...)
-	return &AdminServiceClient_RelaunchExecution{Call: c}
+	c_call := _m.On("RelaunchExecution", matchers...)
+	return &AdminServiceClient_RelaunchExecution{Call: c_call}
 }
 
 // RelaunchExecution provides a mock function with given fields: ctx, in, opts
@@ -1946,13 +1946,13 @@ func (_m AdminServiceClient_TerminateExecution) Return(_a0 *admin.ExecutionTermi
 }
 
 func (_m *AdminServiceClient) OnTerminateExecution(ctx context.Context, in *admin.ExecutionTerminateRequest, opts ...grpc.CallOption) *AdminServiceClient_TerminateExecution {
-	c := _m.On("TerminateExecution", ctx, in, opts)
-	return &AdminServiceClient_TerminateExecution{Call: c}
+	c_call := _m.On("TerminateExecution", ctx, in, opts)
+	return &AdminServiceClient_TerminateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnTerminateExecutionMatch(matchers ...interface{}) *AdminServiceClient_TerminateExecution {
-	c := _m.On("TerminateExecution", matchers...)
-	return &AdminServiceClient_TerminateExecution{Call: c}
+	c_call := _m.On("TerminateExecution", matchers...)
+	return &AdminServiceClient_TerminateExecution{Call: c_call}
 }
 
 // TerminateExecution provides a mock function with given fields: ctx, in, opts
@@ -1994,13 +1994,13 @@ func (_m AdminServiceClient_UpdateExecution) Return(_a0 *admin.ExecutionUpdateRe
 }
 
 func (_m *AdminServiceClient) OnUpdateExecution(ctx context.Context, in *admin.ExecutionUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateExecution {
-	c := _m.On("UpdateExecution", ctx, in, opts)
-	return &AdminServiceClient_UpdateExecution{Call: c}
+	c_call := _m.On("UpdateExecution", ctx, in, opts)
+	return &AdminServiceClient_UpdateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateExecutionMatch(matchers ...interface{}) *AdminServiceClient_UpdateExecution {
-	c := _m.On("UpdateExecution", matchers...)
-	return &AdminServiceClient_UpdateExecution{Call: c}
+	c_call := _m.On("UpdateExecution", matchers...)
+	return &AdminServiceClient_UpdateExecution{Call: c_call}
 }
 
 // UpdateExecution provides a mock function with given fields: ctx, in, opts
@@ -2042,13 +2042,13 @@ func (_m AdminServiceClient_UpdateLaunchPlan) Return(_a0 *admin.LaunchPlanUpdate
 }
 
 func (_m *AdminServiceClient) OnUpdateLaunchPlan(ctx context.Context, in *admin.LaunchPlanUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateLaunchPlan {
-	c := _m.On("UpdateLaunchPlan", ctx, in, opts)
-	return &AdminServiceClient_UpdateLaunchPlan{Call: c}
+	c_call := _m.On("UpdateLaunchPlan", ctx, in, opts)
+	return &AdminServiceClient_UpdateLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateLaunchPlanMatch(matchers ...interface{}) *AdminServiceClient_UpdateLaunchPlan {
-	c := _m.On("UpdateLaunchPlan", matchers...)
-	return &AdminServiceClient_UpdateLaunchPlan{Call: c}
+	c_call := _m.On("UpdateLaunchPlan", matchers...)
+	return &AdminServiceClient_UpdateLaunchPlan{Call: c_call}
 }
 
 // UpdateLaunchPlan provides a mock function with given fields: ctx, in, opts
@@ -2090,13 +2090,13 @@ func (_m AdminServiceClient_UpdateNamedEntity) Return(_a0 *admin.NamedEntityUpda
 }
 
 func (_m *AdminServiceClient) OnUpdateNamedEntity(ctx context.Context, in *admin.NamedEntityUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", ctx, in, opts)
-	return &AdminServiceClient_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", ctx, in, opts)
+	return &AdminServiceClient_UpdateNamedEntity{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateNamedEntityMatch(matchers ...interface{}) *AdminServiceClient_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", matchers...)
-	return &AdminServiceClient_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", matchers...)
+	return &AdminServiceClient_UpdateNamedEntity{Call: c_call}
 }
 
 // UpdateNamedEntity provides a mock function with given fields: ctx, in, opts
@@ -2138,13 +2138,13 @@ func (_m AdminServiceClient_UpdateProject) Return(_a0 *admin.ProjectUpdateRespon
 }
 
 func (_m *AdminServiceClient) OnUpdateProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) *AdminServiceClient_UpdateProject {
-	c := _m.On("UpdateProject", ctx, in, opts)
-	return &AdminServiceClient_UpdateProject{Call: c}
+	c_call := _m.On("UpdateProject", ctx, in, opts)
+	return &AdminServiceClient_UpdateProject{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateProjectMatch(matchers ...interface{}) *AdminServiceClient_UpdateProject {
-	c := _m.On("UpdateProject", matchers...)
-	return &AdminServiceClient_UpdateProject{Call: c}
+	c_call := _m.On("UpdateProject", matchers...)
+	return &AdminServiceClient_UpdateProject{Call: c_call}
 }
 
 // UpdateProject provides a mock function with given fields: ctx, in, opts
@@ -2186,13 +2186,13 @@ func (_m AdminServiceClient_UpdateProjectDomainAttributes) Return(_a0 *admin.Pro
 }
 
 func (_m *AdminServiceClient) OnUpdateProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", ctx, in, opts)
-	return &AdminServiceClient_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", ctx, in, opts)
+	return &AdminServiceClient_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceClient_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", matchers...)
-	return &AdminServiceClient_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", matchers...)
+	return &AdminServiceClient_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 // UpdateProjectDomainAttributes provides a mock function with given fields: ctx, in, opts
@@ -2234,13 +2234,13 @@ func (_m AdminServiceClient_UpdateWorkflowAttributes) Return(_a0 *admin.Workflow
 }
 
 func (_m *AdminServiceClient) OnUpdateWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", ctx, in, opts)
-	return &AdminServiceClient_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", ctx, in, opts)
+	return &AdminServiceClient_UpdateWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceClient) OnUpdateWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceClient_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", matchers...)
-	return &AdminServiceClient_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", matchers...)
+	return &AdminServiceClient_UpdateWorkflowAttributes{Call: c_call}
 }
 
 // UpdateWorkflowAttributes provides a mock function with given fields: ctx, in, opts

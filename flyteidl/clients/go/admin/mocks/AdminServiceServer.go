@@ -24,13 +24,13 @@ func (_m AdminServiceServer_CreateExecution) Return(_a0 *admin.ExecutionCreateRe
 }
 
 func (_m *AdminServiceServer) OnCreateExecution(_a0 context.Context, _a1 *admin.ExecutionCreateRequest) *AdminServiceServer_CreateExecution {
-	c := _m.On("CreateExecution", _a0, _a1)
-	return &AdminServiceServer_CreateExecution{Call: c}
+	c_call := _m.On("CreateExecution", _a0, _a1)
+	return &AdminServiceServer_CreateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateExecutionMatch(matchers ...interface{}) *AdminServiceServer_CreateExecution {
-	c := _m.On("CreateExecution", matchers...)
-	return &AdminServiceServer_CreateExecution{Call: c}
+	c_call := _m.On("CreateExecution", matchers...)
+	return &AdminServiceServer_CreateExecution{Call: c_call}
 }
 
 // CreateExecution provides a mock function with given fields: _a0, _a1
@@ -65,13 +65,13 @@ func (_m AdminServiceServer_CreateLaunchPlan) Return(_a0 *admin.LaunchPlanCreate
 }
 
 func (_m *AdminServiceServer) OnCreateLaunchPlan(_a0 context.Context, _a1 *admin.LaunchPlanCreateRequest) *AdminServiceServer_CreateLaunchPlan {
-	c := _m.On("CreateLaunchPlan", _a0, _a1)
-	return &AdminServiceServer_CreateLaunchPlan{Call: c}
+	c_call := _m.On("CreateLaunchPlan", _a0, _a1)
+	return &AdminServiceServer_CreateLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateLaunchPlanMatch(matchers ...interface{}) *AdminServiceServer_CreateLaunchPlan {
-	c := _m.On("CreateLaunchPlan", matchers...)
-	return &AdminServiceServer_CreateLaunchPlan{Call: c}
+	c_call := _m.On("CreateLaunchPlan", matchers...)
+	return &AdminServiceServer_CreateLaunchPlan{Call: c_call}
 }
 
 // CreateLaunchPlan provides a mock function with given fields: _a0, _a1
@@ -106,13 +106,13 @@ func (_m AdminServiceServer_CreateNodeEvent) Return(_a0 *admin.NodeExecutionEven
 }
 
 func (_m *AdminServiceServer) OnCreateNodeEvent(_a0 context.Context, _a1 *admin.NodeExecutionEventRequest) *AdminServiceServer_CreateNodeEvent {
-	c := _m.On("CreateNodeEvent", _a0, _a1)
-	return &AdminServiceServer_CreateNodeEvent{Call: c}
+	c_call := _m.On("CreateNodeEvent", _a0, _a1)
+	return &AdminServiceServer_CreateNodeEvent{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateNodeEventMatch(matchers ...interface{}) *AdminServiceServer_CreateNodeEvent {
-	c := _m.On("CreateNodeEvent", matchers...)
-	return &AdminServiceServer_CreateNodeEvent{Call: c}
+	c_call := _m.On("CreateNodeEvent", matchers...)
+	return &AdminServiceServer_CreateNodeEvent{Call: c_call}
 }
 
 // CreateNodeEvent provides a mock function with given fields: _a0, _a1
@@ -147,13 +147,13 @@ func (_m AdminServiceServer_CreateTask) Return(_a0 *admin.TaskCreateResponse, _a
 }
 
 func (_m *AdminServiceServer) OnCreateTask(_a0 context.Context, _a1 *admin.TaskCreateRequest) *AdminServiceServer_CreateTask {
-	c := _m.On("CreateTask", _a0, _a1)
-	return &AdminServiceServer_CreateTask{Call: c}
+	c_call := _m.On("CreateTask", _a0, _a1)
+	return &AdminServiceServer_CreateTask{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateTaskMatch(matchers ...interface{}) *AdminServiceServer_CreateTask {
-	c := _m.On("CreateTask", matchers...)
-	return &AdminServiceServer_CreateTask{Call: c}
+	c_call := _m.On("CreateTask", matchers...)
+	return &AdminServiceServer_CreateTask{Call: c_call}
 }
 
 // CreateTask provides a mock function with given fields: _a0, _a1
@@ -188,13 +188,13 @@ func (_m AdminServiceServer_CreateTaskEvent) Return(_a0 *admin.TaskExecutionEven
 }
 
 func (_m *AdminServiceServer) OnCreateTaskEvent(_a0 context.Context, _a1 *admin.TaskExecutionEventRequest) *AdminServiceServer_CreateTaskEvent {
-	c := _m.On("CreateTaskEvent", _a0, _a1)
-	return &AdminServiceServer_CreateTaskEvent{Call: c}
+	c_call := _m.On("CreateTaskEvent", _a0, _a1)
+	return &AdminServiceServer_CreateTaskEvent{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateTaskEventMatch(matchers ...interface{}) *AdminServiceServer_CreateTaskEvent {
-	c := _m.On("CreateTaskEvent", matchers...)
-	return &AdminServiceServer_CreateTaskEvent{Call: c}
+	c_call := _m.On("CreateTaskEvent", matchers...)
+	return &AdminServiceServer_CreateTaskEvent{Call: c_call}
 }
 
 // CreateTaskEvent provides a mock function with given fields: _a0, _a1
@@ -229,13 +229,13 @@ func (_m AdminServiceServer_CreateWorkflow) Return(_a0 *admin.WorkflowCreateResp
 }
 
 func (_m *AdminServiceServer) OnCreateWorkflow(_a0 context.Context, _a1 *admin.WorkflowCreateRequest) *AdminServiceServer_CreateWorkflow {
-	c := _m.On("CreateWorkflow", _a0, _a1)
-	return &AdminServiceServer_CreateWorkflow{Call: c}
+	c_call := _m.On("CreateWorkflow", _a0, _a1)
+	return &AdminServiceServer_CreateWorkflow{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateWorkflowMatch(matchers ...interface{}) *AdminServiceServer_CreateWorkflow {
-	c := _m.On("CreateWorkflow", matchers...)
-	return &AdminServiceServer_CreateWorkflow{Call: c}
+	c_call := _m.On("CreateWorkflow", matchers...)
+	return &AdminServiceServer_CreateWorkflow{Call: c_call}
 }
 
 // CreateWorkflow provides a mock function with given fields: _a0, _a1
@@ -270,13 +270,13 @@ func (_m AdminServiceServer_CreateWorkflowEvent) Return(_a0 *admin.WorkflowExecu
 }
 
 func (_m *AdminServiceServer) OnCreateWorkflowEvent(_a0 context.Context, _a1 *admin.WorkflowExecutionEventRequest) *AdminServiceServer_CreateWorkflowEvent {
-	c := _m.On("CreateWorkflowEvent", _a0, _a1)
-	return &AdminServiceServer_CreateWorkflowEvent{Call: c}
+	c_call := _m.On("CreateWorkflowEvent", _a0, _a1)
+	return &AdminServiceServer_CreateWorkflowEvent{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnCreateWorkflowEventMatch(matchers ...interface{}) *AdminServiceServer_CreateWorkflowEvent {
-	c := _m.On("CreateWorkflowEvent", matchers...)
-	return &AdminServiceServer_CreateWorkflowEvent{Call: c}
+	c_call := _m.On("CreateWorkflowEvent", matchers...)
+	return &AdminServiceServer_CreateWorkflowEvent{Call: c_call}
 }
 
 // CreateWorkflowEvent provides a mock function with given fields: _a0, _a1
@@ -311,13 +311,13 @@ func (_m AdminServiceServer_DeleteProjectDomainAttributes) Return(_a0 *admin.Pro
 }
 
 func (_m *AdminServiceServer) OnDeleteProjectDomainAttributes(_a0 context.Context, _a1 *admin.ProjectDomainAttributesDeleteRequest) *AdminServiceServer_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", _a0, _a1)
-	return &AdminServiceServer_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", _a0, _a1)
+	return &AdminServiceServer_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnDeleteProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceServer_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", matchers...)
-	return &AdminServiceServer_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", matchers...)
+	return &AdminServiceServer_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 // DeleteProjectDomainAttributes provides a mock function with given fields: _a0, _a1
@@ -352,13 +352,13 @@ func (_m AdminServiceServer_DeleteWorkflowAttributes) Return(_a0 *admin.Workflow
 }
 
 func (_m *AdminServiceServer) OnDeleteWorkflowAttributes(_a0 context.Context, _a1 *admin.WorkflowAttributesDeleteRequest) *AdminServiceServer_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", _a0, _a1)
-	return &AdminServiceServer_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", _a0, _a1)
+	return &AdminServiceServer_DeleteWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnDeleteWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceServer_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", matchers...)
-	return &AdminServiceServer_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", matchers...)
+	return &AdminServiceServer_DeleteWorkflowAttributes{Call: c_call}
 }
 
 // DeleteWorkflowAttributes provides a mock function with given fields: _a0, _a1
@@ -393,13 +393,13 @@ func (_m AdminServiceServer_GetActiveLaunchPlan) Return(_a0 *admin.LaunchPlan, _
 }
 
 func (_m *AdminServiceServer) OnGetActiveLaunchPlan(_a0 context.Context, _a1 *admin.ActiveLaunchPlanRequest) *AdminServiceServer_GetActiveLaunchPlan {
-	c := _m.On("GetActiveLaunchPlan", _a0, _a1)
-	return &AdminServiceServer_GetActiveLaunchPlan{Call: c}
+	c_call := _m.On("GetActiveLaunchPlan", _a0, _a1)
+	return &AdminServiceServer_GetActiveLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetActiveLaunchPlanMatch(matchers ...interface{}) *AdminServiceServer_GetActiveLaunchPlan {
-	c := _m.On("GetActiveLaunchPlan", matchers...)
-	return &AdminServiceServer_GetActiveLaunchPlan{Call: c}
+	c_call := _m.On("GetActiveLaunchPlan", matchers...)
+	return &AdminServiceServer_GetActiveLaunchPlan{Call: c_call}
 }
 
 // GetActiveLaunchPlan provides a mock function with given fields: _a0, _a1
@@ -434,13 +434,13 @@ func (_m AdminServiceServer_GetExecution) Return(_a0 *admin.Execution, _a1 error
 }
 
 func (_m *AdminServiceServer) OnGetExecution(_a0 context.Context, _a1 *admin.WorkflowExecutionGetRequest) *AdminServiceServer_GetExecution {
-	c := _m.On("GetExecution", _a0, _a1)
-	return &AdminServiceServer_GetExecution{Call: c}
+	c_call := _m.On("GetExecution", _a0, _a1)
+	return &AdminServiceServer_GetExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetExecutionMatch(matchers ...interface{}) *AdminServiceServer_GetExecution {
-	c := _m.On("GetExecution", matchers...)
-	return &AdminServiceServer_GetExecution{Call: c}
+	c_call := _m.On("GetExecution", matchers...)
+	return &AdminServiceServer_GetExecution{Call: c_call}
 }
 
 // GetExecution provides a mock function with given fields: _a0, _a1
@@ -475,13 +475,13 @@ func (_m AdminServiceServer_GetExecutionData) Return(_a0 *admin.WorkflowExecutio
 }
 
 func (_m *AdminServiceServer) OnGetExecutionData(_a0 context.Context, _a1 *admin.WorkflowExecutionGetDataRequest) *AdminServiceServer_GetExecutionData {
-	c := _m.On("GetExecutionData", _a0, _a1)
-	return &AdminServiceServer_GetExecutionData{Call: c}
+	c_call := _m.On("GetExecutionData", _a0, _a1)
+	return &AdminServiceServer_GetExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetExecutionDataMatch(matchers ...interface{}) *AdminServiceServer_GetExecutionData {
-	c := _m.On("GetExecutionData", matchers...)
-	return &AdminServiceServer_GetExecutionData{Call: c}
+	c_call := _m.On("GetExecutionData", matchers...)
+	return &AdminServiceServer_GetExecutionData{Call: c_call}
 }
 
 // GetExecutionData provides a mock function with given fields: _a0, _a1
@@ -516,13 +516,13 @@ func (_m AdminServiceServer_GetLaunchPlan) Return(_a0 *admin.LaunchPlan, _a1 err
 }
 
 func (_m *AdminServiceServer) OnGetLaunchPlan(_a0 context.Context, _a1 *admin.ObjectGetRequest) *AdminServiceServer_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", _a0, _a1)
-	return &AdminServiceServer_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", _a0, _a1)
+	return &AdminServiceServer_GetLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetLaunchPlanMatch(matchers ...interface{}) *AdminServiceServer_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", matchers...)
-	return &AdminServiceServer_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", matchers...)
+	return &AdminServiceServer_GetLaunchPlan{Call: c_call}
 }
 
 // GetLaunchPlan provides a mock function with given fields: _a0, _a1
@@ -557,13 +557,13 @@ func (_m AdminServiceServer_GetNamedEntity) Return(_a0 *admin.NamedEntity, _a1 e
 }
 
 func (_m *AdminServiceServer) OnGetNamedEntity(_a0 context.Context, _a1 *admin.NamedEntityGetRequest) *AdminServiceServer_GetNamedEntity {
-	c := _m.On("GetNamedEntity", _a0, _a1)
-	return &AdminServiceServer_GetNamedEntity{Call: c}
+	c_call := _m.On("GetNamedEntity", _a0, _a1)
+	return &AdminServiceServer_GetNamedEntity{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetNamedEntityMatch(matchers ...interface{}) *AdminServiceServer_GetNamedEntity {
-	c := _m.On("GetNamedEntity", matchers...)
-	return &AdminServiceServer_GetNamedEntity{Call: c}
+	c_call := _m.On("GetNamedEntity", matchers...)
+	return &AdminServiceServer_GetNamedEntity{Call: c_call}
 }
 
 // GetNamedEntity provides a mock function with given fields: _a0, _a1
@@ -598,13 +598,13 @@ func (_m AdminServiceServer_GetNodeExecution) Return(_a0 *admin.NodeExecution, _
 }
 
 func (_m *AdminServiceServer) OnGetNodeExecution(_a0 context.Context, _a1 *admin.NodeExecutionGetRequest) *AdminServiceServer_GetNodeExecution {
-	c := _m.On("GetNodeExecution", _a0, _a1)
-	return &AdminServiceServer_GetNodeExecution{Call: c}
+	c_call := _m.On("GetNodeExecution", _a0, _a1)
+	return &AdminServiceServer_GetNodeExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetNodeExecutionMatch(matchers ...interface{}) *AdminServiceServer_GetNodeExecution {
-	c := _m.On("GetNodeExecution", matchers...)
-	return &AdminServiceServer_GetNodeExecution{Call: c}
+	c_call := _m.On("GetNodeExecution", matchers...)
+	return &AdminServiceServer_GetNodeExecution{Call: c_call}
 }
 
 // GetNodeExecution provides a mock function with given fields: _a0, _a1
@@ -639,13 +639,13 @@ func (_m AdminServiceServer_GetNodeExecutionData) Return(_a0 *admin.NodeExecutio
 }
 
 func (_m *AdminServiceServer) OnGetNodeExecutionData(_a0 context.Context, _a1 *admin.NodeExecutionGetDataRequest) *AdminServiceServer_GetNodeExecutionData {
-	c := _m.On("GetNodeExecutionData", _a0, _a1)
-	return &AdminServiceServer_GetNodeExecutionData{Call: c}
+	c_call := _m.On("GetNodeExecutionData", _a0, _a1)
+	return &AdminServiceServer_GetNodeExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetNodeExecutionDataMatch(matchers ...interface{}) *AdminServiceServer_GetNodeExecutionData {
-	c := _m.On("GetNodeExecutionData", matchers...)
-	return &AdminServiceServer_GetNodeExecutionData{Call: c}
+	c_call := _m.On("GetNodeExecutionData", matchers...)
+	return &AdminServiceServer_GetNodeExecutionData{Call: c_call}
 }
 
 // GetNodeExecutionData provides a mock function with given fields: _a0, _a1
@@ -680,13 +680,13 @@ func (_m AdminServiceServer_GetProjectDomainAttributes) Return(_a0 *admin.Projec
 }
 
 func (_m *AdminServiceServer) OnGetProjectDomainAttributes(_a0 context.Context, _a1 *admin.ProjectDomainAttributesGetRequest) *AdminServiceServer_GetProjectDomainAttributes {
-	c := _m.On("GetProjectDomainAttributes", _a0, _a1)
-	return &AdminServiceServer_GetProjectDomainAttributes{Call: c}
+	c_call := _m.On("GetProjectDomainAttributes", _a0, _a1)
+	return &AdminServiceServer_GetProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceServer_GetProjectDomainAttributes {
-	c := _m.On("GetProjectDomainAttributes", matchers...)
-	return &AdminServiceServer_GetProjectDomainAttributes{Call: c}
+	c_call := _m.On("GetProjectDomainAttributes", matchers...)
+	return &AdminServiceServer_GetProjectDomainAttributes{Call: c_call}
 }
 
 // GetProjectDomainAttributes provides a mock function with given fields: _a0, _a1
@@ -721,13 +721,13 @@ func (_m AdminServiceServer_GetTask) Return(_a0 *admin.Task, _a1 error) *AdminSe
 }
 
 func (_m *AdminServiceServer) OnGetTask(_a0 context.Context, _a1 *admin.ObjectGetRequest) *AdminServiceServer_GetTask {
-	c := _m.On("GetTask", _a0, _a1)
-	return &AdminServiceServer_GetTask{Call: c}
+	c_call := _m.On("GetTask", _a0, _a1)
+	return &AdminServiceServer_GetTask{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetTaskMatch(matchers ...interface{}) *AdminServiceServer_GetTask {
-	c := _m.On("GetTask", matchers...)
-	return &AdminServiceServer_GetTask{Call: c}
+	c_call := _m.On("GetTask", matchers...)
+	return &AdminServiceServer_GetTask{Call: c_call}
 }
 
 // GetTask provides a mock function with given fields: _a0, _a1
@@ -762,13 +762,13 @@ func (_m AdminServiceServer_GetTaskExecution) Return(_a0 *admin.TaskExecution, _
 }
 
 func (_m *AdminServiceServer) OnGetTaskExecution(_a0 context.Context, _a1 *admin.TaskExecutionGetRequest) *AdminServiceServer_GetTaskExecution {
-	c := _m.On("GetTaskExecution", _a0, _a1)
-	return &AdminServiceServer_GetTaskExecution{Call: c}
+	c_call := _m.On("GetTaskExecution", _a0, _a1)
+	return &AdminServiceServer_GetTaskExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetTaskExecutionMatch(matchers ...interface{}) *AdminServiceServer_GetTaskExecution {
-	c := _m.On("GetTaskExecution", matchers...)
-	return &AdminServiceServer_GetTaskExecution{Call: c}
+	c_call := _m.On("GetTaskExecution", matchers...)
+	return &AdminServiceServer_GetTaskExecution{Call: c_call}
 }
 
 // GetTaskExecution provides a mock function with given fields: _a0, _a1
@@ -803,13 +803,13 @@ func (_m AdminServiceServer_GetTaskExecutionData) Return(_a0 *admin.TaskExecutio
 }
 
 func (_m *AdminServiceServer) OnGetTaskExecutionData(_a0 context.Context, _a1 *admin.TaskExecutionGetDataRequest) *AdminServiceServer_GetTaskExecutionData {
-	c := _m.On("GetTaskExecutionData", _a0, _a1)
-	return &AdminServiceServer_GetTaskExecutionData{Call: c}
+	c_call := _m.On("GetTaskExecutionData", _a0, _a1)
+	return &AdminServiceServer_GetTaskExecutionData{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetTaskExecutionDataMatch(matchers ...interface{}) *AdminServiceServer_GetTaskExecutionData {
-	c := _m.On("GetTaskExecutionData", matchers...)
-	return &AdminServiceServer_GetTaskExecutionData{Call: c}
+	c_call := _m.On("GetTaskExecutionData", matchers...)
+	return &AdminServiceServer_GetTaskExecutionData{Call: c_call}
 }
 
 // GetTaskExecutionData provides a mock function with given fields: _a0, _a1
@@ -844,13 +844,13 @@ func (_m AdminServiceServer_GetVersion) Return(_a0 *admin.GetVersionResponse, _a
 }
 
 func (_m *AdminServiceServer) OnGetVersion(_a0 context.Context, _a1 *admin.GetVersionRequest) *AdminServiceServer_GetVersion {
-	c := _m.On("GetVersion", _a0, _a1)
-	return &AdminServiceServer_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", _a0, _a1)
+	return &AdminServiceServer_GetVersion{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetVersionMatch(matchers ...interface{}) *AdminServiceServer_GetVersion {
-	c := _m.On("GetVersion", matchers...)
-	return &AdminServiceServer_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", matchers...)
+	return &AdminServiceServer_GetVersion{Call: c_call}
 }
 
 // GetVersion provides a mock function with given fields: _a0, _a1
@@ -885,13 +885,13 @@ func (_m AdminServiceServer_GetWorkflow) Return(_a0 *admin.Workflow, _a1 error) 
 }
 
 func (_m *AdminServiceServer) OnGetWorkflow(_a0 context.Context, _a1 *admin.ObjectGetRequest) *AdminServiceServer_GetWorkflow {
-	c := _m.On("GetWorkflow", _a0, _a1)
-	return &AdminServiceServer_GetWorkflow{Call: c}
+	c_call := _m.On("GetWorkflow", _a0, _a1)
+	return &AdminServiceServer_GetWorkflow{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetWorkflowMatch(matchers ...interface{}) *AdminServiceServer_GetWorkflow {
-	c := _m.On("GetWorkflow", matchers...)
-	return &AdminServiceServer_GetWorkflow{Call: c}
+	c_call := _m.On("GetWorkflow", matchers...)
+	return &AdminServiceServer_GetWorkflow{Call: c_call}
 }
 
 // GetWorkflow provides a mock function with given fields: _a0, _a1
@@ -926,13 +926,13 @@ func (_m AdminServiceServer_GetWorkflowAttributes) Return(_a0 *admin.WorkflowAtt
 }
 
 func (_m *AdminServiceServer) OnGetWorkflowAttributes(_a0 context.Context, _a1 *admin.WorkflowAttributesGetRequest) *AdminServiceServer_GetWorkflowAttributes {
-	c := _m.On("GetWorkflowAttributes", _a0, _a1)
-	return &AdminServiceServer_GetWorkflowAttributes{Call: c}
+	c_call := _m.On("GetWorkflowAttributes", _a0, _a1)
+	return &AdminServiceServer_GetWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnGetWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceServer_GetWorkflowAttributes {
-	c := _m.On("GetWorkflowAttributes", matchers...)
-	return &AdminServiceServer_GetWorkflowAttributes{Call: c}
+	c_call := _m.On("GetWorkflowAttributes", matchers...)
+	return &AdminServiceServer_GetWorkflowAttributes{Call: c_call}
 }
 
 // GetWorkflowAttributes provides a mock function with given fields: _a0, _a1
@@ -967,13 +967,13 @@ func (_m AdminServiceServer_ListActiveLaunchPlans) Return(_a0 *admin.LaunchPlanL
 }
 
 func (_m *AdminServiceServer) OnListActiveLaunchPlans(_a0 context.Context, _a1 *admin.ActiveLaunchPlanListRequest) *AdminServiceServer_ListActiveLaunchPlans {
-	c := _m.On("ListActiveLaunchPlans", _a0, _a1)
-	return &AdminServiceServer_ListActiveLaunchPlans{Call: c}
+	c_call := _m.On("ListActiveLaunchPlans", _a0, _a1)
+	return &AdminServiceServer_ListActiveLaunchPlans{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListActiveLaunchPlansMatch(matchers ...interface{}) *AdminServiceServer_ListActiveLaunchPlans {
-	c := _m.On("ListActiveLaunchPlans", matchers...)
-	return &AdminServiceServer_ListActiveLaunchPlans{Call: c}
+	c_call := _m.On("ListActiveLaunchPlans", matchers...)
+	return &AdminServiceServer_ListActiveLaunchPlans{Call: c_call}
 }
 
 // ListActiveLaunchPlans provides a mock function with given fields: _a0, _a1
@@ -1008,13 +1008,13 @@ func (_m AdminServiceServer_ListExecutions) Return(_a0 *admin.ExecutionList, _a1
 }
 
 func (_m *AdminServiceServer) OnListExecutions(_a0 context.Context, _a1 *admin.ResourceListRequest) *AdminServiceServer_ListExecutions {
-	c := _m.On("ListExecutions", _a0, _a1)
-	return &AdminServiceServer_ListExecutions{Call: c}
+	c_call := _m.On("ListExecutions", _a0, _a1)
+	return &AdminServiceServer_ListExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListExecutionsMatch(matchers ...interface{}) *AdminServiceServer_ListExecutions {
-	c := _m.On("ListExecutions", matchers...)
-	return &AdminServiceServer_ListExecutions{Call: c}
+	c_call := _m.On("ListExecutions", matchers...)
+	return &AdminServiceServer_ListExecutions{Call: c_call}
 }
 
 // ListExecutions provides a mock function with given fields: _a0, _a1
@@ -1049,13 +1049,13 @@ func (_m AdminServiceServer_ListLaunchPlanIds) Return(_a0 *admin.NamedEntityIden
 }
 
 func (_m *AdminServiceServer) OnListLaunchPlanIds(_a0 context.Context, _a1 *admin.NamedEntityIdentifierListRequest) *AdminServiceServer_ListLaunchPlanIds {
-	c := _m.On("ListLaunchPlanIds", _a0, _a1)
-	return &AdminServiceServer_ListLaunchPlanIds{Call: c}
+	c_call := _m.On("ListLaunchPlanIds", _a0, _a1)
+	return &AdminServiceServer_ListLaunchPlanIds{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListLaunchPlanIdsMatch(matchers ...interface{}) *AdminServiceServer_ListLaunchPlanIds {
-	c := _m.On("ListLaunchPlanIds", matchers...)
-	return &AdminServiceServer_ListLaunchPlanIds{Call: c}
+	c_call := _m.On("ListLaunchPlanIds", matchers...)
+	return &AdminServiceServer_ListLaunchPlanIds{Call: c_call}
 }
 
 // ListLaunchPlanIds provides a mock function with given fields: _a0, _a1
@@ -1090,13 +1090,13 @@ func (_m AdminServiceServer_ListLaunchPlans) Return(_a0 *admin.LaunchPlanList, _
 }
 
 func (_m *AdminServiceServer) OnListLaunchPlans(_a0 context.Context, _a1 *admin.ResourceListRequest) *AdminServiceServer_ListLaunchPlans {
-	c := _m.On("ListLaunchPlans", _a0, _a1)
-	return &AdminServiceServer_ListLaunchPlans{Call: c}
+	c_call := _m.On("ListLaunchPlans", _a0, _a1)
+	return &AdminServiceServer_ListLaunchPlans{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListLaunchPlansMatch(matchers ...interface{}) *AdminServiceServer_ListLaunchPlans {
-	c := _m.On("ListLaunchPlans", matchers...)
-	return &AdminServiceServer_ListLaunchPlans{Call: c}
+	c_call := _m.On("ListLaunchPlans", matchers...)
+	return &AdminServiceServer_ListLaunchPlans{Call: c_call}
 }
 
 // ListLaunchPlans provides a mock function with given fields: _a0, _a1
@@ -1131,13 +1131,13 @@ func (_m AdminServiceServer_ListMatchableAttributes) Return(_a0 *admin.ListMatch
 }
 
 func (_m *AdminServiceServer) OnListMatchableAttributes(_a0 context.Context, _a1 *admin.ListMatchableAttributesRequest) *AdminServiceServer_ListMatchableAttributes {
-	c := _m.On("ListMatchableAttributes", _a0, _a1)
-	return &AdminServiceServer_ListMatchableAttributes{Call: c}
+	c_call := _m.On("ListMatchableAttributes", _a0, _a1)
+	return &AdminServiceServer_ListMatchableAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListMatchableAttributesMatch(matchers ...interface{}) *AdminServiceServer_ListMatchableAttributes {
-	c := _m.On("ListMatchableAttributes", matchers...)
-	return &AdminServiceServer_ListMatchableAttributes{Call: c}
+	c_call := _m.On("ListMatchableAttributes", matchers...)
+	return &AdminServiceServer_ListMatchableAttributes{Call: c_call}
 }
 
 // ListMatchableAttributes provides a mock function with given fields: _a0, _a1
@@ -1172,13 +1172,13 @@ func (_m AdminServiceServer_ListNamedEntities) Return(_a0 *admin.NamedEntityList
 }
 
 func (_m *AdminServiceServer) OnListNamedEntities(_a0 context.Context, _a1 *admin.NamedEntityListRequest) *AdminServiceServer_ListNamedEntities {
-	c := _m.On("ListNamedEntities", _a0, _a1)
-	return &AdminServiceServer_ListNamedEntities{Call: c}
+	c_call := _m.On("ListNamedEntities", _a0, _a1)
+	return &AdminServiceServer_ListNamedEntities{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListNamedEntitiesMatch(matchers ...interface{}) *AdminServiceServer_ListNamedEntities {
-	c := _m.On("ListNamedEntities", matchers...)
-	return &AdminServiceServer_ListNamedEntities{Call: c}
+	c_call := _m.On("ListNamedEntities", matchers...)
+	return &AdminServiceServer_ListNamedEntities{Call: c_call}
 }
 
 // ListNamedEntities provides a mock function with given fields: _a0, _a1
@@ -1213,13 +1213,13 @@ func (_m AdminServiceServer_ListNodeExecutions) Return(_a0 *admin.NodeExecutionL
 }
 
 func (_m *AdminServiceServer) OnListNodeExecutions(_a0 context.Context, _a1 *admin.NodeExecutionListRequest) *AdminServiceServer_ListNodeExecutions {
-	c := _m.On("ListNodeExecutions", _a0, _a1)
-	return &AdminServiceServer_ListNodeExecutions{Call: c}
+	c_call := _m.On("ListNodeExecutions", _a0, _a1)
+	return &AdminServiceServer_ListNodeExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListNodeExecutionsMatch(matchers ...interface{}) *AdminServiceServer_ListNodeExecutions {
-	c := _m.On("ListNodeExecutions", matchers...)
-	return &AdminServiceServer_ListNodeExecutions{Call: c}
+	c_call := _m.On("ListNodeExecutions", matchers...)
+	return &AdminServiceServer_ListNodeExecutions{Call: c_call}
 }
 
 // ListNodeExecutions provides a mock function with given fields: _a0, _a1
@@ -1254,13 +1254,13 @@ func (_m AdminServiceServer_ListNodeExecutionsForTask) Return(_a0 *admin.NodeExe
 }
 
 func (_m *AdminServiceServer) OnListNodeExecutionsForTask(_a0 context.Context, _a1 *admin.NodeExecutionForTaskListRequest) *AdminServiceServer_ListNodeExecutionsForTask {
-	c := _m.On("ListNodeExecutionsForTask", _a0, _a1)
-	return &AdminServiceServer_ListNodeExecutionsForTask{Call: c}
+	c_call := _m.On("ListNodeExecutionsForTask", _a0, _a1)
+	return &AdminServiceServer_ListNodeExecutionsForTask{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListNodeExecutionsForTaskMatch(matchers ...interface{}) *AdminServiceServer_ListNodeExecutionsForTask {
-	c := _m.On("ListNodeExecutionsForTask", matchers...)
-	return &AdminServiceServer_ListNodeExecutionsForTask{Call: c}
+	c_call := _m.On("ListNodeExecutionsForTask", matchers...)
+	return &AdminServiceServer_ListNodeExecutionsForTask{Call: c_call}
 }
 
 // ListNodeExecutionsForTask provides a mock function with given fields: _a0, _a1
@@ -1295,13 +1295,13 @@ func (_m AdminServiceServer_ListProjects) Return(_a0 *admin.Projects, _a1 error)
 }
 
 func (_m *AdminServiceServer) OnListProjects(_a0 context.Context, _a1 *admin.ProjectListRequest) *AdminServiceServer_ListProjects {
-	c := _m.On("ListProjects", _a0, _a1)
-	return &AdminServiceServer_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", _a0, _a1)
+	return &AdminServiceServer_ListProjects{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListProjectsMatch(matchers ...interface{}) *AdminServiceServer_ListProjects {
-	c := _m.On("ListProjects", matchers...)
-	return &AdminServiceServer_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", matchers...)
+	return &AdminServiceServer_ListProjects{Call: c_call}
 }
 
 // ListProjects provides a mock function with given fields: _a0, _a1
@@ -1336,13 +1336,13 @@ func (_m AdminServiceServer_ListTaskExecutions) Return(_a0 *admin.TaskExecutionL
 }
 
 func (_m *AdminServiceServer) OnListTaskExecutions(_a0 context.Context, _a1 *admin.TaskExecutionListRequest) *AdminServiceServer_ListTaskExecutions {
-	c := _m.On("ListTaskExecutions", _a0, _a1)
-	return &AdminServiceServer_ListTaskExecutions{Call: c}
+	c_call := _m.On("ListTaskExecutions", _a0, _a1)
+	return &AdminServiceServer_ListTaskExecutions{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListTaskExecutionsMatch(matchers ...interface{}) *AdminServiceServer_ListTaskExecutions {
-	c := _m.On("ListTaskExecutions", matchers...)
-	return &AdminServiceServer_ListTaskExecutions{Call: c}
+	c_call := _m.On("ListTaskExecutions", matchers...)
+	return &AdminServiceServer_ListTaskExecutions{Call: c_call}
 }
 
 // ListTaskExecutions provides a mock function with given fields: _a0, _a1
@@ -1377,13 +1377,13 @@ func (_m AdminServiceServer_ListTaskIds) Return(_a0 *admin.NamedEntityIdentifier
 }
 
 func (_m *AdminServiceServer) OnListTaskIds(_a0 context.Context, _a1 *admin.NamedEntityIdentifierListRequest) *AdminServiceServer_ListTaskIds {
-	c := _m.On("ListTaskIds", _a0, _a1)
-	return &AdminServiceServer_ListTaskIds{Call: c}
+	c_call := _m.On("ListTaskIds", _a0, _a1)
+	return &AdminServiceServer_ListTaskIds{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListTaskIdsMatch(matchers ...interface{}) *AdminServiceServer_ListTaskIds {
-	c := _m.On("ListTaskIds", matchers...)
-	return &AdminServiceServer_ListTaskIds{Call: c}
+	c_call := _m.On("ListTaskIds", matchers...)
+	return &AdminServiceServer_ListTaskIds{Call: c_call}
 }
 
 // ListTaskIds provides a mock function with given fields: _a0, _a1
@@ -1418,13 +1418,13 @@ func (_m AdminServiceServer_ListTasks) Return(_a0 *admin.TaskList, _a1 error) *A
 }
 
 func (_m *AdminServiceServer) OnListTasks(_a0 context.Context, _a1 *admin.ResourceListRequest) *AdminServiceServer_ListTasks {
-	c := _m.On("ListTasks", _a0, _a1)
-	return &AdminServiceServer_ListTasks{Call: c}
+	c_call := _m.On("ListTasks", _a0, _a1)
+	return &AdminServiceServer_ListTasks{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListTasksMatch(matchers ...interface{}) *AdminServiceServer_ListTasks {
-	c := _m.On("ListTasks", matchers...)
-	return &AdminServiceServer_ListTasks{Call: c}
+	c_call := _m.On("ListTasks", matchers...)
+	return &AdminServiceServer_ListTasks{Call: c_call}
 }
 
 // ListTasks provides a mock function with given fields: _a0, _a1
@@ -1459,13 +1459,13 @@ func (_m AdminServiceServer_ListWorkflowIds) Return(_a0 *admin.NamedEntityIdenti
 }
 
 func (_m *AdminServiceServer) OnListWorkflowIds(_a0 context.Context, _a1 *admin.NamedEntityIdentifierListRequest) *AdminServiceServer_ListWorkflowIds {
-	c := _m.On("ListWorkflowIds", _a0, _a1)
-	return &AdminServiceServer_ListWorkflowIds{Call: c}
+	c_call := _m.On("ListWorkflowIds", _a0, _a1)
+	return &AdminServiceServer_ListWorkflowIds{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListWorkflowIdsMatch(matchers ...interface{}) *AdminServiceServer_ListWorkflowIds {
-	c := _m.On("ListWorkflowIds", matchers...)
-	return &AdminServiceServer_ListWorkflowIds{Call: c}
+	c_call := _m.On("ListWorkflowIds", matchers...)
+	return &AdminServiceServer_ListWorkflowIds{Call: c_call}
 }
 
 // ListWorkflowIds provides a mock function with given fields: _a0, _a1
@@ -1500,13 +1500,13 @@ func (_m AdminServiceServer_ListWorkflows) Return(_a0 *admin.WorkflowList, _a1 e
 }
 
 func (_m *AdminServiceServer) OnListWorkflows(_a0 context.Context, _a1 *admin.ResourceListRequest) *AdminServiceServer_ListWorkflows {
-	c := _m.On("ListWorkflows", _a0, _a1)
-	return &AdminServiceServer_ListWorkflows{Call: c}
+	c_call := _m.On("ListWorkflows", _a0, _a1)
+	return &AdminServiceServer_ListWorkflows{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnListWorkflowsMatch(matchers ...interface{}) *AdminServiceServer_ListWorkflows {
-	c := _m.On("ListWorkflows", matchers...)
-	return &AdminServiceServer_ListWorkflows{Call: c}
+	c_call := _m.On("ListWorkflows", matchers...)
+	return &AdminServiceServer_ListWorkflows{Call: c_call}
 }
 
 // ListWorkflows provides a mock function with given fields: _a0, _a1
@@ -1541,13 +1541,13 @@ func (_m AdminServiceServer_RecoverExecution) Return(_a0 *admin.ExecutionCreateR
 }
 
 func (_m *AdminServiceServer) OnRecoverExecution(_a0 context.Context, _a1 *admin.ExecutionRecoverRequest) *AdminServiceServer_RecoverExecution {
-	c := _m.On("RecoverExecution", _a0, _a1)
-	return &AdminServiceServer_RecoverExecution{Call: c}
+	c_call := _m.On("RecoverExecution", _a0, _a1)
+	return &AdminServiceServer_RecoverExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnRecoverExecutionMatch(matchers ...interface{}) *AdminServiceServer_RecoverExecution {
-	c := _m.On("RecoverExecution", matchers...)
-	return &AdminServiceServer_RecoverExecution{Call: c}
+	c_call := _m.On("RecoverExecution", matchers...)
+	return &AdminServiceServer_RecoverExecution{Call: c_call}
 }
 
 // RecoverExecution provides a mock function with given fields: _a0, _a1
@@ -1582,13 +1582,13 @@ func (_m AdminServiceServer_RegisterProject) Return(_a0 *admin.ProjectRegisterRe
 }
 
 func (_m *AdminServiceServer) OnRegisterProject(_a0 context.Context, _a1 *admin.ProjectRegisterRequest) *AdminServiceServer_RegisterProject {
-	c := _m.On("RegisterProject", _a0, _a1)
-	return &AdminServiceServer_RegisterProject{Call: c}
+	c_call := _m.On("RegisterProject", _a0, _a1)
+	return &AdminServiceServer_RegisterProject{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnRegisterProjectMatch(matchers ...interface{}) *AdminServiceServer_RegisterProject {
-	c := _m.On("RegisterProject", matchers...)
-	return &AdminServiceServer_RegisterProject{Call: c}
+	c_call := _m.On("RegisterProject", matchers...)
+	return &AdminServiceServer_RegisterProject{Call: c_call}
 }
 
 // RegisterProject provides a mock function with given fields: _a0, _a1
@@ -1623,13 +1623,13 @@ func (_m AdminServiceServer_RelaunchExecution) Return(_a0 *admin.ExecutionCreate
 }
 
 func (_m *AdminServiceServer) OnRelaunchExecution(_a0 context.Context, _a1 *admin.ExecutionRelaunchRequest) *AdminServiceServer_RelaunchExecution {
-	c := _m.On("RelaunchExecution", _a0, _a1)
-	return &AdminServiceServer_RelaunchExecution{Call: c}
+	c_call := _m.On("RelaunchExecution", _a0, _a1)
+	return &AdminServiceServer_RelaunchExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnRelaunchExecutionMatch(matchers ...interface{}) *AdminServiceServer_RelaunchExecution {
-	c := _m.On("RelaunchExecution", matchers...)
-	return &AdminServiceServer_RelaunchExecution{Call: c}
+	c_call := _m.On("RelaunchExecution", matchers...)
+	return &AdminServiceServer_RelaunchExecution{Call: c_call}
 }
 
 // RelaunchExecution provides a mock function with given fields: _a0, _a1
@@ -1664,13 +1664,13 @@ func (_m AdminServiceServer_TerminateExecution) Return(_a0 *admin.ExecutionTermi
 }
 
 func (_m *AdminServiceServer) OnTerminateExecution(_a0 context.Context, _a1 *admin.ExecutionTerminateRequest) *AdminServiceServer_TerminateExecution {
-	c := _m.On("TerminateExecution", _a0, _a1)
-	return &AdminServiceServer_TerminateExecution{Call: c}
+	c_call := _m.On("TerminateExecution", _a0, _a1)
+	return &AdminServiceServer_TerminateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnTerminateExecutionMatch(matchers ...interface{}) *AdminServiceServer_TerminateExecution {
-	c := _m.On("TerminateExecution", matchers...)
-	return &AdminServiceServer_TerminateExecution{Call: c}
+	c_call := _m.On("TerminateExecution", matchers...)
+	return &AdminServiceServer_TerminateExecution{Call: c_call}
 }
 
 // TerminateExecution provides a mock function with given fields: _a0, _a1
@@ -1705,13 +1705,13 @@ func (_m AdminServiceServer_UpdateExecution) Return(_a0 *admin.ExecutionUpdateRe
 }
 
 func (_m *AdminServiceServer) OnUpdateExecution(_a0 context.Context, _a1 *admin.ExecutionUpdateRequest) *AdminServiceServer_UpdateExecution {
-	c := _m.On("UpdateExecution", _a0, _a1)
-	return &AdminServiceServer_UpdateExecution{Call: c}
+	c_call := _m.On("UpdateExecution", _a0, _a1)
+	return &AdminServiceServer_UpdateExecution{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateExecutionMatch(matchers ...interface{}) *AdminServiceServer_UpdateExecution {
-	c := _m.On("UpdateExecution", matchers...)
-	return &AdminServiceServer_UpdateExecution{Call: c}
+	c_call := _m.On("UpdateExecution", matchers...)
+	return &AdminServiceServer_UpdateExecution{Call: c_call}
 }
 
 // UpdateExecution provides a mock function with given fields: _a0, _a1
@@ -1746,13 +1746,13 @@ func (_m AdminServiceServer_UpdateLaunchPlan) Return(_a0 *admin.LaunchPlanUpdate
 }
 
 func (_m *AdminServiceServer) OnUpdateLaunchPlan(_a0 context.Context, _a1 *admin.LaunchPlanUpdateRequest) *AdminServiceServer_UpdateLaunchPlan {
-	c := _m.On("UpdateLaunchPlan", _a0, _a1)
-	return &AdminServiceServer_UpdateLaunchPlan{Call: c}
+	c_call := _m.On("UpdateLaunchPlan", _a0, _a1)
+	return &AdminServiceServer_UpdateLaunchPlan{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateLaunchPlanMatch(matchers ...interface{}) *AdminServiceServer_UpdateLaunchPlan {
-	c := _m.On("UpdateLaunchPlan", matchers...)
-	return &AdminServiceServer_UpdateLaunchPlan{Call: c}
+	c_call := _m.On("UpdateLaunchPlan", matchers...)
+	return &AdminServiceServer_UpdateLaunchPlan{Call: c_call}
 }
 
 // UpdateLaunchPlan provides a mock function with given fields: _a0, _a1
@@ -1787,13 +1787,13 @@ func (_m AdminServiceServer_UpdateNamedEntity) Return(_a0 *admin.NamedEntityUpda
 }
 
 func (_m *AdminServiceServer) OnUpdateNamedEntity(_a0 context.Context, _a1 *admin.NamedEntityUpdateRequest) *AdminServiceServer_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", _a0, _a1)
-	return &AdminServiceServer_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", _a0, _a1)
+	return &AdminServiceServer_UpdateNamedEntity{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateNamedEntityMatch(matchers ...interface{}) *AdminServiceServer_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", matchers...)
-	return &AdminServiceServer_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", matchers...)
+	return &AdminServiceServer_UpdateNamedEntity{Call: c_call}
 }
 
 // UpdateNamedEntity provides a mock function with given fields: _a0, _a1
@@ -1828,13 +1828,13 @@ func (_m AdminServiceServer_UpdateProject) Return(_a0 *admin.ProjectUpdateRespon
 }
 
 func (_m *AdminServiceServer) OnUpdateProject(_a0 context.Context, _a1 *admin.Project) *AdminServiceServer_UpdateProject {
-	c := _m.On("UpdateProject", _a0, _a1)
-	return &AdminServiceServer_UpdateProject{Call: c}
+	c_call := _m.On("UpdateProject", _a0, _a1)
+	return &AdminServiceServer_UpdateProject{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateProjectMatch(matchers ...interface{}) *AdminServiceServer_UpdateProject {
-	c := _m.On("UpdateProject", matchers...)
-	return &AdminServiceServer_UpdateProject{Call: c}
+	c_call := _m.On("UpdateProject", matchers...)
+	return &AdminServiceServer_UpdateProject{Call: c_call}
 }
 
 // UpdateProject provides a mock function with given fields: _a0, _a1
@@ -1869,13 +1869,13 @@ func (_m AdminServiceServer_UpdateProjectDomainAttributes) Return(_a0 *admin.Pro
 }
 
 func (_m *AdminServiceServer) OnUpdateProjectDomainAttributes(_a0 context.Context, _a1 *admin.ProjectDomainAttributesUpdateRequest) *AdminServiceServer_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", _a0, _a1)
-	return &AdminServiceServer_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", _a0, _a1)
+	return &AdminServiceServer_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceServer_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", matchers...)
-	return &AdminServiceServer_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", matchers...)
+	return &AdminServiceServer_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 // UpdateProjectDomainAttributes provides a mock function with given fields: _a0, _a1
@@ -1910,13 +1910,13 @@ func (_m AdminServiceServer_UpdateWorkflowAttributes) Return(_a0 *admin.Workflow
 }
 
 func (_m *AdminServiceServer) OnUpdateWorkflowAttributes(_a0 context.Context, _a1 *admin.WorkflowAttributesUpdateRequest) *AdminServiceServer_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", _a0, _a1)
-	return &AdminServiceServer_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", _a0, _a1)
+	return &AdminServiceServer_UpdateWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminServiceServer) OnUpdateWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceServer_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", matchers...)
-	return &AdminServiceServer_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", matchers...)
+	return &AdminServiceServer_UpdateWorkflowAttributes{Call: c_call}
 }
 
 // UpdateWorkflowAttributes provides a mock function with given fields: _a0, _a1
