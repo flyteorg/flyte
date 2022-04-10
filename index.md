@@ -1,6 +1,6 @@
-# Flyteorg Helm Registry
+# Flyte Helm Chart
 
-Add this repository using:
+Add the FlyteOrg helm repository:
 
 ```bash
 $ helm repo add flyteorg https://helm.flyte.org
@@ -11,13 +11,13 @@ $ helm repo update
 
 The Flyte Helm Chart helps you to run flyte cluster
 
-### Prerequisite
+### Prerequisites
 
-- You need production grade Postgres Aurora or equivalent database
-- You need s3/GCS storage
-- You need a production grade kubernetes cluster
-- Please make sure you have connectivity with database from k8s cluster
-- Please make sure you have correct role & service account in place
+- A Postgres compatible database (e.g. AWS Aurora, GCP CloudSQL, Azure Database for PostgreSQL... etc.).
+- A Blob store (S3, GCS, Minio, Azure).
+- A Kubernetes cluster (v1.19+ for best experience).
+- Verify connectivity to the DB from the K8s cluster.
+- Verify access to storage from the K8s cluster.
 
 #### Production Clusters for eks
 
@@ -47,7 +47,7 @@ userSettings:
 Install Flyte cluster by running this command:
 
 ```bash
-$ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml -f values-override.yaml
+$ helm install -n flyte --create-namespace flyte flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-eks.yaml -f values-override.yaml
 ```
 
 For more details please read the AWS [manual documentation](https://docs.flyte.org/en/latest/deployment/aws/manual.html)
@@ -82,7 +82,7 @@ userSettings:
 Install Flyte cluster by running this command:
 
 ```bash
-$ helm install -n flyte --create-namespace union-operator flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-gcp.yaml -f values-override.yaml
+$ helm install -n flyte --create-namespace flyte flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-gcp.yaml -f values-override.yaml
 ```
 
 For more details please read the GCP [manual documentation](https://docs.flyte.org/en/latest/deployment/gcp/manual.html)
