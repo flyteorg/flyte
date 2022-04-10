@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.50.4](http://github.com/lyft/flyteconsole/compare/v0.50.3...v0.50.4) (2022-04-10)
+
+
+### Bug Fixes
+
+* on resize Header and body of the tables are mismatched ([#369](http://github.com/lyft/flyteconsole/issues/369)) ([5842753](http://github.com/lyft/flyteconsole/commit/5842753feabaa6398b885f90fedd6c1cfe42bd99))
+
 ## [0.50.3](http://github.com/lyft/flyteconsole/compare/v0.50.2...v0.50.3) (2022-04-09)
 
 
