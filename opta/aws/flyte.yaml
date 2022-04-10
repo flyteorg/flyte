@@ -89,40 +89,8 @@ modules:
             "eks.amazonaws.com/role-arn": "${{module.adminflyterole.role_arn}}"
       workflow_scheduler:
         enabled: true
-        config:
-          scheduler:
-            # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
-            eventScheduler:
-              scheme: aws
-              region: "{vars.region}"
-              scheduleRole: "${{module.adminflyterole.role_arn}}"
-              targetName: "${{module.schedulesQueue.queue_arn}}"
-              scheduleNamePrefix: flyte
-            workflowExecutor:
-              scheme: aws
-              region: "{vars.region}"
-              scheduleQueueName: "${{module.schedulesQueue.queue_name}}"
-              accountId: "{vars.account_id}"
-              reconnectAttempts: 10
-              reconnectDelaySeconds: 30
       workflow_notifications:
-        enabled: true
-        config:
-          notifications:
-            type: aws
-            region: "{vars.region}"
-            publisher:
-              topicName: "${{module.topic.topic_arn}}"
-            processor:
-              queueName: "${{module.notifcationsQueue.queue_name}}"
-              accountId: "{vars.account_id}"
-            emailer:
-              subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-              sender: "flyte@{parent.domain}"
-              body: |
-                Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-                Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-                {{ error }}
+        enabled: false
       configmap:
         remoteData:
           remoteData:
