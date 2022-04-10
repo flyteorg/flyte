@@ -1,15 +1,13 @@
-# Flyte Helm Chart
+<html>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
+</p>
 
-Add the FlyteOrg helm repository:
 
-```bash
-$ helm repo add flyteorg https://helm.flyte.org
-$ helm repo update
-```
-
-## Flyte Helm Chart
-
-The Flyte Helm Chart helps you to run flyte cluster
+## Index
+- [Pre-requisites](#prerequisites)
+- [AWS EKS](#production-clusters-for-eks)
+- [GCP GKE](#production-clusters-for-gcp)
 
 ### Prerequisites
 
@@ -18,6 +16,13 @@ The Flyte Helm Chart helps you to run flyte cluster
 - A Kubernetes cluster (v1.19+ for best experience).
 - Verify connectivity to the DB from the K8s cluster.
 - Verify access to storage from the K8s cluster.
+
+#### Add the FlyteOrg helm repository:
+
+```bash
+$ helm repo add flyteorg https://helm.flyte.org
+$ helm repo update
+```
 
 #### Production Clusters for eks
 
