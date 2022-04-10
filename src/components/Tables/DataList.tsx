@@ -12,7 +12,7 @@ import {
   List,
   ListRowRenderer,
 } from 'react-virtualized';
-import { headerGridHeight, tableGridPadding } from './constants';
+import { headerGridHeight, tableGridPadding, minListContainerHeight } from './constants';
 import { LoadMoreRowContent } from './LoadMoreRowContent';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -24,6 +24,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   listContainer: {
     display: 'flex',
     flexDirection: 'column',
+    // set minHeight to avoid AutoResizer setting height to 0
+    minHeight: theme.spacing(minListContainerHeight),
   },
   noRowsContent: {
     color: tablePlaceholderColor,
