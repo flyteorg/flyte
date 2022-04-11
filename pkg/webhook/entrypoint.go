@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
 	config2 "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -24,7 +23,8 @@ const (
 	PodNamespaceEnvVar = "POD_NAMESPACE"
 )
 
-func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config, defaultNamespace string) error {
+func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+	defaultNamespace string, scope *promutils.Scope, mgr *manager.Manager) error {
 	raw, err := json.Marshal(cfg)
 	if err != nil {
 		return err
@@ -32,19 +32,12 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config, 
 
 	fmt.Println(string(raw))
 
-	kubeClient, kubecfg, err := utils.GetKubeConfig(ctx, propellerCfg)
+	kubeClient, _, err := utils.GetKubeConfig(ctx, propellerCfg)
 	if err != nil {
 		return err
 	}
 
-	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
-	webhookScope := propellerScope.NewSubScope("webhook")
-
-	limitNamespace := ""
-	if propellerCfg.LimitNamespace != defaultNamespace {
-		limitNamespace = propellerCfg.LimitNamespace
-	}
+	webhookScope := (*scope).NewSubScope("webhook")
 
 	secretsWebhook := NewPodMutator(cfg, webhookScope)
 
@@ -54,25 +47,13 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config, 
 		return err
 	}
 
-	mgr, err := manager.New(kubecfg, manager.Options{
-		Port:          cfg.ListenPort,
-		CertDir:       cfg.CertDir,
-		Namespace:     limitNamespace,
-		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(webhookScope),
-	})
-
-	if err != nil {
-		logger.Fatalf(ctx, "Failed to initialize controller run-time manager. Error: %v", err)
-	}
-
-	err = secretsWebhook.Register(ctx, mgr)
+	err = secretsWebhook.Register(ctx, *mgr)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
 
 	logger.Infof(ctx, "Starting controller-runtime manager")
-	return mgr.Start(ctx)
+	return (*mgr).Start(ctx)
 }
 
 func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {

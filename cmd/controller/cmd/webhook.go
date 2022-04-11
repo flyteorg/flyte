@@ -3,6 +3,10 @@ package cmd
 import (
 	"context"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"golang.org/x/sync/errgroup"
+
 	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flytestdlib/profutils"
 
@@ -11,10 +15,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/webhook"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/spf13/cobra"
-)
-
-const (
-	podDefaultNamespace = "default"
 )
 
 var webhookCmd = &cobra.Command{
@@ -82,11 +82,37 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(origContext)
 
-	go func() {
-		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, propellerCfg.ProfilerPort.Port, nil)
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
+	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, defaultNamespace, &propellerScope)
+	if err != nil {
+		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
+		return err
+	}
+
+	g, childCtx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, nil)
 		if err != nil {
-			logger.Panicf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
+			logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
 		}
-	}()
-	return webhook.Run(ctx, propellerCfg, cfg, defaultNamespace)
+		return err
+	})
+
+	g.Go(func() error {
+		err := controller.StartControllerManager(childCtx, mgr)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
+		}
+		return err
+	})
+
+	g.Go(func() error {
+		err := webhook.Run(childCtx, propellerCfg, cfg, defaultNamespace, &propellerScope, mgr)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to start webhook. Error: %v", err)
+		}
+		return err
+	})
+
+	return g.Wait()
 }

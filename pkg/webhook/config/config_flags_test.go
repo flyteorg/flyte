@@ -127,6 +127,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_localCert", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("localCert", testValue)
+			if vBool, err := cmdFlags.GetBool("localCert"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LocalCert)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_listenPort", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -149,6 +163,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("serviceName", testValue)
 			if vString, err := cmdFlags.GetString("serviceName"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ServiceName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_servicePort", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("servicePort", testValue)
+			if vInt32, err := cmdFlags.GetInt32("servicePort"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.ServicePort)
 
 			} else {
 				assert.FailNow(t, err.Error())
