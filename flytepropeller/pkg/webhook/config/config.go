@@ -14,8 +14,10 @@ var (
 	DefaultConfig = &Config{
 		SecretName:        "flyte-pod-webhook",
 		ServiceName:       "flyte-pod-webhook",
+		ServicePort:       443,
 		MetricsPrefix:     "flyte:",
 		CertDir:           "/etc/webhook/certs",
+		LocalCert:         false,
 		ListenPort:        9443,
 		SecretManagerType: SecretManagerTypeK8s,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
@@ -72,8 +74,10 @@ const (
 type Config struct {
 	MetricsPrefix            string                   `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
 	CertDir                  string                   `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
+	LocalCert                bool                     `json:"localCert" pflag:",write certs locally. Defaults to false"`
 	ListenPort               int                      `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
 	ServiceName              string                   `json:"serviceName" pflag:",The name of the webhook service."`
+	ServicePort              int32                    `json:"servicePort" pflag:",The port on the service that hosting webhook."`
 	SecretName               string                   `json:"secretName" pflag:",Secret name to write generated certs to."`
 	SecretManagerType        SecretManagerType        `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
 	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`

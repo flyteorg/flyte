@@ -8,6 +8,8 @@ import (
 	"runtime"
 
 	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"golang.org/x/sync/errgroup"
 	"k8s.io/klog"
 
 	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
@@ -103,12 +105,38 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
 
-	go func() {
-		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, cfg.ProfilerPort.Port, nil)
-		if err != nil {
-			logger.Fatalf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
-		}
-	}()
+	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
+	mgr, err := controller.CreateControllerManager(ctx, cfg, defaultNamespace, &propellerScope)
+	if err != nil {
+		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
+		return err
+	}
 
-	return controller.StartController(ctx, cfg, defaultNamespace)
+	g, childCtx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, cfg.ProfilerPort.Port, nil)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
+		}
+		return err
+	})
+
+	g.Go(func() error {
+		err := controller.StartControllerManager(childCtx, mgr)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
+		}
+		return err
+	})
+
+	g.Go(func() error {
+		err := controller.StartController(childCtx, cfg, defaultNamespace, mgr, &propellerScope)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to start controller. Error: %v", err)
+		}
+		return err
+	})
+
+	return g.Wait()
 }

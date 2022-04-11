@@ -493,8 +493,42 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 	return opts
 }
 
+func CreateControllerManager(ctx context.Context, cfg *config.Config,
+	defaultNamespace string, scope *promutils.Scope) (*manager.Manager, error) {
+
+	_, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error building Kubernetes Clientset")
+	}
+
+	limitNamespace := ""
+	if cfg.LimitNamespace != defaultNamespace {
+		limitNamespace = cfg.LimitNamespace
+	}
+	mgr, err := manager.New(kubecfg, manager.Options{
+		Namespace:     limitNamespace,
+		SyncPeriod:    &cfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder((*scope).NewSubScope("kube")),
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to initialize controller-runtime manager")
+	}
+	return &mgr, nil
+}
+
+// StartControllerManager Start controller runtime manager to start listening to resource changes.
+// K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
+// EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
+// workflow changes faster than the default sync interval for workflow CRDs.
+func StartControllerManager(ctx context.Context, mgr *manager.Manager) error {
+	ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
+	pprof.SetGoroutineLabels(ctx)
+	logger.Infof(ctx, "Starting controller-runtime manager")
+	return (*mgr).Start(ctx)
+}
+
 // StartController creates a new FlytePropeller Controller and starts it
-func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string) error {
+func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string, mgr *manager.Manager, scope *promutils.Scope) error {
 	// Setup cancel on the context
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -532,38 +566,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 
 	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration)
 
-	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
-
-	limitNamespace := ""
-	if cfg.LimitNamespace != defaultNamespace {
-		limitNamespace = cfg.LimitNamespace
-	}
-
-	mgr, err := manager.New(kubecfg, manager.Options{
-		Namespace:     limitNamespace,
-		SyncPeriod:    &cfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
-	})
-	if err != nil {
-		return errors.Wrapf(err, "failed to initialize controller-runtime manager")
-	}
-
-	// Start controller runtime manager to start listening to resource changes.
-	// K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
-	// EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
-	// workflow changes faster than the default sync interval for workflow CRDs.
-	go func(ctx context.Context) {
-		ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
-		pprof.SetGoroutineLabels(ctx)
-		logger.Infof(ctx, "Starting controller-runtime manager")
-		err := mgr.Start(ctx)
-		if err != nil {
-			logger.Fatalf(ctx, "Failed to start manager. Error: %v", err)
-		}
-	}(ctx)
-
-	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, mgr, propellerScope)
+	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, *mgr, *scope)
 	if err != nil {
 		return errors.Wrap(err, "failed to start FlytePropeller")
 	} else if c == nil {
