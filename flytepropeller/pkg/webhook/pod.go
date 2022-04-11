@@ -38,12 +38,11 @@ import (
 
 	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
 
-	"github.com/flyteorg/flytepropeller/pkg/utils/secrets"
-
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
