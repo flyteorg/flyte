@@ -16,9 +16,10 @@ export const useWorkflowInfoList = (scope: DomainIdentifierScope, config?: Reque
       );
 
       return {
-        entities: entities.map(({ id, metadata: { description } }) => ({
+        entities: entities.map(({ id, metadata: { description, state } }) => ({
           id,
           description,
+          state,
         })),
         ...rest,
       };

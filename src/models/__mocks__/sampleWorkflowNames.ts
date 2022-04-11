@@ -1,4 +1,5 @@
 import { WorkflowListStructureItem } from 'components/Workflow/types';
+import { WorkflowExecutionState } from 'models/Workflow/enums';
 import { WorkflowId } from 'models/Workflow/types';
 
 export const sampleWorkflowIds: WorkflowId[] = [
@@ -37,4 +38,5 @@ export const sampleWorkflowIds: WorkflowId[] = [
 export const sampleWorkflowNames: WorkflowListStructureItem[] = sampleWorkflowIds.map((id) => ({
   id,
   description: '',
+  state: WorkflowExecutionState.NAMED_ENTITY_ACTIVE,
 }));

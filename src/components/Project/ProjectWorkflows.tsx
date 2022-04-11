@@ -1,8 +1,8 @@
 import { WaitForData } from 'components/common/WaitForData';
+import { useWorkflowShowArchivedState } from 'components/Workflow/filters/useWorkflowShowArchivedState';
 import { SearchableWorkflowNameList } from 'components/Workflow/SearchableWorkflowNameList';
-import { Admin } from 'flyteidl';
 import { limits } from 'models/AdminEntity/constants';
-import { FilterOperationName, SortDirection } from 'models/AdminEntity/types';
+import { SortDirection } from 'models/AdminEntity/types';
 import { workflowSortFields } from 'models/Workflow/constants';
 import * as React from 'react';
 import { useWorkflowInfoList } from '../Workflow/useWorkflowInfoList';
@@ -12,33 +12,33 @@ export interface ProjectWorkflowsProps {
   domainId: string;
 }
 
+const DEFAULT_SORT = {
+  direction: SortDirection.ASCENDING,
+  key: workflowSortFields.name,
+};
+
 /** A listing of the Workflows registered for a project */
 export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
   domainId: domain,
   projectId: project,
 }) => {
+  const archivedFilter = useWorkflowShowArchivedState();
   const workflows = useWorkflowInfoList(
     { domain, project },
     {
       limit: limits.NONE,
-      sort: {
-        direction: SortDirection.ASCENDING,
-        key: workflowSortFields.name,
-      },
-      // Hide archived workflows from the list
-      filter: [
-        {
-          key: 'state',
-          operation: FilterOperationName.EQ,
-          value: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE,
-        },
-      ],
+      sort: DEFAULT_SORT,
+      filter: [archivedFilter.getFilter()],
     },
   );
 
   return (
     <WaitForData {...workflows}>
-      <SearchableWorkflowNameList workflows={workflows.value} />
+      <SearchableWorkflowNameList
+        workflows={workflows.value}
+        showArchived={archivedFilter.showArchived}
+        onArchiveFilterChange={archivedFilter.setShowArchived}
+      />
     </WaitForData>
   );
 };

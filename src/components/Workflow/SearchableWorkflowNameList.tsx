@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 import DeviceHub from '@material-ui/icons/DeviceHub';
 import classNames from 'classnames';
 import { useNamedEntityListStyles } from 'components/common/SearchableNamedEntityList';
@@ -11,27 +11,82 @@ import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import { Shimmer } from 'components/common/Shimmer';
 import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { debounce } from 'lodash';
-import { Typography } from '@material-ui/core';
+import {
+  IconButton,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  FormGroup,
+  Button,
+  CircularProgress,
+} from '@material-ui/core';
+import UnarchiveOutline from '@material-ui/icons/UnarchiveOutlined';
+import ArchiveOutlined from '@material-ui/icons/ArchiveOutlined';
+import { useMutation } from 'react-query';
+import { WorkflowExecutionState } from 'models/Workflow/enums';
+import { updateWorkflowState } from 'models/Workflow/api';
+import { useState } from 'react';
+import { useSnackbar } from 'notistack';
 import { WorkflowListStructureItem } from './types';
 import ProjectStatusBar from '../Project/ProjectStatusBar';
 import { workflowNoInputsString } from '../Launch/LaunchForm/constants';
 import { SearchableInput } from '../common/SearchableList';
 import { useSearchableListState } from '../common/useSearchableListState';
 import { useWorkflowInfoItem } from './useWorkflowInfoItem';
+import t from '../Executions/Tables/WorkflowExecutionTable/strings';
+import { isWorkflowArchived } from './utils';
 
 interface SearchableWorkflowNameItemProps {
   item: WorkflowListStructureItem;
 }
 
-interface SearchableWorkflowNameListProps {
-  workflows: WorkflowListStructureItem[];
+interface SearchableWorkflowNameItemActionsProps {
+  item: WorkflowListStructureItem;
+  setHideItem: (hide: boolean) => void;
 }
 
-const useStyles = makeStyles(() => ({
-  container: {
-    padding: 13,
-    paddingRight: 71,
+interface SearchableWorkflowNameListProps {
+  workflows: WorkflowListStructureItem[];
+  onArchiveFilterChange: (showArchievedItems: boolean) => void;
+  showArchived: boolean;
+}
+
+export const showOnHoverClass = 'showOnHover';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  actionContainer: {
+    display: 'flex',
+    right: 0,
+    top: 0,
+    position: 'absolute',
+    height: '100%',
   },
+  archiveCheckbox: {
+    whiteSpace: 'nowrap',
+  },
+  centeredChild: {
+    alignItems: 'center',
+    marginRight: 24,
+  },
+  confirmationButton: {
+    borderRadius: 0,
+    minWidth: '100px',
+    minHeight: '53px',
+    '&:last-child': {
+      borderRadius: '0px 16px 16px 0px', // to ensure that cancel button will have rounded corners on the right side
+    },
+  },
+  container: {
+    padding: theme.spacing(2),
+    paddingRight: theme.spacing(5),
+  },
+  filterGroup: {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    flexDirection: 'row',
+    margin: theme.spacing(4, 5, 2, 2),
+  },
+
   itemContainer: {
     marginBottom: 15,
     borderRadius: 16,
@@ -40,6 +95,15 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
+    position: 'relative',
+    // All children using the showOnHover class will be hidden until
+    // the mouse enters the container
+    [`& .${showOnHoverClass}`]: {
+      opacity: 0,
+    },
+    [`&:hover .${showOnHoverClass}`]: {
+      opacity: 1,
+    },
   },
   itemName: {
     display: 'flex',
@@ -71,8 +135,7 @@ const useStyles = makeStyles(() => ({
     color: workflowLabelColor,
   },
   searchInputContainer: {
-    padding: '0 13px',
-    margin: '32px 0 23px',
+    paddingLeft: 0,
   },
   w100: {
     flex: 1,
@@ -98,6 +161,103 @@ const padExecutionPaths = (items: WorkflowExecutionIdentifier[]) => {
   return [...items.map((id) => Routes.ExecutionDetails.makeUrl(id)), ...emptyExecutions].reverse();
 };
 
+const getArchiveIcon = (isArchived: boolean) =>
+  isArchived ? <UnarchiveOutline /> : <ArchiveOutlined />;
+
+const SearchableWorkflowNameItemActions: React.FC<SearchableWorkflowNameItemActionsProps> = ({
+  item,
+  setHideItem,
+}) => {
+  const styles = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const { id } = item;
+  const isArchived = isWorkflowArchived(item);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+
+  const mutation = useMutation(
+    (newState: WorkflowExecutionState) => updateWorkflowState(id, newState),
+    {
+      onMutate: () => setIsUpdating(true),
+      onSuccess: () => {
+        enqueueSnackbar(t('archiveSuccess', !isArchived), {
+          variant: 'success',
+        });
+        setHideItem(true);
+      },
+      onError: () => {
+        enqueueSnackbar(`${mutation.error ?? t('archiveError', !isArchived)}`, {
+          variant: 'error',
+        });
+      },
+      onSettled: () => {
+        setShowConfirmation(false);
+        setIsUpdating(false);
+      },
+    },
+  );
+
+  const onArchiveClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const onConfirmArchiveClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    mutation.mutate(
+      isWorkflowArchived(item)
+        ? WorkflowExecutionState.NAMED_ENTITY_ACTIVE
+        : WorkflowExecutionState.NAMED_ENTITY_ARCHIVED,
+    );
+  };
+
+  const onCancelClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setShowConfirmation(false);
+  };
+
+  const singleItemStyle = isUpdating || !showConfirmation ? styles.centeredChild : '';
+  return (
+    <div className={classNames(styles.actionContainer, showOnHoverClass, singleItemStyle)}>
+      {isUpdating ? (
+        <IconButton size="small">
+          <CircularProgress size={24} />
+        </IconButton>
+      ) : showConfirmation ? (
+        <>
+          <Button
+            size="medium"
+            variant="contained"
+            color="primary"
+            className={styles.confirmationButton}
+            disableElevation
+            onClick={onConfirmArchiveClick}
+          >
+            {t('archiveAction', isArchived)}
+          </Button>
+          <Button
+            size="medium"
+            variant="contained"
+            color="inherit"
+            className={styles.confirmationButton}
+            disableElevation
+            onClick={onCancelClick}
+          >
+            {t('cancelAction')}
+          </Button>
+        </>
+      ) : (
+        <IconButton size="small" title={t('archiveAction', isArchived)} onClick={onArchiveClick}>
+          {getArchiveIcon(isArchived)}
+        </IconButton>
+      )}
+    </div>
+  );
+};
+
 /**
  * Renders individual searchable workflow item
  * @param item
@@ -110,6 +270,12 @@ const SearchableWorkflowNameItem: React.FC<SearchableWorkflowNameItemProps> = Re
     const styles = useStyles();
     const { id, description } = item;
     const { data: workflow, isLoading } = useWorkflowInfoItem(id);
+
+    const [hideItem, setHideItem] = useState<boolean>(false);
+
+    if (hideItem) {
+      return null;
+    }
 
     return (
       <Link
@@ -161,6 +327,7 @@ const SearchableWorkflowNameItem: React.FC<SearchableWorkflowNameItemProps> = Re
               {isLoading ? <Shimmer /> : workflow?.outputs ?? <em>No output data found.</em>}
             </div>
           </div>
+          <SearchableWorkflowNameItemActions item={item} setHideItem={setHideItem} />
         </div>
       </Link>
     );
@@ -174,6 +341,8 @@ const SearchableWorkflowNameItem: React.FC<SearchableWorkflowNameItemProps> = Re
  */
 export const SearchableWorkflowNameList: React.FC<SearchableWorkflowNameListProps> = ({
   workflows,
+  onArchiveFilterChange,
+  showArchived,
 }) => {
   const styles = useStyles();
   const [search, setSearch] = React.useState('');
@@ -192,14 +361,26 @@ export const SearchableWorkflowNameList: React.FC<SearchableWorkflowNameListProp
 
   return (
     <>
-      <SearchableInput
-        onClear={onClear}
-        onSearchChange={onSearchChange}
-        variant="normal"
-        value={search}
-        className={styles.searchInputContainer}
-        placeholder="Search Workflow Name"
-      />
+      <FormGroup className={styles.filterGroup}>
+        <SearchableInput
+          onClear={onClear}
+          onSearchChange={onSearchChange}
+          variant="normal"
+          value={search}
+          className={styles.searchInputContainer}
+          placeholder="Search Workflow Name"
+        />
+        <FormControlLabel
+          className={styles.archiveCheckbox}
+          control={
+            <Checkbox
+              checked={showArchived}
+              onChange={(_, checked) => onArchiveFilterChange(checked)}
+            />
+          }
+          label="Show Only Archived Workflows"
+        />
+      </FormGroup>
       <div className={styles.container}>
         {results.map(({ value }) => (
           <SearchableWorkflowNameItem

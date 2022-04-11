@@ -113,11 +113,7 @@ export function getActionsCell(
         </IconButton>
       )}
       {!!onArchiveClick && (
-        <IconButton
-          size="small"
-          title={t('archiveActionString', isArchived)}
-          onClick={onArchiveClick}
-        >
+        <IconButton size="small" title={t('archiveAction', isArchived)} onClick={onArchiveClick}>
           {getArchiveIcon(isArchived)}
         </IconButton>
       )}
