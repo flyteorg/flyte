@@ -367,8 +367,8 @@ github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga
 github.com/fatih/structtag v1.2.0/go.mod h1:mBJUNpUnHmRKrKlQQlmCrh5PuhftFbNv8Ys4/aAZl94=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
-github.com/flyteorg/datacatalog v0.3.30 h1:pJV0OxXwR2zXGl2AwD4a0/HNjhXzNo9vtSG7MeW0BQE=
-github.com/flyteorg/datacatalog v0.3.30/go.mod h1:+Qoeu3H8Tjgd2/8pk3X4ZxEBxgtxWa3Bt7QmfmN5m/c=
+github.com/flyteorg/datacatalog v0.3.33 h1:fnUlndN7Wik/OQRkOY2uZMg1vPK+NB6KFpuRard7XBQ=
+github.com/flyteorg/datacatalog v0.3.33/go.mod h1:baCUhwsIVs6RlCLOjAtvO1DywuI+tq3yh8dI80WVp+M=
 github.com/flyteorg/flyteadmin v0.6.140 h1:BbY041y6Vvcg8Kxy0P8GPv4Wrx82G2b5GVyw4eFmLl8=
 github.com/flyteorg/flyteadmin v0.6.140/go.mod h1:AW4E0gDr7Y/BmpEhkPEX1YpDlCjqLnIDLVI9DXlC7SE=
 github.com/flyteorg/flyteidl v0.24.7/go.mod h1:576W2ViEyjTpT+kEVHAGbrTP3HARNUZ/eCwrNPmdx9U=
@@ -381,8 +381,8 @@ github.com/flyteorg/flytepropeller v0.16.40 h1:dlb/IX99EcSOfz4SnBq6lq8dCZZCV6Ikj
 github.com/flyteorg/flytepropeller v0.16.40/go.mod h1:Z+WqqwU0S9c5Y/9r7eV6YoqZGP0tag2PdfGlTSErAQ4=
 github.com/flyteorg/flytestdlib v0.3.13/go.mod h1:Tz8JCECAbX6VWGwFT6cmEQ+RJpZ/6L9pswu3fzWs220=
 github.com/flyteorg/flytestdlib v0.4.13/go.mod h1:fv1ar34LJLMTaf0tbfetisLykUlARi7rP+NQTUn6QQs=
-github.com/flyteorg/flytestdlib v0.4.22 h1:l0SFJpsnivBXFNFVkobyIM0luKnZvsQqIgfxAMCIUqM=
-github.com/flyteorg/flytestdlib v0.4.22/go.mod h1:QSVN5wIM1lM9d60eAEbX7NwweQXW96t5x4jbyftn89c=
+github.com/flyteorg/flytestdlib v0.4.23 h1:REDpbqzhvuT4biIXPHkWVHpEqs3OMVninB9YadhIPK0=
+github.com/flyteorg/flytestdlib v0.4.23/go.mod h1:QSVN5wIM1lM9d60eAEbX7NwweQXW96t5x4jbyftn89c=
 github.com/flyteorg/stow v0.3.3 h1:tzeNl8mSZFL3oJDi0ACZj6FAineQAF4qyEp6bXtIdQY=
 github.com/flyteorg/stow v0.3.3/go.mod h1:HBld7ud0i4khMHwJjkO8v+NSP7ddKa/ruhf4I8fliaA=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
