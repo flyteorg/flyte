@@ -13,3 +13,4 @@ docs/auto/*
 docs/_rsts/
 .hypothesis
 .config/
+test.ipynb
