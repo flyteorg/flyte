@@ -23,13 +23,12 @@ tasks:
 server:
   kube-config: "/etc/rancher/k3s/k3s.yaml"
   httpPort: 30080
+  serviceHttpEndpoint: http://localhost:30080/
   grpc:
     port: 30081
 flyteadmin:
   runScheduler: false
 database:
-#  sqlite:
-#    file: admin.db
   postgres:
     port: 30089
     username: postgres
