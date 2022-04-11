@@ -43,37 +43,48 @@ Write your first workflow
 
     .. code-block:: python
 
-       from flytekit import task, workflow
+        import typing
+        import pandas as pd
+        import numpy as np
 
-       @task
-       def say_hello(msg: str) -> str:
-           return f"hello, {msg}!"
+        from flytekit import task, workflow
 
-       @workflow
-       def wf(msg: str) -> str:
-           return say_hello(msg=msg)
+
+        @task
+        def generate_normal_df(n:int, mean: float, sigma: float) -> pd.DataFrame:
+            return pd.DataFrame(dict(
+              numbers=np.random.normal(mean, sigma,size=n),
+            ))
+
+        @task
+        def compute_stats(df: pd.DataFrame) -> typing.Tuple[float, float]:
+            return df["numbers"].mean(), df["numbers"].std()
+
+        @workflow
+        def wf(n: int = 200, mean: float = 0.0, sigma: float = 1.0) -> typing.Tuple[float, float]:
+            return compute_stats(df=generate_normal_df(n=n, mean=mean, sigma=sigma))
 
 #. Run your workflow locally using ``pyflyte``:
 
     .. prompt:: bash $
 
-       pyflyte run example.py:wf --msg world
+       pyflyte run example.py:wf
 
 Because this is just Python code also, you can also run the ``wf()`` function from the module.
 
 Run on a Flyte backend installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Start a Flyte sandbox installation on your local machine
+#. Start a Flyte demonstration environment on your local machine
 
     .. prompt:: bash $
 
-       flytectl sandbox start
+       flytectl demo start
 
 #. Now run the same workflow on the Flyte backend
 
     .. prompt:: bash $
 
-       pyflyte run example.py:wf --msg world --remote
+       pyflyte run --remote --service-account demo example.py:wf --n 500 --mean 42 --sigma 2
 
 #. Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
