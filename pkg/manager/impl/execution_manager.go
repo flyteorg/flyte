@@ -456,9 +456,14 @@ func mergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec
 		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
 		isChanged = true
 	}
+
 	if workflowExecConfig.GetSecurityContext() == nil && spec.GetSecurityContext() != nil {
-		workflowExecConfig.SecurityContext = spec.GetSecurityContext()
-		isChanged = true
+		if spec.GetSecurityContext().GetRunAs() != nil &&
+			(len(spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()) > 0 ||
+				len(spec.GetSecurityContext().GetRunAs().GetIamRole()) > 0) {
+			workflowExecConfig.SecurityContext = spec.GetSecurityContext()
+			isChanged = true
+		}
 	}
 	// Launchplan spec has label, annotation and rawOutputDataConfig initialized with empty values.
 	// Hence we do a deep check in the following conditions before assignment
