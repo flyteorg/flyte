@@ -16,6 +16,8 @@ import (
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
 	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/storage"
+	stdmocks "github.com/flyteorg/flytestdlib/storage/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -104,11 +106,17 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	ir.OnGetInputPath().Return("/prefix/inputs.pb")
 	ir.OnGetMatch(mock.Anything).Return(&core2.LiteralMap{}, nil)
 
+	dataStore := &storage.DataStore{
+		ComposedProtobufStore: &stdmocks.ComposedProtobufStore{},
+		ReferenceConstructor:  &storage.URLPathConstructor{},
+	}
+
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskReader().Return(tr)
 	tCtx.OnTaskExecutionMetadata().Return(tMeta)
 	tCtx.OnOutputWriter().Return(ow)
 	tCtx.OnInputReader().Return(ir)
+	tCtx.OnDataStore().Return(dataStore)
 	return tCtx
 }
 

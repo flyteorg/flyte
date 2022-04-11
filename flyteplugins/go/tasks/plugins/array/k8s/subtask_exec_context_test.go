@@ -7,6 +7,8 @@ import (
 
 	podPlugin "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 
+	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +24,7 @@ func TestSubTaskExecutionContext(t *testing.T) {
 	retryAttempt := uint64(1)
 	systemFailures := uint64(0)
 
-	stCtx, err := NewSubTaskExecutionContext(tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt, systemFailures)
+	stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt, systemFailures)
 	assert.Nil(t, err)
 
 	assert.Equal(t, fmt.Sprintf("notfound-%d-%d", executionIndex, retryAttempt), stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
@@ -31,4 +33,6 @@ func TestSubTaskExecutionContext(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int32(2), subtaskTemplate.TaskTypeVersion)
 	assert.Equal(t, podPlugin.ContainerTaskType, subtaskTemplate.Type)
+	assert.Equal(t, storage.DataReference("/prefix/"), stCtx.OutputWriter().GetOutputPrefixPath())
+	assert.Equal(t, storage.DataReference("/raw_prefix/5/1"), stCtx.OutputWriter().GetRawOutputPrefix())
 }
