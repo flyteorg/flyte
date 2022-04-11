@@ -25,9 +25,10 @@ const NodeInterruptibleLabel = "interruptible"
 
 type nodeExecMetadata struct {
 	v1alpha1.Meta
-	nodeExecID     *core.NodeExecutionIdentifier
-	interrutptible bool
-	nodeLabels     map[string]string
+	nodeExecID                    *core.NodeExecutionIdentifier
+	interrutptible                bool
+	interruptibleFailureThreshold uint32
+	nodeLabels                    map[string]string
 }
 
 func (e nodeExecMetadata) GetNodeExecutionID() *core.NodeExecutionIdentifier {
@@ -44,6 +45,10 @@ func (e nodeExecMetadata) GetOwnerID() types.NamespacedName {
 
 func (e nodeExecMetadata) IsInterruptible() bool {
 	return e.interrutptible
+}
+
+func (e nodeExecMetadata) GetInterruptibleFailureThreshold() uint32 {
+	return e.interruptibleFailureThreshold
 }
 
 func (e nodeExecMetadata) GetLabels() map[string]string {
@@ -136,7 +141,7 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
-	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool,
+	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold uint32,
 	maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
@@ -146,7 +151,8 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 			NodeId:      node.GetID(),
 			ExecutionId: execContext.GetExecutionID().WorkflowExecutionIdentifier,
 		},
-		interrutptible: interruptible,
+		interrutptible:                interruptible,
+		interruptibleFailureThreshold: interruptibleFailureThreshold,
 	}
 
 	// Copy the wf labels before adding node specific labels.
@@ -235,6 +241,7 @@ func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNod
 			),
 		),
 		interruptible,
+		c.interruptibleFailureThreshold,
 		c.maxDatasetSizeBytes,
 		&taskEventRecorder{TaskEventRecorder: c.taskRecorder},
 		tr,
