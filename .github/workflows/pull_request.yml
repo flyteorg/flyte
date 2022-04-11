@@ -17,7 +17,7 @@ jobs:
       - name: Unit Tests
         run: make mod_download && make test_unit_codecov
       - name: Push CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.5.2
         with:
           file: coverage.txt
           flags: unittests
