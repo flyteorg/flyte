@@ -3,16 +3,15 @@ package webhook
 import (
 	"context"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	secretUtils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
 
 	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	secretUtils "github.com/flyteorg/flytepropeller/pkg/utils/secrets"
 
 	corev1 "k8s.io/api/core/v1"
 )

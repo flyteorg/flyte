@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flytepropeller/pkg/utils/secrets"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 )
 
 // TaskExecutionContext provides a layer on top of core TaskExecutionContext with a custom TaskExecutionMetadata.

@@ -15,6 +15,10 @@ func (FailingRawStore) CopyRaw(ctx context.Context, source, destination storage.
 	return fmt.Errorf("failed to copy raw")
 }
 
+func (FailingRawStore) CreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) (storage.SignedURLResponse, error) {
+	return storage.SignedURLResponse{}, fmt.Errorf("failed to create signed url")
+}
+
 func (FailingRawStore) GetBaseContainerFQN(ctx context.Context) storage.DataReference {
 	return ""
 }
