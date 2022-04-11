@@ -3814,6 +3814,39 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, requestOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, requestLabels, execConfig.GetLabels().Values)
 	})
+	t.Run("request with empty security context", func(t *testing.T) {
+		request := &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						K8SServiceAccount: "",
+						IamRole:           "",
+					},
+				},
+			},
+		}
+		launchPlan := &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				Annotations:         &admin.Annotations{Values: launchPlanAnnotations},
+				Labels:              &admin.Labels{Values: launchPlanLabels},
+				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: launchPlanOutputLocationPrefix},
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						K8SServiceAccount: launchPlanK8sServiceAccount,
+					},
+				},
+				MaxParallelism: launchPlanMaxParallelism,
+			},
+		}
+		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
+		assert.NoError(t, err)
+		assert.Equal(t, launchPlanMaxParallelism, execConfig.MaxParallelism)
+		assert.Equal(t, launchPlanK8sServiceAccount, execConfig.SecurityContext.RunAs.K8SServiceAccount)
+		assert.Equal(t, launchPlanOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
+		assert.Equal(t, launchPlanLabels, execConfig.GetLabels().Values)
+	})
 	t.Run("request with no config", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.Project,
