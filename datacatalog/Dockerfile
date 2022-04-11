@@ -31,13 +31,8 @@ ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
 FROM alpine:3.14
-LABEL org.opencontainers.image.source https://github.com/flyteorg/datacatalog
-
 COPY --from=builder /artifacts /bin
 
 RUN apk --update add ca-certificates
-
-RUN addgroup -S flyte && adduser -S flyte -G flyte
-USER flyte
 
 CMD ["datacatalog"]
