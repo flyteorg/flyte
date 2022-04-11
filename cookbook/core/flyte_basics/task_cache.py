@@ -92,3 +92,105 @@ def square(n: int) -> int:
 #
 # .. note::
 #   The format used by the store is opaque and not meant to be inspectable.
+#
+# Caching of non-Flyte offloaded objects
+# ######################################
+#
+# The default behavior displayed by Flyte's memoization feature might not match user intuition. For example, this code makes use of pandas dataframes:
+
+# .. code-block:: python
+#
+#    @task
+#    def foo(a: int, b: str) -> pd.DataFrame:
+#      df = pd.Dataframe(...)
+#      ...
+#      return df
+#
+#   @task(cached=True, version="1.0")
+#   def bar(df: pd.Dataframe) -> int:
+#       ...
+#
+#   @workflow
+#   def wf(a: int, b: str):
+#       df = foo(a=a, b=b)
+#       v = bar(df=df)
+#
+#
+# If run twice with the same inputs, one would expect that ``bar`` would trigger a cache hit, but it turns out that's not the case because of how dataframes are represented in Flyte. (something here about offloading/pointers?)  However, with release 0.19.3, Flyte provides a new way to control memoization behavior of  `FlyteSchema` and `StructuredDataset` literals. This is done via a `typing.Annotated` call on the task signature.  For example, in order to cache the result of calls to ``bar``, we can rewrite the code above like this:
+#
+# .. code-block:: python
+#
+#    @task
+#    def foo(a: int, b: str) -> Annotated[pd.DataFrame, HashMethod(hash_pandas_dataframe_function) :
+#        df = pd.Dataframe(...)
+#        ...
+#        return df
+#
+#    @task(cached=True, version="1.0")
+#    def bar(df: pd.Dataframe) -> int:
+#        ...
+#
+#    @workflow
+#    def wf(a: int, b: str):
+#        df = foo(a=a, b=b)
+#        v = bar(df=df)
+#
+# Note how the output of task ``foo`` is annotated with a an object of type ``HashMethod``. Essentially, that represents a function that will produce a hash which will then be used as part of the cache key calculation in calls to task ``bar``.
+#
+# How does caching of offloaded objects work?
+# *******************************************
+#
+# Recall how task input values are taken into account to derive a cache key? This is done by turning the Literal representation into a string and using that string as part of the cache key. In the case of dataframes annotated with ``HashMethod`` we use the hash as the representation of the Literal, in other words, the literal hash is used in the cache key.
+#
+# This feature also works in local execution.  (To clear the local cache, ...)
+#
+# How to enable caching of offloaded types for a different type transformer?
+# ******************************************
+#
+# The ability to cache offloaded objects is controlled by the `hash_overridable <https://github.com/flyteorg/flytekit/blob/9754a0f462f495dbd77df0572719885230bd909b/flytekit/core/type_engine.py#L56-L62>`_ property of the Type Transformer. For example, see how this is done in the case of `StructuredDataSetTransformer <https://github.com/flyteorg/flytekit/blob/9754a0f462f495dbd77df0572719885230bd909b/flytekit/types/structured/structured_dataset.py#L382-L383>`_.
+
+# %%
+# Here's a complete example of the feature:
+
+import pandas
+import time
+from typing_extensions import Annotated
+
+from flytekit import HashMethod, workflow
+from flytekit.core.node_creation import create_node
+
+
+def hash_pandas_dataframe(df: pandas.DataFrame) -> str:
+    return str(pandas.util.hash_pandas_object(df))
+
+@task
+def uncached_data_reading_task() -> Annotated[pandas.DataFrame, HashMethod(hash_pandas_dataframe)]:
+    return pandas.DataFrame({"column_1": [1, 2, 3]})
+
+@task(cache=True, cache_version="1.0")
+def cached_data_processing_task(df: pandas.DataFrame) -> pandas.DataFrame:
+    time.sleep(1)
+    return df * 2
+
+@task
+def compare_dataframes(df1: pandas.DataFrame, df2: pandas.DataFrame):
+    assert df1.equals(df2)
+
+@workflow
+def cached_dataframe_wf():
+    raw_data = uncached_data_reading_task()
+
+    # We execute `cached_data_processing_task` twice, but we force those
+    # two executions to happen serially to demonstrate how the second run
+    # hits the cache.
+    t1_node = create_node(cached_data_processing_task, df=raw_data)
+    t2_node = create_node(cached_data_processing_task, df=raw_data)
+    t1_node >> t2_node
+
+    # Confirm that the dataframes actually match
+    compare_dataframes(df1=t1_node.o0, df2=t2_node.o0)
+
+
+if __name__ == "__main__":
+    print(f"Running cached_dataframe_wf once")
+    df1 = cached_dataframe_wf()
