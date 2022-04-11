@@ -85,6 +85,7 @@ Options inherited from parent commands
 
 ::
 
+      --admin.authType string                      Type of OAuth2 flow used for communicating with admin.ClientSecret, Pkce, ExternalCommand are valid values (default "ClientSecret")
       --admin.authorizationHeader string           Custom metadata header to pass JWT
       --admin.authorizationServerUrl string        This is the URL to your IdP's authorization server. It'll default to Endpoint
       --admin.caCertFilePath string                Use specified certificate file to verify the admin server peer.
@@ -100,10 +101,22 @@ Options inherited from parent commands
       --admin.pkceConfig.refreshTime string         (default "5m0s")
       --admin.pkceConfig.timeout string             (default "15s")
       --admin.scopes strings                       List of scopes to request
+      --admin.tokenRefreshWindow string            Max duration between token refresh attempt and token expiry. (default "0s")
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
   -c, --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
+      --files.archive                              Pass in archive file either an http link or local path.
+      --files.assumableIamRole string              Custom assumable iam auth role to register launch plans with.
+      --files.continueOnError                      Continue on error when registering files.
+      --files.destinationDirectory string          Location of source code in container.
+      --files.dryRun                               Execute command without making any modifications.
+      --files.force                                Force use of version number on entities registered with flyte.
+      --files.k8ServiceAccount string              Deprecated. Please use --K8sServiceAccount
+      --files.k8sServiceAccount string             Custom kubernetes service account auth role to register launch plans with.
+      --files.outputLocationPrefix string          Custom output location prefix for offloaded types (files/schemas).
+      --files.sourceUploadPath string              Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
+      --files.version string                       Version of the entity to be registered with flyte which are un-versioned after serialization.
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
