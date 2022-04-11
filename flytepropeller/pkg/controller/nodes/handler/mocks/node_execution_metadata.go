@@ -51,6 +51,38 @@ func (_m *NodeExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type NodeExecutionMetadata_GetInterruptibleFailureThreshold struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint32) *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
+	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionMetadata) OnGetInterruptibleFailureThreshold() *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
+	c := _m.On("GetInterruptibleFailureThreshold")
+	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+}
+
+func (_m *NodeExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matchers ...interface{}) *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
+	c := _m.On("GetInterruptibleFailureThreshold", matchers...)
+	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+}
+
+// GetInterruptibleFailureThreshold provides a mock function with given fields:
+func (_m *NodeExecutionMetadata) GetInterruptibleFailureThreshold() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type NodeExecutionMetadata_GetK8sServiceAccount struct {
 	*mock.Call
 }

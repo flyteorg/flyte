@@ -39,6 +39,7 @@ type NodeExecutionMetadata interface {
 	GetK8sServiceAccount() string
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
+	GetInterruptibleFailureThreshold() uint32
 }
 
 type NodeExecutionContext interface {
