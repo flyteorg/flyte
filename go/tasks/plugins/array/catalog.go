@@ -488,7 +488,8 @@ func ConstructOutputWriter(ctx context.Context, dataStore *storage.DataStore, ou
 		return nil, err
 	}
 
-	// TODO when we fix https://github.com/flyteorg/flyte/issues/1276 we should make sure that the checkpoint paths are computed correctly
+	// checkpoint paths are not computed here because this function is only called when writing
+	// existing cached outputs. if this functionality changes this will need to be revisited.
 	p := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, dataReference, ioutils.NewRawOutputPaths(ctx, outputSandbox), "")
 	return ioutils.NewRemoteFileOutputWriter(ctx, dataStore, p), nil
 }
@@ -523,7 +524,8 @@ func ConstructOutputReader(ctx context.Context, dataStore *storage.DataStore, ou
 		return nil, err
 	}
 
-	// TODO when we fix https://github.com/flyteorg/flyte/issues/1276 we should make so that the checkpoint paths are computed correctly
+	// checkpoint paths are not computed here because this function is only called when writing
+	// existing cached outputs. if this functionality changes this will need to be revisited.
 	outputPath := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, dataReference, ioutils.NewRawOutputPaths(ctx, outputSandbox), "")
 	return ioutils.NewRemoteFileOutputReader(ctx, dataStore, outputPath, int64(999999999)), nil
 }

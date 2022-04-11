@@ -9,10 +9,13 @@ import (
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	podPlugin "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
+
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 // SubTaskExecutionContext wraps the core TaskExecutionContext so that the k8s array task context
@@ -22,12 +25,18 @@ type SubTaskExecutionContext struct {
 	arrayInputReader io.InputReader
 	metadataOverride pluginsCore.TaskExecutionMetadata
 	originalIndex    int
+	outputWriter     io.OutputWriter
 	subtaskReader    SubTaskReader
 }
 
 // InputReader overrides the base TaskExecutionContext to return a custom InputReader
 func (s SubTaskExecutionContext) InputReader() io.InputReader {
 	return s.arrayInputReader
+}
+
+// OutputWriter overrides the base TaskExecutionContext to return a custom OutputWriter
+func (s SubTaskExecutionContext) OutputWriter() io.OutputWriter {
+	return s.outputWriter
 }
 
 // TaskExecutionMetadata overrides the base TaskExecutionContext to return custom
@@ -42,7 +51,7 @@ func (s SubTaskExecutionContext) TaskReader() pluginsCore.TaskReader {
 }
 
 // NewSubtaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
-func NewSubTaskExecutionContext(tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
+func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
 	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
 
 	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, retryAttempt, systemFailures)
@@ -50,6 +59,7 @@ func NewSubTaskExecutionContext(tCtx pluginsCore.TaskExecutionContext, taskTempl
 		return SubTaskExecutionContext{}, err
 	}
 
+	// construct TaskTemplate
 	subtaskTemplate := &core.TaskTemplate{}
 	*subtaskTemplate = *taskTemplate
 
@@ -64,11 +74,42 @@ func NewSubTaskExecutionContext(tCtx pluginsCore.TaskExecutionContext, taskTempl
 
 	arrayInputReader := array.GetInputReader(tCtx, taskTemplate)
 	subtaskReader := SubTaskReader{tCtx.TaskReader(), subtaskTemplate}
+
+	// construct OutputWriter
+	dataStore := tCtx.DataStore()
+	checkpointPrefix, err := dataStore.ConstructReference(ctx, tCtx.OutputWriter().GetRawOutputPrefix(), strconv.Itoa(originalIndex))
+	if err != nil {
+		return SubTaskExecutionContext{}, err
+	}
+
+	checkpoint, err := dataStore.ConstructReference(ctx, checkpointPrefix, strconv.FormatUint(retryAttempt, 10))
+	if err != nil {
+		return SubTaskExecutionContext{}, err
+	}
+	checkpointPath := ioutils.NewRawOutputPaths(ctx, checkpoint)
+
+	var prevCheckpoint storage.DataReference
+	if retryAttempt == 0 {
+		prevCheckpoint = ""
+	} else {
+		prevCheckpoint, err = dataStore.ConstructReference(ctx, checkpointPrefix, strconv.FormatUint(retryAttempt-1, 10))
+		if err != nil {
+			return SubTaskExecutionContext{}, err
+		}
+	}
+	prevCheckpointPath := ioutils.ConstructCheckpointPath(dataStore, prevCheckpoint)
+
+	// note that we must not append the originalIndex to the original OutputPrefixPath because
+	// flytekit is already doing this
+	p := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, tCtx.OutputWriter().GetOutputPrefixPath(), checkpointPath, prevCheckpointPath)
+	outputWriter := ioutils.NewRemoteFileOutputWriter(ctx, dataStore, p)
+
 	return SubTaskExecutionContext{
 		TaskExecutionContext: tCtx,
 		arrayInputReader:     arrayInputReader,
 		metadataOverride:     subTaskExecutionMetadata,
 		originalIndex:        originalIndex,
+		outputWriter:         outputWriter,
 		subtaskReader:        subtaskReader,
 	}, nil
 }
