@@ -129,8 +129,9 @@ class CustomSorter(FileNameSortKey):
         ## GCP
         # TODO
         ## External Services
-        "hive.py",
-        "snowflake.py",
+        "hive.py"
+        "snowflake.py"
+        "bigquery.py"
         # Extending Flyte
         "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
         "run_custom_types.py",
