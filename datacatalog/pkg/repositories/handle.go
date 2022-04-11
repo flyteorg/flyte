@@ -20,7 +20,7 @@ type DBHandle struct {
 	db *gorm.DB
 }
 
-func NewDBHandle(dbConfigValues database.DbConfig, catalogScope promutils.Scope) (*DBHandle, error) {
+func NewDBHandle(ctx context.Context, dbConfigValues database.DbConfig, catalogScope promutils.Scope) (*DBHandle, error) {
 	var gormDb *gorm.DB
 	var err error
 
@@ -28,7 +28,7 @@ func NewDBHandle(dbConfigValues database.DbConfig, catalogScope promutils.Scope)
 	case !dbConfigValues.SQLite.IsEmpty():
 		gormDb, err = gorm.Open(sqlite.Open(dbConfigValues.SQLite.File))
 	case !dbConfigValues.Postgres.IsEmpty():
-		gormDb, err = config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfigValues, catalogScope.NewSubScope(config.Postgres)))
+		gormDb, err = config.OpenDbConnection(ctx, config.NewPostgresConfigProvider(dbConfigValues, catalogScope.NewSubScope(config.Postgres)))
 	default:
 		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfigValues)
 	}

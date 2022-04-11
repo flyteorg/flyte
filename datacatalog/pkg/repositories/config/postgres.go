@@ -1,7 +1,10 @@
 package config
 
 import (
+	"context"
 	"fmt"
+
+	stdlibLogger "github.com/flyteorg/flytestdlib/logger"
 
 	"gorm.io/gorm/logger"
 
@@ -66,9 +69,9 @@ func (p *PostgresConfigProvider) GetDBConfig() database.DbConfig {
 
 // Opens a connection to the database specified in the config.
 // You must call CloseDbConnection at the end of your session!
-func OpenDbConnection(config DbConnectionConfigProvider) (*gorm.DB, error) {
+func OpenDbConnection(ctx context.Context, config DbConnectionConfigProvider) (*gorm.DB, error) {
 	db, err := gorm.Open(config.GetDialector(), &gorm.Config{
-		Logger:                                   logger.Default.LogMode(config.GetDBConfig().LogLevel),
+		Logger:                                   database.GetGormLogger(ctx, stdlibLogger.GetConfig()),
 		DisableForeignKeyConstraintWhenMigrating: !config.GetDBConfig().EnableForeignKeyConstraintWhenMigrating,
 	})
 	if err != nil {

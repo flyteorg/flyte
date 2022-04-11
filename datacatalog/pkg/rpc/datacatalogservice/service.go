@@ -99,7 +99,7 @@ func NewDataCatalogService() *DataCatalogService {
 	}
 
 	dbConfigValues := configProvider.ApplicationConfiguration().GetDbConfig()
-	repos := repositories.GetRepository(repositories.POSTGRES, *dbConfigValues, catalogScope)
+	repos := repositories.GetRepository(ctx, repositories.POSTGRES, *dbConfigValues, catalogScope)
 	logger.Infof(ctx, "Created DB connection.")
 
 	// Serve profiling endpoint.
