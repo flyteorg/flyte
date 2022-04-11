@@ -8,16 +8,17 @@ import (
 	"strings"
 	"testing"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyteadmin/pkg/config"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	stdConfig "github.com/flyteorg/flytestdlib/config"
+
 	authConfig "github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
-	provider := NewService(&authConfig.Config{
+	provider := NewService(&config.ServerConfig{}, &authConfig.Config{
 		AppAuth: authConfig.OAuth2Options{
 			ThirdParty: authConfig.ThirdPartyConfigOptions{
 				FlyteClientConfig: authConfig.FlyteClientConfig{
@@ -39,8 +40,8 @@ func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 
 func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 	t.Run("Self AuthServer", func(t *testing.T) {
-		provider := NewService(&authConfig.Config{
-			AuthorizedURIs: []config2.URL{{URL: *config.MustParseURL("https://issuer/")}},
+		provider := NewService(&config.ServerConfig{}, &authConfig.Config{
+			AuthorizedURIs: []stdConfig.URL{{URL: *authConfig.MustParseURL("https://issuer/")}},
 		})
 
 		ctx := context.Background()
@@ -74,12 +75,12 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 	http.DefaultClient = s.Client()
 
 	t.Run("External AuthServer", func(t *testing.T) {
-		provider := NewService(&authConfig.Config{
-			AuthorizedURIs: []config2.URL{{URL: *config.MustParseURL("https://issuer/")}},
+		provider := NewService(&config.ServerConfig{}, &authConfig.Config{
+			AuthorizedURIs: []stdConfig.URL{{URL: *authConfig.MustParseURL("https://issuer/")}},
 			AppAuth: authConfig.OAuth2Options{
 				AuthServerType: authConfig.AuthorizationServerTypeExternal,
 				ExternalAuthServer: authConfig.ExternalAuthorizationServer{
-					BaseURL: config2.URL{URL: *config.MustParseURL(s.URL)},
+					BaseURL: stdConfig.URL{URL: *authConfig.MustParseURL(s.URL)},
 				},
 			},
 		})
@@ -91,14 +92,14 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 	})
 
 	t.Run("External AuthServer fallback url", func(t *testing.T) {
-		provider := NewService(&authConfig.Config{
-			AuthorizedURIs: []config2.URL{{URL: *config.MustParseURL("https://issuer/")}},
+		provider := NewService(&config.ServerConfig{}, &authConfig.Config{
+			AuthorizedURIs: []stdConfig.URL{{URL: *authConfig.MustParseURL("https://issuer/")}},
 			AppAuth: authConfig.OAuth2Options{
 				AuthServerType: authConfig.AuthorizationServerTypeExternal,
 			},
 			UserAuth: authConfig.UserAuthConfig{
 				OpenID: authConfig.OpenIDOptions{
-					BaseURL: config2.URL{URL: *config.MustParseURL(s.URL)},
+					BaseURL: stdConfig.URL{URL: *authConfig.MustParseURL(s.URL)},
 				},
 			},
 		})
