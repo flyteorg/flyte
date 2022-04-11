@@ -17,7 +17,9 @@ RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 h
 COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 COPY go.mod go.sum /app/flyte/
 COPY cmd/ /app/flyte/cmd/
-RUN cd /app/flyte && go mod download && go mod vendor && go build -o /flyte cmd/main.go
+WORKDIR /app/flyte
+RUN go mod download 
+RUN go build -o /flyte cmd/main.go
 
 
 FROM alpine:3.13.5 AS base

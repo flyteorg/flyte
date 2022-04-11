@@ -22,8 +22,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyteadmin/pkg/server"
 	adminScheduler "github.com/flyteorg/flyteadmin/scheduler"
-	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/k8s"
-	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	_ "github.com/golang/glog"
