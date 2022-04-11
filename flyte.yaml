@@ -7,7 +7,7 @@ propeller:
   kube-config: "/etc/rancher/k3s/k3s.yaml"
   create-flyteworkflow-crd: true
 webhook:
-  certDir: /etc/webhook/certs
+  certDir: /tmp/k8s-webhook-server/serving-certs
   serviceName: flyte-pod-webhook
   localCert: true
   servicePort: 9443

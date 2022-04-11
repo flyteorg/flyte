@@ -49,7 +49,7 @@ timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment post
 
 k3s kubectl wait --for=condition=available deployment/minio deployment/postgres -n flyte --timeout=5m || ( echo >&2 "Timed out while waiting for the Flyte deployment to start"; exit 1 )
 # Create directory to store certificate
-mkdir -p /etc/webhook/certs
+mkdir -p /tmp/k8s-webhook-server/serving-certs
 flyte start --config /flyteorg/share/flyte.yaml &
 FLYTE_PID=$!
 

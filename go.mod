@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/flyteorg/datacatalog v0.3.30
 	github.com/flyteorg/flyteadmin v0.6.127
-	github.com/flyteorg/flyteplugins v0.10.16
-	github.com/flyteorg/flytepropeller v0.16.37
+	github.com/flyteorg/flyteplugins v0.10.19
+	github.com/flyteorg/flytepropeller v0.16.40
 	github.com/flyteorg/flytestdlib v0.4.19
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.3.0
@@ -49,7 +49,7 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v0.24.10 // indirect
+	github.com/flyteorg/flyteidl v0.24.17 // indirect
 	github.com/flyteorg/stow v0.3.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -173,5 +173,3 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
-
-replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.39-0.20220409203826-b8bcf4522c23
