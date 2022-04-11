@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/flyteorg/flytestdlib/database"
@@ -31,10 +32,10 @@ type RepositoryInterface interface {
 	ReservationRepo() interfaces.ReservationRepo
 }
 
-func GetRepository(repoType RepoConfig, dbConfig database.DbConfig, scope promutils.Scope) RepositoryInterface {
+func GetRepository(ctx context.Context, repoType RepoConfig, dbConfig database.DbConfig, scope promutils.Scope) RepositoryInterface {
 	switch repoType {
 	case POSTGRES:
-		db, err := config.OpenDbConnection(config.NewPostgresConfigProvider(dbConfig, scope.NewSubScope("postgres")))
+		db, err := config.OpenDbConnection(ctx, config.NewPostgresConfigProvider(dbConfig, scope.NewSubScope("postgres")))
 		if err != nil {
 			panic(err)
 		}

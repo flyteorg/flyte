@@ -24,7 +24,7 @@ func Migrate(ctx context.Context) error {
 	dbConfigValues := *configProvider.ApplicationConfiguration().GetDbConfig()
 
 	dbName := dbConfigValues.Postgres.DbName
-	dbHandle, err := NewDBHandle(dbConfigValues, migrateScope)
+	dbHandle, err := NewDBHandle(ctx, dbConfigValues, migrateScope)
 
 	if err != nil {
 		// if db does not exist, try creating it
@@ -39,7 +39,7 @@ func Migrate(ctx context.Context) error {
 			logger.Warningf(ctx, "Database [%v] does not exist, trying to create it now", dbName)
 
 			dbConfigValues.Postgres.DbName = defaultDB
-			setupDBHandler, err := NewDBHandle(dbConfigValues, migrateScope)
+			setupDBHandler, err := NewDBHandle(ctx, dbConfigValues, migrateScope)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to connect to default DB %v, err %v", defaultDB, err)
 				panic(err)
@@ -54,7 +54,7 @@ func Migrate(ctx context.Context) error {
 			}
 
 			dbConfigValues.Postgres.DbName = dbName
-			dbHandle, err = NewDBHandle(dbConfigValues, migrateScope)
+			dbHandle, err = NewDBHandle(ctx, dbConfigValues, migrateScope)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to connect DB err %v", err)
 				panic(err)
