@@ -34,7 +34,7 @@ jobs:
     - name: cat file
       shell: bash
       run: |
-        cat .github/scripts/ci_helper.sh
+        cat ./opta/aws/env.yaml
 #    - name: APPLY Opta
 #      shell: bash
 #      run: |
