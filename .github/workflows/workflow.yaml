@@ -30,6 +30,10 @@ jobs:
       shell: bash
       run: |
         sed -i 's/<env_name>/$ENV_NAME/g' ./opta/aws/env.yaml; sed -i 's/<your_company>/$YOUR_COMPANY/g' ./opta/aws/env.yaml; sed -i 's/<region>/$REGION/g' ./opta/aws/env.yaml; sed -i 's/<account_id>/$AWS_ACCOUNT_ID/g' ./opta/aws/env.yaml; 
+    - name: cat file
+      shell: bash
+      run: |
+        cat ./opta/aws/env.yaml
     - name: APPLY Opta
       shell: bash
       run: |
