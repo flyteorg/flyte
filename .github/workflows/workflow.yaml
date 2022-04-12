@@ -13,12 +13,3 @@ env:
 jobs:
   setup-nightly-and-release-workflows:
     uses: "${{ env.WORKING_LOCATION }}"
-  cat-stuff:
-    uses: ubuntu-latest
-    - name: cat file
-      shell: bash
-      run: |
-        cat ./opta/aws/env.yaml
-
-
-
