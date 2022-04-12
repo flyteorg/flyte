@@ -61,7 +61,7 @@ Locally
 
 .. prompt:: bash $
 
-  pyflyte run example.py:wf
+  pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
 
 *This uses the default image bundled with flytekit, which contains numpy, pandas, flytekit, you can optionally pass a different image*
 
@@ -96,6 +96,12 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 
 .. prompt:: bash $
 
-  pyflyte run --remote --service-account demo example.py:wf --n 500 --mean 42 --sigma 2
+  pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
+
+.. note:: The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execute on the configured backend
+
+
+Check It
+^^^^^^^^^
 
 * Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
