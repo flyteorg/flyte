@@ -54,7 +54,7 @@ if [[ $FLYTE_TEST = "local" ]]
 then
   helm dep update $charts
 fi
-helm upgrade -n flyte --set contour.enabled=false --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install --wait
+helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install --wait
 
 timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl get namespace flyte &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the Flyte namespace to be created"; exit 1 )
 timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment minio -n flyte  &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the minio rollout to be created"; exit 1 )
