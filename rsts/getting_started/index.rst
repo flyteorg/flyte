@@ -73,8 +73,8 @@ Run your workflow locally using ``pyflyte``, which is the CLI that ships with ``
 
 .. tip:: This is just Python code also, you can also simply execute the workflow as a python function -> ``wf()``.
 
-On a Flyte cluster
-"""""""""""""""""""
+Executing on a Flyte Cluster
+"""""""""""""""""""""""""""""""
 
 Install :std:ref:`flytectl`, which is the command-line interface for Flyte. Let's use it to start a local demo Flyte cluster.
 
