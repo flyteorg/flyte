@@ -94,11 +94,11 @@ func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
 // GetSandboxPorts will return sandbox ports
 func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
 	return nat.ParsePortSpecs([]string{
-		"0.0.0.0:30081:30081", // Flyteconsole Port
-		"0.0.0.0:30082:30082", // Flyteadmin Port
+		"0.0.0.0:30080:30080", // Flyteconsole Port
+		"0.0.0.0:30081:30081", // Flyteadmin Port
+		"0.0.0.0:30082:30082", // K8s Dashboard Port
 		"0.0.0.0:30084:30084", // Minio API Port
-		"0.0.0.0:30086:30086", // K8s Dashboard Port
-		"0.0.0.0:30087:30087", // Old Minio Console Port, keeping around for old images
+		"0.0.0.0:30086:30086", // K8s cluster
 		"0.0.0.0:30088:30088", // Minio Console Port
 	})
 }
