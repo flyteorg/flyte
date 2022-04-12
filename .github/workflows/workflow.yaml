@@ -12,7 +12,7 @@ env:
 jobs:
   calculate-pre-reqs:
     name: Calculate pre-requirements
-    runs-on: flyteorg-infra
+    runs-on: ubuntu-latest
     steps:
       - name: Set inputs defaults (needed for scheduled runs)
         id: set-inputs-default
