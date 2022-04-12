@@ -24,7 +24,7 @@ Example
 Create It
 """"""""""
 
-* Copy the following code to a file named ``example.py``
+Copy the following code to a file named ``example.py``
 
 .. code-block:: python
 
@@ -52,12 +52,12 @@ Create It
 
 Run It
 ^^^^^^^
-You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster
+You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster.
 
 Locally
 """"""""
 
-* Run your workflow locally using ``pyflyte``:
+Run your workflow locally using ``pyflyte``
 
 .. prompt:: bash $
 
@@ -103,5 +103,4 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 
 Check It
 ^^^^^^^^^
-
-* Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
+Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
