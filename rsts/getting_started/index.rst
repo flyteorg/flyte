@@ -4,12 +4,12 @@
 Getting Started
 ################
 
-Prerequisites
-^^^^^^^^^^^^^^^^
+Requirements
+^^^^^^^^^^^^^
 Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ and Docker Daemon is running.
 
-Install flytekit
-^^^^^^^^^^^^^^^^^
+Installation
+^^^^^^^^^^^^
 
 Install Flyte's python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__.
 
@@ -18,12 +18,15 @@ Install Flyte's python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__
   pip install flytekit
 
 
-Write your first workflow
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Example
+^^^^^^^^
 
-#. Copy the following code to a file named ``example.py``
+Create It
+""""""""""
 
-  .. code-block:: python
+* Copy the following code to a file named ``example.py``
+
+.. code-block:: python
 
     import typing
     import pandas as pd
@@ -46,7 +49,15 @@ Write your first workflow
     def wf(n: int = 200, mean: float = 0.0, sigma: float = 1.0) -> typing.Tuple[float, float]:
         return compute_stats(df=generate_normal_df(n=n, mean=mean, sigma=sigma))
 
-#. Run your workflow locally using ``pyflyte``:
+
+Run It
+^^^^^^^
+You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster
+
+Locally
+""""""""
+
+* Run your workflow locally using ``pyflyte``:
 
 .. prompt:: bash $
 
@@ -56,11 +67,8 @@ Write your first workflow
 
 .. tip:: This is just Python code also, you can also simply execute the workflow as a python function -> ``wf()``.
 
-Run on a Flyte backend installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install flytectl
-""""""""""""""""
+On a Flyte cluster
+"""""""""""""""""""
 
 Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. This is useful to start a local demo cluster of Flyte.
 
@@ -78,16 +86,16 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
     export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
 
 
-#. Start a Flyte demonstration environment on your local machine
+* Start a Flyte demonstration environment on your local machine
 
 .. prompt:: bash $
 
   flytectl demo start
 
-#. Now run the same workflow on the Flyte backend
+* Now run the same workflow on the Flyte backend
 
 .. prompt:: bash $
 
   pyflyte run --remote --service-account demo example.py:wf --n 500 --mean 42 --sigma 2
 
-#. Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
+* Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
