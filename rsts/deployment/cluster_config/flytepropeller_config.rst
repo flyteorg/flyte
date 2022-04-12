@@ -114,11 +114,25 @@ Max number of gRPC retries
 authType (uint8)
 --------------------------------------------------------------------------------
 
+Type of OAuth2 flow used for communicating with admin.ClientSecret,Pkce,ExternalCommand are valid values
+
 **Default Value**: 
 
 .. code-block:: yaml
 
   ClientSecret
+  
+
+tokenRefreshWindow (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Max duration between token refresh attempt and token expiry.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 useAuth (bool)
@@ -541,7 +555,7 @@ Sets the minimum logging level.
 
 .. code-block:: yaml
 
-  "4"
+  "3"
   
 
 formatter (`logger.FormatterConfig`_)
@@ -573,18 +587,6 @@ Sets logging format type.
 
 Section: plugins
 ================================================================================
-
-enabled-plugins ([]string)
---------------------------------------------------------------------------------
-
-List of enabled plugins, default value is to enable all plugins.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  - '*'
-  
 
 athena (`athena.Config`_)
 --------------------------------------------------------------------------------
@@ -707,6 +709,8 @@ k8s (`config.K8sPluginConfig`_)
   default-node-selector: null
   default-pod-dns-config: null
   default-pod-security-context: null
+  default-pod-template-name: ""
+  default-pod-template-resync: 30s
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
@@ -1800,6 +1804,30 @@ default-pod-dns-config (v1.PodDNSConfig)
 .. code-block:: yaml
 
   null
+  
+
+default-pod-template-name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the PodTemplate to use as the base for all k8s pods created by FlytePropeller.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+default-pod-template-resync (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Frequency of resyncing default pod templates
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
   
 
 config.FlyteCoPilotConfig
@@ -3230,6 +3258,18 @@ Unique cluster id running this flytepropeller instance with which to annotate ex
   propeller
   
 
+create-flyteworkflow-crd (bool)
+--------------------------------------------------------------------------------
+
+Enable creation of the FlyteWorkflow CRD on startup
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 admin-launcher (`launchplan.AdminConfig`_)
 --------------------------------------------------------------------------------
 
@@ -3947,6 +3987,18 @@ Sets the default http client config.
   timeout: 0s
   
 
+signedUrl (`storage.SignedURLConfig`_)
+--------------------------------------------------------------------------------
+
+Sets config for SignedURL.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
 storage.CachingConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4089,13 +4141,26 @@ Maximum allowed download size (in MBs) per call.
   "2"
   
 
+storage.SignedURLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stowConfigOverride (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 storage.StowConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 kind (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Kind of Stow backend to use. Refer to github/graymeta/stow
+Kind of Stow backend to use. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
@@ -4107,7 +4172,7 @@ Kind of Stow backend to use. Refer to github/graymeta/stow
 config (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Configuration for stow backend. Refer to github/graymeta/stow
+Configuration for stow backend. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
@@ -4255,7 +4320,7 @@ config.TaskPluginConfig
 enabled-plugins ([]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-deprecated
+Plugins enabled currently
 
 **Default Value**: 
 
@@ -4301,6 +4366,18 @@ Certificate directory to use to write generated certs. Defaults to /etc/webhook/
   /etc/webhook/certs
   
 
+localCert (bool)
+--------------------------------------------------------------------------------
+
+write certs locally. Defaults to false
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 listenPort (int)
 --------------------------------------------------------------------------------
 
@@ -4323,6 +4400,18 @@ The name of the webhook service.
 .. code-block:: yaml
 
   flyte-pod-webhook
+  
+
+servicePort (int32)
+--------------------------------------------------------------------------------
+
+The port on the service that hosting webhook.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "443"
   
 
 secretName (string)
