@@ -30,12 +30,12 @@ You need Prerequisite in place before installing flyte cluster in eks
 
 | Placeholder | Description | Sample Value |
 | -------- | -------- | -------- |
-| <ACCOUNT_NUMBER>    | The AWS Account ID | 173113148371 |
-| <AWS_REGION>    | The region your EKS cluster is inThe AWS Account ID | us-east-2 |
-| <RDS_HOST_DNS>    | DNS entry for your Aurora instance | flyteadmin.cluster-cuvm8rpzqloo.us-east-2.rds.amazonaws.com |
-| <BUCKET_NAME>    | Bucket used by Flyte | my-sample-s3-bucket |
-| <DB_PASSWORD>    | The password in plaintext for your RDS instance | awesomesauce |
-| <RDS_HOST_DNS>    | The AWS Account ID | 173113148371 |
+| `<ACCOUNT_NUMBER>`    | The AWS Account ID | 173113148371 |
+| `<AWS_REGION>`    | The region your EKS cluster is inThe AWS Account ID | us-east-2 |
+| `<RDS_HOST_DNS>`    | DNS entry for your Aurora instance | flyteadmin.cluster-cuvm8rpzqloo.us-east-2.rds.amazonaws.com |
+| `<BUCKET_NAME>`    | Bucket used by Flyte | my-sample-s3-bucket |
+| `<DB_PASSWORD>`    | The password in plaintext for your RDS instance | awesomesauce |
+| `<RDS_HOST_DNS>`    | The AWS Account ID | 173113148371 |
 
 Create `values-override.yaml` file and add your connection details:
 ```yaml
