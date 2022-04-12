@@ -11,7 +11,7 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ and Docker D
 Installation
 ^^^^^^^^^^^^
 
-Install Flyte's python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__.
+Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's python SDK.
 
 .. prompt:: bash
 
