@@ -14,6 +14,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 HELM_CAPABILITIES="-a rbac.authorization.k8s.io/v1 -a networking.k8s.io/v1/Ingress -a apiextensions.k8s.io/v1/CustomResourceDefinition"
 
 helm dep update ${DIR}/../charts/flyte/
+helm dep update ${DIR}/../charts/flyte-deps/
 
 helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
@@ -25,6 +26,9 @@ done
 
 # Generate manifest AWS Scheduler
 helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-eks.yaml -f ${DIR}/../charts/flyte-core/values-eks-override.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/eks/flyte_aws_scheduler_helm_generated.yaml
+
+# Generate manifest deps chart
+helm template flyte -n flyte ${DIR}/../charts/flyte-deps/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_sandbox_deps_helm_generated.yaml
 
 echo "Generating helm docs"
 if  command -v helm-docs &> /dev/null

@@ -1,0 +1,21 @@
+{{- if .Values.redis.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "redis.name" . }}-resource-manager
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "redis.labels" . | nindent 4 }}
+  {{- with .Values.redis.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.redis.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - name: redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector: {{ include "redis.selectorLabels" . | nindent 4 }}
+{{- end }}
