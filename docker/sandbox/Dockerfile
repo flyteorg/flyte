@@ -26,7 +26,7 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
     chmod 700 /flyteorg/bin/get_helm.sh && \
     sh /flyteorg/bin/get_helm.sh --version ${HELM_VERSION} && \
     mv /usr/local/bin/helm /flyteorg/bin/helm && \
-    rm /flyteorg/bin/get_helm.sh 
+    rm /flyteorg/bin/get_helm.sh
 
 
 # Install flytectl
@@ -39,7 +39,7 @@ COPY charts/flyte-core/ /flyteorg/share/flyte-core
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
 
-FROM docker:20.10.11-dind AS dind
+FROM docker:20.10.14-dind-alpine3.15 AS dind
 
 # Install dependencies
 RUN apk add --no-cache bash git make tini curl jq

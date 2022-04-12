@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: project-quota
+  namespace: {{ namespace }}
+spec:
+  hard:
+    limits.cpu: {{ projectQuotaCpu }}
+    limits.memory: {{ projectQuotaMemory }}
