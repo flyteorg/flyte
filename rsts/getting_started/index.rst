@@ -58,8 +58,8 @@ Running Flyte Workflows
 ^^^^^^^^^^^^^^^^^^^^^^^
 You can run the workflows in `example.py` on a local python environment or a Flyte cluster. In this guide, you'll learn how to run a demo local cluster.
 
-Locally
-""""""""
+Executing Locally
+"""""""""""""""""""
 
 Run your workflow locally using ``pyflyte``, which is the CLI that ships with ``flytekit``.
 
