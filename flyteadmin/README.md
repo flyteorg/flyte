@@ -17,6 +17,8 @@ administering workflow executions. FlyteAdmin implements the
 defines a stateless REST/gRPC service for interacting with registered Flyte entities and executions.
 FlyteAdmin uses a relational style Metadata Store abstracted by [GORM](http://gorm.io/) ORM library.
 
+For more background on Flyte, check out the official [website](https://flyte.org/) and the [docs](https://docs.flyte.org/en/latest/index.html)
+
 Before Check-In
 ---------------
 
