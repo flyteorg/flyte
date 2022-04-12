@@ -24,7 +24,7 @@ spec:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
         - name: POSTGRES_DB
-          value: {{ .Values.flyte.db.admin.database.dbname }}
+          value: {{ .Values.postgres.dbname }}
         ports:
         - containerPort: 5432
           name: postgres

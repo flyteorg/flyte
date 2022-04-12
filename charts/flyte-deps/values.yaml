@@ -9,6 +9,7 @@ redis:
 postgres:
   # --- enable or disable Postgres deployment installation
   enabled: true
+  dbname: flyteadmin
   # -- Replicas count for Postgres deployment
   replicaCount: 1
   image:

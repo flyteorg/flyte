@@ -1,6 +1,6 @@
 apiVersion: v2
-name: flyte
-description: A Helm chart for Flyte Sandbox
+name: flyte-deps
+description: A Helm chart for Flyte dependency
 type: application
 version: v0.1.10 # VERSION
 dependencies:
