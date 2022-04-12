@@ -67,7 +67,9 @@ Run your workflow locally using ``pyflyte``, which is the CLI that ships with ``
 
   pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
 
-*This uses the default image bundled with flytekit, which contains numpy, pandas, flytekit, you can optionally pass a different image*
+.. note::
+   This uses the default image bundled with flytekit, which contains numpy, pandas, flytekit.
+   You can also pass in your own image using the ``--image`` flag.
 
 .. tip:: This is just Python code also, you can also simply execute the workflow as a python function -> ``wf()``.
 
