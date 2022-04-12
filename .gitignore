@@ -17,7 +17,9 @@ docs/
 release/
 __pycache__/
 /charts/flyte/charts
+/charts/flyte-deps/charts
 /charts/flyte/Chart.lock
+/charts/flyte-deps/Chart.lock
 /charts/flyte-core/Chart.lock
 **/*.bak-
 bin/-

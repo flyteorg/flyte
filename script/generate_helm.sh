@@ -40,7 +40,6 @@ GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 
 ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 
-
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
