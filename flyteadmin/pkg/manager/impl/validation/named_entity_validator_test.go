@@ -130,6 +130,17 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
 		},
 	}))
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_TASK,
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Metadata: &admin.NamedEntityMetadata{
+			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
+		},
+	}))
 }
 
 func TestValidateNamedEntityListRequest(t *testing.T) {

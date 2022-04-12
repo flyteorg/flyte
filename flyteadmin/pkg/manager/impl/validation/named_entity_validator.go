@@ -6,7 +6,10 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
+
+var archivableResourceTypes = sets.NewInt32(int32(core.ResourceType_WORKFLOW), int32(core.ResourceType_TASK))
 
 func ValidateNamedEntityGetRequest(request admin.NamedEntityGetRequest) error {
 	if err := ValidateResourceType(request.ResourceType); err != nil {
@@ -29,11 +32,11 @@ func ValidateNamedEntityUpdateRequest(request admin.NamedEntityUpdateRequest) er
 		return shared.GetMissingArgumentError(shared.Metadata)
 	}
 
-	// Anything but the default state is only permitted for workflow resources.
+	// Only tasks and workflow resources can be modified from the default state.
 	if request.Metadata.State != admin.NamedEntityState_NAMED_ENTITY_ACTIVE &&
-		request.ResourceType != core.ResourceType_WORKFLOW {
+		!archivableResourceTypes.Has(int32(request.ResourceType)) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"Only workflow name entities can have their state updated")
+			"Resource [%s] cannot have its state updated", request.ResourceType.String())
 	}
 	return nil
 }
