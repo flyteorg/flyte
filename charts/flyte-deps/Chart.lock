@@ -1,0 +1,12 @@
+dependencies:
+- name: contour
+  repository: https://charts.bitnami.com/bitnami
+  version: 5.0.0
+- name: spark-operator
+  repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+  version: 1.1.15
+- name: kubernetes-dashboard
+  repository: https://kubernetes.github.io/dashboard/
+  version: 4.0.2
+digest: sha256:330695579246ad9704b1ed0830d991e0a02fdc16e2e297714aafa72d89926500
+generated: "2022-04-12T11:55:00.877164+05:30"

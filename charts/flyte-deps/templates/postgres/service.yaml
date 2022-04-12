@@ -1,0 +1,21 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "postgres.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "postgres.labels" . | nindent 4 }}
+  {{- with .Values.postgres.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.postgres.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: postgres
+  selector: {{ include "postgres.selectorLabels" . | nindent 4 }}
+{{- end }}
