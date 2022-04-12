@@ -62,10 +62,10 @@ def run_launch_plan(remote, version, workflow_name, inputs):
 
 
 def schedule_workflow_group(
-        tag: str,
-        workflow_group: str,
-        remote: FlyteRemote,
-        terminate_workflow_on_failure: bool,
+    tag: str,
+    workflow_group: str,
+    remote: FlyteRemote,
+    terminate_workflow_on_failure: bool,
 ) -> bool:
     """
     Schedule all workflows executions and return True if all executions succeed, otherwise
@@ -80,7 +80,7 @@ def schedule_workflow_group(
     # Wait for all launch plans to finish
     attempt = 0
     while attempt == 0 or (
-            not all([lp.is_done for lp in launch_plans]) and attempt < MAX_ATTEMPTS
+        not all([lp.is_done for lp in launch_plans]) and attempt < MAX_ATTEMPTS
     ):
         attempt += 1
         print(
@@ -125,10 +125,10 @@ def valid(workflow_group):
 
 
 def run(
-        flytesnacks_release_tag: str,
-        priorities: List[str],
-        config_file_path,
-        terminate_workflow_on_failure: bool,
+    flytesnacks_release_tag: str,
+    priorities: List[str],
+    config_file_path,
+    terminate_workflow_on_failure: bool,
 ) -> List[Dict[str, str]]:
     remote = FlyteRemote(
         Config.auto(config_file=config_file_path),
@@ -212,11 +212,11 @@ def run(
 @click.argument("priorities")
 @click.argument("config_file")
 def cli(
-        flytesnacks_release_tag,
-        priorities,
-        config_file,
-        return_non_zero_on_failure,
-        terminate_workflow_on_failure,
+    flytesnacks_release_tag,
+    priorities,
+    config_file,
+    return_non_zero_on_failure,
+    terminate_workflow_on_failure,
 ):
     print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
     results = run(

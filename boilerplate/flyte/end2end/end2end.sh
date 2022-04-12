@@ -4,10 +4,7 @@
 # ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
 #
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
-set -eu
-
-CONFIG_FILE=$1; shift
-EXTRA_FLAGS=( "$@" )
+set -e
 
 CONFIG_FILE=$1; shift
 EXTRA_FLAGS=( "$@" )
