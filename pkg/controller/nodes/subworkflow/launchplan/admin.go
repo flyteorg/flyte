@@ -89,10 +89,12 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			return nil
 		}
 	}
+
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
 		Name:    executionID.Name,
+		Inputs:  inputs,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlanRef,
 			Metadata: &admin.ExecutionMetadata{
@@ -101,9 +103,14 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 				Principal:           launchCtx.Principal,
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
-			Inputs: inputs,
+			Labels:              &admin.Labels{Values: launchCtx.Labels},
+			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
+			SecurityContext:     &launchCtx.SecurityContext,
+			MaxParallelism:      int32(launchCtx.MaxParallelism),
+			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
 		},
 	}
+
 	_, err = a.adminClient.CreateExecution(ctx, req)
 	if err != nil {
 		launchErr := a.handleLaunchError(ctx, !isRecovery, executionID, launchPlanRef, err)

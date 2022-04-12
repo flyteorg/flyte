@@ -18,13 +18,13 @@ func (_m RedisClient_Ping) Return(_a0 string, _a1 error) *RedisClient_Ping {
 }
 
 func (_m *RedisClient) OnPing() *RedisClient_Ping {
-	c := _m.On("Ping")
-	return &RedisClient_Ping{Call: c}
+	c_call := _m.On("Ping")
+	return &RedisClient_Ping{Call: c_call}
 }
 
 func (_m *RedisClient) OnPingMatch(matchers ...interface{}) *RedisClient_Ping {
-	c := _m.On("Ping", matchers...)
-	return &RedisClient_Ping{Call: c}
+	c_call := _m.On("Ping", matchers...)
+	return &RedisClient_Ping{Call: c_call}
 }
 
 // Ping provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m RedisClient_SAdd) Return(_a0 int64, _a1 error) *RedisClient_SAdd {
 }
 
 func (_m *RedisClient) OnSAdd(_a0 string, _a1 interface{}) *RedisClient_SAdd {
-	c := _m.On("SAdd", _a0, _a1)
-	return &RedisClient_SAdd{Call: c}
+	c_call := _m.On("SAdd", _a0, _a1)
+	return &RedisClient_SAdd{Call: c_call}
 }
 
 func (_m *RedisClient) OnSAddMatch(matchers ...interface{}) *RedisClient_SAdd {
-	c := _m.On("SAdd", matchers...)
-	return &RedisClient_SAdd{Call: c}
+	c_call := _m.On("SAdd", matchers...)
+	return &RedisClient_SAdd{Call: c_call}
 }
 
 // SAdd provides a mock function with given fields: _a0, _a1
@@ -96,13 +96,13 @@ func (_m RedisClient_SCard) Return(_a0 int64, _a1 error) *RedisClient_SCard {
 }
 
 func (_m *RedisClient) OnSCard(_a0 string) *RedisClient_SCard {
-	c := _m.On("SCard", _a0)
-	return &RedisClient_SCard{Call: c}
+	c_call := _m.On("SCard", _a0)
+	return &RedisClient_SCard{Call: c_call}
 }
 
 func (_m *RedisClient) OnSCardMatch(matchers ...interface{}) *RedisClient_SCard {
-	c := _m.On("SCard", matchers...)
-	return &RedisClient_SCard{Call: c}
+	c_call := _m.On("SCard", matchers...)
+	return &RedisClient_SCard{Call: c_call}
 }
 
 // SCard provides a mock function with given fields: _a0
@@ -135,13 +135,13 @@ func (_m RedisClient_SIsMember) Return(_a0 bool, _a1 error) *RedisClient_SIsMemb
 }
 
 func (_m *RedisClient) OnSIsMember(_a0 string, _a1 interface{}) *RedisClient_SIsMember {
-	c := _m.On("SIsMember", _a0, _a1)
-	return &RedisClient_SIsMember{Call: c}
+	c_call := _m.On("SIsMember", _a0, _a1)
+	return &RedisClient_SIsMember{Call: c_call}
 }
 
 func (_m *RedisClient) OnSIsMemberMatch(matchers ...interface{}) *RedisClient_SIsMember {
-	c := _m.On("SIsMember", matchers...)
-	return &RedisClient_SIsMember{Call: c}
+	c_call := _m.On("SIsMember", matchers...)
+	return &RedisClient_SIsMember{Call: c_call}
 }
 
 // SIsMember provides a mock function with given fields: _a0, _a1
@@ -174,13 +174,13 @@ func (_m RedisClient_SMembers) Return(_a0 []string, _a1 error) *RedisClient_SMem
 }
 
 func (_m *RedisClient) OnSMembers(_a0 string) *RedisClient_SMembers {
-	c := _m.On("SMembers", _a0)
-	return &RedisClient_SMembers{Call: c}
+	c_call := _m.On("SMembers", _a0)
+	return &RedisClient_SMembers{Call: c_call}
 }
 
 func (_m *RedisClient) OnSMembersMatch(matchers ...interface{}) *RedisClient_SMembers {
-	c := _m.On("SMembers", matchers...)
-	return &RedisClient_SMembers{Call: c}
+	c_call := _m.On("SMembers", matchers...)
+	return &RedisClient_SMembers{Call: c_call}
 }
 
 // SMembers provides a mock function with given fields: _a0
@@ -215,13 +215,13 @@ func (_m RedisClient_SRem) Return(_a0 int64, _a1 error) *RedisClient_SRem {
 }
 
 func (_m *RedisClient) OnSRem(_a0 string, _a1 interface{}) *RedisClient_SRem {
-	c := _m.On("SRem", _a0, _a1)
-	return &RedisClient_SRem{Call: c}
+	c_call := _m.On("SRem", _a0, _a1)
+	return &RedisClient_SRem{Call: c_call}
 }
 
 func (_m *RedisClient) OnSRemMatch(matchers ...interface{}) *RedisClient_SRem {
-	c := _m.On("SRem", matchers...)
-	return &RedisClient_SRem{Call: c}
+	c_call := _m.On("SRem", matchers...)
+	return &RedisClient_SRem{Call: c_call}
 }
 
 // SRem provides a mock function with given fields: _a0, _a1

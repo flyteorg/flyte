@@ -66,7 +66,13 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 
 	launchCtx := launchplan.LaunchContext{
 		ParentNodeExecution: parentNodeExecutionID,
+		MaxParallelism:      nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism,
+		SecurityContext:     nCtx.ExecutionContext().GetSecurityContext(),
+		RawOutputDataConfig: nCtx.ExecutionContext().GetRawOutputDataConfig().RawOutputDataConfig,
+		Labels:              nCtx.ExecutionContext().GetLabels(),
+		Annotations:         nCtx.ExecutionContext().GetAnnotations(),
 	}
+
 	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
 		recovered, err := l.recoveryClient.RecoverNodeExecution(ctx, nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier, nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 		if err != nil {

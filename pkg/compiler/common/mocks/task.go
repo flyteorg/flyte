@@ -21,13 +21,13 @@ func (_m Task_GetCoreTask) Return(_a0 *core.TaskTemplate) *Task_GetCoreTask {
 }
 
 func (_m *Task) OnGetCoreTask() *Task_GetCoreTask {
-	c := _m.On("GetCoreTask")
-	return &Task_GetCoreTask{Call: c}
+	c_call := _m.On("GetCoreTask")
+	return &Task_GetCoreTask{Call: c_call}
 }
 
 func (_m *Task) OnGetCoreTaskMatch(matchers ...interface{}) *Task_GetCoreTask {
-	c := _m.On("GetCoreTask", matchers...)
-	return &Task_GetCoreTask{Call: c}
+	c_call := _m.On("GetCoreTask", matchers...)
+	return &Task_GetCoreTask{Call: c_call}
 }
 
 // GetCoreTask provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m Task_GetID) Return(_a0 core.Identifier) *Task_GetID {
 }
 
 func (_m *Task) OnGetID() *Task_GetID {
-	c := _m.On("GetID")
-	return &Task_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &Task_GetID{Call: c_call}
 }
 
 func (_m *Task) OnGetIDMatch(matchers ...interface{}) *Task_GetID {
-	c := _m.On("GetID", matchers...)
-	return &Task_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &Task_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -87,13 +87,13 @@ func (_m Task_GetInterface) Return(_a0 *core.TypedInterface) *Task_GetInterface 
 }
 
 func (_m *Task) OnGetInterface() *Task_GetInterface {
-	c := _m.On("GetInterface")
-	return &Task_GetInterface{Call: c}
+	c_call := _m.On("GetInterface")
+	return &Task_GetInterface{Call: c_call}
 }
 
 func (_m *Task) OnGetInterfaceMatch(matchers ...interface{}) *Task_GetInterface {
-	c := _m.On("GetInterface", matchers...)
-	return &Task_GetInterface{Call: c}
+	c_call := _m.On("GetInterface", matchers...)
+	return &Task_GetInterface{Call: c_call}
 }
 
 // GetInterface provides a mock function with given fields:

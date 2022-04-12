@@ -26,13 +26,13 @@ func (_m ExecutableNode_GetActiveDeadline) Return(_a0 *time.Duration) *Executabl
 }
 
 func (_m *ExecutableNode) OnGetActiveDeadline() *ExecutableNode_GetActiveDeadline {
-	c := _m.On("GetActiveDeadline")
-	return &ExecutableNode_GetActiveDeadline{Call: c}
+	c_call := _m.On("GetActiveDeadline")
+	return &ExecutableNode_GetActiveDeadline{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetActiveDeadlineMatch(matchers ...interface{}) *ExecutableNode_GetActiveDeadline {
-	c := _m.On("GetActiveDeadline", matchers...)
-	return &ExecutableNode_GetActiveDeadline{Call: c}
+	c_call := _m.On("GetActiveDeadline", matchers...)
+	return &ExecutableNode_GetActiveDeadline{Call: c_call}
 }
 
 // GetActiveDeadline provides a mock function with given fields:
@@ -60,13 +60,13 @@ func (_m ExecutableNode_GetBranchNode) Return(_a0 v1alpha1.ExecutableBranchNode)
 }
 
 func (_m *ExecutableNode) OnGetBranchNode() *ExecutableNode_GetBranchNode {
-	c := _m.On("GetBranchNode")
-	return &ExecutableNode_GetBranchNode{Call: c}
+	c_call := _m.On("GetBranchNode")
+	return &ExecutableNode_GetBranchNode{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetBranchNodeMatch(matchers ...interface{}) *ExecutableNode_GetBranchNode {
-	c := _m.On("GetBranchNode", matchers...)
-	return &ExecutableNode_GetBranchNode{Call: c}
+	c_call := _m.On("GetBranchNode", matchers...)
+	return &ExecutableNode_GetBranchNode{Call: c_call}
 }
 
 // GetBranchNode provides a mock function with given fields:
@@ -94,13 +94,13 @@ func (_m ExecutableNode_GetConfig) Return(_a0 *v1.ConfigMap) *ExecutableNode_Get
 }
 
 func (_m *ExecutableNode) OnGetConfig() *ExecutableNode_GetConfig {
-	c := _m.On("GetConfig")
-	return &ExecutableNode_GetConfig{Call: c}
+	c_call := _m.On("GetConfig")
+	return &ExecutableNode_GetConfig{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetConfigMatch(matchers ...interface{}) *ExecutableNode_GetConfig {
-	c := _m.On("GetConfig", matchers...)
-	return &ExecutableNode_GetConfig{Call: c}
+	c_call := _m.On("GetConfig", matchers...)
+	return &ExecutableNode_GetConfig{Call: c_call}
 }
 
 // GetConfig provides a mock function with given fields:
@@ -128,13 +128,13 @@ func (_m ExecutableNode_GetExecutionDeadline) Return(_a0 *time.Duration) *Execut
 }
 
 func (_m *ExecutableNode) OnGetExecutionDeadline() *ExecutableNode_GetExecutionDeadline {
-	c := _m.On("GetExecutionDeadline")
-	return &ExecutableNode_GetExecutionDeadline{Call: c}
+	c_call := _m.On("GetExecutionDeadline")
+	return &ExecutableNode_GetExecutionDeadline{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetExecutionDeadlineMatch(matchers ...interface{}) *ExecutableNode_GetExecutionDeadline {
-	c := _m.On("GetExecutionDeadline", matchers...)
-	return &ExecutableNode_GetExecutionDeadline{Call: c}
+	c_call := _m.On("GetExecutionDeadline", matchers...)
+	return &ExecutableNode_GetExecutionDeadline{Call: c_call}
 }
 
 // GetExecutionDeadline provides a mock function with given fields:
@@ -162,13 +162,13 @@ func (_m ExecutableNode_GetID) Return(_a0 string) *ExecutableNode_GetID {
 }
 
 func (_m *ExecutableNode) OnGetID() *ExecutableNode_GetID {
-	c := _m.On("GetID")
-	return &ExecutableNode_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ExecutableNode_GetID{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetIDMatch(matchers ...interface{}) *ExecutableNode_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ExecutableNode_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ExecutableNode_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -194,13 +194,13 @@ func (_m ExecutableNode_GetInputBindings) Return(_a0 []*v1alpha1.Binding) *Execu
 }
 
 func (_m *ExecutableNode) OnGetInputBindings() *ExecutableNode_GetInputBindings {
-	c := _m.On("GetInputBindings")
-	return &ExecutableNode_GetInputBindings{Call: c}
+	c_call := _m.On("GetInputBindings")
+	return &ExecutableNode_GetInputBindings{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetInputBindingsMatch(matchers ...interface{}) *ExecutableNode_GetInputBindings {
-	c := _m.On("GetInputBindings", matchers...)
-	return &ExecutableNode_GetInputBindings{Call: c}
+	c_call := _m.On("GetInputBindings", matchers...)
+	return &ExecutableNode_GetInputBindings{Call: c_call}
 }
 
 // GetInputBindings provides a mock function with given fields:
@@ -228,13 +228,13 @@ func (_m ExecutableNode_GetKind) Return(_a0 v1alpha1.NodeKind) *ExecutableNode_G
 }
 
 func (_m *ExecutableNode) OnGetKind() *ExecutableNode_GetKind {
-	c := _m.On("GetKind")
-	return &ExecutableNode_GetKind{Call: c}
+	c_call := _m.On("GetKind")
+	return &ExecutableNode_GetKind{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetKindMatch(matchers ...interface{}) *ExecutableNode_GetKind {
-	c := _m.On("GetKind", matchers...)
-	return &ExecutableNode_GetKind{Call: c}
+	c_call := _m.On("GetKind", matchers...)
+	return &ExecutableNode_GetKind{Call: c_call}
 }
 
 // GetKind provides a mock function with given fields:
@@ -260,13 +260,13 @@ func (_m ExecutableNode_GetName) Return(_a0 string) *ExecutableNode_GetName {
 }
 
 func (_m *ExecutableNode) OnGetName() *ExecutableNode_GetName {
-	c := _m.On("GetName")
-	return &ExecutableNode_GetName{Call: c}
+	c_call := _m.On("GetName")
+	return &ExecutableNode_GetName{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetNameMatch(matchers ...interface{}) *ExecutableNode_GetName {
-	c := _m.On("GetName", matchers...)
-	return &ExecutableNode_GetName{Call: c}
+	c_call := _m.On("GetName", matchers...)
+	return &ExecutableNode_GetName{Call: c_call}
 }
 
 // GetName provides a mock function with given fields:
@@ -292,13 +292,13 @@ func (_m ExecutableNode_GetOutputAlias) Return(_a0 []v1alpha1.Alias) *Executable
 }
 
 func (_m *ExecutableNode) OnGetOutputAlias() *ExecutableNode_GetOutputAlias {
-	c := _m.On("GetOutputAlias")
-	return &ExecutableNode_GetOutputAlias{Call: c}
+	c_call := _m.On("GetOutputAlias")
+	return &ExecutableNode_GetOutputAlias{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetOutputAliasMatch(matchers ...interface{}) *ExecutableNode_GetOutputAlias {
-	c := _m.On("GetOutputAlias", matchers...)
-	return &ExecutableNode_GetOutputAlias{Call: c}
+	c_call := _m.On("GetOutputAlias", matchers...)
+	return &ExecutableNode_GetOutputAlias{Call: c_call}
 }
 
 // GetOutputAlias provides a mock function with given fields:
@@ -326,13 +326,13 @@ func (_m ExecutableNode_GetResources) Return(_a0 *v1.ResourceRequirements) *Exec
 }
 
 func (_m *ExecutableNode) OnGetResources() *ExecutableNode_GetResources {
-	c := _m.On("GetResources")
-	return &ExecutableNode_GetResources{Call: c}
+	c_call := _m.On("GetResources")
+	return &ExecutableNode_GetResources{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetResourcesMatch(matchers ...interface{}) *ExecutableNode_GetResources {
-	c := _m.On("GetResources", matchers...)
-	return &ExecutableNode_GetResources{Call: c}
+	c_call := _m.On("GetResources", matchers...)
+	return &ExecutableNode_GetResources{Call: c_call}
 }
 
 // GetResources provides a mock function with given fields:
@@ -360,13 +360,13 @@ func (_m ExecutableNode_GetRetryStrategy) Return(_a0 *v1alpha1.RetryStrategy) *E
 }
 
 func (_m *ExecutableNode) OnGetRetryStrategy() *ExecutableNode_GetRetryStrategy {
-	c := _m.On("GetRetryStrategy")
-	return &ExecutableNode_GetRetryStrategy{Call: c}
+	c_call := _m.On("GetRetryStrategy")
+	return &ExecutableNode_GetRetryStrategy{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetRetryStrategyMatch(matchers ...interface{}) *ExecutableNode_GetRetryStrategy {
-	c := _m.On("GetRetryStrategy", matchers...)
-	return &ExecutableNode_GetRetryStrategy{Call: c}
+	c_call := _m.On("GetRetryStrategy", matchers...)
+	return &ExecutableNode_GetRetryStrategy{Call: c_call}
 }
 
 // GetRetryStrategy provides a mock function with given fields:
@@ -394,13 +394,13 @@ func (_m ExecutableNode_GetTaskID) Return(_a0 *string) *ExecutableNode_GetTaskID
 }
 
 func (_m *ExecutableNode) OnGetTaskID() *ExecutableNode_GetTaskID {
-	c := _m.On("GetTaskID")
-	return &ExecutableNode_GetTaskID{Call: c}
+	c_call := _m.On("GetTaskID")
+	return &ExecutableNode_GetTaskID{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetTaskIDMatch(matchers ...interface{}) *ExecutableNode_GetTaskID {
-	c := _m.On("GetTaskID", matchers...)
-	return &ExecutableNode_GetTaskID{Call: c}
+	c_call := _m.On("GetTaskID", matchers...)
+	return &ExecutableNode_GetTaskID{Call: c_call}
 }
 
 // GetTaskID provides a mock function with given fields:
@@ -428,13 +428,13 @@ func (_m ExecutableNode_GetWorkflowNode) Return(_a0 v1alpha1.ExecutableWorkflowN
 }
 
 func (_m *ExecutableNode) OnGetWorkflowNode() *ExecutableNode_GetWorkflowNode {
-	c := _m.On("GetWorkflowNode")
-	return &ExecutableNode_GetWorkflowNode{Call: c}
+	c_call := _m.On("GetWorkflowNode")
+	return &ExecutableNode_GetWorkflowNode{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnGetWorkflowNodeMatch(matchers ...interface{}) *ExecutableNode_GetWorkflowNode {
-	c := _m.On("GetWorkflowNode", matchers...)
-	return &ExecutableNode_GetWorkflowNode{Call: c}
+	c_call := _m.On("GetWorkflowNode", matchers...)
+	return &ExecutableNode_GetWorkflowNode{Call: c_call}
 }
 
 // GetWorkflowNode provides a mock function with given fields:
@@ -462,13 +462,13 @@ func (_m ExecutableNode_IsEndNode) Return(_a0 bool) *ExecutableNode_IsEndNode {
 }
 
 func (_m *ExecutableNode) OnIsEndNode() *ExecutableNode_IsEndNode {
-	c := _m.On("IsEndNode")
-	return &ExecutableNode_IsEndNode{Call: c}
+	c_call := _m.On("IsEndNode")
+	return &ExecutableNode_IsEndNode{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnIsEndNodeMatch(matchers ...interface{}) *ExecutableNode_IsEndNode {
-	c := _m.On("IsEndNode", matchers...)
-	return &ExecutableNode_IsEndNode{Call: c}
+	c_call := _m.On("IsEndNode", matchers...)
+	return &ExecutableNode_IsEndNode{Call: c_call}
 }
 
 // IsEndNode provides a mock function with given fields:
@@ -494,13 +494,13 @@ func (_m ExecutableNode_IsInterruptible) Return(_a0 *bool) *ExecutableNode_IsInt
 }
 
 func (_m *ExecutableNode) OnIsInterruptible() *ExecutableNode_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &ExecutableNode_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &ExecutableNode_IsInterruptible{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnIsInterruptibleMatch(matchers ...interface{}) *ExecutableNode_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &ExecutableNode_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &ExecutableNode_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:
@@ -528,13 +528,13 @@ func (_m ExecutableNode_IsStartNode) Return(_a0 bool) *ExecutableNode_IsStartNod
 }
 
 func (_m *ExecutableNode) OnIsStartNode() *ExecutableNode_IsStartNode {
-	c := _m.On("IsStartNode")
-	return &ExecutableNode_IsStartNode{Call: c}
+	c_call := _m.On("IsStartNode")
+	return &ExecutableNode_IsStartNode{Call: c_call}
 }
 
 func (_m *ExecutableNode) OnIsStartNodeMatch(matchers ...interface{}) *ExecutableNode_IsStartNode {
-	c := _m.On("IsStartNode", matchers...)
-	return &ExecutableNode_IsStartNode{Call: c}
+	c_call := _m.On("IsStartNode", matchers...)
+	return &ExecutableNode_IsStartNode{Call: c_call}
 }
 
 // IsStartNode provides a mock function with given fields:

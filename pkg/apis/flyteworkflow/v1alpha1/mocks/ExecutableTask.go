@@ -21,13 +21,13 @@ func (_m ExecutableTask_CoreTask) Return(_a0 *core.TaskTemplate) *ExecutableTask
 }
 
 func (_m *ExecutableTask) OnCoreTask() *ExecutableTask_CoreTask {
-	c := _m.On("CoreTask")
-	return &ExecutableTask_CoreTask{Call: c}
+	c_call := _m.On("CoreTask")
+	return &ExecutableTask_CoreTask{Call: c_call}
 }
 
 func (_m *ExecutableTask) OnCoreTaskMatch(matchers ...interface{}) *ExecutableTask_CoreTask {
-	c := _m.On("CoreTask", matchers...)
-	return &ExecutableTask_CoreTask{Call: c}
+	c_call := _m.On("CoreTask", matchers...)
+	return &ExecutableTask_CoreTask{Call: c_call}
 }
 
 // CoreTask provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableTask_TaskType) Return(_a0 string) *ExecutableTask_TaskType {
 }
 
 func (_m *ExecutableTask) OnTaskType() *ExecutableTask_TaskType {
-	c := _m.On("TaskType")
-	return &ExecutableTask_TaskType{Call: c}
+	c_call := _m.On("TaskType")
+	return &ExecutableTask_TaskType{Call: c_call}
 }
 
 func (_m *ExecutableTask) OnTaskTypeMatch(matchers ...interface{}) *ExecutableTask_TaskType {
-	c := _m.On("TaskType", matchers...)
-	return &ExecutableTask_TaskType{Call: c}
+	c_call := _m.On("TaskType", matchers...)
+	return &ExecutableTask_TaskType{Call: c_call}
 }
 
 // TaskType provides a mock function with given fields:

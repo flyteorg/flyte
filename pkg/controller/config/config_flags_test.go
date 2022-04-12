@@ -732,7 +732,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_include-shard-key-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.IncludeShardKeyLabel, ",")
 
 			cmdFlags.Set("include-shard-key-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("include-shard-key-label"); err == nil {
@@ -746,7 +746,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_exclude-shard-key-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.ExcludeShardKeyLabel, ",")
 
 			cmdFlags.Set("exclude-shard-key-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("exclude-shard-key-label"); err == nil {
@@ -760,7 +760,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_include-project-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.IncludeProjectLabel, ",")
 
 			cmdFlags.Set("include-project-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("include-project-label"); err == nil {
@@ -774,7 +774,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_exclude-project-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.ExcludeProjectLabel, ",")
 
 			cmdFlags.Set("exclude-project-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("exclude-project-label"); err == nil {
@@ -788,7 +788,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_include-domain-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.IncludeDomainLabel, ",")
 
 			cmdFlags.Set("include-domain-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("include-domain-label"); err == nil {
@@ -802,7 +802,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_exclude-domain-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.ExcludeDomainLabel, ",")
 
 			cmdFlags.Set("exclude-domain-label", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("exclude-domain-label"); err == nil {

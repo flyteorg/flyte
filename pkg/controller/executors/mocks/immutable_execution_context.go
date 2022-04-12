@@ -28,13 +28,13 @@ func (_m ImmutableExecutionContext_GetAnnotations) Return(_a0 map[string]string)
 }
 
 func (_m *ImmutableExecutionContext) OnGetAnnotations() *ImmutableExecutionContext_GetAnnotations {
-	c := _m.On("GetAnnotations")
-	return &ImmutableExecutionContext_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations")
+	return &ImmutableExecutionContext_GetAnnotations{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetAnnotationsMatch(matchers ...interface{}) *ImmutableExecutionContext_GetAnnotations {
-	c := _m.On("GetAnnotations", matchers...)
-	return &ImmutableExecutionContext_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &ImmutableExecutionContext_GetAnnotations{Call: c_call}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -62,13 +62,13 @@ func (_m ImmutableExecutionContext_GetCreationTimestamp) Return(_a0 v1.Time) *Im
 }
 
 func (_m *ImmutableExecutionContext) OnGetCreationTimestamp() *ImmutableExecutionContext_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp")
-	return &ImmutableExecutionContext_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp")
+	return &ImmutableExecutionContext_GetCreationTimestamp{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetCreationTimestampMatch(matchers ...interface{}) *ImmutableExecutionContext_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp", matchers...)
-	return &ImmutableExecutionContext_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp", matchers...)
+	return &ImmutableExecutionContext_GetCreationTimestamp{Call: c_call}
 }
 
 // GetCreationTimestamp provides a mock function with given fields:
@@ -94,13 +94,13 @@ func (_m ImmutableExecutionContext_GetEventVersion) Return(_a0 v1alpha1.EventVer
 }
 
 func (_m *ImmutableExecutionContext) OnGetEventVersion() *ImmutableExecutionContext_GetEventVersion {
-	c := _m.On("GetEventVersion")
-	return &ImmutableExecutionContext_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion")
+	return &ImmutableExecutionContext_GetEventVersion{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetEventVersionMatch(matchers ...interface{}) *ImmutableExecutionContext_GetEventVersion {
-	c := _m.On("GetEventVersion", matchers...)
-	return &ImmutableExecutionContext_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion", matchers...)
+	return &ImmutableExecutionContext_GetEventVersion{Call: c_call}
 }
 
 // GetEventVersion provides a mock function with given fields:
@@ -126,13 +126,13 @@ func (_m ImmutableExecutionContext_GetExecutionConfig) Return(_a0 v1alpha1.Execu
 }
 
 func (_m *ImmutableExecutionContext) OnGetExecutionConfig() *ImmutableExecutionContext_GetExecutionConfig {
-	c := _m.On("GetExecutionConfig")
-	return &ImmutableExecutionContext_GetExecutionConfig{Call: c}
+	c_call := _m.On("GetExecutionConfig")
+	return &ImmutableExecutionContext_GetExecutionConfig{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetExecutionConfigMatch(matchers ...interface{}) *ImmutableExecutionContext_GetExecutionConfig {
-	c := _m.On("GetExecutionConfig", matchers...)
-	return &ImmutableExecutionContext_GetExecutionConfig{Call: c}
+	c_call := _m.On("GetExecutionConfig", matchers...)
+	return &ImmutableExecutionContext_GetExecutionConfig{Call: c_call}
 }
 
 // GetExecutionConfig provides a mock function with given fields:
@@ -158,13 +158,13 @@ func (_m ImmutableExecutionContext_GetExecutionID) Return(_a0 v1alpha1.WorkflowE
 }
 
 func (_m *ImmutableExecutionContext) OnGetExecutionID() *ImmutableExecutionContext_GetExecutionID {
-	c := _m.On("GetExecutionID")
-	return &ImmutableExecutionContext_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID")
+	return &ImmutableExecutionContext_GetExecutionID{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetExecutionIDMatch(matchers ...interface{}) *ImmutableExecutionContext_GetExecutionID {
-	c := _m.On("GetExecutionID", matchers...)
-	return &ImmutableExecutionContext_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID", matchers...)
+	return &ImmutableExecutionContext_GetExecutionID{Call: c_call}
 }
 
 // GetExecutionID provides a mock function with given fields:
@@ -190,13 +190,13 @@ func (_m ImmutableExecutionContext_GetID) Return(_a0 string) *ImmutableExecution
 }
 
 func (_m *ImmutableExecutionContext) OnGetID() *ImmutableExecutionContext_GetID {
-	c := _m.On("GetID")
-	return &ImmutableExecutionContext_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ImmutableExecutionContext_GetID{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetIDMatch(matchers ...interface{}) *ImmutableExecutionContext_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ImmutableExecutionContext_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ImmutableExecutionContext_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -222,13 +222,13 @@ func (_m ImmutableExecutionContext_GetK8sWorkflowID) Return(_a0 types.Namespaced
 }
 
 func (_m *ImmutableExecutionContext) OnGetK8sWorkflowID() *ImmutableExecutionContext_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID")
-	return &ImmutableExecutionContext_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID")
+	return &ImmutableExecutionContext_GetK8sWorkflowID{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetK8sWorkflowIDMatch(matchers ...interface{}) *ImmutableExecutionContext_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID", matchers...)
-	return &ImmutableExecutionContext_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID", matchers...)
+	return &ImmutableExecutionContext_GetK8sWorkflowID{Call: c_call}
 }
 
 // GetK8sWorkflowID provides a mock function with given fields:
@@ -254,13 +254,13 @@ func (_m ImmutableExecutionContext_GetLabels) Return(_a0 map[string]string) *Imm
 }
 
 func (_m *ImmutableExecutionContext) OnGetLabels() *ImmutableExecutionContext_GetLabels {
-	c := _m.On("GetLabels")
-	return &ImmutableExecutionContext_GetLabels{Call: c}
+	c_call := _m.On("GetLabels")
+	return &ImmutableExecutionContext_GetLabels{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetLabelsMatch(matchers ...interface{}) *ImmutableExecutionContext_GetLabels {
-	c := _m.On("GetLabels", matchers...)
-	return &ImmutableExecutionContext_GetLabels{Call: c}
+	c_call := _m.On("GetLabels", matchers...)
+	return &ImmutableExecutionContext_GetLabels{Call: c_call}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -288,13 +288,13 @@ func (_m ImmutableExecutionContext_GetName) Return(_a0 string) *ImmutableExecuti
 }
 
 func (_m *ImmutableExecutionContext) OnGetName() *ImmutableExecutionContext_GetName {
-	c := _m.On("GetName")
-	return &ImmutableExecutionContext_GetName{Call: c}
+	c_call := _m.On("GetName")
+	return &ImmutableExecutionContext_GetName{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetNameMatch(matchers ...interface{}) *ImmutableExecutionContext_GetName {
-	c := _m.On("GetName", matchers...)
-	return &ImmutableExecutionContext_GetName{Call: c}
+	c_call := _m.On("GetName", matchers...)
+	return &ImmutableExecutionContext_GetName{Call: c_call}
 }
 
 // GetName provides a mock function with given fields:
@@ -320,13 +320,13 @@ func (_m ImmutableExecutionContext_GetNamespace) Return(_a0 string) *ImmutableEx
 }
 
 func (_m *ImmutableExecutionContext) OnGetNamespace() *ImmutableExecutionContext_GetNamespace {
-	c := _m.On("GetNamespace")
-	return &ImmutableExecutionContext_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace")
+	return &ImmutableExecutionContext_GetNamespace{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetNamespaceMatch(matchers ...interface{}) *ImmutableExecutionContext_GetNamespace {
-	c := _m.On("GetNamespace", matchers...)
-	return &ImmutableExecutionContext_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace", matchers...)
+	return &ImmutableExecutionContext_GetNamespace{Call: c_call}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -352,13 +352,13 @@ func (_m ImmutableExecutionContext_GetOnFailurePolicy) Return(_a0 v1alpha1.Workf
 }
 
 func (_m *ImmutableExecutionContext) OnGetOnFailurePolicy() *ImmutableExecutionContext_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy")
-	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy")
+	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ImmutableExecutionContext_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy", matchers...)
-	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy", matchers...)
+	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c_call}
 }
 
 // GetOnFailurePolicy provides a mock function with given fields:
@@ -384,13 +384,13 @@ func (_m ImmutableExecutionContext_GetOwnerReference) Return(_a0 v1.OwnerReferen
 }
 
 func (_m *ImmutableExecutionContext) OnGetOwnerReference() *ImmutableExecutionContext_GetOwnerReference {
-	c := _m.On("GetOwnerReference")
-	return &ImmutableExecutionContext_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference")
+	return &ImmutableExecutionContext_GetOwnerReference{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetOwnerReferenceMatch(matchers ...interface{}) *ImmutableExecutionContext_GetOwnerReference {
-	c := _m.On("GetOwnerReference", matchers...)
-	return &ImmutableExecutionContext_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference", matchers...)
+	return &ImmutableExecutionContext_GetOwnerReference{Call: c_call}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -416,13 +416,13 @@ func (_m ImmutableExecutionContext_GetRawOutputDataConfig) Return(_a0 v1alpha1.R
 }
 
 func (_m *ImmutableExecutionContext) OnGetRawOutputDataConfig() *ImmutableExecutionContext_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig")
-	return &ImmutableExecutionContext_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig")
+	return &ImmutableExecutionContext_GetRawOutputDataConfig{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *ImmutableExecutionContext_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig", matchers...)
-	return &ImmutableExecutionContext_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig", matchers...)
+	return &ImmutableExecutionContext_GetRawOutputDataConfig{Call: c_call}
 }
 
 // GetRawOutputDataConfig provides a mock function with given fields:
@@ -448,13 +448,13 @@ func (_m ImmutableExecutionContext_GetSecurityContext) Return(_a0 core.SecurityC
 }
 
 func (_m *ImmutableExecutionContext) OnGetSecurityContext() *ImmutableExecutionContext_GetSecurityContext {
-	c := _m.On("GetSecurityContext")
-	return &ImmutableExecutionContext_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext")
+	return &ImmutableExecutionContext_GetSecurityContext{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetSecurityContextMatch(matchers ...interface{}) *ImmutableExecutionContext_GetSecurityContext {
-	c := _m.On("GetSecurityContext", matchers...)
-	return &ImmutableExecutionContext_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext", matchers...)
+	return &ImmutableExecutionContext_GetSecurityContext{Call: c_call}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -480,13 +480,13 @@ func (_m ImmutableExecutionContext_GetServiceAccountName) Return(_a0 string) *Im
 }
 
 func (_m *ImmutableExecutionContext) OnGetServiceAccountName() *ImmutableExecutionContext_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName")
-	return &ImmutableExecutionContext_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName")
+	return &ImmutableExecutionContext_GetServiceAccountName{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnGetServiceAccountNameMatch(matchers ...interface{}) *ImmutableExecutionContext_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName", matchers...)
-	return &ImmutableExecutionContext_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName", matchers...)
+	return &ImmutableExecutionContext_GetServiceAccountName{Call: c_call}
 }
 
 // GetServiceAccountName provides a mock function with given fields:
@@ -512,13 +512,13 @@ func (_m ImmutableExecutionContext_IsInterruptible) Return(_a0 bool) *ImmutableE
 }
 
 func (_m *ImmutableExecutionContext) OnIsInterruptible() *ImmutableExecutionContext_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &ImmutableExecutionContext_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &ImmutableExecutionContext_IsInterruptible{Call: c_call}
 }
 
 func (_m *ImmutableExecutionContext) OnIsInterruptibleMatch(matchers ...interface{}) *ImmutableExecutionContext_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &ImmutableExecutionContext_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &ImmutableExecutionContext_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:

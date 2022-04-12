@@ -18,13 +18,13 @@ func (_m ControlFlow_CurrentParallelism) Return(_a0 uint32) *ControlFlow_Current
 }
 
 func (_m *ControlFlow) OnCurrentParallelism() *ControlFlow_CurrentParallelism {
-	c := _m.On("CurrentParallelism")
-	return &ControlFlow_CurrentParallelism{Call: c}
+	c_call := _m.On("CurrentParallelism")
+	return &ControlFlow_CurrentParallelism{Call: c_call}
 }
 
 func (_m *ControlFlow) OnCurrentParallelismMatch(matchers ...interface{}) *ControlFlow_CurrentParallelism {
-	c := _m.On("CurrentParallelism", matchers...)
-	return &ControlFlow_CurrentParallelism{Call: c}
+	c_call := _m.On("CurrentParallelism", matchers...)
+	return &ControlFlow_CurrentParallelism{Call: c_call}
 }
 
 // CurrentParallelism provides a mock function with given fields:
@@ -50,13 +50,13 @@ func (_m ControlFlow_IncrementParallelism) Return(_a0 uint32) *ControlFlow_Incre
 }
 
 func (_m *ControlFlow) OnIncrementParallelism() *ControlFlow_IncrementParallelism {
-	c := _m.On("IncrementParallelism")
-	return &ControlFlow_IncrementParallelism{Call: c}
+	c_call := _m.On("IncrementParallelism")
+	return &ControlFlow_IncrementParallelism{Call: c_call}
 }
 
 func (_m *ControlFlow) OnIncrementParallelismMatch(matchers ...interface{}) *ControlFlow_IncrementParallelism {
-	c := _m.On("IncrementParallelism", matchers...)
-	return &ControlFlow_IncrementParallelism{Call: c}
+	c_call := _m.On("IncrementParallelism", matchers...)
+	return &ControlFlow_IncrementParallelism{Call: c_call}
 }
 
 // IncrementParallelism provides a mock function with given fields:

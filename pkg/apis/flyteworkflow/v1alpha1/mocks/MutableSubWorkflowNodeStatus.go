@@ -21,13 +21,13 @@ func (_m MutableSubWorkflowNodeStatus_GetPhase) Return(_a0 v1alpha1.WorkflowPhas
 }
 
 func (_m *MutableSubWorkflowNodeStatus) OnGetPhase() *MutableSubWorkflowNodeStatus_GetPhase {
-	c := _m.On("GetPhase")
-	return &MutableSubWorkflowNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase")
+	return &MutableSubWorkflowNodeStatus_GetPhase{Call: c_call}
 }
 
 func (_m *MutableSubWorkflowNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *MutableSubWorkflowNodeStatus_GetPhase {
-	c := _m.On("GetPhase", matchers...)
-	return &MutableSubWorkflowNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase", matchers...)
+	return &MutableSubWorkflowNodeStatus_GetPhase{Call: c_call}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m MutableSubWorkflowNodeStatus_IsDirty) Return(_a0 bool) *MutableSubWorkf
 }
 
 func (_m *MutableSubWorkflowNodeStatus) OnIsDirty() *MutableSubWorkflowNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableSubWorkflowNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableSubWorkflowNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

@@ -29,13 +29,13 @@ func (_m ExecutableWorkflow_FindSubWorkflow) Return(_a0 v1alpha1.ExecutableSubWo
 }
 
 func (_m *ExecutableWorkflow) OnFindSubWorkflow(subID string) *ExecutableWorkflow_FindSubWorkflow {
-	c := _m.On("FindSubWorkflow", subID)
-	return &ExecutableWorkflow_FindSubWorkflow{Call: c}
+	c_call := _m.On("FindSubWorkflow", subID)
+	return &ExecutableWorkflow_FindSubWorkflow{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnFindSubWorkflowMatch(matchers ...interface{}) *ExecutableWorkflow_FindSubWorkflow {
-	c := _m.On("FindSubWorkflow", matchers...)
-	return &ExecutableWorkflow_FindSubWorkflow{Call: c}
+	c_call := _m.On("FindSubWorkflow", matchers...)
+	return &ExecutableWorkflow_FindSubWorkflow{Call: c_call}
 }
 
 // FindSubWorkflow provides a mock function with given fields: subID
@@ -63,13 +63,13 @@ func (_m ExecutableWorkflow_FromNode) Return(_a0 []string, _a1 error) *Executabl
 }
 
 func (_m *ExecutableWorkflow) OnFromNode(name string) *ExecutableWorkflow_FromNode {
-	c := _m.On("FromNode", name)
-	return &ExecutableWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", name)
+	return &ExecutableWorkflow_FromNode{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnFromNodeMatch(matchers ...interface{}) *ExecutableWorkflow_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &ExecutableWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &ExecutableWorkflow_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: name
@@ -104,13 +104,13 @@ func (_m ExecutableWorkflow_GetAnnotations) Return(_a0 map[string]string) *Execu
 }
 
 func (_m *ExecutableWorkflow) OnGetAnnotations() *ExecutableWorkflow_GetAnnotations {
-	c := _m.On("GetAnnotations")
-	return &ExecutableWorkflow_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations")
+	return &ExecutableWorkflow_GetAnnotations{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetAnnotationsMatch(matchers ...interface{}) *ExecutableWorkflow_GetAnnotations {
-	c := _m.On("GetAnnotations", matchers...)
-	return &ExecutableWorkflow_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &ExecutableWorkflow_GetAnnotations{Call: c_call}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -138,13 +138,13 @@ func (_m ExecutableWorkflow_GetConnections) Return(_a0 *v1alpha1.Connections) *E
 }
 
 func (_m *ExecutableWorkflow) OnGetConnections() *ExecutableWorkflow_GetConnections {
-	c := _m.On("GetConnections")
-	return &ExecutableWorkflow_GetConnections{Call: c}
+	c_call := _m.On("GetConnections")
+	return &ExecutableWorkflow_GetConnections{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetConnectionsMatch(matchers ...interface{}) *ExecutableWorkflow_GetConnections {
-	c := _m.On("GetConnections", matchers...)
-	return &ExecutableWorkflow_GetConnections{Call: c}
+	c_call := _m.On("GetConnections", matchers...)
+	return &ExecutableWorkflow_GetConnections{Call: c_call}
 }
 
 // GetConnections provides a mock function with given fields:
@@ -172,13 +172,13 @@ func (_m ExecutableWorkflow_GetCreationTimestamp) Return(_a0 v1.Time) *Executabl
 }
 
 func (_m *ExecutableWorkflow) OnGetCreationTimestamp() *ExecutableWorkflow_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp")
-	return &ExecutableWorkflow_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp")
+	return &ExecutableWorkflow_GetCreationTimestamp{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetCreationTimestampMatch(matchers ...interface{}) *ExecutableWorkflow_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp", matchers...)
-	return &ExecutableWorkflow_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp", matchers...)
+	return &ExecutableWorkflow_GetCreationTimestamp{Call: c_call}
 }
 
 // GetCreationTimestamp provides a mock function with given fields:
@@ -204,13 +204,13 @@ func (_m ExecutableWorkflow_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *
 }
 
 func (_m *ExecutableWorkflow) OnGetEventVersion() *ExecutableWorkflow_GetEventVersion {
-	c := _m.On("GetEventVersion")
-	return &ExecutableWorkflow_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion")
+	return &ExecutableWorkflow_GetEventVersion{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetEventVersionMatch(matchers ...interface{}) *ExecutableWorkflow_GetEventVersion {
-	c := _m.On("GetEventVersion", matchers...)
-	return &ExecutableWorkflow_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion", matchers...)
+	return &ExecutableWorkflow_GetEventVersion{Call: c_call}
 }
 
 // GetEventVersion provides a mock function with given fields:
@@ -236,13 +236,13 @@ func (_m ExecutableWorkflow_GetExecutionConfig) Return(_a0 v1alpha1.ExecutionCon
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionConfig() *ExecutableWorkflow_GetExecutionConfig {
-	c := _m.On("GetExecutionConfig")
-	return &ExecutableWorkflow_GetExecutionConfig{Call: c}
+	c_call := _m.On("GetExecutionConfig")
+	return &ExecutableWorkflow_GetExecutionConfig{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionConfigMatch(matchers ...interface{}) *ExecutableWorkflow_GetExecutionConfig {
-	c := _m.On("GetExecutionConfig", matchers...)
-	return &ExecutableWorkflow_GetExecutionConfig{Call: c}
+	c_call := _m.On("GetExecutionConfig", matchers...)
+	return &ExecutableWorkflow_GetExecutionConfig{Call: c_call}
 }
 
 // GetExecutionConfig provides a mock function with given fields:
@@ -268,13 +268,13 @@ func (_m ExecutableWorkflow_GetExecutionID) Return(_a0 v1alpha1.WorkflowExecutio
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionID() *ExecutableWorkflow_GetExecutionID {
-	c := _m.On("GetExecutionID")
-	return &ExecutableWorkflow_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID")
+	return &ExecutableWorkflow_GetExecutionID{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionIDMatch(matchers ...interface{}) *ExecutableWorkflow_GetExecutionID {
-	c := _m.On("GetExecutionID", matchers...)
-	return &ExecutableWorkflow_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID", matchers...)
+	return &ExecutableWorkflow_GetExecutionID{Call: c_call}
 }
 
 // GetExecutionID provides a mock function with given fields:
@@ -300,13 +300,13 @@ func (_m ExecutableWorkflow_GetExecutionStatus) Return(_a0 v1alpha1.ExecutableWo
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionStatus() *ExecutableWorkflow_GetExecutionStatus {
-	c := _m.On("GetExecutionStatus")
-	return &ExecutableWorkflow_GetExecutionStatus{Call: c}
+	c_call := _m.On("GetExecutionStatus")
+	return &ExecutableWorkflow_GetExecutionStatus{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetExecutionStatusMatch(matchers ...interface{}) *ExecutableWorkflow_GetExecutionStatus {
-	c := _m.On("GetExecutionStatus", matchers...)
-	return &ExecutableWorkflow_GetExecutionStatus{Call: c}
+	c_call := _m.On("GetExecutionStatus", matchers...)
+	return &ExecutableWorkflow_GetExecutionStatus{Call: c_call}
 }
 
 // GetExecutionStatus provides a mock function with given fields:
@@ -334,13 +334,13 @@ func (_m ExecutableWorkflow_GetID) Return(_a0 string) *ExecutableWorkflow_GetID 
 }
 
 func (_m *ExecutableWorkflow) OnGetID() *ExecutableWorkflow_GetID {
-	c := _m.On("GetID")
-	return &ExecutableWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ExecutableWorkflow_GetID{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetIDMatch(matchers ...interface{}) *ExecutableWorkflow_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ExecutableWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ExecutableWorkflow_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -366,13 +366,13 @@ func (_m ExecutableWorkflow_GetK8sWorkflowID) Return(_a0 types.NamespacedName) *
 }
 
 func (_m *ExecutableWorkflow) OnGetK8sWorkflowID() *ExecutableWorkflow_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID")
-	return &ExecutableWorkflow_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID")
+	return &ExecutableWorkflow_GetK8sWorkflowID{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetK8sWorkflowIDMatch(matchers ...interface{}) *ExecutableWorkflow_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID", matchers...)
-	return &ExecutableWorkflow_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID", matchers...)
+	return &ExecutableWorkflow_GetK8sWorkflowID{Call: c_call}
 }
 
 // GetK8sWorkflowID provides a mock function with given fields:
@@ -398,13 +398,13 @@ func (_m ExecutableWorkflow_GetLabels) Return(_a0 map[string]string) *Executable
 }
 
 func (_m *ExecutableWorkflow) OnGetLabels() *ExecutableWorkflow_GetLabels {
-	c := _m.On("GetLabels")
-	return &ExecutableWorkflow_GetLabels{Call: c}
+	c_call := _m.On("GetLabels")
+	return &ExecutableWorkflow_GetLabels{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetLabelsMatch(matchers ...interface{}) *ExecutableWorkflow_GetLabels {
-	c := _m.On("GetLabels", matchers...)
-	return &ExecutableWorkflow_GetLabels{Call: c}
+	c_call := _m.On("GetLabels", matchers...)
+	return &ExecutableWorkflow_GetLabels{Call: c_call}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -432,13 +432,13 @@ func (_m ExecutableWorkflow_GetName) Return(_a0 string) *ExecutableWorkflow_GetN
 }
 
 func (_m *ExecutableWorkflow) OnGetName() *ExecutableWorkflow_GetName {
-	c := _m.On("GetName")
-	return &ExecutableWorkflow_GetName{Call: c}
+	c_call := _m.On("GetName")
+	return &ExecutableWorkflow_GetName{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetNameMatch(matchers ...interface{}) *ExecutableWorkflow_GetName {
-	c := _m.On("GetName", matchers...)
-	return &ExecutableWorkflow_GetName{Call: c}
+	c_call := _m.On("GetName", matchers...)
+	return &ExecutableWorkflow_GetName{Call: c_call}
 }
 
 // GetName provides a mock function with given fields:
@@ -464,13 +464,13 @@ func (_m ExecutableWorkflow_GetNamespace) Return(_a0 string) *ExecutableWorkflow
 }
 
 func (_m *ExecutableWorkflow) OnGetNamespace() *ExecutableWorkflow_GetNamespace {
-	c := _m.On("GetNamespace")
-	return &ExecutableWorkflow_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace")
+	return &ExecutableWorkflow_GetNamespace{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetNamespaceMatch(matchers ...interface{}) *ExecutableWorkflow_GetNamespace {
-	c := _m.On("GetNamespace", matchers...)
-	return &ExecutableWorkflow_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace", matchers...)
+	return &ExecutableWorkflow_GetNamespace{Call: c_call}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -496,13 +496,13 @@ func (_m ExecutableWorkflow_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1 boo
 }
 
 func (_m *ExecutableWorkflow) OnGetNode(nodeID string) *ExecutableWorkflow_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &ExecutableWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &ExecutableWorkflow_GetNode{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetNodeMatch(matchers ...interface{}) *ExecutableWorkflow_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &ExecutableWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &ExecutableWorkflow_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID
@@ -537,13 +537,13 @@ func (_m ExecutableWorkflow_GetNodeExecutionStatus) Return(_a0 v1alpha1.Executab
 }
 
 func (_m *ExecutableWorkflow) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableWorkflow_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *ExecutableWorkflow_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", matchers...)
-	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", matchers...)
+	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c_call}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id
@@ -571,13 +571,13 @@ func (_m ExecutableWorkflow_GetNodes) Return(_a0 []string) *ExecutableWorkflow_G
 }
 
 func (_m *ExecutableWorkflow) OnGetNodes() *ExecutableWorkflow_GetNodes {
-	c := _m.On("GetNodes")
-	return &ExecutableWorkflow_GetNodes{Call: c}
+	c_call := _m.On("GetNodes")
+	return &ExecutableWorkflow_GetNodes{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetNodesMatch(matchers ...interface{}) *ExecutableWorkflow_GetNodes {
-	c := _m.On("GetNodes", matchers...)
-	return &ExecutableWorkflow_GetNodes{Call: c}
+	c_call := _m.On("GetNodes", matchers...)
+	return &ExecutableWorkflow_GetNodes{Call: c_call}
 }
 
 // GetNodes provides a mock function with given fields:
@@ -605,13 +605,13 @@ func (_m ExecutableWorkflow_GetOnFailureNode) Return(_a0 v1alpha1.ExecutableNode
 }
 
 func (_m *ExecutableWorkflow) OnGetOnFailureNode() *ExecutableWorkflow_GetOnFailureNode {
-	c := _m.On("GetOnFailureNode")
-	return &ExecutableWorkflow_GetOnFailureNode{Call: c}
+	c_call := _m.On("GetOnFailureNode")
+	return &ExecutableWorkflow_GetOnFailureNode{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetOnFailureNodeMatch(matchers ...interface{}) *ExecutableWorkflow_GetOnFailureNode {
-	c := _m.On("GetOnFailureNode", matchers...)
-	return &ExecutableWorkflow_GetOnFailureNode{Call: c}
+	c_call := _m.On("GetOnFailureNode", matchers...)
+	return &ExecutableWorkflow_GetOnFailureNode{Call: c_call}
 }
 
 // GetOnFailureNode provides a mock function with given fields:
@@ -639,13 +639,13 @@ func (_m ExecutableWorkflow_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowOnFa
 }
 
 func (_m *ExecutableWorkflow) OnGetOnFailurePolicy() *ExecutableWorkflow_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy")
-	return &ExecutableWorkflow_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy")
+	return &ExecutableWorkflow_GetOnFailurePolicy{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ExecutableWorkflow_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy", matchers...)
-	return &ExecutableWorkflow_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy", matchers...)
+	return &ExecutableWorkflow_GetOnFailurePolicy{Call: c_call}
 }
 
 // GetOnFailurePolicy provides a mock function with given fields:
@@ -671,13 +671,13 @@ func (_m ExecutableWorkflow_GetOutputBindings) Return(_a0 []*v1alpha1.Binding) *
 }
 
 func (_m *ExecutableWorkflow) OnGetOutputBindings() *ExecutableWorkflow_GetOutputBindings {
-	c := _m.On("GetOutputBindings")
-	return &ExecutableWorkflow_GetOutputBindings{Call: c}
+	c_call := _m.On("GetOutputBindings")
+	return &ExecutableWorkflow_GetOutputBindings{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetOutputBindingsMatch(matchers ...interface{}) *ExecutableWorkflow_GetOutputBindings {
-	c := _m.On("GetOutputBindings", matchers...)
-	return &ExecutableWorkflow_GetOutputBindings{Call: c}
+	c_call := _m.On("GetOutputBindings", matchers...)
+	return &ExecutableWorkflow_GetOutputBindings{Call: c_call}
 }
 
 // GetOutputBindings provides a mock function with given fields:
@@ -705,13 +705,13 @@ func (_m ExecutableWorkflow_GetOutputs) Return(_a0 *v1alpha1.OutputVarMap) *Exec
 }
 
 func (_m *ExecutableWorkflow) OnGetOutputs() *ExecutableWorkflow_GetOutputs {
-	c := _m.On("GetOutputs")
-	return &ExecutableWorkflow_GetOutputs{Call: c}
+	c_call := _m.On("GetOutputs")
+	return &ExecutableWorkflow_GetOutputs{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetOutputsMatch(matchers ...interface{}) *ExecutableWorkflow_GetOutputs {
-	c := _m.On("GetOutputs", matchers...)
-	return &ExecutableWorkflow_GetOutputs{Call: c}
+	c_call := _m.On("GetOutputs", matchers...)
+	return &ExecutableWorkflow_GetOutputs{Call: c_call}
 }
 
 // GetOutputs provides a mock function with given fields:
@@ -739,13 +739,13 @@ func (_m ExecutableWorkflow_GetOwnerReference) Return(_a0 v1.OwnerReference) *Ex
 }
 
 func (_m *ExecutableWorkflow) OnGetOwnerReference() *ExecutableWorkflow_GetOwnerReference {
-	c := _m.On("GetOwnerReference")
-	return &ExecutableWorkflow_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference")
+	return &ExecutableWorkflow_GetOwnerReference{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetOwnerReferenceMatch(matchers ...interface{}) *ExecutableWorkflow_GetOwnerReference {
-	c := _m.On("GetOwnerReference", matchers...)
-	return &ExecutableWorkflow_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference", matchers...)
+	return &ExecutableWorkflow_GetOwnerReference{Call: c_call}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -771,13 +771,13 @@ func (_m ExecutableWorkflow_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutpu
 }
 
 func (_m *ExecutableWorkflow) OnGetRawOutputDataConfig() *ExecutableWorkflow_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig")
-	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig")
+	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *ExecutableWorkflow_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig", matchers...)
-	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig", matchers...)
+	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c_call}
 }
 
 // GetRawOutputDataConfig provides a mock function with given fields:
@@ -803,13 +803,13 @@ func (_m ExecutableWorkflow_GetSecurityContext) Return(_a0 core.SecurityContext)
 }
 
 func (_m *ExecutableWorkflow) OnGetSecurityContext() *ExecutableWorkflow_GetSecurityContext {
-	c := _m.On("GetSecurityContext")
-	return &ExecutableWorkflow_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext")
+	return &ExecutableWorkflow_GetSecurityContext{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetSecurityContextMatch(matchers ...interface{}) *ExecutableWorkflow_GetSecurityContext {
-	c := _m.On("GetSecurityContext", matchers...)
-	return &ExecutableWorkflow_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext", matchers...)
+	return &ExecutableWorkflow_GetSecurityContext{Call: c_call}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -835,13 +835,13 @@ func (_m ExecutableWorkflow_GetServiceAccountName) Return(_a0 string) *Executabl
 }
 
 func (_m *ExecutableWorkflow) OnGetServiceAccountName() *ExecutableWorkflow_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName")
-	return &ExecutableWorkflow_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName")
+	return &ExecutableWorkflow_GetServiceAccountName{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetServiceAccountNameMatch(matchers ...interface{}) *ExecutableWorkflow_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName", matchers...)
-	return &ExecutableWorkflow_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName", matchers...)
+	return &ExecutableWorkflow_GetServiceAccountName{Call: c_call}
 }
 
 // GetServiceAccountName provides a mock function with given fields:
@@ -867,13 +867,13 @@ func (_m ExecutableWorkflow_GetTask) Return(_a0 v1alpha1.ExecutableTask, _a1 err
 }
 
 func (_m *ExecutableWorkflow) OnGetTask(id string) *ExecutableWorkflow_GetTask {
-	c := _m.On("GetTask", id)
-	return &ExecutableWorkflow_GetTask{Call: c}
+	c_call := _m.On("GetTask", id)
+	return &ExecutableWorkflow_GetTask{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnGetTaskMatch(matchers ...interface{}) *ExecutableWorkflow_GetTask {
-	c := _m.On("GetTask", matchers...)
-	return &ExecutableWorkflow_GetTask{Call: c}
+	c_call := _m.On("GetTask", matchers...)
+	return &ExecutableWorkflow_GetTask{Call: c_call}
 }
 
 // GetTask provides a mock function with given fields: id
@@ -908,13 +908,13 @@ func (_m ExecutableWorkflow_IsInterruptible) Return(_a0 bool) *ExecutableWorkflo
 }
 
 func (_m *ExecutableWorkflow) OnIsInterruptible() *ExecutableWorkflow_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &ExecutableWorkflow_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &ExecutableWorkflow_IsInterruptible{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnIsInterruptibleMatch(matchers ...interface{}) *ExecutableWorkflow_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &ExecutableWorkflow_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &ExecutableWorkflow_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:
@@ -940,13 +940,13 @@ func (_m ExecutableWorkflow_StartNode) Return(_a0 v1alpha1.ExecutableNode) *Exec
 }
 
 func (_m *ExecutableWorkflow) OnStartNode() *ExecutableWorkflow_StartNode {
-	c := _m.On("StartNode")
-	return &ExecutableWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode")
+	return &ExecutableWorkflow_StartNode{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnStartNodeMatch(matchers ...interface{}) *ExecutableWorkflow_StartNode {
-	c := _m.On("StartNode", matchers...)
-	return &ExecutableWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode", matchers...)
+	return &ExecutableWorkflow_StartNode{Call: c_call}
 }
 
 // StartNode provides a mock function with given fields:
@@ -974,13 +974,13 @@ func (_m ExecutableWorkflow_ToNode) Return(_a0 []string, _a1 error) *ExecutableW
 }
 
 func (_m *ExecutableWorkflow) OnToNode(name string) *ExecutableWorkflow_ToNode {
-	c := _m.On("ToNode", name)
-	return &ExecutableWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", name)
+	return &ExecutableWorkflow_ToNode{Call: c_call}
 }
 
 func (_m *ExecutableWorkflow) OnToNodeMatch(matchers ...interface{}) *ExecutableWorkflow_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &ExecutableWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &ExecutableWorkflow_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: name

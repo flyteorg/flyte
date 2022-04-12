@@ -21,13 +21,13 @@ func (_m InterfaceProvider_GetExpectedInputs) Return(_a0 *core.ParameterMap) *In
 }
 
 func (_m *InterfaceProvider) OnGetExpectedInputs() *InterfaceProvider_GetExpectedInputs {
-	c := _m.On("GetExpectedInputs")
-	return &InterfaceProvider_GetExpectedInputs{Call: c}
+	c_call := _m.On("GetExpectedInputs")
+	return &InterfaceProvider_GetExpectedInputs{Call: c_call}
 }
 
 func (_m *InterfaceProvider) OnGetExpectedInputsMatch(matchers ...interface{}) *InterfaceProvider_GetExpectedInputs {
-	c := _m.On("GetExpectedInputs", matchers...)
-	return &InterfaceProvider_GetExpectedInputs{Call: c}
+	c_call := _m.On("GetExpectedInputs", matchers...)
+	return &InterfaceProvider_GetExpectedInputs{Call: c_call}
 }
 
 // GetExpectedInputs provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m InterfaceProvider_GetExpectedOutputs) Return(_a0 *core.VariableMap) *In
 }
 
 func (_m *InterfaceProvider) OnGetExpectedOutputs() *InterfaceProvider_GetExpectedOutputs {
-	c := _m.On("GetExpectedOutputs")
-	return &InterfaceProvider_GetExpectedOutputs{Call: c}
+	c_call := _m.On("GetExpectedOutputs")
+	return &InterfaceProvider_GetExpectedOutputs{Call: c_call}
 }
 
 func (_m *InterfaceProvider) OnGetExpectedOutputsMatch(matchers ...interface{}) *InterfaceProvider_GetExpectedOutputs {
-	c := _m.On("GetExpectedOutputs", matchers...)
-	return &InterfaceProvider_GetExpectedOutputs{Call: c}
+	c_call := _m.On("GetExpectedOutputs", matchers...)
+	return &InterfaceProvider_GetExpectedOutputs{Call: c_call}
 }
 
 // GetExpectedOutputs provides a mock function with given fields:
@@ -89,13 +89,13 @@ func (_m InterfaceProvider_GetID) Return(_a0 *core.Identifier) *InterfaceProvide
 }
 
 func (_m *InterfaceProvider) OnGetID() *InterfaceProvider_GetID {
-	c := _m.On("GetID")
-	return &InterfaceProvider_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &InterfaceProvider_GetID{Call: c_call}
 }
 
 func (_m *InterfaceProvider) OnGetIDMatch(matchers ...interface{}) *InterfaceProvider_GetID {
-	c := _m.On("GetID", matchers...)
-	return &InterfaceProvider_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &InterfaceProvider_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
