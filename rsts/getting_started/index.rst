@@ -18,8 +18,12 @@ Install Flyte's python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__
   pip install flytekit
 
 
-Example
-^^^^^^^^
+Example Script: Computing Descriptive Statistics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Let's create a simple Flyte workflow involving two steps:
+1. Generate a dataset of ``numbers`` drawn from a normal distribution.
+2. Compute the mean and standard deviation the ``numbers`` data.
 
 Create It
 """"""""""
