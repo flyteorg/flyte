@@ -61,7 +61,7 @@ You can run the workflows in `example.py` on a local python environment or a Fly
 Locally
 """"""""
 
-Run your workflow locally using ``pyflyte``
+Run your workflow locally using ``pyflyte``, which is the CLI that ships with ``flytekit``.
 
 .. prompt:: bash $
 
