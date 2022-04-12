@@ -100,6 +100,7 @@ func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, e
 		"0.0.0.0:30084:30084", // Minio API Port
 		"0.0.0.0:30086:30086", // K8s cluster
 		"0.0.0.0:30088:30088", // Minio Console Port
+		"0.0.0.0:30089:30089", // Postgres Port
 	})
 }
 
