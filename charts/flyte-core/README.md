@@ -89,7 +89,6 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
-| configmap.logger | object | `{"logger":{"level":4,"show-source":true}}` | Logger configuration |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
 | configmap.remoteData.remoteData.signedUrls.durationMinutes | int | `3` |  |
