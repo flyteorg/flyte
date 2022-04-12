@@ -56,7 +56,7 @@ Copy the following code to a file named ``example.py``
 
 Running Flyte Workflows
 ^^^^^^^^^^^^^^^^^^^^^^^
-You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster.
+You can run the workflows in `example.py` on a local python environment or a Flyte cluster. In this guide, you'll learn how to run a demo local cluster.
 
 Locally
 """"""""
