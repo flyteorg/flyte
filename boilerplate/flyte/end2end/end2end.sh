@@ -9,6 +9,9 @@ set -eu
 CONFIG_FILE=$1; shift
 EXTRA_FLAGS=( "$@" )
 
+CONFIG_FILE=$1; shift
+EXTRA_FLAGS=( "$@" )
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 LATEST_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
