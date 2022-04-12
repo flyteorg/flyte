@@ -18,13 +18,13 @@ func (_m ImmutableParentInfo_CurrentAttempt) Return(_a0 uint32) *ImmutableParent
 }
 
 func (_m *ImmutableParentInfo) OnCurrentAttempt() *ImmutableParentInfo_CurrentAttempt {
-	c := _m.On("CurrentAttempt")
-	return &ImmutableParentInfo_CurrentAttempt{Call: c}
+	c_call := _m.On("CurrentAttempt")
+	return &ImmutableParentInfo_CurrentAttempt{Call: c_call}
 }
 
 func (_m *ImmutableParentInfo) OnCurrentAttemptMatch(matchers ...interface{}) *ImmutableParentInfo_CurrentAttempt {
-	c := _m.On("CurrentAttempt", matchers...)
-	return &ImmutableParentInfo_CurrentAttempt{Call: c}
+	c_call := _m.On("CurrentAttempt", matchers...)
+	return &ImmutableParentInfo_CurrentAttempt{Call: c_call}
 }
 
 // CurrentAttempt provides a mock function with given fields:
@@ -50,13 +50,13 @@ func (_m ImmutableParentInfo_GetUniqueID) Return(_a0 string) *ImmutableParentInf
 }
 
 func (_m *ImmutableParentInfo) OnGetUniqueID() *ImmutableParentInfo_GetUniqueID {
-	c := _m.On("GetUniqueID")
-	return &ImmutableParentInfo_GetUniqueID{Call: c}
+	c_call := _m.On("GetUniqueID")
+	return &ImmutableParentInfo_GetUniqueID{Call: c_call}
 }
 
 func (_m *ImmutableParentInfo) OnGetUniqueIDMatch(matchers ...interface{}) *ImmutableParentInfo_GetUniqueID {
-	c := _m.On("GetUniqueID", matchers...)
-	return &ImmutableParentInfo_GetUniqueID{Call: c}
+	c_call := _m.On("GetUniqueID", matchers...)
+	return &ImmutableParentInfo_GetUniqueID{Call: c_call}
 }
 
 // GetUniqueID provides a mock function with given fields:

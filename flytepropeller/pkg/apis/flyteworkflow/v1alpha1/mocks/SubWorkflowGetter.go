@@ -21,13 +21,13 @@ func (_m SubWorkflowGetter_FindSubWorkflow) Return(_a0 v1alpha1.ExecutableSubWor
 }
 
 func (_m *SubWorkflowGetter) OnFindSubWorkflow(subID string) *SubWorkflowGetter_FindSubWorkflow {
-	c := _m.On("FindSubWorkflow", subID)
-	return &SubWorkflowGetter_FindSubWorkflow{Call: c}
+	c_call := _m.On("FindSubWorkflow", subID)
+	return &SubWorkflowGetter_FindSubWorkflow{Call: c_call}
 }
 
 func (_m *SubWorkflowGetter) OnFindSubWorkflowMatch(matchers ...interface{}) *SubWorkflowGetter_FindSubWorkflow {
-	c := _m.On("FindSubWorkflow", matchers...)
-	return &SubWorkflowGetter_FindSubWorkflow{Call: c}
+	c_call := _m.On("FindSubWorkflow", matchers...)
+	return &SubWorkflowGetter_FindSubWorkflow{Call: c_call}
 }
 
 // FindSubWorkflow provides a mock function with given fields: subID

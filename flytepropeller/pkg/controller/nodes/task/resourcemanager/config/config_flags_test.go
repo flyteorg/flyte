@@ -130,7 +130,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_redis.hostPaths", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.RedisConfig.HostPaths, ",")
 
 			cmdFlags.Set("redis.hostPaths", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("redis.hostPaths"); err == nil {

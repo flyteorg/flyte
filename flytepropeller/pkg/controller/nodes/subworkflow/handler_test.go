@@ -109,6 +109,10 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	ex.OnGetName().Return("name")
 	ex.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 	ex.OnIncrementParallelism().Return(1)
+	ex.OnGetSecurityContext().Return(core.SecurityContext{})
+	ex.OnGetAnnotations().Return(nil)
+	ex.OnGetLabels().Return(nil)
+	ex.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
 
 	nCtx.OnExecutionContext().Return(ex)
 

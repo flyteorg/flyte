@@ -28,13 +28,13 @@ func (_m FlyteAdmin_GetLaunchPlan) Return(_a0 *admin.LaunchPlan, _a1 error) *Fly
 }
 
 func (_m *FlyteAdmin) OnGetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) *FlyteAdmin_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", ctx, launchPlanRef)
-	return &FlyteAdmin_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", ctx, launchPlanRef)
+	return &FlyteAdmin_GetLaunchPlan{Call: c_call}
 }
 
 func (_m *FlyteAdmin) OnGetLaunchPlanMatch(matchers ...interface{}) *FlyteAdmin_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", matchers...)
-	return &FlyteAdmin_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", matchers...)
+	return &FlyteAdmin_GetLaunchPlan{Call: c_call}
 }
 
 // GetLaunchPlan provides a mock function with given fields: ctx, launchPlanRef
@@ -69,13 +69,13 @@ func (_m FlyteAdmin_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 error) *F
 }
 
 func (_m *FlyteAdmin) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_GetStatus {
-	c := _m.On("GetStatus", ctx, executionID)
-	return &FlyteAdmin_GetStatus{Call: c}
+	c_call := _m.On("GetStatus", ctx, executionID)
+	return &FlyteAdmin_GetStatus{Call: c_call}
 }
 
 func (_m *FlyteAdmin) OnGetStatusMatch(matchers ...interface{}) *FlyteAdmin_GetStatus {
-	c := _m.On("GetStatus", matchers...)
-	return &FlyteAdmin_GetStatus{Call: c}
+	c_call := _m.On("GetStatus", matchers...)
+	return &FlyteAdmin_GetStatus{Call: c_call}
 }
 
 // GetStatus provides a mock function with given fields: ctx, executionID
@@ -110,13 +110,13 @@ func (_m FlyteAdmin_Initialize) Return(_a0 error) *FlyteAdmin_Initialize {
 }
 
 func (_m *FlyteAdmin) OnInitialize(ctx context.Context) *FlyteAdmin_Initialize {
-	c := _m.On("Initialize", ctx)
-	return &FlyteAdmin_Initialize{Call: c}
+	c_call := _m.On("Initialize", ctx)
+	return &FlyteAdmin_Initialize{Call: c_call}
 }
 
 func (_m *FlyteAdmin) OnInitializeMatch(matchers ...interface{}) *FlyteAdmin_Initialize {
-	c := _m.On("Initialize", matchers...)
-	return &FlyteAdmin_Initialize{Call: c}
+	c_call := _m.On("Initialize", matchers...)
+	return &FlyteAdmin_Initialize{Call: c_call}
 }
 
 // Initialize provides a mock function with given fields: ctx
@@ -142,13 +142,13 @@ func (_m FlyteAdmin_Kill) Return(_a0 error) *FlyteAdmin_Kill {
 }
 
 func (_m *FlyteAdmin) OnKill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) *FlyteAdmin_Kill {
-	c := _m.On("Kill", ctx, executionID, reason)
-	return &FlyteAdmin_Kill{Call: c}
+	c_call := _m.On("Kill", ctx, executionID, reason)
+	return &FlyteAdmin_Kill{Call: c_call}
 }
 
 func (_m *FlyteAdmin) OnKillMatch(matchers ...interface{}) *FlyteAdmin_Kill {
-	c := _m.On("Kill", matchers...)
-	return &FlyteAdmin_Kill{Call: c}
+	c_call := _m.On("Kill", matchers...)
+	return &FlyteAdmin_Kill{Call: c_call}
 }
 
 // Kill provides a mock function with given fields: ctx, executionID, reason
@@ -174,13 +174,13 @@ func (_m FlyteAdmin_Launch) Return(_a0 error) *FlyteAdmin_Launch {
 }
 
 func (_m *FlyteAdmin) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) *FlyteAdmin_Launch {
-	c := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
-	return &FlyteAdmin_Launch{Call: c}
+	c_call := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
+	return &FlyteAdmin_Launch{Call: c_call}
 }
 
 func (_m *FlyteAdmin) OnLaunchMatch(matchers ...interface{}) *FlyteAdmin_Launch {
-	c := _m.On("Launch", matchers...)
-	return &FlyteAdmin_Launch{Call: c}
+	c_call := _m.On("Launch", matchers...)
+	return &FlyteAdmin_Launch{Call: c_call}
 }
 
 // Launch provides a mock function with given fields: ctx, launchCtx, executionID, launchPlanRef, inputs

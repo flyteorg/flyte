@@ -26,13 +26,13 @@ func (_m Client_RecoverNodeExecution) Return(_a0 *admin.NodeExecution, _a1 error
 }
 
 func (_m *Client) OnRecoverNodeExecution(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) *Client_RecoverNodeExecution {
-	c := _m.On("RecoverNodeExecution", ctx, execID, id)
-	return &Client_RecoverNodeExecution{Call: c}
+	c_call := _m.On("RecoverNodeExecution", ctx, execID, id)
+	return &Client_RecoverNodeExecution{Call: c_call}
 }
 
 func (_m *Client) OnRecoverNodeExecutionMatch(matchers ...interface{}) *Client_RecoverNodeExecution {
-	c := _m.On("RecoverNodeExecution", matchers...)
-	return &Client_RecoverNodeExecution{Call: c}
+	c_call := _m.On("RecoverNodeExecution", matchers...)
+	return &Client_RecoverNodeExecution{Call: c_call}
 }
 
 // RecoverNodeExecution provides a mock function with given fields: ctx, execID, id
@@ -67,13 +67,13 @@ func (_m Client_RecoverNodeExecutionData) Return(_a0 *admin.NodeExecutionGetData
 }
 
 func (_m *Client) OnRecoverNodeExecutionData(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) *Client_RecoverNodeExecutionData {
-	c := _m.On("RecoverNodeExecutionData", ctx, execID, id)
-	return &Client_RecoverNodeExecutionData{Call: c}
+	c_call := _m.On("RecoverNodeExecutionData", ctx, execID, id)
+	return &Client_RecoverNodeExecutionData{Call: c_call}
 }
 
 func (_m *Client) OnRecoverNodeExecutionDataMatch(matchers ...interface{}) *Client_RecoverNodeExecutionData {
-	c := _m.On("RecoverNodeExecutionData", matchers...)
-	return &Client_RecoverNodeExecutionData{Call: c}
+	c_call := _m.On("RecoverNodeExecutionData", matchers...)
+	return &Client_RecoverNodeExecutionData{Call: c_call}
 }
 
 // RecoverNodeExecutionData provides a mock function with given fields: ctx, execID, id

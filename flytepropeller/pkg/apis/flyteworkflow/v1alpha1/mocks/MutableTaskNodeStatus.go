@@ -22,13 +22,13 @@ func (_m MutableTaskNodeStatus_GetBarrierClockTick) Return(_a0 uint32) *MutableT
 }
 
 func (_m *MutableTaskNodeStatus) OnGetBarrierClockTick() *MutableTaskNodeStatus_GetBarrierClockTick {
-	c := _m.On("GetBarrierClockTick")
-	return &MutableTaskNodeStatus_GetBarrierClockTick{Call: c}
+	c_call := _m.On("GetBarrierClockTick")
+	return &MutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetBarrierClockTickMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetBarrierClockTick {
-	c := _m.On("GetBarrierClockTick", matchers...)
-	return &MutableTaskNodeStatus_GetBarrierClockTick{Call: c}
+	c_call := _m.On("GetBarrierClockTick", matchers...)
+	return &MutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
 }
 
 // GetBarrierClockTick provides a mock function with given fields:
@@ -54,13 +54,13 @@ func (_m MutableTaskNodeStatus_GetLastPhaseUpdatedAt) Return(_a0 time.Time) *Mut
 }
 
 func (_m *MutableTaskNodeStatus) OnGetLastPhaseUpdatedAt() *MutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c := _m.On("GetLastPhaseUpdatedAt")
-	return &MutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
+	c_call := _m.On("GetLastPhaseUpdatedAt")
+	return &MutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetLastPhaseUpdatedAtMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c := _m.On("GetLastPhaseUpdatedAt", matchers...)
-	return &MutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
+	c_call := _m.On("GetLastPhaseUpdatedAt", matchers...)
+	return &MutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
 }
 
 // GetLastPhaseUpdatedAt provides a mock function with given fields:
@@ -86,13 +86,13 @@ func (_m MutableTaskNodeStatus_GetPhase) Return(_a0 int) *MutableTaskNodeStatus_
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPhase() *MutableTaskNodeStatus_GetPhase {
-	c := _m.On("GetPhase")
-	return &MutableTaskNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase")
+	return &MutableTaskNodeStatus_GetPhase{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetPhase {
-	c := _m.On("GetPhase", matchers...)
-	return &MutableTaskNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase", matchers...)
+	return &MutableTaskNodeStatus_GetPhase{Call: c_call}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -118,13 +118,13 @@ func (_m MutableTaskNodeStatus_GetPhaseVersion) Return(_a0 uint32) *MutableTaskN
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPhaseVersion() *MutableTaskNodeStatus_GetPhaseVersion {
-	c := _m.On("GetPhaseVersion")
-	return &MutableTaskNodeStatus_GetPhaseVersion{Call: c}
+	c_call := _m.On("GetPhaseVersion")
+	return &MutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPhaseVersionMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetPhaseVersion {
-	c := _m.On("GetPhaseVersion", matchers...)
-	return &MutableTaskNodeStatus_GetPhaseVersion{Call: c}
+	c_call := _m.On("GetPhaseVersion", matchers...)
+	return &MutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
 }
 
 // GetPhaseVersion provides a mock function with given fields:
@@ -150,13 +150,13 @@ func (_m MutableTaskNodeStatus_GetPluginState) Return(_a0 []byte) *MutableTaskNo
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPluginState() *MutableTaskNodeStatus_GetPluginState {
-	c := _m.On("GetPluginState")
-	return &MutableTaskNodeStatus_GetPluginState{Call: c}
+	c_call := _m.On("GetPluginState")
+	return &MutableTaskNodeStatus_GetPluginState{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPluginStateMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetPluginState {
-	c := _m.On("GetPluginState", matchers...)
-	return &MutableTaskNodeStatus_GetPluginState{Call: c}
+	c_call := _m.On("GetPluginState", matchers...)
+	return &MutableTaskNodeStatus_GetPluginState{Call: c_call}
 }
 
 // GetPluginState provides a mock function with given fields:
@@ -184,13 +184,13 @@ func (_m MutableTaskNodeStatus_GetPluginStateVersion) Return(_a0 uint32) *Mutabl
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPluginStateVersion() *MutableTaskNodeStatus_GetPluginStateVersion {
-	c := _m.On("GetPluginStateVersion")
-	return &MutableTaskNodeStatus_GetPluginStateVersion{Call: c}
+	c_call := _m.On("GetPluginStateVersion")
+	return &MutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnGetPluginStateVersionMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetPluginStateVersion {
-	c := _m.On("GetPluginStateVersion", matchers...)
-	return &MutableTaskNodeStatus_GetPluginStateVersion{Call: c}
+	c_call := _m.On("GetPluginStateVersion", matchers...)
+	return &MutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
 }
 
 // GetPluginStateVersion provides a mock function with given fields:
@@ -216,13 +216,13 @@ func (_m MutableTaskNodeStatus_IsDirty) Return(_a0 bool) *MutableTaskNodeStatus_
 }
 
 func (_m *MutableTaskNodeStatus) OnIsDirty() *MutableTaskNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableTaskNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableTaskNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableTaskNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableTaskNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableTaskNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableTaskNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

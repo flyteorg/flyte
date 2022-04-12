@@ -28,13 +28,13 @@ func (_m Executor_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 error) *Exe
 }
 
 func (_m *Executor) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *Executor_GetStatus {
-	c := _m.On("GetStatus", ctx, executionID)
-	return &Executor_GetStatus{Call: c}
+	c_call := _m.On("GetStatus", ctx, executionID)
+	return &Executor_GetStatus{Call: c_call}
 }
 
 func (_m *Executor) OnGetStatusMatch(matchers ...interface{}) *Executor_GetStatus {
-	c := _m.On("GetStatus", matchers...)
-	return &Executor_GetStatus{Call: c}
+	c_call := _m.On("GetStatus", matchers...)
+	return &Executor_GetStatus{Call: c_call}
 }
 
 // GetStatus provides a mock function with given fields: ctx, executionID
@@ -69,13 +69,13 @@ func (_m Executor_Initialize) Return(_a0 error) *Executor_Initialize {
 }
 
 func (_m *Executor) OnInitialize(ctx context.Context) *Executor_Initialize {
-	c := _m.On("Initialize", ctx)
-	return &Executor_Initialize{Call: c}
+	c_call := _m.On("Initialize", ctx)
+	return &Executor_Initialize{Call: c_call}
 }
 
 func (_m *Executor) OnInitializeMatch(matchers ...interface{}) *Executor_Initialize {
-	c := _m.On("Initialize", matchers...)
-	return &Executor_Initialize{Call: c}
+	c_call := _m.On("Initialize", matchers...)
+	return &Executor_Initialize{Call: c_call}
 }
 
 // Initialize provides a mock function with given fields: ctx
@@ -101,13 +101,13 @@ func (_m Executor_Kill) Return(_a0 error) *Executor_Kill {
 }
 
 func (_m *Executor) OnKill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) *Executor_Kill {
-	c := _m.On("Kill", ctx, executionID, reason)
-	return &Executor_Kill{Call: c}
+	c_call := _m.On("Kill", ctx, executionID, reason)
+	return &Executor_Kill{Call: c_call}
 }
 
 func (_m *Executor) OnKillMatch(matchers ...interface{}) *Executor_Kill {
-	c := _m.On("Kill", matchers...)
-	return &Executor_Kill{Call: c}
+	c_call := _m.On("Kill", matchers...)
+	return &Executor_Kill{Call: c_call}
 }
 
 // Kill provides a mock function with given fields: ctx, executionID, reason
@@ -133,13 +133,13 @@ func (_m Executor_Launch) Return(_a0 error) *Executor_Launch {
 }
 
 func (_m *Executor) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) *Executor_Launch {
-	c := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
-	return &Executor_Launch{Call: c}
+	c_call := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
+	return &Executor_Launch{Call: c_call}
 }
 
 func (_m *Executor) OnLaunchMatch(matchers ...interface{}) *Executor_Launch {
-	c := _m.On("Launch", matchers...)
-	return &Executor_Launch{Call: c}
+	c_call := _m.On("Launch", matchers...)
+	return &Executor_Launch{Call: c_call}
 }
 
 // Launch provides a mock function with given fields: ctx, launchCtx, executionID, launchPlanRef, inputs

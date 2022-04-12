@@ -21,13 +21,13 @@ func (_m BaseWorkflow_FromNode) Return(_a0 []string, _a1 error) *BaseWorkflow_Fr
 }
 
 func (_m *BaseWorkflow) OnFromNode(name string) *BaseWorkflow_FromNode {
-	c := _m.On("FromNode", name)
-	return &BaseWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", name)
+	return &BaseWorkflow_FromNode{Call: c_call}
 }
 
 func (_m *BaseWorkflow) OnFromNodeMatch(matchers ...interface{}) *BaseWorkflow_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &BaseWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &BaseWorkflow_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: name
@@ -62,13 +62,13 @@ func (_m BaseWorkflow_GetID) Return(_a0 string) *BaseWorkflow_GetID {
 }
 
 func (_m *BaseWorkflow) OnGetID() *BaseWorkflow_GetID {
-	c := _m.On("GetID")
-	return &BaseWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &BaseWorkflow_GetID{Call: c_call}
 }
 
 func (_m *BaseWorkflow) OnGetIDMatch(matchers ...interface{}) *BaseWorkflow_GetID {
-	c := _m.On("GetID", matchers...)
-	return &BaseWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &BaseWorkflow_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -94,13 +94,13 @@ func (_m BaseWorkflow_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1 bool) *Ba
 }
 
 func (_m *BaseWorkflow) OnGetNode(nodeID string) *BaseWorkflow_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &BaseWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &BaseWorkflow_GetNode{Call: c_call}
 }
 
 func (_m *BaseWorkflow) OnGetNodeMatch(matchers ...interface{}) *BaseWorkflow_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &BaseWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &BaseWorkflow_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID
@@ -135,13 +135,13 @@ func (_m BaseWorkflow_StartNode) Return(_a0 v1alpha1.ExecutableNode) *BaseWorkfl
 }
 
 func (_m *BaseWorkflow) OnStartNode() *BaseWorkflow_StartNode {
-	c := _m.On("StartNode")
-	return &BaseWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode")
+	return &BaseWorkflow_StartNode{Call: c_call}
 }
 
 func (_m *BaseWorkflow) OnStartNodeMatch(matchers ...interface{}) *BaseWorkflow_StartNode {
-	c := _m.On("StartNode", matchers...)
-	return &BaseWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode", matchers...)
+	return &BaseWorkflow_StartNode{Call: c_call}
 }
 
 // StartNode provides a mock function with given fields:
@@ -169,13 +169,13 @@ func (_m BaseWorkflow_ToNode) Return(_a0 []string, _a1 error) *BaseWorkflow_ToNo
 }
 
 func (_m *BaseWorkflow) OnToNode(name string) *BaseWorkflow_ToNode {
-	c := _m.On("ToNode", name)
-	return &BaseWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", name)
+	return &BaseWorkflow_ToNode{Call: c_call}
 }
 
 func (_m *BaseWorkflow) OnToNodeMatch(matchers ...interface{}) *BaseWorkflow_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &BaseWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &BaseWorkflow_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: name

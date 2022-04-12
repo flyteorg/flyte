@@ -256,6 +256,11 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			},
 		})
 		ectx.OnIncrementParallelism().Return(1)
+		ectx.OnGetSecurityContext().Return(core.SecurityContext{})
+		ectx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+		ectx.OnGetLabels().Return(nil)
+		ectx.OnGetAnnotations().Return(nil)
+
 		nCtx.OnExecutionContext().Return(ectx)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 		nCtx.OnNode().Return(mockNode)

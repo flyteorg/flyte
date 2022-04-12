@@ -22,13 +22,13 @@ func (_m ExecutableTaskNodeStatus_GetBarrierClockTick) Return(_a0 uint32) *Execu
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetBarrierClockTick() *ExecutableTaskNodeStatus_GetBarrierClockTick {
-	c := _m.On("GetBarrierClockTick")
-	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c}
+	c_call := _m.On("GetBarrierClockTick")
+	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetBarrierClockTickMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetBarrierClockTick {
-	c := _m.On("GetBarrierClockTick", matchers...)
-	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c}
+	c_call := _m.On("GetBarrierClockTick", matchers...)
+	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
 }
 
 // GetBarrierClockTick provides a mock function with given fields:
@@ -54,13 +54,13 @@ func (_m ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt) Return(_a0 time.Time) *
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetLastPhaseUpdatedAt() *ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c := _m.On("GetLastPhaseUpdatedAt")
-	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
+	c_call := _m.On("GetLastPhaseUpdatedAt")
+	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetLastPhaseUpdatedAtMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c := _m.On("GetLastPhaseUpdatedAt", matchers...)
-	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
+	c_call := _m.On("GetLastPhaseUpdatedAt", matchers...)
+	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
 }
 
 // GetLastPhaseUpdatedAt provides a mock function with given fields:
@@ -86,13 +86,13 @@ func (_m ExecutableTaskNodeStatus_GetPhase) Return(_a0 int) *ExecutableTaskNodeS
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhase() *ExecutableTaskNodeStatus_GetPhase {
-	c := _m.On("GetPhase")
-	return &ExecutableTaskNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase")
+	return &ExecutableTaskNodeStatus_GetPhase{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPhase {
-	c := _m.On("GetPhase", matchers...)
-	return &ExecutableTaskNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase", matchers...)
+	return &ExecutableTaskNodeStatus_GetPhase{Call: c_call}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -118,13 +118,13 @@ func (_m ExecutableTaskNodeStatus_GetPhaseVersion) Return(_a0 uint32) *Executabl
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseVersion() *ExecutableTaskNodeStatus_GetPhaseVersion {
-	c := _m.On("GetPhaseVersion")
-	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c}
+	c_call := _m.On("GetPhaseVersion")
+	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseVersionMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPhaseVersion {
-	c := _m.On("GetPhaseVersion", matchers...)
-	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c}
+	c_call := _m.On("GetPhaseVersion", matchers...)
+	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
 }
 
 // GetPhaseVersion provides a mock function with given fields:
@@ -150,13 +150,13 @@ func (_m ExecutableTaskNodeStatus_GetPluginState) Return(_a0 []byte) *Executable
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginState() *ExecutableTaskNodeStatus_GetPluginState {
-	c := _m.On("GetPluginState")
-	return &ExecutableTaskNodeStatus_GetPluginState{Call: c}
+	c_call := _m.On("GetPluginState")
+	return &ExecutableTaskNodeStatus_GetPluginState{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPluginState {
-	c := _m.On("GetPluginState", matchers...)
-	return &ExecutableTaskNodeStatus_GetPluginState{Call: c}
+	c_call := _m.On("GetPluginState", matchers...)
+	return &ExecutableTaskNodeStatus_GetPluginState{Call: c_call}
 }
 
 // GetPluginState provides a mock function with given fields:
@@ -184,13 +184,13 @@ func (_m ExecutableTaskNodeStatus_GetPluginStateVersion) Return(_a0 uint32) *Exe
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateVersion() *ExecutableTaskNodeStatus_GetPluginStateVersion {
-	c := _m.On("GetPluginStateVersion")
-	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c}
+	c_call := _m.On("GetPluginStateVersion")
+	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateVersionMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPluginStateVersion {
-	c := _m.On("GetPluginStateVersion", matchers...)
-	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c}
+	c_call := _m.On("GetPluginStateVersion", matchers...)
+	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
 }
 
 // GetPluginStateVersion provides a mock function with given fields:

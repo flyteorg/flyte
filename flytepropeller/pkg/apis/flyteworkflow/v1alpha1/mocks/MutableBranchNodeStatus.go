@@ -21,13 +21,13 @@ func (_m MutableBranchNodeStatus_GetFinalizedNode) Return(_a0 *string) *MutableB
 }
 
 func (_m *MutableBranchNodeStatus) OnGetFinalizedNode() *MutableBranchNodeStatus_GetFinalizedNode {
-	c := _m.On("GetFinalizedNode")
-	return &MutableBranchNodeStatus_GetFinalizedNode{Call: c}
+	c_call := _m.On("GetFinalizedNode")
+	return &MutableBranchNodeStatus_GetFinalizedNode{Call: c_call}
 }
 
 func (_m *MutableBranchNodeStatus) OnGetFinalizedNodeMatch(matchers ...interface{}) *MutableBranchNodeStatus_GetFinalizedNode {
-	c := _m.On("GetFinalizedNode", matchers...)
-	return &MutableBranchNodeStatus_GetFinalizedNode{Call: c}
+	c_call := _m.On("GetFinalizedNode", matchers...)
+	return &MutableBranchNodeStatus_GetFinalizedNode{Call: c_call}
 }
 
 // GetFinalizedNode provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m MutableBranchNodeStatus_GetPhase) Return(_a0 v1alpha1.BranchNodePhase) 
 }
 
 func (_m *MutableBranchNodeStatus) OnGetPhase() *MutableBranchNodeStatus_GetPhase {
-	c := _m.On("GetPhase")
-	return &MutableBranchNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase")
+	return &MutableBranchNodeStatus_GetPhase{Call: c_call}
 }
 
 func (_m *MutableBranchNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *MutableBranchNodeStatus_GetPhase {
-	c := _m.On("GetPhase", matchers...)
-	return &MutableBranchNodeStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase", matchers...)
+	return &MutableBranchNodeStatus_GetPhase{Call: c_call}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -87,13 +87,13 @@ func (_m MutableBranchNodeStatus_IsDirty) Return(_a0 bool) *MutableBranchNodeSta
 }
 
 func (_m *MutableBranchNodeStatus) OnIsDirty() *MutableBranchNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableBranchNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableBranchNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableBranchNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableBranchNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableBranchNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableBranchNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

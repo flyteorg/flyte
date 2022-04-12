@@ -22,13 +22,13 @@ func (_m writer_Flush) Return(_a0 error) *writer_Flush {
 }
 
 func (_m *writer) OnFlush() *writer_Flush {
-	c := _m.On("Flush")
-	return &writer_Flush{Call: c}
+	c_call := _m.On("Flush")
+	return &writer_Flush{Call: c_call}
 }
 
 func (_m *writer) OnFlushMatch(matchers ...interface{}) *writer_Flush {
-	c := _m.On("Flush", matchers...)
-	return &writer_Flush{Call: c}
+	c_call := _m.On("Flush", matchers...)
+	return &writer_Flush{Call: c_call}
 }
 
 // Flush provides a mock function with given fields:
@@ -54,13 +54,13 @@ func (_m writer_Write) Return(_a0 error) *writer_Write {
 }
 
 func (_m *writer) OnWrite(ctx context.Context, content string) *writer_Write {
-	c := _m.On("Write", ctx, content)
-	return &writer_Write{Call: c}
+	c_call := _m.On("Write", ctx, content)
+	return &writer_Write{Call: c_call}
 }
 
 func (_m *writer) OnWriteMatch(matchers ...interface{}) *writer_Write {
-	c := _m.On("Write", matchers...)
-	return &writer_Write{Call: c}
+	c_call := _m.On("Write", matchers...)
+	return &writer_Write{Call: c_call}
 }
 
 // Write provides a mock function with given fields: ctx, content

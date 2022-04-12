@@ -52,7 +52,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Which resource manager to use")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "resourceMaxQuota"), defaultConfig.ResourceMaxQuota, "Global limit for concurrent Qubole queries")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "redis.hostPaths"), []string{}, "Redis hosts locations.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "redis.hostPaths"), defaultConfig.RedisConfig.HostPaths, "Redis hosts locations.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.primaryName"), defaultConfig.RedisConfig.PrimaryName, "Redis primary name,  fill in only if you are connecting to a redis sentinel cluster.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.hostPath"), defaultConfig.RedisConfig.HostPath, "Redis host location")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.hostKey"), defaultConfig.RedisConfig.HostKey, "Key for local Redis access")

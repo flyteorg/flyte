@@ -26,13 +26,13 @@ func (_m WorkflowEventRecorder_RecordWorkflowEvent) Return(_a0 error) *WorkflowE
 }
 
 func (_m *WorkflowEventRecorder) OnRecordWorkflowEvent(ctx context.Context, _a1 *event.WorkflowExecutionEvent, eventConfig *config.EventConfig) *WorkflowEventRecorder_RecordWorkflowEvent {
-	c := _m.On("RecordWorkflowEvent", ctx, _a1, eventConfig)
-	return &WorkflowEventRecorder_RecordWorkflowEvent{Call: c}
+	c_call := _m.On("RecordWorkflowEvent", ctx, _a1, eventConfig)
+	return &WorkflowEventRecorder_RecordWorkflowEvent{Call: c_call}
 }
 
 func (_m *WorkflowEventRecorder) OnRecordWorkflowEventMatch(matchers ...interface{}) *WorkflowEventRecorder_RecordWorkflowEvent {
-	c := _m.On("RecordWorkflowEvent", matchers...)
-	return &WorkflowEventRecorder_RecordWorkflowEvent{Call: c}
+	c_call := _m.On("RecordWorkflowEvent", matchers...)
+	return &WorkflowEventRecorder_RecordWorkflowEvent{Call: c_call}
 }
 
 // RecordWorkflowEvent provides a mock function with given fields: ctx, _a1, eventConfig

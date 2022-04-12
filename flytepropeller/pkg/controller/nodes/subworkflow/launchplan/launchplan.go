@@ -9,7 +9,7 @@ import (
 
 //go:generate mockery -all -case=underscore
 
-// A simple context that is used to start an execution of a LaunchPlan. It encapsulates enough parent information
+// LaunchContext is a simple context that is used to start an execution of a LaunchPlan. It encapsulates enough parent information
 // to tie the executions
 type LaunchContext struct {
 	// Nesting level of the current workflow (parent)
@@ -20,25 +20,33 @@ type LaunchContext struct {
 	ParentNodeExecution *core.NodeExecutionIdentifier
 	// If a node in recovery mode launched this execution, propagate recovery mode to the child execution.
 	RecoveryExecution *core.WorkflowExecutionIdentifier
+	// SecurityContext contains information from the parent execution about the security context.
+	SecurityContext core.SecurityContext
+	// MaxParallelism
+	MaxParallelism uint32
+	// RawOutputDataConfig
+	RawOutputDataConfig *admin.RawOutputDataConfig
+	Annotations         map[string]string
+	Labels              map[string]string
 }
 
-// Interface to be implemented by the remote system that can allow workflow launching capabilities
+// Executor interface to be implemented by the remote system that can allow workflow launching capabilities
 type Executor interface {
-	// Start an execution of a launchplan
+	// Launch start an execution of a launchplan
 	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error
 
-	// Retrieve status of a LaunchPlan execution
+	// GetStatus retrieves status of a LaunchPlan execution
 	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, error)
 
 	// Kill a remote execution
 	Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error
 
-	// Initializes Executor.
+	// Initialize initializes Executor.
 	Initialize(ctx context.Context) error
 }
 
 type Reader interface {
-	// Get the definition of a launch plan. This is primarily used to ensure all the TypedInterfaces match up before actually executing.
+	// GetLaunchPlan gets the definition of a launch plan. This is primarily used to ensure all the TypedInterfaces match up before actually executing.
 	GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error)
 }
 

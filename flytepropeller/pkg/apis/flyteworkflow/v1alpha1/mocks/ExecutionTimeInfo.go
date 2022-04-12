@@ -21,13 +21,13 @@ func (_m ExecutionTimeInfo_GetLastUpdatedAt) Return(_a0 *v1.Time) *ExecutionTime
 }
 
 func (_m *ExecutionTimeInfo) OnGetLastUpdatedAt() *ExecutionTimeInfo_GetLastUpdatedAt {
-	c := _m.On("GetLastUpdatedAt")
-	return &ExecutionTimeInfo_GetLastUpdatedAt{Call: c}
+	c_call := _m.On("GetLastUpdatedAt")
+	return &ExecutionTimeInfo_GetLastUpdatedAt{Call: c_call}
 }
 
 func (_m *ExecutionTimeInfo) OnGetLastUpdatedAtMatch(matchers ...interface{}) *ExecutionTimeInfo_GetLastUpdatedAt {
-	c := _m.On("GetLastUpdatedAt", matchers...)
-	return &ExecutionTimeInfo_GetLastUpdatedAt{Call: c}
+	c_call := _m.On("GetLastUpdatedAt", matchers...)
+	return &ExecutionTimeInfo_GetLastUpdatedAt{Call: c_call}
 }
 
 // GetLastUpdatedAt provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutionTimeInfo_GetStartedAt) Return(_a0 *v1.Time) *ExecutionTimeInfo
 }
 
 func (_m *ExecutionTimeInfo) OnGetStartedAt() *ExecutionTimeInfo_GetStartedAt {
-	c := _m.On("GetStartedAt")
-	return &ExecutionTimeInfo_GetStartedAt{Call: c}
+	c_call := _m.On("GetStartedAt")
+	return &ExecutionTimeInfo_GetStartedAt{Call: c_call}
 }
 
 func (_m *ExecutionTimeInfo) OnGetStartedAtMatch(matchers ...interface{}) *ExecutionTimeInfo_GetStartedAt {
-	c := _m.On("GetStartedAt", matchers...)
-	return &ExecutionTimeInfo_GetStartedAt{Call: c}
+	c_call := _m.On("GetStartedAt", matchers...)
+	return &ExecutionTimeInfo_GetStartedAt{Call: c_call}
 }
 
 // GetStartedAt provides a mock function with given fields:
@@ -89,13 +89,13 @@ func (_m ExecutionTimeInfo_GetStoppedAt) Return(_a0 *v1.Time) *ExecutionTimeInfo
 }
 
 func (_m *ExecutionTimeInfo) OnGetStoppedAt() *ExecutionTimeInfo_GetStoppedAt {
-	c := _m.On("GetStoppedAt")
-	return &ExecutionTimeInfo_GetStoppedAt{Call: c}
+	c_call := _m.On("GetStoppedAt")
+	return &ExecutionTimeInfo_GetStoppedAt{Call: c_call}
 }
 
 func (_m *ExecutionTimeInfo) OnGetStoppedAtMatch(matchers ...interface{}) *ExecutionTimeInfo_GetStoppedAt {
-	c := _m.On("GetStoppedAt", matchers...)
-	return &ExecutionTimeInfo_GetStoppedAt{Call: c}
+	c_call := _m.On("GetStoppedAt", matchers...)
+	return &ExecutionTimeInfo_GetStoppedAt{Call: c_call}
 }
 
 // GetStoppedAt provides a mock function with given fields:

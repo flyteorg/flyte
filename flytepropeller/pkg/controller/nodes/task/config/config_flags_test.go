@@ -102,7 +102,7 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_task-plugins.enabled-plugins", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config("1,1", ",")
+			testValue := join_Config(defaultConfig.TaskPlugins.EnabledPlugins, ",")
 
 			cmdFlags.Set("task-plugins.enabled-plugins", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("task-plugins.enabled-plugins"); err == nil {

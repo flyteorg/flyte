@@ -27,13 +27,13 @@ func (_m Meta_GetAnnotations) Return(_a0 map[string]string) *Meta_GetAnnotations
 }
 
 func (_m *Meta) OnGetAnnotations() *Meta_GetAnnotations {
-	c := _m.On("GetAnnotations")
-	return &Meta_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations")
+	return &Meta_GetAnnotations{Call: c_call}
 }
 
 func (_m *Meta) OnGetAnnotationsMatch(matchers ...interface{}) *Meta_GetAnnotations {
-	c := _m.On("GetAnnotations", matchers...)
-	return &Meta_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &Meta_GetAnnotations{Call: c_call}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -61,13 +61,13 @@ func (_m Meta_GetCreationTimestamp) Return(_a0 v1.Time) *Meta_GetCreationTimesta
 }
 
 func (_m *Meta) OnGetCreationTimestamp() *Meta_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp")
-	return &Meta_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp")
+	return &Meta_GetCreationTimestamp{Call: c_call}
 }
 
 func (_m *Meta) OnGetCreationTimestampMatch(matchers ...interface{}) *Meta_GetCreationTimestamp {
-	c := _m.On("GetCreationTimestamp", matchers...)
-	return &Meta_GetCreationTimestamp{Call: c}
+	c_call := _m.On("GetCreationTimestamp", matchers...)
+	return &Meta_GetCreationTimestamp{Call: c_call}
 }
 
 // GetCreationTimestamp provides a mock function with given fields:
@@ -93,13 +93,13 @@ func (_m Meta_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *Meta_GetEventV
 }
 
 func (_m *Meta) OnGetEventVersion() *Meta_GetEventVersion {
-	c := _m.On("GetEventVersion")
-	return &Meta_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion")
+	return &Meta_GetEventVersion{Call: c_call}
 }
 
 func (_m *Meta) OnGetEventVersionMatch(matchers ...interface{}) *Meta_GetEventVersion {
-	c := _m.On("GetEventVersion", matchers...)
-	return &Meta_GetEventVersion{Call: c}
+	c_call := _m.On("GetEventVersion", matchers...)
+	return &Meta_GetEventVersion{Call: c_call}
 }
 
 // GetEventVersion provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m Meta_GetExecutionID) Return(_a0 v1alpha1.WorkflowExecutionIdentifier) *
 }
 
 func (_m *Meta) OnGetExecutionID() *Meta_GetExecutionID {
-	c := _m.On("GetExecutionID")
-	return &Meta_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID")
+	return &Meta_GetExecutionID{Call: c_call}
 }
 
 func (_m *Meta) OnGetExecutionIDMatch(matchers ...interface{}) *Meta_GetExecutionID {
-	c := _m.On("GetExecutionID", matchers...)
-	return &Meta_GetExecutionID{Call: c}
+	c_call := _m.On("GetExecutionID", matchers...)
+	return &Meta_GetExecutionID{Call: c_call}
 }
 
 // GetExecutionID provides a mock function with given fields:
@@ -157,13 +157,13 @@ func (_m Meta_GetK8sWorkflowID) Return(_a0 types.NamespacedName) *Meta_GetK8sWor
 }
 
 func (_m *Meta) OnGetK8sWorkflowID() *Meta_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID")
-	return &Meta_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID")
+	return &Meta_GetK8sWorkflowID{Call: c_call}
 }
 
 func (_m *Meta) OnGetK8sWorkflowIDMatch(matchers ...interface{}) *Meta_GetK8sWorkflowID {
-	c := _m.On("GetK8sWorkflowID", matchers...)
-	return &Meta_GetK8sWorkflowID{Call: c}
+	c_call := _m.On("GetK8sWorkflowID", matchers...)
+	return &Meta_GetK8sWorkflowID{Call: c_call}
 }
 
 // GetK8sWorkflowID provides a mock function with given fields:
@@ -189,13 +189,13 @@ func (_m Meta_GetLabels) Return(_a0 map[string]string) *Meta_GetLabels {
 }
 
 func (_m *Meta) OnGetLabels() *Meta_GetLabels {
-	c := _m.On("GetLabels")
-	return &Meta_GetLabels{Call: c}
+	c_call := _m.On("GetLabels")
+	return &Meta_GetLabels{Call: c_call}
 }
 
 func (_m *Meta) OnGetLabelsMatch(matchers ...interface{}) *Meta_GetLabels {
-	c := _m.On("GetLabels", matchers...)
-	return &Meta_GetLabels{Call: c}
+	c_call := _m.On("GetLabels", matchers...)
+	return &Meta_GetLabels{Call: c_call}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -223,13 +223,13 @@ func (_m Meta_GetName) Return(_a0 string) *Meta_GetName {
 }
 
 func (_m *Meta) OnGetName() *Meta_GetName {
-	c := _m.On("GetName")
-	return &Meta_GetName{Call: c}
+	c_call := _m.On("GetName")
+	return &Meta_GetName{Call: c_call}
 }
 
 func (_m *Meta) OnGetNameMatch(matchers ...interface{}) *Meta_GetName {
-	c := _m.On("GetName", matchers...)
-	return &Meta_GetName{Call: c}
+	c_call := _m.On("GetName", matchers...)
+	return &Meta_GetName{Call: c_call}
 }
 
 // GetName provides a mock function with given fields:
@@ -255,13 +255,13 @@ func (_m Meta_GetNamespace) Return(_a0 string) *Meta_GetNamespace {
 }
 
 func (_m *Meta) OnGetNamespace() *Meta_GetNamespace {
-	c := _m.On("GetNamespace")
-	return &Meta_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace")
+	return &Meta_GetNamespace{Call: c_call}
 }
 
 func (_m *Meta) OnGetNamespaceMatch(matchers ...interface{}) *Meta_GetNamespace {
-	c := _m.On("GetNamespace", matchers...)
-	return &Meta_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace", matchers...)
+	return &Meta_GetNamespace{Call: c_call}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -287,13 +287,13 @@ func (_m Meta_GetOwnerReference) Return(_a0 v1.OwnerReference) *Meta_GetOwnerRef
 }
 
 func (_m *Meta) OnGetOwnerReference() *Meta_GetOwnerReference {
-	c := _m.On("GetOwnerReference")
-	return &Meta_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference")
+	return &Meta_GetOwnerReference{Call: c_call}
 }
 
 func (_m *Meta) OnGetOwnerReferenceMatch(matchers ...interface{}) *Meta_GetOwnerReference {
-	c := _m.On("GetOwnerReference", matchers...)
-	return &Meta_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference", matchers...)
+	return &Meta_GetOwnerReference{Call: c_call}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -319,13 +319,13 @@ func (_m Meta_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutputDataConfig) *
 }
 
 func (_m *Meta) OnGetRawOutputDataConfig() *Meta_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig")
-	return &Meta_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig")
+	return &Meta_GetRawOutputDataConfig{Call: c_call}
 }
 
 func (_m *Meta) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *Meta_GetRawOutputDataConfig {
-	c := _m.On("GetRawOutputDataConfig", matchers...)
-	return &Meta_GetRawOutputDataConfig{Call: c}
+	c_call := _m.On("GetRawOutputDataConfig", matchers...)
+	return &Meta_GetRawOutputDataConfig{Call: c_call}
 }
 
 // GetRawOutputDataConfig provides a mock function with given fields:
@@ -351,13 +351,13 @@ func (_m Meta_GetSecurityContext) Return(_a0 core.SecurityContext) *Meta_GetSecu
 }
 
 func (_m *Meta) OnGetSecurityContext() *Meta_GetSecurityContext {
-	c := _m.On("GetSecurityContext")
-	return &Meta_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext")
+	return &Meta_GetSecurityContext{Call: c_call}
 }
 
 func (_m *Meta) OnGetSecurityContextMatch(matchers ...interface{}) *Meta_GetSecurityContext {
-	c := _m.On("GetSecurityContext", matchers...)
-	return &Meta_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext", matchers...)
+	return &Meta_GetSecurityContext{Call: c_call}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -383,13 +383,13 @@ func (_m Meta_GetServiceAccountName) Return(_a0 string) *Meta_GetServiceAccountN
 }
 
 func (_m *Meta) OnGetServiceAccountName() *Meta_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName")
-	return &Meta_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName")
+	return &Meta_GetServiceAccountName{Call: c_call}
 }
 
 func (_m *Meta) OnGetServiceAccountNameMatch(matchers ...interface{}) *Meta_GetServiceAccountName {
-	c := _m.On("GetServiceAccountName", matchers...)
-	return &Meta_GetServiceAccountName{Call: c}
+	c_call := _m.On("GetServiceAccountName", matchers...)
+	return &Meta_GetServiceAccountName{Call: c_call}
 }
 
 // GetServiceAccountName provides a mock function with given fields:
@@ -415,13 +415,13 @@ func (_m Meta_IsInterruptible) Return(_a0 bool) *Meta_IsInterruptible {
 }
 
 func (_m *Meta) OnIsInterruptible() *Meta_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &Meta_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &Meta_IsInterruptible{Call: c_call}
 }
 
 func (_m *Meta) OnIsInterruptibleMatch(matchers ...interface{}) *Meta_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &Meta_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &Meta_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:

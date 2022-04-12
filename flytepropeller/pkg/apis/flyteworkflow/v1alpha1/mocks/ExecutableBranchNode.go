@@ -23,13 +23,13 @@ func (_m ExecutableBranchNode_GetElse) Return(_a0 *string) *ExecutableBranchNode
 }
 
 func (_m *ExecutableBranchNode) OnGetElse() *ExecutableBranchNode_GetElse {
-	c := _m.On("GetElse")
-	return &ExecutableBranchNode_GetElse{Call: c}
+	c_call := _m.On("GetElse")
+	return &ExecutableBranchNode_GetElse{Call: c_call}
 }
 
 func (_m *ExecutableBranchNode) OnGetElseMatch(matchers ...interface{}) *ExecutableBranchNode_GetElse {
-	c := _m.On("GetElse", matchers...)
-	return &ExecutableBranchNode_GetElse{Call: c}
+	c_call := _m.On("GetElse", matchers...)
+	return &ExecutableBranchNode_GetElse{Call: c_call}
 }
 
 // GetElse provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m ExecutableBranchNode_GetElseFail) Return(_a0 *core.Error) *ExecutableBr
 }
 
 func (_m *ExecutableBranchNode) OnGetElseFail() *ExecutableBranchNode_GetElseFail {
-	c := _m.On("GetElseFail")
-	return &ExecutableBranchNode_GetElseFail{Call: c}
+	c_call := _m.On("GetElseFail")
+	return &ExecutableBranchNode_GetElseFail{Call: c_call}
 }
 
 func (_m *ExecutableBranchNode) OnGetElseFailMatch(matchers ...interface{}) *ExecutableBranchNode_GetElseFail {
-	c := _m.On("GetElseFail", matchers...)
-	return &ExecutableBranchNode_GetElseFail{Call: c}
+	c_call := _m.On("GetElseFail", matchers...)
+	return &ExecutableBranchNode_GetElseFail{Call: c_call}
 }
 
 // GetElseFail provides a mock function with given fields:
@@ -91,13 +91,13 @@ func (_m ExecutableBranchNode_GetElseIf) Return(_a0 []v1alpha1.ExecutableIfBlock
 }
 
 func (_m *ExecutableBranchNode) OnGetElseIf() *ExecutableBranchNode_GetElseIf {
-	c := _m.On("GetElseIf")
-	return &ExecutableBranchNode_GetElseIf{Call: c}
+	c_call := _m.On("GetElseIf")
+	return &ExecutableBranchNode_GetElseIf{Call: c_call}
 }
 
 func (_m *ExecutableBranchNode) OnGetElseIfMatch(matchers ...interface{}) *ExecutableBranchNode_GetElseIf {
-	c := _m.On("GetElseIf", matchers...)
-	return &ExecutableBranchNode_GetElseIf{Call: c}
+	c_call := _m.On("GetElseIf", matchers...)
+	return &ExecutableBranchNode_GetElseIf{Call: c_call}
 }
 
 // GetElseIf provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m ExecutableBranchNode_GetIf) Return(_a0 v1alpha1.ExecutableIfBlock) *Exe
 }
 
 func (_m *ExecutableBranchNode) OnGetIf() *ExecutableBranchNode_GetIf {
-	c := _m.On("GetIf")
-	return &ExecutableBranchNode_GetIf{Call: c}
+	c_call := _m.On("GetIf")
+	return &ExecutableBranchNode_GetIf{Call: c_call}
 }
 
 func (_m *ExecutableBranchNode) OnGetIfMatch(matchers ...interface{}) *ExecutableBranchNode_GetIf {
-	c := _m.On("GetIf", matchers...)
-	return &ExecutableBranchNode_GetIf{Call: c}
+	c_call := _m.On("GetIf", matchers...)
+	return &ExecutableBranchNode_GetIf{Call: c_call}
 }
 
 // GetIf provides a mock function with given fields:
