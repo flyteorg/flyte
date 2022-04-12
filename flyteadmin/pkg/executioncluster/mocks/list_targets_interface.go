@@ -22,13 +22,13 @@ func (_m ListTargetsInterface_GetAllTargets) Return(_a0 map[string]*executionclu
 }
 
 func (_m *ListTargetsInterface) OnGetAllTargets() *ListTargetsInterface_GetAllTargets {
-	c := _m.On("GetAllTargets")
-	return &ListTargetsInterface_GetAllTargets{Call: c}
+	c_call := _m.On("GetAllTargets")
+	return &ListTargetsInterface_GetAllTargets{Call: c_call}
 }
 
 func (_m *ListTargetsInterface) OnGetAllTargetsMatch(matchers ...interface{}) *ListTargetsInterface_GetAllTargets {
-	c := _m.On("GetAllTargets", matchers...)
-	return &ListTargetsInterface_GetAllTargets{Call: c}
+	c_call := _m.On("GetAllTargets", matchers...)
+	return &ListTargetsInterface_GetAllTargets{Call: c_call}
 }
 
 // GetAllTargets provides a mock function with given fields:
@@ -56,13 +56,13 @@ func (_m ListTargetsInterface_GetValidTargets) Return(_a0 map[string]*executionc
 }
 
 func (_m *ListTargetsInterface) OnGetValidTargets() *ListTargetsInterface_GetValidTargets {
-	c := _m.On("GetValidTargets")
-	return &ListTargetsInterface_GetValidTargets{Call: c}
+	c_call := _m.On("GetValidTargets")
+	return &ListTargetsInterface_GetValidTargets{Call: c_call}
 }
 
 func (_m *ListTargetsInterface) OnGetValidTargetsMatch(matchers ...interface{}) *ListTargetsInterface_GetValidTargets {
-	c := _m.On("GetValidTargets", matchers...)
-	return &ListTargetsInterface_GetValidTargets{Call: c}
+	c_call := _m.On("GetValidTargets", matchers...)
+	return &ListTargetsInterface_GetValidTargets{Call: c_call}
 }
 
 // GetValidTargets provides a mock function with given fields:

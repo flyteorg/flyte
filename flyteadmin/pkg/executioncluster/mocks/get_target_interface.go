@@ -24,13 +24,13 @@ func (_m GetTargetInterface_GetTarget) Return(_a0 *executioncluster.ExecutionTar
 }
 
 func (_m *GetTargetInterface) OnGetTarget(_a0 context.Context, _a1 *executioncluster.ExecutionTargetSpec) *GetTargetInterface_GetTarget {
-	c := _m.On("GetTarget", _a0, _a1)
-	return &GetTargetInterface_GetTarget{Call: c}
+	c_call := _m.On("GetTarget", _a0, _a1)
+	return &GetTargetInterface_GetTarget{Call: c_call}
 }
 
 func (_m *GetTargetInterface) OnGetTargetMatch(matchers ...interface{}) *GetTargetInterface_GetTarget {
-	c := _m.On("GetTarget", matchers...)
-	return &GetTargetInterface_GetTarget{Call: c}
+	c_call := _m.On("GetTarget", matchers...)
+	return &GetTargetInterface_GetTarget{Call: c_call}
 }
 
 // GetTarget provides a mock function with given fields: _a0, _a1

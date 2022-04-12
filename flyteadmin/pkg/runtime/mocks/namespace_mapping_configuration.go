@@ -18,13 +18,13 @@ func (_m NamespaceMappingConfiguration_GetNamespaceTemplate) Return(_a0 string) 
 }
 
 func (_m *NamespaceMappingConfiguration) OnGetNamespaceTemplate() *NamespaceMappingConfiguration_GetNamespaceTemplate {
-	c := _m.On("GetNamespaceTemplate")
-	return &NamespaceMappingConfiguration_GetNamespaceTemplate{Call: c}
+	c_call := _m.On("GetNamespaceTemplate")
+	return &NamespaceMappingConfiguration_GetNamespaceTemplate{Call: c_call}
 }
 
 func (_m *NamespaceMappingConfiguration) OnGetNamespaceTemplateMatch(matchers ...interface{}) *NamespaceMappingConfiguration_GetNamespaceTemplate {
-	c := _m.On("GetNamespaceTemplate", matchers...)
-	return &NamespaceMappingConfiguration_GetNamespaceTemplate{Call: c}
+	c_call := _m.On("GetNamespaceTemplate", matchers...)
+	return &NamespaceMappingConfiguration_GetNamespaceTemplate{Call: c_call}
 }
 
 // GetNamespaceTemplate provides a mock function with given fields:

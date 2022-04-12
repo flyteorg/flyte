@@ -24,13 +24,13 @@ func (_m VersionInterface_GetVersion) Return(_a0 *admin.GetVersionResponse, _a1 
 }
 
 func (_m *VersionInterface) OnGetVersion(ctx context.Context, r *admin.GetVersionRequest) *VersionInterface_GetVersion {
-	c := _m.On("GetVersion", ctx, r)
-	return &VersionInterface_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", ctx, r)
+	return &VersionInterface_GetVersion{Call: c_call}
 }
 
 func (_m *VersionInterface) OnGetVersionMatch(matchers ...interface{}) *VersionInterface_GetVersion {
-	c := _m.On("GetVersion", matchers...)
-	return &VersionInterface_GetVersion{Call: c}
+	c_call := _m.On("GetVersion", matchers...)
+	return &VersionInterface_GetVersion{Call: c_call}
 }
 
 // GetVersion provides a mock function with given fields: ctx, r

@@ -26,13 +26,13 @@ func (_m ExecutionTargetProvider_GetExecutionTarget) Return(_a0 *executioncluste
 }
 
 func (_m *ExecutionTargetProvider) OnGetExecutionTarget(initializationErrorCounter prometheus.Counter, k8sCluster interfaces.ClusterConfig) *ExecutionTargetProvider_GetExecutionTarget {
-	c := _m.On("GetExecutionTarget", initializationErrorCounter, k8sCluster)
-	return &ExecutionTargetProvider_GetExecutionTarget{Call: c}
+	c_call := _m.On("GetExecutionTarget", initializationErrorCounter, k8sCluster)
+	return &ExecutionTargetProvider_GetExecutionTarget{Call: c_call}
 }
 
 func (_m *ExecutionTargetProvider) OnGetExecutionTargetMatch(matchers ...interface{}) *ExecutionTargetProvider_GetExecutionTarget {
-	c := _m.On("GetExecutionTarget", matchers...)
-	return &ExecutionTargetProvider_GetExecutionTarget{Call: c}
+	c_call := _m.On("GetExecutionTarget", matchers...)
+	return &ExecutionTargetProvider_GetExecutionTarget{Call: c_call}
 }
 
 // GetExecutionTarget provides a mock function with given fields: initializationErrorCounter, k8sCluster

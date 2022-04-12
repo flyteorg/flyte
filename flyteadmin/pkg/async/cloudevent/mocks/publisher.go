@@ -24,13 +24,13 @@ func (_m Publisher_Publish) Return(_a0 error) *Publisher_Publish {
 }
 
 func (_m *Publisher) OnPublish(ctx context.Context, notificationType string, msg protoiface.MessageV1) *Publisher_Publish {
-	c := _m.On("Publish", ctx, notificationType, msg)
-	return &Publisher_Publish{Call: c}
+	c_call := _m.On("Publish", ctx, notificationType, msg)
+	return &Publisher_Publish{Call: c_call}
 }
 
 func (_m *Publisher) OnPublishMatch(matchers ...interface{}) *Publisher_Publish {
-	c := _m.On("Publish", matchers...)
-	return &Publisher_Publish{Call: c}
+	c_call := _m.On("Publish", matchers...)
+	return &Publisher_Publish{Call: c_call}
 }
 
 // Publish provides a mock function with given fields: ctx, notificationType, msg

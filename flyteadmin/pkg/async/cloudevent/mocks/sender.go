@@ -24,13 +24,13 @@ func (_m Sender_Send) Return(_a0 error) *Sender_Send {
 }
 
 func (_m *Sender) OnSend(ctx context.Context, notificationType string, _a2 event.Event) *Sender_Send {
-	c := _m.On("Send", ctx, notificationType, _a2)
-	return &Sender_Send{Call: c}
+	c_call := _m.On("Send", ctx, notificationType, _a2)
+	return &Sender_Send{Call: c_call}
 }
 
 func (_m *Sender) OnSendMatch(matchers ...interface{}) *Sender_Send {
-	c := _m.On("Send", matchers...)
-	return &Sender_Send{Call: c}
+	c_call := _m.On("Send", matchers...)
+	return &Sender_Send{Call: c_call}
 }
 
 // Send provides a mock function with given fields: ctx, notificationType, _a2

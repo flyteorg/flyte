@@ -23,13 +23,13 @@ func (_m WorkflowExecutor_Abort) Return(_a0 error) *WorkflowExecutor_Abort {
 }
 
 func (_m *WorkflowExecutor) OnAbort(ctx context.Context, data interfaces.AbortData) *WorkflowExecutor_Abort {
-	c := _m.On("Abort", ctx, data)
-	return &WorkflowExecutor_Abort{Call: c}
+	c_call := _m.On("Abort", ctx, data)
+	return &WorkflowExecutor_Abort{Call: c_call}
 }
 
 func (_m *WorkflowExecutor) OnAbortMatch(matchers ...interface{}) *WorkflowExecutor_Abort {
-	c := _m.On("Abort", matchers...)
-	return &WorkflowExecutor_Abort{Call: c}
+	c_call := _m.On("Abort", matchers...)
+	return &WorkflowExecutor_Abort{Call: c_call}
 }
 
 // Abort provides a mock function with given fields: ctx, data
@@ -55,13 +55,13 @@ func (_m WorkflowExecutor_Execute) Return(_a0 interfaces.ExecutionResponse, _a1 
 }
 
 func (_m *WorkflowExecutor) OnExecute(ctx context.Context, data interfaces.ExecutionData) *WorkflowExecutor_Execute {
-	c := _m.On("Execute", ctx, data)
-	return &WorkflowExecutor_Execute{Call: c}
+	c_call := _m.On("Execute", ctx, data)
+	return &WorkflowExecutor_Execute{Call: c_call}
 }
 
 func (_m *WorkflowExecutor) OnExecuteMatch(matchers ...interface{}) *WorkflowExecutor_Execute {
-	c := _m.On("Execute", matchers...)
-	return &WorkflowExecutor_Execute{Call: c}
+	c_call := _m.On("Execute", matchers...)
+	return &WorkflowExecutor_Execute{Call: c_call}
 }
 
 // Execute provides a mock function with given fields: ctx, data
@@ -94,13 +94,13 @@ func (_m WorkflowExecutor_ID) Return(_a0 string) *WorkflowExecutor_ID {
 }
 
 func (_m *WorkflowExecutor) OnID() *WorkflowExecutor_ID {
-	c := _m.On("ID")
-	return &WorkflowExecutor_ID{Call: c}
+	c_call := _m.On("ID")
+	return &WorkflowExecutor_ID{Call: c_call}
 }
 
 func (_m *WorkflowExecutor) OnIDMatch(matchers ...interface{}) *WorkflowExecutor_ID {
-	c := _m.On("ID", matchers...)
-	return &WorkflowExecutor_ID{Call: c}
+	c_call := _m.On("ID", matchers...)
+	return &WorkflowExecutor_ID{Call: c_call}
 }
 
 // ID provides a mock function with given fields:

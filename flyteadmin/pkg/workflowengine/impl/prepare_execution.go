@@ -117,7 +117,7 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 
 	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
 	// have migrated over to security context
-	addPermissions(data.ExecutionParameters.SecurityContext,
+	addPermissions(data.ExecutionParameters.ExecutionConfig.SecurityContext,
 		data.ExecutionParameters.RoleNameKey, flyteWorkflow)
 
 	labels := addMapValues(data.ExecutionParameters.Labels, flyteWorkflow.Labels)

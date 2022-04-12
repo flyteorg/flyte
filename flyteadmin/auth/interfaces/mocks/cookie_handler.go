@@ -32,13 +32,13 @@ func (_m CookieHandler_RetrieveAuthCodeRequest) Return(authRequestURL string, er
 }
 
 func (_m *CookieHandler) OnRetrieveAuthCodeRequest(ctx context.Context, request *http.Request) *CookieHandler_RetrieveAuthCodeRequest {
-	c := _m.On("RetrieveAuthCodeRequest", ctx, request)
-	return &CookieHandler_RetrieveAuthCodeRequest{Call: c}
+	c_call := _m.On("RetrieveAuthCodeRequest", ctx, request)
+	return &CookieHandler_RetrieveAuthCodeRequest{Call: c_call}
 }
 
 func (_m *CookieHandler) OnRetrieveAuthCodeRequestMatch(matchers ...interface{}) *CookieHandler_RetrieveAuthCodeRequest {
-	c := _m.On("RetrieveAuthCodeRequest", matchers...)
-	return &CookieHandler_RetrieveAuthCodeRequest{Call: c}
+	c_call := _m.On("RetrieveAuthCodeRequest", matchers...)
+	return &CookieHandler_RetrieveAuthCodeRequest{Call: c_call}
 }
 
 // RetrieveAuthCodeRequest provides a mock function with given fields: ctx, request
@@ -71,13 +71,13 @@ func (_m CookieHandler_RetrieveTokenValues) Return(idToken string, accessToken s
 }
 
 func (_m *CookieHandler) OnRetrieveTokenValues(ctx context.Context, request *http.Request) *CookieHandler_RetrieveTokenValues {
-	c := _m.On("RetrieveTokenValues", ctx, request)
-	return &CookieHandler_RetrieveTokenValues{Call: c}
+	c_call := _m.On("RetrieveTokenValues", ctx, request)
+	return &CookieHandler_RetrieveTokenValues{Call: c_call}
 }
 
 func (_m *CookieHandler) OnRetrieveTokenValuesMatch(matchers ...interface{}) *CookieHandler_RetrieveTokenValues {
-	c := _m.On("RetrieveTokenValues", matchers...)
-	return &CookieHandler_RetrieveTokenValues{Call: c}
+	c_call := _m.On("RetrieveTokenValues", matchers...)
+	return &CookieHandler_RetrieveTokenValues{Call: c_call}
 }
 
 // RetrieveTokenValues provides a mock function with given fields: ctx, request
@@ -124,13 +124,13 @@ func (_m CookieHandler_RetrieveUserInfo) Return(_a0 *service.UserInfoResponse, _
 }
 
 func (_m *CookieHandler) OnRetrieveUserInfo(ctx context.Context, request *http.Request) *CookieHandler_RetrieveUserInfo {
-	c := _m.On("RetrieveUserInfo", ctx, request)
-	return &CookieHandler_RetrieveUserInfo{Call: c}
+	c_call := _m.On("RetrieveUserInfo", ctx, request)
+	return &CookieHandler_RetrieveUserInfo{Call: c_call}
 }
 
 func (_m *CookieHandler) OnRetrieveUserInfoMatch(matchers ...interface{}) *CookieHandler_RetrieveUserInfo {
-	c := _m.On("RetrieveUserInfo", matchers...)
-	return &CookieHandler_RetrieveUserInfo{Call: c}
+	c_call := _m.On("RetrieveUserInfo", matchers...)
+	return &CookieHandler_RetrieveUserInfo{Call: c_call}
 }
 
 // RetrieveUserInfo provides a mock function with given fields: ctx, request
@@ -165,13 +165,13 @@ func (_m CookieHandler_SetAuthCodeCookie) Return(_a0 error) *CookieHandler_SetAu
 }
 
 func (_m *CookieHandler) OnSetAuthCodeCookie(ctx context.Context, writer http.ResponseWriter, authRequestURL string) *CookieHandler_SetAuthCodeCookie {
-	c := _m.On("SetAuthCodeCookie", ctx, writer, authRequestURL)
-	return &CookieHandler_SetAuthCodeCookie{Call: c}
+	c_call := _m.On("SetAuthCodeCookie", ctx, writer, authRequestURL)
+	return &CookieHandler_SetAuthCodeCookie{Call: c_call}
 }
 
 func (_m *CookieHandler) OnSetAuthCodeCookieMatch(matchers ...interface{}) *CookieHandler_SetAuthCodeCookie {
-	c := _m.On("SetAuthCodeCookie", matchers...)
-	return &CookieHandler_SetAuthCodeCookie{Call: c}
+	c_call := _m.On("SetAuthCodeCookie", matchers...)
+	return &CookieHandler_SetAuthCodeCookie{Call: c_call}
 }
 
 // SetAuthCodeCookie provides a mock function with given fields: ctx, writer, authRequestURL
@@ -197,13 +197,13 @@ func (_m CookieHandler_SetTokenCookies) Return(_a0 error) *CookieHandler_SetToke
 }
 
 func (_m *CookieHandler) OnSetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) *CookieHandler_SetTokenCookies {
-	c := _m.On("SetTokenCookies", ctx, writer, token)
-	return &CookieHandler_SetTokenCookies{Call: c}
+	c_call := _m.On("SetTokenCookies", ctx, writer, token)
+	return &CookieHandler_SetTokenCookies{Call: c_call}
 }
 
 func (_m *CookieHandler) OnSetTokenCookiesMatch(matchers ...interface{}) *CookieHandler_SetTokenCookies {
-	c := _m.On("SetTokenCookies", matchers...)
-	return &CookieHandler_SetTokenCookies{Call: c}
+	c_call := _m.On("SetTokenCookies", matchers...)
+	return &CookieHandler_SetTokenCookies{Call: c_call}
 }
 
 // SetTokenCookies provides a mock function with given fields: ctx, writer, token
@@ -229,13 +229,13 @@ func (_m CookieHandler_SetUserInfoCookie) Return(_a0 error) *CookieHandler_SetUs
 }
 
 func (_m *CookieHandler) OnSetUserInfoCookie(ctx context.Context, writer http.ResponseWriter, userInfo *service.UserInfoResponse) *CookieHandler_SetUserInfoCookie {
-	c := _m.On("SetUserInfoCookie", ctx, writer, userInfo)
-	return &CookieHandler_SetUserInfoCookie{Call: c}
+	c_call := _m.On("SetUserInfoCookie", ctx, writer, userInfo)
+	return &CookieHandler_SetUserInfoCookie{Call: c_call}
 }
 
 func (_m *CookieHandler) OnSetUserInfoCookieMatch(matchers ...interface{}) *CookieHandler_SetUserInfoCookie {
-	c := _m.On("SetUserInfoCookie", matchers...)
-	return &CookieHandler_SetUserInfoCookie{Call: c}
+	c_call := _m.On("SetUserInfoCookie", matchers...)
+	return &CookieHandler_SetUserInfoCookie{Call: c_call}
 }
 
 // SetUserInfoCookie provides a mock function with given fields: ctx, writer, userInfo

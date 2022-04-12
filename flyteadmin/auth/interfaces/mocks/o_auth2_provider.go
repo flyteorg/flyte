@@ -34,13 +34,13 @@ func (_m OAuth2Provider_IntrospectToken) Return(_a0 fosite.TokenType, _a1 fosite
 }
 
 func (_m *OAuth2Provider) OnIntrospectToken(ctx context.Context, token string, tokenUse fosite.TokenType, session fosite.Session, scope ...string) *OAuth2Provider_IntrospectToken {
-	c := _m.On("IntrospectToken", ctx, token, tokenUse, session, scope)
-	return &OAuth2Provider_IntrospectToken{Call: c}
+	c_call := _m.On("IntrospectToken", ctx, token, tokenUse, session, scope)
+	return &OAuth2Provider_IntrospectToken{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnIntrospectTokenMatch(matchers ...interface{}) *OAuth2Provider_IntrospectToken {
-	c := _m.On("IntrospectToken", matchers...)
-	return &OAuth2Provider_IntrospectToken{Call: c}
+	c_call := _m.On("IntrospectToken", matchers...)
+	return &OAuth2Provider_IntrospectToken{Call: c_call}
 }
 
 // IntrospectToken provides a mock function with given fields: ctx, token, tokenUse, session, scope
@@ -89,13 +89,13 @@ func (_m OAuth2Provider_KeySet) Return(_a0 jwk.Set) *OAuth2Provider_KeySet {
 }
 
 func (_m *OAuth2Provider) OnKeySet() *OAuth2Provider_KeySet {
-	c := _m.On("KeySet")
-	return &OAuth2Provider_KeySet{Call: c}
+	c_call := _m.On("KeySet")
+	return &OAuth2Provider_KeySet{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnKeySetMatch(matchers ...interface{}) *OAuth2Provider_KeySet {
-	c := _m.On("KeySet", matchers...)
-	return &OAuth2Provider_KeySet{Call: c}
+	c_call := _m.On("KeySet", matchers...)
+	return &OAuth2Provider_KeySet{Call: c_call}
 }
 
 // KeySet provides a mock function with given fields:
@@ -123,13 +123,13 @@ func (_m OAuth2Provider_NewAccessRequest) Return(_a0 fosite.AccessRequester, _a1
 }
 
 func (_m *OAuth2Provider) OnNewAccessRequest(ctx context.Context, req *http.Request, session fosite.Session) *OAuth2Provider_NewAccessRequest {
-	c := _m.On("NewAccessRequest", ctx, req, session)
-	return &OAuth2Provider_NewAccessRequest{Call: c}
+	c_call := _m.On("NewAccessRequest", ctx, req, session)
+	return &OAuth2Provider_NewAccessRequest{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewAccessRequestMatch(matchers ...interface{}) *OAuth2Provider_NewAccessRequest {
-	c := _m.On("NewAccessRequest", matchers...)
-	return &OAuth2Provider_NewAccessRequest{Call: c}
+	c_call := _m.On("NewAccessRequest", matchers...)
+	return &OAuth2Provider_NewAccessRequest{Call: c_call}
 }
 
 // NewAccessRequest provides a mock function with given fields: ctx, req, session
@@ -164,13 +164,13 @@ func (_m OAuth2Provider_NewAccessResponse) Return(_a0 fosite.AccessResponder, _a
 }
 
 func (_m *OAuth2Provider) OnNewAccessResponse(ctx context.Context, requester fosite.AccessRequester) *OAuth2Provider_NewAccessResponse {
-	c := _m.On("NewAccessResponse", ctx, requester)
-	return &OAuth2Provider_NewAccessResponse{Call: c}
+	c_call := _m.On("NewAccessResponse", ctx, requester)
+	return &OAuth2Provider_NewAccessResponse{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewAccessResponseMatch(matchers ...interface{}) *OAuth2Provider_NewAccessResponse {
-	c := _m.On("NewAccessResponse", matchers...)
-	return &OAuth2Provider_NewAccessResponse{Call: c}
+	c_call := _m.On("NewAccessResponse", matchers...)
+	return &OAuth2Provider_NewAccessResponse{Call: c_call}
 }
 
 // NewAccessResponse provides a mock function with given fields: ctx, requester
@@ -205,13 +205,13 @@ func (_m OAuth2Provider_NewAuthorizeRequest) Return(_a0 fosite.AuthorizeRequeste
 }
 
 func (_m *OAuth2Provider) OnNewAuthorizeRequest(ctx context.Context, req *http.Request) *OAuth2Provider_NewAuthorizeRequest {
-	c := _m.On("NewAuthorizeRequest", ctx, req)
-	return &OAuth2Provider_NewAuthorizeRequest{Call: c}
+	c_call := _m.On("NewAuthorizeRequest", ctx, req)
+	return &OAuth2Provider_NewAuthorizeRequest{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewAuthorizeRequestMatch(matchers ...interface{}) *OAuth2Provider_NewAuthorizeRequest {
-	c := _m.On("NewAuthorizeRequest", matchers...)
-	return &OAuth2Provider_NewAuthorizeRequest{Call: c}
+	c_call := _m.On("NewAuthorizeRequest", matchers...)
+	return &OAuth2Provider_NewAuthorizeRequest{Call: c_call}
 }
 
 // NewAuthorizeRequest provides a mock function with given fields: ctx, req
@@ -246,13 +246,13 @@ func (_m OAuth2Provider_NewAuthorizeResponse) Return(_a0 fosite.AuthorizeRespond
 }
 
 func (_m *OAuth2Provider) OnNewAuthorizeResponse(ctx context.Context, requester fosite.AuthorizeRequester, session fosite.Session) *OAuth2Provider_NewAuthorizeResponse {
-	c := _m.On("NewAuthorizeResponse", ctx, requester, session)
-	return &OAuth2Provider_NewAuthorizeResponse{Call: c}
+	c_call := _m.On("NewAuthorizeResponse", ctx, requester, session)
+	return &OAuth2Provider_NewAuthorizeResponse{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewAuthorizeResponseMatch(matchers ...interface{}) *OAuth2Provider_NewAuthorizeResponse {
-	c := _m.On("NewAuthorizeResponse", matchers...)
-	return &OAuth2Provider_NewAuthorizeResponse{Call: c}
+	c_call := _m.On("NewAuthorizeResponse", matchers...)
+	return &OAuth2Provider_NewAuthorizeResponse{Call: c_call}
 }
 
 // NewAuthorizeResponse provides a mock function with given fields: ctx, requester, session
@@ -287,13 +287,13 @@ func (_m OAuth2Provider_NewIntrospectionRequest) Return(_a0 fosite.Introspection
 }
 
 func (_m *OAuth2Provider) OnNewIntrospectionRequest(ctx context.Context, r *http.Request, session fosite.Session) *OAuth2Provider_NewIntrospectionRequest {
-	c := _m.On("NewIntrospectionRequest", ctx, r, session)
-	return &OAuth2Provider_NewIntrospectionRequest{Call: c}
+	c_call := _m.On("NewIntrospectionRequest", ctx, r, session)
+	return &OAuth2Provider_NewIntrospectionRequest{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewIntrospectionRequestMatch(matchers ...interface{}) *OAuth2Provider_NewIntrospectionRequest {
-	c := _m.On("NewIntrospectionRequest", matchers...)
-	return &OAuth2Provider_NewIntrospectionRequest{Call: c}
+	c_call := _m.On("NewIntrospectionRequest", matchers...)
+	return &OAuth2Provider_NewIntrospectionRequest{Call: c_call}
 }
 
 // NewIntrospectionRequest provides a mock function with given fields: ctx, r, session
@@ -328,13 +328,13 @@ func (_m OAuth2Provider_NewJWTSessionToken) Return(_a0 *oauth2.JWTSession) *OAut
 }
 
 func (_m *OAuth2Provider) OnNewJWTSessionToken(subject string, appID string, issuer string, audience string, userInfoClaims *service.UserInfoResponse) *OAuth2Provider_NewJWTSessionToken {
-	c := _m.On("NewJWTSessionToken", subject, appID, issuer, audience, userInfoClaims)
-	return &OAuth2Provider_NewJWTSessionToken{Call: c}
+	c_call := _m.On("NewJWTSessionToken", subject, appID, issuer, audience, userInfoClaims)
+	return &OAuth2Provider_NewJWTSessionToken{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewJWTSessionTokenMatch(matchers ...interface{}) *OAuth2Provider_NewJWTSessionToken {
-	c := _m.On("NewJWTSessionToken", matchers...)
-	return &OAuth2Provider_NewJWTSessionToken{Call: c}
+	c_call := _m.On("NewJWTSessionToken", matchers...)
+	return &OAuth2Provider_NewJWTSessionToken{Call: c_call}
 }
 
 // NewJWTSessionToken provides a mock function with given fields: subject, appID, issuer, audience, userInfoClaims
@@ -362,13 +362,13 @@ func (_m OAuth2Provider_NewRevocationRequest) Return(_a0 error) *OAuth2Provider_
 }
 
 func (_m *OAuth2Provider) OnNewRevocationRequest(ctx context.Context, r *http.Request) *OAuth2Provider_NewRevocationRequest {
-	c := _m.On("NewRevocationRequest", ctx, r)
-	return &OAuth2Provider_NewRevocationRequest{Call: c}
+	c_call := _m.On("NewRevocationRequest", ctx, r)
+	return &OAuth2Provider_NewRevocationRequest{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnNewRevocationRequestMatch(matchers ...interface{}) *OAuth2Provider_NewRevocationRequest {
-	c := _m.On("NewRevocationRequest", matchers...)
-	return &OAuth2Provider_NewRevocationRequest{Call: c}
+	c_call := _m.On("NewRevocationRequest", matchers...)
+	return &OAuth2Provider_NewRevocationRequest{Call: c_call}
 }
 
 // NewRevocationRequest provides a mock function with given fields: ctx, r
@@ -394,13 +394,13 @@ func (_m OAuth2Provider_ValidateAccessToken) Return(_a0 interfaces.IdentityConte
 }
 
 func (_m *OAuth2Provider) OnValidateAccessToken(ctx context.Context, expectedAudience string, tokenStr string) *OAuth2Provider_ValidateAccessToken {
-	c := _m.On("ValidateAccessToken", ctx, expectedAudience, tokenStr)
-	return &OAuth2Provider_ValidateAccessToken{Call: c}
+	c_call := _m.On("ValidateAccessToken", ctx, expectedAudience, tokenStr)
+	return &OAuth2Provider_ValidateAccessToken{Call: c_call}
 }
 
 func (_m *OAuth2Provider) OnValidateAccessTokenMatch(matchers ...interface{}) *OAuth2Provider_ValidateAccessToken {
-	c := _m.On("ValidateAccessToken", matchers...)
-	return &OAuth2Provider_ValidateAccessToken{Call: c}
+	c_call := _m.On("ValidateAccessToken", matchers...)
+	return &OAuth2Provider_ValidateAccessToken{Call: c_call}
 }
 
 // ValidateAccessToken provides a mock function with given fields: ctx, expectedAudience, tokenStr

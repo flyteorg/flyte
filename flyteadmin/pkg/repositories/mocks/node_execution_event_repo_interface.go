@@ -24,13 +24,13 @@ func (_m NodeExecutionEventRepoInterface_Create) Return(_a0 error) *NodeExecutio
 }
 
 func (_m *NodeExecutionEventRepoInterface) OnCreate(ctx context.Context, input models.NodeExecutionEvent) *NodeExecutionEventRepoInterface_Create {
-	c := _m.On("Create", ctx, input)
-	return &NodeExecutionEventRepoInterface_Create{Call: c}
+	c_call := _m.On("Create", ctx, input)
+	return &NodeExecutionEventRepoInterface_Create{Call: c_call}
 }
 
 func (_m *NodeExecutionEventRepoInterface) OnCreateMatch(matchers ...interface{}) *NodeExecutionEventRepoInterface_Create {
-	c := _m.On("Create", matchers...)
-	return &NodeExecutionEventRepoInterface_Create{Call: c}
+	c_call := _m.On("Create", matchers...)
+	return &NodeExecutionEventRepoInterface_Create{Call: c_call}
 }
 
 // Create provides a mock function with given fields: ctx, input
