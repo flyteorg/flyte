@@ -21,11 +21,11 @@ jobs:
         # This aws account should have admin permissions
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
-        aws-region: us-east-1 
+        aws-region: $AWS_REGION
     - name: SETUP Opta
       shell: bash
       run: |
-        ./scripts/ci_helper.sh setup_opta
+        .github/scripts/ci_helper.sh setup_opta
     - name: set variables
       shell: bash
       run: |
