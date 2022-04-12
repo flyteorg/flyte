@@ -101,8 +101,8 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 .. note:: The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execution on the configured backend.
 
 
-Check It
-^^^^^^^^^
+Inspect the Results
+^^^^^^^^^^^^^^^^^^^^^^
 Navigate to the url produced as the result of running ``pyflyte``. This should take you to Flyte Console, the web UI used to manage Flyte entities such as tasks, workflows, and executions.
 
 Recap
