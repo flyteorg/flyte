@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-
 	"github.com/flyteorg/flyteadmin/auth"
 
 	authConfig "github.com/flyteorg/flyteadmin/auth/config"
@@ -17,11 +15,10 @@ import (
 )
 
 type OAuth2MetadataProvider struct {
-	cfg       *authConfig.Config
-	serverCfg *config.ServerConfig
+	cfg *authConfig.Config
 }
 
-// AuthFuncOverride overrides auth func to enforce anonymous access on the implemented APIs
+// Override auth func to enforce anonymous access on the implemented APIs
 // Ref: https://github.com/grpc-ecosystem/go-grpc-middleware/blob/master/auth/auth.go#L31
 func (s OAuth2MetadataProvider) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
 	return ctx, nil
@@ -93,13 +90,11 @@ func (s OAuth2MetadataProvider) GetPublicClientConfig(context.Context, *service.
 		RedirectUri:              s.cfg.AppAuth.ThirdParty.FlyteClientConfig.RedirectURI,
 		Scopes:                   s.cfg.AppAuth.ThirdParty.FlyteClientConfig.Scopes,
 		AuthorizationMetadataKey: s.cfg.GrpcAuthorizationHeader,
-		ServiceHttpEndpoint:      s.serverCfg.ServiceHTTPEndpoint.String(),
 	}, nil
 }
 
-func NewService(serverCfg *config.ServerConfig, config *authConfig.Config) OAuth2MetadataProvider {
+func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 	return OAuth2MetadataProvider{
-		cfg:       config,
-		serverCfg: serverCfg,
+		cfg: config,
 	}
 }

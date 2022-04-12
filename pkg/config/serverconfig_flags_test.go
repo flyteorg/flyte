@@ -421,18 +421,4 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_serviceHttpEndpoint", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultServerConfig.ServiceHTTPEndpoint.String()
-
-			cmdFlags.Set("serviceHttpEndpoint", testValue)
-			if vString, err := cmdFlags.GetString("serviceHttpEndpoint"); err == nil {
-				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.ServiceHTTPEndpoint)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 }
