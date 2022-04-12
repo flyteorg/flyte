@@ -30,15 +30,15 @@ helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/fl
 helm template flyte -n flyte ${DIR}/../charts/flyte-deps/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_sandbox_deps_helm_generated.yaml
 
 echo "Generating helm docs"
-#if  command -v helm-docs &> /dev/null
-#then
-#    rm $(which helm-docs)
-#fi
-#
-#GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
-#
-#${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
-helm-docs -c ${DIR}/../charts/
+if  command -v helm-docs &> /dev/null
+then
+    rm $(which helm-docs)
+fi
+
+GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+
+${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
+
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
