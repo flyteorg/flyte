@@ -22,7 +22,7 @@ $ helm repo add flyteorg https://helm.flyte.org
 $ helm repo update
 ```
 
-#### Production Clusters for eks
+### Production Clusters for eks
 
 NOTE: Before installing please read our [manual guide](https://docs.flyte.org/en/latest/deployment/aws/manual.html#aws-permissioning) for aws and create roles & service account. They are required for communication with s3.
 
