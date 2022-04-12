@@ -103,4 +103,17 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 
 Check It
 ^^^^^^^^^
-Navigate to the url produced as the result of running ``pyflyte``, this should take you to Flyte Console, the web UI used to manage Flyte entities.
+Navigate to the url produced as the result of running ``pyflyte``. This should take you to Flyte Console, the web UI used to manage Flyte entities such as tasks, workflows, and executions.
+
+Recap
+^^^^^^^^
+
+🎉  Congratulations 🎉  To summarize, you have just:
+
+1. Created a Flyte script called `example.py`, which creates some data and computes descriptive statistics over it.
+2. Run a workflow (i) locally and (ii) on a demo Flyte cluster.
+
+What's Next?
+^^^^^^^^^^^^^^^^
+
+To experience the full power of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
