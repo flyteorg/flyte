@@ -17,4 +17,4 @@ jobs:
     - name: Create bucket
       shell: bash
       run: |
-        aws s3 mb s3://totally-unique-bucket-name-12354
+        aws s3 mb s3://totally-unique-bucket-name-12354532
