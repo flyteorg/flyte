@@ -70,7 +70,7 @@ Run your workflow locally using ``pyflyte``
 On a Flyte cluster
 """""""""""""""""""
 
-Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. This is useful to start a local demo cluster of Flyte.
+Install :std:ref:`flytectl`, which is the command-line interface for Flyte. Let's use it to start a local demo Flyte cluster.
 
 .. tabbed:: OSX
 
