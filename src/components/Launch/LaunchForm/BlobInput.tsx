@@ -37,8 +37,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** A micro form for entering the values related to a Blob Literal */
 export const BlobInput: React.FC<InputProps> = (props) => {
   const styles = useStyles();
-  const { error, label, name, onChange, value: propValue } = props;
-  const blobValue = isBlobValue(propValue) ? propValue : defaultBlobValue;
+  const { error, label, name, onChange, value: propValue, typeDefinition } = props;
+  const dimensionality = typeDefinition?.literalType?.blob?.dimensionality;
+  const blobValue = isBlobValue(propValue)
+    ? propValue
+    : {
+        uri: '',
+        dimensionality: dimensionality ?? BlobDimensionality.SINGLE,
+      };
   const hasError = !!error;
   const helperText = hasError ? error : props.helperText;
 
@@ -102,6 +108,7 @@ export const BlobInput: React.FC<InputProps> = (props) => {
               id={selectId}
               value={blobValue.dimensionality}
               onChange={handleDimensionalityChange}
+              disabled
             >
               <MenuItem value={BlobDimensionality.SINGLE}>Single (File)</MenuItem>
               <MenuItem value={BlobDimensionality.MULTIPART}>Multipart (Directory)</MenuItem>
