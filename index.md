@@ -1,8 +1,6 @@
-<html>
 <p align="center">
   <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
 </p>
-
 
 ## Index
 - [Pre-requisites](#prerequisites)
