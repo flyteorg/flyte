@@ -12,21 +12,13 @@ env:
 
 jobs:
   setup-nightly-and-release-workflows:
-    uses: ${{ WORKING_LOCATION }}
-  cat:
+    uses: "${{ WORKING_LOCATION }}"
+  cat-stuff:
     uses: ubuntu-latest
     - name: cat file
       shell: bash
       run: |
         cat ./opta/aws/env.yaml
-#    - name: APPLY Opta
-#      shell: bash
-#      run: |
-#        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
-#    - name: DESTROY Opta
-#      shell: bash
-#      run: |
-#        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --auto-approve 
 
 
 
