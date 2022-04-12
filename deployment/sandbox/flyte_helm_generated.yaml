@@ -4083,9 +4083,10 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - name: postgres
+    nodePort: 30089
     port: 5432
     protocol: TCP
     targetPort: postgres

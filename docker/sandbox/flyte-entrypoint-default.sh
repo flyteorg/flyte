@@ -19,6 +19,10 @@ monitor() {
 
 # Start docker daemon
 echo "Starting Docker daemon..."
+file="/var/run/docker.pid"
+if [ -f "$file" ] ; then
+    rm "$file"
+fi
 dockerd &> /var/log/dockerd.log &
 DOCKERD_PID=$!
 timeout 600 sh -c "until docker info &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for dockerd to start"; exit 1 )

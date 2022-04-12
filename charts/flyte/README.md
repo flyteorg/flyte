@@ -223,7 +223,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
 | postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |
 | postgres.resources | object | `{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Postgres deployment |
-| postgres.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Postgres |
+| postgres.service | object | `{"annotations":{},"type":"NodePort"}` | Service settings for Postgres |
 | postgres.tolerations | list | `[]` | tolerations for Postgres deployment |
 | redis | object | `{"enabled":false}` | --------------------------------------------- REDIS SETTINGS |
 | redis.enabled | bool | `false` | - enable or disable Redis Statefulset installation |

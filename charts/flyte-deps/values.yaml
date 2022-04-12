@@ -37,7 +37,7 @@ postgres:
   # -- Service settings for Postgres
   service:
     annotations: {}
-    type: ClusterIP
+    type: NodePort
   # -- Annotations for Postgres pods
   podAnnotations: {}
   # -- nodeSelector for Postgres deployment
