@@ -10,8 +10,39 @@ env:
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
 
 jobs:
+    calculate-pre-reqs:
+    name: Calculate pre-requirements
+    runs-on: flyteorg-infra
+    steps:
+      - name: Set inputs defaults (needed for scheduled runs)
+        id: set-inputs-default
+        run: |
+          COMPONENTS_VERSION=${{ github.event.inputs.components_version || 'latest' }}
+          echo ::set-output name=components_version::${COMPONENTS_VERSION}
+
+          MODE=${{ github.event.inputs.mode || 'nightly' }}
+          echo ::set-output name=mode::${MODE}
+          # We use the mode in the subsequent next step to determine the badge version. Github has a specific syntax to define environment variables
+          # as defined in https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions).
+          echo 'MODE='$MODE >> $GITHUB_ENV
+      - name: Determine Badge version
+        id: parse-badge-version
+        run: |
+          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ github.event.inputs.components_version }})
+          echo ::set-output name=badge_version::${BADGE_VERSION}
+      - name: Parse latest flytesnacks version
+        id: parse-flytesnacks-version
+        run: |
+          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
+          echo ::set-output name=flytesnacks_latest::${LATEST_VERSION}
+    outputs:
+      mode: ${{ steps.set-inputs-default.outputs.mode }}
+      components_version: ${{ steps.set-inputs-default.outputs.components_version }}
+      badge_version: ${{ steps.parse-badge-version.outputs.badge_version }}
+      flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
   run-testing-workflows:
     runs-on: ubuntu-latest
+    needs: calculate-pre-reqs
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
