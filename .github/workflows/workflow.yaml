@@ -23,17 +23,17 @@ jobs:
     - name: Download Opta
       shell: bash
       run: |
-        yes | curl -fsSL https://docs.opta.dev/install.sh
+        /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: APPLY Opta
       shell: bash
       run: |
-        ~/.opta/opta apply -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
     - name: DESTROY Opta
       shell: bash
       run: |
-        ~/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
 
 
 
