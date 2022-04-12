@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Generating Flyte Configuration Documents"
+echo "Generating Flyte Configuration Documents..."
 CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 ROOT_DIR=${CUR_DIR}/..
 OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/cluster_config
