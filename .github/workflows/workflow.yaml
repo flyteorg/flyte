@@ -20,10 +20,10 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
         aws-region: us-east-1 
-    - name: Download Opta
+    - name: SETUP Opta
       shell: bash
       run: |
-        /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
+        ./scripts/ci_helper.sh setup_opta
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: set variables
