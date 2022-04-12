@@ -29,6 +29,9 @@ helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/fl
 # Gen
 helm template flyte -n flyte ${DIR}/../charts/flyte-deps/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_sandbox_deps_helm_generated.yaml
 
+# Generate manifest deps chart
+helm template flyte -n flyte ${DIR}/../charts/flyte-deps/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_sandbox_deps_helm_generated.yaml
+
 echo "Generating helm docs"
 if  command -v helm-docs &> /dev/null
 then
