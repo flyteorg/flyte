@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/flyteorg/datacatalog v0.3.33
 	github.com/flyteorg/flyteadmin v0.6.140
-	github.com/flyteorg/flytepropeller v0.16.40
+	github.com/flyteorg/flytepropeller v0.16.42
 	github.com/flyteorg/flytestdlib v0.4.23
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.3.0
@@ -217,5 +217,3 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
-
-replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v0.16.42-0.20220412052240-1d004d39429e
