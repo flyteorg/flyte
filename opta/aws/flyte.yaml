@@ -4,13 +4,14 @@ environments:
     variables:
       region: <region>
       account_id: <account_id>
+      bucket_name: <unique-bucket-name>
 name: service-flyte
 modules:
   - name: postgres
     type: aws-postgres
   - name: s3
     type: aws-s3
-    bucket_name: "{parent_name}-{layer_name}"
+    bucket_name: "{vars.bucket_name}"
   - name: adminflyterole
     type: aws-iam-role
     extra_iam_policies:
@@ -64,7 +65,7 @@ modules:
             stringData:
               pass.txt: "${{module.postgres.db_password}}"
       storage:
-        bucketName: "{parent_name}-{layer_name}"
+        bucketName: "{vars.bucket_name}"
         s3:
           region: "{vars.region}"
       flyteadmin:

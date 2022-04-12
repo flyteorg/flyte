@@ -33,15 +33,15 @@ jobs:
     - name: cat file
       shell: bash
       run: |
-        cat ./opta/aws/env.yaml
-    - name: APPLY Opta
-      shell: bash
-      run: |
-        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
-    - name: DESTROY Opta
-      shell: bash
-      run: |
-        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --auto-approve 
+        cat .github/scripts/ci_helper.sh
+#    - name: APPLY Opta
+#      shell: bash
+#      run: |
+#        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
+#    - name: DESTROY Opta
+#      shell: bash
+#      run: |
+#        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --auto-approve 
 
 
 
