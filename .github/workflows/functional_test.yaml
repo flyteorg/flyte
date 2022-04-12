@@ -53,5 +53,5 @@ jobs:
         env:
           PRIORITIES: "P0"
         run: |
-          ./boilerplate/flyte/end2end/end2end.sh
+          make end2end_execute
 
