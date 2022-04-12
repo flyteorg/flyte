@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flytesnacks-development
+  labels:
+    helm.sh/chart: {{ include "flyte.chart" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
