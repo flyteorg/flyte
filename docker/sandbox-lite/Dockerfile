@@ -18,7 +18,7 @@ COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 COPY go.mod go.sum /app/flyte/
 COPY cmd/ /app/flyte/cmd/
 WORKDIR /app/flyte
-RUN go mod download 
+RUN go mod download
 RUN go build -o /flyte cmd/main.go
 
 
@@ -50,7 +50,7 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
     chmod 700 /flyteorg/bin/get_helm.sh && \
     sh /flyteorg/bin/get_helm.sh --version ${HELM_VERSION} && \
     mv /usr/local/bin/helm /flyteorg/bin/helm && \
-    rm /flyteorg/bin/get_helm.sh 
+    rm /flyteorg/bin/get_helm.sh
 
 
 # Install flytectl
@@ -60,7 +60,7 @@ RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/inst
 COPY --from=go_builder /install/linux/ /flyte /flyteorg/bin/
 
 # Copy flyte chart
-COPY docker/sandbox-lite/storage /flyteorg/share/storage
+COPY charts/flyte-deps/ /flyteorg/share/flyte-deps
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/

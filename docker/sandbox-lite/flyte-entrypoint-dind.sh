@@ -39,7 +39,7 @@ echo "Done."
 
 # Deploy flyte
 echo "Deploying Flyte..."
-charts="/flyteorg/share/storage"
+charts="/flyteorg/share/flyte-deps"
 helm dep update $charts
 helm install -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml
 k3s kubectl create namespace flytesnacks-development
