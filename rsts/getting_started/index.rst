@@ -98,7 +98,7 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 
   pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
 
-.. note:: The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execute on the configured backend
+.. note:: The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execution on the configured backend.
 
 
 Check It
