@@ -85,6 +85,8 @@ ENV FLYTE_VERSION "${FLYTE_VERSION}"
 ARG FLYTE_TEST="release"
 ENV FLYTE_TEST "${FLYTE_TEST}"
 
+RUN addgroup -S docker
+
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
 

@@ -24,7 +24,7 @@ file="/var/run/docker.pid"
 if [ -f "$file" ] ; then
     rm "$file"
 fi
-dockerd &> /var/log/dockerd.log &
+dockerd  &> /var/log/dockerd.log &
 DOCKERD_PID=$!
 timeout "$FLYTE_TIMEOUT" sh -c "until docker info &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for dockerd to start"; exit 1 )
 echo "Done."
@@ -54,8 +54,7 @@ if [[ $FLYTE_TEST = "local" ]]
 then
   helm dep update $charts
 fi
-helm install -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml
-k3s kubectl create namespace flytesnacks-development
+helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install --wait
 
 timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl get namespace flyte &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the Flyte namespace to be created"; exit 1 )
 timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment minio -n flyte  &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the minio rollout to be created"; exit 1 )
