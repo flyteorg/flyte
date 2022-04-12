@@ -1,4 +1,4 @@
-ARG FLYTECONSOLE_VERSION="lastest"
+ARG FLYTECONSOLE_VERSION="latest"
 FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
 
 FROM golang:1.18.0-alpine3.15 AS go_builder
