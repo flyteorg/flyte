@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.1](http://github.com/lyft/flyteconsole/compare/v0.51.0...v0.51.1) (2022-04-12)
+
+
+### Bug Fixes
+
+* dimensionality per data type blob and be disabled in UI ([#371](http://github.com/lyft/flyteconsole/issues/371)) ([dc38ae3](http://github.com/lyft/flyteconsole/commit/dc38ae39ceecce24f9a65f4c02f364d8ab05728d))
+
 # [0.51.0](http://github.com/lyft/flyteconsole/compare/v0.50.4...v0.51.0) (2022-04-12)
 
 
