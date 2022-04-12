@@ -3,6 +3,12 @@ on:
     branches:
       - opta-aws
 
+env:
+  ENV_NAME: development
+  COMPANY: bamboozoology
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
 jobs:
   testing-workflows:
     runs-on: ubuntu-latest
@@ -14,7 +20,22 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
         aws-region: us-east-1 
-    - name: Create bucket
+    - name: Download Opta
       shell: bash
       run: |
-        aws s3 mb s3://totally-unique-bucket-name-12354532
+        curl -fsSL https://docs.opta.dev/install.sh
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: APPLY Opta
+      needs:
+      shell: bash
+      run: |
+        ~/.opta/opta apply -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+    - name: DESTROY Opta
+      needs:
+      shell: bash
+      run: |
+        ~/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+
+
+
