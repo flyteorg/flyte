@@ -1,4 +1,4 @@
-package sandbox
+package demo
 
 import (
 	"bufio"
@@ -31,53 +31,38 @@ import (
 )
 
 const (
-	startShort = "Starts the Flyte sandbox cluster."
+	startShort = "Starts the Flyte demo cluster."
 	startLong  = `
-Flyte sandbox is a fully standalone minimal environment for running Flyte.
-It provides a simplified way of running Flyte sandbox as a single Docker container locally.
+Flyte demo is a fully standalone minimal environment for running Flyte.
+It provides a simplified way of running Flyte demo as a single Docker container locally.
 
-Starts the sandbox cluster without any source code:
+Starts the demo cluster without any source code:
 ::
 
- flytectl sandbox start
+ flytectl demo start
 	
-Mounts your source code repository inside the sandbox:
+Mounts your source code repository inside the demo cluster:
 ::
 
- flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
-	
-Runs a specific version of Flyte. Flytectl sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
+ flytectl demo start --source=$HOME/flyteorg/flytesnacks 
+
+Specify a Flyte demo compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
 
- flytectl sandbox start  --version=v0.14.0
-
-.. note::
-	  Flytectl Sandbox is only supported for Flyte versions > v0.10.0.
-
-Runs the latest pre release of  Flyte.
-::
-
- flytectl sandbox start  --pre
-
-Note: The pre release flag will be ignored if the user passes the version flag. In that case, Flytectl will use a specific version. 
-
-Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
-::
-
-  flytectl sandbox start --image docker.io/my-override:latest
+  flytectl demo start --image docker.io/my-override:latest
 
 Note: If image flag is passed then Flytectl will ignore version and pre flags.
 	
-Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
+Specify a Flyte demo image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
 
- flytectl sandbox start  --image docker.io/my-override:latest --imagePullPolicy Always
+ flytectl demo start  --image docker.io/my-override:latest --imagePullPolicy Always
 
-Start sandbox cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
-eg : for passing timeout value in secs for the sandbox container use the following.
+Start demo cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
+eg : for passing timeout value in secs for the demo container use the following.
 ::
 
- flytectl sandbox start --env FLYTE_TIMEOUT=700
+ flytectl demo start --env FLYTE_TIMEOUT=700
 
 
 The DURATION can be a positive integer or a floating-point number, followed by an optional unit suffix::
@@ -91,18 +76,18 @@ When no unit is used, it defaults to seconds. If the duration is set to zero, th
 eg : for passing multiple environment variables
 ::
 
- flytectl sandbox start --env USER=foo --env PASSWORD=bar
+ flytectl demo start --env USER=foo --env PASSWORD=bar
 
 
 Usage
 `
-	k8sEndpoint          = "https://127.0.0.1:30086"
-	flyteNamespace       = "flyte"
-	diskPressureTaint    = "node.kubernetes.io/disk-pressure"
-	taintEffect          = "NoSchedule"
-	sandboxContextName   = "flyte-sandbox"
-	sandboxDockerContext = "default"
-	sandboxImageName     = "cr.flyte.org/flyteorg/flyte-sandbox"
+	k8sEndpoint       = "https://127.0.0.1:30086"
+	flyteNamespace    = "flyte"
+	diskPressureTaint = "node.kubernetes.io/disk-pressure"
+	taintEffect       = "NoSchedule"
+	demoContextName   = "flyte-sandbox"
+	demoDockerContext = "default"
+	demoImageName     = "cr.flyte.org/flyteorg/flyte-sandbox-lite"
 )
 
 type ExecResult struct {
@@ -111,13 +96,13 @@ type ExecResult struct {
 	ExitCode int
 }
 
-func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+func startDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	cli, err := docker.GetDockerClient()
 	if err != nil {
 		return err
 	}
 
-	reader, err := startSandbox(ctx, cli, os.Stdin)
+	reader, err := startDemo(ctx, cli, os.Stdin)
 	if err != nil {
 		return err
 	}
@@ -144,7 +129,7 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 		if err := watchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
 			return err
 		}
-		util.PrintSandboxMessage(util.SandBoxConsolePort)
+		util.PrintSandboxMessage(util.DemoConsolePort)
 	}
 	return nil
 }
@@ -155,18 +140,18 @@ func updateLocalKubeContext() error {
 		LoadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 	}
 	k8sCtxMgr := k8s.NewK8sContextManager()
-	return k8sCtxMgr.CopyContext(srcConfigAccess, sandboxDockerContext, sandboxContextName)
+	return k8sCtxMgr.CopyContext(srcConfigAccess, demoDockerContext, demoContextName)
 }
 
-func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
+func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
 	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 
 	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
 		if err.Error() != clierrors.ErrSandboxExists {
 			return nil, err
 		}
-		fmt.Printf("Existing details of your sandbox")
-		util.PrintSandboxMessage(util.SandBoxConsolePort)
+		fmt.Printf("Existing details of your demo cluster")
+		util.PrintSandboxMessage(util.DemoConsolePort)
 		return nil, nil
 	}
 
@@ -189,27 +174,27 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 	} else if vol != nil {
 		volumes = append(volumes, *vol)
 	}
-	sandboxImage := sandboxConfig.DefaultConfig.Image
-	if len(sandboxImage) == 0 {
-		image, version, err := githubutil.GetFullyQualifiedImageName(sandboxConfig.DefaultConfig.Version, sandboxImageName, sandboxConfig.DefaultConfig.Prerelease)
+	demoImage := sandboxConfig.DefaultConfig.Image
+	if len(demoImage) == 0 {
+		image, version, err := githubutil.GetFullyQualifiedImageName(sandboxConfig.DefaultConfig.Version, demoImageName, sandboxConfig.DefaultConfig.Prerelease)
 		if err != nil {
 			return nil, err
 		}
-		sandboxImage = image
+		demoImage = image
 		fmt.Printf("%v Running Flyte %s release\n", emoji.Whale, version)
 	}
-	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, sandboxImage)
-	if err := docker.PullDockerImage(ctx, cli, sandboxImage, sandboxConfig.DefaultConfig.ImagePullPolicy, sandboxConfig.DefaultConfig.ImagePullOptions); err != nil {
+	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, demoImage)
+	if err := docker.PullDockerImage(ctx, cli, demoImage, sandboxConfig.DefaultConfig.ImagePullPolicy, sandboxConfig.DefaultConfig.ImagePullOptions); err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
+	fmt.Printf("%v booting flyte-demo container\n", emoji.FactoryWorker)
 	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
 	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
-		sandboxImage, sandboxDefaultConfig.Env)
+		demoImage, sandboxDefaultConfig.Env)
 
 	if err != nil {
-		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
+		fmt.Printf("%v Something went wrong: Failed to start demo container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
 		return nil, err
 	}
 
