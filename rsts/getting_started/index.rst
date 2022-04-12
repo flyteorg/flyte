@@ -86,7 +86,7 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
     export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
 
 
-* Start a Flyte demonstration environment on your local machine
+Start a Flyte demonstration environment on your local machine:
 
 .. prompt:: bash $
 
