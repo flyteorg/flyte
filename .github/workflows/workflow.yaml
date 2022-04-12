@@ -23,7 +23,7 @@ jobs:
     - name: Download Opta
       shell: bash
       run: |
-        yes | curl -fsSL https://docs.opta.dev/install.sh | sh
+        yes | curl -fsSL https://docs.opta.dev/install.sh
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: APPLY Opta
