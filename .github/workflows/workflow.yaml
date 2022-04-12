@@ -13,6 +13,8 @@ jobs:
   testing-workflows:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
     - name: Configure AWS credentials 
       uses: aws-actions/configure-aws-credentials@v1  
       with: 
@@ -24,8 +26,6 @@ jobs:
       shell: bash
       run: |
         ./scripts/ci_helper.sh setup_opta
-    - name: Checkout repo
-      uses: actions/checkout@v3
     - name: set variables
       shell: bash
       run: |
