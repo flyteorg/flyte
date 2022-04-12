@@ -1,4 +1,3 @@
-#!/bin/bash
 set -ex
 
 setup_opta () {
