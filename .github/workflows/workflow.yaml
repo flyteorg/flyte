@@ -7,7 +7,7 @@ env:
   ENV_NAME: development
   COMPANY: bamboozoology
   AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
+  AWS_ACCOUNT_ID: "854086493178"
 
 jobs:
   testing-workflows:
