@@ -226,6 +226,15 @@ Table of Contents
    ^^^^^^^^^^^^^^^
    Define custom plugins that aren't currently supported in the Flyte ecosystem.
 
+   ---
+
+   .. link-button:: auto/larger_apps/index
+      :type: ref
+      :text: ⛰ Building Large Apps
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^^^^
+   Build, deploy, and iterate on large projects by organizing your Flyte app.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
@@ -252,7 +261,8 @@ Table of Contents
    Remote Access <auto/remote_access/index>
    Production Config <auto/deployment/index>
    Scheduling Workflows <auto/core/scheduled_workflows/index>
-   Extending flyte <auto/core/extend_flyte/index>
+   Extending Flyte <auto/core/extend_flyte/index>
+   Building Large Apps <auto/larger_apps/index>
    contribute
 
 .. toctree::

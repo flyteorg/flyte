@@ -13,5 +13,6 @@ sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
 sphinxcontrib-yt
+sphinx-tabs
 docutils
 astroid
