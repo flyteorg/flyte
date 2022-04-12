@@ -73,6 +73,5 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "dataProxy.upload.maxExpiresIn"), defaultServerConfig.DataProxy.Upload.MaxExpiresIn.String(), "Maximum allowed expiration duration.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "dataProxy.upload.defaultFileNameLength"), defaultServerConfig.DataProxy.Upload.DefaultFileNameLength, "Default length for the generated file name if not provided in the request.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "dataProxy.upload.storagePrefix"), defaultServerConfig.DataProxy.Upload.StoragePrefix, "Storage prefix to use for all upload requests.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "serviceHttpEndpoint"), defaultServerConfig.ServiceHTTPEndpoint.String(), "Defines the http endpoint the service is accessible at.")
 	return cmdFlags
 }

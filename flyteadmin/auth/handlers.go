@@ -54,9 +54,8 @@ func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer,
 	handler.HandleFunc("/logout", GetLogoutEndpointHandler(ctx, authCtx))
 }
 
-// RefreshTokensIfExists looks for access token and refresh token, if both are present and the access token is expired,
-// then attempt to refresh. Otherwise do nothing and proceed to the next handler. If successfully refreshed, proceed to
-// the landing page.
+// Look for access token and refresh token, if both are present and the access token is expired, then attempt to
+// refresh. Otherwise do nothing and proceed to the next handler. If successfully refreshed, proceed to the landing page.
 func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.AuthenticationContext, authHandler http.HandlerFunc) http.HandlerFunc {
 
 	return func(writer http.ResponseWriter, request *http.Request) {

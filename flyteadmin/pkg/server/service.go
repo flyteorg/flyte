@@ -72,7 +72,7 @@ func blanketAuthorization(ctx context.Context, req interface{}, _ *grpc.UnarySer
 
 // Creates a new gRPC Server with all the configuration
 func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
-	storageCfg *storage.Config, authCfg *authConfig.Config, authCtx interfaces.AuthenticationContext,
+	storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
 	scope promutils.Scope, opts ...grpc.ServerOption) (*grpc.Server, error) {
 	// Not yet implemented for streaming
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
@@ -107,8 +107,8 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	configuration := runtime2.NewConfigurationProvider()
 	service.RegisterAdminServiceServer(grpcServer, adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin")))
-	service.RegisterAuthMetadataServiceServer(grpcServer, authzserver.NewService(cfg, authCfg))
 	if cfg.Security.UseAuth {
+		service.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
 		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
@@ -243,7 +243,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 			}
 		}
 
-		oauth2MetadataProvider := authzserver.NewService(cfg, authCfg)
+		oauth2MetadataProvider := authzserver.NewService(authCfg)
 		oidcUserInfoProvider := auth.NewUserInfoProvider()
 
 		authCtx, err = auth.NewAuthenticationContext(ctx, sm, oauth2Provider, oauth2ResourceServer, oauth2MetadataProvider, oidcUserInfoProvider, authCfg)
@@ -253,7 +253,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCfg, authCtx, scope)
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope)
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}
@@ -346,7 +346,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 			}
 		}
 
-		oauth2MetadataProvider := authzserver.NewService(cfg, authCfg)
+		oauth2MetadataProvider := authzserver.NewService(authCfg)
 		oidcUserInfoProvider := auth.NewUserInfoProvider()
 
 		authCtx, err = auth.NewAuthenticationContext(ctx, sm, oauth2Provider, oauth2ResourceServer, oauth2MetadataProvider, oidcUserInfoProvider, authCfg)
@@ -356,7 +356,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCfg, authCtx, scope, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}
