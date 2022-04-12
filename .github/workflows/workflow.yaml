@@ -10,7 +10,7 @@ env:
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
 
 jobs:
-    calculate-pre-reqs:
+  calculate-pre-reqs:
     name: Calculate pre-requirements
     runs-on: flyteorg-infra
     steps:
@@ -40,7 +40,7 @@ jobs:
       components_version: ${{ steps.set-inputs-default.outputs.components_version }}
       badge_version: ${{ steps.parse-badge-version.outputs.badge_version }}
       flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
-    run-testing-workflows:
+  run-testing-workflows:
     runs-on: ubuntu-latest
     needs: calculate-pre-reqs
     steps:
