@@ -6,38 +6,50 @@
 #
 ansiwrap==0.8.4
     # via papermill
-appnope==0.1.2
+appnope==0.1.3
     # via
     #   ipykernel
     #   ipython
-attrs==21.2.0
-    # via
-    #   jsonschema
-    #   scantree
+arrow==1.2.2
+    # via jinja2-time
+asttokens==2.0.5
+    # via stack-data
+attrs==21.4.0
+    # via jsonschema
 backcall==0.2.0
     # via ipython
-black==21.9b0
-    # via papermill
-bleach==4.1.0
+beautifulsoup4==4.11.1
     # via nbconvert
-certifi==2021.5.30
+binaryornot==0.4.4
+    # via cookiecutter
+bleach==5.0.0
+    # via nbconvert
+certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.6
+chardet==4.0.0
+    # via binaryornot
+charset-normalizer==2.0.12
     # via requests
-click==7.1.2
+checksumdir==1.2.0
+    # via flytekit
+click==8.1.2
     # via
-    #   black
+    #   cookiecutter
     #   flytekit
     #   papermill
-croniter==1.0.15
+cloudpickle==2.0.0
     # via flytekit
-cycler==0.10.0
+cookiecutter==1.7.3
+    # via flytekit
+croniter==1.3.4
+    # via flytekit
+cycler==0.11.0
     # via matplotlib
-dataclasses-json==0.5.6
+dataclasses-json==0.5.7
     # via flytekit
-debugpy==1.5.0
+debugpy==1.6.0
     # via ipykernel
-decorator==5.1.0
+decorator==5.1.1
     # via
     #   ipython
     #   retry
@@ -45,76 +57,87 @@ defusedxml==0.7.1
     # via nbconvert
 deprecated==1.2.13
     # via flytekit
-dirhash==0.2.1
-    # via flytekit
-diskcache==5.2.1
+diskcache==5.4.0
     # via flytekit
 docker-image-py==0.1.12
     # via flytekit
-docstring-parser==0.11
+docstring-parser==0.13
     # via flytekit
-entrypoints==0.3
+entrypoints==0.4
     # via
     #   jupyter-client
     #   nbconvert
     #   papermill
-flyteidl==0.20.2
+executing==0.8.3
+    # via stack-data
+fastjsonschema==2.15.3
+    # via nbformat
+flyteidl==0.24.19
     # via flytekit
-flytekit==0.22.2
+flytekit==0.31.0
     # via
     #   -r ../../../common/requirements-common.in
     #   flytekitplugins-papermill
-flytekitplugins-papermill==0.22.3
+flytekitplugins-papermill==0.31.0
     # via -r requirements.in
-grpcio==1.41.0
+fonttools==4.32.0
+    # via matplotlib
+googleapis-common-protos==1.56.0
+    # via flyteidl
+grpcio==1.44.0
     # via flytekit
-idna==3.2
+idna==3.3
     # via requests
-importlib-metadata==4.8.1
+importlib-metadata==4.11.3
     # via keyring
-ipykernel==6.4.1
+importlib-resources==5.6.0
+    # via jsonschema
+ipykernel==6.13.0
     # via flytekitplugins-papermill
-ipython==7.28.0
+ipython==8.2.0
     # via ipykernel
-ipython-genutils==0.2.0
-    # via
-    #   ipykernel
-    #   nbformat
-jedi==0.18.0
+jedi==0.18.1
     # via ipython
-jinja2==3.0.2
-    # via nbconvert
+jinja2==3.1.1
+    # via
+    #   cookiecutter
+    #   jinja2-time
+    #   nbconvert
+jinja2-time==0.2.0
+    # via cookiecutter
 joblib==1.1.0
     # via scikit-learn
-jsonschema==4.0.1
+jsonschema==4.4.0
     # via nbformat
-jupyter-client==7.0.6
+jupyter-client==7.2.2
     # via
     #   ipykernel
     #   nbclient
-jupyter-core==4.8.1
+jupyter-core==4.9.2
     # via
     #   jupyter-client
     #   nbconvert
     #   nbformat
-jupyterlab-pygments==0.1.2
+jupyterlab-pygments==0.2.0
     # via nbconvert
-keyring==23.2.1
+keyring==23.5.0
     # via flytekit
-kiwisolver==1.3.2
+kiwisolver==1.4.2
     # via matplotlib
-markupsafe==2.0.1
-    # via jinja2
-marshmallow==3.13.0
+markupsafe==2.1.1
+    # via
+    #   jinja2
+    #   nbconvert
+marshmallow==3.15.0
     # via
     #   dataclasses-json
     #   marshmallow-enum
     #   marshmallow-jsonschema
 marshmallow-enum==1.5.1
     # via dataclasses-json
-marshmallow-jsonschema==0.12.0
+marshmallow-jsonschema==0.13.0
     # via flytekit
-matplotlib==3.4.3
+matplotlib==3.5.1
     # via
     #   -r ../../../common/requirements-common.in
     #   -r requirements.in
@@ -126,27 +149,26 @@ matplotlib-inline==0.1.3
 mistune==0.8.4
     # via nbconvert
 mypy-extensions==0.4.3
-    # via
-    #   black
-    #   typing-inspect
-natsort==7.1.1
+    # via typing-inspect
+natsort==8.1.0
     # via flytekit
-nbclient==0.5.4
+nbclient==0.5.13
     # via
     #   nbconvert
     #   papermill
-nbconvert==6.2.0
+nbconvert==6.5.0
     # via flytekitplugins-papermill
-nbformat==5.1.3
+nbformat==5.3.0
     # via
     #   nbclient
     #   nbconvert
     #   papermill
-nest-asyncio==1.5.1
+nest-asyncio==1.5.5
     # via
+    #   ipykernel
     #   jupyter-client
     #   nbclient
-numpy==1.21.2
+numpy==1.22.3
     # via
     #   matplotlib
     #   pandas
@@ -154,57 +176,65 @@ numpy==1.21.2
     #   scikit-learn
     #   scipy
     #   seaborn
-packaging==21.0
-    # via bleach
-pandas==1.3.3
+packaging==21.3
+    # via
+    #   ipykernel
+    #   marshmallow
+    #   matplotlib
+    #   nbconvert
+pandas==1.4.2
     # via
     #   flytekit
     #   seaborn
 pandocfilters==1.5.0
     # via nbconvert
-papermill==2.3.3
+papermill==2.3.4
     # via flytekitplugins-papermill
-parso==0.8.2
+parso==0.8.3
     # via jedi
-pathspec==0.9.0
-    # via
-    #   black
-    #   scantree
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.3.2
+pillow==9.1.0
     # via matplotlib
-platformdirs==2.4.0
-    # via black
-prompt-toolkit==3.0.20
+poyo==0.5.0
+    # via cookiecutter
+prompt-toolkit==3.0.29
     # via ipython
-protobuf==3.18.1
+protobuf==3.20.0
     # via
     #   flyteidl
     #   flytekit
+    #   googleapis-common-protos
+    #   protoc-gen-swagger
+protoc-gen-swagger==0.1.0
+    # via flyteidl
+psutil==5.9.0
+    # via ipykernel
 ptyprocess==0.7.0
     # via pexpect
-py==1.10.0
+pure-eval==0.2.2
+    # via stack-data
+py==1.11.0
     # via retry
-pyarrow==3.0.0
+pyarrow==6.0.1
     # via flytekit
-pygments==2.10.0
+pygments==2.11.2
     # via
     #   ipython
-    #   jupyterlab-pygments
     #   nbconvert
-pyparsing==2.4.7
+pyparsing==3.0.8
     # via
     #   matplotlib
     #   packaging
-pyrsistent==0.18.0
+pyrsistent==0.18.1
     # via jsonschema
 pysocks==1.7.1
     # via -r requirements.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
+    #   arrow
     #   croniter
     #   flytekit
     #   jupyter-client
@@ -212,34 +242,33 @@ python-dateutil==2.8.1
     #   pandas
 python-json-logger==2.0.2
     # via flytekit
+python-slugify==6.1.1
+    # via cookiecutter
 pytimeparse==1.1.8
     # via flytekit
-pytz==2018.4
+pytz==2022.1
     # via
     #   flytekit
     #   pandas
-pyyaml==5.4.1
+pyyaml==6.0
     # via papermill
 pyzmq==22.3.0
     # via jupyter-client
-regex==2021.9.30
+regex==2022.3.15
+    # via docker-image-py
+requests==2.27.1
     # via
-    #   black
-    #   docker-image-py
-requests==2.26.0
-    # via
+    #   cookiecutter
     #   flytekit
     #   papermill
     #   responses
-responses==0.14.0
+responses==0.20.0
     # via flytekit
 retry==0.9.2
     # via flytekit
-scantree==0.0.1
-    # via dirhash
-scikit-learn==1.0
+scikit-learn==1.0.2
     # via -r requirements.in
-scipy==1.7.1
+scipy==1.8.0
     # via
     #   scikit-learn
     #   seaborn
@@ -247,34 +276,36 @@ seaborn==0.11.2
     # via -r requirements.in
 six==1.16.0
     # via
+    #   asttokens
     #   bleach
-    #   cycler
-    #   flytekit
+    #   cookiecutter
     #   grpcio
     #   python-dateutil
-    #   responses
-    #   scantree
 sortedcontainers==2.4.0
     # via flytekit
+soupsieve==2.3.2
+    # via beautifulsoup4
+stack-data==0.2.0
+    # via ipython
 statsd==3.3.0
     # via flytekit
 tenacity==8.0.1
     # via papermill
-testpath==0.5.0
-    # via nbconvert
+text-unidecode==1.3
+    # via python-slugify
 textwrap3==0.9.2
     # via ansiwrap
-threadpoolctl==3.0.0
+threadpoolctl==3.1.0
     # via scikit-learn
-tomli==1.2.1
-    # via black
+tinycss2==1.1.1
+    # via nbconvert
 tornado==6.1
     # via
     #   ipykernel
     #   jupyter-client
-tqdm==4.62.3
+tqdm==4.64.0
     # via papermill
-traitlets==5.1.0
+traitlets==5.1.1
     # via
     #   ipykernel
     #   ipython
@@ -284,13 +315,13 @@ traitlets==5.1.0
     #   nbclient
     #   nbconvert
     #   nbformat
-typing-extensions==3.10.0.2
+typing-extensions==4.1.1
     # via
-    #   black
+    #   flytekit
     #   typing-inspect
 typing-inspect==0.7.1
     # via dataclasses-json
-urllib3==1.26.7
+urllib3==1.26.9
     # via
     #   flytekit
     #   requests
@@ -298,17 +329,21 @@ urllib3==1.26.7
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
-    # via bleach
-wheel==0.37.0
+    # via
+    #   bleach
+    #   tinycss2
+wheel==0.37.1
     # via
     #   -r ../../../common/requirements-common.in
     #   flytekit
-wrapt==1.13.1
+wrapt==1.14.0
     # via
     #   deprecated
     #   flytekit
-zipp==3.6.0
-    # via importlib-metadata
+zipp==3.8.0
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

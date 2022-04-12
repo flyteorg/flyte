@@ -7,6 +7,7 @@ Flyte has an optional plugin that makes it possible to run `Apache Spark <https:
 It makes it extremely easy to run your pyspark (coming soon to scala/java) code as a task. The plugin creates a new virtual cluster for the spark execution dynamically and Flyte will manage the execution, auto-scaling
 for the spark job.
 
+
 Spark in Flytekit
 =================
 For a more complete example refer to the :std:ref:`example-spark`

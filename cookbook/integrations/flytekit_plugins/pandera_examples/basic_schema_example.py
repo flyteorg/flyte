@@ -64,7 +64,7 @@ class IntermediateSchema(InSchema):
         return df["total_pay"] == df["hourly_pay"] * df["hours_worked"]
 
 class OutSchema(IntermediateSchema):
-    worker_id: Series[str] = pa.Field(allow_duplicates=False)
+    worker_id: Series[str] = pa.Field()
 
 # %%
 # Columns are specified as class attributes with a specified data type using the
