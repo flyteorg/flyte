@@ -3243,6 +3243,7 @@ spec:
   ports:
   - name: postgres
     port: 5432
+    nodePort: 30089
     protocol: TCP
     targetPort: postgres
   selector: 
