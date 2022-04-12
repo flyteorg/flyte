@@ -1,4 +1,5 @@
 export REPOSITORY=flyte
+include boilerplate/flyte/end2end/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -25,10 +26,6 @@ release_automation:
 .PHONY: deploy_sandbox
 deploy_sandbox: 
 	bash script/deploy.sh
-
-.PHONY: end2end_execute
-end2end_execute: ## Execute tests in the current kubernetes context
-	@end2end/execute.sh
 
 .PHONY: install-piptools
 install-piptools: ## Install pip-tools
