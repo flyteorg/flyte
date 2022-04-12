@@ -126,7 +126,7 @@ redoc:
 
 contour:
   # --- enable or disable Contour deployment installation
-  enabled: true
+  enabled: false
   # -- Replicas count for Contour deployment
   replicaCount: 1
   contour:
