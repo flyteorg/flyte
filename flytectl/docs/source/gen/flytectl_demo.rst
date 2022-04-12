@@ -1,18 +1,48 @@
-.. _flytectl:
+.. _flytectl_demo:
 
-flytectl
---------
+flytectl demo
+-------------
 
-Flytectl CLI tool
+Helps with demo interactions like start, teardown, status, and exec.
 
 Synopsis
 ~~~~~~~~
 
 
-Flytectl is a CLI tool written in Go to interact with the FlyteAdmin service.
+
+Flyte Demo is a fully standalone minimal environment for running Flyte.
+It provides a simplified way of running Flyte demo as a single Docker container locally.
+	
+To create a demo cluster, run:
+::
+
+ flytectl demo start 
+
+To remove a demo cluster, run:
+::
+
+ flytectl demo teardown
+
+To check the status of the demo container, run:
+::
+
+ flytectl demo status
+
+To execute commands inside the demo container, use exec:
+::
+
+ flytectl demo exec -- pwd 	
+
 
 Options
 ~~~~~~~
+
+::
+
+  -h, --help   help for demo
+
+Options inherited from parent commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -48,7 +78,6 @@ Options
       --files.outputLocationPrefix string          Custom output location prefix for offloaded types (files/schemas).
       --files.sourceUploadPath string              Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                       Version of the entity to be registered with flyte which are un-versioned after serialization.
-  -h, --help                                       help for flytectl
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -74,15 +103,9 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_completion` 	 - Generates completion script.
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
-* :doc:`flytectl_create` 	 - Creates various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_demo` 	 - Helps with demo interactions like start, teardown, status, and exec.
-* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_register` 	 - Registers tasks, workflows, and launch plans from a list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
-* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
-* :doc:`flytectl_upgrade` 	 - Upgrades/rollbacks to a Flyte version.
-* :doc:`flytectl_version` 	 - Fetches Flyte version
+* :doc:`flytectl` 	 - Flytectl CLI tool
+* :doc:`flytectl_demo_exec` 	 - Executes non-interactive command inside the demo container
+* :doc:`flytectl_demo_start` 	 - Starts the Flyte demo cluster.
+* :doc:`flytectl_demo_status` 	 - Gets the status of the demo environment.
+* :doc:`flytectl_demo_teardown` 	 - Cleans up the demo environment
 
