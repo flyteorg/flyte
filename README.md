@@ -187,9 +187,13 @@ URL of your target FlyteAdmin API instance. These instructions will use
    127.0.0.1 localhost.different.admin.service.com
    ```
    
-* Install Chrome plugin: [Allow CORS: Access-Control-Allow-Origin](https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf)
+* Install Chrome plugin: [Moesif Origin & CORS Changer](https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc)
 
-    > Activate plugin (toggle to "on")
+    > _NOTE:_
+    > 1. Activate plugin (toggle to "on")
+    > 1. Open 'Advanced Settings':
+    > - set `Access-Control-Allow-Credentials`: `true`
+    > - set `Domain List`: `your.localhost.com`
 
 * Start `flyteconsole`
 
