@@ -1,0 +1,84 @@
+name: Update Cluster
+
+on:
+  workflow_call:
+    inputs:
+      admin_version:
+        description: "Flyte admin version"
+        required: true
+        type: string
+      propeller_version:
+        description: "Flyte propeller version"
+        required: true
+        type: string
+      datacatalog_version:
+        description: "Flyte datacatalog version"
+        required: true
+        type: string
+      console_version:
+        description: "Flyte console version"
+        required: true
+        type: string
+      opta_environment:
+        description: "Opta environment to use in this run, i.e. either nightly or release"
+        required: true
+        type: string
+
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
+      DATADOG_API_KEY:
+        required: true
+jobs:
+  update-cluster:
+    name: Update cluster to specified versions
+    runs-on: flyteorg-infra
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: azure/setup-helm@v1
+      - name: Update Helm Chart dependencies
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm dep update ./dev/opta/helm/
+      - name: Pin terraform version
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          terraform_wrapper: false
+      - name: Pin Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.8.0"
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+      - name: Apply opta changes
+        env:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+          LANGUAGE: en_US.UTF-8
+          DATADOG_API_KEY: ${{secrets.DATADOG_API_KEY}}
+          ENV:  "${{ inputs.opta_environment }}"
+          FLYTEADMIN_TAG: "${{ inputs.admin_version }}"
+          DATACATALOG_TAG: "${{ inputs.datacatalog_version }}"
+          FLYTECONSOLE_TAG: "${{ inputs.propeller_version }}"
+          FLYTEPROPELLER_TAG: "${{ inputs.console_version }}"
+          OPTA_ENVIRONMENT: "${{ inputs.opta_environment }}"
+        run: |
+          ./scripts/ci_helper.sh setup_opta
+          ./scripts/ci_helper.sh prepare_flyte_release_build
+          ./scripts/ci_helper.sh prepare_helm_chart
+          ./scripts/ci_helper.sh opta_action apply dev/opta
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          # selectable fields (default: repo,message)
+          fields: repo,action,eventName,ref,workflow
+          channel: '#functional-tests'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() # Pick up events even if the job fails or is canceled.

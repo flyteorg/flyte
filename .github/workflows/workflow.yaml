@@ -8,29 +8,13 @@ env:
   YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
+  WORKING_LOCATION: brucearctor/flyte/.github/workflows/setup_nightly_and_release.yml@opta-aws
 
 jobs:
-  testing-workflows:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-    - name: Configure AWS credentials 
-      uses: aws-actions/configure-aws-credentials@v1  
-      with: 
-        # This aws account should have admin permissions
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
-        aws-region: ${{ env.AWS_REGION }}
-    - name: SETUP Opta
-      shell: bash
-      run: |
-        sudo chmod +x .github/scripts/ci_helper.sh
-        .github/scripts/ci_helper.sh setup_opta
-    - name: set variables
-      shell: bash
-      run: |
-        sed -i "s/<env_name>/${{ env.ENV_NAME }}/" ./opta/aws/env.yaml; sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml; sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml; sed -i "s/<account_id>/$AWS_ACCOUNT_ID/g" ./opta/aws/env.yaml; 
+  setup-nightly-and-release-workflows:
+    uses: ${{ WORKING_LOCATION }}
+  cat:
+    uses: ubuntu-latest
     - name: cat file
       shell: bash
       run: |
