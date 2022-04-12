@@ -33,7 +33,7 @@ jobs:
     - name: DESTROY Opta
       shell: bash
       run: |
-        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name="${ENV_NAME}" --var company="${COMPANY}" --var aws_region="${AWS_REGION}"  --var=aws_account_id="${AWS_ACCOUNT_ID}" --auto-approve 
 
 
 
