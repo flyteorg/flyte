@@ -25,7 +25,7 @@ jobs:
     - name: SETUP Opta
       shell: bash
       run: |
-        chmod 400 .github/scripts/ci_helper.sh
+        sudo chmod +x .github/scripts/ci_helper.sh
         .github/scripts/ci_helper.sh setup_opta
     - name: set variables
       shell: bash
