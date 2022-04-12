@@ -82,7 +82,7 @@ COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
-ARG FLYTE_TEST="local"
+ARG FLYTE_TEST="release"
 ENV FLYTE_TEST "${FLYTE_TEST}"
 
 # Update PATH variable
