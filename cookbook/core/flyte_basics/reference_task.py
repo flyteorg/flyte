@@ -14,8 +14,10 @@ This example demonstrates the usage of reference tasks.
 
 # %%
 # First, let's import the dependencies.
+from typing import List
+
 from flytekit import reference_task, workflow
-from flytekit.types.file import JPEGImageFile
+from flytekit.types.file import FlyteFile
 
 
 # %%
@@ -23,10 +25,15 @@ from flytekit.types.file import JPEGImageFile
 @reference_task(
     project="flytesnacks",
     domain="development",
-    name="core.flyte_basics.files.rotate",
+    name="core.flyte_basics.files.normalize_columns",
     version="{{ registration.version }}",
 )
-def rotate(image_location: JPEGImageFile, location: str) -> JPEGImageFile:
+def normalize_columns(
+    csv_url: FlyteFile,
+    column_names: List[str],
+    columns_to_normalize: List[str],
+    output_location: str,
+) -> FlyteFile:
     ...
 
 
@@ -43,19 +50,21 @@ def rotate(image_location: JPEGImageFile, location: str) -> JPEGImageFile:
 #          @reference_task(
 #               project="flytesnacks",
 #               domain="development",
-#               name="core.flyte_basics.files.rotate",
+#               name="core.flyte_basics.files.normalize_columns",
 #               version="d06cebcfbeabc02b545eefa13a01c6ca992940c8", # If using GIT for versioning OR 0.16.0, if semver
 #           )
-#           def rotate(...):
+#           def normalize_columns(...):
 #               ...
 
 # %%
 # Next, we define a workflow to call the ``rotate()`` task.
 @workflow
-def wf():
-    return rotate(
-        image_location="https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg",
-        location= ""
+def wf() -> FlyteFile:
+    return normalize_columns(
+        csv_url="https://people.sc.fsu.edu/~jburkardt/data/csv/biostats.csv",
+        column_names=["Name", "Sex", "Age", "Heights (in)", "Weight (lbs)"],
+        columns_to_normalize=["Age"],
+        output_location="",
     )
 
 
