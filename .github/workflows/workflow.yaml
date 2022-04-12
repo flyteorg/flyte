@@ -8,11 +8,10 @@ env:
   YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
-  WORKING_LOCATION: brucearctor/flyte/.github/workflows/setup_nightly_and_release.yml@opta-aws
 
 jobs:
-  setup-nightly-and-release-workflows:
-    uses: ${{ WORKING_LOCATION }}
+  run-testing-workflows:
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
