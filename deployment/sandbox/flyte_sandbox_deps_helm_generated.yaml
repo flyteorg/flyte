@@ -1,4 +1,13 @@
 ---
+# Source: flyte-deps/templates/common/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flytesnacks-development
+  labels:
+    helm.sh/chart: flyte-deps-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-deps/charts/contour/templates/contour/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -3239,7 +3248,7 @@ metadata:
     helm.sh/chart: flyte-deps-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - name: postgres
     port: 5432
@@ -3271,6 +3280,18 @@ spec:
   selector: 
     app.kubernetes.io/name: redoc
     app.kubernetes.io/instance: flyte
+---
+# Source: flyte-deps/templates/webhook/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: ExternalName
+  externalName: host.docker.internal
 ---
 # Source: flyte-deps/charts/contour/templates/envoy/daemonset.yaml
 apiVersion: apps/v1
@@ -3795,56 +3816,6 @@ spec:
       volumes:
         - name: postgres-storage
           emptyDir: {}
----
-# Source: flyte-deps/templates/redoc/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: redoc
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: redoc
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-deps-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app.kubernetes.io/name: redoc
-      app.kubernetes.io/instance: flyte
-  template:
-    metadata:
-      labels: 
-        app.kubernetes.io/name: redoc
-        app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-deps-v0.1.10
-        app.kubernetes.io/managed-by: Helm
-    spec:
-      containers:
-      - image: "docker.io/redocly/redoc:latest"
-        imagePullPolicy: "IfNotPresent"
-        name: redoc
-        command:
-          - sh
-          - -c
-          - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
-        env:
-          - name: PAGE_TITLE
-            value: Flyte Admin OpenAPI
-          - name: SPEC_URL
-            value: /api/v1/openapi
-          - name: PORT
-            value: "8087"
-        ports:
-          - containerPort: 8087
-        resources: 
-          limits:
-            cpu: 200m
-            memory: 512Mi
-          requests:
-            cpu: 10m
-            memory: 128Mi
 ---
 # Source: flyte-deps/charts/kubernetes-dashboard/templates/ingress.yaml
 # Copyright 2017 The Kubernetes Authors.
