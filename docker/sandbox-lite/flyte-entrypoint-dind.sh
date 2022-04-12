@@ -40,7 +40,21 @@ echo "Done."
 # Deploy flyte
 echo "Deploying Flyte..."
 charts="/flyteorg/share/flyte-deps"
-helm dep update $charts
+version=""
+charts="/flyteorg/share/flyte"
+
+if [[ $FLYTE_TEST = "release" ]]
+then
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm fetch flyteorg/flyte --version=$FLYTE_VERSION
+  version="--version $FLYTE_VERSION"
+  charts="flyteorg/flyte"
+fi
+
+if [[ $FLYTE_TEST = "local" ]]
+then
+  helm dep update $charts
+fi
 helm install -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml
 k3s kubectl create namespace flytesnacks-development
 
