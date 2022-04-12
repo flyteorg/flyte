@@ -12,7 +12,7 @@ env:
 
 jobs:
   setup-nightly-and-release-workflows:
-    uses: "${{ WORKING_LOCATION }}"
+    uses: "${{ env.WORKING_LOCATION }}"
   cat-stuff:
     uses: ubuntu-latest
     - name: cat file
