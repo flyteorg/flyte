@@ -68,6 +68,11 @@ func TestCreateExecutionModel(t *testing.T) {
 	}
 
 	cluster := "cluster"
+	securityCtx := &core.SecurityContext{
+		RunAs: &core.Identity{
+			IamRole: "iam_role",
+		},
+	}
 	execution, err := CreateExecutionModel(CreateExecutionModelInput{
 		WorkflowExecutionID: core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -83,6 +88,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		ParentNodeExecutionID: nodeID,
 		SourceExecutionID:     sourceID,
 		Cluster:               cluster,
+		SecurityContext:       securityCtx,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "project", execution.Project)
@@ -100,6 +106,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 		ExecutionCluster: cluster,
 	}
+	expectedSpec.SecurityContext = securityCtx
 	expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 	assert.Equal(t, expectedSpecBytes, execution.Spec)
 	assert.Equal(t, execution.User, principal)

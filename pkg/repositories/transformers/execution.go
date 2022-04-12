@@ -39,6 +39,7 @@ type CreateExecutionModelInput struct {
 	Cluster               string
 	InputsURI             storage.DataReference
 	UserInputsURI         storage.DataReference
+	SecurityContext       *core.SecurityContext
 }
 
 // CreateExecutionModel transforms a ExecutionCreateRequest to a Execution model
@@ -50,6 +51,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	requestSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 		ExecutionCluster: input.Cluster,
 	}
+	requestSpec.SecurityContext = input.SecurityContext
 	spec, err := proto.Marshal(requestSpec)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
