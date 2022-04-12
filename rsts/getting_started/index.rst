@@ -50,7 +50,7 @@ Copy the following code to a file named ``example.py``
         return compute_stats(df=generate_normal_df(n=n, mean=mean, sigma=sigma))
 
 
-Run It
+Running Flyte Workflows
 ^^^^^^^
 You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster.
 
