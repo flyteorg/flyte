@@ -1,13 +1,4 @@
 ---
-# Source: flyte-deps/templates/common/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: flytesnacks-development
-  labels:
-    helm.sh/chart: flyte-deps-v0.1.10
-    app.kubernetes.io/managed-by: Helm
----
 # Source: flyte-deps/charts/kubernetes-dashboard/templates/serviceaccount.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
