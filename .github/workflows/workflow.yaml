@@ -5,9 +5,9 @@ on:
 
 env:
   ENV_NAME: development
-  COMPANY: bamboozoology
+  YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: "854086493178"
+  AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
 
 jobs:
   testing-workflows:
@@ -26,14 +26,18 @@ jobs:
         /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
     - name: Checkout repo
       uses: actions/checkout@v3
+    - name: set variables
+      shell: bash
+      run: |
+        sed -i 's/<env_name>/$ENV_NAME/g' ./opta/aws/env.yaml; sed -i 's/<your_company>/$YOUR_COMPANY/g' ./opta/aws/env.yaml; sed -i 's/<region>/$REGION/g' ./opta/aws/env.yaml; sed -i 's/<account_id>/$AWS_ACCOUNT_ID/g' ./opta/aws/env.yaml; 
     - name: APPLY Opta
       shell: bash
       run: |
-        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
     - name: DESTROY Opta
       shell: bash
       run: |
-        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
+        /home/runner/.opta/opta destroy -c ./opta/aws/env.yaml --auto-approve 
 
 
 
