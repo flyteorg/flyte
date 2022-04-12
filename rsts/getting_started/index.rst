@@ -26,7 +26,7 @@ Let's create a simple Flyte workflow involving two steps:
 2. Compute the mean and standard deviation the ``numbers`` data.
 
 Create It
-""""""""""
+"""""""""
 
 Copy the following code to a file named ``example.py``
 
@@ -41,13 +41,13 @@ Copy the following code to a file named ``example.py``
 
     @task
     def generate_normal_df(n:int, mean: float, sigma: float) -> pd.DataFrame:
-        return pd.DataFrame(dict(
-          numbers=np.random.normal(mean, sigma,size=n),
-        ))
+        return pd.DataFrame({
+            "numbers": np.random.normal(mean, sigma,size=n),
+        })
 
     @task
     def compute_stats(df: pd.DataFrame) -> typing.Tuple[float, float]:
-        return df["numbers"].mean(), df["numbers"].std()
+        return float(df["numbers"].mean()), float(df["numbers"].std())
 
     @workflow
     def wf(n: int = 200, mean: float = 0.0, sigma: float = 1.0) -> typing.Tuple[float, float]:
@@ -55,7 +55,7 @@ Copy the following code to a file named ``example.py``
 
 
 Running Flyte Workflows
-^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 You can either execute the code in python environment or on a remote cluster. We will show how to run on a demo local cluster.
 
 Locally
