@@ -108,6 +108,17 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
     4. Add Login redirect URIs (e.g, http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``).
 
+.. tabbed:: Microsoft Azure AD
+
+    Follow `Azure AD Docs <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings>`__ on how to configure the IdP for OpenIDConnect.
+
+    Make note of the Client ID and Client Secret, and add ``https://<your deployment url>/callback`` as redirect URI.
+
+    .. note::
+
+      Make sure the app is registered without `additional claims <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings#configure-additional-claims>`__.
+      The OpenIDConnect authentication will not work otherwise, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
+
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
