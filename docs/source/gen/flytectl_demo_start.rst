@@ -1,18 +1,85 @@
-.. _flytectl:
+.. _flytectl_demo_start:
 
-flytectl
---------
+flytectl demo start
+-------------------
 
-Flytectl CLI tool
+Starts the Flyte demo cluster.
 
 Synopsis
 ~~~~~~~~
 
 
-Flytectl is a CLI tool written in Go to interact with the FlyteAdmin service.
+
+Flyte demo is a fully standalone minimal environment for running Flyte.
+It provides a simplified way of running Flyte demo as a single Docker container locally.
+
+Starts the demo cluster without any source code:
+::
+
+ flytectl demo start
+	
+Mounts your source code repository inside the demo cluster:
+::
+
+ flytectl demo start --source=$HOME/flyteorg/flytesnacks 
+
+Specify a Flyte demo compliant image with the registry. This is useful in case you want to use an image from your registry.
+::
+
+  flytectl demo start --image docker.io/my-override:latest
+
+Note: If image flag is passed then Flytectl will ignore version and pre flags.
+	
+Specify a Flyte demo image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
+::
+
+ flytectl demo start  --image docker.io/my-override:latest --imagePullPolicy Always
+
+Start demo cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
+eg : for passing timeout value in secs for the demo container use the following.
+::
+
+ flytectl demo start --env FLYTE_TIMEOUT=700
+
+
+The DURATION can be a positive integer or a floating-point number, followed by an optional unit suffix::
+s - seconds (default)
+m - minutes
+h - hours
+d - days
+When no unit is used, it defaults to seconds. If the duration is set to zero, the associated timeout is disabled.
+
+
+eg : for passing multiple environment variables
+::
+
+ flytectl demo start --env USER=foo --env PASSWORD=bar
+
+
+Usage
+
+
+::
+
+  flytectl demo start [flags]
 
 Options
 ~~~~~~~
+
+::
+
+      --env strings                            Optional. Provide Env variable in key=value format which can be passed to sandbox container.
+  -h, --help                                   help for start
+      --image string                           Optional. Provide a fully qualified path to a Flyte compliant docker image.
+      --imagePullOptions.platform string       Forces a specific platform's image to be pulled.'
+      --imagePullOptions.registryAuth string   The base64 encoded credentials for the registry.
+      --imagePullPolicy ImagePullPolicy        Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --pre                                    Optional. Pre release Version of flyte will be used for sandbox.
+      --source string                          Path of your source code
+      --version string                         Version of flyte. Only supports flyte releases greater than v0.10.0
+
+Options inherited from parent commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -48,7 +115,6 @@ Options
       --files.outputLocationPrefix string          Custom output location prefix for offloaded types (files/schemas).
       --files.sourceUploadPath string              Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                       Version of the entity to be registered with flyte which are un-versioned after serialization.
-  -h, --help                                       help for flytectl
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -74,15 +140,5 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_completion` 	 - Generates completion script.
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
-* :doc:`flytectl_create` 	 - Creates various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 * :doc:`flytectl_demo` 	 - Helps with demo interactions like start, teardown, status, and exec.
-* :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_register` 	 - Registers tasks, workflows, and launch plans from a list of generated serialized files.
-* :doc:`flytectl_sandbox` 	 - Helps with sandbox interactions like start, teardown, status, and exec.
-* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
-* :doc:`flytectl_upgrade` 	 - Upgrades/rollbacks to a Flyte version.
-* :doc:`flytectl_version` 	 - Fetches Flyte version
 
