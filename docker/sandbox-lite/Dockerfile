@@ -79,6 +79,9 @@ COPY --from=base /flyteorg/ /flyteorg/
 # Copy entrypoints
 COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
+# Copy cluster resource templates
+COPY docker/sandbox-lite/templates/ /etc/flyte/clusterresource/templates/
+
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
