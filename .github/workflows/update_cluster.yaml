@@ -1,4 +1,7 @@
-name: Update Cluster
+
+
+# TERRAFORM VERSION
+# OTHER VERSIONS as VARS?
 
 on:
   workflow_call:
@@ -24,17 +27,12 @@ on:
         required: true
         type: string
 
-    secrets:
-      SLACK_WEBHOOK_URL:
-        required: true
-      DATADOG_API_KEY:
-        required: true
 jobs:
   update-cluster:
     name: Update cluster to specified versions
     runs-on: flyteorg-infra
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
       - uses: azure/setup-helm@v1
@@ -54,8 +52,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16.8.0"
-      - id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
       - name: Apply opta changes
         env:
           LC_ALL: en_US.UTF-8
@@ -69,7 +65,6 @@ jobs:
           FLYTEPROPELLER_TAG: "${{ inputs.console_version }}"
           OPTA_ENVIRONMENT: "${{ inputs.opta_environment }}"
         run: |
-          ./scripts/ci_helper.sh setup_opta
           ./scripts/ci_helper.sh prepare_flyte_release_build
           ./scripts/ci_helper.sh prepare_helm_chart
           ./scripts/ci_helper.sh opta_action apply dev/opta

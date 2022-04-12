@@ -3,6 +3,8 @@
 #  YOUR_COMPANY: bamboozoology
 #  AWS_REGION: us-east-1
 #  AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
+on:
+  workflow_call:
 
 jobs:
   needed-prep:
