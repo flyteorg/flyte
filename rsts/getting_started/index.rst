@@ -56,7 +56,7 @@ Copy the following code to a file named ``example.py``
 
 Running Flyte Workflows
 ^^^^^^^^^^^^^^^^^^^^^^^
-You can run the workflows in `example.py` on a local python environment or a Flyte cluster. In this guide, you'll learn how to run a demo local cluster.
+You can run the workflows in ``example.py`` on a local python environment or a Flyte cluster. In this guide, you'll learn how to run a demo local cluster.
 
 Executing Locally
 """""""""""""""""""
@@ -116,7 +116,7 @@ Recap
 
 🎉  Congratulations 🎉  To summarize, you have just:
 
-1. Created a Flyte script called `example.py`, which creates some data and computes descriptive statistics over it.
+1. Created a Flyte script called ``example.py``, which creates some data and computes descriptive statistics over it.
 2. Run a workflow (i) locally and (ii) on a demo Flyte cluster.
 
 What's Next?
