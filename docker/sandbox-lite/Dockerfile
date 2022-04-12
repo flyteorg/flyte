@@ -22,7 +22,7 @@ RUN go mod download
 RUN go build -o /flyte cmd/main.go
 
 
-FROM alpine:3.13.5 AS base
+FROM alpine:3.15 AS base
 
 # Install dependencies
 RUN apk add --no-cache openssl
