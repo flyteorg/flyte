@@ -92,7 +92,7 @@ Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte. 
 
   flytectl demo start
 
-* Now run the same workflow on the Flyte backend
+Then run the same workflow on the Flyte cluster:
 
 .. prompt:: bash $
 
