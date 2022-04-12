@@ -34,13 +34,13 @@ func (_m AuthenticationContext_AuthMetadataService) Return(_a0 service.AuthMetad
 }
 
 func (_m *AuthenticationContext) OnAuthMetadataService() *AuthenticationContext_AuthMetadataService {
-	c := _m.On("AuthMetadataService")
-	return &AuthenticationContext_AuthMetadataService{Call: c}
+	c_call := _m.On("AuthMetadataService")
+	return &AuthenticationContext_AuthMetadataService{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnAuthMetadataServiceMatch(matchers ...interface{}) *AuthenticationContext_AuthMetadataService {
-	c := _m.On("AuthMetadataService", matchers...)
-	return &AuthenticationContext_AuthMetadataService{Call: c}
+	c_call := _m.On("AuthMetadataService", matchers...)
+	return &AuthenticationContext_AuthMetadataService{Call: c_call}
 }
 
 // AuthMetadataService provides a mock function with given fields:
@@ -68,13 +68,13 @@ func (_m AuthenticationContext_CookieManager) Return(_a0 interfaces.CookieHandle
 }
 
 func (_m *AuthenticationContext) OnCookieManager() *AuthenticationContext_CookieManager {
-	c := _m.On("CookieManager")
-	return &AuthenticationContext_CookieManager{Call: c}
+	c_call := _m.On("CookieManager")
+	return &AuthenticationContext_CookieManager{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnCookieManagerMatch(matchers ...interface{}) *AuthenticationContext_CookieManager {
-	c := _m.On("CookieManager", matchers...)
-	return &AuthenticationContext_CookieManager{Call: c}
+	c_call := _m.On("CookieManager", matchers...)
+	return &AuthenticationContext_CookieManager{Call: c_call}
 }
 
 // CookieManager provides a mock function with given fields:
@@ -102,13 +102,13 @@ func (_m AuthenticationContext_GetHTTPClient) Return(_a0 *http.Client) *Authenti
 }
 
 func (_m *AuthenticationContext) OnGetHTTPClient() *AuthenticationContext_GetHTTPClient {
-	c := _m.On("GetHTTPClient")
-	return &AuthenticationContext_GetHTTPClient{Call: c}
+	c_call := _m.On("GetHTTPClient")
+	return &AuthenticationContext_GetHTTPClient{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnGetHTTPClientMatch(matchers ...interface{}) *AuthenticationContext_GetHTTPClient {
-	c := _m.On("GetHTTPClient", matchers...)
-	return &AuthenticationContext_GetHTTPClient{Call: c}
+	c_call := _m.On("GetHTTPClient", matchers...)
+	return &AuthenticationContext_GetHTTPClient{Call: c_call}
 }
 
 // GetHTTPClient provides a mock function with given fields:
@@ -136,13 +136,13 @@ func (_m AuthenticationContext_GetOAuth2MetadataURL) Return(_a0 *url.URL) *Authe
 }
 
 func (_m *AuthenticationContext) OnGetOAuth2MetadataURL() *AuthenticationContext_GetOAuth2MetadataURL {
-	c := _m.On("GetOAuth2MetadataURL")
-	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c}
+	c_call := _m.On("GetOAuth2MetadataURL")
+	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnGetOAuth2MetadataURLMatch(matchers ...interface{}) *AuthenticationContext_GetOAuth2MetadataURL {
-	c := _m.On("GetOAuth2MetadataURL", matchers...)
-	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c}
+	c_call := _m.On("GetOAuth2MetadataURL", matchers...)
+	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c_call}
 }
 
 // GetOAuth2MetadataURL provides a mock function with given fields:
@@ -170,13 +170,13 @@ func (_m AuthenticationContext_GetOIdCMetadataURL) Return(_a0 *url.URL) *Authent
 }
 
 func (_m *AuthenticationContext) OnGetOIdCMetadataURL() *AuthenticationContext_GetOIdCMetadataURL {
-	c := _m.On("GetOIdCMetadataURL")
-	return &AuthenticationContext_GetOIdCMetadataURL{Call: c}
+	c_call := _m.On("GetOIdCMetadataURL")
+	return &AuthenticationContext_GetOIdCMetadataURL{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnGetOIdCMetadataURLMatch(matchers ...interface{}) *AuthenticationContext_GetOIdCMetadataURL {
-	c := _m.On("GetOIdCMetadataURL", matchers...)
-	return &AuthenticationContext_GetOIdCMetadataURL{Call: c}
+	c_call := _m.On("GetOIdCMetadataURL", matchers...)
+	return &AuthenticationContext_GetOIdCMetadataURL{Call: c_call}
 }
 
 // GetOIdCMetadataURL provides a mock function with given fields:
@@ -204,13 +204,13 @@ func (_m AuthenticationContext_IdentityService) Return(_a0 service.IdentityServi
 }
 
 func (_m *AuthenticationContext) OnIdentityService() *AuthenticationContext_IdentityService {
-	c := _m.On("IdentityService")
-	return &AuthenticationContext_IdentityService{Call: c}
+	c_call := _m.On("IdentityService")
+	return &AuthenticationContext_IdentityService{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnIdentityServiceMatch(matchers ...interface{}) *AuthenticationContext_IdentityService {
-	c := _m.On("IdentityService", matchers...)
-	return &AuthenticationContext_IdentityService{Call: c}
+	c_call := _m.On("IdentityService", matchers...)
+	return &AuthenticationContext_IdentityService{Call: c_call}
 }
 
 // IdentityService provides a mock function with given fields:
@@ -238,13 +238,13 @@ func (_m AuthenticationContext_OAuth2ClientConfig) Return(_a0 *oauth2.Config) *A
 }
 
 func (_m *AuthenticationContext) OnOAuth2ClientConfig(requestURL *url.URL) *AuthenticationContext_OAuth2ClientConfig {
-	c := _m.On("OAuth2ClientConfig", requestURL)
-	return &AuthenticationContext_OAuth2ClientConfig{Call: c}
+	c_call := _m.On("OAuth2ClientConfig", requestURL)
+	return &AuthenticationContext_OAuth2ClientConfig{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnOAuth2ClientConfigMatch(matchers ...interface{}) *AuthenticationContext_OAuth2ClientConfig {
-	c := _m.On("OAuth2ClientConfig", matchers...)
-	return &AuthenticationContext_OAuth2ClientConfig{Call: c}
+	c_call := _m.On("OAuth2ClientConfig", matchers...)
+	return &AuthenticationContext_OAuth2ClientConfig{Call: c_call}
 }
 
 // OAuth2ClientConfig provides a mock function with given fields: requestURL
@@ -272,13 +272,13 @@ func (_m AuthenticationContext_OAuth2Provider) Return(_a0 interfaces.OAuth2Provi
 }
 
 func (_m *AuthenticationContext) OnOAuth2Provider() *AuthenticationContext_OAuth2Provider {
-	c := _m.On("OAuth2Provider")
-	return &AuthenticationContext_OAuth2Provider{Call: c}
+	c_call := _m.On("OAuth2Provider")
+	return &AuthenticationContext_OAuth2Provider{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnOAuth2ProviderMatch(matchers ...interface{}) *AuthenticationContext_OAuth2Provider {
-	c := _m.On("OAuth2Provider", matchers...)
-	return &AuthenticationContext_OAuth2Provider{Call: c}
+	c_call := _m.On("OAuth2Provider", matchers...)
+	return &AuthenticationContext_OAuth2Provider{Call: c_call}
 }
 
 // OAuth2Provider provides a mock function with given fields:
@@ -306,13 +306,13 @@ func (_m AuthenticationContext_OAuth2ResourceServer) Return(_a0 interfaces.OAuth
 }
 
 func (_m *AuthenticationContext) OnOAuth2ResourceServer() *AuthenticationContext_OAuth2ResourceServer {
-	c := _m.On("OAuth2ResourceServer")
-	return &AuthenticationContext_OAuth2ResourceServer{Call: c}
+	c_call := _m.On("OAuth2ResourceServer")
+	return &AuthenticationContext_OAuth2ResourceServer{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnOAuth2ResourceServerMatch(matchers ...interface{}) *AuthenticationContext_OAuth2ResourceServer {
-	c := _m.On("OAuth2ResourceServer", matchers...)
-	return &AuthenticationContext_OAuth2ResourceServer{Call: c}
+	c_call := _m.On("OAuth2ResourceServer", matchers...)
+	return &AuthenticationContext_OAuth2ResourceServer{Call: c_call}
 }
 
 // OAuth2ResourceServer provides a mock function with given fields:
@@ -340,13 +340,13 @@ func (_m AuthenticationContext_OidcProvider) Return(_a0 *oidc.Provider) *Authent
 }
 
 func (_m *AuthenticationContext) OnOidcProvider() *AuthenticationContext_OidcProvider {
-	c := _m.On("OidcProvider")
-	return &AuthenticationContext_OidcProvider{Call: c}
+	c_call := _m.On("OidcProvider")
+	return &AuthenticationContext_OidcProvider{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnOidcProviderMatch(matchers ...interface{}) *AuthenticationContext_OidcProvider {
-	c := _m.On("OidcProvider", matchers...)
-	return &AuthenticationContext_OidcProvider{Call: c}
+	c_call := _m.On("OidcProvider", matchers...)
+	return &AuthenticationContext_OidcProvider{Call: c_call}
 }
 
 // OidcProvider provides a mock function with given fields:
@@ -374,13 +374,13 @@ func (_m AuthenticationContext_Options) Return(_a0 *config.Config) *Authenticati
 }
 
 func (_m *AuthenticationContext) OnOptions() *AuthenticationContext_Options {
-	c := _m.On("Options")
-	return &AuthenticationContext_Options{Call: c}
+	c_call := _m.On("Options")
+	return &AuthenticationContext_Options{Call: c_call}
 }
 
 func (_m *AuthenticationContext) OnOptionsMatch(matchers ...interface{}) *AuthenticationContext_Options {
-	c := _m.On("Options", matchers...)
-	return &AuthenticationContext_Options{Call: c}
+	c_call := _m.On("Options", matchers...)
+	return &AuthenticationContext_Options{Call: c_call}
 }
 
 // Options provides a mock function with given fields:

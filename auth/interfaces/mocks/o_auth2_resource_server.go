@@ -23,13 +23,13 @@ func (_m OAuth2ResourceServer_ValidateAccessToken) Return(_a0 interfaces.Identit
 }
 
 func (_m *OAuth2ResourceServer) OnValidateAccessToken(ctx context.Context, expectedAudience string, tokenStr string) *OAuth2ResourceServer_ValidateAccessToken {
-	c := _m.On("ValidateAccessToken", ctx, expectedAudience, tokenStr)
-	return &OAuth2ResourceServer_ValidateAccessToken{Call: c}
+	c_call := _m.On("ValidateAccessToken", ctx, expectedAudience, tokenStr)
+	return &OAuth2ResourceServer_ValidateAccessToken{Call: c_call}
 }
 
 func (_m *OAuth2ResourceServer) OnValidateAccessTokenMatch(matchers ...interface{}) *OAuth2ResourceServer_ValidateAccessToken {
-	c := _m.On("ValidateAccessToken", matchers...)
-	return &OAuth2ResourceServer_ValidateAccessToken{Call: c}
+	c_call := _m.On("ValidateAccessToken", matchers...)
+	return &OAuth2ResourceServer_ValidateAccessToken{Call: c_call}
 }
 
 // ValidateAccessToken provides a mock function with given fields: ctx, expectedAudience, tokenStr

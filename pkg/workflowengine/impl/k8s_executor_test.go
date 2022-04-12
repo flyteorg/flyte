@@ -5,23 +5,23 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/workflowengine/mocks"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
-	"github.com/stretchr/testify/assert"
-	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 	execClusterIfaces "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	clusterMock "github.com/flyteorg/flyteadmin/pkg/executioncluster/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/workflowengine/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
 	v1alpha12 "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/mock"
+	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 var fakeFlyteWF = FakeFlyteWorkflowV1alpha1{}
@@ -165,6 +165,14 @@ func TestExecute(t *testing.T) {
 		WorkflowClosure:         &workflowClosure,
 		ExecutionParameters: interfaces.ExecutionParameters{
 			Inputs: testInputs,
+			ExecutionConfig: &admin.WorkflowExecutionConfig{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           testRoleSc,
+						K8SServiceAccount: testK8sServiceAccountSc,
+					},
+				},
+			},
 		},
 	})
 	assert.NoError(t, err)
@@ -192,6 +200,16 @@ func TestExecute_AlreadyExists(t *testing.T) {
 		ExecutionID:             execID,
 		ReferenceWorkflowName:   "ref_workflow_name",
 		ReferenceLaunchPlanName: "ref_lp_name",
+		ExecutionParameters: interfaces.ExecutionParameters{
+			ExecutionConfig: &admin.WorkflowExecutionConfig{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           testRoleSc,
+						K8SServiceAccount: testK8sServiceAccountSc,
+					},
+				},
+			},
+		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, resp.Cluster, clusterID)
@@ -218,6 +236,16 @@ func TestExecute_MiscError(t *testing.T) {
 		ExecutionID:             execID,
 		ReferenceWorkflowName:   "ref_workflow_name",
 		ReferenceLaunchPlanName: "ref_lp_name",
+		ExecutionParameters: interfaces.ExecutionParameters{
+			ExecutionConfig: &admin.WorkflowExecutionConfig{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           testRoleSc,
+						K8SServiceAccount: testK8sServiceAccountSc,
+					},
+				},
+			},
+		},
 	})
 	assert.EqualError(t, err, "failed to create workflow in propeller call failed")
 }

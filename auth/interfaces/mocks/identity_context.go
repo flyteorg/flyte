@@ -28,13 +28,13 @@ func (_m IdentityContext_AppID) Return(_a0 string) *IdentityContext_AppID {
 }
 
 func (_m *IdentityContext) OnAppID() *IdentityContext_AppID {
-	c := _m.On("AppID")
-	return &IdentityContext_AppID{Call: c}
+	c_call := _m.On("AppID")
+	return &IdentityContext_AppID{Call: c_call}
 }
 
 func (_m *IdentityContext) OnAppIDMatch(matchers ...interface{}) *IdentityContext_AppID {
-	c := _m.On("AppID", matchers...)
-	return &IdentityContext_AppID{Call: c}
+	c_call := _m.On("AppID", matchers...)
+	return &IdentityContext_AppID{Call: c_call}
 }
 
 // AppID provides a mock function with given fields:
@@ -60,13 +60,13 @@ func (_m IdentityContext_Audience) Return(_a0 string) *IdentityContext_Audience 
 }
 
 func (_m *IdentityContext) OnAudience() *IdentityContext_Audience {
-	c := _m.On("Audience")
-	return &IdentityContext_Audience{Call: c}
+	c_call := _m.On("Audience")
+	return &IdentityContext_Audience{Call: c_call}
 }
 
 func (_m *IdentityContext) OnAudienceMatch(matchers ...interface{}) *IdentityContext_Audience {
-	c := _m.On("Audience", matchers...)
-	return &IdentityContext_Audience{Call: c}
+	c_call := _m.On("Audience", matchers...)
+	return &IdentityContext_Audience{Call: c_call}
 }
 
 // Audience provides a mock function with given fields:
@@ -92,13 +92,13 @@ func (_m IdentityContext_AuthenticatedAt) Return(_a0 time.Time) *IdentityContext
 }
 
 func (_m *IdentityContext) OnAuthenticatedAt() *IdentityContext_AuthenticatedAt {
-	c := _m.On("AuthenticatedAt")
-	return &IdentityContext_AuthenticatedAt{Call: c}
+	c_call := _m.On("AuthenticatedAt")
+	return &IdentityContext_AuthenticatedAt{Call: c_call}
 }
 
 func (_m *IdentityContext) OnAuthenticatedAtMatch(matchers ...interface{}) *IdentityContext_AuthenticatedAt {
-	c := _m.On("AuthenticatedAt", matchers...)
-	return &IdentityContext_AuthenticatedAt{Call: c}
+	c_call := _m.On("AuthenticatedAt", matchers...)
+	return &IdentityContext_AuthenticatedAt{Call: c_call}
 }
 
 // AuthenticatedAt provides a mock function with given fields:
@@ -124,13 +124,13 @@ func (_m IdentityContext_IsEmpty) Return(_a0 bool) *IdentityContext_IsEmpty {
 }
 
 func (_m *IdentityContext) OnIsEmpty() *IdentityContext_IsEmpty {
-	c := _m.On("IsEmpty")
-	return &IdentityContext_IsEmpty{Call: c}
+	c_call := _m.On("IsEmpty")
+	return &IdentityContext_IsEmpty{Call: c_call}
 }
 
 func (_m *IdentityContext) OnIsEmptyMatch(matchers ...interface{}) *IdentityContext_IsEmpty {
-	c := _m.On("IsEmpty", matchers...)
-	return &IdentityContext_IsEmpty{Call: c}
+	c_call := _m.On("IsEmpty", matchers...)
+	return &IdentityContext_IsEmpty{Call: c_call}
 }
 
 // IsEmpty provides a mock function with given fields:
@@ -156,13 +156,13 @@ func (_m IdentityContext_Scopes) Return(_a0 sets.String) *IdentityContext_Scopes
 }
 
 func (_m *IdentityContext) OnScopes() *IdentityContext_Scopes {
-	c := _m.On("Scopes")
-	return &IdentityContext_Scopes{Call: c}
+	c_call := _m.On("Scopes")
+	return &IdentityContext_Scopes{Call: c_call}
 }
 
 func (_m *IdentityContext) OnScopesMatch(matchers ...interface{}) *IdentityContext_Scopes {
-	c := _m.On("Scopes", matchers...)
-	return &IdentityContext_Scopes{Call: c}
+	c_call := _m.On("Scopes", matchers...)
+	return &IdentityContext_Scopes{Call: c_call}
 }
 
 // Scopes provides a mock function with given fields:
@@ -190,13 +190,13 @@ func (_m IdentityContext_UserID) Return(_a0 string) *IdentityContext_UserID {
 }
 
 func (_m *IdentityContext) OnUserID() *IdentityContext_UserID {
-	c := _m.On("UserID")
-	return &IdentityContext_UserID{Call: c}
+	c_call := _m.On("UserID")
+	return &IdentityContext_UserID{Call: c_call}
 }
 
 func (_m *IdentityContext) OnUserIDMatch(matchers ...interface{}) *IdentityContext_UserID {
-	c := _m.On("UserID", matchers...)
-	return &IdentityContext_UserID{Call: c}
+	c_call := _m.On("UserID", matchers...)
+	return &IdentityContext_UserID{Call: c_call}
 }
 
 // UserID provides a mock function with given fields:
@@ -222,13 +222,13 @@ func (_m IdentityContext_UserInfo) Return(_a0 *service.UserInfoResponse) *Identi
 }
 
 func (_m *IdentityContext) OnUserInfo() *IdentityContext_UserInfo {
-	c := _m.On("UserInfo")
-	return &IdentityContext_UserInfo{Call: c}
+	c_call := _m.On("UserInfo")
+	return &IdentityContext_UserInfo{Call: c_call}
 }
 
 func (_m *IdentityContext) OnUserInfoMatch(matchers ...interface{}) *IdentityContext_UserInfo {
-	c := _m.On("UserInfo", matchers...)
-	return &IdentityContext_UserInfo{Call: c}
+	c_call := _m.On("UserInfo", matchers...)
+	return &IdentityContext_UserInfo{Call: c_call}
 }
 
 // UserInfo provides a mock function with given fields:
@@ -256,13 +256,13 @@ func (_m IdentityContext_WithContext) Return(_a0 context.Context) *IdentityConte
 }
 
 func (_m *IdentityContext) OnWithContext(ctx context.Context) *IdentityContext_WithContext {
-	c := _m.On("WithContext", ctx)
-	return &IdentityContext_WithContext{Call: c}
+	c_call := _m.On("WithContext", ctx)
+	return &IdentityContext_WithContext{Call: c_call}
 }
 
 func (_m *IdentityContext) OnWithContextMatch(matchers ...interface{}) *IdentityContext_WithContext {
-	c := _m.On("WithContext", matchers...)
-	return &IdentityContext_WithContext{Call: c}
+	c_call := _m.On("WithContext", matchers...)
+	return &IdentityContext_WithContext{Call: c_call}
 }
 
 // WithContext provides a mock function with given fields: ctx

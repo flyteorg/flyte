@@ -24,13 +24,13 @@ func (_m FlyteAdminDataProvider_GetClusterResourceAttributes) Return(_a0 *admin.
 }
 
 func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributes(ctx context.Context, project string, domain string) *FlyteAdminDataProvider_GetClusterResourceAttributes {
-	c := _m.On("GetClusterResourceAttributes", ctx, project, domain)
-	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c}
+	c_call := _m.On("GetClusterResourceAttributes", ctx, project, domain)
+	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c_call}
 }
 
 func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributesMatch(matchers ...interface{}) *FlyteAdminDataProvider_GetClusterResourceAttributes {
-	c := _m.On("GetClusterResourceAttributes", matchers...)
-	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c}
+	c_call := _m.On("GetClusterResourceAttributes", matchers...)
+	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c_call}
 }
 
 // GetClusterResourceAttributes provides a mock function with given fields: ctx, project, domain
@@ -65,13 +65,13 @@ func (_m FlyteAdminDataProvider_GetProjects) Return(_a0 *admin.Projects, _a1 err
 }
 
 func (_m *FlyteAdminDataProvider) OnGetProjects(ctx context.Context) *FlyteAdminDataProvider_GetProjects {
-	c := _m.On("GetProjects", ctx)
-	return &FlyteAdminDataProvider_GetProjects{Call: c}
+	c_call := _m.On("GetProjects", ctx)
+	return &FlyteAdminDataProvider_GetProjects{Call: c_call}
 }
 
 func (_m *FlyteAdminDataProvider) OnGetProjectsMatch(matchers ...interface{}) *FlyteAdminDataProvider_GetProjects {
-	c := _m.On("GetProjects", matchers...)
-	return &FlyteAdminDataProvider_GetProjects{Call: c}
+	c_call := _m.On("GetProjects", matchers...)
+	return &FlyteAdminDataProvider_GetProjects{Call: c_call}
 }
 
 // GetProjects provides a mock function with given fields: ctx

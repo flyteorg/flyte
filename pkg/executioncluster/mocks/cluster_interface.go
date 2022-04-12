@@ -24,13 +24,13 @@ func (_m ClusterInterface_GetAllTargets) Return(_a0 map[string]*executioncluster
 }
 
 func (_m *ClusterInterface) OnGetAllTargets() *ClusterInterface_GetAllTargets {
-	c := _m.On("GetAllTargets")
-	return &ClusterInterface_GetAllTargets{Call: c}
+	c_call := _m.On("GetAllTargets")
+	return &ClusterInterface_GetAllTargets{Call: c_call}
 }
 
 func (_m *ClusterInterface) OnGetAllTargetsMatch(matchers ...interface{}) *ClusterInterface_GetAllTargets {
-	c := _m.On("GetAllTargets", matchers...)
-	return &ClusterInterface_GetAllTargets{Call: c}
+	c_call := _m.On("GetAllTargets", matchers...)
+	return &ClusterInterface_GetAllTargets{Call: c_call}
 }
 
 // GetAllTargets provides a mock function with given fields:
@@ -58,13 +58,13 @@ func (_m ClusterInterface_GetTarget) Return(_a0 *executioncluster.ExecutionTarge
 }
 
 func (_m *ClusterInterface) OnGetTarget(_a0 context.Context, _a1 *executioncluster.ExecutionTargetSpec) *ClusterInterface_GetTarget {
-	c := _m.On("GetTarget", _a0, _a1)
-	return &ClusterInterface_GetTarget{Call: c}
+	c_call := _m.On("GetTarget", _a0, _a1)
+	return &ClusterInterface_GetTarget{Call: c_call}
 }
 
 func (_m *ClusterInterface) OnGetTargetMatch(matchers ...interface{}) *ClusterInterface_GetTarget {
-	c := _m.On("GetTarget", matchers...)
-	return &ClusterInterface_GetTarget{Call: c}
+	c_call := _m.On("GetTarget", matchers...)
+	return &ClusterInterface_GetTarget{Call: c_call}
 }
 
 // GetTarget provides a mock function with given fields: _a0, _a1
@@ -99,13 +99,13 @@ func (_m ClusterInterface_GetValidTargets) Return(_a0 map[string]*executionclust
 }
 
 func (_m *ClusterInterface) OnGetValidTargets() *ClusterInterface_GetValidTargets {
-	c := _m.On("GetValidTargets")
-	return &ClusterInterface_GetValidTargets{Call: c}
+	c_call := _m.On("GetValidTargets")
+	return &ClusterInterface_GetValidTargets{Call: c_call}
 }
 
 func (_m *ClusterInterface) OnGetValidTargetsMatch(matchers ...interface{}) *ClusterInterface_GetValidTargets {
-	c := _m.On("GetValidTargets", matchers...)
-	return &ClusterInterface_GetValidTargets{Call: c}
+	c_call := _m.On("GetValidTargets", matchers...)
+	return &ClusterInterface_GetValidTargets{Call: c_call}
 }
 
 // GetValidTargets provides a mock function with given fields:

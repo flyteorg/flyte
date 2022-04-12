@@ -24,13 +24,13 @@ func (_m FlyteWorkflowBuilder_Build) Return(_a0 *v1alpha1.FlyteWorkflow, _a1 err
 }
 
 func (_m *FlyteWorkflowBuilder) OnBuild(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap, executionID *core.WorkflowExecutionIdentifier, namespace string) *FlyteWorkflowBuilder_Build {
-	c := _m.On("Build", wfClosure, inputs, executionID, namespace)
-	return &FlyteWorkflowBuilder_Build{Call: c}
+	c_call := _m.On("Build", wfClosure, inputs, executionID, namespace)
+	return &FlyteWorkflowBuilder_Build{Call: c_call}
 }
 
 func (_m *FlyteWorkflowBuilder) OnBuildMatch(matchers ...interface{}) *FlyteWorkflowBuilder_Build {
-	c := _m.On("Build", matchers...)
-	return &FlyteWorkflowBuilder_Build{Call: c}
+	c_call := _m.On("Build", matchers...)
+	return &FlyteWorkflowBuilder_Build{Call: c_call}
 }
 
 // Build provides a mock function with given fields: wfClosure, inputs, executionID, namespace

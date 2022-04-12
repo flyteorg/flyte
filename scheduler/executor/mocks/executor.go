@@ -26,13 +26,13 @@ func (_m Executor_Execute) Return(_a0 error) *Executor_Execute {
 }
 
 func (_m *Executor) OnExecute(ctx context.Context, scheduledTime time.Time, s models.SchedulableEntity) *Executor_Execute {
-	c := _m.On("Execute", ctx, scheduledTime, s)
-	return &Executor_Execute{Call: c}
+	c_call := _m.On("Execute", ctx, scheduledTime, s)
+	return &Executor_Execute{Call: c_call}
 }
 
 func (_m *Executor) OnExecuteMatch(matchers ...interface{}) *Executor_Execute {
-	c := _m.On("Execute", matchers...)
-	return &Executor_Execute{Call: c}
+	c_call := _m.On("Execute", matchers...)
+	return &Executor_Execute{Call: c_call}
 }
 
 // Execute provides a mock function with given fields: ctx, scheduledTime, s

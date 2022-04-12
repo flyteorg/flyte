@@ -21,13 +21,13 @@ func (_m ClusterConfiguration_GetClusterConfigs) Return(_a0 []interfaces.Cluster
 }
 
 func (_m *ClusterConfiguration) OnGetClusterConfigs() *ClusterConfiguration_GetClusterConfigs {
-	c := _m.On("GetClusterConfigs")
-	return &ClusterConfiguration_GetClusterConfigs{Call: c}
+	c_call := _m.On("GetClusterConfigs")
+	return &ClusterConfiguration_GetClusterConfigs{Call: c_call}
 }
 
 func (_m *ClusterConfiguration) OnGetClusterConfigsMatch(matchers ...interface{}) *ClusterConfiguration_GetClusterConfigs {
-	c := _m.On("GetClusterConfigs", matchers...)
-	return &ClusterConfiguration_GetClusterConfigs{Call: c}
+	c_call := _m.On("GetClusterConfigs", matchers...)
+	return &ClusterConfiguration_GetClusterConfigs{Call: c_call}
 }
 
 // GetClusterConfigs provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ClusterConfiguration_GetLabelClusterMap) Return(_a0 map[string][]interf
 }
 
 func (_m *ClusterConfiguration) OnGetLabelClusterMap() *ClusterConfiguration_GetLabelClusterMap {
-	c := _m.On("GetLabelClusterMap")
-	return &ClusterConfiguration_GetLabelClusterMap{Call: c}
+	c_call := _m.On("GetLabelClusterMap")
+	return &ClusterConfiguration_GetLabelClusterMap{Call: c_call}
 }
 
 func (_m *ClusterConfiguration) OnGetLabelClusterMapMatch(matchers ...interface{}) *ClusterConfiguration_GetLabelClusterMap {
-	c := _m.On("GetLabelClusterMap", matchers...)
-	return &ClusterConfiguration_GetLabelClusterMap{Call: c}
+	c_call := _m.On("GetLabelClusterMap", matchers...)
+	return &ClusterConfiguration_GetLabelClusterMap{Call: c_call}
 }
 
 // GetLabelClusterMap provides a mock function with given fields:

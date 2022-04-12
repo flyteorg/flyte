@@ -24,13 +24,13 @@ func (_m SchedulableEntityRepoInterface_Activate) Return(_a0 error) *Schedulable
 }
 
 func (_m *SchedulableEntityRepoInterface) OnActivate(ctx context.Context, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Activate {
-	c := _m.On("Activate", ctx, input)
-	return &SchedulableEntityRepoInterface_Activate{Call: c}
+	c_call := _m.On("Activate", ctx, input)
+	return &SchedulableEntityRepoInterface_Activate{Call: c_call}
 }
 
 func (_m *SchedulableEntityRepoInterface) OnActivateMatch(matchers ...interface{}) *SchedulableEntityRepoInterface_Activate {
-	c := _m.On("Activate", matchers...)
-	return &SchedulableEntityRepoInterface_Activate{Call: c}
+	c_call := _m.On("Activate", matchers...)
+	return &SchedulableEntityRepoInterface_Activate{Call: c_call}
 }
 
 // Activate provides a mock function with given fields: ctx, input
@@ -56,13 +56,13 @@ func (_m SchedulableEntityRepoInterface_Create) Return(_a0 error) *SchedulableEn
 }
 
 func (_m *SchedulableEntityRepoInterface) OnCreate(ctx context.Context, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Create {
-	c := _m.On("Create", ctx, input)
-	return &SchedulableEntityRepoInterface_Create{Call: c}
+	c_call := _m.On("Create", ctx, input)
+	return &SchedulableEntityRepoInterface_Create{Call: c_call}
 }
 
 func (_m *SchedulableEntityRepoInterface) OnCreateMatch(matchers ...interface{}) *SchedulableEntityRepoInterface_Create {
-	c := _m.On("Create", matchers...)
-	return &SchedulableEntityRepoInterface_Create{Call: c}
+	c_call := _m.On("Create", matchers...)
+	return &SchedulableEntityRepoInterface_Create{Call: c_call}
 }
 
 // Create provides a mock function with given fields: ctx, input
@@ -88,13 +88,13 @@ func (_m SchedulableEntityRepoInterface_Deactivate) Return(_a0 error) *Schedulab
 }
 
 func (_m *SchedulableEntityRepoInterface) OnDeactivate(ctx context.Context, ID models.SchedulableEntityKey) *SchedulableEntityRepoInterface_Deactivate {
-	c := _m.On("Deactivate", ctx, ID)
-	return &SchedulableEntityRepoInterface_Deactivate{Call: c}
+	c_call := _m.On("Deactivate", ctx, ID)
+	return &SchedulableEntityRepoInterface_Deactivate{Call: c_call}
 }
 
 func (_m *SchedulableEntityRepoInterface) OnDeactivateMatch(matchers ...interface{}) *SchedulableEntityRepoInterface_Deactivate {
-	c := _m.On("Deactivate", matchers...)
-	return &SchedulableEntityRepoInterface_Deactivate{Call: c}
+	c_call := _m.On("Deactivate", matchers...)
+	return &SchedulableEntityRepoInterface_Deactivate{Call: c_call}
 }
 
 // Deactivate provides a mock function with given fields: ctx, ID
@@ -120,13 +120,13 @@ func (_m SchedulableEntityRepoInterface_Get) Return(_a0 models.SchedulableEntity
 }
 
 func (_m *SchedulableEntityRepoInterface) OnGet(ctx context.Context, ID models.SchedulableEntityKey) *SchedulableEntityRepoInterface_Get {
-	c := _m.On("Get", ctx, ID)
-	return &SchedulableEntityRepoInterface_Get{Call: c}
+	c_call := _m.On("Get", ctx, ID)
+	return &SchedulableEntityRepoInterface_Get{Call: c_call}
 }
 
 func (_m *SchedulableEntityRepoInterface) OnGetMatch(matchers ...interface{}) *SchedulableEntityRepoInterface_Get {
-	c := _m.On("Get", matchers...)
-	return &SchedulableEntityRepoInterface_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &SchedulableEntityRepoInterface_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, ID
@@ -159,13 +159,13 @@ func (_m SchedulableEntityRepoInterface_GetAll) Return(_a0 []models.SchedulableE
 }
 
 func (_m *SchedulableEntityRepoInterface) OnGetAll(ctx context.Context) *SchedulableEntityRepoInterface_GetAll {
-	c := _m.On("GetAll", ctx)
-	return &SchedulableEntityRepoInterface_GetAll{Call: c}
+	c_call := _m.On("GetAll", ctx)
+	return &SchedulableEntityRepoInterface_GetAll{Call: c_call}
 }
 
 func (_m *SchedulableEntityRepoInterface) OnGetAllMatch(matchers ...interface{}) *SchedulableEntityRepoInterface_GetAll {
-	c := _m.On("GetAll", matchers...)
-	return &SchedulableEntityRepoInterface_GetAll{Call: c}
+	c_call := _m.On("GetAll", matchers...)
+	return &SchedulableEntityRepoInterface_GetAll{Call: c_call}
 }
 
 // GetAll provides a mock function with given fields: ctx

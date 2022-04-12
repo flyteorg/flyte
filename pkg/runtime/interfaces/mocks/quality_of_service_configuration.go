@@ -22,13 +22,13 @@ func (_m QualityOfServiceConfiguration_GetDefaultTiers) Return(_a0 map[string]co
 }
 
 func (_m *QualityOfServiceConfiguration) OnGetDefaultTiers() *QualityOfServiceConfiguration_GetDefaultTiers {
-	c := _m.On("GetDefaultTiers")
-	return &QualityOfServiceConfiguration_GetDefaultTiers{Call: c}
+	c_call := _m.On("GetDefaultTiers")
+	return &QualityOfServiceConfiguration_GetDefaultTiers{Call: c_call}
 }
 
 func (_m *QualityOfServiceConfiguration) OnGetDefaultTiersMatch(matchers ...interface{}) *QualityOfServiceConfiguration_GetDefaultTiers {
-	c := _m.On("GetDefaultTiers", matchers...)
-	return &QualityOfServiceConfiguration_GetDefaultTiers{Call: c}
+	c_call := _m.On("GetDefaultTiers", matchers...)
+	return &QualityOfServiceConfiguration_GetDefaultTiers{Call: c_call}
 }
 
 // GetDefaultTiers provides a mock function with given fields:
@@ -56,13 +56,13 @@ func (_m QualityOfServiceConfiguration_GetTierExecutionValues) Return(_a0 map[co
 }
 
 func (_m *QualityOfServiceConfiguration) OnGetTierExecutionValues() *QualityOfServiceConfiguration_GetTierExecutionValues {
-	c := _m.On("GetTierExecutionValues")
-	return &QualityOfServiceConfiguration_GetTierExecutionValues{Call: c}
+	c_call := _m.On("GetTierExecutionValues")
+	return &QualityOfServiceConfiguration_GetTierExecutionValues{Call: c_call}
 }
 
 func (_m *QualityOfServiceConfiguration) OnGetTierExecutionValuesMatch(matchers ...interface{}) *QualityOfServiceConfiguration_GetTierExecutionValues {
-	c := _m.On("GetTierExecutionValues", matchers...)
-	return &QualityOfServiceConfiguration_GetTierExecutionValues{Call: c}
+	c_call := _m.On("GetTierExecutionValues", matchers...)
+	return &QualityOfServiceConfiguration_GetTierExecutionValues{Call: c_call}
 }
 
 // GetTierExecutionValues provides a mock function with given fields:

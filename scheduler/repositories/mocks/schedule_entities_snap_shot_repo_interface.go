@@ -24,13 +24,13 @@ func (_m ScheduleEntitiesSnapShotRepoInterface_Read) Return(_a0 models.ScheduleE
 }
 
 func (_m *ScheduleEntitiesSnapShotRepoInterface) OnRead(ctx context.Context) *ScheduleEntitiesSnapShotRepoInterface_Read {
-	c := _m.On("Read", ctx)
-	return &ScheduleEntitiesSnapShotRepoInterface_Read{Call: c}
+	c_call := _m.On("Read", ctx)
+	return &ScheduleEntitiesSnapShotRepoInterface_Read{Call: c_call}
 }
 
 func (_m *ScheduleEntitiesSnapShotRepoInterface) OnReadMatch(matchers ...interface{}) *ScheduleEntitiesSnapShotRepoInterface_Read {
-	c := _m.On("Read", matchers...)
-	return &ScheduleEntitiesSnapShotRepoInterface_Read{Call: c}
+	c_call := _m.On("Read", matchers...)
+	return &ScheduleEntitiesSnapShotRepoInterface_Read{Call: c_call}
 }
 
 // Read provides a mock function with given fields: ctx
@@ -63,13 +63,13 @@ func (_m ScheduleEntitiesSnapShotRepoInterface_Write) Return(_a0 error) *Schedul
 }
 
 func (_m *ScheduleEntitiesSnapShotRepoInterface) OnWrite(ctx context.Context, input models.ScheduleEntitiesSnapshot) *ScheduleEntitiesSnapShotRepoInterface_Write {
-	c := _m.On("Write", ctx, input)
-	return &ScheduleEntitiesSnapShotRepoInterface_Write{Call: c}
+	c_call := _m.On("Write", ctx, input)
+	return &ScheduleEntitiesSnapShotRepoInterface_Write{Call: c_call}
 }
 
 func (_m *ScheduleEntitiesSnapShotRepoInterface) OnWriteMatch(matchers ...interface{}) *ScheduleEntitiesSnapShotRepoInterface_Write {
-	c := _m.On("Write", matchers...)
-	return &ScheduleEntitiesSnapShotRepoInterface_Write{Call: c}
+	c_call := _m.On("Write", matchers...)
+	return &ScheduleEntitiesSnapShotRepoInterface_Write{Call: c_call}
 }
 
 // Write provides a mock function with given fields: ctx, input

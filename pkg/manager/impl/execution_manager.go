@@ -496,6 +496,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	workflowExecConfig := &admin.WorkflowExecutionConfig{}
 	// merge the request spec into workflowExecConfig
 	if isChanged := mergeIntoExecConfig(workflowExecConfig, request.Spec); isChanged {
+		logger.Infof(ctx, "getting the workflow execution config from request spec")
 		return workflowExecConfig, nil
 	}
 
@@ -503,6 +504,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	if launchPlan != nil && launchPlan.Spec != nil {
 		// merge the launch plan spec into workflowExecConfig
 		if isChanged := mergeIntoExecConfig(workflowExecConfig, launchPlan.Spec); isChanged {
+			logger.Infof(ctx, "getting the workflow execution config from launchplan spec")
 			return workflowExecConfig, nil
 		}
 		if launchPlan.Spec.WorkflowId != nil {
@@ -520,11 +522,13 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 		// merge the matchable resource workflow execution config into workflowExecConfig
 		if isChanged := mergeIntoExecConfig(workflowExecConfig,
 			matchableResource.Attributes.GetWorkflowExecutionConfig()); isChanged {
+			logger.Infof(ctx, "getting the workflow execution config from workflow execution matchable attribute")
 			return workflowExecConfig, nil
 		}
 	}
 	//  merge the application config into workflowExecConfig
 	mergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
+	logger.Infof(ctx, "getting the workflow execution config from application configuration")
 	// Defaults to one from the application config
 	return workflowExecConfig, nil
 }
@@ -667,15 +671,12 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
-	resolvedAuthRole := resolveAuthRole(request, launchPlan)
-	resolvedSecurityCtx := resolveSecurityCtx(ctx, request, launchPlan, resolvedAuthRole)
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
 		Inputs:              request.Inputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,
 		ExecutionConfig:     executionConfig,
-		SecurityContext:     resolvedSecurityCtx,
 		TaskResources:       &platformTaskResources,
 		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
@@ -743,7 +744,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       resolvedSecurityCtx,
+		SecurityContext:       executionConfig.GetSecurityContext(),
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
@@ -907,15 +908,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
-	resolvedAuthRole := resolveAuthRole(request, launchPlan)
-	resolvedSecurityCtx := resolveSecurityCtx(ctx, request, launchPlan, resolvedAuthRole)
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
 		Inputs:              executionInputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,
 		ExecutionConfig:     executionConfig,
-		SecurityContext:     resolvedSecurityCtx,
 		TaskResources:       &platformTaskResources,
 		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
@@ -984,7 +982,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       resolvedSecurityCtx,
+		SecurityContext:       executionConfig.GetSecurityContext(),
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
