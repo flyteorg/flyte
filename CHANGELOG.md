@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.51.0](http://github.com/lyft/flyteconsole/compare/v0.50.4...v0.51.0) (2022-04-12)
+
+
+### Bug Fixes
+
+* add more descriptive errors on task/workflow run failure ([#370](http://github.com/lyft/flyteconsole/issues/370)) ([4e501fa](http://github.com/lyft/flyteconsole/commit/4e501faae1fd46faba268d2803c7c5452fcc3c60))
+
+
+### Features
+
+* Allow to archive workflow from flyteconsole ([#361](http://github.com/lyft/flyteconsole/issues/361)) ([1ed28c4](http://github.com/lyft/flyteconsole/commit/1ed28c4d566def6f286e164744c8da7e68f8d898))
+
 ## [0.50.4](http://github.com/lyft/flyteconsole/compare/v0.50.3...v0.50.4) (2022-04-10)
 
 
