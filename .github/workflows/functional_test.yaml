@@ -6,6 +6,7 @@ on:
       - docker/**
       - charts/**
       - .github/workflows/functional_test.yaml
+      - boilerplate/flyte/end2end/run-tests.py
 
 defaults:
   run:
