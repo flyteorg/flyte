@@ -97,9 +97,8 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-lite
           tags: |
-            dind
             ${{ steps.set_version.outputs.flyte_version }}
-            type=sha,format=long, prefix=dind-
+            type=sha,format=long
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
