@@ -27,12 +27,10 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: APPLY Opta
-      needs:
       shell: bash
       run: |
         ~/.opta/opta apply -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
     - name: DESTROY Opta
-      needs:
       shell: bash
       run: |
         ~/.opta/opta destroy -c ./opta/aws/env.yaml --var env_name=$ENV_NAME --var company=$COMPANY --var aws_region=$AWS_REGION  --var=aws_account_id=$AWS_ACCOUNT_ID --auto-approve 
