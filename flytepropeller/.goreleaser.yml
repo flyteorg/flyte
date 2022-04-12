@@ -14,6 +14,18 @@ builds:
       - darwin
     ldflags:
       - -s -w -X github.com/lyft/flytepropeller/version.Version={{.Version}} -X github.com/lyft/flytepropeller/version.Build={{.ShortCommit}} -X github.com/lyft/flytepropeller/version.BuildTime={{.Date}}
+  - id: flytepropeller
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
+    binary: flytepropeller
+    goos:
+      - linux
+      - windows
+      - darwin
 archives:
   - id: kubectl-flyte-archive
     name_template: |-
@@ -25,6 +37,22 @@ archives:
       {{- end -}}
     builds:
       - kubectl-flyte
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+  - id: flytepropeller-archive
+    name_template: |-
+      flytepropeller_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+      {{- end -}}
+    builds:
+      - flytepropeller
     replacements:
       386: i386
       amd64: x86_64
