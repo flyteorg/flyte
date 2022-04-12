@@ -3,7 +3,7 @@ redis:
   enabled: false
 
 webhook:
-  enabled: false
+  enabled: true
   # -- Service settings for the webhook
   service:
     annotations:
@@ -37,7 +37,7 @@ postgres:
   # -- Service settings for Postgres
   service:
     annotations: {}
-    type: ClusterIP
+    type: NodePort
   # -- Annotations for Postgres pods
   podAnnotations: {}
   # -- nodeSelector for Postgres deployment

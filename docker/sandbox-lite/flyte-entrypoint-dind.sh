@@ -41,14 +41,13 @@ echo "Done."
 echo "Deploying Flyte..."
 charts="/flyteorg/share/flyte-deps"
 version=""
-charts="/flyteorg/share/flyte"
 
 if [[ $FLYTE_TEST = "release" ]]
 then
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm fetch flyteorg/flyte --version=$FLYTE_VERSION
   version="--version $FLYTE_VERSION"
-  charts="flyteorg/flyte"
+  charts="flyteorg/flyte-deps"
 fi
 
 if [[ $FLYTE_TEST = "local" ]]

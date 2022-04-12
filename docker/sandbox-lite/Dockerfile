@@ -82,7 +82,7 @@ COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
-ARG FLYTE_TEST="release"
+ARG FLYTE_TEST="local"
 ENV FLYTE_TEST "${FLYTE_TEST}"
 
 # Update PATH variable
@@ -97,6 +97,6 @@ COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 
 # Expose Flyte ports
 # 30080 for console, 30081 for gRPC, 30082 for k8s dashboard, 30084 for minio api, 30088 for minio console
-EXPOSE 30080 30081 30082 30084 30088
+EXPOSE 30080 30081 30082 30084 30088 30089
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
