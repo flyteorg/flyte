@@ -74,7 +74,7 @@ jobs:
     - name: find helm 
       shell: bash
       run: |
-        ls .
+        ls -la .
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
       with:
