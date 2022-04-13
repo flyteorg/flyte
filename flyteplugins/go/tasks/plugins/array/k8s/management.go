@@ -10,6 +10,8 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
@@ -211,6 +213,30 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		if phaseInfo.Err() != nil {
 			messageCollector.Collect(childIdx, phaseInfo.Err().String())
+
+			// If the service reported an error but there is no error.pb written, write one with the
+			// service-provided error message.
+			or, err := array.ConstructOutputReader(ctx, dataStore, outputPrefix, baseOutputDataSandbox, originalIdx)
+			if err != nil {
+				return currentState, externalResources, err
+			}
+
+			if hasErr, err := or.IsError(ctx); err != nil {
+				return currentState, externalResources, err
+			} else if !hasErr {
+				// The subtask has not produced an error.pb, write one.
+				ow, err := array.ConstructOutputWriter(ctx, dataStore, outputPrefix, baseOutputDataSandbox, originalIdx)
+				if err != nil {
+					return currentState, externalResources, err
+				}
+
+				if err = ow.Put(ctx, ioutils.NewInMemoryOutputReader(nil, &io.ExecutionError{
+					ExecutionError: phaseInfo.Err(),
+					IsRecoverable:  phaseInfo.Phase() != core.PhasePermanentFailure,
+				})); err != nil {
+					return currentState, externalResources, err
+				}
+			}
 		}
 
 		if phaseInfo.Err() != nil && phaseInfo.Err().GetKind() == idlCore.ExecutionError_SYSTEM {
@@ -250,10 +276,6 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		}
 
 		// process phaseInfo
-		if phaseInfo.Err() != nil {
-			messageCollector.Collect(childIdx, phaseInfo.Err().String())
-		}
-
 		var logLinks []*idlCore.TaskLog
 		if phaseInfo.Info() != nil {
 			logLinks = phaseInfo.Info().Logs
