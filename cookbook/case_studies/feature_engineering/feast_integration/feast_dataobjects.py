@@ -20,7 +20,7 @@ from feast.infra.offline_stores.file import FileOfflineStoreConfig
 from feast.infra.online_stores.sqlite import SqliteOnlineStoreConfig
 from feast.repo_config import RepoConfig
 from flytekit import FlyteContext
-from flytekit.configuration import aws
+from flytekit.configuration.internal import AWS
 
 
 @dataclass_json
@@ -38,9 +38,9 @@ class FeatureStore:
     config: FeatureStoreConfig
 
     def _build_feast_feature_store(self):
-        os.environ["FEAST_S3_ENDPOINT_URL"] = aws.S3_ENDPOINT.get()
-        os.environ["AWS_ACCESS_KEY_ID"] = aws.S3_ACCESS_KEY_ID.get()
-        os.environ["AWS_SECRET_ACCESS_KEY"] = aws.S3_SECRET_ACCESS_KEY.get()
+        os.environ["FEAST_S3_ENDPOINT_URL"] = AWS.S3_ENDPOINT.get()
+        os.environ["AWS_ACCESS_KEY_ID"] = AWS.S3_ACCESS_KEY_ID.get()
+        os.environ["AWS_SECRET_ACCESS_KEY"] = AWS.S3_SECRET_ACCESS_KEY.get()
 
         config = RepoConfig(
             registry=f"s3://{self.config.s3_bucket}/{self.config.registry_path}",

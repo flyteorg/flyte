@@ -30,7 +30,7 @@ import joblib
 import pandas as pd
 from feast import Entity, Feature, FeatureStore, FeatureView, FileSource, ValueType
 from flytekit import task, workflow, TaskMetadata, Resources
-from flytekit.configuration import aws
+from flytekit.configuration.internal import AWS
 from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 from flytekit.types.file import JoblibSerializedFile
 from flytekit.types.schema import FlyteSchema
@@ -68,10 +68,10 @@ DATA_CLASS = "surgical lesion"
 def create_bucket(bucket_name: str) -> str:
     client = boto3.client(
         "s3",
-        aws_access_key_id=aws.S3_ACCESS_KEY_ID.get(),
-        aws_secret_access_key=aws.S3_SECRET_ACCESS_KEY.get(),
+        aws_access_key_id=AWS.S3_ACCESS_KEY_ID.get(),
+        aws_secret_access_key=AWS.S3_SECRET_ACCESS_KEY.get(),
         use_ssl=False,
-        endpoint_url=aws.S3_ENDPOINT.get(),
+        endpoint_url=AWS.S3_ENDPOINT.get(),
     )
 
     try:

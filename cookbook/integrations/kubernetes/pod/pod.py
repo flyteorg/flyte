@@ -38,7 +38,7 @@ import os
 import time
 from typing import List
 
-from flytekit import task, workflow
+from flytekit import task, workflow, Resources
 from flytekitplugins.pod import Pod
 from kubernetes.client.models import (
     V1Container,
@@ -101,6 +101,9 @@ def generate_pod_spec_for_task():
     task_config=Pod(
         pod_spec=generate_pod_spec_for_task(), primary_container_name="primary"
     ),
+    requests=Resources(
+        mem="1G",
+    ),
 )
 def my_pod_task() -> str:
     # The code defined in this task will get injected into the primary container.
@@ -112,7 +115,7 @@ def my_pod_task() -> str:
 
 
 @workflow
-def PodWorkflow() -> str:
+def pod_workflow() -> str:
     s = my_pod_task()
     return s
 
@@ -140,11 +143,15 @@ from flytekit import map_task, TaskMetadata
             ],
             init_containers=[
                 V1Container(
+                    image="alpine",
                     name="init",
                     command=["/bin/sh"],
                     args=["-c", 'echo "I\'m a customizable init container"'],
+                    resources=V1ResourceRequirements(
+                        limits={"cpu": ".5", "memory": "500Mi"},
+                    ),
                 )
-            ],
+            ]
         ),
         primary_container_name="primary",
     )
@@ -167,9 +174,50 @@ def my_map_workflow(a: List[int]) -> str:
     coalesced = coalesce(b=mapped_out)
     return coalesced
 
+
+# %%
+# Dynamic Pod Tasks
+# ====================
+#
+# To use pod task a dynamic task, simply pass the pod task config to an annotated dynamic task.
+from flytekit import dynamic
+
+
+@task
+def simple_stringify(val: int) -> str:
+    return f"{val} served courtesy of a dynamic pod task!"
+
+
+@dynamic(
+    task_config=Pod(
+        pod_spec=V1PodSpec(
+            containers=[
+                V1Container(
+                    name="primary",
+                    resources=V1ResourceRequirements(
+                        requests={"cpu": ".5", "memory": "450Mi"},
+                        limits={"cpu": ".5", "memory": "500Mi"},
+                    ),
+                )
+            ],
+        ),
+        primary_container_name="primary",
+    )
+)
+def my_dynamic_pod_task(val: int) -> str:
+    return simple_stringify(val=val)
+
+
+@workflow
+def my_dynamic_pod_task_workflow(val: int=6) -> str:
+    s = my_dynamic_pod_task(val=val)
+    return s
+
+
 # %%
 # The workflows can be executed locally as follows:
 if __name__ == "__main__":
     print(f"Running {__file__} main...")
-    print(f"Calling PodWorkflow()... {PodWorkflow()}")
+    print(f"Calling PodWorkflow()... {pod_workflow()}")
     print(f"Calling my_map_workflow()... {my_map_workflow()}")
+    print(f"Calling my_dynamic_pod_task_workflow()... {my_dynamic_pod_task_workflow()}")

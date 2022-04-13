@@ -1,15 +1,21 @@
 """
-Using Structured Dataset
+.. _structured_dataset_example:
+
+Structured Dataset
 ------------------
 
-This example explains how an Structured Dataset is passed between tasks.
-Flytekit makes it possible for users to directly return or accept a :py:class:`pandas.DataFrame`, which are automatically
-converted into flyte's abstract representation of a Structured Dataset object
+Structured dataset is a superset of Flyte Schema.
 
-The structured dataset is a superset of flyte scheme. StructuredDataset Transformer can write dataframe to the BigQuery,
- S3, or any other storage by registering new structured dataset encoder/decoder.
+The ``StructuredDataset`` Transformer can write a dataframe to BigQuery, s3, or any storage by registering new structured dataset encoder and decoder.
 
+Flytekit makes it possible to return or accept a :py:class:`pandas.DataFrame` which is automatically
+converted into Flyte's abstract representation of a structured dataset object.
+
+This example explains how a structured dataset can be used with the Flyte entities.
 """
+
+# %%
+# Let's import the necessary dependencies.
 import os
 import typing
 
@@ -22,8 +28,15 @@ from flytekit import task, workflow, kwtypes, FlyteContext, StructuredDatasetTyp
 from flytekit.models import literals
 from flytekit.models.literals import StructuredDatasetMetadata
 from flytekit.types.schema import FlyteSchema
-from flytekit.types.structured.structured_dataset import StructuredDataset, StructuredDatasetEncoder, \
-    StructuredDatasetDecoder, StructuredDatasetTransformerEngine, PARQUET, S3, LOCAL
+from flytekit.types.structured.structured_dataset import (
+    StructuredDataset,
+    StructuredDatasetEncoder,
+    StructuredDatasetDecoder,
+    StructuredDatasetTransformerEngine,
+    PARQUET,
+    S3,
+    LOCAL,
+)
 
 try:
     from typing import Annotated
@@ -32,20 +45,22 @@ except ImportError:
 
 
 # %%
-# Define columns type for schema and structuredDataset
+# We define the columns types for schema and ``StructuredDataset``.
 superset_cols = kwtypes(Name=str, Age=int, Height=int)
 subset_cols = kwtypes(Age=int)
 
 
 # %%
-# This task generates a pandas.DataFrame and returns it. The Dataframe itself will be serialized to an intermediate
-# format like parquet before passing between tasks.
+# We define two tasks — one returns a pandas DataFrame, and the other, a :py:class:`flytekit.types.schema.FlyteSchema`.
+# The DataFrames themselves will be serialized to an intermediate format like parquet before sending them to the other tasks.
 @task
 def get_df(a: int) -> Annotated[pd.DataFrame, superset_cols]:
     """
     Generate a sample dataframe
     """
-    return pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [a, 22], "Height": [160, 178]})
+    return pd.DataFrame(
+        {"Name": ["Tom", "Joseph"], "Age": [a, 22], "Height": [160, 178]}
+    )
 
 
 @task
@@ -54,30 +69,40 @@ def get_schema_df(a: int) -> FlyteSchema[superset_cols]:
     Generate a sample dataframe
     """
     s = FlyteSchema()
-    s.open().write(pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [a, 22], "Height": [160, 178]}))
+    s.open().write(
+        pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [a, 22], "Height": [160, 178]})
+    )
     return s
 
 
 # %%
-# This task shows an example of transforming a dataFrame, opening a Structured Dataset
-# When we invoke all(), flyte engine will download parquet fine on s3, and deserialized to pandas.dataframe
+# Next, we define a task that opens a structured dataset by calling ``all()``.
+# When we invoke ``all()``, the Flyte engine will download parquet fine on s3, and deserializes it to ``pandas.dataframe``.
 #
 # .. note::
-# * Although the input type of task is StructuredDataset, it can also accepts FlyteSchema as input.
-# * This may result in runtime failures if the columns do not match.
+#   * Despite the input type of the task being ``StructuredDataset``, it can also accept FlyteSchema as input.
+#   * The code may result in runtime failures if the columns do not match.
 @task
-def get_subset_df(df: Annotated[StructuredDataset, subset_cols]) -> Annotated[StructuredDataset, subset_cols]:
+def get_subset_df(
+    df: Annotated[StructuredDataset, subset_cols]
+) -> Annotated[StructuredDataset, subset_cols]:
     df = df.open(pd.DataFrame).all()
-    df = df.append(pd.DataFrame(data={"Age": [30]}))
-    # You can also specify bigquery uri for StructuredDataset, then flytekit will write pd.dataframe to bigquery table
+    df = pd.concat([df, pd.DataFrame([[30]], columns=["Age"])])
+    # On specifying BigQuery uri for StructuredDataset, Flytekit will write pd.dataframe to a BigQuery table
     return StructuredDataset(dataframe=df)
 
 
 # %%
-# Extend StructuredDatasetEncoder, implement the encode function, and register your concrete class with the
-# FLYTE_DATASET_TRANSFORMER defined at this module level in order for the core flytekit type engine to handle
-# dataframe libraries. This is the encoding interface, meaning it is used when there is a Python value that the
-# flytekit type engine is trying to convert into a Flyte Literal.
+# ``StructuredDataset`` ships with an encoder and a decoder that handles conversion of a Python value to Flyte literal and vice-versa, respectively.
+# Let's understand how they need to be written by defining a Numpy encoder and decoder, which in turn helps use Numpy array as a valid type within structured datasets.
+
+
+# %%
+# Numpy Encoder
+# =============
+#
+# We extend ``StructuredDatasetEncoder`` and implement the ``encode`` function.
+# The ``encode`` function converts Numpy array to an intermediate format like parquet.
 class NumpyEncodingHandlers(StructuredDatasetEncoder):
     def encode(
         self,
@@ -93,20 +118,26 @@ class NumpyEncodingHandlers(StructuredDatasetEncoder):
         local_path = os.path.join(local_dir, f"{0:05}")
         pq.write_table(table, local_path)
         ctx.file_access.upload_directory(local_dir, path)
-        return literals.StructuredDataset(uri=path,
-                                          metadata=StructuredDatasetMetadata(
-                                              structured_dataset_type=StructuredDatasetType(format=PARQUET)))
+        return literals.StructuredDataset(
+            uri=path,
+            metadata=StructuredDatasetMetadata(
+                structured_dataset_type=StructuredDatasetType(format=PARQUET)
+            ),
+        )
 
 
 # %%
-# Extend StructuredDatasetDecoder, implement the decode function, and register your concrete class with the
-# FLYTE_DATASET_TRANSFORMER. This is the decoding interface, meaning it is used when there is a Flyte Literal that the
-# flytekit type engine is trying to convert into a python value, e.g. `pandas.Dataframe`
+# Numpy Decoder
+# =============
+#
+# Next we extend ``StructuredDatasetDecoder`` and implement the ``decode`` function.
+# The ``decode`` function converts the parquet file to a ``numpy.ndarray``.
 class NumpyDecodingHandlers(StructuredDatasetDecoder):
     def decode(
         self,
         ctx: FlyteContext,
         flyte_value: literals.StructuredDataset,
+        current_task_metadata: StructuredDatasetMetadata,
     ) -> np.ndarray:
         local_dir = ctx.file_access.get_random_local_directory()
         ctx.file_access.get_data(flyte_value.uri, local_dir, is_multipart=True)
@@ -114,38 +145,54 @@ class NumpyDecodingHandlers(StructuredDatasetDecoder):
         return table.to_pandas().to_numpy()
 
 
+# %%
+# Finally, we register the encoder and decoder with the ``StructuredDatasetTransformerEngine``.
 for protocol in [LOCAL, S3]:
-    StructuredDatasetTransformerEngine.register(NumpyEncodingHandlers(np.ndarray, protocol, PARQUET))
-    StructuredDatasetTransformerEngine.register(NumpyDecodingHandlers(np.ndarray, protocol, PARQUET))
-
+    StructuredDatasetTransformerEngine.register(
+        NumpyEncodingHandlers(np.ndarray, protocol, PARQUET)
+    )
+    StructuredDatasetTransformerEngine.register(
+        NumpyDecodingHandlers(np.ndarray, protocol, PARQUET)
+    )
 
 # %%
-# We just registered NumpyEncodingHandlers and NumpyDecodingHandlers, so we can deserialize the parquet file to numpy,
-# and serialize task's output which is numpy array to s3.
+# You can now use ``numpy.ndarray`` to deserialize the parquet file to Numpy and serialize a task's output (Numpy array) to a parquet file.
+
+# %%
+# Let's define a task to test the above functionality.
+# We open a structured dataset of type ``numpy.ndarray`` and serialize it again.
 @task
-def to_numpy(ds: Annotated[StructuredDataset, subset_cols]) -> Annotated[StructuredDataset, subset_cols, PARQUET]:
+def to_numpy(
+    ds: Annotated[StructuredDataset, subset_cols]
+) -> Annotated[StructuredDataset, subset_cols, PARQUET]:
     numpy_array = ds.open(np.ndarray).all()
     return StructuredDataset(dataframe=numpy_array)
 
 
 # %%
-# The workflow shows that passing DataFrame's between tasks is as simple as passing dataFrames in memory
+# Finally, we define two workflows that showcase how a ``pandas.DataFrame`` and ``FlyteSchema`` are accepted by the ``StructuredDataset``.
 @workflow
-def wf(a: int) -> Annotated[StructuredDataset, subset_cols]:
+def pandas_compatibility_wf(a: int) -> Annotated[StructuredDataset, subset_cols]:
     df = get_df(a=a)
-    ds = get_subset_df(df=df)  # noqa, shown for demonstration, users should use the same types from one task to another
+    ds = get_subset_df(
+        df=df
+    )  # noqa: shown for demonstration; users should use the same types between tasks
     return to_numpy(ds=ds)
 
 
 @workflow
 def schema_compatibility_wf(a: int) -> Annotated[StructuredDataset, subset_cols]:
     df = get_schema_df(a=a)
-    ds = get_subset_df(df=df)  # noqa, shown for demonstration, users should use the same types from one task to another
+    ds = get_subset_df(
+        df=df
+    )  # noqa: shown for demonstration; users should use the same types between tasks
     return to_numpy(ds=ds)
 
 
 # %%
-# The entire program can be run locally
+# You can run the code locally as follows:
 if __name__ == "__main__":
-    dataframe = wf(a=42).open(pd.DataFrame).all()
-    print(f"Dataframe value:\n", dataframe)
+    numpy_array_one = pandas_compatibility_wf(a=42).open(np.ndarray).all()
+    print(f"pandas DataFrame compatibility check output: ", numpy_array_one)
+    numpy_array_two = schema_compatibility_wf(a=42).open(np.ndarray).all()
+    print(f"Schema compatibility check output: ", numpy_array_two)

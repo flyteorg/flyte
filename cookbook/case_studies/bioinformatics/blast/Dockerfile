@@ -30,12 +30,16 @@ RUN pip3 install awscli
 # Install gcloud for GCP
 RUN apt-get install curl --assume-yes
 
-RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH $PATH:/root/google-cloud-sdk/bin
+WORKDIR /opt
+RUN curl https://sdk.cloud.google.com > install.sh
+RUN bash /opt/install.sh --install-dir=/opt
+ENV PATH $PATH:/opt/google-cloud-sdk/bin
+WORKDIR /root
 
 # Virtual environment
-RUN python3.8 -m venv ${VENV}
-RUN ${VENV}/bin/pip install wheel
+ENV VENV /opt/venv
+RUN python3 -m venv ${VENV}
+ENV PATH="${VENV}/bin:$PATH"
 
 # Download BLAST
 RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.12.0/ncbi-blast-2.12.0+-x64-linux.tar.gz && \
@@ -69,6 +73,3 @@ RUN chmod a+x /usr/local/bin/flytekit_venv
 ARG tag
 ENV FLYTE_INTERNAL_IMAGE $tag
 ENV FLYTE_SDK_USE_STRUCTURED_DATASET TRUE
-
-# Enable the virtualenv for this image. Note this relies on the VENV variable we've set in this image.
-ENTRYPOINT ["/usr/local/bin/flytekit_venv"]

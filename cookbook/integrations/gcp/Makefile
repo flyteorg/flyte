@@ -1,2 +1,2 @@
-include ../common/common.mk
-include ../common/parent.mk
+include ../../common/common.mk
+include ../../common/parent.mk

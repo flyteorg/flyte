@@ -18,8 +18,11 @@ RUN pip3 install awscli
 # Install gcloud for GCP
 RUN apt-get install curl --assume-yes
 
-RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH $PATH:/root/google-cloud-sdk/bin
+WORKDIR /opt
+RUN curl https://sdk.cloud.google.com > install.sh
+RUN bash /opt/install.sh --install-dir=/opt
+ENV PATH $PATH:/opt/google-cloud-sdk/bin
+WORKDIR /root
 
 ENV VENV /opt/venv
 # Virtual environment
@@ -53,7 +56,8 @@ COPY k8s_spark/sandbox.config /root
 # Copy the actual code
 COPY k8s_spark/ /root/k8s_spark
 
-# Delete these after we switch to package
+# This tag is supplied by the build script and will be used to determine the version
+# when registering tasks, workflows, and launch plans
 ARG tag
 ENV FLYTE_INTERNAL_IMAGE $tag
 
@@ -62,6 +66,5 @@ RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/
 RUN chmod a+x /usr/local/bin/flytekit_venv
 
 # For spark we want to use the default entrypoint which is part of the
-# distribution, also enable the virtualenv for this image. 
-# Note this relies on the VENV variable we've set in this image.
+# distribution, also enable the virtualenv for this image.
 ENTRYPOINT ["/opt/entrypoint.sh"]
