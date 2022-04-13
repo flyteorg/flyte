@@ -99,8 +99,8 @@ jobs:
         FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         OPTA_ENVIRONMENT: "${{ needs.calculate-pre-reqs.outputs.mode }}"
       run: |
-        ./scripts/ci_helper.sh prepare_flyte_release_build
-        ./scripts/ci_helper.sh prepare_helm_chart
+        .github/scripts/ci_helper.sh prepare_flyte_release_build
+        .github/scripts/ci_helper.sh prepare_helm_chart
     - name: STORE flyte.yaml
       shell: bash
       run: |
