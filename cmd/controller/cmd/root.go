@@ -7,6 +7,9 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"golang.org/x/sync/errgroup"
@@ -107,7 +110,17 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
-	mgr, err := controller.CreateControllerManager(ctx, cfg, defaultNamespace, &propellerScope)
+	limitNamespace := ""
+	if cfg.LimitNamespace != defaultNamespace {
+		limitNamespace = cfg.LimitNamespace
+	}
+	options := manager.Options{
+		Namespace:     limitNamespace,
+		SyncPeriod:    &cfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
+	}
+
+	mgr, err := controller.CreateControllerManager(ctx, cfg, options)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
 		return err
