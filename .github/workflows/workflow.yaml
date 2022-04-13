@@ -116,14 +116,16 @@ jobs:
       shell: bash
       run: |
         aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/1/opta/aws/flyte.yaml
-    - name: OPTA APPLY FLYTEADMIN
+    - name: OPTA APPLY FLYTE
       shell: bash
       run: |
-        opta apply -c ./opta/aws/flyte.yaml --auto-approve
+        cd opta/aws
+        opta apply -c ./flyte.yaml --auto-approve
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
-        opta destroy -c ./opta/aws/flyte.yaml --auto-approve 
+        cd opta/aws
+        opta destroy -c ./flyte.yaml --auto-approve 
     - name: DESTROY OPTA ENV
       shell: bash
       run: |
