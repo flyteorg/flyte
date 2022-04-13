@@ -122,10 +122,6 @@ export const createWorkflowExecution = (
     annotations,
   };
 
-  if (authRole?.assumableIamRole || authRole?.kubernetesServiceAccount) {
-    spec.authRole = authRole;
-  }
-
   if (securityContext?.runAs?.iamRole || securityContext?.runAs?.k8sServiceAccount) {
     spec.securityContext = securityContext;
   }

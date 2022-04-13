@@ -38,7 +38,7 @@ export const ExecutionMetadataExtra: React.FC<{
     launchPlan: launchPlanId,
     maxParallelism,
     rawOutputDataConfig,
-    authRole,
+    securityContext,
   } = execution.spec;
 
   const [launchPlanSpec, setLaunchPlanSpec] = React.useState<Partial<LaunchPlanSpec>>({});
@@ -50,11 +50,12 @@ export const ExecutionMetadataExtra: React.FC<{
   const details: DetailItem[] = [
     {
       label: ExecutionMetadataLabels.iam,
-      value: authRole?.assumableIamRole || ExecutionMetadataLabels.securityContextDefault,
+      value: securityContext?.runAs?.iamRole || ExecutionMetadataLabels.securityContextDefault,
     },
     {
       label: ExecutionMetadataLabels.serviceAccount,
-      value: authRole?.kubernetesServiceAccount || ExecutionMetadataLabels.securityContextDefault,
+      value:
+        securityContext?.runAs?.k8sServiceAccount || ExecutionMetadataLabels.securityContextDefault,
     },
     {
       label: ExecutionMetadataLabels.rawOutputPrefix,
