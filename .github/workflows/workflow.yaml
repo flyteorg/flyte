@@ -74,7 +74,7 @@ jobs:
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
       with:
-        exec: helm dep update ./dev/opta/helm/
+        exec: helm dep update ./helm/
     - name: Pin terraform version
       uses: hashicorp/setup-terraform@v1
       with:
@@ -104,7 +104,7 @@ jobs:
     - name: STORE flyte.yaml
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml
+        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/1/opta/aws/flyte.yaml
     - name: OPTA APPLY FLYTEADMIN_TAG
       shell: bash
       run: |
