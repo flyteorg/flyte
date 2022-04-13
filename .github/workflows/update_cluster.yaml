@@ -57,7 +57,6 @@ jobs:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
           LANGUAGE: en_US.UTF-8
-          DATADOG_API_KEY: ${{secrets.DATADOG_API_KEY}}
           ENV:  "${{ inputs.opta_environment }}"
           FLYTEADMIN_TAG: "${{ inputs.admin_version }}"
           DATACATALOG_TAG: "${{ inputs.datacatalog_version }}"
