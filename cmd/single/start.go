@@ -3,6 +3,9 @@ package single
 import (
 	"context"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/plugins"
 	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
@@ -92,9 +95,22 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 func startPropeller(ctx context.Context, cfg Propeller) error {
 	propellerCfg := propellerConfig.GetConfig()
 	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
-	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, defaultNamespace, &propellerScope)
+	limitNamespace := ""
+	if propellerCfg.LimitNamespace != defaultNamespace {
+		limitNamespace = propellerCfg.LimitNamespace
+	}
+
+	options := manager.Options{
+		Namespace:     limitNamespace,
+		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope),
+		CertDir:       webhookConfig.GetConfig().CertDir,
+		Port:           webhookConfig.GetConfig().ListenPort,
+	}
+
+	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)
 	if err != nil {
-		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
+		logger.Errorf(ctx, "Failed to create controller manager. %v", err)
 		return err
 	}
 	g, childCtx := errgroup.WithContext(ctx)
@@ -104,10 +120,11 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			logger.Infof(childCtx, "Starting to initialize certificate...")
 			err := webhookEntrypoint.InitCerts(childCtx, propellerCfg, webhookConfig.GetConfig())
 			if err != nil {
+				logger.Errorf(childCtx, "Failed to initialize certificates for Secrets Webhook. %v", err)
 				return err
 			}
 			logger.Infof(childCtx, "Starting Webhook server...")
-			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), "flyte", &propellerScope, mgr)
+			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), defaultNamespace, &propellerScope, mgr)
 		})
 	}
 
