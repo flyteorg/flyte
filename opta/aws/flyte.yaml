@@ -4,7 +4,7 @@ environments:
     variables:
       region: <region>
       account_id: <account_id>
-      bucket_name: <unique-bucket-name>
+      bucket_name: <unique_bucket_name>
 name: service-flyte
 modules:
   - name: postgres
