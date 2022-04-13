@@ -53,7 +53,18 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
         aws-region: ${{ env.AWS_REGION }}
-    - name: cat file...
+    - name: cat file
+      shell: bash
+      run: |
+        cat ./opta/aws/env.yaml
+    - name: set variables
+      shell: bash
+      run: |
+        sed -i "s/<env_name>/$ENV_NAME/" ./opta/aws/env.yaml
+        sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml
+        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
+        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
+    - name: cat file
       shell: bash
       run: |
         cat ./opta/aws/env.yaml
@@ -63,37 +74,37 @@ jobs:
         sudo chmod +x .github/scripts/ci_helper.sh
         .github/scripts/ci_helper.sh setup_opta
         /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
-      - uses: azure/setup-helm@v1
-      - name: Update Helm Chart dependencies
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          exec: helm dep update ./dev/opta/helm/
-      - name: Pin terraform version
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.0
-          terraform_wrapper: false
-      - name: Pin Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "16.8.0"
-      - name: Prepare opta changes
-        env:
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
-          LANGUAGE: en_US.UTF-8
-          ENV:  "${{ needs.calculate-pre-reqs.outputs.mode }}"
-          FLYTEADMIN_TAG: "$${{ needs.calculate-pre-reqs.outputs.components_version }}"
-          DATACATALOG_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-          FLYTECONSOLE_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-          FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-          OPTA_ENVIRONMENT: "${{ needs.calculate-pre-reqs.outputs.mode }}"
-        run: |
-          ./scripts/ci_helper.sh prepare_flyte_release_build
-          ./scripts/ci_helper.sh prepare_helm_chart
+    - uses: azure/setup-helm@v1
+    - name: Update Helm Chart dependencies
+      uses: WyriHaximus/github-action-helm3@v2
+      with:
+        exec: helm dep update ./dev/opta/helm/
+    - name: Pin terraform version
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+        terraform_wrapper: false
+    - name: Pin Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - uses: actions/setup-node@v2
+      with:
+        node-version: "16.8.0"
+    - name: Prepare opta changes
+      env:
+        LC_ALL: en_US.UTF-8
+        LANG: en_US.UTF-8
+        LANGUAGE: en_US.UTF-8
+        ENV:  "${{ needs.calculate-pre-reqs.outputs.mode }}"
+        FLYTEADMIN_TAG: "$${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        DATACATALOG_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        FLYTECONSOLE_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        OPTA_ENVIRONMENT: "${{ needs.calculate-pre-reqs.outputs.mode }}"
+      run: |
+        ./scripts/ci_helper.sh prepare_flyte_release_build
+        ./scripts/ci_helper.sh prepare_helm_chart
     - name: STORE flyte.yaml
       shell: bash
       run: |
