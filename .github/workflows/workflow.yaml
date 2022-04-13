@@ -105,9 +105,13 @@ jobs:
     - name: set flyte variables
       shell: bash
       run: |
-        sed -i "s/<bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
+        sed -i "s/<unique_bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
         sed -i "s/<region>/$AWS_REGION/" ./opta/aws/flyte.yaml
         sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/flyte.yaml
+    - name: view flyte.yaml
+      shell: bash
+      run: |
+        cat ./opta/aws/flyte.yaml
     - name: STORE flyte.yaml
       shell: bash
       run: |
