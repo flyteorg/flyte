@@ -57,13 +57,6 @@ jobs:
       shell: bash
       run: |
         cat ./opta/aws/env.yaml
-#    - name: set variables
-#      shell: bash
-#      run: |
-#        sed -i "s/<env_name>/$ENV_NAME/" ./opta/aws/env.yaml
-#        sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml
-#        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
-#        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
     - name: SETUP and APPLY Opta
       shell: bash
       run: |
