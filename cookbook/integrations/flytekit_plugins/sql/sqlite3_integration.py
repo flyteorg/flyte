@@ -21,7 +21,7 @@ from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 # https://www.sqlitetutorial.net/sqlite-sample-database/
 from flytekit.types.schema import FlyteSchema
 
-EXAMPLE_DB = "https://cdn.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"
+EXAMPLE_DB = "https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"
 
 # %%
 # the task is declared as a regular task. Alternatively it can be declared within a workflow just at the point of using
