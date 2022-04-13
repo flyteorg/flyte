@@ -26,7 +26,7 @@ On which grpc port to serve Catalog
 
 .. code-block:: yaml
 
-  "0"
+  "8081"
   
 
 grpcServerReflection (bool)
@@ -38,7 +38,7 @@ Enable GRPC Server Reflection
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 httpPort (int)
@@ -50,7 +50,7 @@ On which http port to serve Catalog
 
 .. code-block:: yaml
 
-  "0"
+  "8080"
   
 
 secure (bool)
@@ -138,14 +138,216 @@ options (string)
   ""
   
 
-log_level (int)
+debug (bool)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "0"
+  "false"
+  
+
+enableForeignKeyConstraintWhenMigrating (bool)
+--------------------------------------------------------------------------------
+
+Whether to enable gorm foreign keys when migrating the db
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+maxIdleConnections (int)
+--------------------------------------------------------------------------------
+
+maxIdleConnections sets the maximum number of connections in the idle connection pool.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+maxOpenConnections (int)
+--------------------------------------------------------------------------------
+
+maxOpenConnections sets the maximum number of open connections to the database.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+connMaxLifeTime (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+sets the maximum amount of time a connection may be reused
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
+  
+
+postgres (`database.PostgresConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dbname: postgres
+  debug: false
+  host: postgres
+  options: sslmode=disable
+  password: ""
+  passwordPath: ""
+  port: 5432
+  username: postgres
+  
+
+sqlite (`database.SQLiteConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  file: ""
+  
+
+config.Duration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Duration (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
+  
+
+database.PostgresConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+host (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  postgres
+  
+
+port (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The port name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5432"
+  
+
+dbname (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database name
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  postgres
+  
+
+username (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database user who is connecting to the server.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  postgres
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Points to the file containing the database password.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+options (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  sslmode=disable
+  
+
+debug (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Whether or not to start the database connection with debug mode enabled.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+database.SQLiteConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+file (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: datacatalog
@@ -160,7 +362,7 @@ StoragePrefix specifies the prefix where DataCatalog stores offloaded ArtifactDa
 
 .. code-block:: yaml
 
-  ""
+  metadata
   
 
 metrics-scope (string)
@@ -172,7 +374,7 @@ Scope that the metrics will record under.
 
 .. code-block:: yaml
 
-  ""
+  datacatalog
   
 
 profiler-port (int)
@@ -184,7 +386,7 @@ Port that the profiling service is listening on.
 
 .. code-block:: yaml
 
-  "0"
+  "10254"
   
 
 heartbeat-grace-period-multiplier (int)
@@ -196,7 +398,7 @@ Number of heartbeats before a reservation expires without an extension.
 
 .. code-block:: yaml
 
-  "0"
+  "3"
   
 
 max-reservation-heartbeat (`config.Duration`_)
@@ -208,20 +410,7 @@ The maximum available reservation extension heartbeat interval.
 
 .. code-block:: yaml
 
-  0s
-  
-
-config.Duration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Duration (int64)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  0s
+  10s
   
 
 Section: logger
@@ -260,7 +449,7 @@ Sets the minimum logging level.
 
 .. code-block:: yaml
 
-  "4"
+  "3"
   
 
 formatter (`logger.FormatterConfig`_)
@@ -390,6 +579,18 @@ Sets the default http client config.
 
   headers: null
   timeout: 0s
+  
+
+signedUrl (`storage.SignedURLConfig`_)
+--------------------------------------------------------------------------------
+
+Sets config for SignedURL.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
   
 
 storage.CachingConfig
@@ -659,13 +860,26 @@ Maximum allowed download size (in MBs) per call.
   "2"
   
 
+storage.SignedURLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stowConfigOverride (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 storage.StowConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 kind (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Kind of Stow backend to use. Refer to github/graymeta/stow
+Kind of Stow backend to use. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
@@ -677,7 +891,7 @@ Kind of Stow backend to use. Refer to github/graymeta/stow
 config (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Configuration for stow backend. Refer to github/graymeta/stow
+Configuration for stow backend. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
