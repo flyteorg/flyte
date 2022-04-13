@@ -53,10 +53,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
         aws-region: ${{ env.AWS_REGION }}
-    - name: cat file
-      shell: bash
-      run: |
-        cat ./opta/aws/env.yaml
     - name: set variables
       shell: bash
       run: |
@@ -64,11 +60,10 @@ jobs:
         sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml
         sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
         sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
-    - name: cat file
+    - name: STORE file
       shell: bash
       run: |
-        cat ./opta/aws/env.yaml
-    - name: SETUP and APPLY Opta
+        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml    - name: SETUP and APPLY Opta
       shell: bash
       run: |
         sudo chmod +x .github/scripts/ci_helper.sh
