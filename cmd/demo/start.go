@@ -96,6 +96,28 @@ type ExecResult struct {
 	ExitCode int
 }
 
+func primeFlytekitPod(ctx context.Context, podService corev1.PodInterface) {
+	_, err := podService.Create(ctx, &corev1api.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "py39-cacher",
+		},
+		Spec: corev1api.PodSpec{
+			RestartPolicy: corev1api.RestartPolicyNever,
+			Containers: []corev1api.Container{
+				{
+					Name:    "flytekit",
+					Image:   "ghcr.io/flyteorg/flytekit:py3.9-latest",
+					Command: []string{"echo"},
+					Args:    []string{"Flyte"},
+				},
+			},
+		},
+	}, v1.CreateOptions{})
+	if err != nil {
+		fmt.Printf("Failed to create primer pod - %s", err)
+	}
+}
+
 func startDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	cli, err := docker.GetDockerClient()
 	if err != nil {
@@ -129,6 +151,7 @@ func startDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		if err := watchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
 			return err
 		}
+		primeFlytekitPod(ctx, k8sClient.CoreV1().Pods("default"))
 		util.PrintSandboxMessage(util.DemoConsolePort)
 	}
 	return nil
@@ -250,7 +273,7 @@ func watchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface
 		var total, ready int
 		total = len(pods.Items)
 		ready = 0
-		if total != 0 {
+		if total > 0 {
 			for _, v := range pods.Items {
 				if isPodReady(v) {
 					ready++
@@ -261,14 +284,15 @@ func watchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface
 			}
 			table.Render()
 			if total == ready {
-				break
+				return nil
 			}
+		} else {
+			table.Append([]string{"k8s: This might take a little bit", "Bootstrapping", ""})
+			table.Render()
 		}
 
-		time.Sleep(40 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
-
-	return nil
 }
 
 func isPodReady(v corev1api.Pod) bool {
