@@ -71,10 +71,6 @@ jobs:
         .github/scripts/ci_helper.sh setup_opta
         /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
     - uses: azure/setup-helm@v1
-    - name: find helm 
-      shell: bash
-      run: |
-        ls -la .
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
       with:
