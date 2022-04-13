@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.2](http://github.com/lyft/flyteconsole/compare/v0.51.1...v0.51.2) (2022-04-13)
+
+
+### Bug Fixes
+
+* service account is not properly propagated from the execution info ([#374](http://github.com/lyft/flyteconsole/issues/374)) ([2e250bb](http://github.com/lyft/flyteconsole/commit/2e250bb53159069bc34b8578ac53aa64334837ce))
+
 ## [0.51.1](http://github.com/lyft/flyteconsole/compare/v0.51.0...v0.51.1) (2022-04-12)
 
 
