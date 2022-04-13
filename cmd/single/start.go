@@ -2,6 +2,7 @@ package single
 
 import (
 	"context"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -103,13 +104,13 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		Namespace:     limitNamespace,
 		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
 		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope),
-		// CertDir:       cfg.CertDir, CertDir defaults to local /tmp/k8s-webhook-server/serving-certs
+		CertDir:       webhookConfig.GetConfig().CertDir,
 		//Port:           webhookConfig.GetConfig().ListenPort,
 	}
 
 	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)
 	if err != nil {
-		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
+		logger.Errorf(ctx, "Failed to create controller manager. %v", err)
 		return err
 	}
 	g, childCtx := errgroup.WithContext(ctx)
@@ -119,6 +120,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			logger.Infof(childCtx, "Starting to initialize certificate...")
 			err := webhookEntrypoint.InitCerts(childCtx, propellerCfg, webhookConfig.GetConfig())
 			if err != nil {
+				logger.Errorf(childCtx, "Failed to initialize certificates for Secrets Webhook. %v", err)
 				return err
 			}
 			logger.Infof(childCtx, "Starting Webhook server...")
