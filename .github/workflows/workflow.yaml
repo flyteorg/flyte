@@ -106,8 +106,8 @@ jobs:
       shell: bash
       run: |
         sed -i "s/<bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
-        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
-        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
+        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/flyte.yaml
+        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/flyte.yaml
     - name: STORE flyte.yaml
       shell: bash
       run: |
