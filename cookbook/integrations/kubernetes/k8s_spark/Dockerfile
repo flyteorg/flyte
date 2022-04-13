@@ -44,14 +44,16 @@ ENV PYSPARK_PYTHON ${VENV}/bin/python3
 ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
 
 # Copy the makefile targets to expose on the container. This makes it easier to register.
+# Delete this after we update CI
 COPY in_container.mk /root/Makefile
+
+# Delete this after we update CI to not serialize inside the container
 COPY k8s_spark/sandbox.config /root
 
 # Copy the actual code
 COPY k8s_spark/ /root/k8s_spark
 
-# This tag is supplied by the build script and will be used to determine the version
-# when registering tasks, workflows, and launch plans
+# Delete these after we switch to package
 ARG tag
 ENV FLYTE_INTERNAL_IMAGE $tag
 
@@ -62,6 +64,4 @@ RUN chmod a+x /usr/local/bin/flytekit_venv
 # For spark we want to use the default entrypoint which is part of the
 # distribution, also enable the virtualenv for this image. 
 # Note this relies on the VENV variable we've set in this image.
-ENTRYPOINT ["/usr/local/bin/flytekit_venv", "/opt/entrypoint.sh"]
-
-ENV FLYTE_SDK_USE_STRUCTURED_DATASET TRUE
+ENTRYPOINT ["/opt/entrypoint.sh"]
