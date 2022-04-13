@@ -70,7 +70,14 @@ jobs:
       run: |
         sudo chmod +x .github/scripts/ci_helper.sh
         .github/scripts/ci_helper.sh setup_opta
-        /home/runner/.opta/opta apply -c ./opta/aws/env.yaml --auto-approve 
+        opta apply -c ./opta/aws/env.yaml --auto-approve 
+        opta output -c ./opta/aws/env.yaml
+    - name: OPTA DNS 
+    - id: opta-dns
+      shell: bash
+      run: |
+        .github/scripts/ci_helper.sh setup_jq
+        opta output -c ./opta/aws/env.yaml | jq
     - uses: azure/setup-helm@v1
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
@@ -130,5 +137,18 @@ jobs:
       shell: bash
       run: |
         opta destroy -c ./opta/aws/env.yaml --auto-approve
-
-
+    outputs:
+      flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
+#  trigger-run-tests:
+#    name: Run tests
+#    needs:
+#      - run-testing-workflows
+#      - calculate-pre-reqs
+#    uses: brucearctor/flyte/.github/workflows/register_tests.yml@opta-aws
+#    with:
+#      priorities: P0,P1
+#      flytesnacks_version: ${{ needs.calculate-pre-reqs.outputs.flytesnacks_latest }}
+#      badge_version: ${{ needs.calculate-pre-reqs.outputs.badge_version }}
+#    secrets:
+#      client_secret: ${{ secrets.PROPELLER_CLIENT_SECRET }}
+#      DNS: ${{ secrets.DNS }}

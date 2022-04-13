@@ -8,6 +8,9 @@ setup_opta () {
   export PATH=$PATH:/home/runner/.opta
 }
 
+setup_jq () {
+  sudo apt-get install -y jq
+}
 
 commit_changelog () {
   sed -i "s,changelog:[^*]*# OPTA_CHANGELOG,changelog: $(date +%s) # OPTA_CHANGELOG," ./opta/aws/flyte.yaml
