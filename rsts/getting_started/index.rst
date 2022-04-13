@@ -68,11 +68,16 @@ Run your workflow locally using ``pyflyte``, which is the CLI that ships with ``
 
   pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
 
-.. note::
-   This uses the default image bundled with flytekit, which contains numpy, pandas, flytekit.
-   You can also pass in your own image using the ``--image`` flag.
+.. dropdown:: :fa:`info-circle` Why ``pyflyte run`` - You can simply use ``python example.py`` - But?
+    :animate: fade-in-slide-down
 
-.. tip:: All the functions defined in `example.py` are also just Python code, so you could simply execute the workflow as a python function by invoking it: ``wf(n=200, mean=4.0, sigma=2.0)``.
+    Flyte ``@task`` and ``@workflow`` decorators are designed to continue to work with your code-base. There is one
+    restriction, they have to be the outermost decorators. Thus you can, simply invoke your ``tasks`` and ``workflows``
+    as regular python methods.
+
+    Also note, that Tasks are pure python functions, while Workflows are a DSL and only look like a python function.
+    Do not use non-determininstic operations in a workflow - like ``rand.random`` or ``time.now()`` etc. Also, in a workflow
+    you cannot simply access the outputs of tasks and operate on them, you can only pass them to other tasks.
 
 Executing on a Flyte Cluster
 """""""""""""""""""""""""""""""
@@ -99,14 +104,28 @@ Start a Flyte demonstration environment on your local machine:
 
   flytectl demo start
 
+
+.. dropdown:: :fa:`info-circle` What is a flyte demo environment?
+    :animate: fade-in-slide-down
+
+    Flyte demo environment is a fully included testing environment that can be run on your local machine. It is not a substitute for production environment
+    but is great to try out the platform and check out some of the capabilities. Most plugins are not directly installed in this environment and it is not really
+    a great way to test the performance of the platform.
+
 Then run the same workflow on the Flyte cluster:
 
 .. prompt:: bash $
 
   pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
 
-.. note:: The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execution on the configured backend.
+.. dropdown:: :fa:`info-circle` What does the ``--remote`` flag do?
+    :animate: fade-in-slide-down
 
+   * The only difference between previous ``local`` and this command is the ``--remote`` flag. This will trigger an execution on the configured backend.
+   * Dependency management is a challenge with python projects. Flyte uses containers to manage dependencies for your project.
+   * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, flytekit and matches your current python (major, minor) version
+   * For cases in which you want to use a custom image, it is possible to pass a custom image using the ``--image`` flag.
+   * Also it is possible to completely use an image that contains your code built-in - refer to package & register flow
 
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^^^^
