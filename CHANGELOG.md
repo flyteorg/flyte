@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.3](http://github.com/lyft/flyteconsole/compare/v0.51.2...v0.51.3) (2022-04-13)
+
+
+### Bug Fixes
+
+* **383:** tasks and workflow number capped to 25 in dashboard page ([#384](http://github.com/lyft/flyteconsole/issues/384)) ([a8c0ab8](http://github.com/lyft/flyteconsole/commit/a8c0ab8e80fc63c872e8840e24635970b04ed58c))
+
 ## [0.51.2](http://github.com/lyft/flyteconsole/compare/v0.51.1...v0.51.2) (2022-04-13)
 
 
