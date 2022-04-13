@@ -63,7 +63,7 @@ jobs:
     - name: STORE file
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml    - name: SETUP and APPLY Opta
+        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml
     - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
