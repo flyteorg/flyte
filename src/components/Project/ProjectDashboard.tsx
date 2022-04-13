@@ -8,6 +8,7 @@ import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { Admin } from 'flyteidl';
 import { DomainSettingsSection } from 'components/common/DomainSettingsSection';
 import { getCacheKey } from 'components/Cache/utils';
+import { limits } from 'models/AdminEntity/constants';
 import { ErrorBoundary } from 'components/common/ErrorBoundary';
 import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { DataError } from 'components/Errors/DataError';
@@ -127,9 +128,9 @@ export const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
 
   const fetch = React.useCallback(() => executionsQuery.fetchNextPage(), [executionsQuery]);
 
-  const { value: workflows } = useWorkflowNameList({ domain, project }, {});
+  const { value: workflows } = useWorkflowNameList({ domain, project }, { limit: limits.NONE });
   const numberOfWorkflows = workflows.length;
-  const { value: tasks } = useTaskNameList({ domain, project }, {});
+  const { value: tasks } = useTaskNameList({ domain, project }, { limit: limits.NONE });
   const numberOfTasks = tasks.length;
 
   const queryClient = useQueryClient();
