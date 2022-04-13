@@ -8,6 +8,7 @@ env:
   YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
+  FLYTE_STORAGE_BUCKET: "flyte-unique-nooverlap-bucket-$RANDOM"
 
 jobs:
   calculate-pre-reqs:
@@ -53,17 +54,17 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}  
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
         aws-region: ${{ env.AWS_REGION }}
-    - name: set variables
+    - name: set env variables
       shell: bash
       run: |
         sed -i "s/<env_name>/$ENV_NAME/" ./opta/aws/env.yaml
         sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml
         sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
         sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
-    - name: STORE file
+    - name: STORE env file
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml
+        aws s3 cp ./opta/aws/env.yaml s3://flyte-unique-bucket/0/opta/aws/env.yaml
     - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
@@ -101,11 +102,17 @@ jobs:
       run: |
         .github/scripts/ci_helper.sh prepare_flyte_release_build
         .github/scripts/ci_helper.sh prepare_helm_chart
+    - name: set flyte variables
+      shell: bash
+      run: |
+        sed -i "s/<bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
+        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
+        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
     - name: STORE flyte.yaml
       shell: bash
       run: |
         aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/1/opta/aws/flyte.yaml
-    - name: OPTA APPLY FLYTEADMIN_TAG
+    - name: OPTA APPLY FLYTEADMIN
       shell: bash
       run: |
         opta apply -c ./opta/aws/flyte.yaml --auto-approve
@@ -113,7 +120,7 @@ jobs:
       shell: bash
       run: |
         opta destroy -c ./opta/aws/flyte.yaml --auto-approve 
-    - name: DESTROY OPTA ENV_NAME
+    - name: DESTROY OPTA ENV
       shell: bash
       run: |
         opta destroy -c ./opta/aws/env.yaml --auto-approve
