@@ -3,6 +3,9 @@ package cmd
 import (
 	"context"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"github.com/flyteorg/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"golang.org/x/sync/errgroup"
@@ -82,8 +85,20 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(origContext)
 
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
-	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, defaultNamespace, &propellerScope)
+	webhookScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("webhook")
+	limitNamespace := ""
+	if propellerCfg.LimitNamespace != defaultNamespace {
+		limitNamespace = propellerCfg.LimitNamespace
+	}
+	options := manager.Options{
+		Namespace:     limitNamespace,
+		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder(webhookScope),
+		CertDir:       cfg.CertDir,
+		Port:          cfg.ListenPort,
+	}
+
+	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, options)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)
 		return err
@@ -99,15 +114,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	})
 
 	g.Go(func() error {
-		err := controller.StartControllerManager(childCtx, mgr)
-		if err != nil {
-			logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
-		}
-		return err
-	})
-
-	g.Go(func() error {
-		err := webhook.Run(childCtx, propellerCfg, cfg, defaultNamespace, &propellerScope, mgr)
+		err := webhook.Run(childCtx, propellerCfg, cfg, defaultNamespace, &webhookScope, mgr)
 		if err != nil {
 			logger.Fatalf(childCtx, "Failed to start webhook. Error: %v", err)
 		}

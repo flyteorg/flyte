@@ -493,23 +493,14 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 	return opts
 }
 
-func CreateControllerManager(ctx context.Context, cfg *config.Config,
-	defaultNamespace string, scope *promutils.Scope) (*manager.Manager, error) {
+func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (*manager.Manager, error) {
 
 	_, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error building Kubernetes Clientset")
 	}
 
-	limitNamespace := ""
-	if cfg.LimitNamespace != defaultNamespace {
-		limitNamespace = cfg.LimitNamespace
-	}
-	mgr, err := manager.New(kubecfg, manager.Options{
-		Namespace:     limitNamespace,
-		SyncPeriod:    &cfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder((*scope).NewSubScope("kube")),
-	})
+	mgr, err := manager.New(kubecfg, options)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to initialize controller-runtime manager")
 	}
