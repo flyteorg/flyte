@@ -64,6 +64,7 @@ jobs:
       shell: bash
       run: |
         aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/0/opta/aws/flyte.yaml    - name: SETUP and APPLY Opta
+    - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
         sudo chmod +x .github/scripts/ci_helper.sh
