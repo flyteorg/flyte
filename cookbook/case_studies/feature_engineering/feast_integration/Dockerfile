@@ -10,7 +10,7 @@ ENV PYTHONPATH "$PYTHONPATH:/root/feast_integration"
 RUN pip3 install awscli
 
 # Install gcloud for GCP
-RUN apt-get install curl --assume-yes
+RUN apt-get update && apt-get install -y curl
 
 WORKDIR /opt
 RUN curl https://sdk.cloud.google.com > install.sh

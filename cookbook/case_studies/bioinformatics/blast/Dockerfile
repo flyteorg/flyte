@@ -12,6 +12,7 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y \
     cmake \
+    curl \
     python3.8 \
     python3.8-venv \
     python3.8-dev \
@@ -26,9 +27,6 @@ RUN apt-get update \
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
-
-# Install gcloud for GCP
-RUN apt-get install curl --assume-yes
 
 WORKDIR /opt
 RUN curl https://sdk.cloud.google.com > install.sh

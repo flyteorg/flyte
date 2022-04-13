@@ -16,9 +16,6 @@ RUN apt-get update && apt-get install -y make build-essential libssl-dev curl
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip install awscli
 
-# Install gcloud for GCP
-RUN apt-get install curl --assume-yes
-
 WORKDIR /opt
 RUN curl https://sdk.cloud.google.com > install.sh
 RUN bash /opt/install.sh --install-dir=/opt

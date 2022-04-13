@@ -7,7 +7,7 @@ ENV LC_ALL C.UTF-8
 ENV PYTHONPATH /root
 
 RUN apt-get update && \
-    apt-get -y install sudo
+    apt-get -y install sudo curl
 
 # Install dolt
 RUN sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/download/install.sh | sudo bash' &&\
@@ -16,9 +16,6 @@ RUN sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/downlo
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
-
-# Install gcloud for GCP
-RUN apt-get install curl --assume-yes
 
 WORKDIR /opt
 RUN curl https://sdk.cloud.google.com > install.sh

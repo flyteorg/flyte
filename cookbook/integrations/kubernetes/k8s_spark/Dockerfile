@@ -15,9 +15,6 @@ RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-ess
 # in future versions to make it completely portable
 RUN pip3 install awscli
 
-# Install gcloud for GCP
-RUN apt-get install curl --assume-yes
-
 WORKDIR /opt
 RUN curl https://sdk.cloud.google.com > install.sh
 RUN bash /opt/install.sh --install-dir=/opt
