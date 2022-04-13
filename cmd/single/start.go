@@ -105,7 +105,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
 		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope),
 		CertDir:       webhookConfig.GetConfig().CertDir,
-		//Port:           webhookConfig.GetConfig().ListenPort,
+		Port:           webhookConfig.GetConfig().ListenPort,
 	}
 
 	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)
