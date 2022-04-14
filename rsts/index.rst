@@ -74,6 +74,8 @@ The core unit of execution in Flyte is a :ref:`task <divedeep-tasks>`, which you
 
     .. code:: python
 
+        from flytekit import task, workflow
+
         @task
         def greet(name: str) -> str:
             return f"Welcome, {name}!"
@@ -91,8 +93,8 @@ The core unit of execution in Flyte is a :ref:`task <divedeep-tasks>`, which you
             greeting = greet(name=name)
             return add_question(greeting=greeting)
 
-        welcome(name="Traveler")
-        # Output: "Welcome, Traveler! How are you?"
+        welcome(name="Traveller")
+        # Output: "Welcome, Traveller! How are you?"
 
 .. tabbed:: Java
 
