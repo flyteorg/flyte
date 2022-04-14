@@ -1,3 +1,4 @@
+import { log } from 'common/log';
 import { QueryInput, QueryType } from 'components/data/types';
 import { extractTaskTemplates } from 'components/hooks/utils';
 import { getNodeExecutionData } from 'models/Execution/api';
@@ -16,6 +17,7 @@ export function makeWorkflowQuery(queryClient: QueryClient, id: WorkflowId): Que
       extractTaskTemplates(workflow).forEach((task) =>
         queryClient.setQueryData([QueryType.TaskTemplate, task.id], task),
       );
+
       return workflow;
     },
     // `Workflow` objects (individual versions) are immutable and safe to
@@ -25,20 +27,26 @@ export function makeWorkflowQuery(queryClient: QueryClient, id: WorkflowId): Que
 }
 
 export function makeNodeExecutionDynamicWorkflowQuery(
-  queryClient: QueryClient,
   parentsToFetch,
 ): QueryInput<{ [key: string]: any }> {
   return {
     queryKey: [QueryType.DynamicWorkflowFromNodeExecution, parentsToFetch],
     queryFn: async () => {
       return await Promise.all(
-        Object.keys(parentsToFetch).map((id) => {
-          const executionId = parentsToFetch[id];
-          const data = getNodeExecutionData(executionId.id).then((value) => {
-            return { key: id, value: value };
-          });
-          return data;
-        }),
+        Object.keys(parentsToFetch)
+          .filter((id) => parentsToFetch[id])
+          .map((id) => {
+            const executionId = parentsToFetch[id];
+            if (!executionId) {
+              // TODO FC#377: This check and filter few lines abode need to be deleted
+              // when Branch node support would be added
+              log.error(`Graph missing info for ${id}`);
+            }
+            const data = getNodeExecutionData(executionId.id).then((value) => {
+              return { key: id, value: value };
+            });
+            return data;
+          }),
       ).then((values) => {
         const output: { [key: string]: any } = {};
         for (let i = 0; i < values.length; i++) {

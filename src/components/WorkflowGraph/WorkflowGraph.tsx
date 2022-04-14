@@ -7,7 +7,7 @@ import { NonIdealState } from 'components/common/NonIdealState';
 import { DataError } from 'components/Errors/DataError';
 import { NodeExecutionsContext } from 'components/Executions/contexts';
 import { WaitForQuery } from 'components/common/WaitForQuery';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { makeNodeExecutionDynamicWorkflowQuery } from 'components/Workflow/workflowQueries';
 import { createDebugLogger } from 'common/log';
 import { CompiledNode } from 'models/Node/types';
@@ -90,9 +90,7 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
   };
 
   const dynamicParents = checkForDynamicExeuctions(nodeExecutionsById, staticExecutionIdsMap);
-  const dynamicWorkflowQuery = useQuery(
-    makeNodeExecutionDynamicWorkflowQuery(useQueryClient(), dynamicParents),
-  );
+  const dynamicWorkflowQuery = useQuery(makeNodeExecutionDynamicWorkflowQuery(dynamicParents));
   const renderReactFlowGraph = (dynamicWorkflows) => {
     debug('DynamicWorkflows:', dynamicWorkflows);
     let mergedDag = dag;
