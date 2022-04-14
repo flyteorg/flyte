@@ -65,10 +65,10 @@ What is Flyte?
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform implemented in Golang. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome, and many others, Flyte provides first-class support for Python, JAVA, and Scala. It is built directly on Kubernetes for all the benefits of containerization like portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome, and many others, Flyte provides first-class support for Python, Java, and Scala. It is built directly on Kubernetes for all the benefits of containerization like portability, scalability, and reliability.
 
 
-The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
+The core unit of execution in Flyte is a :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
 
 .. tabbed:: Python
 
@@ -78,7 +78,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
         def greet(name: str) -> str:
             return f"Welcome, {name}!"
 
-    You can compose one or more tasks to create a ``workflow``:
+    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
 
     .. code:: python
 
@@ -128,7 +128,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
           }
         }
 
-    You can compose one or more tasks to create a ``workflow``:
+    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
 
     .. code:: java
 
@@ -207,7 +207,7 @@ The core unit of execution in Flyte is the :ref:`task <divedeep-tasks>`, which y
             new GreetTask().withInput("name", name)
         }
 
-    You can compose one or more tasks to create a ``workflow``:
+    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
 
     .. code:: scala
 
@@ -264,7 +264,7 @@ Core Features
 * Extensible Backend and SDKs
 * Ergonomic SDKs in Python, Java and Scala
 * Versioned and Auditable - all actions are recorded
-* Matches your workflow - Start with one task, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
+* Matches your workflow - Start with one task, define workflows, and launchplans, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
 * Battle-tested - millions of pipelines executed per month
 * Vertically-Integrated Compute - serverless experience
 * Deep understanding of data-lineage and provenance
@@ -277,7 +277,7 @@ Who's Using Flyte?
 
 At `Lyft <https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59>`__, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams.
 
-For the most current list of Flyte's deployments, please click `here <https://github.com/flyteorg/flyte#%EF%B8%8F-current-deployments>`_.
+For the most current list of Flyte's deployments, click `here <https://github.com/flyteorg/flyte#%EF%B8%8F-current-deployments>`_.
 
 Next Steps
 ----------
