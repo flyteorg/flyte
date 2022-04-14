@@ -28,7 +28,7 @@ jobs:
           committer: Flyte-Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
-          branch: flyte-bot-update-releases-katrina
+          branch: flyte-bot-update-releases
           delete-branch: true
           title: 'Update Flyte components'
           body: |
