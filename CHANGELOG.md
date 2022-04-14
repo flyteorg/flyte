@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.52.0](http://github.com/lyft/flyteconsole/compare/v0.51.3...v0.52.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* **378:** ensure that undefined executions ids won't get into graph ([#388](http://github.com/lyft/flyteconsole/issues/388)) ([ea9d2b3](http://github.com/lyft/flyteconsole/commit/ea9d2b31e1e6f51872eb7d10283b645de3b17bec))
+
+
+### Features
+
+* cleanup ([#389](http://github.com/lyft/flyteconsole/issues/389)) ([05b88ed](http://github.com/lyft/flyteconsole/commit/05b88ed2d2ecdb5d8a8404efea25414e57189709))
+
 ## [0.51.3](http://github.com/lyft/flyteconsole/compare/v0.51.2...v0.51.3) (2022-04-13)
 
 
