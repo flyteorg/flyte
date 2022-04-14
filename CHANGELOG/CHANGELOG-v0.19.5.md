@@ -1,4 +1,4 @@
-# Flyte v0.19.4 Changelog
+# Flyte v0.19.5 Changelog
 
 ## Core Platform
 - Single binary: deploy the entire Flyte back-end as a single binary. This speeds up sandbox and improves the local contributor experience. Coming soon: faster deployment for small-scale use-cases
