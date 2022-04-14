@@ -134,25 +134,6 @@ asdf install
 yarn install
 ```
 
-## CORS Proxying: Recommended Setup
-
-In the common hosting arrangement, all API requests will be to the same origin
-serving the client application, making CORS unnecessary. However, if you would like
-to setup your local dev enviornment to target a FlyteAdmin service running on a different
-domain you will need to configure your enviornment to support CORS. One example would be
-hosting the Admin API on a different domain than the console. Another example is
-when fetching execution data from external storage such as S3.
-
-The fastest (recommended) way to setup a CORS solution is to do so within the browser.
-If you would like to handle this at the Node level you will need to disable authentication
-(see below).
-
-_NOTE:_ Do not configure for both browser and Node solutions.
-
-These instructions require using Google Chrome. You will also need to identify the
-URL of your target FlyteAdmin API instance. These instructions will use
-`https://different.admin.service.com` as an example.
-
 1. Set `ADMIN_API_URL` and `ADMIN_API_USE_SSL`
 
     ```

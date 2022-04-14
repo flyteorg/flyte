@@ -17,7 +17,7 @@ RUN : \
   # build
   && make build_prod \
   # place the runtime application in /app
-  && mv dist corsProxy.js index.js env.js plugins.js /app
+  && mv dist index.js env.js plugins.js /app
 
 FROM gcr.io/distroless/nodejs
 LABEL org.opencontainers.image.source https://github.com/lyft/flyteconsole

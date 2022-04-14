@@ -8,7 +8,6 @@ const morgan = require('morgan');
 const express = require('express');
 const env = require('./env');
 const { applyMiddleware } = require('./plugins');
-const corsProxy = require('./corsProxy.js');
 
 const app = express();
 
@@ -16,7 +15,6 @@ const app = express();
 app.use(morgan('combined'));
 app.use(express.json());
 app.get(`${env.BASE_URL}/healthz`, (_req, res) => res.status(200).send());
-app.use(corsProxy(`${env.BASE_URL}${env.CORS_PROXY_PREFIX}`));
 
 if (typeof applyMiddleware === 'function') {
   console.log('Found middleware plugins, applying...');

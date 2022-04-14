@@ -88,10 +88,6 @@ For help with installing dependencies look into
     `/api/v1` and `/console` for example). For local development, this is
     usually not needed, so the default behavior is to run without a prefix.
 
-* `CORS_PROXY_PREFIX` (default: `/cors_proxy`)
-
-    Sets the local endpoint for [CORS request proxying](CONTRIBUTING.md#cors-proxying-recommended-setup).
-
 ### Running from docker image as localhost
 
 To run flyteconsole directly from your docker image as localhost you must set a
@@ -139,26 +135,6 @@ For continious development we are using:
   \- adds tracking code to the app or website. To disable use `ENABLE_GA=false`
 
 More info on each section could be found at [CONTRIBUTING.md](CONTRIBUTING.md)
-
-### CORS Proxying: Recommended setup
-
-In the common hosting arrangement, all API requests will be to the same origin
-serving the client application, making CORS unnecessary. However, if you would like
-to setup your local dev enviornment to target a FlyteAdmin service running on a different
-domain you will need to configure your enviornment support CORS. One example would be
-hosting the Admin API on a different domain than the console. Another example is
-when fetching execution data from external storage such as S3.
-
-The fastest (recommended) way to setup a CORS solution is to do so within the browser. 
-If you would like to handle this at the Node level you will need to disable authentication
-(see below)
-
-> Do not configure for both browser and Node solutions. 
-
-These instructions require using Google Chrome. You will also need to identify the 
-URL of your target FlyteAdmin API instance. These instructions will use
-`https://different.admin.service.com` as an example.
-
 
 * Set `ADMIN_API_URL` and `ADMIN_API_USE_SSL`
    
