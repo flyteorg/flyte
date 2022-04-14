@@ -284,7 +284,7 @@ Next Steps
 
 Whether you want to write Flyte workflows, deploy the Flyte platform to your K8s cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
 
-* :ref:`Get Started <gettingstarted_build>`
+* :ref:`Get Started <getting-started>`
 * :ref:`Main Concepts <divedeep>`
 * :ref:`Extend Flyte <cookbook:plugins_extend>`
 * :ref:`Join the Community <community>`
