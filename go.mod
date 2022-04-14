@@ -3,15 +3,16 @@ module github.com/flyteorg/flyte
 go 1.18
 
 require (
-	github.com/flyteorg/datacatalog v0.3.33
-	github.com/flyteorg/flyteadmin v0.6.142
-	github.com/flyteorg/flytepropeller v0.16.45-0.20220413011715-fe1981b1f10e
+	github.com/flyteorg/datacatalog v0.3.34
+	github.com/flyteorg/flyteadmin v0.6.145
+	github.com/flyteorg/flytepropeller v0.16.46
 	github.com/flyteorg/flytestdlib v0.4.23
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gorm.io/driver/postgres v1.2.3
+	sigs.k8s.io/controller-runtime v0.8.3
 )
 
 require (
@@ -70,7 +71,7 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/flyteorg/flyteidl v0.24.19 // indirect
-	github.com/flyteorg/flyteplugins v0.10.23 // indirect
+	github.com/flyteorg/flyteplugins v0.10.24 // indirect
 	github.com/flyteorg/stow v0.3.3 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -211,7 +212,6 @@ require (
 	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305164622-f622666832c1 // indirect
 	k8s.io/utils v0.0.0-20210305010621-2afb4311ab10 // indirect
-	sigs.k8s.io/controller-runtime v0.8.3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.0 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
