@@ -74,3 +74,9 @@ The plugin requires configuring the Flyte backend as well. Refer to :ref:`Kubern
 In a nutshell, here’s how Horovod-Spark-Flyte can be beneficial:
 Horovod provides the distributed framework, Spark enables extracting, preprocessing, and partitioning data,
 Flyte can stitch the former two pieces together, e.g., by connecting the data output of a Spark transform to a training system using Horovod while ensuring high utilization of GPUs!
+
+Run workflows in this directory with the custom-built base image like so:
+
+```shell
+pyflyte run --remote keras_spark_rossmann_estimator.py:horovod_spark_wf --image ghcr.io/flyteorg/flytecookbook:spark_horovod-latest
+```

@@ -338,6 +338,7 @@ def trainer(df: FlyteSchema, num_features_univariate: int = 7) -> JoblibSerializ
 # Finally, we define a workflow that streamlines the whole pipeline building and feature serving process.
 # To show how to compose an end to end workflow that includes featurization, training and example predictions,
 # we construct the following workflow, composing other workflows:
+#
 @workflow
 def feast_workflow(
     imputation_method: str = "mean",
