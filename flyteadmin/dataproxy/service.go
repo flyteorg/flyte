@@ -2,6 +2,7 @@ package dataproxy
 
 import (
 	"context"
+	"encoding/base32"
 	"encoding/base64"
 	"fmt"
 	"strings"
@@ -60,8 +61,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	}
 
 	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
+	urlSafeMd5 := base32.StdEncoding.EncodeToString(req.ContentMd5)
+
 	storagePath, err := createShardedStorageLocation(ctx, s.shardSelector, s.dataStore, s.cfg.Upload,
-		req.Project, req.Domain, md5, req.Filename)
+		req.Project, req.Domain, urlSafeMd5, req.Filename)
 	if err != nil {
 		return nil, err
 	}
