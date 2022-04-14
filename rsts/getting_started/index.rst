@@ -21,13 +21,13 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's python SDK.
 Example Script: Computing Descriptive Statistics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's create a simple Flyte workflow involving two steps:
+Let's create a simple Flyte workflow that involves two steps:
 
 1. Generate a dataset of ``numbers`` drawn from a normal distribution.
 2. Compute the mean and standard deviation of the ``numbers`` data.
 
-Create It
-"""""""""
+Create Workflow
+""""""""""""""""
 
 Copy the following code to a file named ``example.py``
 
@@ -57,7 +57,7 @@ Copy the following code to a file named ``example.py``
 
 Running Flyte Workflows
 ^^^^^^^^^^^^^^^^^^^^^^^
-You can run the workflows in ``example.py`` on a local python environment or a Flyte cluster. In this guide, you will learn how to run a local demo cluster.
+You can run the workflow in ``example.py`` on a local python environment or a Flyte cluster. In this guide, you will learn how to run a local demo cluster.
 
 Executing Locally
 """""""""""""""""""
@@ -72,8 +72,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
     :animate: fade-in-slide-down
 
     Flyte ``@task`` and ``@workflow`` decorators are designed to continue to work with your code-base with a restriction that they have to be the outermost decorators. 
-   Thus you can invoke your ``tasks`` and ``workflows``
-    as regular python methods.
+    Thus you can invoke your ``tasks`` and ``workflows`` as regular python methods.
 
     Also, note that Tasks are pure python functions, while Workflows are a DSL and only look like a python function.
     Do not use non-deterministic operations in a workflow - like ``rand.random`` or ``time.now()`` etc. Also, in a workflow,
