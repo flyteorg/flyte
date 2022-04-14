@@ -15,140 +15,65 @@ First, install the Flyte Sqlalchemy plugin:
 
     pip install flytekitplugins-sqlalchemy
 
-
-.. note::
-    This example works locally only. For remote, you need to input a valid URI.
 """
 
 # %%
 # Let's first import the libraries.
-import typing
-
 import pandas
-import psycopg2
 from flytekit import kwtypes, task, workflow
+from flytekit.types.schema import FlyteSchema
 from flytekitplugins.sqlalchemy import SQLAlchemyConfig, SQLAlchemyTask
 
 
 # %%
-# Next, we define a ``create_db`` function to create a Postgres DB using `psycopg2 <https://pypi.org/project/psycopg2/>`__.
-def create_db(
-    conn_info: typing.Dict[str, str],
-) -> None:
-    psql_connection_string = (
-        f"user={conn_info['user']} password={conn_info['password']}"
-    )
-    conn = psycopg2.connect(psql_connection_string)
-    cur = conn.cursor()
-
-    conn.autocommit = True
-    sql_query = f"CREATE DATABASE {conn_info['database']}"
-
-    try:
-        cur.execute(sql_query)
-    except Exception as e:
-        print(f"{type(e).__name__}: {e}")
-        print(f"Query: {cur.query}")
-        cur.close()
-    else:
-        conn.autocommit = False
-
-
-# %%
-# We define a ``run_query`` function to create a table and insert data entries into it.
-def run_query(
-    sql_query: str,
-    conn: psycopg2.extensions.connection,
-    cur: psycopg2.extensions.cursor,
-) -> None:
-    try:
-        cur.execute(sql_query)
-    except Exception as e:
-        print(f"{type(e).__name__}: {e}")
-        print(f"Query: {cur.query}")
-        conn.rollback()
-        cur.close()
-    else:
-        conn.commit()
-
-
-local_pg_server = f"postgresql://localhost/flights"
-
-
-# %%
-# We define a helper function.
-def pg_server() -> str:
-    conn_info = {"database": "flights", "user": "postgres", "password": "postgres"}
-
-    # create database
-    create_db(conn_info)
-
-    # connect to the database
-    connection = psycopg2.connect(**conn_info)
-    cursor = connection.cursor()
-
-    # run queries
-    table_sql = """
-        CREATE TABLE test (
-            origin VARCHAR NOT NULL,
-            destination VARCHAR NOT NULL,
-            duration INTEGER NOT NULL
-        );
-    """
-    run_query(table_sql, connection, cursor)
-
-    first_entry_sql = """
-        INSERT INTO test (origin, destination, duration)
-        VALUES ('New York', 'London', 415);
-    """
-    run_query(first_entry_sql, connection, cursor)
-
-    second_entry_sql = """
-        INSERT INTO test (origin, destination, duration)
-        VALUES ('Shanghai', 'Paris', 760);
-    """
-    run_query(second_entry_sql, connection, cursor)
-
-    cursor.close()
-    connection.close()
-
-    return local_pg_server
-
-
-# %%
-# Finally, we fetch the number of data entries whose durations lie within the user-specified durations.
+# First we define a ``SQLALchemyTask``, which returns the first ``n`` records from the ``rna`` table of the
+# `RNA central database <https://rnacentral.org/help/public-database>`__ . Since this database is public, we can
+# hard-code the database URI, including the user and password in a string.
 #
 # .. note::
 #
 #   The output of SQLAlchemyTask is a :py:class:`~flytekit.types.schema.FlyteSchema` by default.
-@task
-def get_length(df: pandas.DataFrame) -> int:
-    return len(df)
+#
+# .. caution::
+#
+#    **Never** store passwords for proprietary or sensitive databases! If you need to store and access secrets in a task,
+#    Flyte provides a convenient API. See :ref:`sphx_glr_auto_core_containerization_use_secrets.py` for more details.
 
+DATABASE_URI = "postgresql://reader:NWDMCE5xdipIjRrp@hh-pgsql-public.ebi.ac.uk:5432/pfmegrnargs"
+
+# Here we define the schema of the expected output of the query, which we then re-use in the `get_mean_length` task.
+DataSchema = FlyteSchema[kwtypes(sequence_length=int)]
 
 sql_task = SQLAlchemyTask(
-    "fetch_flight_data",
+    "rna",
     query_template="""
-            select * from test
-            where duration >= {{ .inputs.lower_duration_cap }}
-            and duration <= {{ .inputs.upper_duration_cap }}
-        """,
-    inputs=kwtypes(lower_duration_cap=int, upper_duration_cap=int),
-    task_config=SQLAlchemyConfig(uri="postgresql://localhost/flights"),
+        select len as sequence_length from rna
+        where len >= {{ .inputs.min_length }}
+        and len <= {{ .inputs.max_length }}
+        limit {{ .inputs.limit }}
+    """,
+    inputs=kwtypes(min_length=int, max_length=int, limit=int),
+    output_schema_type=DataSchema,
+    task_config=SQLAlchemyConfig(uri=DATABASE_URI),
 )
 
 
+# %%
+# Next, we define a task that computes the mean length of sequences in the subset of RNA sequences that our query
+# returned.
+@task
+def get_mean_length(data: DataSchema) -> float:
+    dataframe = data.open().all()
+    return dataframe["sequence_length"].mean().item()
+
+
+# %%
+# Finally, we put everything together into a workflow:
 @workflow
-def my_wf(lower_duration_cap: int, upper_duration_cap: int) -> int:
-    return get_length(
-        df=sql_task(
-            lower_duration_cap=lower_duration_cap, upper_duration_cap=upper_duration_cap
-        )
-    )
+def my_wf(min_length: int, max_length: int, limit: int) -> float:
+    return get_mean_length(data=sql_task(min_length=min_length, max_length=max_length, limit=limit))
 
 
 if __name__ == "__main__":
-    print(f"Starting pg server at {pg_server()}")
     print(f"Running {__file__} main...")
-    print(f"Starting Postgres DB at {pg_server()}")
-    print(my_wf(lower_duration_cap=300, upper_duration_cap=800))
+    print(my_wf(min_length=50, max_length=200, limit=5))
