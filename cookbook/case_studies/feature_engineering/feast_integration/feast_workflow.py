@@ -38,7 +38,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
 from feast_dataobjects import FeatureStore, FeatureStoreConfig
-from feature_eng_tasks import mean_median_imputer, univariate_selection
+from .feature_eng_tasks import mean_median_imputer, univariate_selection
 
 logger = logging.getLogger(__file__)
 
