@@ -21,7 +21,7 @@ from flytekit.types.file import FlyteFile
 
 
 # %%
-# We define a ``reference_task`` by importing the ``rotate()`` function.
+# We define a ``reference_task`` by importing the ``normalize_columns()`` function.
 @reference_task(
     project="flytesnacks",
     domain="development",
