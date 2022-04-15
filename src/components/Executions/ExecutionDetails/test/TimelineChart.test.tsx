@@ -2,7 +2,6 @@ import {
   CASHED_GREEN,
   formatSecondsToHmsFormat,
   generateChartData,
-  getOffsetColor,
   TRANSPARENT,
 } from '../Timeline/TimelineChart/utils';
 import { mockbarItems } from './__mocks__/NodeExecution.mock';
@@ -25,17 +24,6 @@ describe('ExecutionDetails > Timeline > BarChart', () => {
     expect(formatSecondsToHmsFormat(59)).toEqual('59s');
     expect(formatSecondsToHmsFormat(23)).toEqual('23s');
     expect(formatSecondsToHmsFormat(0)).toEqual('0s');
-  });
-
-  it('getOffsetColor returns colored background for cached items', () => {
-    const cachedArray = [false, true, false];
-    const offsetColors = getOffsetColor(cachedArray);
-
-    // If items is not cached - offset is transparent
-    expect(offsetColors[0]).toEqual(TRANSPARENT);
-    expect(offsetColors[2]).toEqual(TRANSPARENT);
-    // If cached - colored backfground
-    expect(offsetColors[1]).toEqual(CASHED_GREEN);
   });
 
   it('generateChartData properly generates map of data for ChartBars', () => {

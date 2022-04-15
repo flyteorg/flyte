@@ -166,7 +166,7 @@ async function submit(
     throw new Error('Unexpected empty form inputs ref');
   }
 
-  const { authRole, securityContext } = roleInputRef.current?.getValue() as LaunchRoles;
+  const { securityContext } = roleInputRef.current?.getValue() as LaunchRoles;
   const literals = formInputsRef.current.getValues();
   const { disableAll, labels, annotations, maxParallelism, rawOutputDataConfig } =
     advancedOptionsRef.current?.getValues() || {};
@@ -175,7 +175,6 @@ async function submit(
 
   const response = await createWorkflowExecution({
     annotations,
-    authRole,
     securityContext,
     disableAll,
     maxParallelism,

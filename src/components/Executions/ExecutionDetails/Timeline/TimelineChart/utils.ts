@@ -5,12 +5,6 @@ import { NodeExecutionPhase } from 'models/Execution/enums';
 export const CASHED_GREEN = 'rgba(74,227,174,0.25)'; // statusColors.SUCCESS (Mint20) with 25% opacity
 export const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
-export enum RelationToCache {
-  None = 'none',
-  ReadFromCaceh = 'Read from Cache',
-  WroteToCache = 'Wrote to cache',
-}
-
 export interface BarItemData {
   phase: NodeExecutionPhase;
   startOffsetSec: number;
@@ -43,11 +37,6 @@ export const formatSecondsToHmsFormat = (seconds: number) => {
     return `${minutes}m ${seconds}s`;
   }
   return `${seconds}s`;
-};
-
-export const getOffsetColor = (isCachedValue: boolean[]) => {
-  const colors = isCachedValue.map((val) => (val === true ? CASHED_GREEN : TRANSPARENT));
-  return colors;
 };
 
 /**
