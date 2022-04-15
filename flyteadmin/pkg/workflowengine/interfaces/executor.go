@@ -24,6 +24,7 @@ type ExecutionParameters struct {
 	Annotations         map[string]string
 	TaskPluginOverrides []*admin.PluginOverride
 	ExecutionConfig     *admin.WorkflowExecutionConfig
+	SecurityContext     *core.SecurityContext
 	RecoveryExecution   *core.WorkflowExecutionIdentifier
 	TaskResources       *TaskResources
 	EventVersion        int
