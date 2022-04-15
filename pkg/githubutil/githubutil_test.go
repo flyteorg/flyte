@@ -49,19 +49,19 @@ func TestCheckVersionExist(t *testing.T) {
 
 func TestGetFullyQualifiedImageName(t *testing.T) {
 	t.Run("Get tFully Qualified Image Name ", func(t *testing.T) {
-		image, tag, err := GetFullyQualifiedImageName("", sandboxImageName, false)
+		image, tag, err := GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
 		assert.Nil(t, err)
 		assert.Equal(t, true, strings.HasPrefix(tag, "v"))
 		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
 	})
 	t.Run("Get tFully Qualified Image Name with pre release", func(t *testing.T) {
-		image, tag, err := GetFullyQualifiedImageName("", sandboxImageName, true)
+		image, tag, err := GetFullyQualifiedImageName("dind", "", sandboxImageName, true)
 		assert.Nil(t, err)
 		assert.Equal(t, true, strings.HasPrefix(tag, "v"))
 		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
 	})
 	t.Run("Get tFully Qualified Image Name with specific version", func(t *testing.T) {
-		image, tag, err := GetFullyQualifiedImageName("v0.19.0", sandboxImageName, true)
+		image, tag, err := GetFullyQualifiedImageName("dind", "v0.19.0", sandboxImageName, true)
 		assert.Nil(t, err)
 		assert.Equal(t, "v0.19.0", tag)
 		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
