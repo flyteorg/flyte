@@ -3118,7 +3118,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: cr.flyte.org/flyteorg/flyteconsole:v0.51.3
+        image: cr.flyte.org/flyteorg/flyteconsole:v0.52.0
         name: flyteconsole
         ports:
         - containerPort: 8080

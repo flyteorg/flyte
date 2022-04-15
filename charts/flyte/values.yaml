@@ -223,7 +223,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v0.51.3 # FLYTECONSOLE_TAG
+      tag: v0.52.0 # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
