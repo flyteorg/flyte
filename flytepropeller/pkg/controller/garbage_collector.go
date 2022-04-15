@@ -40,7 +40,41 @@ type GarbageCollector struct {
 // Issues a background deletion command with label selector for all completed workflows outside of the retention period
 func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 
-	s := CompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours-1, g.clk.Now())
+	s := CompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours, g.clk.Now())
+
+	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
+	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
+		namespaceList, err := g.namespaceClient.List(ctx, v1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		for _, n := range namespaceList.Items {
+			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
+			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
+
+			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
+				g.metrics.gcRoundFailure.Inc(namespaceCtx)
+				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
+			} else {
+				g.metrics.gcRoundSuccess.Inc(namespaceCtx)
+			}
+		}
+	} else {
+		namespaceCtx := contextutils.WithNamespace(ctx, g.namespace)
+		logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", g.namespace)
+		if err := g.deleteWorkflowsForNamespace(ctx, g.namespace, s); err != nil {
+			g.metrics.gcRoundFailure.Inc(namespaceCtx)
+			logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", g.namespace, err)
+		} else {
+			g.metrics.gcRoundSuccess.Inc(namespaceCtx)
+		}
+	}
+	return nil
+}
+
+func (g *GarbageCollector) deleteWorkflowsAbandon(ctx context.Context) error {
+
+	s := CompletedWorkflowsSelectorOutsideRetentionPeriodAbandon(g.ttlHours, g.clk.Now())
 
 	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
 	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
@@ -100,6 +134,9 @@ func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
 		case <-ticker.C():
 			logger.Infof(ctx, "Garbage collector running...")
 			t := g.metrics.gcTime.Start(ctx)
+			if err := g.deleteWorkflowsAbandon(ctx); err != nil {
+				logger.Errorf(ctx, "Garbage collection failed in this round.Error : [%v]", err)
+			}
 			if err := g.deleteWorkflows(ctx); err != nil {
 				logger.Errorf(ctx, "Garbage collection failed in this round.Error : [%v]", err)
 			}

@@ -102,45 +102,36 @@ func TestSetCompletedLabel(t *testing.T) {
 
 func TestCalculateHoursToDelete(t *testing.T) {
 	assert.Equal(t, []string{
-		"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
-	}, CalculateHoursToDelete(6, 5))
+		"2009-11-10.06", "2009-11-10.05", "2009-11-10.04", "2009-11-10.03", "2009-11-10.02", "2009-11-10.01", "2009-11-10.00",
+	}, CalculateHoursToKeep(6, time.Date(2009, time.November, 10, 6, 0, 0, 0, time.UTC)))
 
 	assert.Equal(t, []string{
-		"7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-	}, CalculateHoursToDelete(6, 6))
+		"2009-10-01.03", "2009-10-01.02", "2009-10-01.01", "2009-10-01.00", "2009-09-30.23", "2009-09-30.22", "2009-09-30.21",
+	}, CalculateHoursToKeep(6, time.Date(2009, time.October, 1, 3, 0, 0, 0, time.UTC)))
 
 	assert.Equal(t, []string{
-		"0", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-	}, CalculateHoursToDelete(6, 7))
+		"2009-01-01.00", "2008-12-31.23", "2008-12-31.22", "2008-12-31.21", "2008-12-31.20", "2008-12-31.19", "2008-12-31.18",
+	}, CalculateHoursToKeep(6, time.Date(2009, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "23",
-	}, CalculateHoursToDelete(6, 22))
+		"2009-11-10.22", "2009-11-10.21", "2009-11-10.20", "2009-11-10.19", "2009-11-10.18", "2009-11-10.17", "2009-11-10.16",
+	}, CalculateHoursToKeep(6, time.Date(2009, time.November, 10, 22, 0, 0, 0, time.UTC)))
 
 	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-	}, CalculateHoursToDelete(6, 23))
+		"2009-11-10.23", "2009-11-10.22", "2009-11-10.21", "2009-11-10.20", "2009-11-10.19", "2009-11-10.18", "2009-11-10.17",
+	}, CalculateHoursToKeep(6, time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)))
+
+	assert.Equal(t, []string{"2009-11-10.20", "2009-11-10.19"}, CalculateHoursToKeep(1, time.Date(2009, time.November, 10, 20, 0, 0, 0, time.UTC)))
+	assert.Equal(t, []string{"2009-11-10.23", "2009-11-10.22", "2009-11-10.21"}, CalculateHoursToKeep(2, time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)))
 
 	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
-	}, CalculateHoursToDelete(0, 23))
-
+		"2009-11-10.12", "2009-11-10.11", "2009-11-10.10", "2009-11-10.09", "2009-11-10.08", "2009-11-10.07", "2009-11-10.06", "2009-11-10.05", "2009-11-10.04", "2009-11-10.03", "2009-11-10.02", "2009-11-10.01", "2009-11-10.00", "2009-11-09.23", "2009-11-09.22", "2009-11-09.21", "2009-11-09.20", "2009-11-09.19", "2009-11-09.18", "2009-11-09.17", "2009-11-09.16", "2009-11-09.15", "2009-11-09.14",
+	}, CalculateHoursToKeep(22, time.Date(2009, time.November, 10, 12, 0, 0, 0, time.UTC)))
 	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "23",
-	}, CalculateHoursToDelete(0, 20))
+		"2009-11-10.00", "2009-11-09.23", "2009-11-09.22", "2009-11-09.21", "2009-11-09.20", "2009-11-09.19", "2009-11-09.18", "2009-11-09.17", "2009-11-09.16", "2009-11-09.15", "2009-11-09.14", "2009-11-09.13", "2009-11-09.12", "2009-11-09.11", "2009-11-09.10", "2009-11-09.09", "2009-11-09.08", "2009-11-09.07", "2009-11-09.06", "2009-11-09.05", "2009-11-09.04", "2009-11-09.03", "2009-11-09.02",
+	}, CalculateHoursToKeep(22, time.Date(2009, time.November, 10, 0, 0, 0, 0, time.UTC)))
 
-	assert.Equal(t, []string{
-		"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-	}, CalculateHoursToDelete(0, 0))
-
-	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-	}, CalculateHoursToDelete(0, 12))
-
-	assert.Equal(t, []string{"13"}, CalculateHoursToDelete(22, 12))
-	assert.Equal(t, []string{"1"}, CalculateHoursToDelete(22, 0))
-	assert.Equal(t, []string{"0"}, CalculateHoursToDelete(22, 23))
-	assert.Equal(t, []string{"23"}, CalculateHoursToDelete(22, 22))
+	assert.Equal(t, []string{"2022-03-30.12", "2022-03-30.11"}, CalculateHoursToKeep(1, time.Date(2022, time.March, 30, 12, 10, 0, 0, time.UTC)))
 }
 
 func TestCompletedWorkflowsSelectorOutsideRetentionPeriod(t *testing.T) {
@@ -151,10 +142,10 @@ func TestCompletedWorkflowsSelectorOutsideRetentionPeriod(t *testing.T) {
 	assert.Equal(t, workflowTerminatedValue, v)
 	assert.NotEmpty(t, s.MatchExpressions)
 	r := s.MatchExpressions[0]
-	assert.Equal(t, hourOfDayCompletedKey, r.Key)
-	assert.Equal(t, v1.LabelSelectorOpIn, r.Operator)
-	assert.Equal(t, 21, len(r.Values))
+	assert.Equal(t, completedTimeKey, r.Key)
+	assert.Equal(t, v1.LabelSelectorOpNotIn, r.Operator)
+	assert.Equal(t, 3, len(r.Values))
 	assert.Equal(t, []string{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+		"2009-11-10.23", "2009-11-10.22", "2009-11-10.21",
 	}, r.Values)
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -101,7 +102,11 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 		DeleteCollectionCb: func(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 			assert.NotNil(t, options)
 			assert.NotNil(t, listOptions)
-			assert.Equal(t, "hour-of-day in (0,1,10,11,12,13,14,15,16,17,18,19,2,20,21,3,4,5,6,7,8,9),termination-status=terminated", listOptions.LabelSelector)
+			if strings.HasPrefix(listOptions.LabelSelector, "completed-time") {
+				assert.Equal(t, "completed-time notin (2009-11-10.22,2009-11-10.23,2009-11-11.00),hour-of-day in (),termination-status=terminated", listOptions.LabelSelector)
+			} else {
+				assert.Equal(t, "hour-of-day in (0,1,10,11,12,13,14,15,16,17,18,19,2,20,21,3,4,5,6,7,8,9),termination-status=terminated", listOptions.LabelSelector)
+			}
 			wg.Done()
 			return nil
 		},
@@ -145,7 +150,7 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 		mockNamespaceInvoked = false
 		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), fakeClock, mockNamespaceClient, mockClient)
 		assert.NoError(t, err)
-		wg.Add(1)
+		wg.Add(2)
 		ctx := context.TODO()
 		ctx, cancel := context.WithCancel(ctx)
 		assert.NoError(t, gc.StartGC(ctx))
@@ -166,7 +171,7 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 		mockNamespaceInvoked = false
 		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), fakeClock, mockNamespaceClient, mockClient)
 		assert.NoError(t, err)
-		wg.Add(2)
+		wg.Add(4)
 		ctx := context.TODO()
 		ctx, cancel := context.WithCancel(ctx)
 		assert.NoError(t, gc.StartGC(ctx))
