@@ -19,7 +19,7 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's python SDK.
 
 
 Example Script: Computing Descriptive Statistics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Let's create a simple Flyte workflow that involves two steps:
 
@@ -38,7 +38,6 @@ Copy the following code to a file named ``example.py``
     import numpy as np
 
     from flytekit import task, workflow
-
 
     @task
     def generate_normal_df(n:int, mean: float, sigma: float) -> pd.DataFrame:
