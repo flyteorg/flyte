@@ -2,6 +2,7 @@ package controller
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -12,6 +13,7 @@ const controllerAgentName = "flyteworkflow-controller"
 const workflowTerminationStatusKey = "termination-status"
 const workflowTerminatedValue = "terminated"
 const hourOfDayCompletedKey = "hour-of-day"
+const completedTimeKey = "completed-time"
 
 // This function creates a label selector, that will ignore all objects (in this case workflow) that DOES NOT have a
 // label key=workflowTerminationStatusKey with a value=workflowTerminatedValue
@@ -41,7 +43,7 @@ func SetCompletedLabel(w *v1alpha1.FlyteWorkflow, currentTime time.Time) {
 		w.Labels = make(map[string]string)
 	}
 	w.Labels[workflowTerminationStatusKey] = workflowTerminatedValue
-	w.Labels[hourOfDayCompletedKey] = strconv.Itoa(currentTime.Hour())
+	w.Labels[completedTimeKey] = SplitTimeToMeetsLabelFormat(currentTime)
 }
 
 func HasCompletedLabel(w *v1alpha1.FlyteWorkflow) bool {
@@ -73,10 +75,36 @@ func CalculateHoursToDelete(retentionPeriodHours, currentHourOfDay int) []string
 	return hoursToDelete
 }
 
+//Calculates a list of all the hours that should be kept given the current time and the retentionperiod in hours
+func CalculateHoursToKeep(retentionPeriodHours int, currentTime time.Time) []string {
+	hoursToKeep := make([]string, 0, retentionPeriodHours+1)
+	for i := 0; i <= retentionPeriodHours; i++ {
+		hoursToKeep = append(hoursToKeep, SplitTimeToMeetsLabelFormat(currentTime))
+		currentTime = currentTime.Add(-1 * time.Hour)
+	}
+	return hoursToKeep
+}
+
 // Creates a new selector that selects all completed workflows and workflows with completed hour label outside of the
 // retention window
 func CompletedWorkflowsSelectorOutsideRetentionPeriod(retentionPeriodHours int, currentTime time.Time) *v1.LabelSelector {
-	hoursToDelete := CalculateHoursToDelete(retentionPeriodHours, currentTime.Hour())
+	hoursToKeep := CalculateHoursToKeep(retentionPeriodHours, currentTime)
+	s := CompletedWorkflowsLabelSelector()
+	s.MatchExpressions = append(s.MatchExpressions, v1.LabelSelectorRequirement{
+		Key:      completedTimeKey,
+		Operator: v1.LabelSelectorOpNotIn,
+		Values:   hoursToKeep,
+	})
+	s.MatchExpressions = append(s.MatchExpressions, v1.LabelSelectorRequirement{
+		Key:      hourOfDayCompletedKey,
+		Operator: v1.LabelSelectorOpIn,
+		Values:   []string{""},
+	})
+	return s
+}
+
+func CompletedWorkflowsSelectorOutsideRetentionPeriodAbandon(retentionPeriodHours int, currentTime time.Time) *v1.LabelSelector {
+	hoursToDelete := CalculateHoursToDelete(retentionPeriodHours-1, currentTime.Hour())
 	s := CompletedWorkflowsLabelSelector()
 	s.MatchExpressions = append(s.MatchExpressions, v1.LabelSelectorRequirement{
 		Key:      hourOfDayCompletedKey,
@@ -84,4 +112,9 @@ func CompletedWorkflowsSelectorOutsideRetentionPeriod(retentionPeriodHours int, 
 		Values:   hoursToDelete,
 	})
 	return s
+}
+
+func SplitTimeToMeetsLabelFormat(currentTime time.Time) string {
+	return strings.ReplaceAll(
+		strings.Split(currentTime.Round(time.Hour).String(), ":")[0], " ", ".")
 }
