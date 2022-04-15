@@ -7,21 +7,21 @@ An example dataset is available `here <https://raw.githubusercontent.com/jbrownl
 
 Why a Workflow?
 ================
-One common question when you read through the example might be - is it really required to split the training of xgboost into multiple steps. The answer is complicated, but let us try and understand what advantages and disadvantages of doing so.
+One common question when you read through the example would be whether it is really required to split the training of XGBoost into multiple steps. The answer is complicated, but let us try and understand the pros and cons of doing so.
 
 Pros:
 ^^^^^
 
-- Each task/step is standalone and can be used for various other pipelines
+- Each task/step is standalone and can be used for other pipelines
 - Each step can be unit tested
-- Data splitting, cleaning etc can be done using a more scalable system like Spark
-- State is always saved between steps, so it is cheap to recover from failures, especially if caching=True
-- Visibility is high
+- Data splitting, cleaning and processing can be done using a more scalable system like Spark
+- State is always saved between steps, so it is cheap to recover from failures, especially if ``caching=True``
+- High visibility
 
 Cons:
 ^^^^^
 
-- Performance for small datasets is a concern. The reason is, the intermediate data is durably stored and the state recorded. Each step is essnetially a checkpoint
+- Performance for small datasets is a concern because the intermediate data is durably stored and the state is recorded, and each step is essentially a checkpoint
 
 Steps of the Pipeline
 ======================
@@ -35,14 +35,14 @@ Steps of the Pipeline
 Takeaways
 ===========
 
-- Usage of FlyteSchema Type. Schema type allows passing a type safe vector from one task to task. The vector is also directly loaded into a pandas dataframe. We could use an unstructured Schema (By simply omiting the column types). this will allow any data to be accepted by the train algorithm.
-- We pass the file as a CSV input. The file is auto-loaded.
+- Usage of FlyteSchema Type. Schema type allows passing a type safe vector from one task to task. The vector is directly loaded into a pandas dataframe. We could use an unstructured Schema (By simply omitting the column types). This will allow any data to be accepted by the training algorithm.
+- We pass the file (that is auto-loaded) as a CSV input.
 
 
 Walkthrough
 ====================
 
-Run workflows in this directory with the custom-built base image like so:
+Run workflows in this directory with the custom-built base image:
 
 ```shell
 pyflyte run --remote diabetes.py:diabetes_xgboost_model --image ghcr.io/flyteorg/flytecookbook:pima_diabetes-latest
