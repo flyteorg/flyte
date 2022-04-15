@@ -40,8 +40,7 @@ jobs:
         run: make lint
 
   build_docker_image:
-    if: ${{ github.event_name == 'pull_request' }}
-    name: Build Flyteconsole Image
+    name: Build & Push Flyteconsole Image
     uses: flyteorg/flytetools/.github/workflows/publish.yml@master
     with:
       version: v1
