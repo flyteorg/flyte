@@ -5,7 +5,6 @@ import { WaitForData } from 'components/common/WaitForData';
 import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { mapValues } from 'lodash';
-import * as Long from 'long';
 import { Literal, LiteralMap, Variable } from 'models/Common/types';
 import { Execution, ExecutionData } from 'models/Execution/types';
 import { mockWorkflowExecutionResponse } from 'models/Execution/__mocks__/mockWorkflowExecutionsData';
@@ -53,13 +52,6 @@ const generateMocks = (variables: Record<string, Variable>) => {
 
   mockLaunchPlan.closure!.expectedInputs = parameterMap;
 
-  const mockExecutionData: ExecutionData = {
-    inputs: { url: 'inputsUrl', bytes: Long.fromNumber(1000) },
-    outputs: { url: 'outputsUrl', bytes: Long.fromNumber(1000) },
-    fullInputs: null,
-    fullOutputs: null,
-  };
-
   const mockExecutionInputs: LiteralMap = Object.keys(parameterMap.parameters).reduce(
     (out, paramName) => {
       const defaultValue = simpleVariableDefaults[paramName as SimpleVariableKey];
@@ -69,6 +61,11 @@ const generateMocks = (variables: Record<string, Variable>) => {
     { literals: {} } as LiteralMap,
   );
 
+  const mockExecutionData: ExecutionData = {
+    fullInputs: mockExecutionInputs,
+    fullOutputs: null,
+  };
+
   const mockApi = mockAPIContextValue({
     createWorkflowExecution: (input) => {
       console.log(input);
@@ -76,7 +73,6 @@ const generateMocks = (variables: Record<string, Variable>) => {
       return Promise.reject('Not implemented');
     },
     getExecutionData: () => resolveAfter(100, mockExecutionData),
-    getRemoteLiteralMap: () => resolveAfter(100, mockExecutionInputs),
     getLaunchPlan: () => resolveAfter(500, mockLaunchPlan),
     getWorkflow: (id) => {
       const workflow: Workflow = {

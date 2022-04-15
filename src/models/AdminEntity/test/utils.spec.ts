@@ -11,13 +11,11 @@ jest.mock('common/env', () => ({
 }));
 
 const adminPrefix = 'http://admin';
-const corsPrefix = '/cors_proxy';
 
 describe('AdminEntity/utils', () => {
   describe('adminApiUrl', () => {
     beforeEach(() => {
       env.ADMIN_API_URL = adminPrefix;
-      env.CORS_PROXY_PREFIX = corsPrefix;
     });
 
     it('uses env variable if provided', () => {

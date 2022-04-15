@@ -1,7 +1,6 @@
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { QueryInput, QueryType } from 'components/data/types';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
-import { maxBlobDownloadSizeBytes } from 'components/Literals/constants';
 import { LiteralMap } from 'models/Common/types';
 import { getExecution } from 'models/Execution/api';
 import { Execution, ExecutionData, WorkflowExecutionIdentifier } from 'models/Execution/types';
@@ -60,25 +59,19 @@ export const fetchWorkflowExecutionInputs = async (
   execution: Execution,
   apiContext: APIContextValue,
 ) => {
-  const { getExecutionData, getRemoteLiteralMap } = apiContext;
+  const { getExecutionData } = apiContext;
   if (execution.closure.computedInputs) {
     return execution.closure.computedInputs;
   }
   /** Note:
-   * getExecutionData will retun signed urls (`inputs`) as well as raw values
-   * (`fullInputs`) if input payload isn't too large.
-   *
-   * If a signed URL is returned `fullInputs` will be null; use `fullInputs`
-   * when available.
+   * getExecutionData will retun raw values (`fullInputs`) if input payload isn't too large.
    */
-  const { inputs, fullInputs } = await getExecutionData(execution.id);
+  const { fullInputs } = await getExecutionData(execution.id);
   if (fullInputs) {
     return LiteralMap.create(fullInputs);
   }
-  if (!inputs.url || !inputs.bytes || inputs.bytes.gt(maxBlobDownloadSizeBytes)) {
-    return { literals: {} };
-  }
-  return getRemoteLiteralMap(inputs.url);
+
+  return { literals: {} };
 };
 
 /** A hook for fetching the inputs object associated with an Execution. Will

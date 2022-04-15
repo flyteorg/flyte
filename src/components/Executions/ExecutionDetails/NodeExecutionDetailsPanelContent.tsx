@@ -18,7 +18,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useQuery, useQueryClient } from 'react-query';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes/routes';
-import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
+import { NoDataIsAvailable } from 'components/Literals/LiteralMapViewer';
 import { fetchWorkflow } from 'components/Workflow/workflowQueries';
 import { PanelSection } from 'components/common/PanelSection';
 import { DumpJSON } from 'components/common/DumpJSON';
@@ -171,6 +171,9 @@ const ExecutionTypeDetails: React.FC<{
   );
 };
 
+// TODO FC#393: Check if it could be replaced with tabsContent or simplified further.
+// Check if we need to request task info instead of relying on dag
+// Also check strange setDag pattern
 const WorkflowTabs: React.FC<{
   dagData: dNode;
   nodeId: string;
@@ -180,13 +183,13 @@ const WorkflowTabs: React.FC<{
 
   let tabContent: JSX.Element | null = null;
   const id = nodeId.slice(nodeId.lastIndexOf('-') + 1);
-  const taskTemplate = dagData[id].value.template;
+  const taskTemplate = dagData[id]?.value.template;
 
   switch (tabState.value) {
     case tabIds.inputs: {
       tabContent = taskTemplate ? (
         <PanelSection>
-          <RemoteLiteralMapViewer blob={taskTemplate.interface.inputs} map={null} />
+          <NoDataIsAvailable />
         </PanelSection>
       ) : null;
       break;

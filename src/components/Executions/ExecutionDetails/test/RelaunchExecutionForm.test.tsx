@@ -10,7 +10,6 @@ import {
 import { mockSimpleVariables } from 'components/Launch/LaunchForm/__mocks__/mockInputs';
 import { primitiveLiteral } from 'components/Launch/LaunchForm/__mocks__/utils';
 import { Admin } from 'flyteidl';
-import { getRemoteLiteralMap } from 'models/Common/api';
 import { LiteralMap, ResourceType, Variable } from 'models/Common/types';
 import { getExecutionData } from 'models/Execution/api';
 import { Execution, ExecutionData } from 'models/Execution/types';
@@ -56,7 +55,6 @@ describe('RelaunchExecutionForm', () => {
   let mockGetWorkflow: jest.Mock<ReturnType<typeof getWorkflow>>;
   let mockGetTask: jest.Mock<ReturnType<typeof getTask>>;
   let mockGetExecutionData: jest.Mock<ReturnType<typeof getExecutionData>>;
-  let mockGetRemoteLiteralMap: jest.Mock<ReturnType<typeof getRemoteLiteralMap>>;
 
   beforeEach(() => {
     onClose = jest.fn();
@@ -74,10 +72,8 @@ describe('RelaunchExecutionForm', () => {
     mockGetWorkflow = jest.fn().mockResolvedValue(workflow);
     mockGetTask = jest.fn().mockResolvedValue(task);
     mockGetExecutionData = jest.fn().mockResolvedValue(executionData);
-    mockGetRemoteLiteralMap = jest.fn().mockResolvedValue({});
     apiContext = mockAPIContextValue({
       getExecutionData: mockGetExecutionData,
-      getRemoteLiteralMap: mockGetRemoteLiteralMap,
       getTask: mockGetTask,
       getWorkflow: mockGetWorkflow,
     });
@@ -125,7 +121,6 @@ describe('RelaunchExecutionForm', () => {
         },
       };
       execution.closure.computedInputs = executionInputs;
-      mockGetRemoteLiteralMap.mockResolvedValue(executionInputs);
 
       values = createValuesMap(workflowInputDefinitions, executionInputs);
     });
@@ -154,7 +149,6 @@ describe('RelaunchExecutionForm', () => {
       const { getByText } = renderForm();
       await waitFor(() => getByText(mockContentString));
       expect(mockGetExecutionData).toHaveBeenCalledWith(execution.id);
-      expect(mockGetRemoteLiteralMap).toHaveBeenCalledWith(executionData.inputs.url);
       checkLaunchFormProps({
         initialParameters: expect.objectContaining({
           values,
@@ -187,12 +181,11 @@ describe('RelaunchExecutionForm', () => {
       execution.closure.computedInputs = executionInputs;
       values = createValuesMap(workflowInputDefinitions, executionInputs);
     });
-    it('correctly uses fullInputs when value is present and does not call getRemoteLiteralMap()', async () => {
+    it('correctly uses fullInputs', async () => {
       delete execution.closure.computedInputs;
       const { getByText } = renderForm();
       await waitFor(() => getByText(mockContentString));
       expect(mockGetExecutionData).toHaveBeenCalledWith(execution.id);
-      expect(mockGetRemoteLiteralMap).not.toHaveBeenCalled();
       checkLaunchFormProps({
         initialParameters: expect.objectContaining({
           values,
@@ -229,7 +222,6 @@ describe('RelaunchExecutionForm', () => {
         },
       };
       execution.closure.computedInputs = executionInputs;
-      mockGetRemoteLiteralMap.mockResolvedValue(executionInputs);
       values = createValuesMap(taskInputDefinitions, executionInputs);
     });
 
@@ -258,19 +250,6 @@ describe('RelaunchExecutionForm', () => {
       const { getByText } = renderForm();
       await waitFor(() => getByText(mockContentString));
 
-      checkLaunchFormProps({
-        initialParameters: expect.objectContaining({
-          values,
-        }),
-      });
-    });
-
-    it('correctly fetches remote execution inputs', async () => {
-      delete execution.closure.computedInputs;
-      const { getByText } = renderForm();
-      await waitFor(() => getByText(mockContentString));
-      expect(mockGetExecutionData).toHaveBeenCalledWith(execution.id);
-      expect(mockGetRemoteLiteralMap).toHaveBeenCalledWith(executionData.inputs.url);
       checkLaunchFormProps({
         initialParameters: expect.objectContaining({
           values,

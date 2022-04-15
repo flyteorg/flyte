@@ -3,7 +3,6 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { ClosableDialogTitle } from 'components/common/ClosableDialogTitle';
 import { WaitForData } from 'components/common/WaitForData';
 import { LiteralMapViewer } from 'components/Literals/LiteralMapViewer';
-import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
 import { emptyLiteralMapBlob } from 'models/Common/constants';
 import { Execution } from 'models/Execution/types';
 import * as React from 'react';
@@ -42,12 +41,7 @@ const RemoteExecutionInputs: React.FC<{ execution: Execution }> = ({ execution }
   const executionData = useWorkflowExecutionData(execution.id);
   return (
     <WaitForData {...executionData} spinnerVariant="none">
-      {() => (
-        <RemoteLiteralMapViewer
-          map={executionData.value.fullInputs}
-          blob={executionData.value.inputs}
-        />
-      )}
+      <LiteralMapViewer map={executionData.value.fullInputs} />
     </WaitForData>
   );
 };
@@ -56,12 +50,7 @@ const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({ execution 
   const executionData = useWorkflowExecutionData(execution.id);
   return (
     <WaitForData {...executionData} spinnerVariant="none">
-      {() => (
-        <RemoteLiteralMapViewer
-          map={executionData.value.fullOutputs}
-          blob={executionData.value.outputs}
-        />
-      )}
+      <LiteralMapViewer map={executionData.value.fullOutputs} />
     </WaitForData>
   );
 };

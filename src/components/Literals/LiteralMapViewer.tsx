@@ -7,12 +7,24 @@ import { htmlEntities } from './constants';
 import { LiteralValue } from './LiteralValue';
 import { NoneTypeValue } from './Scalar/NoneTypeValue';
 
+export const NoDataIsAvailable = () => {
+  return (
+    <p>
+      <em>No data is available.</em>
+    </p>
+  );
+};
+
 /** Renders a LiteralMap as a formatted object */
 export const LiteralMapViewer: React.FC<{
   className?: string;
-  map: LiteralMap;
+  map: LiteralMap | null;
   showBrackets?: boolean;
 }> = ({ className, map, showBrackets = false }) => {
+  if (!map) {
+    return <NoDataIsAvailable />;
+  }
+
   const commonStyles = useCommonStyles();
   const { literals } = map;
   const mapContent = Object.keys(literals).length ? (

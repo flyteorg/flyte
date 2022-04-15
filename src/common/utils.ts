@@ -64,13 +64,6 @@ export function createLocalURL(path: string) {
   return `${window.location.origin}${ensureSlashPrefixed(path)}`;
 }
 
-/** Creates a URL that will be routed through the local CORS proxy */
-export function createCorsProxyURL(path: string) {
-  const baseUrl = env.BASE_URL ? `${ensureSlashPrefixed(env.BASE_URL)}` : '';
-  const corsProxyPrefix = ensureSlashPrefixed(env.CORS_PROXY_PREFIX);
-  return createLocalURL(`${baseUrl}${corsProxyPrefix}${ensureSlashPrefixed(path)}`);
-}
-
 /** Returns entires for an object, sorted lexicographically */
 export function sortedObjectEntries<T = unknown>(object: { [s: string]: T }): [string, T][] {
   return Object.entries(object).sort((a, b) => a[0].localeCompare(b[0]));

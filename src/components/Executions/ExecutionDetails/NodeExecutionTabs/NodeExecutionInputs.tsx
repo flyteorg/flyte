@@ -1,7 +1,7 @@
 import { PanelSection } from 'components/common/PanelSection';
 import { WaitForData } from 'components/common/WaitForData';
 import { useNodeExecutionData } from 'components/hooks/useNodeExecution';
-import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
+import { LiteralMapViewer } from 'components/Literals/LiteralMapViewer';
 import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 
@@ -11,10 +11,7 @@ export const NodeExecutionInputs: React.FC<{ execution: NodeExecution }> = ({ ex
   return (
     <WaitForData {...executionData}>
       <PanelSection>
-        <RemoteLiteralMapViewer
-          map={executionData.value.fullInputs}
-          blob={executionData.value.inputs}
-        />
+        <LiteralMapViewer map={executionData.value.fullInputs} />
       </PanelSection>
     </WaitForData>
   );

@@ -6,7 +6,7 @@ import { CompiledTask, TaskTemplate } from 'models/Task/types';
 import { dTypes, dNode } from 'models/Graph/types';
 import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 /**
- * @TODO these are dupes for testing, remove once tests fixed
+ * TODO FC#393: these are dupes for testing, remove once tests fixed
  */
 export const DISPLAY_NAME_START = 'start';
 export const DISPLAY_NAME_END = 'end';

@@ -1,15 +1,15 @@
+import { renderHook } from '@testing-library/react-hooks';
 import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
 import { useUserProfile } from 'components/hooks/useUserProfile';
 import { useOnlyMyExecutionsFilterState } from 'components/Executions/filters/useOnlyMyExecutionsFilterState';
 import { UserProfile } from 'models/Common/types';
 import { FetchableData } from 'components/hooks/types';
-import { renderHook } from '@testing-library/react-hooks';
 
 jest.mock('components/hooks/useUserProfile');
 
 describe('useOnlyMyExecutionsFilterState', () => {
-  const mockUseRemoteLiteralMap = useUserProfile as jest.Mock<FetchableData<UserProfile | null>>;
-  mockUseRemoteLiteralMap.mockReturnValue(loadedFetchable(null, jest.fn()));
+  const mockUseUserProfile = useUserProfile as jest.Mock<FetchableData<UserProfile | null>>;
+  mockUseUserProfile.mockReturnValue(loadedFetchable(null, jest.fn()));
 
   describe.each`
     isFilterDisabled | initialValue | expected

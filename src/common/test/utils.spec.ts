@@ -1,10 +1,7 @@
-import { env } from 'common/env';
-
 import { long, obj } from 'test/utils';
 import { Protobuf } from 'flyteidl';
 import {
   compareTimestampsAscending,
-  createCorsProxyURL,
   createLocalURL,
   dateToTimestamp,
   durationToMilliseconds,
@@ -17,8 +14,6 @@ import {
 jest.mock('common/env', () => ({
   env: jest.requireActual('common/env').env,
 }));
-
-const corsPrefix = '/cors_proxy';
 
 describe('isValidDate', () => {
   const cases: [string | Date, boolean][] = [
@@ -139,25 +134,5 @@ describe('createLocalURL', () => {
 
   it('should ensure that path is slash-prefixed', () => {
     expect(createLocalURL('test')).toBe(`${window.location.origin}/test`);
-  });
-});
-
-describe('createCorsProxyURL', () => {
-  const url = 'http://www.example.com';
-  beforeEach(() => {
-    env.CORS_PROXY_PREFIX = corsPrefix;
-  });
-
-  it('should use the prefix defined in env variables', () => {
-    expect(createCorsProxyURL(url)).toContain(corsPrefix);
-  });
-
-  it('should correctly construct the path', () => {
-    expect(createCorsProxyURL(url)).toBe(`${window.location.origin}${corsPrefix}/${url}`);
-  });
-
-  it('should prepend the base url if provided', () => {
-    env.BASE_URL = '/console';
-    expect(createCorsProxyURL(url)).toBe(`${window.location.origin}/console${corsPrefix}/${url}`);
   });
 });

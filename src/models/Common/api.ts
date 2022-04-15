@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { env } from 'common/env';
 import { log } from 'common/log';
-import { createCorsProxyURL } from 'common/utils';
 import { Admin, Core } from 'flyteidl';
-import { getAdminEntity, getProtobufObject } from 'models/AdminEntity/AdminEntity';
+import { getAdminEntity } from 'models/AdminEntity/AdminEntity';
 import { defaultPaginationConfig } from 'models/AdminEntity/constants';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
 import { PaginatedEntityResponse, RequestConfig } from 'models/AdminEntity/types';
@@ -12,7 +11,6 @@ import { defaultAxiosConfig, defaultSystemStatus, identifierPrefixes } from './c
 import {
   GetVersionResponse,
   IdentifierScope,
-  LiteralMap,
   NamedEntity,
   NamedEntityIdentifier,
   ResourceType,
@@ -148,9 +146,3 @@ export const getSystemStatus = async () => {
     throw new Error(`Failed to fetch system status: ${message}`);
   }
 };
-
-/** Given a url to a `LiteralMap` stored at a remote location, will fetch and
- * decode the resulting object.
- */
-export const getRemoteLiteralMap = async (url: string) =>
-  getProtobufObject<LiteralMap>({ url: createCorsProxyURL(url) }, LiteralMap);
