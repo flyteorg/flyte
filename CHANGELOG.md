@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.52.1](http://github.com/lyft/flyteconsole/compare/v0.52.0...v0.52.1) (2022-04-15)
+
+
+### Reverts
+
+* Revert "chore: remove redundant docker build on merge to master (#390)" (#392) ([fb564f3](http://github.com/lyft/flyteconsole/commit/fb564f33c490859ecb7b2cfb4c3a6a6294de3530)), closes [#390](http://github.com/lyft/flyteconsole/issues/390) [#392](http://github.com/lyft/flyteconsole/issues/392)
+
 # [0.52.0](http://github.com/lyft/flyteconsole/compare/v0.51.3...v0.52.0) (2022-04-14)
 
 
