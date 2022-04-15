@@ -81,8 +81,8 @@ Running Flyte Workflows
 
 You can run the workflow in ``example.py`` on a local python environment or a Flyte cluster.
 
-Executing Locally
-"""""""""""""""""""
+Executing Workflows Locally
+""""""""""""""""""""""""""""
 
 Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit``.
 
@@ -123,7 +123,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
               args = parser.parse_args()
               wf(n=args.n, mean=args.mean, sigma=args.sigma)
 
-Executing on a Flyte Cluster
+Creating a Demo Flyte Cluster
 """""""""""""""""""""""""""""""
 
 To start a local demo cluster, first install :std:ref:`flytectl`, which is the command-line interface for Flyte.
@@ -174,6 +174,10 @@ Start a Flyte demonstration environment on your local machine:
 
     Most :doc:`integrations <cookbook:integrations>` are not directly installed in this environment, and it's not a great
     way to test the platform's performance.
+
+
+Executing Workflows on a Flyte Cluster
+"""""""""""""""""""""""""""""""""""""""
 
 Then run the same Workflow on the Flyte cluster:
 
