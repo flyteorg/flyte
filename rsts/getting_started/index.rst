@@ -189,7 +189,7 @@ Then run the same Workflow on the Flyte cluster:
 
       Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution_name> to see execution in the console.
 
-   Where ``<execution_name>`` is a unique identifier for you Workflow Execution.
+   Where ``<execution_name>`` is a unique identifier for your Workflow Execution.
 
 |
 
