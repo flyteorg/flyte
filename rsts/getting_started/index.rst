@@ -119,11 +119,11 @@ Then run the same workflow on the Flyte cluster:
 .. dropdown:: :fa:`info-circle` What does the ``--remote`` flag do?
     :animate: fade-in-slide-down
 
-   * The only difference between the previous ``local`` and this command is the ``--remote`` flag. This will trigger the execution on the configured backend.
-   * Dependency management is a challenge with python projects. Flyte uses containers to manage dependencies for your project.
-   * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
-   * If you want to use a custom image, use the ``--image`` flag.
-   * Also, it is possible to use an image with your completely built-in code.  Refer to package & register flow.
+    * The only difference between the previous ``local`` and this command is the ``--remote`` flag. This will trigger the execution on the configured backend.
+    * Dependency management is a challenge with python projects. Flyte uses containers to manage dependencies for your project.
+    * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
+    * If you want to use a custom image, use the ``--image`` flag.
+    * Also, it is possible to use an image with your completely built-in code.  Refer to package & register flow.
 
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^^^^
