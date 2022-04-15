@@ -50,13 +50,13 @@ class CustomSorter(FileNameSortKey):
         "decorating_tasks.py",
         "decorating_workflows.py",
         # Control Flow
-        "run_conditions.py",
+        "conditions.py",
         "chain_tasks.py",
         "subworkflows.py",
         "dynamics.py",
         "map_task.py",
         "checkpoint.py",
-        "run_merge_sort.py",
+        "merge_sort.py",
         # Type System
         "flyte_python_types.py",
         "schema.py",
@@ -75,9 +75,9 @@ class CustomSorter(FileNameSortKey):
         "workflow_labels_annotations.py",
         # Remote Access
         "register_project.py",
-        "run_task.py",
-        "run_workflow.py",
-        "run_launchplan.py",
+        "remote_task.py",
+        "remote_workflow.py",
+        "remote_launchplan.py",
         "inspecting_executions.py",
         "debugging_workflows_tasks.py",
         # Deployment
@@ -101,10 +101,6 @@ class CustomSorter(FileNameSortKey):
         "kubernetes.py",
         "aws.py",
         "gcp.py",
-        # Control Plane
-        "register_project.py",
-        "run_task.py",
-        "run_workflow.py",
         # Integrations
         ## Flytekit Plugins
         "simple.py",
@@ -136,7 +132,7 @@ class CustomSorter(FileNameSortKey):
         "bigquery.py"
         # Extending Flyte
         "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
-        "run_custom_types.py",
+        "custom_types.py",
         "custom_task_plugin.py",
         # Repo-based Projects
         "larger_apps_setup.py",

@@ -7,7 +7,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
 **Generate execution spec file** ::
 
-    flytectl get tasks -d development -p flytectldemo core.advanced.run_merge_sort.merge  --latest --execFile exec_spec.yaml
+    flytectl get tasks -d development -p flytectldemo core.advanced.merge_sort.merge  --latest --execFile exec_spec.yaml
 
 **Update the input spec file for arguments to the workflow** ::
 
@@ -24,7 +24,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
             kubeServiceAcct: ""
             targetDomain: ""
             targetProject: ""
-            task: core.advanced.run_merge_sort.merge
+            task: core.advanced.merge_sort.merge
             version: "v1"
 
 **Create execution using the exec spec file** ::
