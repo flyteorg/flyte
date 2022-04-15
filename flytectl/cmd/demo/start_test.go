@@ -91,7 +91,7 @@ func TestStartDemoFunc(t *testing.T) {
 		errCh := make(chan error)
 		sandboxConfig.DefaultConfig.Version = "v0.19.1"
 		bodyStatus := make(chan container.ContainerWaitOKBody)
-		image, _, err := githubutil.GetFullyQualifiedImageName(sandboxConfig.DefaultConfig.Version, demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", sandboxConfig.DefaultConfig.Version, demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -122,7 +122,7 @@ func TestStartDemoFunc(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
 		errCh := make(chan error)
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -171,7 +171,7 @@ func TestStartDemoFunc(t *testing.T) {
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
 		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -213,7 +213,7 @@ func TestStartDemoFunc(t *testing.T) {
 			Source: absPath,
 			Target: docker.Source,
 		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -248,7 +248,7 @@ func TestStartDemoFunc(t *testing.T) {
 		sandboxConfig.DefaultConfig.Version = "v0.18.0"
 		sandboxConfig.DefaultConfig.Source = ""
 
-		image, _, err := githubutil.GetFullyQualifiedImageName(sandboxConfig.DefaultConfig.Version, demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", sandboxConfig.DefaultConfig.Version, demoImageName, false)
 		assert.Nil(t, err)
 		volumes := docker.Volumes
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -283,7 +283,7 @@ func TestStartDemoFunc(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Version = "v0.1444.0"
 		sandboxConfig.DefaultConfig.Source = ""
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		volumes := docker.Volumes
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -316,7 +316,7 @@ func TestStartDemoFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
 		volumes := docker.Volumes
@@ -362,7 +362,7 @@ func TestStartDemoFunc(t *testing.T) {
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
 		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -404,7 +404,7 @@ func TestStartDemoFunc(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		sandboxConfig.DefaultConfig.Source = ""
 		sandboxConfig.DefaultConfig.Version = ""
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -443,7 +443,7 @@ func TestStartDemoFunc(t *testing.T) {
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
 		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -483,7 +483,7 @@ func TestStartDemoFunc(t *testing.T) {
 			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.Source,
 		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -527,7 +527,7 @@ func TestStartDemoFunc(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -570,7 +570,7 @@ func TestStartDemoFunc(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -705,26 +705,26 @@ func TestGetNodeTaintStatus(t *testing.T) {
 
 func TestGetDemoImage(t *testing.T) {
 	t.Run("Get Latest demo cluster", func(t *testing.T) {
-		image, _, err := githubutil.GetFullyQualifiedImageName("", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "", demoImageName, false)
 		assert.Nil(t, err)
-		assert.Equal(t, true, strings.HasPrefix(image, "cr.flyte.org/flyteorg/flyte-sandbox-lite:dind-"))
+		assert.Equal(t, true, strings.HasPrefix(image, "cr.flyte.org/flyteorg/flyte-sandbox-lite:sha-"))
 	})
 
 	t.Run("Get demo image with version ", func(t *testing.T) {
-		image, _, err := githubutil.GetFullyQualifiedImageName("v0.14.0", demoImageName, false)
+		image, _, err := githubutil.GetFullyQualifiedImageName("sha", "v0.14.0", demoImageName, false)
 		assert.Nil(t, err)
 		assert.Equal(t, true, strings.HasPrefix(image, demoImageName))
 	})
 	t.Run("Get demo image with wrong version ", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("v100.1.0", demoImageName, false)
+		_, _, err := githubutil.GetFullyQualifiedImageName("sha", "v100.1.0", demoImageName, false)
 		assert.NotNil(t, err)
 	})
 	t.Run("Get demo image with wrong version ", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("aaaaaa", demoImageName, false)
+		_, _, err := githubutil.GetFullyQualifiedImageName("sha", "aaaaaa", demoImageName, false)
 		assert.NotNil(t, err)
 	})
 	t.Run("Get demo image with version that is not supported", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("v0.10.0", demoImageName, false)
+		_, _, err := githubutil.GetFullyQualifiedImageName("sha", "v0.10.0", demoImageName, false)
 		assert.NotNil(t, err)
 	})
 

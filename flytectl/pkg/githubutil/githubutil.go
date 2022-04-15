@@ -218,11 +218,11 @@ func CheckBrewInstall(goos platformutil.Platform) (string, error) {
 // if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA} is used
 // else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
 // If pre release is true then use latest pre release of Flyte, In that case User don't need to pass version
-func GetFullyQualifiedImageName(version, image string, pre bool) (string, string, error) {
+func GetFullyQualifiedImageName(prefix, version, image string, pre bool) (string, string, error) {
 	sha, version, err := GetSandboxImageSha(version, pre)
 	if err != nil {
 		return "", version, err
 	}
 
-	return fmt.Sprintf("%s:%s", image, fmt.Sprintf("dind-%s", sha)), version, nil
+	return fmt.Sprintf("%s:%s", image, fmt.Sprintf("%s-%s", prefix, sha)), version, nil
 }
