@@ -9,5 +9,6 @@ sphinx-issues
 sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
+sphinxcontrib-video
 sphinxcontrib-yt
 sphinx-tabs
