@@ -148,7 +148,7 @@ Start a Flyte demonstration environment on your local machine:
 
   flytectl demo start
 
-.. div:: shadow p-3 mb-8 bg-white rounded
+.. div:: shadow p-3 mb-8 rounded
 
    **Expected Output:**
 
@@ -185,7 +185,7 @@ Then run the same Workflow on the Flyte cluster:
 
   pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
 
-.. div:: shadow p-3 mb-8 bg-white rounded
+.. div:: shadow p-3 mb-8 rounded
 
    **Expected Output:** A URL to the Workflow Execution on your demo Flyte cluster:
 
@@ -215,7 +215,7 @@ Inspect the Results
 Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to Flyte Console, the web UI
 used to manage Flyte entities such as tasks, workflows, and executions.
 
-.. video:: ../_static/videos/getting_started_console.mp4
+.. video:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.mp4
    :width: 100%
    :autoplay:
 
@@ -241,4 +241,9 @@ Recap
 What's Next?
 ^^^^^^^^^^^^^^^^
 
-To experience the full power of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
+This guide demonstrated how you can quickly iterate on self-contained scripts using ``pyflyte run``.
+
+- To learn more about Flyte's features such as caching, conditionals, specifying resources requirements, and scheduling
+  workflows, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
+- To learn more about how to organize, package, and register workflows for larger projects, see the guide for
+  :ref:`Building Large Apps <cookbook:larger_apps>`.
