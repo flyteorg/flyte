@@ -142,6 +142,5 @@ To summarize, you have:
     (b) on a demo Flyte cluster.
 
 What's Next?
-^^^^^^^^^^^^^^^^
-
-To experience the full power of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
+^^^^^^^^^^^^^^^
+This guide demonstrated how you can quickly iterate on self-contained scripts using ``pyflyte run``. This command combined a few steps into one. For larger projects, you will need to separately package your code, register those compiled objects with Flyte, and launch your tasks and workflows. To experience the full power of Flyte, please follow to guide for :ref:`working with repos <cookbook:larger_apps>` as well as the complete set of examples in the  `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
