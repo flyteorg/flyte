@@ -53,5 +53,5 @@ Flytectl needs a CA-certified SSL cert for OAuth to work. If a self-signed certi
 `certificate is not standards compliant.`
 
 There are two options to fix this:
-1. Switch to a full external OAuth Provider (okta, GCP cloud identity, keycloak, azure ad...etc.).
+1. Switch to a full external OAuth Provider (okta, GCP cloud identity, keycloak, Azure AD etc.).
 2. Use a CA-certified SSL cert.
