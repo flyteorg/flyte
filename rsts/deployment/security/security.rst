@@ -52,7 +52,7 @@ Flytectl needs a CA-certified SSL cert for OAuth to work. If a self-signed certi
 
 .. code-block::
     
-    `certificate is not standards compliant.`
+    certificate is not standards compliant.
 
 There are two options to fix this:
 
