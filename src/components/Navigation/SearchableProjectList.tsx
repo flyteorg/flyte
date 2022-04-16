@@ -1,6 +1,7 @@
 import { Fade, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import classnames from 'classnames';
+import { NoResults } from 'components/common/NoResults';
 import { SearchableList, SearchResult } from 'components/common/SearchableList';
 import { useCommonStyles } from 'components/common/styles';
 import { defaultProjectDescription } from 'components/SelectProject/constants';
@@ -15,12 +16,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   itemName: {
     flex: '1 0 0',
     fontWeight: 'bold',
-  },
-  noResults: {
-    color: theme.palette.text.disabled,
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: theme.spacing(4),
   },
   searchResult: {
     alignItems: 'center',
@@ -43,12 +38,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type ProjectSelectedCallback = (project: Project) => void;
-
-const NoResults: React.FC = () => (
-  <Typography className={useStyles().noResults} variant="body2" component="div">
-    No matching results
-  </Typography>
-);
 
 interface SearchResultsProps {
   onProjectSelected: ProjectSelectedCallback;

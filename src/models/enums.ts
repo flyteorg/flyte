@@ -5,7 +5,6 @@ import { Admin } from 'flyteidl';
  * modules individually (such as when running with ts-jest)
  */
 
-/* It's an ENUM exports, and as such need to be exported as both type and const value */
 /* eslint-disable @typescript-eslint/no-redeclare */
-export type WorkflowExecutionState = Admin.NamedEntityState;
-export const WorkflowExecutionState = Admin.NamedEntityState;
+export type NamedEntityState = Admin.NamedEntityState;
+export const NamedEntityState = Admin.NamedEntityState;

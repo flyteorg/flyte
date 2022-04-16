@@ -4,7 +4,7 @@ import { defaultPaginationConfig } from 'models/AdminEntity/constants';
 import { RequestConfig } from 'models/AdminEntity/types';
 import { Identifier, IdentifierScope } from 'models/Common/types';
 import { makeNamedEntityPath } from 'models/Common/utils';
-import { WorkflowExecutionState } from './enums';
+import { NamedEntityState } from 'models/enums';
 import { Workflow } from './types';
 import { makeWorkflowPath, workflowListTransformer } from './utils';
 
@@ -32,7 +32,7 @@ export const getWorkflow = (id: Identifier, config?: RequestConfig) =>
 /** Updates `Workflow` archive state */
 export const updateWorkflowState = (
   id: Admin.NamedEntityIdentifier,
-  newState: WorkflowExecutionState,
+  newState: NamedEntityState,
   config?: RequestConfig,
 ) => {
   const path = makeNamedEntityPath({ resourceType: Core.ResourceType.WORKFLOW, ...id });

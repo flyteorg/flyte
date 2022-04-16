@@ -1,5 +1,6 @@
-import { Admin, Core } from 'flyteidl';
+import { Core } from 'flyteidl';
 import { NamedEntity, NamedEntityIdentifier } from 'models/Common/types';
+import { NamedEntityState } from 'models/enums';
 
 export const sampleTaskIds: NamedEntityIdentifier[] = [
   'app.complex_workflows.custom_image.task_object',
@@ -53,6 +54,6 @@ export const sampleTaskNames: NamedEntity[] = sampleTaskIds.map((id) => ({
   resourceType: Core.ResourceType.TASK,
   metadata: {
     description: `A description for ${id.name}`,
-    state: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE,
+    state: NamedEntityState.NAMED_ENTITY_ACTIVE,
   },
 }));

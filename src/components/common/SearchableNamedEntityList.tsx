@@ -3,6 +3,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { listhoverColor, separatorColor } from 'components/Theme/constants';
 import { NamedEntity } from 'models/Common/types';
 import * as React from 'react';
+import { NoResults } from './NoResults';
 import { SearchableList, SearchResult } from './SearchableList';
 import { useCommonStyles } from './styles';
 
@@ -19,16 +20,11 @@ export const useNamedEntityListStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.grey[500],
     flex: '0 0 auto',
   },
-  noResults: {
-    color: theme.palette.text.disabled,
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: theme.spacing(6),
-  },
   searchResult: {
     alignItems: 'center',
     borderBottom: `1px solid ${separatorColor}`,
     display: 'flex',
+    position: 'relative',
     flexDirection: 'row',
     padding: `0 ${theme.spacing(3)}px`,
     '&:first-of-type': {
@@ -50,12 +46,6 @@ export interface SearchableNamedEntity extends NamedEntity {
 }
 
 const nameKey = ({ id: { domain, name, project } }: NamedEntity) => `${domain}/${name}/${project}`;
-
-const NoResults: React.FC = () => (
-  <Typography className={useNamedEntityListStyles().noResults} variant="h6" component="div">
-    No matching results
-  </Typography>
-);
 
 type ItemRenderer = (item: SearchResult<SearchableNamedEntity>) => React.ReactNode;
 

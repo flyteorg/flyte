@@ -23,7 +23,7 @@ import {
 import UnarchiveOutline from '@material-ui/icons/UnarchiveOutlined';
 import ArchiveOutlined from '@material-ui/icons/ArchiveOutlined';
 import { useMutation } from 'react-query';
-import { WorkflowExecutionState } from 'models/Workflow/enums';
+import { NamedEntityState } from 'models/enums';
 import { updateWorkflowState } from 'models/Workflow/api';
 import { useState } from 'react';
 import { useSnackbar } from 'notistack';
@@ -175,27 +175,24 @@ const SearchableWorkflowNameItemActions: React.FC<SearchableWorkflowNameItemActi
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
-  const mutation = useMutation(
-    (newState: WorkflowExecutionState) => updateWorkflowState(id, newState),
-    {
-      onMutate: () => setIsUpdating(true),
-      onSuccess: () => {
-        enqueueSnackbar(t('archiveSuccess', !isArchived), {
-          variant: 'success',
-        });
-        setHideItem(true);
-      },
-      onError: () => {
-        enqueueSnackbar(`${mutation.error ?? t('archiveError', !isArchived)}`, {
-          variant: 'error',
-        });
-      },
-      onSettled: () => {
-        setShowConfirmation(false);
-        setIsUpdating(false);
-      },
+  const mutation = useMutation((newState: NamedEntityState) => updateWorkflowState(id, newState), {
+    onMutate: () => setIsUpdating(true),
+    onSuccess: () => {
+      enqueueSnackbar(t('archiveSuccess', !isArchived), {
+        variant: 'success',
+      });
+      setHideItem(true);
     },
-  );
+    onError: () => {
+      enqueueSnackbar(`${mutation.error ?? t('archiveError', !isArchived)}`, {
+        variant: 'error',
+      });
+    },
+    onSettled: () => {
+      setShowConfirmation(false);
+      setIsUpdating(false);
+    },
+  });
 
   const onArchiveClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -208,8 +205,8 @@ const SearchableWorkflowNameItemActions: React.FC<SearchableWorkflowNameItemActi
     event.preventDefault();
     mutation.mutate(
       isWorkflowArchived(item)
-        ? WorkflowExecutionState.NAMED_ENTITY_ACTIVE
-        : WorkflowExecutionState.NAMED_ENTITY_ARCHIVED,
+        ? NamedEntityState.NAMED_ENTITY_ACTIVE
+        : NamedEntityState.NAMED_ENTITY_ARCHIVED,
     );
   };
 

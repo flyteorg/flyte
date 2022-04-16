@@ -3,14 +3,25 @@ import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { FilterOperationName } from 'models/AdminEntity/types';
 import { getUserProfile, listNamedEntities } from 'models/Common/api';
-import { NamedEntity, UserProfile } from 'models/Common/types';
+import {
+  NamedEntity,
+  NamedEntityIdentifier,
+  NamedEntityMetadata,
+  ResourceType,
+  UserProfile,
+} from 'models/Common/types';
 import { NamedEntityState } from 'models/enums';
+import { updateTaskState } from 'models/Task/api';
 import * as React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { MemoryRouter } from 'react-router';
-import { createWorkflowName } from 'test/modelUtils';
+import { createNamedEntity } from 'test/modelUtils';
 import { createTestQueryClient } from 'test/utils';
-import { ProjectWorkflows } from '../ProjectWorkflows';
+import { ProjectTasks } from '../ProjectTasks';
+
+export function createTask(id: NamedEntityIdentifier, metadata?: Partial<NamedEntityMetadata>) {
+  return createNamedEntity(ResourceType.TASK, id, metadata);
+}
 
 const sampleUserProfile: UserProfile = {
   subject: 'subject',
@@ -20,10 +31,14 @@ jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
 
-describe('ProjectWorkflows', () => {
+jest.mock('models/Task/api', () => ({
+  updateTaskState: jest.fn().mockResolvedValue({}),
+}));
+
+describe('ProjectTasks', () => {
   const project = 'TestProject';
   const domain = 'TestDomain';
-  let workflowNames: NamedEntity[];
+  let tasks: NamedEntity[];
   let queryClient: QueryClient;
   let mockListNamedEntities: jest.Mock<ReturnType<typeof listNamedEntities>>;
   let mockGetUserProfile: jest.Mock<ReturnType<typeof getUserProfile>>;
@@ -31,10 +46,14 @@ describe('ProjectWorkflows', () => {
   beforeEach(() => {
     mockGetUserProfile = jest.fn().mockResolvedValue(null);
     queryClient = createTestQueryClient();
-    workflowNames = ['MyWorkflow', 'MyOtherWorkflow'].map((name) =>
-      createWorkflowName({ domain, name, project }),
-    );
-    mockListNamedEntities = jest.fn().mockResolvedValue({ entities: workflowNames });
+    tasks = ['MyTask', 'MyOtherTask'].map((name) => createTask({ domain, name, project }));
+    mockListNamedEntities = jest.fn().mockResolvedValue({ entities: tasks });
+
+    window.IntersectionObserver = jest.fn().mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null,
+    });
   });
 
   const renderComponent = () =>
@@ -46,14 +65,14 @@ describe('ProjectWorkflows', () => {
             getUserProfile: mockGetUserProfile,
           })}
         >
-          <ProjectWorkflows projectId={project} domainId={domain} />
+          <ProjectTasks projectId={project} domainId={domain} />
         </APIContext.Provider>
       </QueryClientProvider>,
       { wrapper: MemoryRouter },
     );
 
-  it('does not show archived workflows', async () => {
-    renderComponent();
+  it('does not show archived tasks', async () => {
+    const { getByText } = renderComponent();
     await waitFor(() => {});
 
     expect(mockListNamedEntities).toHaveBeenCalledWith(
@@ -68,6 +87,7 @@ describe('ProjectWorkflows', () => {
         ],
       }),
     );
+    await waitFor(() => expect(getByText('MyTask')));
   });
 
   it('should display checkbox if user login', async () => {
@@ -80,17 +100,50 @@ describe('ProjectWorkflows', () => {
     expect(checkboxes[0]?.checked).toEqual(false);
   });
 
-  /** user doesn't have its own workflow */
-  it('clicking show archived should hide active workflows', async () => {
+  it('should display archive button', async () => {
+    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    const { getByText, getAllByTitle, findAllByText } = renderComponent();
+    await waitFor(() => {});
+
+    const task = getByText('MyTask');
+    expect(task).toBeTruthy();
+
+    const parent = task?.parentElement?.parentElement?.parentElement!;
+    fireEvent.mouseOver(parent);
+
+    const archiveButton = getAllByTitle('Archive');
+    expect(archiveButton[0]).toBeTruthy();
+
+    fireEvent.click(archiveButton[0]);
+
+    const cancelButton = await findAllByText('Cancel');
+    await waitFor(() => expect(cancelButton.length).toEqual(1));
+    const confirmArchiveButton = cancelButton?.[0]?.parentElement?.parentElement?.children[0]!;
+
+    expect(confirmArchiveButton).toBeTruthy();
+
+    fireEvent.click(confirmArchiveButton!);
+
+    await waitFor(() => {
+      expect(updateTaskState).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('clicking show archived should hide active tasks', async () => {
     mockGetUserProfile.mockResolvedValue(sampleUserProfile);
     const { getByText, queryByText, getAllByRole } = renderComponent();
     await waitFor(() => {});
+
+    // check the checkbox is present
     const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];
     expect(checkboxes[0]).toBeTruthy();
     expect(checkboxes[0]?.checked).toEqual(false);
-    await waitFor(() => expect(getByText('MyWorkflow')));
+
+    // check that my task is in document
+    await waitFor(() => expect(getByText('MyTask')));
     fireEvent.click(checkboxes[0]);
-    // when user selects checkbox, table should have no workflows to display
-    await waitFor(() => expect(queryByText('MyWorkflow')).not.toBeInTheDocument());
+
+    // when user selects checkbox, table should have no tasks to display
+    await waitFor(() => expect(queryByText('MyTask')).not.toBeInTheDocument());
   });
 });

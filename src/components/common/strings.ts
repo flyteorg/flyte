@@ -11,6 +11,7 @@ const str = {
   rawDataHeader: 'Raw output data config',
   securityContextHeader: 'Security Context',
   serviceAccountHeader: 'Service Account',
+  noMatchingResults: 'No matching results',
 };
 
 export { patternKey } from 'basics/Locale';
