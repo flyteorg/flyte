@@ -43,3 +43,15 @@ context for these.
 For example: in case of `Flyteadmin <https://github.com/flyteorg/flyte/blob/master/charts/flyte/templates/admin/deployment.yaml>`__
 the init container of check-db-ready that runs postgres-provided docker image is not able to resolve the host for the checks and fails. This is mostly due to no read
 permissions on etc/hosts file. Only the check-db-ready container is run using the root user and which we will plan to fix as well.
+
+
+************
+OAuth
+************
+Flytectl needs a CA-certified SSL cert for OAuth to work. If a self-signed certificate is used, the following error is raised.
+
+`certificate is not standards compliant.`
+
+There are two options to fix this:
+1. Switch to a full external OAuth Provider (okta, GCP cloud identity, keycloak, azure ad...etc.).
+2. Use a CA-certified SSL cert.
