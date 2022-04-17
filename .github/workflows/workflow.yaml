@@ -64,7 +64,7 @@ jobs:
     - name: STORE env file
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/env.yaml s3://flyte-unique-bucket/opta/aws/env.yaml
+        aws s3 cp ./opta/aws/env.yaml s3://flyte-unique-bucket/opta/aws/1/env.yaml
     - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
@@ -122,7 +122,7 @@ jobs:
     - name: STORE flyte.yaml
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/opta/aws/flyte.yaml
+        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/opta/aws/1/flyte.yaml
     - name: OPTA APPLY FLYTE
       shell: bash
       run: |
@@ -136,6 +136,11 @@ jobs:
       run: |
         ls 
         ls dev/
+    - name: update configs
+      shell: bash
+      run: |
+        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
     - name: Register flytesnacks examples
       uses: unionai/flyte-register-action@v0.0.2
       with:
@@ -143,7 +148,7 @@ jobs:
         project: flytesnacks
         version: "${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}"
         domain: development
-        config: dev/config.yaml
+        config: .github/ci_config/config.yaml
     - name: see files
       shell: bash
       run: |
@@ -163,7 +168,7 @@ jobs:
         # TODO REMOVE BELOW FLYTE_SDK_USE_STRUCTURED_DATASET ONCE ON v1
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
       run: |
-        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh ./dev/config)
+        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config)
         echo "$run_tests_output"  # for debugging purposes
         badges=$(echo "$run_tests_output" | tail -n1)
         echo "$badges"  # for debugging purposes
