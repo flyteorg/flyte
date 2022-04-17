@@ -1,8 +1,23 @@
 export REPOSITORY=flyte
+include boilerplate/flyte/end2end/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
+
+GIT_VERSION := $(shell git describe --always --tags)
+GIT_HASH := $(shell git rev-parse --short HEAD)
+TIMESTAMP := $(shell date '+%Y-%m-%d')
+PACKAGE ?=github.com/flyteorg/flytestdlib
+LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+
+.PHONY: compile
+compile:
+	go build -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
+
+.PHONY: linux_compile
+linux_compile:
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: update_boilerplate
 update_boilerplate:
@@ -25,10 +40,6 @@ release_automation:
 .PHONY: deploy_sandbox
 deploy_sandbox: 
 	bash script/deploy.sh
-
-.PHONY: end2end_execute
-end2end_execute: ## Execute tests in the current kubernetes context
-	@end2end/execute.sh
 
 .PHONY: install-piptools
 install-piptools: ## Install pip-tools

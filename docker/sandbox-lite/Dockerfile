@@ -1,4 +1,20 @@
-FROM alpine:3.13.5 AS base
+ARG FLYTECONSOLE_VERSION="latest"
+FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
+
+FROM golang:1.18.0-alpine3.15 AS go_builder
+
+# Install dependencies
+RUN apk add --no-cache build-base
+
+COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
+COPY go.mod go.sum /app/flyte/
+COPY cmd/ /app/flyte/cmd/
+WORKDIR /app/flyte
+RUN go mod download
+RUN go build -o /flyte cmd/main.go
+
+
+FROM alpine:3.15 AS base
 
 # Install dependencies
 RUN apk add --no-cache openssl
@@ -32,12 +48,17 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
+# Install buildkit-cli-for-kubectl
+COPY --from=go_builder /flyte /flyteorg/bin/
+
 # Copy flyte chart
-COPY charts/flyte/ /flyteorg/share/flyte
-COPY charts/flyte-core/ /flyteorg/share/flyte-core
+COPY charts/flyte-deps/ /flyteorg/share/flyte-deps
 
 # Copy scripts
-COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
+COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh /flyteorg/bin/
+
+# Copy Flyte config
+COPY flyte.yaml /flyteorg/share/flyte.yaml
 
 FROM docker:20.10.14-dind-alpine3.15 AS dind
 
@@ -48,13 +69,18 @@ RUN apk add --no-cache bash git make tini curl jq
 COPY --from=base /flyteorg/ /flyteorg/
 
 # Copy entrypoints
-COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
+
+# Copy cluster resource templates
+COPY docker/sandbox-lite/templates/ /etc/flyte/clusterresource/templates/
 
 ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
 ARG FLYTE_TEST="release"
 ENV FLYTE_TEST "${FLYTE_TEST}"
+
+RUN addgroup -S docker
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -66,7 +92,7 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 30081 30082 30084 30088
-
+# 30080 for console, 30081 for gRPC, 30082 for k8s dashboard, 30084 for minio api, 30088 for minio console
+EXPOSE 30080 30081 30082 30084 30088 30089
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]

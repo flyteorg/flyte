@@ -6,6 +6,7 @@ on:
       - docker/**
       - charts/**
       - .github/workflows/functional_test.yaml
+      - boilerplate/flyte/end2end/run-tests.py
 
 defaults:
   run:
@@ -52,5 +53,5 @@ jobs:
         env:
           PRIORITIES: "P0"
         run: |
-          ./boilerplate/flyte/end2end/end2end.sh
+          make end2end_execute
 

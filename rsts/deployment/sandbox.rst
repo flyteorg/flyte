@@ -73,7 +73,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
 .. tabbed:: Docker Image
 
-    Recommend using ``flytectl sandbox`` as describe in :ref:`gettingstarted_build`
+    Recommend using ``flytectl sandbox`` as describe in :ref:`getting-started`
 
     .. prompt:: bash $
 

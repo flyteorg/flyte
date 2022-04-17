@@ -53,7 +53,7 @@ helm upgrade -f values.yaml flyte .
 | contour.contour.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Contour |
 | contour.contour.resources.limits | object | `{"cpu":"100m","memory":"100Mi"}` | Limits are the maximum set of resources needed for this pod |
 | contour.contour.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum set of resources needed for this pod |
-| contour.enabled | bool | `true` | - enable or disable Contour deployment installation |
+| contour.enabled | bool | `false` | - enable or disable Contour deployment installation |
 | contour.envoy.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Envoy |
 | contour.envoy.resources.limits | object | `{"cpu":"100m","memory":"100Mi"}` | Limits are the maximum set of resources needed for this pod |
 | contour.envoy.resources.requests | object | `{"cpu":"10m","memory":"50Mi"}` | Requests are the minimum set of resources needed for this pod |
@@ -97,7 +97,7 @@ helm upgrade -f values.yaml flyte .
 | postgres.podAnnotations | object | `{}` | Annotations for Postgres pods |
 | postgres.replicaCount | int | `1` | Replicas count for Postgres deployment |
 | postgres.resources | object | `{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Postgres deployment |
-| postgres.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Postgres |
+| postgres.service | object | `{"annotations":{},"type":"NodePort"}` | Service settings for Postgres |
 | postgres.tolerations | list | `[]` | tolerations for Postgres deployment |
 | redis.enabled | bool | `false` | - enable or disable Redis Statefulset installation |
 | redoc.affinity | object | `{}` | affinity for Minio deployment |
@@ -115,5 +115,5 @@ helm upgrade -f values.yaml flyte .
 | redoc.tolerations | list | `[]` | tolerations for Minio deployment |
 | sparkoperator | object | `{"enabled":false}` | Optional: Spark Plugin using the Spark Operator |
 | sparkoperator.enabled | bool | `false` | - enable or disable Sparkoperator deployment installation |
-| webhook.enabled | bool | `false` |  |
+| webhook.enabled | bool | `true` |  |
 | webhook.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for the webhook |
