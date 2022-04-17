@@ -64,7 +64,7 @@ jobs:
     - name: STORE env file
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/env.yaml s3://flyte-unique-bucket/0/opta/aws/env.yaml
+        aws s3 cp ./opta/aws/env.yaml s3://flyte-unique-bucket/opta/aws/env.yaml
     - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
@@ -76,8 +76,8 @@ jobs:
       id: opta-dns
       shell: bash
       run: |
-        .github/scripts/ci_helper.sh setup_jq
-        opta output -c ./opta/aws/env.yaml | jq
+        DNS=$(opta output -c ./opta/aws/env.yaml | jq .load_balancer_raw_dns)
+        echo ::set-output name=dns::${DNS}
     - uses: azure/setup-helm@v1
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
@@ -122,12 +122,49 @@ jobs:
     - name: STORE flyte.yaml
       shell: bash
       run: |
-        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/1/opta/aws/flyte.yaml
+        aws s3 cp ./opta/aws/flyte.yaml s3://flyte-unique-bucket/opta/aws/flyte.yaml
     - name: OPTA APPLY FLYTE
       shell: bash
       run: |
         cd opta/aws
         opta apply -c ./flyte.yaml --auto-approve
+    - uses: actions/checkout@v2
+    - name: Setup flytectl
+      uses: unionai/flytectl-setup-action@v0.0.1
+    - name: Create secret
+      env:
+        CLIENT_SECRET: ${{ secrets.client_secret }}
+      run: |
+        echo $CLIENT_SECRET >> /home/runner/secret_location
+    - name: Register flytesnacks examples
+      uses: unionai/flyte-register-action@v0.0.2
+      with:
+        flytesnacks: true
+        project: flytesnacks
+        version: "${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}"
+        domain: development
+        config: dev/config.yaml
+    - name: Setup Flytekit
+      env:
+        CLIENT_SECRET: ${{ secrets.client_secret }}
+        DNS: ${{ steps.opta-dns.outputs.dns }}
+      run: |
+        ./scripts/ci_helper.sh setup_flytekit
+    # TODO: add a badge for when test is running
+    - name: Run tests
+      id: run-tests
+      env:
+        VERSION: "${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}"
+        PRIORITIES: P0,P1
+        FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_FILE: /home/runner/secret_location
+        FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
+      run: |
+        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh ./dev/config)
+        echo "$run_tests_output"  # for debugging purposes
+        badges=$(echo "$run_tests_output" | tail -n1)
+        echo "$badges"  # for debugging purposes
+        echo ::set-output name=badges::${badges}
+    # TODO: Add a slack update after tests run
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
@@ -137,18 +174,3 @@ jobs:
       shell: bash
       run: |
         opta destroy -c ./opta/aws/env.yaml --auto-approve
-    outputs:
-      flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
-#  trigger-run-tests:
-#    name: Run tests
-#    needs:
-#      - run-testing-workflows
-#      - calculate-pre-reqs
-#    uses: brucearctor/flyte/.github/workflows/register_tests.yml@opta-aws
-#    with:
-#      priorities: P0,P1
-#      flytesnacks_version: ${{ needs.calculate-pre-reqs.outputs.flytesnacks_latest }}
-#      badge_version: ${{ needs.calculate-pre-reqs.outputs.badge_version }}
-#    secrets:
-#      client_secret: ${{ secrets.PROPELLER_CLIENT_SECRET }}
-#      DNS: ${{ secrets.DNS }}
