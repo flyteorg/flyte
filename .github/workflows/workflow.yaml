@@ -8,7 +8,7 @@ env:
   YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
-  FLYTE_STORAGE_BUCKET: "flyte-unique-nooverlap-bucket-12345"
+  FLYTE_STORAGE_BUCKET: flyte-unique-nooverlap-bucket-123456
 
 jobs:
   calculate-pre-reqs:
