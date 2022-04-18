@@ -115,6 +115,7 @@ jobs:
         sed -i "s/<unique_bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
         sed -i "s/<region>/$AWS_REGION/" ./opta/aws/flyte.yaml
         sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/flyte.yaml
+        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}" ./opta/aws/flyte.yaml
     - name: view flyte.yaml
       shell: bash
       run: |
@@ -139,8 +140,8 @@ jobs:
     - name: update configs
       shell: bash
       run: |
-        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
-        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
+        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
+        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
     - name: Register flytesnacks examples
       uses: unionai/flyte-register-action@v0.0.2
       with:
@@ -174,12 +175,12 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-    - name: DESTROY FLYTE Opta
-      shell: bash
-      run: |
-        cd opta/aws
-        opta destroy -c ./flyte.yaml --auto-approve 
-    - name: DESTROY OPTA ENV
-      shell: bash
-      run: |
-        opta destroy -c ./opta/aws/env.yaml --auto-approve
+#    - name: DESTROY FLYTE Opta
+#      shell: bash
+#      run: |
+#        cd opta/aws
+#        opta destroy -c ./flyte.yaml --auto-approve 
+#    - name: DESTROY OPTA ENV
+#      shell: bash
+#      run: |
+#        opta destroy -c ./opta/aws/env.yaml --auto-approve
