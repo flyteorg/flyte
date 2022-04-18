@@ -171,7 +171,9 @@ jobs:
         DNS: ${{ steps.opta-dns.outputs.dns }}
       shell: bash
       run: |
-        ./scripts/ci_helper.sh setup_flytekit
+        python -m pip install --upgrade pip
+        pip install flytekit
+        pip freeze
     # TODO: add a badge for when test is running
     - name: Run tests
       id: run-tests
