@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.54.0](http://github.com/lyft/flyteconsole/compare/v0.53.0...v0.54.0) (2022-04-18)
+
+
+### Features
+
+* add cache icons for cached tasks in graph view ([#400](http://github.com/lyft/flyteconsole/issues/400)) ([0c0cd4b](http://github.com/lyft/flyteconsole/commit/0c0cd4b21d621afd1465be9efbb9b21a807d5e00))
+
 # [0.53.0](http://github.com/lyft/flyteconsole/compare/v0.52.1...v0.53.0) (2022-04-16)
 
 
