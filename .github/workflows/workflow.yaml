@@ -78,6 +78,7 @@ jobs:
       run: |
         cat ./opta/aws/env.yaml
         DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
+        echo ""
         echo $DNS
         echo "::set-output name=dns::${DNS}"
     - uses: azure/setup-helm@v1
@@ -168,6 +169,7 @@ jobs:
     - name: Setup Flytekit
       env:
         DNS: ${{ steps.opta-dns.outputs.dns }}
+      shell: bash
       run: |
         ./scripts/ci_helper.sh setup_flytekit
     # TODO: add a badge for when test is running
@@ -178,6 +180,7 @@ jobs:
         PRIORITIES: P0,P1
         # TODO REMOVE BELOW FLYTE_SDK_USE_STRUCTURED_DATASET ONCE ON v1
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
+      shell: bash
       run: |
         run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config)
         echo "$run_tests_output"  # for debugging purposes
