@@ -76,6 +76,7 @@ jobs:
       id: opta-dns
       shell: bash
       run: |
+        cat ./opta/aws/env.yaml
         DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
         echo ::set-output name=dns::${DNS}
     - uses: azure/setup-helm@v1
