@@ -2,9 +2,9 @@ admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: dns:///<dns_of_cluster>
   # Change insecure flag to ensure that you use the right setting for your environment
+  insecureSkipVerify: true
   insecure: false
-  clientId: flytepropeller
 logger:
   # Logger settings to control logger output. Useful to debug logger:
   show-source: true
-  level: 1
+  level: 10

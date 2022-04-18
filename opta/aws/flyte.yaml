@@ -105,7 +105,7 @@ modules:
               cloudwatch-region: "{vars.region}"
         core:
           propeller:
-            rawoutput-prefix: "s3://{parent_name}-{layer_name}"
+            rawoutput-prefix: "s3://{vars.bucket_name}"
       cluster_resource_manager:
         enabled: true
         config:
