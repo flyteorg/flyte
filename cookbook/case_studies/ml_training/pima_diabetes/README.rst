@@ -44,8 +44,9 @@ Walkthrough
 
 Run workflows in this directory with the custom-built base image:
 
-```shell
-pyflyte run --remote diabetes.py:diabetes_xgboost_model --image ghcr.io/flyteorg/flytecookbook:pima_diabetes-latest
-```
+.. prompt:: bash $
+
+     pyflyte run --remote diabetes.py:diabetes_xgboost_model --image ghcr.io/flyteorg/flytecookbook:pima_diabetes-latest
+
 
 

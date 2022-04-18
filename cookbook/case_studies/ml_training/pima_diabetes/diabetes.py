@@ -213,7 +213,7 @@ def diabetes_xgboost_model(
 
 
 # %%
-# The entire workflow can be executed locally as follows...
+# The entire workflow can be executed locally as follows.
 if __name__ == "__main__":
     print(f"Running {__file__} main...")
     print(diabetes_xgboost_model())
