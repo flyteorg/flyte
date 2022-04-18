@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => {
       position: 'relative',
     },
     detailsContainer: {
-      alignItems: 'center',
+      alignItems: 'start',
       display: 'flex',
       flex: '0 1 auto',
       paddingTop: theme.spacing(3),

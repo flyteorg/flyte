@@ -2,6 +2,9 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 import { dTypes } from 'models/Graph/types';
+import CachedOutlined from '@material-ui/icons/CachedOutlined';
+import { CatalogCacheStatus } from 'models/Execution/enums';
+import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
 import {
   COLOR_TASK_TYPE,
   COLOR_GRAPH_BACKGROUND,
@@ -226,6 +229,13 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
     padding: '.1rem .2rem',
     fontSize: '.3rem',
   };
+  const cacheIconStyles: React.CSSProperties = {
+    width: '8px',
+    height: '8px',
+    marginLeft: '4px',
+    marginTop: '1px',
+    color: COLOR_GRAPH_BACKGROUND,
+  };
 
   const handleClick = (_e) => {
     setSelectedNode(true);
@@ -238,10 +248,25 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
       </div>
     );
   };
+
+  const renderCacheIcon = (cacheStatus) => {
+    switch (cacheStatus) {
+      case CatalogCacheStatus.CACHE_HIT:
+        return <CachedOutlined style={cacheIconStyles} />;
+      case CatalogCacheStatus.CACHE_POPULATED:
+        return <PublishedWithChangesOutlined style={cacheIconStyles} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div onClick={handleClick}>
       {data.taskType ? renderTaskType() : null}
-      <div style={styles}>{data.text}</div>
+      <div style={styles}>
+        {data.text}
+        {renderCacheIcon(data.cacheStatus)}
+      </div>
       {renderDefaultHandles(
         data.scopedId,
         getGraphHandleStyle('source'),

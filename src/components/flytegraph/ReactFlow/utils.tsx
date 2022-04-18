@@ -167,6 +167,8 @@ export const getGraphNodeStyle = (
     width: 'auto',
     zIndex: 100000,
     position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
   };
 
   const nestedPoint = {

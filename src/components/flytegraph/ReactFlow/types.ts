@@ -1,3 +1,4 @@
+import { CatalogCacheStatus } from 'models/Execution/enums';
 import { NodeExecutionsById } from 'models/Execution/types';
 import { dNode, dTypes } from 'models/Graph/types';
 import { HandleProps } from 'react-flow-renderer';
@@ -72,6 +73,7 @@ export interface RFCustomData {
   scopedId: string;
   dag: any;
   taskType?: dTypes;
+  cacheStatus?: CatalogCacheStatus;
   onNodeSelectionChanged?: any;
   onAddNestedView: any;
   onRemoveNestedView: any;

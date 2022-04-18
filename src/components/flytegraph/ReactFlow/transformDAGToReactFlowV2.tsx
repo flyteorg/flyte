@@ -1,6 +1,6 @@
 import { dEdge, dNode, dTypes } from 'models/Graph/types';
 import { Edge, Node, Position } from 'react-flow-renderer';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
 import { createDebugLogger } from 'common/log';
 import { ReactFlowGraphConfig } from './utils';
 import { ConvertDagProps } from './types';
@@ -77,13 +77,18 @@ export const buildReactFlowDataProps = (props: BuildDataProps) => {
   };
   const nodeExecutionStatus = mapNodeExecutionStatus();
 
+  const cacheStatus: CatalogCacheStatus =
+    nodeExecutionsById[node.scopedId]?.closure.taskNodeMetadata?.cacheStatus ??
+    CatalogCacheStatus.CACHE_DISABLED;
+
   const dataProps = {
-    nodeExecutionStatus: nodeExecutionStatus,
+    nodeExecutionStatus,
     text: displayName,
     handles: [],
     nodeType: node.type,
     scopedId: node.scopedId,
-    taskType: taskType,
+    taskType,
+    cacheStatus,
     onNodeSelectionChanged: () => {
       if (onNodeSelectionChanged) {
         onNodeSelectionChanged([node.scopedId]);
