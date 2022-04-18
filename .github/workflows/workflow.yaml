@@ -76,7 +76,8 @@ jobs:
       id: opta-dns
       shell: bash
       run: |
-        DNS=$(opta output -c ./opta/aws/env.yaml | jq .load_balancer_raw_dns)
+        DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
+        DNS=
         echo ::set-output name=dns::${DNS}
     - uses: azure/setup-helm@v1
     - name: Update Helm Chart dependencies
