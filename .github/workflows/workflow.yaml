@@ -143,6 +143,17 @@ jobs:
       run: |
         sed -i "s/<cluster_ingress>/$DNS/" .github/ci_config/config.yaml
         sed -i "s/<cluster_ingress>/$DNS/" .github/ci_config/config
+    - name: see config files
+      shell: bash
+      run: |
+        cat .github/ci_config/config.yaml
+        cat .github/ci_config/config
+    - name: check version
+      env:
+        OMG_VERSION: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+      shell: bash
+      run: |
+        echo $OMG_VERSION
     - name: Register flytesnacks examples
       uses: unionai/flyte-register-action@v0.0.2
       with:
@@ -151,11 +162,6 @@ jobs:
         version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         domain: development
         config: .github/ci_config/config.yaml
-    - name: see files
-      shell: bash
-      run: |
-        ls 
-        ls dev/
     - name: Setup Flytekit
       env:
         DNS: ${{ steps.opta-dns.outputs.dns }}

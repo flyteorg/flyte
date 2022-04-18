@@ -81,8 +81,8 @@ install_flytekit () {
 
 setup_flytekit () {
   install_flytekit
-  echo $CLIENT_SECRET >> /home/runner/secret_location
-  flyte-cli setup-config --host=$DNS
+  #echo $CLIENT_SECRET >> /home/runner/secret_location
+  #flyte-cli setup-config --host=$DNS
 }
 
 $1 $2 $3
