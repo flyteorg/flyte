@@ -136,7 +136,6 @@ jobs:
       shell: bash
       run: |
         ls 
-        ls dev/
     - name: update configs
       env:
         DNS: ${{ steps.opta-dns.outputs.dns }}
