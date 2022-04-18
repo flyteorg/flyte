@@ -110,6 +110,8 @@ jobs:
         .github/scripts/ci_helper.sh prepare_flyte_release_build
         .github/scripts/ci_helper.sh prepare_helm_chart
     - name: set flyte variables
+      env:
+        DNS: ${{ steps.opta-dns.outputs.dns }}
       shell: bash
       run: |
         sed -i "s/<unique_bucket_name>/$FLYTE_STORAGE_BUCKET/" ./opta/aws/flyte.yaml
@@ -138,10 +140,12 @@ jobs:
         ls 
         ls dev/
     - name: update configs
+      env:
+        DNS: ${{ steps.opta-dns.outputs.dns }}
       shell: bash
       run: |
-        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
-        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
+        sed -i "s/<cluster_ingress>/$DNS/" .github/ci_config/config.yaml
+        sed -i "s/<cluster_ingress>/$DNS/" .github/ci_config/config
     - name: Register flytesnacks examples
       uses: unionai/flyte-register-action@v0.0.2
       with:
