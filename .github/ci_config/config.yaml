@@ -7,4 +7,4 @@ admin:
 logger:
   # Logger settings to control logger output. Useful to debug logger:
   show-source: true
-  level: 10
+  level: 1
