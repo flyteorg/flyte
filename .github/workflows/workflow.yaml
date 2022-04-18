@@ -22,20 +22,20 @@ jobs:
           echo ::set-output name=components_version::${COMPONENTS_VERSION}
 
           MODE=${{ github.event.inputs.mode || 'nightly' }}
-          echo ::set-output name=mode::${MODE}
+          echo "::set-output name=mode::${MODE}"
           # We use the mode in the subsequent next step to determine the badge version. Github has a specific syntax to define environment variables
           # as defined in https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions).
-          echo 'MODE='$MODE >> $GITHUB_ENV
+          echo "'MODE='$MODE >> $GITHUB_ENV"
       - name: Determine Badge version
         id: parse-badge-version
         run: |
           BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ github.event.inputs.components_version }})
-          echo ::set-output name=badge_version::${BADGE_VERSION}
+          echo "::set-output name=badge_version::${BADGE_VERSION}"
       - name: Parse latest flytesnacks version
         id: parse-flytesnacks-version
         run: |
           LATEST_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
-          echo ::set-output name=flytesnacks_latest::${LATEST_VERSION}
+          echo "::set-output name=flytesnacks_latest::${LATEST_VERSION}"
     outputs:
       mode: ${{ steps.set-inputs-default.outputs.mode }}
       components_version: ${{ steps.set-inputs-default.outputs.components_version }}
@@ -78,7 +78,7 @@ jobs:
       run: |
         cat ./opta/aws/env.yaml
         DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
-        echo ::set-output name=dns::${DNS}
+        echo "::set-output name=dns::${DNS}"
     - uses: azure/setup-helm@v1
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
@@ -142,8 +142,9 @@ jobs:
         DNS: ${{ steps.opta-dns.outputs.dns }}
       shell: bash
       run: |
-        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
-        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
+        echo $DNS
+        sed -i "s/<dns_of_cluster>/$DNS/" .github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/$DNS/" .github/ci_config/config
     - name: see config files
       shell: bash
       run: |
