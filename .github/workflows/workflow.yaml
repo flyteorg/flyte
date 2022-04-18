@@ -148,7 +148,7 @@ jobs:
       with:
         flytesnacks: true
         project: flytesnacks
-        version: "${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}"
+        version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         domain: development
         config: .github/ci_config/config.yaml
     - name: see files
@@ -165,7 +165,7 @@ jobs:
     - name: Run tests
       id: run-tests
       env:
-        VERSION: "${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}"
+        VERSION: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         PRIORITIES: P0,P1
         # TODO REMOVE BELOW FLYTE_SDK_USE_STRUCTURED_DATASET ONCE ON v1
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
