@@ -141,8 +141,8 @@ jobs:
         DNS: ${{ steps.opta-dns.outputs.dns }}
       shell: bash
       run: |
-        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
-        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
+        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/${{ steps.opta-dns.outputs.dns }}/" .github/ci_config/config
     - name: see config files
       shell: bash
       run: |
