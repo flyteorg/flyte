@@ -24,6 +24,30 @@
     serviceName: flyteadmin
     servicePort: 81
 {{- end }}
+- path: /flyteidl.service.DataProxyService
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
+- path: /flyteidl.service.DataProxyService/*
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
 - path: /flyteidl.service.AuthMetadataService
   pathType: ImplementationSpecific
   backend:

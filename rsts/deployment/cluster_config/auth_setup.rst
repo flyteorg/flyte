@@ -53,15 +53,14 @@ The following is required for non-sandbox deployments:
 * A public domain name (e.g. example.foobar.com)
 * Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
 
-   .. note::
+.. note::
 
-      Flyte's Ingress routes traffic to either
-      Flyte Console or FlyteAdmin based on the url path
+   Flyte's Ingress routes traffic to either Flyte Console or FlyteAdmin based on the url path.
 
-   .. prompt:: bash
+.. prompt:: bash
 
-      # determine Flyte Ingress IP
-      kubectl get ingress -n flyte flyte
+   # determine Flyte Ingress IP
+   kubectl get ingress -n flyte flyte
 
 IdP Configuration
 =================
@@ -108,6 +107,17 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     2. Create a realm in keycloak installation using its `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
     3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
     4. Add Login redirect URIs (e.g, http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``).
+
+.. tabbed:: Microsoft Azure AD
+
+    Follow `Azure AD Docs <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings>`__ on how to configure the IdP for OpenIDConnect.
+
+    Make note of the Client ID and Client Secret, and add ``https://<your deployment url>/callback`` as redirect URI.
+
+    .. note::
+
+      Make sure the app is registered without `additional claims <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings#configure-additional-claims>`__.
+      The OpenIDConnect authentication will not work otherwise, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
 
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
@@ -181,6 +191,12 @@ Apply Configuration
 
       kubectl rollout restart deployment/flytepropeller -n flyte
 
+#. Restart `flytescheduler` to start using authenticated requests:
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flytescheduler -n flyte
+
 .. note::
 
    **Congratulations!**
@@ -198,7 +214,17 @@ Flyte comes with a built-in authorization server that can be statically configur
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/pull/168/files#diff-1267ff8bd9146e1c0ff22a9e9d53cfc56d71c1d47fed9905f95ed4bddf930f8eR74-R100>`__
 and the corresponding section can be modified through configs.
 
-To set up an external OAuth2 Authorization Server, please follow the instructions below:
+Hence, it is not necessary to set up an external Authorization Server. However, it is recommended to do so to maintain the security of the configured apps in a secure location and to
+be manage (add, modify, delete) apps using the external authorization server.
+
+To set up an external OAuth2 Authorization Server, follow the instructions below:
+
+.. note::
+
+   **Google IdP**
+
+   Google IdP does not offer an OAuth2 Authorization Server that could be used to protect external services (For example Flyte). In this case, Google offers a separate Cloud Product called Google Cloud Identity.
+   Configuration for Cloud Identity is not included in this guide. If unavailable, setup can stop here and FlyteAdmin BuiltIn OAuth2 Authorization Server can be used instead.
 
 .. tabbed:: Okta
 

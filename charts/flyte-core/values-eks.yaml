@@ -68,10 +68,10 @@ datacatalog:
       eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
   resources:
     limits:
-      cpu: 500m
+      cpu: 1
       ephemeral-storage: 200Mi
     requests:
-      cpu: 50m
+      cpu: 500m
       ephemeral-storage: 200Mi
       memory: 200Mi
   service:
@@ -111,6 +111,8 @@ flytepropeller:
       ephemeral-storage: 1Gi
       memory: 2Gi
   cacheSizeMbs: 1024
+  # -- Sets priorityClassName for propeller pod(s).
+  priorityClassName: "system-cluster-critical"
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -298,9 +300,6 @@ configmap:
   #          sagemaker_custom_training_task: sagemaker_custom_training
   #          sagemaker_custom_training_job_task: sagemaker_custom_training
 
-  logger:
-    logger:
-      level: 5
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various

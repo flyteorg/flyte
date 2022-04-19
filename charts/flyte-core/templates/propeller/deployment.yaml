@@ -61,12 +61,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- if .Values.flytepropeller.manager }}
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        {{- end }}
         image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
         imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
         {{- if .Values.flytepropeller.manager }}

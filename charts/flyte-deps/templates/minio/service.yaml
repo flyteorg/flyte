@@ -1,0 +1,27 @@
+{{- if .Values.minio.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "minio.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "minio.labels" . | nindent 4 }}
+  {{- with .Values.minio.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.minio.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - name: minio
+    nodePort: 30084
+    port: 9000
+    protocol: TCP
+    targetPort: minio
+  - name: minio-console
+    nodePort: 30088
+    port: 9001
+    protocol: TCP
+    targetPort: minio-console
+  selector: {{ include "minio.selectorLabels" . | nindent 4 }}
+{{- end }}
