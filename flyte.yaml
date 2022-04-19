@@ -92,6 +92,6 @@ cluster_resources:
   refresh: 5m
 task_resources:
   defaults:
-    cpu: 600m
+    cpu: 500m
     memory: 500Mi
     storage: 500Mi
