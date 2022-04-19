@@ -1,8 +1,4 @@
 [platform]
 url = <dns_of_cluster>
-insecure = False
 insecure_skip_verify = True
-
-[credentials]
-client_id=flytepropeller
-scopes=all
+insecure = False
