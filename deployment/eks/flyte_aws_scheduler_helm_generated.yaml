@@ -1093,11 +1093,11 @@ spec:
         - containerPort: 10254
         resources: 
           limits:
-            cpu: 500m
+            cpu: 1
             ephemeral-storage: 200Mi
             memory: 500Mi
           requests:
-            cpu: 50m
+            cpu: 500m
             ephemeral-storage: 200Mi
             memory: 200Mi
         volumeMounts:
