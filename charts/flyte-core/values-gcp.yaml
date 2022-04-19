@@ -26,9 +26,9 @@ flyteadmin:
     limits:
       ephemeral-storage: 2Gi
     requests:
-      cpu: 50m
+      cpu: 500m
       ephemeral-storage: 2Gi
-      memory: 200Mi
+      memory: 1G
   service:
     annotations:
       # Required for the ingress to properly route grpc traffic to grpc port
@@ -234,8 +234,8 @@ configmap:
   task_resource_defaults:
     task_resources:
       defaults:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 500m
+        memory: 500Mi
         storage: 500Mi
       limits:
         storage: 2000Mi
@@ -279,17 +279,12 @@ configmap:
         enabled-plugins:
           - container
           - sidecar
-          - spark
           - k8s-array
         default-for-task-types:
           container: container
           sidecar: sidecar
-          spark: spark
           container_array: k8s-array
 
-  logger:
-    logger:
-      level: 5
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
