@@ -90,9 +90,8 @@ cluster_resources:
     - projectQuotaMemory:
         value: "3000Mi"
   refresh: 5m
-task_resource_defaults:
-  task_resources:
-    defaults:
-      cpu: 500m
-      memory: 500Mi
-      storage: 500Mi
+task_resources:
+  defaults:
+    cpu: 600m
+    memory: 500Mi
+    storage: 500Mi
