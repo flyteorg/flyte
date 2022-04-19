@@ -203,7 +203,7 @@ flytepropeller:
     requests:
       cpu: 10m
       ephemeral-storage: 50Mi
-      memory: 50Mi
+      memory: 100Mi
   cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
@@ -522,8 +522,8 @@ configmap:
     task_resources:
       defaults:
         cpu: 100m
-        memory: 100Mi
-        storage: 5Mi
+        memory: 500Mi
+        storage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi

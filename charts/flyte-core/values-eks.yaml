@@ -68,10 +68,10 @@ datacatalog:
       eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
   resources:
     limits:
-      cpu: 500m
+      cpu: 1
       ephemeral-storage: 200Mi
     requests:
-      cpu: 50m
+      cpu: 500m
       ephemeral-storage: 200Mi
       memory: 200Mi
   service:
