@@ -23,7 +23,6 @@ const indexHTML = "/index.html"
 // For every file add a "dist" as the prefix, as every file is assumed to be packaged in "dist" folder fv
 func GetConsoleFile(name string) string {
 	name = strings.TrimPrefix(name, consoleRoot)
-	name = strings.TrimPrefix(name, "/"+assetsDir)
 	if name == "" || name == "/" {
 		name = indexHTML
 	} else if !strings.Contains(name, assetsDir) {
