@@ -70,7 +70,7 @@ jobs:
       run: |
         sudo chmod +x .github/scripts/ci_helper.sh
         .github/scripts/ci_helper.sh setup_opta
-        opta apply -c ./opta/aws/env.yaml --auto-approve 
+#        opta apply -c ./opta/aws/env.yaml --auto-approve 
         opta output -c ./opta/aws/env.yaml
     - name: OPTA DNS 
       id: opta-dns
@@ -131,7 +131,7 @@ jobs:
       shell: bash
       run: |
         cd opta/aws
-        opta apply -c ./flyte.yaml --auto-approve
+#        opta apply -c ./flyte.yaml --auto-approve
     - uses: actions/checkout@v2
     - name: Setup flytectl
       uses: unionai/flytectl-setup-action@v0.0.1
