@@ -197,6 +197,8 @@ jobs:
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
+        aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/flyte.yaml ./opta/aws/flyte.yaml 
+        aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/env.yaml ./opta/aws/env.yaml 
         cat ./opta/aws/flyte.yaml
         cd opta/aws
         opta destroy -c ./flyte.yaml --auto-approve 
