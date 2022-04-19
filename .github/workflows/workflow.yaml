@@ -190,13 +190,10 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-    - name: view flyte.yaml
-      shell: bash
-      run: |
-        cat ./opta/aws/flyte.yaml
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
+        ls ./opta/aws/
         aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/flyte.yaml ./opta/aws/flyte.yaml 
         aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/env.yaml ./opta/aws/env.yaml 
         cat ./opta/aws/flyte.yaml
