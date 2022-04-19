@@ -4,7 +4,7 @@
 Security Overview
 ###################
 
-Here we cover the security aspects of running your flyte deployments. In the current stat, we will cover the user
+Here we cover the security aspects of running your flyte deployments. In the current state, we will cover the user
 used for running the flyte services, and go through why we do this and not run them as a root user.
 
 *****************
