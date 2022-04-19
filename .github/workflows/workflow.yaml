@@ -131,7 +131,7 @@ jobs:
       shell: bash
       run: |
         cd opta/aws
-#        opta apply -c ./flyte.yaml --auto-approve
+        #opta apply -c ./flyte.yaml --auto-approve
     - uses: actions/checkout@v2
     - name: Setup flytectl
       uses: unionai/flytectl-setup-action@v0.0.1
@@ -174,7 +174,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flytekit
         pip freeze
-        flyte-cli setup-config --host=$DNS
     # TODO: add a badge for when test is running
     - name: Run tests
       id: run-tests
@@ -191,12 +190,12 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-#    - name: DESTROY FLYTE Opta
-#      shell: bash
-#      run: |
-#        cd opta/aws
-#        opta destroy -c ./flyte.yaml --auto-approve 
-#    - name: DESTROY OPTA ENV
-#      shell: bash
-#      run: |
-#        opta destroy -c ./opta/aws/env.yaml --auto-approve
+    - name: DESTROY FLYTE Opta
+      shell: bash
+      run: |
+        cd opta/aws
+        opta destroy -c ./flyte.yaml --auto-approve 
+    - name: DESTROY OPTA ENV
+      shell: bash
+      run: |
+        opta destroy -c ./opta/aws/env.yaml --auto-approve
