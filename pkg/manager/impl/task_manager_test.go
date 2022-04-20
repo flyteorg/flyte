@@ -48,7 +48,7 @@ var taskIdentifier = core.Identifier{
 }
 
 func init() {
-	labeled.SetMetricKeys(common.RuntimeTypeKey, common.RuntimeVersionKey)
+	labeled.SetMetricKeys(common.RuntimeTypeKey, common.RuntimeVersionKey, common.ErrorKindKey)
 }
 
 func getMockTaskCompiler() workflowengine.Compiler {

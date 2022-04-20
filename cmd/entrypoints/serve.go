@@ -49,6 +49,6 @@ func init() {
 	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
 		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
-		contextutils.TaskTypeKey, contextutils.PhaseKey, contextutils.LaunchPlanIDKey, common.RuntimeTypeKey,
+		contextutils.TaskTypeKey, contextutils.PhaseKey, contextutils.LaunchPlanIDKey, common.ErrorKindKey, common.RuntimeTypeKey,
 		common.RuntimeVersionKey)
 }
