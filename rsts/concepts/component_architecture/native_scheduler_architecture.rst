@@ -29,6 +29,7 @@ Schedule Management
 This component supports creation/activation and deactivation of schedules. Each schedule is tied to a launchplan and is versioned in a similar manner. The schedule is created or its state is changed to activated/deactivated whenever the `admin API <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#launchplanupdaterequest>`__ is invoked for it with `ACTIVE/INACTIVE state <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-launchplanstate>`__. This is done either through `flytectl <https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_update_launchplan.html#synopsis>`__ or through any other client calling the GRPC API.
 The API is similar to that of a launchplan, which makes sure one schedule at most is active for a given launchplan.
 
+.. _scheduler_concept:
 
 Scheduler
 ---------
