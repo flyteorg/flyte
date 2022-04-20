@@ -1343,6 +1343,16 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 			go m.emitScheduledWorkflowMetrics(ctx, executionModel, request.Event.OccurredAt)
 		}
 	} else if common.IsExecutionTerminal(request.Event.Phase) {
+		if request.Event.Phase == core.WorkflowExecution_FAILED {
+			// request.Event is expected to be of type WorkflowExecutionEvent_Error when workflow fails.
+			// if not, log the error and continue
+			if err := request.Event.GetError(); err != nil {
+				ctx = context.WithValue(ctx, common.ErrorKindKey, err.Kind.String())
+			} else {
+				logger.Warning(ctx, "Failed to parse error for FAILED request [%+v]", request)
+			}
+		}
+
 		m.systemMetrics.ActiveExecutions.Dec()
 		m.systemMetrics.ExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
 		go m.emitOverallWorkflowExecutionTime(executionModel, request.Event.OccurredAt)

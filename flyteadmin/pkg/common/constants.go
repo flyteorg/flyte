@@ -8,6 +8,7 @@ var RuntimeVersionKey = contextutils.Key("runtime_version")
 const (
 	AuditFieldsContextKey contextutils.Key = "audit_fields"
 	PrincipalContextKey   contextutils.Key = "principal"
+	ErrorKindKey          contextutils.Key = "error_kind"
 )
 
 const MaxResponseStatusBytes = 32000
