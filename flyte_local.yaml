@@ -90,3 +90,8 @@ flyte:
   admin:
     disableClusterResourceManager: true
     disableScheduler: true
+task_resources:
+  defaults:
+    cpu: 500m
+    memory: 500Mi
+    storage: 500Mi
