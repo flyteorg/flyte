@@ -78,7 +78,7 @@ var fakePod = corev1.Pod{
 }
 
 func TestStartDemoFunc(t *testing.T) {
-	p1, p2, _ := docker.GetSandboxPorts()
+	p1, p2, _ := docker.GetDemoPorts()
 	assert.Nil(t, util.SetupFlyteDir())
 	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm))
 	assert.Nil(t, ioutil.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm))
