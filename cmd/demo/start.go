@@ -224,7 +224,7 @@ func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio
 	}
 
 	fmt.Printf("%v booting flyte-demo container\n", emoji.FactoryWorker)
-	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
+	exposedPorts, portBindings, _ := docker.GetDemoPorts()
 	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
 		demoImage, sandboxDefaultConfig.Env)
 
