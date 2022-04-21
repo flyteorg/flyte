@@ -902,7 +902,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -919,7 +919,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -933,7 +933,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -944,7 +944,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -967,7 +967,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1049,7 +1049,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.52.1"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v0.54.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -1206,7 +1206,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.147"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.148"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -1222,7 +1222,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.147"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v0.6.148"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -1445,7 +1445,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.147"
+            image: "cr.flyte.org/flyteorg/flyteadmin:v0.6.148"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
