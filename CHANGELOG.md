@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.54.1](http://github.com/lyft/flyteconsole/compare/v0.54.0...v0.54.1) (2022-04-21)
+
+
+### Bug Fixes
+
+* empty commit to generate release ([#415](http://github.com/lyft/flyteconsole/issues/415)) ([ddcda48](http://github.com/lyft/flyteconsole/commit/ddcda48b3cc7d5721e35fc689c2517deb231d67a))
+
 # [0.54.0](http://github.com/lyft/flyteconsole/compare/v0.53.0...v0.54.0) (2022-04-18)
 
 
