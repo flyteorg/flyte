@@ -900,8 +900,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 	var rawOutputDataConfig *admin.RawOutputDataConfig
-	if requestSpec.RawOutputDataConfig != nil {
-		rawOutputDataConfig = requestSpec.RawOutputDataConfig
+	if executionConfig.RawOutputDataConfig != nil {
+		rawOutputDataConfig = executionConfig.RawOutputDataConfig
 	}
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, &request)
