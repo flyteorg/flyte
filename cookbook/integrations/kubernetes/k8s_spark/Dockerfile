@@ -39,7 +39,7 @@ RUN wget  https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
 # Setup Spark environment
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV SPARK_HOME /opt/spark
-ENV SPARK_VERSION 3.0.1
+ENV SPARK_VERSION 3.2.1
 ENV PYSPARK_PYTHON ${VENV}/bin/python3
 ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
 
