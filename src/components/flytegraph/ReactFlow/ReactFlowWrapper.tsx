@@ -105,8 +105,8 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
       nodeTypes={CustomNodeTypes}
       onNodesChange={onNodesChange}
       style={reactFlowStyle}
-      onPaneReady={onLoad}
-      fitViewOnInit
+      onInit={onLoad}
+      fitView
     >
       <Background
         style={backgroundStyle.background}
