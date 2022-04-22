@@ -1,1 +1,2 @@
-gen/* linguist-generated=true
+gen/** linguist-generated=true
+protos/**/*.rst linguist-generated=true
