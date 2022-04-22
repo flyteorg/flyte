@@ -652,6 +652,9 @@ flyte:
               limits.cpu: {{ projectQuotaCpu }}
               limits.memory: {{ projectQuotaMemory }}
 
+    # -- Annotations for cluster resource controller pods
+    podAnnotations: {}
+
 # ----------------------------------------------
 # Sandbox Configuration
 # Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop.

@@ -10,7 +10,7 @@ spec:
   jobTemplate:
     spec:
       template:
-        {{- with .Values.flyteadmin.podAnnotations }}
+        {{- with .Values.cluster_resource_manager.podAnnotations }}
         metadata:
           annotations: {{ tpl (toYaml .) $ | nindent 12 }}
         {{- end }}

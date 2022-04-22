@@ -753,6 +753,9 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
+  # -- Annotations for cluster resource controller pods
+  podAnnotations: {}
+
 # --------------------------------------------------------
 # Optional Plugins
 # --------------------------------------------------------
