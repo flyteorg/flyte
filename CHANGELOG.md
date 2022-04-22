@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.55.0](http://github.com/lyft/flyteconsole/compare/v0.54.2...v0.55.0) (2022-04-22)
+
+
+### Features
+
+* webpack config changes ([#419](http://github.com/lyft/flyteconsole/issues/419)) ([f93e94f](http://github.com/lyft/flyteconsole/commit/f93e94fd5b04c8da65b0bcd97ce1097451d83b28))
+
 ## [0.54.2](http://github.com/lyft/flyteconsole/compare/v0.54.1...v0.54.2) (2022-04-22)
 
 
