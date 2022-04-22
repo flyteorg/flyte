@@ -12,7 +12,6 @@ import { SystemStatusBanner } from 'components/Notifications/SystemStatusBanner'
 import { skeletonColor, skeletonHighlightColor } from 'components/Theme/constants';
 import { muiTheme } from 'components/Theme/muiTheme';
 import * as React from 'react';
-import { Helmet } from 'react-helmet';
 import { hot } from 'react-hot-loader';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { QueryClientProvider } from 'react-query';
@@ -44,10 +43,6 @@ export const AppComponent: React.FC = () => {
               <QueryAuthorizationObserver />
               <SkeletonTheme color={skeletonColor} highlightColor={skeletonHighlightColor}>
                 <CssBaseline />
-                <Helmet>
-                  <title>Flyte Console</title>
-                  <meta name="viewport" content="width=device-width" />
-                </Helmet>
                 <Router history={history}>
                   <ErrorBoundary fixed={true}>
                     <NavBarRouter />

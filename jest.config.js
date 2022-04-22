@@ -33,6 +33,7 @@ module.exports = {
     '<rootDir>/dist',
     '<rootDir>/build',
     '<rootDir>/src/tsd',
+    '<rootDir>/src/server.ts',
     '<rootDir>/.eslintrc.js',
     '\\.config.js$',
   ],

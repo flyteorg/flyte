@@ -139,6 +139,7 @@ yarn install
     ```
       export ADMIN_API_URL=https://different.admin.service.com
       export ADMIN_API_USE_SSL="https"
+      export LOCAL_DEV_HOST=localhost.different.admin.service.com
     ```
 
     _NOTE:_ Add these to your local profile (e.g., `./profile`) to prevent having to do this step each time

@@ -4,4 +4,6 @@ src/generated/
 dist/
 node_modules/
 tsd/
-webpack.config.ts
+webpack.common.config.ts
+webpack.dev.config.ts
+webpack.prod.config.ts

@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Open+Sans:400,700" rel="stylesheet">
+        <meta charset="UTF-8" />
+        <title>Flyte Console</title>
+        <meta name="viewport" content="width=device-width" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Open+Sans:400,700"
+            rel="stylesheet"
+        />
+
+        <script>window.env = <%= htmlWebpackPlugin.options.clientEnv %></script>
     </head>
     <body>
         <div id="react-app"></div>
+        <% if (htmlWebpackPlugin.options.cdnReact) { %>
+        <script crossorigin src="<%= htmlWebpackPlugin.options.cdnReact %>"></script>
+        <% } %> <% if (htmlWebpackPlugin.options.cdnReactDOM) { %>
+        <script crossorigin src="<%= htmlWebpackPlugin.options.cdnReactDOM %>"></script>
+        <% } %>
     </body>
 </html>

@@ -141,6 +141,7 @@ More info on each section could be found at [CONTRIBUTING.md](CONTRIBUTING.md)
    ```bash
    export ADMIN_API_URL=https://different.admin.service.com
    export ADMIN_API_USE_SSL="https"
+   export LOCAL_DEV_HOST=localhost.different.admin.service.com
    ```  
    
    > **Hint:** Add these to your local profile (eg, `./profile`) to prevent having to do this step each time

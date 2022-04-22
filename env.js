@@ -11,7 +11,14 @@ const ADMIN_API_URL = process.env.ADMIN_API_URL;
 // Use this to create SSL server
 const ADMIN_API_USE_SSL = process.env.ADMIN_API_USE_SSL || 'http';
 
+const LOCAL_DEV_HOST = process.env.LOCAL_DEV_HOST;
+
 const BASE_URL = process.env.BASE_URL || '';
+
+/** All emitted assets will have relative path to this path
+ * every time it is changed - the index.js app.use should also be updated.
+ */
+const ASSETS_PATH = `${BASE_URL}/assets/`;
 
 // Defines a file to be required which will provide implementations for
 // any user-definable code.
@@ -35,6 +42,8 @@ module.exports = {
   STATUS_URL,
   ENABLE_GA,
   GA_TRACKING_ID,
+  ASSETS_PATH,
+  LOCAL_DEV_HOST,
   processEnv: {
     ADMIN_API_URL,
     BASE_URL,
