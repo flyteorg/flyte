@@ -35,7 +35,7 @@ What do Launch Plans Provide?
 - Ability to easily enable and disable schedules.
 - Can be created dynamically with flyteclient or statically using the Flyte SDK.
 - Associate different notifications with your workflows.
-- Restrict inputs to be passed to the workflows at launch time using the fixed_inputs_. parameter.
+- Restrict inputs to be passed to the workflows at launch time using the :ref:`fixed_inputs <fixed_inputs>` parameter.
 - Multiple versions of the launch plan (with same name) with only one active version. Schedule will reflect only on the active launch plan version.
 
 .. _concepts-launchplans-inputs:
