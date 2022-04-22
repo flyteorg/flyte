@@ -51,7 +51,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
             color="primary"
             key={domainId}
             component={ButtonLink}
-            to={Routes.ProjectDetails.sections.workflows.makeUrl(project.id, domainId)}
+            to={Routes.ProjectDetails.sections.dashboard.makeUrl(project.id, domainId)}
           >
             {name}
           </Button>
