@@ -5,16 +5,15 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-
 	"os"
 	"strings"
 
-	hversion "github.com/hashicorp/go-version"
-
-	"github.com/enescakir/emoji"
 	"github.com/flyteorg/flytectl/pkg/configutil"
 	"github.com/flyteorg/flytectl/pkg/docker"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+
+	"github.com/enescakir/emoji"
+	hversion "github.com/hashicorp/go-version"
 )
 
 const (
@@ -64,6 +63,12 @@ func PrintSandboxMessage(flyteConsolePort int) {
 	fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
 	fmt.Printf("export KUBECONFIG=%v \n", kubeconfig)
 	fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
+}
+
+// PrintDemoMessage will print demo success message
+func PrintDemoMessage(flyteConsolePort int) {
+	successMsg := fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessage, flyteConsolePort)
+	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, successMsg, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
 }
 
 // SendRequest will create request and return the response

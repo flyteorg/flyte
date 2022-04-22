@@ -164,7 +164,7 @@ func startDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Command
 			return err
 		}
 		primeFlytekitPod(ctx, k8sClient.CoreV1().Pods("default"))
-		util.PrintSandboxMessage(util.DemoConsolePort)
+		util.PrintDemoMessage(util.DemoConsolePort)
 	}
 	return nil
 }
@@ -186,7 +186,7 @@ func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio
 			return nil, err
 		}
 		fmt.Printf("Existing details of your demo cluster")
-		util.PrintSandboxMessage(util.DemoConsolePort)
+		util.PrintDemoMessage(util.DemoConsolePort)
 		return nil, nil
 	}
 
@@ -198,7 +198,7 @@ func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio
 		Host:     "localhost:30081",
 		Insecure: true,
 	}
-	if err := configutil.SetupConfig(configutil.FlytectlConfig, configutil.GetSandboxTemplate(), templateValues); err != nil {
+	if err := configutil.SetupConfig(configutil.ConfigFile, configutil.GetDemoTemplate(), templateValues); err != nil {
 		return nil, err
 	}
 
