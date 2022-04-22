@@ -88,14 +88,14 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
 
 .. prompt:: bash $
 
-  pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
+  pyflyte run example.py wf --n 500 --mean 42 --sigma 2
 
 .. dropdown:: :fa:`info-circle` Why use ``pyflyte run`` rather than ``python example.py``?
     :title: text-muted
     :animate: fade-in-slide-down
 
     ``pyflyte run`` enables you to execute a specific workflow in your python script using the syntax
-    ``pyflyte run <path/to/script.py>:<workflow_function_name>``.
+    ``pyflyte run <path/to/script.py> <workflow_function_name>``.
 
     Key-word arguments can be supplied to ``pyflyte run`` by passing in options in the format ``--kwarg value``, and in
     the case of ``snake_case_arg`` argument names, you can pass in options in the form of ``--snake-case-arg value``.
@@ -183,7 +183,7 @@ Then run the same Workflow on the Flyte cluster:
 
 .. prompt:: bash $
 
-  pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
+  pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2
 
 .. div:: shadow p-3 mb-8 rounded
 
