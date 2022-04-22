@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v0.6.112 # FLYTEADMIN_TAG
+    tag: v0.6.148 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -89,7 +89,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v0.6.112 # FLYTESCHEDULER_TAG
+    tag: v0.6.148 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -137,7 +137,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v0.3.23 # DATACATALOG_TAG
+    tag: v0.3.34 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -192,7 +192,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v0.16.32 # FLYTEPROPELLER_TAG
+    tag: v0.16.47 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -203,7 +203,7 @@ flytepropeller:
     requests:
       cpu: 10m
       ephemeral-storage: 50Mi
-      memory: 50Mi
+      memory: 100Mi
   cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
@@ -229,7 +229,7 @@ flytepropeller:
   # -- Defines the cluster name used in events sent to Admin
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
-  priorityClassName: "system-cluster-critical"
+  priorityClassName: ""
 
 #
 # FLYTECONSOLE SETTINGS
@@ -242,7 +242,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v0.43.0 # FLYTECONSOLE_TAG
+    tag: v0.54.1 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -428,7 +428,6 @@ configmap:
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
-    DISABLE_AUTH: "1"
 
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
@@ -523,8 +522,8 @@ configmap:
     task_resources:
       defaults:
         cpu: 100m
-        memory: 100Mi
-        storage: 5Mi
+        memory: 500Mi
+        storage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi
@@ -632,12 +631,6 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-
-  # -- Logger configuration
-  logger:
-    logger:
-      show-source: true
-      level: 4
 
   remoteData:
     remoteData:

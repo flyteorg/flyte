@@ -6,6 +6,8 @@ Flyte Scheduler Configuration
 
 - `admin <#section-admin>`_
 
+- `cloudevents <#section-cloudevents>`_
+
 - `cluster_resources <#section-cluster_resources>`_
 
 - `clusters <#section-clusters>`_
@@ -130,11 +132,25 @@ Max number of gRPC retries
 authType (uint8)
 --------------------------------------------------------------------------------
 
+Type of OAuth2 flow used for communicating with admin.ClientSecret,Pkce,ExternalCommand are valid values
+
 **Default Value**: 
 
 .. code-block:: yaml
 
   ClientSecret
+  
+
+tokenRefreshWindow (`config.Duration`_)
+--------------------------------------------------------------------------------
+
+Max duration between token refresh attempt and token expiry.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 useAuth (bool)
@@ -407,6 +423,176 @@ refreshTime (`config.Duration`_)
   5m0s
   
 
+Section: cloudevents
+================================================================================
+
+enable (bool)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+type (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  local
+  
+
+aws (`interfaces.AWSConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  region: ""
+  
+
+gcp (`interfaces.GCPConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  projectId: ""
+  
+
+kafka (`interfaces.KafkaConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Version: {}
+  brokers: null
+  
+
+eventsPublisher (`interfaces.EventsPublisherConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  eventTypes: null
+  topicName: ""
+  
+
+reconnectAttempts (int)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+reconnectDelaySeconds (int)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+interfaces.AWSConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+region (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.EventsPublisherConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+topicName (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+eventTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+interfaces.GCPConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+projectId (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.KafkaConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Version (`sarama.KafkaVersion`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
+brokers ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+sarama.KafkaVersion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+version (array)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  '[0 0 0 0]'
+  
+
 Section: cluster_resources
 ================================================================================
 
@@ -491,55 +677,45 @@ Section: database
 host (string)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
 
-  postgres
+  ""
   
 
 port (int)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "5432"
+  "0"
   
 
 dbname (string)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
 
-  postgres
+  ""
   
 
 username (string)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
 
-  postgres
+  ""
   
 
 password (string)
 --------------------------------------------------------------------------------
-
-deprecated
 
 **Default Value**: 
 
@@ -551,8 +727,6 @@ deprecated
 passwordPath (string)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
@@ -563,19 +737,15 @@ deprecated
 options (string)
 --------------------------------------------------------------------------------
 
-deprecated
-
 **Default Value**: 
 
 .. code-block:: yaml
 
-  sslmode=disable
+  ""
   
 
 debug (bool)
 --------------------------------------------------------------------------------
-
-deprecated
 
 **Default Value**: 
 
@@ -632,24 +802,34 @@ sets the maximum amount of time a connection may be reused
   1h0m0s
   
 
-postgres (`interfaces.PostgresConfig`_)
+postgres (`database.PostgresConfig`_)
 --------------------------------------------------------------------------------
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  dbname: ""
+  dbname: postgres
   debug: false
-  host: ""
-  options: ""
+  host: postgres
+  options: sslmode=disable
   password: ""
   passwordPath: ""
-  port: 0
-  username: ""
+  port: 5432
+  username: postgres
   
 
-interfaces.PostgresConfig
+sqlite (`database.SQLiteConfig`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  file: ""
+  
+
+database.PostgresConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 host (string)
@@ -661,7 +841,7 @@ The host name of the database server
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 port (int)
@@ -673,7 +853,7 @@ The port name of the database server
 
 .. code-block:: yaml
 
-  "0"
+  "5432"
   
 
 dbname (string)
@@ -685,7 +865,7 @@ The database name
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 username (string)
@@ -697,7 +877,7 @@ The database user who is connecting to the server.
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 password (string)
@@ -733,7 +913,7 @@ See http://gorm.io/docs/connecting_to_the_database.html for available options pa
 
 .. code-block:: yaml
 
-  ""
+  sslmode=disable
   
 
 debug (bool)
@@ -746,6 +926,21 @@ Whether or not to start the database connection with debug mode enabled.
 .. code-block:: yaml
 
   "false"
+  
+
+database.SQLiteConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+file (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: domains
@@ -845,55 +1040,6 @@ reconnectDelaySeconds (int)
   "0"
   
 
-interfaces.AWSConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-interfaces.EventsPublisherConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-topicName (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-eventTypes ([]string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
-  
-
-interfaces.GCPConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-projectId (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
 Section: flyteadmin
 ================================================================================
 
@@ -968,6 +1114,56 @@ maxParallelism (int32)
   "25"
   
 
+labels (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+annotations (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+assumableIamRole (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+k8sServiceAccount (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default
+  
+
+outputLocationPrefix (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 Section: logger
 ================================================================================
 
@@ -1004,7 +1200,7 @@ Sets the minimum logging level.
 
 .. code-block:: yaml
 
-  "4"
+  "3"
   
 
 formatter (`logger.FormatterConfig`_)
@@ -1822,6 +2018,18 @@ Sets the default http client config.
   timeout: 0s
   
 
+signedUrl (`storage.SignedURLConfig`_)
+--------------------------------------------------------------------------------
+
+Sets config for SignedURL.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
 storage.CachingConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1964,13 +2172,26 @@ Maximum allowed download size (in MBs) per call.
   "2"
   
 
+storage.SignedURLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stowConfigOverride (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 storage.StowConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 kind (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Kind of Stow backend to use. Refer to github/graymeta/stow
+Kind of Stow backend to use. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
@@ -1982,7 +2203,7 @@ Kind of Stow backend to use. Refer to github/graymeta/stow
 config (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Configuration for stow backend. Refer to github/graymeta/stow
+Configuration for stow backend. Refer to github/flyteorg/stow
 
 **Default Value**: 
 
