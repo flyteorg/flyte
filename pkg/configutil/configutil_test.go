@@ -52,4 +52,5 @@ func TestAwsConfig(t *testing.T) {
 	assert.Equal(t, AdminConfigTemplate+StorageS3ConfigTemplate, GetAWSCloudTemplate())
 	assert.Equal(t, AdminConfigTemplate+StorageGCSConfigTemplate, GetGoogleCloudTemplate())
 	assert.Equal(t, AdminConfigTemplate+StorageConfigTemplate, GetSandboxTemplate())
+	assert.Equal(t, AdminConfigTemplate, GetDemoTemplate())
 }

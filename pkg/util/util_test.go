@@ -29,6 +29,12 @@ func TestPrintSandboxMessage(t *testing.T) {
 	})
 }
 
+func TestPrintDemoMessage(t *testing.T) {
+	t.Run("Print Demo Message", func(t *testing.T) {
+		PrintDemoMessage(DemoConsolePort)
+	})
+}
+
 func TestSendRequest(t *testing.T) {
 	t.Run("Successful get request", func(t *testing.T) {
 		response, err := SendRequest("GET", "https://github.com", nil)

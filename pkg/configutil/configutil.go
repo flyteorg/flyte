@@ -65,6 +65,11 @@ func GetSandboxTemplate() string {
 	return AdminConfigTemplate + StorageConfigTemplate
 }
 
+// GetDemoTemplate return demo cluster config
+func GetDemoTemplate() string {
+	return AdminConfigTemplate
+}
+
 // GetAWSCloudTemplate return aws Flyte config with storage config
 func GetAWSCloudTemplate() string {
 	return AdminConfigTemplate + StorageS3ConfigTemplate
