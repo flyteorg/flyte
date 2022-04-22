@@ -170,7 +170,7 @@ Monitor the execution by providing the execution name from the ``create executio
 
    .. group-tab:: Flyte Sandbox
 
-      Visit ``http://localhost:30081`` on your browser
+      Visit ``http://localhost:30080/console`` on your browser
 
    .. group-tab:: Remote Flyte Cluster
 
