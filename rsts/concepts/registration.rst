@@ -23,7 +23,7 @@ Typical Flow Using Flytekit
 
 Typical Flow Without Flytekit
 -----------------------------
-It is possible to achieve the exact same workflow as mentioned above even if Flytekit is not available. Workflows and tasks are purely specifications and can be provided using any tool like ``YAML``, ``JSON``, ``protobuf binary`` or any other programming language. 
+It is possible to achieve the exact same workflow as mentioned above even if Flytekit is not available. Workflows and tasks are purely specifications and can be provided using tools like ``YAML``, ``JSON``, ``protobuf binary`` or any other programming language. 
 
 Contributions using other tools are welcome.
 
