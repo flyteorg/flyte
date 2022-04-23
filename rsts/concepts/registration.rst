@@ -10,7 +10,7 @@ During registration, Flyte validates the workflow structure and saves the workfl
 
 Typical Flow 
 -------------
-The following steps elaborate the registration process from the FlyteAdmin point of view:
+The following steps elaborate on the specifics of the registration process:
 
 * Define the tasks using the :py:mod:`Flytekit <flytekit:flytekit>` Task Definition language.
 * Define a workflow using the :py:mod:`Flytekit <flytekit:flytekit>` Workflow definition language.
