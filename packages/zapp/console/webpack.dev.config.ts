@@ -27,8 +27,8 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
     server: {
       type: 'https',
       options: {
-        key: fs.readFileSync('script/server.key'),
-        cert: fs.readFileSync('script/server.crt'),
+        key: fs.readFileSync('../../../script/server.key'),
+        cert: fs.readFileSync('../../../script/server.crt'),
       },
     },
     client: {

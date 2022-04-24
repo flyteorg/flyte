@@ -42,8 +42,8 @@ const port = process.env.PORT || 3000;
 if (env.ADMIN_API_USE_SSL === 'https') {
   const fs = require('fs');
   const https = require('https');
-  var privateKey = fs.readFileSync('script/server.key');
-  var certificate = fs.readFileSync('script/server.crt');
+  var privateKey = fs.readFileSync('../../../script/server.key');
+  var certificate = fs.readFileSync('../../../script/server.crt');
 
   server = https
     .createServer(

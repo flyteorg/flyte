@@ -1,0 +1,54 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "baseUrl": "src",
+        "checkJs": false,
+        "downlevelIteration": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "jsx": "react",
+        "lib": ["es6", "es2021", "dom", "dom.iterable"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "outDir": "./dist",
+        "removeComments": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es6",
+        "types": ["node", "webpack-env", "jest"],
+
+        "composite": true,
+        "paths": {
+            "@flyteconsole/*": ["../../plugins/*/src", "../../zapp/*/src"]
+        }
+    },
+    "references": [{ "path": "../../plugins/components" }],
+    // "extends": "../../../tsconfig.base.json",
+    // "compilerOptions": {
+    //     "rootDir": "./src",
+    //     "outDir": "./dist"
+    // },
+    // "references": [{ "path": "../../plugins/components" }],
+    "include": ["src/**/*"],
+    "exclude": [
+        "**/__mocks__",
+        "**/test",
+        "**/mocks",
+        // baseline
+        "**/node_modules",
+        "**/dist",
+        "**/lib",
+        "**/src/**/*.spec.*",
+        "**/src/**/*.test.*",
+        "**/src/**/*.stories.*"
+    ]
+}

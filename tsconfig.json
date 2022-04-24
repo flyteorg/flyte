@@ -1,29 +1,25 @@
 {
+    "files": [],
+    "include": [],
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
-        "allowJs": true,
-        "baseUrl": "src",
-        "checkJs": false,
-        "downlevelIteration": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "importHelpers": true,
+        // compilerOptions here used for jest setup only -
+        // all packages are using tsconfig.base.json as a baseline
         "jsx": "react",
-        "lib": ["es6", "es2021", "dom", "dom.iterable"],
-        "module": "commonjs",
+        "lib": ["dom", "esnext"],
+        "module": "esnext",
         "moduleResolution": "node",
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noImplicitAny": false,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
-        "outDir": "./dist",
-        "removeComments": false,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "strict": true,
-        "target": "es6",
-        "types": ["node", "webpack-env", "jest"]
-    }
+        "esModuleInterop": true,
+        "baseUrl": "./",
+        "paths": {
+            "@flyteconsole/*": [
+                "./packages/components/*/src",
+                "./packages/plugins/*/src",
+                "./packages/zapp/*/src"
+            ]
+        }
+    },
+    "references": [
+        { "path": "./packages/plugins/components" },
+        { "path": "./packages/zapp/console" }
+    ]
 }

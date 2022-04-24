@@ -1,0 +1,74 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "checkJs": false,
+        "downlevelIteration": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "jsx": "react",
+        "lib": ["es6", "es2021", "dom", "dom.iterable"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "outDir": "./dist",
+        "removeComments": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "es6",
+        "types": ["node", "webpack-env", "jest"],
+
+        // "lib": ["dom", "dom.iterable", "es2018"],
+        // "jsx": "react",
+        // "target": "esnext",
+        // "module": "commonjs",
+        // "moduleResolution": "node",
+
+        // "allowJs": false,
+        // "allowUnreachableCode": false,
+        // "esModuleInterop": true,
+        // "strict": true,
+        // "isolatedModules": true,
+        // "declaration": true,
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true,
+        // "noImplicitReturns": true,
+        // "noImplicitThis": true,
+        // "noImplicitAny": true,
+        // "importHelpers": true,
+        // "declarationMap": true,
+        // "useDefineForClassFields": true,
+        // "useUnknownInCatchVariables": false,
+        // "resolveJsonModule": true,
+        // "experimentalDecorators": true,
+        // "skipLibCheck": true,
+
+        // // More strict
+        // "exactOptionalPropertyTypes": false, // true,
+        // "noUncheckedIndexedAccess": false,
+        // "noFallthroughCasesInSwitch": true,
+        // "noPropertyAccessFromIndexSignature": false,
+        // "noImplicitOverride": true,
+
+        "sourceMap": true,
+        "composite": true,
+        "baseUrl": ".",
+        "paths": {
+            "@flyteconsole/*": ["./packages/components/*/src", "./packages/zapp/*/src"]
+        }
+    },
+    "exclude": [
+        "**/node_modules",
+        "**/dist",
+        "**/lib",
+        "**/src/**/*.spec.*",
+        "**/src/**/*.test.*",
+        "**/src/**/*.stories.*"
+    ]
+}

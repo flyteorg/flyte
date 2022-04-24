@@ -1,26 +1,19 @@
 {
-    "name": "flyteconsole",
-    "version": "1.0.0",
-    "private": true,
+    "name": "@flyteconsole/client-app",
+    "version": "0.55.0",
     "description": "The web UI for the Flyte platform",
     "repository": {
         "type": "git",
         "url": "http://github.com/lyft/flyteconsole.git"
     },
     "main": "index.js",
-    "workspaces": [
-        "packages/basics/**",
-        "packages/composites/**",
-        "packages/plugins/**",
-        "packages/zapp/**"
-    ],
     "scripts": {
-        "start": "yarn workspace @flyteconsole/client-app start",
         "clean": "rm -rf dist",
         "prebuild": "yarn run clean",
         "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.dev.config.ts --mode=development",
         "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.prod.config.ts --mode=production --progress",
         "build:storybook": "build-storybook",
+        "start": "webpack serve --open --config webpack.dev.config.ts --hot",
         "start:prod": "NODE_ENV=production node -r dotenv/config index.js",
         "storybook": "start-storybook -p 6006",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -87,7 +80,7 @@
         "@commitlint/cli": "^8.3.5",
         "@commitlint/config-conventional": "^8.3.4",
         "@date-io/moment": "1.3.9",
-        "@flyteorg/flyteidl": "1.1.0",
+        "@flyteorg/flyteidl": "0.24.11",
         "@material-ui/core": "^4.0.0",
         "@material-ui/icons": "^4.0.0",
         "@material-ui/pickers": "^3.2.2",
