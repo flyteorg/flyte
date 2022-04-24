@@ -11,6 +11,5 @@ type Dictionary<T> = { [k: string]: T };
 type Fn<ReturnType> = () => ReturnType;
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-type RequireFields<T, FieldTypes extends keyof T> = T &
-    { [K in FieldTypes]-?: NonNullable<T[K]> };
+type RequireFields<T, FieldTypes extends keyof T> = T & { [K in FieldTypes]-?: NonNullable<T[K]> };
 type RequiredNonNullable<T> = RequireFields<T, keyof T>;
