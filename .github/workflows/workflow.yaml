@@ -184,7 +184,7 @@ jobs:
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
       shell: bash
       run: |
-        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config)
+        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config.yaml )
         echo "$run_tests_output"  # for debugging purposes
         badges=$(echo "$run_tests_output" | tail -n1)
         echo "$badges"  # for debugging purposes
