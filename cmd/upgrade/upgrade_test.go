@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/testutils"
 
-	"github.com/flyteorg/flytectl/pkg/githubutil"
+	"github.com/flyteorg/flytectl/pkg/github"
 	"github.com/flyteorg/flytectl/pkg/util"
 
 	"github.com/flyteorg/flytectl/pkg/platformutil"
@@ -48,9 +48,9 @@ func TestUpgradeCommand(t *testing.T) {
 func TestUpgrade(t *testing.T) {
 	_ = util.WriteIntoFile([]byte("data"), tempExt)
 	stdlibversion.Version = version
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	t.Run("Successful upgrade", func(t *testing.T) {
-		message, err := upgrade(githubutil.FlytectlReleaseConfig)
+		message, err := upgrade(github.FlytectlReleaseConfig)
 		assert.Nil(t, err)
 		assert.Contains(t, message, "Successfully updated to version")
 	})
@@ -61,7 +61,7 @@ func TestCheckGoosForRollback(t *testing.T) {
 	linux := platformutil.Linux
 	windows := platformutil.Windows
 	darwin := platformutil.Darwin
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	t.Run("checkGOOSForRollback on linux", func(t *testing.T) {
 		assert.Equal(t, true, isRollBackSupported(linux))
 		assert.Equal(t, false, isRollBackSupported(windows))
@@ -71,7 +71,7 @@ func TestCheckGoosForRollback(t *testing.T) {
 
 func TestIsUpgradeable(t *testing.T) {
 	stdlibversion.Version = version
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	linux := platformutil.Linux
 	windows := platformutil.Windows
 	darwin := platformutil.Darwin
@@ -106,7 +106,7 @@ func TestIsUpgradeable(t *testing.T) {
 
 func TestSelfUpgrade(t *testing.T) {
 	stdlibversion.Version = version
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
 		s := testutils.Setup()
@@ -120,7 +120,7 @@ func TestSelfUpgrade(t *testing.T) {
 
 func TestSelfUpgradeError(t *testing.T) {
 	stdlibversion.Version = version
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
 		s := testutils.Setup()
@@ -135,7 +135,7 @@ func TestSelfUpgradeError(t *testing.T) {
 
 func TestSelfUpgradeRollback(t *testing.T) {
 	stdlibversion.Version = version
-	githubutil.FlytectlReleaseConfig.OverrideExecutable = tempExt
+	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful rollback", func(t *testing.T) {
 		s := testutils.Setup()
@@ -171,7 +171,7 @@ func TestSelfUpgradeRollback(t *testing.T) {
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
 		stdlibversion.Version = version
-		githubutil.FlytectlReleaseConfig.OverrideExecutable = "/"
+		github.FlytectlReleaseConfig.OverrideExecutable = "/"
 		assert.Nil(t, selfUpgrade(s.Ctx, args, s.CmdCtx))
 	})
 

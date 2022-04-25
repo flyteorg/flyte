@@ -33,7 +33,10 @@ func demoClusterExec(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 }
 
 func execute(ctx context.Context, cli docker.Docker, args []string) error {
-	c := docker.GetSandbox(ctx, cli)
+	c, err := docker.GetSandbox(ctx, cli)
+	if err != nil {
+		return err
+	}
 	if c != nil {
 		exec, err := docker.ExecCommend(ctx, cli, c.ID, args)
 		if err != nil {

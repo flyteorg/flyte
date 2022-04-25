@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	ghMocks "github.com/flyteorg/flytectl/pkg/github/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
@@ -29,6 +30,7 @@ import (
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
+	"github.com/google/go-github/v42/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -434,15 +436,35 @@ func TestGetStorageClient(t *testing.T) {
 
 func TestGetAllFlytesnacksExample(t *testing.T) {
 	t.Run("Failed to get manifest with wrong name", func(t *testing.T) {
-		_, _, err := getAllExample("no////ne", "")
+		mockGh := &ghMocks.GHRepoService{}
+		mockGh.OnGetLatestReleaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, fmt.Errorf("failed"))
+		_, _, err := getAllExample("no////ne", "", mockGh)
 		assert.NotNil(t, err)
 	})
 	t.Run("Failed to get release", func(t *testing.T) {
-		_, _, err := getAllExample("homebrew-tap", "")
+		mockGh := &ghMocks.GHRepoService{}
+		tag := "v0.15.0"
+		sandboxManifest := "flyte_sandbox_manifest.tgz"
+		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+			TagName: &tag,
+			Assets: []*github.ReleaseAsset{{
+				Name: &sandboxManifest,
+			}},
+		}, nil, fmt.Errorf("failed"))
+		_, _, err := getAllExample("homebrew-tap", "1.0", mockGh)
 		assert.NotNil(t, err)
 	})
 	t.Run("Successfully get examples", func(t *testing.T) {
-		assets, r, err := getAllExample("flytesnacks", "v0.2.175")
+		mockGh := &ghMocks.GHRepoService{}
+		tag := "v0.15.0"
+		sandboxManifest := "flyte_sandbox_manifest.tgz"
+		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+			TagName: &tag,
+			Assets: []*github.ReleaseAsset{{
+				Name: &sandboxManifest,
+			}},
+		}, nil, nil)
+		assets, r, err := getAllExample("flytesnacks", tag, mockGh)
 		assert.Nil(t, err)
 		assert.Greater(t, len(*r.TagName), 0)
 		assert.Greater(t, len(assets), 0)

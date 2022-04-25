@@ -32,7 +32,10 @@ func demoClusterStatus(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 }
 
 func printStatus(ctx context.Context, cli docker.Docker) error {
-	c := docker.GetSandbox(ctx, cli)
+	c, err := docker.GetSandbox(ctx, cli)
+	if err != nil {
+		return err
+	}
 	if c == nil {
 		fmt.Printf("%v no demo cluster found \n", emoji.StopSign)
 		return nil

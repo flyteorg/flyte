@@ -1,36 +1,30 @@
-package githubutil
+package github
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
-	"github.com/flyteorg/flytectl/pkg/util"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"golang.org/x/oauth2"
-
 	"github.com/flyteorg/flytectl/pkg/platformutil"
+	"github.com/flyteorg/flytectl/pkg/util"
+	"github.com/flyteorg/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
-	"github.com/mouuff/go-rocket-update/pkg/provider"
-	"github.com/mouuff/go-rocket-update/pkg/updater"
-
-	"fmt"
 
 	"github.com/google/go-github/v42/github"
+	"github.com/mouuff/go-rocket-update/pkg/provider"
+	"github.com/mouuff/go-rocket-update/pkg/updater"
+	"golang.org/x/oauth2"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const (
 	owner                   = "flyteorg"
 	flyte                   = "flyte"
-	sandboxManifest         = "flyte_sandbox_manifest.yaml"
 	flytectl                = "flytectl"
 	sandboxSupportedVersion = "v0.10.0"
 	flytectlRepository      = "github.com/flyteorg/flytectl"
@@ -41,6 +35,8 @@ const (
 	releaseURL              = "https://github.com/flyteorg/flytectl/releases/tag/%s \n"
 	brewInstallDirectory    = "/Cellar/flytectl"
 )
+
+var Client GHRepoService
 
 // FlytectlReleaseConfig represent the updater config for flytectl binary
 var FlytectlReleaseConfig = &updater.Updater{
@@ -56,31 +52,28 @@ var (
 	arch = platformutil.Arch(runtime.GOARCH)
 )
 
-//GetGHClient will return github client
-func GetGHClient() *github.Client {
-	if len(os.Getenv("GITHUB_TOKEN")) > 0 {
-		return github.NewClient(oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-		)))
-	}
-	return github.NewClient(&http.Client{})
+//go:generate mockery -name=GHRepoService -case=underscore
+
+type GHRepoService interface {
+	GetLatestRelease(ctx context.Context, owner, repo string) (*github.RepositoryRelease, *github.Response, error)
+	ListReleases(ctx context.Context, owner, repo string, opts *github.ListOptions) ([]*github.RepositoryRelease, *github.Response, error)
+	GetReleaseByTag(ctx context.Context, owner, repo, tag string) (*github.RepositoryRelease, *github.Response, error)
+	GetCommitSHA1(ctx context.Context, owner, repo, ref, lastSHA string) (string, *github.Response, error)
 }
 
-// GetLatestVersion returns the latest non-prerelease version of provided repository, as
+// GetLatestRelease returns the latest non-prerelease version of provided repoName, as
 // described in https://docs.github.com/en/rest/reference/releases#get-the-latest-release
-func GetLatestVersion(repository string) (*github.RepositoryRelease, error) {
-	client := GetGHClient()
-	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repository)
+func GetLatestRelease(repoName string, g GHRepoService) (*github.RepositoryRelease, error) {
+	release, _, err := g.GetLatestRelease(context.Background(), owner, repoName)
 	if err != nil {
 		return nil, err
 	}
 	return release, err
 }
 
-// GetListRelease returns the list of release of provided repository
-func GetListRelease(repository string) ([]*github.RepositoryRelease, error) {
-	client := GetGHClient()
-	releases, _, err := client.Repositories.ListReleases(context.Background(), owner, repository, &github.ListOptions{
+// ListReleases returns the list of release of provided repoName
+func ListReleases(repoName string, g GHRepoService) ([]*github.RepositoryRelease, error) {
+	releases, _, err := g.ListReleases(context.Background(), owner, repoName, &github.ListOptions{
 		PerPage: 100,
 	})
 	if err != nil {
@@ -89,11 +82,43 @@ func GetListRelease(repository string) ([]*github.RepositoryRelease, error) {
 	return releases, err
 }
 
+// GetReleaseByTag returns the provided tag release if tag exist in repository
+func GetReleaseByTag(repoName, tag string, g GHRepoService) (*github.RepositoryRelease, error) {
+	release, _, err := g.GetReleaseByTag(context.Background(), owner, repoName, tag)
+	if err != nil {
+		return nil, err
+	}
+	return release, err
+}
+
+// GetCommitSHA1 returns sha hash against the version
+func GetCommitSHA1(repoName, version string, g GHRepoService) (string, error) {
+	sha, _, err := g.GetCommitSHA1(context.Background(), owner, repoName, version, "")
+	if err != nil {
+		return "", err
+	}
+	return sha, err
+}
+
+// GetAssetFromRelease returns the asset using assetName from github release with tag
+func GetAssetFromRelease(tag, assetName, repoName string, g GHRepoService) (*github.ReleaseAsset, error) {
+	release, _, err := g.GetReleaseByTag(context.Background(), owner, repoName, tag)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range release.Assets {
+		if v.GetName() == assetName {
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("assest is not found in %s[%s] release", repoName, tag)
+}
+
 // GetSandboxImageSha returns the sha as per input
-func GetSandboxImageSha(version string, pre bool) (string, string, error) {
+func GetSandboxImageSha(tag string, pre bool, g GHRepoService) (string, string, error) {
 	var release *github.RepositoryRelease
-	if len(version) == 0 {
-		releases, err := GetListRelease(flyte)
+	if len(tag) == 0 {
+		releases, err := ListReleases(flyte, g)
 		if err != nil {
 			return "", release.GetTagName(), err
 		}
@@ -107,8 +132,8 @@ func GetSandboxImageSha(version string, pre bool) (string, string, error) {
 			}
 		}
 		logger.Infof(context.Background(), "starting with release %s", release.GetTagName())
-	} else if len(version) > 0 {
-		r, err := CheckVersionExist(version, flyte)
+	} else if len(tag) > 0 {
+		r, err := GetReleaseByTag(flyte, tag, g)
 		if err != nil {
 			return "", r.GetTagName(), err
 		}
@@ -121,7 +146,7 @@ func GetSandboxImageSha(version string, pre bool) (string, string, error) {
 	if !isGreater {
 		return "", release.GetTagName(), fmt.Errorf("version flag only supported with flyte %s+ release", sandboxSupportedVersion)
 	}
-	sha, err := GetSHAFromVersion(release.GetTagName(), flyte)
+	sha, err := GetCommitSHA1(flyte, release.GetTagName(), g)
 	if err != nil {
 		return "", release.GetTagName(), err
 	}
@@ -135,40 +160,6 @@ func getFlytectlAssetName() string {
 		arch = platformutil.Archi386
 	}
 	return fmt.Sprintf("flytectl_%s_%s.tar.gz", cases.Title(language.English).String(runtime.GOOS), arch.String())
-}
-
-// CheckVersionExist returns the provided version release if version exist in repository
-func CheckVersionExist(version, repository string) (*github.RepositoryRelease, error) {
-	client := GetGHClient()
-	release, _, err := client.Repositories.GetReleaseByTag(context.Background(), owner, repository, version)
-	if err != nil {
-		return nil, err
-	}
-	return release, err
-}
-
-// GetSHAFromVersion returns sha commit hash against a release
-func GetSHAFromVersion(version, repository string) (string, error) {
-	client := GetGHClient()
-	sha, _, err := client.Repositories.GetCommitSHA1(context.Background(), owner, repository, version, "")
-	if err != nil {
-		return "", err
-	}
-	return sha, err
-}
-
-// GetAssetsFromRelease returns the asset from github release
-func GetAssetsFromRelease(version, assets, repository string) (*github.ReleaseAsset, error) {
-	release, err := CheckVersionExist(version, repository)
-	if err != nil {
-		return nil, err
-	}
-	for _, v := range release.Assets {
-		if v.GetName() == assets {
-			return v, nil
-		}
-	}
-	return nil, fmt.Errorf("assest is not found in %s[%s] release", repository, version)
 }
 
 // GetUpgradeMessage return the upgrade message
@@ -218,11 +209,28 @@ func CheckBrewInstall(goos platformutil.Platform) (string, error) {
 // if no version is specified then the Latest release of cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA} is used
 // else cr.flyte.org/flyteorg/flyte-sandbox:dind-{SHA}, where sha is derived from the version.
 // If pre release is true then use latest pre release of Flyte, In that case User don't need to pass version
-func GetFullyQualifiedImageName(prefix, version, image string, pre bool) (string, string, error) {
-	sha, version, err := GetSandboxImageSha(version, pre)
+
+func GetFullyQualifiedImageName(prefix, version, image string, pre bool, g GHRepoService) (string, string, error) {
+	sha, version, err := GetSandboxImageSha(version, pre, g)
 	if err != nil {
 		return "", version, err
 	}
 
 	return fmt.Sprintf("%s:%s", image, fmt.Sprintf("%s-%s", prefix, sha)), version, nil
+}
+
+// GetGHRepoService returns the initialized github repo service client.
+func GetGHRepoService() GHRepoService {
+	if Client == nil {
+		var gh *github.Client
+		if len(os.Getenv("GITHUB_TOKEN")) > 0 {
+			gh = github.NewClient(oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+			)))
+		} else {
+			gh = github.NewClient(&http.Client{})
+		}
+		return gh.Repositories
+	}
+	return Client
 }
