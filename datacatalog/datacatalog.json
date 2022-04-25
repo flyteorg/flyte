@@ -1,19 +1,19 @@
 {
-    "version": "0.3.37",
+    "version": "1.0.0",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/flyteorg/datacatalog/releases/download/v0.3.37/datacatalog_v0.3.37_windows_i386.zip",
+            "url": "https://github.com/flyteorg/datacatalog/releases/download/v1.0.0/datacatalog_v1.0.0_windows_i386.zip",
             "bin": [
                 "datacatalog.exe"
             ],
-            "hash": "3991ad01979b9e27c1d0085ba97bc50607decaffa70d6ad4edd411048732463f"
+            "hash": "b846941b774e55550369357a5b8ccedcc9d44e54eb5cfad6d8d96d7528b75efc"
         },
         "64bit": {
-            "url": "https://github.com/flyteorg/datacatalog/releases/download/v0.3.37/datacatalog_v0.3.37_windows_x86_64.zip",
+            "url": "https://github.com/flyteorg/datacatalog/releases/download/v1.0.0/datacatalog_v1.0.0_windows_x86_64.zip",
             "bin": [
                 "datacatalog.exe"
             ],
-            "hash": "f17025d9e57e79dbb3a53a1626ec540ad53af814ed9c8471bb569c44a857838f"
+            "hash": "a7803bd0abbd1235405ecd847ecb8966ec8507d179431e1ac309c828bcdee4e6"
         }
     },
     "homepage": "https://godoc.org/github.com/lyft/datacatalog",
