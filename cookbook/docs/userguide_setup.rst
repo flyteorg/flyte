@@ -75,7 +75,7 @@ You should see an output that looks like:
 
 You can visit this url to inspect the execution as it runs:
 
-.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/first_run_console.gif
         :alt: A quick visual tour for launching your first Workflow.
 
 Finally, let's run a workflow that takes some inputs, for example the ``basic_workflow.py`` example:
