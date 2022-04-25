@@ -1,4 +1,3 @@
 [platform]
 url = <dns_of_cluster>
-insecure = True
-
+auth=False
