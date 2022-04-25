@@ -30,7 +30,7 @@ export function extractAndIdentifyNodes(workflow: Workflow): GloballyUniqueNode[
       // When we are rendering sub-workflow nodes correctly, this should
       // be updated to use the proper parent workflow id
       // (subWorkflow.template.id)
-      // See https://github.com/lyft/flyte/issues/357
+      // See https://github.com/flyteorg/flyte/issues/357
       workflowId: workflow.id,
     },
   }));

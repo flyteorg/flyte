@@ -44,7 +44,7 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
 
   // TODO: We removed all loading indicators here. Decide if we want skeletons
   // instead.
-  // https://github.com/lyft/flyte/issues/666
+  // https://github.com/flyteorg/flyteconsole/issues/422
 
   return (
     <>

@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import * as React from 'react';
 import { NewTargetLink } from '../NewTargetLink';
 
-const linkTarget = 'https://www.github.com/lyft/flyteconsole';
+const linkTarget = 'https://github.com/flyteorg/flyteconsole';
 
 const linkText = 'open in new page';
 const renderLink = () => render(<NewTargetLink href={linkTarget}>{linkText}</NewTargetLink>);

@@ -2,7 +2,7 @@ module.exports = {
   core: {
     builder: 'webpack5',
   },
-  stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../packages/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
@@ -10,7 +10,7 @@ module.exports = {
   ],
   framework: '@storybook/react',
   webpackFinal: async (config, { configType }) => {
-    config.resolve.modules = ['src', 'node_modules'];
+    config.resolve.modules = ['packages/zapp/console/src', 'node_modules'];
     config.module.rules = [
       ...config.module.rules,
       {

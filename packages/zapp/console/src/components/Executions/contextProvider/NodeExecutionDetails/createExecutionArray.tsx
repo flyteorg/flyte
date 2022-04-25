@@ -60,7 +60,7 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
     };
   }
 
-  // TODO: https://github.com/lyft/flyte/issues/655
+  // TODO: https://github.com/flyteorg/flyteconsole/issues/274
   if (node.value.branchNode) {
     return {
       scopedId: node.scopedId,

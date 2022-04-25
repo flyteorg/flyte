@@ -1,5 +1,5 @@
 FROM node:16 as builder
-LABEL org.opencontainers.image.source https://github.com/lyft/flyteconsole
+LABEL org.opencontainers.image.source https://github.com/flyteorg/flyteconsole
 
 WORKDIR /code/flyteconsole
 COPY package*.json yarn.lock ./
@@ -20,7 +20,7 @@ RUN : \
   && mv dist index.js env.js plugins.js /app
 
 FROM gcr.io/distroless/nodejs
-LABEL org.opencontainers.image.source https://github.com/lyft/flyteconsole
+LABEL org.opencontainers.image.source https://github.com/flyteorg/flyteconsole
 
 COPY --from=builder /app app
 WORKDIR /app
