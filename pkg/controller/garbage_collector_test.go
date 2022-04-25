@@ -103,7 +103,7 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 			assert.NotNil(t, options)
 			assert.NotNil(t, listOptions)
 			if strings.HasPrefix(listOptions.LabelSelector, "completed-time") {
-				assert.Equal(t, "completed-time notin (2009-11-10.22,2009-11-10.23,2009-11-11.00),hour-of-day in (),termination-status=terminated", listOptions.LabelSelector)
+				assert.Equal(t, "completed-time notin (2009-11-10.21,2009-11-10.22,2009-11-10.23),!hour-of-day,termination-status=terminated", listOptions.LabelSelector)
 			} else {
 				assert.Equal(t, "hour-of-day in (0,1,10,11,12,13,14,15,16,17,18,19,2,20,21,3,4,5,6,7,8,9),termination-status=terminated", listOptions.LabelSelector)
 			}
