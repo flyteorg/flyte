@@ -53,11 +53,12 @@ The parameterization engine uses Golangs native templating format and hence uses
   task_logs:
     plugins:
       logs:
-        displayName: <name-to-show>
-        templateUris:
-          - "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-          - "https://some-other-source/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-        messageFormat: "json" # "unknown" | "csv" | "json"
+        templates:
+          - displayName: <name-to-show>
+            templateUris:
+              - "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
+              - "https://some-other-source/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
+            messageFormat: "json" # "unknown" | "csv" | "json"
 
 This code snippet will output two logs per task that use the log plugin.
 However, not all task types use the log plugin; for example, the Sagemaker plugin uses the log output provided by Sagemaker, and the Snowflake plugin will use a link to the snowflake console.
