@@ -40,6 +40,7 @@ app/public/styles/*.css
 .idea
 .cache/
 venv/
+*.tsbuildinfo
 
 # Frontend
 .awcache/

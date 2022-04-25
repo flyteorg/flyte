@@ -71,7 +71,7 @@ export const limitChunksPlugin = new webpack.optimize.LimitChunkCountPlugin({
 const typescriptRule = {
   test: /\.tsx?$/,
   exclude: /node_modules/,
-  include: path.resolve(__dirname, 'src'),
+  // include: path.resolve(__dirname, 'src'), // narusina - check with Carina as we need to remove it for micropackages structure
   use: [{ loader: 'ts-loader', options: { transpileOnly: true } }],
 };
 
@@ -82,6 +82,10 @@ const resolve = {
   extensions: ['.ts', '.tsx', '.js', '.jsx'],
   /** "main" fields in package.json files to resolve a CommonJS module for */
   mainFields: ['browser', 'module', 'main'],
+  /** allow to resolve local packages to it's source code */
+  alias: {
+    '@flyteconsole/components': path.resolve(__dirname, '../../plugins/components/src'),
+  },
 };
 
 /**

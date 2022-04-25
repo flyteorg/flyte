@@ -28,7 +28,7 @@
 
         "composite": true,
         "paths": {
-            "@flyteconsole/*": ["../../plugins/*/src", "../../zapp/*/src"]
+            "@flyteconsole/*": ["../../plugins/*/src"]
         }
     },
     "references": [{ "path": "../../plugins/components" }],
