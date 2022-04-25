@@ -215,9 +215,7 @@ Inspect the Results
 Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to Flyte Console, the web UI
 used to manage Flyte entities such as tasks, workflows, and executions.
 
-.. video:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.gif
-   :width: 100%
-   :autoplay:
+.. image:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.gif
 
 .. note::
 
