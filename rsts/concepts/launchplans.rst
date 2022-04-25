@@ -15,7 +15,7 @@ See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPX
 The Association between Workflows and LaunchPlans
 --------------------------------------------------
 Every workflow comes with a `default` launch plan that has the same name as that of a workflow. The default launch plan is authored (in code) as part of creating a new workflow.
-A launch plan version can only ever be mapped to one WF version; meaning a launch plan version cannot be used twice. This is because part of what makes a new launch plan version is the mapping to the specific workflow version.
+A launch plan version can only ever be mapped to one workflow version; meaning a launch plan version cannot be used twice. This is because part of what makes a new launch plan version is the mapping to the specific workflow version.
 
 .. note::
    Users rarely interact with the default launch plan.
@@ -35,7 +35,7 @@ What do Launch Plans Provide?
 - Ability to easily enable and disable schedules.
 - Can be created dynamically with flyteclient or statically using the Flyte SDK.
 - Associate different notifications with your workflows.
-- Restrict inputs to be passed to the workflows at launch time using the fixed_inputs_. parameter.
+- Restrict inputs to be passed to the workflows at launch time using the :ref:`fixed_inputs <fixed_inputs>` parameter.
 - Multiple versions of the launch plan (with same name) with only one active version. Schedule will reflect only on the active launch plan version.
 
 .. _concepts-launchplans-inputs:

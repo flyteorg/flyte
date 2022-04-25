@@ -3,8 +3,7 @@
 Dynamic Job Spec
 ================
 
-A dynamic job spec is a subset of the full workflow spec that defines a set of tasks, workflows as well as 
-nodes and output bindindgs that control how the job should assemble its outputs.
+A dynamic job spec is a subset of the entire workflow spec that defines a set of tasks, workflows as well as nodes and output bindindgs that control how the job should assemble its outputs.
 
 This spec is currently only supported as an intermediate step in running Dynamic Tasks.
 

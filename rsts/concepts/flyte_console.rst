@@ -7,8 +7,7 @@ Flyte UI is a web-based user interface for Flyte. It helps interact with Flyte o
 
 With Flyte UI, you can:
 
-* Launch Workflows
-* Launch Tasks
+* Launch tasks and workflows
 * View Versioned Tasks and Workflows
 * Trigger Versioned Tasks and Workflows
 * Inspect Executions through Inputs, Outputs, Logs, and Graphs
@@ -17,7 +16,7 @@ With Flyte UI, you can:
 * Recover Executions
 
 .. note::
-    `Flyte Console <https://github.com/flyteorg/flyteconsole>`__ hosts the Flyte user interface code.
+    `FlyteConsole <https://github.com/flyteorg/flyteconsole>`__ hosts the Flyte user interface code.
 
 Launching Workflows
 -------------------
@@ -74,8 +73,7 @@ The UI should be accessible at http://localhost:30081/console.
 
 |
 
-A pop-up window appears with input fields that the task requires and the role with which the task has to run
-on clicking the **Launch Task** button.
+A pop-up window appears with input fields that the task requires and the role with which the task has to run on clicking the **Launch Task** button.
 
 |
 
@@ -148,7 +146,7 @@ Logs are accessible as well.
 
 Every execution has two views: Nodes and Graph.
 
-A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger a child workflow.
+A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger an external workflow.
 More about nodes can be found in :std:ref:`divedeep-nodes`.
 
 |
@@ -174,7 +172,7 @@ Graph view showcases a static DAG.
 Cloning Executions
 ------------------
 
-An execution in the RUNNING state can be cloned.
+An execution in the ``RUNNING`` state can be cloned.
 
 Click on the ellipsis on the top right corner of the UI.
 

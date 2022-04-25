@@ -4,26 +4,26 @@
 Component Architecture
 ######################
 
-This document aims to demystify how Flyte's major components ``FlyteIDL``, ``FlyteKit``, ``FlyteCLI``, ``FlyteConsole``, ``FlyteAdmin``, ``FlytePropeller``, and ``FlytePlugins`` fit together at a high level.
+This document aims to demystify how Flyte's major components ``Flyteidl``, ``Flytekit``, ``Flytectl``, ``FlyteConsole``, ``FlyteAdmin``, ``FlytePropeller``, and ``FlytePlugins`` fit together at a high level.
 
 FlyteIDL
 ========
 
-In Flyte, entities like "Workflows", "Tasks", "Launch Plans", and "Schedules" are recognized by multiple system components. In order for components to communicate effectively, they need a shared understanding about the structure of these entities.
+In Flyte, entities like "Workflows", "Tasks", "Launch Plans", and "Schedules" are recognized by multiple system components. For components to communicate effectively, they need a shared understanding about the structure of these entities.
 
-The Flyte IDL (Interface Definition Language) is where shared Flyte entities are defined. This IDL also defines the RPC service definition for the :std:ref:`core Flyte API <protos/docs/service/service:flyteidl/service/admin.proto>`.
+Flyteidl (Interface Definition Language) is where shared Flyte entities are defined. It also defines the RPC service definition for the :std:ref:`core Flyte API <protos/docs/service/service:flyteidl/service/admin.proto>`.
 
-FlyteIDL uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ schema to describe entities. Clients are generated for Python, Golang, and JavaScript and imported by Flyte components.
+Flyteidl uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ schema to describe entities. Clients are generated for Python, Golang, and JavaScript and imported by Flyte components.
 
 
 Planes
 ======
 
-Flyte components are separated into 3 logical planes. The planes are summarized and explained in detail below. The goal is that these planes can be replaced by alternate implementations.
+Flyte components are separated into 3 logical planes. The planes are summarized and explained in detail below. These planes can be replaced by alternate implementations too.
 
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 | **User Plane**    | The User Plane consists of all user tools that assist in interacting with the core Flyte API.                 |
-|                   | These tools include the FlyteConsole, FlyteKit, and FlyteCLI.                                                 |
+|                   | These tools include the FlyteConsole, Flytekit, and Flytectl.                                                 |
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 | **Control Plane** | The Control Plane implements the core Flyte API.                                                              |
 |                   | It serves all client requests coming from the User Plane.                                                     |
@@ -39,30 +39,30 @@ Flyte components are separated into 3 logical planes. The planes are summarized 
 User Plane
 ----------
 
-In Flyte, workflows are represented as a Directed Acyclic Graph (DAG) of tasks. While this representation is logical for services, managing workflow DAGs in this format is a tedious exercise for humans. The Flyte User Plane provides tools to create, manage, and visualize workflows in a format that is easily digestible to users.
+In Flyte, workflows are represented as a Directed Acyclic Graph (DAG) of tasks. While this representation is logical for services, managing workflow DAGs in this format is a tedious exercise for humans. The Flyte User Plane provides tools to create, manage, and visualize workflows in a format that is easily digestible to the users.
 
 These tools include: 
 
-FlyteKit
-  FlyteKit is an SDK that helps users design new workflows using the Python programming language. FlyteKit can parse the python code, compile it into a valid Workflow DAG, and submit it to Flyte to be executed.
+Flytekit
+  Flytekit is an SDK that helps users design new workflows using the Python programming language. It can parse the Python code, compile it into a valid Workflow DAG, and submit it to Flyte for execution.
 
 FlyteConsole
-  Flyte console provides the Web interface for Flyte. Users and administrators can use the console to view workflows, launch plans, schedules, tasks, and individual task executions. The console provides tools to visualize workflows, and surfaces relevant logs for debugging failed tasks.
+  FlyteConsole provides the Web interface for Flyte. Users and administrators can use the console to view workflows, launch plans, schedules, tasks, and individual task executions. The console provides tools to visualize workflows, and surfaces relevant logs for debugging failed tasks.
 
-FlyteCLI
-  Flyte Command Line Interface provides interactive access to Flyte to launch and access Flyte workflows via terminal.
+Flytectl
+  Flytectl provides interactive access to Flyte to launch and access workflows via terminal.
 
 
 Control Plane
 -------------
 
-The Control Plane supports the core REST/gRPC API defined in FlyteIDL. User Plane tools like FlyteConsole and FlyteKit contact the control plane on behalf of users to store and retrieve information. 
+The Control Plane supports the core REST/gRPC API defined in Flyteidl. User Plane tools like FlyteConsole and Flytekit contact the control plane on behalf of users to store and retrieve information. 
 
 Currently, the entire control plane is handled by a single service called **FlyteAdmin**.
 
-FlyteAdmin is stateless. It processes requests to create entities like Tasks, Workflows, and Schedules by persisting data in a relational database.
+FlyteAdmin is stateless. It processes requests to create entities like tasks, workflows, and schedules by persisting data in a relational database.
 
-While FlyteAdmin serves the Workflow Exeuction API, it does not, itself, execute workflows. To launch workflow executions, FlyteAdmin sends the workflow DAG off to the DataPlane. For added scalability and fault-tolerance, FlyteAdmin can be configured to load-balance workflows across multiple isolated data-plane clusters.
+While FlyteAdmin serves the Workflow Exeuction API, it does not itself execute workflows. To launch workflow executions, FlyteAdmin sends the workflow DAG to the DataPlane. For added scalability and fault-tolerance, FlyteAdmin can be configured to load-balance workflows across multiple isolated data-plane clusters.
 
 
 Data Plane
@@ -70,26 +70,26 @@ Data Plane
 
 The Data Plane is the engine that accepts DAGs, and fulfills workflow executions by launching tasks in the order defined by the graph. Requests to the Data Plane generally come via the control plane, and not from end-users.
 
-In order to support compute-intensive workflows at massive scale, the Data Plane needs to launch containers on a cluster of machines. The current implementation leverages `kubernetes <https://kubernetes.io/>`_ for cluster management.
+In order to support compute-intensive workflows at massive scale, the Data Plane needs to launch containers on a cluster of machines. The current implementation leverages `Kubernetes <https://kubernetes.io/>`_ for cluster management.
 
-Unlike the user-facing control-plane, the Data Plane does not expose a traditional REST/gRPC API. To launch an execution in the Data Plane, you create a “flyteworkflow” resource in kubernetes.
-A “flyteworkflow” is a kubernetes `Custom Resource <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`_ (CRD) created by our team. This custom resource represents the flyte workflow DAG.
+Unlike the user-facing Control Plane, the Data Plane does not expose a traditional REST/gRPC API. To launch an execution in the Data Plane, you create a “flyteworkflow” resource in Kubernetes.
+A “flyteworkflow” is a Kubernetes `Custom Resource <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`_ (CRD) created by our team. This custom resource represents the Flyte workflow DAG.
 
-The core state machine that processes flyteworkflows is worker we call **FlytePropeller**.
+The core state machine that processes flyteworkflows is the worker known as **FlytePropeller**.
 
-FlytePropeller leverages the kubernetes `operator pattern <https://kubernetes.io/docs/concepts/extend-kubernetes/operator/>`_. It polls the kubernetes API, looking for newly created flyteworkflow resources. FlytePropeller understands the workflow DAG, and launches the appropriate kubernetes pods as needed to complete tasks. It periodically checks for completed tasks, launching downstream tasks until the workflow is complete.
+FlytePropeller leverages the Kubernetes `operator pattern <https://kubernetes.io/docs/concepts/extend-kubernetes/operator/>`_. It polls the Kubernetes API, looking for newly created flyteworkflow resources. FlytePropeller understands the workflow DAG, and launches the appropriate Kubernetes pods as needed to complete tasks. It periodically checks for completed tasks, launching downstream tasks until the workflow is complete.
 
 **Plugins**
 
 Each task in a flyteworkflow DAG has a specified **type**. The logic for fulfilling a task is determined by its task type.
-In the most basic case, FlytePropeller launches a single kubernetes pod to fulfill a task.
-More complex task types require workloads to be distributed across hundreds of pods.
+In the basic case, FlytePropeller launches a single Kubernetes pod to fulfill a task.
+Complex task types require workloads to be distributed across hundreds of pods.
 
-The type-specific task logic is separated into isolated code modules that we call **plugins**.
+The type-specific task logic is separated into isolated code modules known as **plugins**.
 Each task type has an associated plugin that is responsible for handling tasks of its type.
 For each task in a workflow, FlytePropeller activates the appropriate plugin based on the task type in order to fullfill the task.
 
-The Flyte team has pre-built plugins for Hive, Spark, and AWS Batch, and more.
+The Flyte team has pre-built plugins for Hive, Spark, AWS Batch, and :ref:`more <integrations>`.
 To support new use-cases, developers can create their own plugins and bundle them in their FlytePropeller deployment.
 
 Component Code Architecture

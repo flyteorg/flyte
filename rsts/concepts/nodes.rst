@@ -8,7 +8,7 @@ a :ref:`task <divedeep-tasks>`, but it can also contain an entire subworkflow or
 Nodes can have inputs and outputs, which are used to coordinate task inputs and outputs. 
 Moreover, node outputs can be used as inputs to other nodes within a workflow.
 
-Tasks are always encapsulated within a node, however, like tasks, nodes can come in a variety of flavors determined by their *target*.
+Tasks are always encapsulated within a node. However, like tasks, nodes can come in a variety of flavors determined by their *target*.
 These targets include :ref:`task nodes <divedeep-task-nodes>`, :ref:`workflow nodes <divedeep-workflow-nodes>`, and :ref:`branch nodes <divedeep-branch-nodes>`.
 
 .. _divedeep-task-nodes:

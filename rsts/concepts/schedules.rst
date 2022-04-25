@@ -4,9 +4,9 @@ Schedules
 ==========
 Workflows can be run automatically using :ref:`schedules <cookbook:launchplan_schedules>` associated with launch plans.
 
-At most, only one launch plan version for a given {Project, Domain, Name} combination can be active, which means, at most, only one schedule can be active for a launch plan. This is because only one active schedule can exist across all versions of the launch plan. 
+Only one launch plan version for a given {Project, Domain, Name} combination can be active, which means only one schedule can be active for a launch plan. This is because a single active schedule can exist across all versions of the launch plan. 
 
-To clarify, a :ref:`workflow <divedeep-workflows>` version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
+A :ref:`workflow <divedeep-workflows>` version can have multiple schedules associated with it, given that these schedules exist as versions of different launch plans. 
 
 Creating a new schedule creates a new version of the launch plan.
 If you wish to change a schedule, you will have to create a new version of that launch plan since a **schedule cannot be edited**.

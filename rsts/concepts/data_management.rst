@@ -38,7 +38,7 @@ All of them from Flyte's point of view are ``data``.
 The difference lies in how Flyte stores and passes each of these data items.
 
 For every task that receives input, Flyte sends an **Inputs Metadata** object, which contains all the primitive or simple scalar values inlined, but in the case of
-complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m``, and ``n`` are inlined while
+complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m`` and ``n`` are inlined while
 ``o`` and the output ``pd.DataFrame`` are offloaded to an object store, and their reference is captured in the metadata.
 
 `Flytekit TypeTransformers` make it possible to use complex objects as if they are available locally - just like persistent filehandles. But Flyte backend only deals with
@@ -52,12 +52,12 @@ but can be accessed by users's container/tasks.
 Raw Data Prefix
 ~~~~~~~~~~~~~~~
 
-Every task can read/write its own data files. If ``FlyteFile``, or any natively supported type like ``pandas.DataFrame`` is used, Flyte will automatically offload and download
+Every task can read/write its own data files. If ``FlyteFile`` or any natively supported type like ``pandas.DataFrame`` is used, Flyte will automatically offload and download
 data from the configured object-store paths. These paths are completely customizable per `LaunchPlan` or `Execution`.
 
 - The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :std:ref:`flytectl_register_files`.
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
-- To override the ``RawOutput`` path (prefix in an object store like S3/GCS), we can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
+- To override the ``RawOutput`` path (prefix in an object store like S3/GCS), you can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
   .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/launch_raw_output.png
 
@@ -69,7 +69,7 @@ Metadata
 
 Metadata in Flyte is critical to enable the passing of data between tasks. It allows to perform in-memory computations for branches or send partial outputs from one task to another or compose outputs from multiple tasks into one input to be sent to a task.
 
-Thus, metadata is restricted due to its omnipresence. Each `meta output` / `input` cannot be larger than 1MB. If you have `List[int]`, it cannot be larger than 1MB, considering the other input entities. In scenarios where large lists or strings need to be sent between tasks, file abstraction is preferred.
+Thus, metadata is restricted due to its omnipresence. Each `meta output`/`input` cannot be larger than 1MB. If you have `List[int]`, it cannot be larger than 1MB, considering other input entities. In scenarios where large lists or strings need to be sent between tasks, file abstraction is preferred.
 
 ``LiteralType`` & Literals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +149,7 @@ One implementation of Flyte is the current workflow engine.
 
 The workflow engine is responsible for moving data from a previous task to the next task. As explained previously, Flyte only deals with Metadata and not the actual Raw data.
 The illustration below explains how data flows from engine to the task and how that is transferred between tasks. The medium to transfer the data can change, and will change in the future.
-We could use faster metadata stores to speed up data movement or exploit locality.
+We could use fast metadata stores to speed up data movement or exploit locality.
 
 Between Flytepropeller and Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
