@@ -12,7 +12,7 @@ import (
 
 	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
-	"github.com/flyteorg/flytectl/pkg/githubutil"
+	"github.com/flyteorg/flytectl/pkg/github"
 
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
@@ -67,7 +67,7 @@ func selfUpgrade(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 		if args[0] == rollBackSubCommand && !isRollBackSupported(goos) {
 			return nil
 		}
-		ext, err := githubutil.FlytectlReleaseConfig.GetExecutable()
+		ext, err := github.FlytectlReleaseConfig.GetExecutable()
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func selfUpgrade(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 		if _, err := os.Stat(backupBinary); err != nil {
 			return errors.New("flytectl backup doesn't exist. Rollback is not possible")
 		}
-		return githubutil.FlytectlReleaseConfig.Rollback()
+		return github.FlytectlReleaseConfig.Rollback()
 	}
 
 	if isSupported, err := isUpgradeSupported(goos); err != nil {
@@ -84,7 +84,7 @@ func selfUpgrade(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 		return nil
 	}
 
-	if message, err := upgrade(githubutil.FlytectlReleaseConfig); err != nil {
+	if message, err := upgrade(github.FlytectlReleaseConfig); err != nil {
 		return err
 	} else if len(message) > 0 {
 		logger.Info(ctx, message)
@@ -109,7 +109,7 @@ func upgrade(u *updater.Updater) (string, error) {
 }
 
 func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
-	latest, err := githubutil.FlytectlReleaseConfig.GetLatestVersion()
+	latest, err := github.FlytectlReleaseConfig.GetLatestVersion()
 	if err != nil {
 		return false, err
 	}
@@ -121,7 +121,7 @@ func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
 		return false, nil
 	}
 
-	message, err := githubutil.GetUpgradeMessage(latest, goos)
+	message, err := github.GetUpgradeMessage(latest, goos)
 	if err != nil {
 		return false, err
 	}

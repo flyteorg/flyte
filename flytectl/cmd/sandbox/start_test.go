@@ -6,26 +6,24 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin"
-
-	"github.com/flyteorg/flytectl/pkg/githubutil"
-
-	"github.com/flyteorg/flytectl/pkg/k8s"
-
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
 	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	ghutil "github.com/flyteorg/flytectl/pkg/github"
+	ghMocks "github.com/flyteorg/flytectl/pkg/github/mocks"
+	"github.com/flyteorg/flytectl/pkg/k8s"
 	k8sMocks "github.com/flyteorg/flytectl/pkg/k8s/mocks"
 	"github.com/flyteorg/flytectl/pkg/util"
+	"github.com/flyteorg/flyteidl/clients/go/admin"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/google/go-github/v42/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
@@ -77,68 +75,50 @@ var fakePod = corev1.Pod{
 	},
 }
 
-func TestStartSandboxFunc(t *testing.T) {
-	p1, p2, _ := docker.GetSandboxPorts()
+var (
+	githubMock *ghMocks.GHRepoService
+	ctx        context.Context
+	mockDocker *mocks.Docker
+)
+
+func sandboxSetup() {
+	ctx = context.Background()
+	mockDocker = &mocks.Docker{}
+	errCh := make(chan error)
+	sandboxConfig.DefaultConfig.Version = "v0.19.1"
+	bodyStatus := make(chan container.ContainerWaitOKBody)
+	githubMock = &ghMocks.GHRepoService{}
+	sandboxConfig.DefaultConfig.Image = "dummyimage"
+	mockDocker.OnContainerCreateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(container.ContainerCreateCreatedBody{
+		ID: "Hello",
+	}, nil)
+
+	mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+}
+
+func TestStartFunc(t *testing.T) {
 	assert.Nil(t, util.SetupFlyteDir())
 	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm))
 	assert.Nil(t, ioutil.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm))
 
 	fakePod.SetName("flyte")
-	fakePod.SetName("flyte")
 
-	t.Run("Successfully run sandbox cluster", func(t *testing.T) {
-		ctx := context.Background()
-		mockDocker := &mocks.Docker{}
-		errCh := make(chan error)
-		sandboxConfig.DefaultConfig.Version = "v0.19.1"
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", sandboxConfig.DefaultConfig.Version, sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       docker.Volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+	t.Run("Successfully run demo cluster", func(t *testing.T) {
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.Nil(t, err)
 	})
-	t.Run("Successfully exit when sandbox cluster exist", func(t *testing.T) {
-		ctx := context.Background()
-		mockDocker := &mocks.Docker{}
-		errCh := make(chan error)
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       docker.Volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+	t.Run("Successfully exit when demo cluster exist", func(t *testing.T) {
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
@@ -148,46 +128,23 @@ func TestStartSandboxFunc(t *testing.T) {
 			},
 		}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		reader, err := startSandbox(ctx, mockDocker, strings.NewReader("n"))
+		reader, err := startSandbox(ctx, mockDocker, githubMock, strings.NewReader("n"))
 		assert.Nil(t, err)
 		assert.Nil(t, reader)
 	})
-	t.Run("Successfully run sandbox cluster with source code", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
+	t.Run("Successfully run demo cluster with source code", func(t *testing.T) {
 		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
 		sandboxConfig.DefaultConfig.Version = ""
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
@@ -195,41 +152,15 @@ func TestStartSandboxFunc(t *testing.T) {
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.Nil(t, err)
 	})
-	t.Run("Successfully run sandbox cluster with abs path of source code", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
+	t.Run("Successfully run demo cluster with abs path of source code", func(t *testing.T) {
 		sandboxConfig.DefaultConfig.Source = "../"
 		sandboxConfig.DefaultConfig.Version = ""
-		absPath, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
-		assert.Nil(t, err)
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: absPath,
-			Target: docker.Source,
-		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
@@ -237,147 +168,56 @@ func TestStartSandboxFunc(t *testing.T) {
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.Nil(t, err)
 	})
-	t.Run("Successfully run sandbox cluster with specific version", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Version = "v0.18.0"
-		sandboxConfig.DefaultConfig.Source = ""
+	t.Run("Successfully run demo cluster with specific version", func(t *testing.T) {
+		sandboxSetup()
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+			ShowStderr: true,
+			ShowStdout: true,
+			Timestamps: true,
+			Follow:     true,
+		}).Return(nil, nil)
+		sandboxConfig.DefaultConfig.Image = ""
+		tag := "v0.15.0"
+		githubMock.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+			TagName: &tag,
+		}, nil, nil)
 
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", sandboxConfig.DefaultConfig.Version, sandboxImageName, false)
-		assert.Nil(t, err)
-		volumes := docker.Volumes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
-			ShowStderr: true,
-			ShowStdout: true,
-			Timestamps: true,
-			Follow:     true,
-		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		githubMock.OnGetCommitSHA1Match(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("dummySha", nil, nil)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.Nil(t, err)
 	})
-	t.Run("Failed run sandbox cluster with wrong version", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Version = "v0.1444.0"
-		sandboxConfig.DefaultConfig.Source = ""
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		volumes := docker.Volumes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+	t.Run("Failed run demo cluster with wrong version", func(t *testing.T) {
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
-			ShowStderr: true,
-			ShowStdout: true,
-			Timestamps: true,
-			Follow:     true,
-		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		sandboxConfig.DefaultConfig.Image = ""
+		githubMock.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, fmt.Errorf("non-existent-tag"))
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.NotNil(t, err)
+		assert.Equal(t, "non-existent-tag", err.Error())
 	})
 	t.Run("Error in pulling image", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("error"))
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
-			ShowStderr: true,
-			ShowStdout: true,
-			Timestamps: true,
-			Follow:     true,
-		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("failed to pull"))
+		sandboxConfig.DefaultConfig.Image = ""
+		tag := "v0.15.0"
+		githubMock.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+			TagName: &tag,
+		}, nil, nil)
+
+		githubMock.OnGetCommitSHA1Match(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("dummySha", nil, nil)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.NotNil(t, err)
+		assert.Equal(t, "failed to pull", err.Error())
 	})
 	t.Run("Error in  removing existing cluster", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
@@ -387,136 +227,53 @@ func TestStartSandboxFunc(t *testing.T) {
 			},
 		}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
-			ShowStderr: true,
-			ShowStdout: true,
-			Timestamps: true,
-			Follow:     true,
-		}).Return(nil, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("error"))
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, strings.NewReader("y"))
+		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("failed to remove container"))
+		_, err := startSandbox(ctx, mockDocker, githubMock, strings.NewReader("y"))
 		assert.NotNil(t, err)
+		assert.Equal(t, "failed to remove container", err.Error())
 	})
 	t.Run("Error in start container", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Source = ""
-		sandboxConfig.DefaultConfig.Version = ""
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       docker.Volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, fmt.Errorf("error"))
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("error"))
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
-			ShowStderr: true,
-			ShowStdout: true,
-			Timestamps: true,
-			Follow:     true,
-		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("failed to run container"))
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.NotNil(t, err)
+		assert.Equal(t, "failed to run container", err.Error())
 	})
 	t.Run("Error in reading logs", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
 			Follow:     true,
-		}).Return(nil, fmt.Errorf("error"))
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		}).Return(nil, fmt.Errorf("failed to get container logs"))
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
 		assert.NotNil(t, err)
+		assert.Equal(t, "failed to get container logs", err.Error())
 	})
 	t.Run("Error in list container", func(t *testing.T) {
-		ctx := context.Background()
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.Source = f.UserHomeDir()
-		sandboxConfig.DefaultConfig.Version = ""
-		volumes := docker.Volumes
-		volumes = append(volumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.Source,
-		})
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, fmt.Errorf("error"))
+		sandboxSetup()
+		mockDocker.OnContainerListMatch(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		_, err = startSandbox(ctx, mockDocker, os.Stdin)
-		assert.Nil(t, err)
+		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin)
+		assert.NotNil(t, err)
+		assert.Equal(t, "failed to list containers", err.Error())
 	})
-	t.Run("Successfully run sandbox cluster command", func(t *testing.T) {
+	t.Run("Successfully run demo cluster command", func(t *testing.T) {
 		mockOutStream := new(io.Writer)
-		ctx := context.Background()
 		cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
-		mockDocker := &mocks.Docker{}
-		errCh := make(chan error)
 		client := testclient.NewSimpleClientset()
 		k8s.Client = client
 		_, err := client.CoreV1().Pods("flyte").Create(ctx, &fakePod, v1.CreateOptions{})
@@ -528,24 +285,11 @@ func TestStartSandboxFunc(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       docker.Volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnImagePullMatch(mock.Anything, mock.Anything, mock.Anything).Return(os.Stdin, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+
 		stringReader := strings.NewReader(docker.SuccessMessage)
 		reader := ioutil.NopCloser(stringReader)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
@@ -554,52 +298,31 @@ func TestStartSandboxFunc(t *testing.T) {
 			Timestamps: true,
 			Follow:     true,
 		}).Return(reader, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
 		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		docker.Client = mockDocker
 		sandboxConfig.DefaultConfig.Source = ""
 		sandboxConfig.DefaultConfig.Version = ""
 		k8s.ContextMgr = mockK8sContextMgr
+		ghutil.Client = githubMock
 		mockK8sContextMgr.OnCopyContextMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		err = startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})
-	t.Run("Error in running sandbox cluster command", func(t *testing.T) {
+	t.Run("Error in running demo cluster command", func(t *testing.T) {
 		mockOutStream := new(io.Writer)
-		ctx := context.Background()
 		cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
-		mockDocker := &mocks.Docker{}
-		errCh := make(chan error)
-		bodyStatus := make(chan container.ContainerWaitOKBody)
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		mockDocker.OnContainerCreate(ctx, &container.Config{
-			Env:          docker.Environment,
-			Image:        image,
-			Tty:          false,
-			ExposedPorts: p1,
-		}, &container.HostConfig{
-			Mounts:       docker.Volumes,
-			PortBindings: p2,
-			Privileged:   true,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
-			ID: "Hello",
-		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("error"))
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, fmt.Errorf("error"))
+		sandboxSetup()
+		docker.Client = mockDocker
+		mockDocker.OnContainerListMatch(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		stringReader := strings.NewReader(docker.SuccessMessage)
-		reader := ioutil.NopCloser(stringReader)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
 			Follow:     true,
-		}).Return(reader, nil)
-		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
-		docker.Client = mockDocker
-		sandboxConfig.DefaultConfig.Source = ""
-		err = startSandboxCluster(ctx, []string{}, cmdCtx)
+		}).Return(nil, nil)
+		err := startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.NotNil(t, err)
 	})
 }
@@ -702,31 +425,4 @@ func TestGetNodeTaintStatus(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, true, c)
 	})
-}
-
-func TestGetSandboxImage(t *testing.T) {
-	t.Run("Get Latest sandbox", func(t *testing.T) {
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "", sandboxImageName, false)
-		assert.Nil(t, err)
-		assert.Equal(t, true, strings.HasPrefix(image, "cr.flyte.org/flyteorg/flyte-sandbox:dind-"))
-	})
-
-	t.Run("Get sandbox image with version ", func(t *testing.T) {
-		image, _, err := githubutil.GetFullyQualifiedImageName("dind", "v0.14.0", sandboxImageName, false)
-		assert.Nil(t, err)
-		assert.Equal(t, true, strings.HasPrefix(image, sandboxImageName))
-	})
-	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("dind", "v100.1.0", sandboxImageName, false)
-		assert.NotNil(t, err)
-	})
-	t.Run("Get sandbox image with wrong version ", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("dind", "aaaaaa", sandboxImageName, false)
-		assert.NotNil(t, err)
-	})
-	t.Run("Get sandbox image with version that is not supported", func(t *testing.T) {
-		_, _, err := githubutil.GetFullyQualifiedImageName("dind", "v0.10.0", sandboxImageName, false)
-		assert.NotNil(t, err)
-	})
-
 }

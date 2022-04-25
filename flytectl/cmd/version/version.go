@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/flyteorg/flytectl/pkg/githubutil"
+	"github.com/flyteorg/flytectl/pkg/github"
 
 	"github.com/flyteorg/flytectl/pkg/platformutil"
 
@@ -53,11 +53,11 @@ func GetVersionCommand(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 
 func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	goos := platformutil.Platform(runtime.GOOS)
-	version, err := githubutil.FlytectlReleaseConfig.GetLatestVersion()
+	version, err := github.FlytectlReleaseConfig.GetLatestVersion()
 	if err != nil {
 		logger.Error(ctx, "Unable to get the latest version because %v", err)
 	} else {
-		message, err := githubutil.GetUpgradeMessage(version, goos)
+		message, err := github.GetUpgradeMessage(version, goos)
 		if err != nil {
 			logger.Error(ctx, "Unable to detect a new version because %v", err)
 		}

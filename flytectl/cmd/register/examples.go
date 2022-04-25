@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flytectl/cmd/config"
-
+	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	g "github.com/flyteorg/flytectl/pkg/github"
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/google/go-github/v42/github"
-
-	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
 const (
@@ -44,7 +43,8 @@ func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Com
 	// Deprecated checks for --k8Service
 	deprecatedCheck(ctx, &rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.K8ServiceAccount)
 
-	examples, tag, err := getAllExample(flytesnacks, rconfig.DefaultFilesConfig.Version)
+	ghRepo := g.GetGHRepoService()
+	examples, tag, err := getAllExample(flytesnacks, rconfig.DefaultFilesConfig.Version, ghRepo)
 	if err != nil {
 		return err
 	}

@@ -22,7 +22,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
-	"github.com/flyteorg/flytectl/pkg/githubutil"
+	g "github.com/flyteorg/flytectl/pkg/github"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -654,15 +654,15 @@ func filterExampleFromRelease(releases *github.RepositoryRelease) []*github.Rele
 	return assets
 }
 
-func getAllExample(repository, version string) ([]*github.ReleaseAsset, *github.RepositoryRelease, error) {
+func getAllExample(repository, version string, repoService g.GHRepoService) ([]*github.ReleaseAsset, *github.RepositoryRelease, error) {
 	if len(version) > 0 {
-		release, err := githubutil.CheckVersionExist(version, repository)
+		release, err := g.GetReleaseByTag(version, repository, repoService)
 		if err != nil {
 			return nil, nil, err
 		}
 		return filterExampleFromRelease(release), release, nil
 	}
-	release, err := githubutil.GetLatestVersion(repository)
+	release, err := g.GetLatestRelease(repository, repoService)
 	if err != nil {
 		return nil, nil, err
 	}

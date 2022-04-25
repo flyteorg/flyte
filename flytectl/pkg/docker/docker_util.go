@@ -65,21 +65,28 @@ func GetDockerClient() (Docker, error) {
 }
 
 // GetSandbox will return sandbox container if it exist
-func GetSandbox(ctx context.Context, cli Docker) *types.Container {
-	containers, _ := cli.ContainerList(ctx, types.ContainerListOptions{
+func GetSandbox(ctx context.Context, cli Docker) (*types.Container, error) {
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
 	})
+	if err != nil {
+		return nil, err
+	}
 	for _, v := range containers {
 		if strings.Contains(v.Names[0], FlyteSandboxClusterName) {
-			return &v
+			return &v, nil
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 // RemoveSandbox will remove sandbox container if exist
 func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
-	if c := GetSandbox(ctx, cli); c != nil {
+	c, err := GetSandbox(ctx, cli)
+	if err != nil {
+		return err
+	}
+	if c != nil {
 		if cmdUtil.AskForConfirmation("delete existing sandbox cluster", reader) {
 			err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
 				Force: true,

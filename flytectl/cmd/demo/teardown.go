@@ -38,7 +38,10 @@ func teardownDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 }
 
 func tearDownDemo(ctx context.Context, cli docker.Docker) error {
-	c := docker.GetSandbox(ctx, cli)
+	c, err := docker.GetSandbox(ctx, cli)
+	if err != nil {
+		return err
+	}
 	if c != nil {
 		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
 			Force: true,

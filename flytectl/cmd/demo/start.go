@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flytectl/clierrors"
-	"github.com/flyteorg/flytectl/pkg/githubutil"
+	"github.com/flyteorg/flytectl/pkg/github"
 
 	"github.com/avast/retry-go"
 	"github.com/olekukonko/tablewriter"
@@ -136,7 +136,9 @@ func startDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		return err
 	}
 
-	reader, err := startDemo(ctx, cli, os.Stdin)
+	ghRepo := github.GetGHRepoService()
+
+	reader, err := startDemo(ctx, cli, ghRepo, os.Stdin)
 	if err != nil {
 		return err
 	}
@@ -178,7 +180,7 @@ func updateLocalKubeContext() error {
 	return k8sCtxMgr.CopyContext(srcConfigAccess, demoDockerContext, demoContextName)
 }
 
-func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
+func startDemo(ctx context.Context, cli docker.Docker, g github.GHRepoService, reader io.Reader) (*bufio.Scanner, error) {
 	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 
 	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
@@ -211,7 +213,7 @@ func startDemo(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio
 	}
 	demoImage := sandboxConfig.DefaultConfig.Image
 	if len(demoImage) == 0 {
-		image, version, err := githubutil.GetFullyQualifiedImageName("sha", sandboxConfig.DefaultConfig.Version, demoImageName, sandboxConfig.DefaultConfig.Prerelease)
+		image, version, err := github.GetFullyQualifiedImageName("sha", sandboxConfig.DefaultConfig.Version, demoImageName, sandboxConfig.DefaultConfig.Prerelease, g)
 		if err != nil {
 			return nil, err
 		}
