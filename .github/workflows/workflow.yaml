@@ -184,23 +184,23 @@ jobs:
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
       shell: bash
       run: |
-        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config.yaml )
+        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config )
         echo "$run_tests_output"  # for debugging purposes
         badges=$(echo "$run_tests_output" | tail -n1)
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-    #- name: DESTROY FLYTE Opta
-    #  shell: bash
-    #  run: |
-    #    ls ./opta/aws/
-    #    aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/flyte.yaml ./opta/aws/flyte.yaml 
-    #    aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/env.yaml ./opta/aws/env.yaml 
-    #    cat ./opta/aws/flyte.yaml
-    #    cd opta/aws
-    #    opta destroy -c ./flyte.yaml --auto-approve 
-    #- name: DESTROY OPTA ENV
-    #  shell: bash
-    #  run: |
-    #    cat ./opta/aws/env.yaml
-    #    opta destroy -c ./opta/aws/env.yaml --auto-approve
+    - name: DESTROY FLYTE Opta
+      shell: bash
+      run: |
+        ls ./opta/aws/
+        aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/flyte.yaml ./opta/aws/flyte.yaml 
+        aws s3 cp s3://$FLYTE_STORAGE_BUCKET/opta/aws/1/env.yaml ./opta/aws/env.yaml 
+        cat ./opta/aws/flyte.yaml
+        cd opta/aws
+        opta destroy -c ./flyte.yaml --auto-approve 
+    - name: DESTROY OPTA ENV
+      shell: bash
+      run: |
+        cat ./opta/aws/env.yaml
+        opta destroy -c ./opta/aws/env.yaml --auto-approve

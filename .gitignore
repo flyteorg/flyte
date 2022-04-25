@@ -32,3 +32,4 @@ dist
 *.db
 flyte
 vendor/
+opta/aws/opta_crash_report.zip
