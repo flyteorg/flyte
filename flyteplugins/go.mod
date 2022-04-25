@@ -13,8 +13,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v0.24.19
-	github.com/flyteorg/flytestdlib v0.4.13
+	github.com/flyteorg/flyteidl v1.0.0
+	github.com/flyteorg/flytestdlib v1.0.0
 	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.4.3
@@ -34,7 +34,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
