@@ -16,7 +16,9 @@
     ],
     "scripts": {
         "start": "yarn workspace @flyteconsole/client-app start",
-        "storybook": "start-storybook -p 6006"
+        "storybook": "start-storybook -p 6006",
+        "test": "pushd packages/zapp/console && yarn test && popd",
+        "test-coverage": "pushd packages/zapp/console && yarn test-coverage && popd"
     },
     "husky": {
         "hooks": {
