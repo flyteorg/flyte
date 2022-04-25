@@ -5,7 +5,7 @@
     "description": "The web UI for the Flyte platform",
     "repository": {
         "type": "git",
-        "url": "http://github.com/lyft/flyteconsole.git"
+        "url": "https://github.com/flyteorg/flyteconsole"
     },
     "main": "index.js",
     "workspaces": [
@@ -16,20 +16,7 @@
     ],
     "scripts": {
         "start": "yarn workspace @flyteconsole/client-app start",
-        "clean": "rm -rf dist",
-        "prebuild": "yarn run clean",
-        "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.dev.config.ts --mode=development",
-        "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.prod.config.ts --mode=production --progress",
-        "build:storybook": "build-storybook",
-        "start:prod": "NODE_ENV=production node -r dotenv/config index.js",
-        "storybook": "start-storybook -p 6006",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "format": "prettier --ignore-path .eslintignore --write \"**/*.+(js|jsx|ts|tsx|json)\"",
-        "fix": "yarn lint --fix && yarn format",
-        "mockApi": "node ./mockApi",
-        "tdd": "yarn run test --watch --verbose false",
-        "test": "NODE_ENV=test jest --config=jest.config.js",
-        "test-coverage": "NODE_ENV=test jest --coverage --config=jest.config.js"
+        "storybook": "start-storybook -p 6006"
     },
     "husky": {
         "hooks": {

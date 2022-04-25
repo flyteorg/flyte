@@ -28,22 +28,23 @@ jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
 
-const projectDomainAttributesMock: Admin.ProjectDomainAttributesDeleteResponse = {
-  attributes: {
-    matchingAttributes: {
-      workflowExecutionConfig: {
-        maxParallelism: 5,
-        securityContext: { runAs: { k8sServiceAccount: 'default' } },
-        rawOutputDataConfig: { outputLocationPrefix: 'cliOutputLocationPrefix' },
-        annotations: { values: { cliAnnotationKey: 'cliAnnotationValue' } },
-        labels: { values: { cliLabelKey: 'cliLabelValue' } },
-      },
-    },
-  },
-};
-
 jest.mock('models/Project/api', () => ({
-  getProjectDomainAttributes: jest.fn().mockResolvedValue(projectDomainAttributesMock),
+  getProjectDomainAttributes: jest.fn().mockResolvedValue(() => {
+    const projectDomainAttributesMock: Admin.ProjectDomainAttributesDeleteResponse = {
+      attributes: {
+        matchingAttributes: {
+          workflowExecutionConfig: {
+            maxParallelism: 5,
+            securityContext: { runAs: { k8sServiceAccount: 'default' } },
+            rawOutputDataConfig: { outputLocationPrefix: 'cliOutputLocationPrefix' },
+            annotations: { values: { cliAnnotationKey: 'cliAnnotationValue' } },
+            labels: { values: { cliLabelKey: 'cliLabelValue' } },
+          },
+        },
+      },
+    };
+    return projectDomainAttributesMock;
+  }),
 }));
 
 describe('ProjectDashboard', () => {

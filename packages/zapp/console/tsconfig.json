@@ -24,7 +24,7 @@
         "sourceMap": true,
         "strict": true,
         "target": "es6",
-        "types": ["node", "webpack-env", "jest"],
+        "types": ["node", "webpack-env", "jest", "@testing-library/jest-dom"],
 
         "composite": true,
         "paths": {

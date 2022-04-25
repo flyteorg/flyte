@@ -11,11 +11,7 @@
         "esModuleInterop": true,
         "baseUrl": "./",
         "paths": {
-            "@flyteconsole/*": [
-                "./packages/components/*/src",
-                "./packages/plugins/*/src",
-                "./packages/zapp/*/src"
-            ]
+            "@flyteconsole/*": ["./packages/plugins/*/src", "./packages/zapp/*/src"]
         }
     },
     "references": [
