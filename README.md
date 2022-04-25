@@ -92,7 +92,7 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 - Data-aware and strongly-typed
 - Resource-aware and deployments at scale
 
-| ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif) |
+| ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/common/first_run_console.gif) |
 |:--:|
 | *✨ Flyte UI ✨* |
 
@@ -312,6 +312,9 @@ Find answers to the FAQs at [Knowledge Base](https://discuss.flyte.io): our mini
 <details>
 
 ### Conferences
+
+SandraGH5-playlist
+Videos and recordings can be found on Flyte's YouTube channel under the [Conference Talks and Podcasts](https://www.youtube.com/playlist?list=PLmQd1BBY9MWouwgSeivMoA4ldSyRcRj_-) playlist.   
 
 2019
 

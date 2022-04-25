@@ -30,7 +30,7 @@ author = u"Flyte"
 # The short X.Y version
 version = u""
 # The full version, including alpha/beta/rc tags
-release = u"0.19.3"
+release = u"1.0.0-b1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -61,6 +61,7 @@ extensions = [
     "sphinx_issues",
     "sphinx_panels",
     "sphinxcontrib.mermaid",
+    "sphinxcontrib.video",
     "sphinxcontrib.yt",
     "sphinx_tabs.tabs",
 ]
@@ -72,6 +73,7 @@ extlinks = {
     "plugins": ("https://github.com/flyteorg/flyteplugins/tree/v0.1.4/%s", ""),
     "idl": ("https://github.com/flyteorg/flyteidl/tree/v0.14.1/%s", ""),
     "admin": ("https://github.com/flyteorg/flyteadmin/tree/master/%s", ""),
+    "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
