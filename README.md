@@ -92,7 +92,7 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 - Data-aware and strongly-typed
 - Resource-aware and deployments at scale
 
-| ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/first_run_console_2.gif) |
+| ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/common/first_run_console.gif) |
 |:--:|
 | *✨ Flyte UI ✨* |
 
