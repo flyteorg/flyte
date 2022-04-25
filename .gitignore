@@ -33,3 +33,4 @@ dist
 flyte
 vendor/
 opta/aws/opta_crash_report.zip
+opta/aws/opta_crash_report/
