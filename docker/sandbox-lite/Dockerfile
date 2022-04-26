@@ -1,18 +1,19 @@
-ARG FLYTECONSOLE_VERSION="latest"
-FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
+ARG FLYTE_VERSION="latest"
+FROM ghcr.io/flyteorg/flyteconsole-release:${FLYTE_VERSION} AS flyteconsole
 
 FROM golang:1.18.0-alpine3.15 AS go_builder
 
 # Install dependencies
 RUN apk add --no-cache build-base
 
-COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 COPY go.mod go.sum /app/flyte/
-COPY cmd/ /app/flyte/cmd/
 WORKDIR /app/flyte
 RUN go mod download
-RUN go build -o /flyte cmd/main.go
 
+COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
+
+COPY cmd/ /app/flyte/cmd/
+RUN go build -v -o /flyte cmd/main.go
 
 FROM alpine:3.15 AS base
 
@@ -44,7 +45,6 @@ RUN wget -q -O /flyteorg/bin/get_helm.sh https://raw.githubusercontent.com/helm/
     mv /usr/local/bin/helm /flyteorg/bin/helm && \
     rm /flyteorg/bin/get_helm.sh
 
-
 # Install flytectl
 RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
 
@@ -74,7 +74,6 @@ COPY docker/sandbox-lite/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint
 # Copy cluster resource templates
 COPY docker/sandbox-lite/templates/ /etc/flyte/clusterresource/templates/
 
-ARG FLYTE_VERSION="latest"
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
 ARG FLYTE_TEST="release"
