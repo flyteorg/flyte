@@ -16,6 +16,8 @@
     ],
     "scripts": {
         "start": "yarn workspace @flyteconsole/client-app start",
+        "build:prod": "yarn workspace @flyteconsole/client-app build:prod",
+        "start:prod": "yarn workspace @flyteconsole/client-app start:prod",
         "storybook": "start-storybook -p 6006",
         "test": "pushd packages/zapp/console && yarn test && popd",
         "test-coverage": "pushd packages/zapp/console && yarn test-coverage && popd"
