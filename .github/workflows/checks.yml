@@ -5,11 +5,23 @@ on:
   pull_request:
     branches:
       - master
+      - devmain
   push:
     branches:
       - master
+      - devmain
 
 jobs:
+  extraxt_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      currentTag: ${{ steps.extract_branch.outputs.extract_branch }}
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
   unit_tests_with_coverage:
     runs-on: ubuntu-latest
     steps:
@@ -53,8 +65,8 @@ jobs:
 
   release:
     name: Generate Release
-    if: ${{ github.event_name != 'pull_request' }}
-    needs: [unit_tests_with_coverage, lint_project, build_docker_image]
+    if: ${{ (github.event_name != 'pull_request') && (needs.extract_branch.outputs.branch == 'master') }}
+    needs: [unit_tests_with_coverage, lint_project, build_docker_image, extraxt_branch]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
