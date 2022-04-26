@@ -132,7 +132,7 @@ else
     IMAGE_ARG="--image rancher/k3s:${K3S_VERSION}"
   fi
 
-  k3d cluster create -p "30082:30082" -p "30084:30084" -p "30089:30089" --no-lb --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable=servicelb' "${IMAGE_ARG}" $K3D_CLUSTER_NAME
+  k3d cluster create -p "30082:30082" -p "30084:30084" -p "30089:30089" --no-lb --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable=servicelb' ${IMAGE_ARG} $K3D_CLUSTER_NAME
 fi
 
 if [ -f "${K3D_KUBECONFIG_FILE_PATH}" ]; then
