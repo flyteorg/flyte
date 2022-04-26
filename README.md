@@ -40,12 +40,12 @@ For help with installing dependencies look into
 ## 🚀 Quick Start
 1. Follow [Start a Local flyte backend](https://docs.flyte.org/en/latest/getting_started/index.html), like:
     ```bash
-    docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 cr.flyte.org/flyteorg/flyte-sandbox
+    docker run --rm --privileged -p 30080:30080 -p 30081:30081 -p 30082:30082 -p 30084:30084 cr.flyte.org/flyteorg/flyte-sandbox
     ``` 
 2. Now, export the following env variables:
 
     ``
-    export ADMIN_API_URL=http://localhost:30081
+    export ADMIN_API_URL=http://localhost:30080
     export DISABLE_AUTH=1
     ``
 
@@ -99,9 +99,9 @@ few environment variables in your run command to setup the appliation.
 
 `DISABLE_AUTH="1"` (optional)
 
-This example assumes building from ``v0.30.0`` on port ``8080``
+This example assumes building from ``v1.0.0`` on port ``8080``
 ```bash
-docker run -p 8080:8080 -e BASE_URL="/console" -e CONFIG_DIR="/etc/flyte/config" -e DISABLE_AUTH="1" ghcr.io/flyteorg/flyteconsole:v0.30.0
+docker run -p 8080:8080 -e BASE_URL="/console" -e CONFIG_DIR="/etc/flyte/config" -e DISABLE_AUTH="1" ghcr.io/flyteorg/flyteconsole:v1.0.0
 ```   
 
 
