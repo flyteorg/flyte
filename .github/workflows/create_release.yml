@@ -29,10 +29,18 @@ jobs:
   publish-flyte-component-image:
     name: Publish flyte component image for the release version
     runs-on: ubuntu-latest
-    needs: [ bump-version ]
+    needs: [bump-version]
     strategy:
       matrix:
-        component: [flyteconsole, flytepropeller, flyteadmin, datacatalog, flytescheduler,flytecopilot]
+        component:
+          [
+            flyteconsole,
+            flytepropeller,
+            flyteadmin,
+            datacatalog,
+            flytescheduler,
+            flytecopilot,
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -65,10 +73,13 @@ jobs:
           docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
           docker push ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
 
+          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:latest
+          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:latest
+
   helm-release:
     name: Flyte helm release
     runs-on: ubuntu-latest
-    needs: [ bump-version ]
+    needs: [bump-version]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -97,7 +108,7 @@ jobs:
   manifest-release:
     name: Flyte manifest release
     runs-on: ubuntu-latest
-    needs: [ bump-version ]
+    needs: [bump-version]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
