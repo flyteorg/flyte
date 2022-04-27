@@ -48,8 +48,8 @@ doc_gen_deps:
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
-PLACEHOLDER := "__version__\ =\ \"develop\""
-PLACEHOLDER_NPM := \"version\": \"develop\"
+PLACEHOLDER := "__version__\ =\ \"0.0.0+develop\""
+PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
 
 .PHONY: update_pyversion
 update_pyversion:

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = "develop"
+__version__ = "0.0.0+develop"
 
 setup(
     name='flyteidl',
