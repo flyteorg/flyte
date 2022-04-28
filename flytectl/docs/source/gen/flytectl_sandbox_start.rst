@@ -17,12 +17,12 @@ Starts the sandbox cluster without any source code:
 ::
 
  flytectl sandbox start
-	
+
 Mounts your source code repository inside the sandbox:
 ::
 
- flytectl sandbox start --source=$HOME/flyteorg/flytesnacks 
-	
+ flytectl sandbox start --source=$HOME/flyteorg/flytesnacks
+
 Runs a specific version of Flyte. Flytectl sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
 ::
 
@@ -36,7 +36,7 @@ Runs the latest pre release of  Flyte.
 
  flytectl sandbox start  --pre
 
-Note: The pre release flag will be ignored if the user passes the version flag. In that case, Flytectl will use a specific version. 
+Note: The pre release flag will be ignored if the user passes the version flag. In that case, Flytectl will use a specific version.
 
 Specify a Flyte Sandbox compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
@@ -44,7 +44,7 @@ Specify a Flyte Sandbox compliant image with the registry. This is useful in cas
   flytectl sandbox start --image docker.io/my-override:latest
 
 Note: If image flag is passed then Flytectl will ignore version and pre flags.
-	
+
 Specify a Flyte Sandbox image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
 

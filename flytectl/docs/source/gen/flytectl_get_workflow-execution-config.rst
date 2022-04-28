@@ -61,6 +61,56 @@ Example: content of wec.yaml:
     project: flytectldemo
     max_parallelism: 5
 
+Generate a sample workflow execution config file to be used for creating a new workflow execution config at project domain
+
+::
+	flytectl get workflow-execution-config -p flytesnacks -d development --attrFile wec.yaml --gen
+
+
+.. code-block:: yaml
+
+	annotations:
+	  values:
+		cliAnnotationKey: cliAnnotationValue
+	domain: development
+	labels:
+	  values:
+		cliLabelKey: cliLabelValue
+	max_parallelism: 10
+	project: flytesnacks
+	raw_output_data_config:
+	  output_location_prefix: cliOutputLocationPrefix
+	security_context:
+	  run_as:
+		k8s_service_account: default
+
+
+
+Generate a sample workflow execution config file to be used for creating a new workflow execution config at project domain workflow level
+
+::
+	flytectl get workflow-execution-config -p flytesnacks -d development --attrFile wec.yaml flytectl get workflow-execution-config --gen
+
+
+.. code-block:: yaml
+
+	annotations:
+	  values:
+		cliAnnotationKey: cliAnnotationValue
+	domain: development
+	labels:
+	  values:
+		cliLabelKey: cliLabelValue
+	max_parallelism: 10
+	project: flytesnacks
+	workflow: k8s_spark.dataframe_passing.my_smart_structured_dataset
+	raw_output_data_config:
+	  output_location_prefix: cliOutputLocationPrefix
+	security_context:
+	  run_as:
+		k8s_service_account: default
+
+
 Usage
 
 
