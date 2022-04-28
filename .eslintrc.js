@@ -85,6 +85,7 @@ module.exports = {
     'no-await-in-loop': 'off',
     'no-undef-init': 'off',
     'no-unneeded-ternary': 'off',
+    'no-underscore-dangle': 'off',
     'prefer-object-spread': 'off',
     'prefer-template': 'off',
     'default-case': 'off',

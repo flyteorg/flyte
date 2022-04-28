@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import { contentContainerId } from 'common/constants';
@@ -7,9 +8,6 @@ import {
   navbarGridHeight,
   sideNavGridWidth,
 } from 'common/layout';
-import * as React from 'react';
-import { detailsPanelWidth } from './constants';
-import { DetailsPanel } from './DetailsPanel';
 import { ErrorBoundary } from './ErrorBoundary';
 
 enum ContainerClasses {
@@ -35,9 +33,6 @@ const useStyles = makeStyles((theme: Theme) => {
       [`&.${ContainerClasses.Centered}`]: {
         margin: '0 auto',
         maxWidth: theme.spacing(maxContainerGridWidth),
-      },
-      [`&.${ContainerClasses.WithDetailsPanel}`]: {
-        paddingRight: 0,
       },
       [`&.${ContainerClasses.WithSideNav}`]: {
         marginLeft: theme.spacing(sideNavGridWidth),
@@ -73,7 +68,6 @@ export const ContentContainer: React.FC<ContentContainerProps> = (props) => {
     noMargin = false,
     className: additionalClassName,
     children,
-    detailsPanel = false,
     sideNav = false,
     ...restProps
   } = props;
@@ -81,18 +75,12 @@ export const ContentContainer: React.FC<ContentContainerProps> = (props) => {
   const className = classnames(styles.root, additionalClassName, {
     [ContainerClasses.Centered]: center,
     [ContainerClasses.NoMargin]: noMargin,
-    [ContainerClasses.WithDetailsPanel]: detailsPanel,
     [ContainerClasses.WithSideNav]: sideNav,
   });
 
-  const marginRight = detailsPanel ? detailsPanelWidth : 'auto';
-
   return (
-    <>
-      <div {...restProps} className={className} id={contentContainerId} style={{ marginRight }}>
-        <ErrorBoundary>{children}</ErrorBoundary>
-      </div>
-      {detailsPanel && <DetailsPanel />}
-    </>
+    <div {...restProps} className={className} id={contentContainerId}>
+      <ErrorBoundary>{children}</ErrorBoundary>
+    </div>
   );
 };
