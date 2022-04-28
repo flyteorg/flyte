@@ -109,7 +109,7 @@ Let us first look at various config properties that can be set and would impact 
 
 In the above table the 2 most important configs are ``workers`` and ``kube-client-config``.
 
-The kube client config controls the request throughput from FlytePropeller to the kube API server, these requests may include creating / monitoring Pods or creating / updating FlyteWorkflow CRDs to track workflow execution. The default configuration (provided by k8s) contains very steep rate limiting and therefore FlytePropeller provides a default configuration which offers better performance. However, if your workload involves larger scales (e.x. >5k fanout dynamic or map tasks, >8k concurrent workflows, etc) the kube client config rate limiting may still be contributing to a noticeable drop in performance. Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. An example kube-client-config is as follows:
+The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. The default configuration (provided by k8s) contains very steep rate-limiting, and therefore FlytePropeller provides a default configuration that offers better performance. However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the Kube client config rate limiting may still contribute to a noticeable drop in performance. Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. An example of Kube-client-config is as follows:
 
 .. code-block:: yaml
 
@@ -122,7 +122,7 @@ The kube client config controls the request throughput from FlytePropeller to th
 
 .. note:: As you increase the number of workers in FlytePropeller it is important to increase the number of cpu's given to FlytePropeller pod.
 
-It is important to note that the kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of kube API server requests (e.x. increasing FlytePropeller workers or relaxing kube client config rate limiting) there may be steep performance decreases for no apparent reason. In these situations, looking at kube API server request queue metrics can help indicate whether throttling is the culprit. Unfortunately, there is no one-size-fits-all solution here and a fair bit of experimenting is useful in configuring these parameters for your workload.
+It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of Kube API server requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. Looking at the Kube API server request queue metrics in these cases can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
 
 Another area of slowdown could be the size of the input-output cache that FlytePropeller maintains in-memory. This can be configured, while configuring
 the storage for FlytePropeller. Rule of thumb, for FlytePropeller with x memory limit, allocate x/2 to the cache
