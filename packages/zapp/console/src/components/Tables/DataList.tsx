@@ -91,7 +91,7 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
    * thrown away immediately. So we're using a creation function which useState
    * will call to create the initial value.
    */
-  const [cellCache] = React.useState(createCellMeasurerCache);
+  const [cellCache, setCellCache] = React.useState(createCellMeasurerCache);
 
   const recomputeRow = React.useMemo(
     () => (rowIndex: number) => {
@@ -115,6 +115,9 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
       recomputeRow(lengthRef.current);
     }
     lengthRef.current = props.value.length;
+
+    // remesuare each row and cache the value when the rows update
+    setCellCache(createCellMeasurerCache);
   }, [items.length]);
 
   const headerHeight = theme.spacing(headerGridHeight);
