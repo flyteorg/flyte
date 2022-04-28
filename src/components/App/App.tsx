@@ -20,6 +20,7 @@ import { Router } from 'react-router-dom';
 import { ApplicationRouter } from 'routes/ApplicationRouter';
 import { history } from 'routes/history';
 import { NavBarRouter } from 'routes/NavBarRouter';
+import { LocalCacheProvider } from 'basics/LocalCache/ContextProvider';
 
 const queryClient = createQueryClient();
 
@@ -31,31 +32,33 @@ export const AppComponent: React.FC = () => {
 
   return (
     <FeatureFlagsProvider>
-      <ThemeProvider theme={muiTheme}>
-        <SnackbarProvider
-          // Notifications provider https://iamhosseindhv.com/notistack/demos
-          maxSnack={2}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          TransitionComponent={Collapse}
-        >
-          <QueryClientProvider client={queryClient}>
-            <APIContext.Provider value={apiState}>
-              <QueryAuthorizationObserver />
-              <SkeletonTheme color={skeletonColor} highlightColor={skeletonHighlightColor}>
-                <CssBaseline />
-                <Router history={history}>
-                  <ErrorBoundary fixed={true}>
-                    <NavBarRouter />
-                    <ApplicationRouter />
-                  </ErrorBoundary>
-                </Router>
-                <SystemStatusBanner />
-              </SkeletonTheme>
-            </APIContext.Provider>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </QueryClientProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
+      <LocalCacheProvider>
+        <ThemeProvider theme={muiTheme}>
+          <SnackbarProvider
+            // Notifications provider https://iamhosseindhv.com/notistack/demos
+            maxSnack={2}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            TransitionComponent={Collapse}
+          >
+            <QueryClientProvider client={queryClient}>
+              <APIContext.Provider value={apiState}>
+                <QueryAuthorizationObserver />
+                <SkeletonTheme color={skeletonColor} highlightColor={skeletonHighlightColor}>
+                  <CssBaseline />
+                  <Router history={history}>
+                    <ErrorBoundary fixed={true}>
+                      <NavBarRouter />
+                      <ApplicationRouter />
+                    </ErrorBoundary>
+                  </Router>
+                  <SystemStatusBanner />
+                </SkeletonTheme>
+              </APIContext.Provider>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </QueryClientProvider>
+          </SnackbarProvider>
+        </ThemeProvider>
+      </LocalCacheProvider>
     </FeatureFlagsProvider>
   );
 };

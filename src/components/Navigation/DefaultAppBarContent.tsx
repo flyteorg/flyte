@@ -5,7 +5,9 @@ import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes/routes';
+import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
 import { UserInformation } from './UserInformation';
+import { OnlyMine } from './OnlyMine/OnlyMine';
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacer: {
@@ -20,12 +22,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const DefaultAppBarContent: React.FC = () => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
+  const isFlagEnabled = useFeatureFlag(FeatureFlag.OnlyMine);
+
   return (
     <>
       <Link className={classnames(commonStyles.linkUnstyled)} to={Routes.SelectProject.path}>
         <FlyteLogo size={32} variant="dark" />
       </Link>
       <div className={styles.spacer} />
+      {isFlagEnabled && <OnlyMine />}
       <UserInformation />
     </>
   );

@@ -75,3 +75,5 @@ export const taskColors: TaskColorMap = {
 
 export const bodyFontSize = '0.875rem';
 export const smallFontSize = '0.75rem';
+
+export const smallIconSize = '1.2rem';

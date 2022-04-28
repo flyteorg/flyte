@@ -9,6 +9,8 @@ import { SnackbarProvider } from 'notistack';
 import { ErrorBoundary } from '../src/components/common/ErrorBoundary';
 import { createQueryClient } from '../src/components/data/queryCache';
 import { muiTheme } from '../src/components/Theme/muiTheme';
+import { LocalCacheProvider } from '../src/basics/LocalCache/ContextProvider';
+import { FeatureFlagsProvider } from '../src/basics/FeatureFlags';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -24,11 +26,18 @@ export const StorybookContainer: React.FC = ({ children }) => {
       <CssBaseline />
       <ErrorBoundary>
         <MemoryRouter>
-          <SnackbarProvider maxSnack={2} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-            <QueryClientProvider client={queryClient}>
-              <div className={useStyles().container}>{children}</div>
-            </QueryClientProvider>
-          </SnackbarProvider>
+          <FeatureFlagsProvider>
+            <LocalCacheProvider>
+              <SnackbarProvider
+                maxSnack={2}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <QueryClientProvider client={queryClient}>
+                  <div className={useStyles().container}>{children}</div>
+                </QueryClientProvider>
+              </SnackbarProvider>
+            </LocalCacheProvider>
+          </FeatureFlagsProvider>
         </MemoryRouter>
       </ErrorBoundary>
     </ThemeProvider>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { render, screen, act, fireEvent, getByTestId } from '@testing-library/react';
 import { ClearLocalCache, LocalCacheItem, useLocalCache, onlyForTesting } from '.';
+import { LocalCacheProvider } from './ContextProvider';
 
 const SHOW_TEXT = 'SHOWED';
 const HIDDEN_TEXT = 'HIDDEN';
@@ -10,13 +11,20 @@ const TestFrame = () => {
 
   const toShow = () => setShow(true);
   const toClear = () => clearShow();
-
   return (
     <div>
       <div>{show ? SHOW_TEXT : HIDDEN_TEXT}</div>
       <button onClick={toShow} data-testid="show" />
       <button onClick={toClear} data-testid="clear" />
     </div>
+  );
+};
+
+const TestPage = () => {
+  return (
+    <LocalCacheProvider>
+      <TestFrame />
+    </LocalCacheProvider>
   );
 };
 
@@ -30,7 +38,8 @@ describe('LocalCache', () => {
   });
 
   it('Can be used by component as expected', () => {
-    const { container } = render(<TestFrame />);
+    const { container } = render(<TestPage />);
+
     const show = getByTestId(container, 'show');
     const clear = getByTestId(container, 'clear');
 

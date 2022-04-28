@@ -9,6 +9,9 @@ export enum FeatureFlag {
 
   // Production flags
   LaunchPlan = 'launch-plan',
+
+  // Test Only Mine flag
+  OnlyMine = 'only-mine',
 }
 
 export type FeatureFlagConfig = { [k: string]: boolean };
@@ -20,6 +23,8 @@ export const defaultFlagConfig: FeatureFlagConfig = {
   // Production - new code should be turned off by default
   // If you need to turn it on locally -> update runtimeConfig in ./index.tsx file
   'launch-plan': false,
+
+  'only-mine': false,
 };
 
 export interface AdminVersion {

@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import * as React from 'react';
-
+import { LocalCacheProvider } from 'basics/LocalCache/ContextProvider';
 import { DomainSettingsSection } from '../DomainSettingsSection';
 
 const serviceAccount = 'default';
@@ -30,13 +30,19 @@ const mockConfigDataWithoutLabelsAndAnnotations = {
 
 describe('DomainSettingsSection', () => {
   it('should not render a block if config data passed is empty', () => {
-    const { container } = render(<DomainSettingsSection configData={{}} />);
+    const { container } = render(
+      <LocalCacheProvider>
+        <DomainSettingsSection configData={{}} />
+      </LocalCacheProvider>,
+    );
     expect(container).toBeEmptyDOMElement();
   });
 
   it('should render a section without IAMRole data', () => {
     const { queryByText, queryAllByRole } = render(
-      <DomainSettingsSection configData={mockConfigData} />,
+      <LocalCacheProvider>
+        <DomainSettingsSection configData={mockConfigData} />
+      </LocalCacheProvider>,
     );
     expect(queryByText('Domain Settings')).toBeInTheDocument();
     // should display serviceAccount value
@@ -55,7 +61,9 @@ describe('DomainSettingsSection', () => {
 
   it('should render a section without IAMRole and Labels data', () => {
     const { queryByText, queryAllByText, queryAllByRole } = render(
-      <DomainSettingsSection configData={mockConfigDataWithoutLabels} />,
+      <LocalCacheProvider>
+        <DomainSettingsSection configData={mockConfigDataWithoutLabels} />
+      </LocalCacheProvider>,
     );
     expect(queryByText('Domain Settings')).toBeInTheDocument();
     // should display serviceAccount value
@@ -74,7 +82,9 @@ describe('DomainSettingsSection', () => {
 
   it('should render a section without IAMRole, Labels, Annotations data', () => {
     const { queryByText, queryAllByText, queryByRole } = render(
-      <DomainSettingsSection configData={mockConfigDataWithoutLabelsAndAnnotations} />,
+      <LocalCacheProvider>
+        <DomainSettingsSection configData={mockConfigDataWithoutLabelsAndAnnotations} />
+      </LocalCacheProvider>,
     );
     expect(queryByText('Domain Settings')).toBeInTheDocument();
     // should display serviceAccount value

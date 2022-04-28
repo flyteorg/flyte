@@ -4,6 +4,7 @@ import { ExecutionDetailsAppBarContent } from 'components/Executions/ExecutionDe
 import { mockExecution } from 'models/Execution/__mocks__/mockWorkflowExecutionsData';
 import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
+import { FeatureFlag, useFeatureFlagContext } from 'basics/FeatureFlags';
 import { NavBar } from '../NavBar';
 
 // Helper to let us delay rendering of custom content until after the first
@@ -29,3 +30,14 @@ stories.add('execution details', () => (
     </DelayedMount>
   </>
 ));
+stories.add('only mine', () => {
+  const { setFeatureFlag } = useFeatureFlagContext();
+  React.useEffect(() => {
+    setFeatureFlag(FeatureFlag.OnlyMine, true);
+    return () => {
+      setFeatureFlag(FeatureFlag.OnlyMine, false);
+    };
+  }, []);
+
+  return <NavBar />;
+});
