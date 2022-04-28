@@ -23,3 +23,4 @@ Flytectl nouns specify the resource on which the action needs to be performed. E
     files
     config
     sandbox
+    demo

@@ -17,11 +17,11 @@ Starts the demo cluster without any source code:
 ::
 
  flytectl demo start
-	
+
 Mounts your source code repository inside the demo cluster:
 ::
 
- flytectl demo start --source=$HOME/flyteorg/flytesnacks 
+ flytectl demo start --source=$HOME/flyteorg/flytesnacks
 
 Specify a Flyte demo compliant image with the registry. This is useful in case you want to use an image from your registry.
 ::
@@ -29,18 +29,30 @@ Specify a Flyte demo compliant image with the registry. This is useful in case y
   flytectl demo start --image docker.io/my-override:latest
 
 Note: If image flag is passed then Flytectl will ignore version and pre flags.
-	
+
 Specify a Flyte demo image pull policy. Possible pull policy values are Always, IfNotPresent, or Never:
 ::
 
- flytectl demo start  --image docker.io/my-override:latest --imagePullPolicy Always
+ flytectl demo start --image docker.io/my-override:latest --imagePullPolicy Always
+
+Runs a specific version of Flyte. Flytectl demo only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
+::
+
+ flytectl demo start --version=v0.14.0
+
+.. note::
+	  Flytectl demo is only supported for Flyte versions >= v1.0.0
+
+Runs the latest pre release of  Flyte.
+::
+
+ flytectl demo start --pre
 
 Start demo cluster passing environment variables. This can be used to pass docker specific env variables or flyte specific env variables.
 eg : for passing timeout value in secs for the demo container use the following.
 ::
 
  flytectl demo start --env FLYTE_TIMEOUT=700
-
 
 The DURATION can be a positive integer or a floating-point number, followed by an optional unit suffix::
 s - seconds (default)

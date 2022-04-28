@@ -93,7 +93,7 @@ Options
       --filter.fieldSelector string   Specifies the Field selector
       --filter.limit int32            Specifies the limit (default 100)
       --filter.page int32             Specifies the page number,  in case there are multiple pages of results (default 1)
-      --filter.sortBy string          Specifies which field to sort results  (default "created_at")
+      --filter.sortBy string          Specifies which field to sort results 
   -h, --help                          help for workflow
       --latest                         flag to indicate to fetch the latest version,  version flag will be ignored in this case
       --version string                version of the workflow to be fetched.
