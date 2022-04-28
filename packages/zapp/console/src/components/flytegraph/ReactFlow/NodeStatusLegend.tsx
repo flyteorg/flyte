@@ -33,8 +33,14 @@ export const LegendItem = ({ color, text }) => {
   );
 };
 
-export const Legend = () => {
-  const [isVisible, setIsVisible] = useState(true);
+interface LegendProps {
+  initialIsVisible?: boolean;
+}
+
+export const Legend: React.FC<LegendProps> = (props) => {
+  const { initialIsVisible = false } = props;
+
+  const [isVisible, setIsVisible] = useState(initialIsVisible);
 
   const positionStyle: CSSProperties = {
     bottom: '1rem',
