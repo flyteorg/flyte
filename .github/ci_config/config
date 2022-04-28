@@ -1,3 +1,8 @@
-[platform]
-url = <dns_of_cluster>
-auth=False
+[admin]
+endpoint=dns:///<dns_of_cluster>
+insecureSkipVerify=true
+insecure=false
+
+[logger]
+show-source=true
+level=1
