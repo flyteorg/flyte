@@ -1,64 +1,47 @@
 {
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
-        "allowJs": true,
+        "strict": true,
         "checkJs": false,
-        "downlevelIteration": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "removeComments": false,
         "importHelpers": true,
+
         "jsx": "react",
         "lib": ["es6", "es2021", "dom", "dom.iterable"],
+        // TODO: switch target to "esnext" when babel would be removed.
+        "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
-        "noFallthroughCasesInSwitch": true,
+        "types": ["node", "webpack-env", "jest", "@testing-library/jest-dom"],
+
+        "isolatedModules": true,
+        "declaration": true,
+        "declarationMap": true,
+        "downlevelIteration": true,
         "noImplicitReturns": true,
-        "noImplicitAny": false,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
-        "outDir": "./dist",
-        "removeComments": false,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "target": "es6",
-        "types": ["node", "webpack-env", "jest"],
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "useDefineForClassFields": true,
+        "useUnknownInCatchVariables": false,
 
-        // "lib": ["dom", "dom.iterable", "es2018"],
-        // "jsx": "react",
-        // "target": "esnext",
-        // "module": "commonjs",
-        // "moduleResolution": "node",
-
-        // "allowJs": false,
-        // "allowUnreachableCode": false,
-        // "esModuleInterop": true,
-        // "strict": true,
-        // "isolatedModules": true,
-        // "declaration": true,
-        // "noUnusedLocals": true,
-        // "noUnusedParameters": true,
-        // "noImplicitReturns": true,
-        // "noImplicitThis": true,
-        // "noImplicitAny": true,
-        // "importHelpers": true,
-        // "declarationMap": true,
-        // "useDefineForClassFields": true,
-        // "useUnknownInCatchVariables": false,
-        // "resolveJsonModule": true,
-        // "experimentalDecorators": true,
-        // "skipLibCheck": true,
-
-        // // More strict
-        // "exactOptionalPropertyTypes": false, // true,
-        // "noUncheckedIndexedAccess": false,
-        // "noFallthroughCasesInSwitch": true,
-        // "noPropertyAccessFromIndexSignature": false,
-        // "noImplicitOverride": true,
+        // More strict rules
+        "exactOptionalPropertyTypes": true,
+        "noUncheckedIndexedAccess": false,
+        "noPropertyAccessFromIndexSignature": false,
+        "noImplicitOverride": true,
+        "noFallthroughCasesInSwitch": true,
 
         "sourceMap": true,
         "composite": true,
         "baseUrl": ".",
+        "outDir": "./dist",
         "paths": {
             "@flyteconsole/*": ["./packages/plugins/*/src", "./packages/zapp/*/src"]
         }
@@ -69,6 +52,10 @@
         "**/lib",
         "**/src/**/*.spec.*",
         "**/src/**/*.test.*",
-        "**/src/**/*.stories.*"
+        "**/src/**/*.stories.*",
+        // old code patterns
+        "**/__mocks__",
+        "**/test",
+        "**/mocks"
     ]
 }

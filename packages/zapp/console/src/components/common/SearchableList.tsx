@@ -130,4 +130,4 @@ export const SearchableList = <T extends {}>(props: SearchableListProps<T>) => {
   );
 };
 
-export { SearchResult, PropertyGetter };
+export type { SearchResult, PropertyGetter };

@@ -1,54 +1,16 @@
 {
+    "extends": "../../../tsconfig.base.json",
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
-        "allowJs": true,
-        "baseUrl": "src",
-        "checkJs": false,
-        "downlevelIteration": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "importHelpers": true,
-        "jsx": "react",
-        "lib": ["es6", "es2021", "dom", "dom.iterable"],
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noImplicitAny": false,
+        "baseUrl": "./src",
+        "outDir": "./dist",
+
+        // TODO: this items should be removed when violations are fixed:
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "outDir": "./dist",
-        "removeComments": false,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "strict": true,
-        "target": "es6",
-        "types": ["node", "webpack-env", "jest", "@testing-library/jest-dom"],
-
-        "composite": true,
-        "paths": {
-            "@flyteconsole/*": ["../../plugins/*/src"]
-        }
+        "noImplicitAny": false,
+        "exactOptionalPropertyTypes": false,
+        "noImplicitOverride": false
     },
     "references": [{ "path": "../../plugins/components" }],
-    // "extends": "../../../tsconfig.base.json",
-    // "compilerOptions": {
-    //     "rootDir": "./src",
-    //     "outDir": "./dist"
-    // },
-    // "references": [{ "path": "../../plugins/components" }],
-    "include": ["src/**/*"],
-    "exclude": [
-        "**/__mocks__",
-        "**/test",
-        "**/mocks",
-        // baseline
-        "**/node_modules",
-        "**/dist",
-        "**/lib",
-        "**/src/**/*.spec.*",
-        "**/src/**/*.test.*",
-        "**/src/**/*.stories.*"
-    ]
+    "include": ["src/**/*"]
 }

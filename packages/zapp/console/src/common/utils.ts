@@ -1,4 +1,3 @@
-import { env } from 'common/env';
 import { Protobuf } from 'flyteidl';
 import * as Long from 'long';
 

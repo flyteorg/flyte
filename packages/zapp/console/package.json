@@ -9,7 +9,6 @@
     "main": "index.js",
     "scripts": {
         "clean": "rm -rf dist",
-        "prebuild": "yarn run clean",
         "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.dev.config.ts --mode=development",
         "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.prod.config.ts --mode=production --progress",
         "start": "webpack serve --open --config webpack.dev.config.ts --hot",

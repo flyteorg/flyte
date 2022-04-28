@@ -53,7 +53,4 @@ yarn-error.log
 
 # Certs
 .srl
-script/rootCA.*
-script/server.crt
-script/server.csr
-script/server.key
+certificate/

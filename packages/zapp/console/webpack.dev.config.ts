@@ -1,13 +1,30 @@
 import * as webpack from 'webpack';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
-import { processEnv as env, LOCAL_DEV_HOST } from './env';
+import chalk from 'chalk';
+import { LOCAL_DEV_HOST, CERTIFICATE_PATH } from './env';
 
 const { merge } = require('webpack-merge');
 const fs = require('fs');
 const common = require('./webpack.common.config');
 
 const devtool = 'eval-cheap-module-source-map';
+
+// Check if certificate provided and if not - exit early
+if (
+  !fs.existsSync(`${CERTIFICATE_PATH}/server.key`) ||
+  !fs.existsSync(`${CERTIFICATE_PATH}/server.crt`)
+) {
+  console.log(
+    chalk.red(`ERROR: Can not locate server.key and server.crt in ${CERTIFICATE_PATH} location`),
+  );
+  console.log(
+    chalk.red('Please re-genereate your site certificates by running'),
+    'make generate_ssl',
+    chalk.red('than re-run the command'),
+  );
+  process.exit(0);
+}
 
 /**
  * Client configuration
@@ -27,8 +44,8 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
     server: {
       type: 'https',
       options: {
-        key: fs.readFileSync('../../../script/server.key'),
-        cert: fs.readFileSync('../../../script/server.crt'),
+        key: fs.readFileSync(`${CERTIFICATE_PATH}/server.key`),
+        cert: fs.readFileSync(`${CERTIFICATE_PATH}/server.crt`),
       },
     },
     client: {

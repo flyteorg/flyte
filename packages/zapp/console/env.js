@@ -20,6 +20,12 @@ const BASE_URL = process.env.BASE_URL || '';
  */
 const ASSETS_PATH = `${BASE_URL}/assets/`;
 
+/**
+ * Certificate path required for local development, should not include trailing '/'.
+ * Located at top level of the repository in script folder
+ */
+const CERTIFICATE_PATH = '../../../script/certificate';
+
 // Defines a file to be required which will provide implementations for
 // any user-definable code.
 const PLUGINS_MODULE = process.env.PLUGINS_MODULE;
@@ -43,6 +49,7 @@ module.exports = {
   ENABLE_GA,
   GA_TRACKING_ID,
   ASSETS_PATH,
+  CERTIFICATE_PATH,
   LOCAL_DEV_HOST,
   processEnv: {
     ADMIN_API_URL,

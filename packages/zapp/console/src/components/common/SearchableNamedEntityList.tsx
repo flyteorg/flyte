@@ -1,4 +1,3 @@
-import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { listhoverColor, separatorColor } from 'components/Theme/constants';
 import { NamedEntity } from 'models/Common/types';

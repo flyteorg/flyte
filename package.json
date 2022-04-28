@@ -15,6 +15,7 @@
         "packages/zapp/**"
     ],
     "scripts": {
+        "clean": "yarn workspace @flyteconsole/client-app clean",
         "start": "yarn workspace @flyteconsole/client-app start",
         "start:prod": "yarn workspace @flyteconsole/client-app start:prod",
         "build:prod": "yarn workspace @flyteconsole/client-app build:prod",

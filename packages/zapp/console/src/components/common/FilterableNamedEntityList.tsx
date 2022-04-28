@@ -1,4 +1,4 @@
-import { Checkbox, debounce, FormControlLabel, FormGroup, Typography } from '@material-ui/core';
+import { Checkbox, debounce, FormControlLabel, FormGroup } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { NamedEntity } from 'models/Common/types';
 import * as React from 'react';

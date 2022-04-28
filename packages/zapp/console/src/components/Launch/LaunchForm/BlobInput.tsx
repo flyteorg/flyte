@@ -10,7 +10,7 @@ import {
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { BlobDimensionality } from 'models/Common/types';
 import * as React from 'react';
-import { blobFormatHelperText, blobUriHelperText, defaultBlobValue } from './constants';
+import { blobFormatHelperText, blobUriHelperText } from './constants';
 import { InputProps } from './types';
 import { getLaunchInputId, isBlobValue } from './utils';
 
