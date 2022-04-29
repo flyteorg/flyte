@@ -88,7 +88,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
 
 .. prompt:: bash $
 
-  pyflyte run example.py wf --n 500 --mean 42 --sigma 2
+  pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
 
 .. dropdown:: :fa:`info-circle` Why use ``pyflyte run`` rather than ``python example.py``?
     :title: text-muted
