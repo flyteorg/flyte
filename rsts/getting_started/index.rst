@@ -180,7 +180,7 @@ Then run the same Workflow on the Flyte cluster:
 
 .. prompt:: bash $
 
-  pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2
+  pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
 
 .. div:: shadow p-3 mb-8 rounded
 
